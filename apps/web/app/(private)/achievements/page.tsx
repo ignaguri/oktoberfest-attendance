@@ -1,36 +1,72 @@
 "use client";
 
+import { SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
-import type { AchievementCategory, AchievementWithProgress } from "@prostcounter/shared/schemas";
+import type { SeriesCard as SeriesCardData, SeriesCategory } from "@prostcounter/shared/schemas";
 import { useState } from "react";
 
-import { AchievementGrid } from "@/components/achievements/AchievementGrid";
-import { SingleSelect } from "@/components/Select/SingleSelect";
-import { Badge } from "@/components/ui/badge";
+import { CategoryChips, type CategoryFilter } from "@/components/achievements/CategoryChips";
+import { SeriesCard } from "@/components/achievements/SeriesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { useTranslation } from "@/lib/i18n/client";
+
+function CardGrid({ cards }: { cards: SeriesCardData[] }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {cards.map((card) => (
+        <SeriesCard key={card.id} card={card} />
+      ))}
+    </div>
+  );
+}
+
+function CategorySection({
+  category,
+  cards,
+}: {
+  category: SeriesCategory;
+  cards: SeriesCardData[];
+}) {
+  const { t } = useTranslation();
+  const { completed, inProgress } = splitCardsByCompletion(cards);
+
+  if (cards.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="space-y-4">
+      <h2 className="text-xl font-semibold">{t(`achievements.categories.${category}`)}</h2>
+
+      {completed.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-medium text-green-700">{t("achievements.completed")}</h3>
+          <CardGrid cards={completed} />
+        </div>
+      )}
+
+      {inProgress.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-medium text-gray-700">{t("achievements.inProgress")}</h3>
+          <CardGrid cards={inProgress} />
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default function AchievementsPage() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const { data, loading: isLoading } = useAchievementsWithProgress(currentFestival?.id);
-  const [activeTab, setActiveTab] = useState<"all" | AchievementCategory>("all");
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
 
-  const achievements = data?.data || [];
+  const cards = data?.cards || [];
   const stats = data?.stats;
 
-  const filteredAchievements =
-    activeTab === "all"
-      ? achievements
-      : achievements.filter((a: AchievementWithProgress) => a.category === activeTab);
-
-  const unlockedAchievements = filteredAchievements.filter(
-    (a: AchievementWithProgress) => a.is_unlocked,
-  );
-  const lockedAchievements = filteredAchievements.filter(
-    (a: AchievementWithProgress) => !a.is_unlocked,
-  );
+  const visibleCategories =
+    activeCategory === "all" ? SERIES_CATEGORY_ORDER : [activeCategory as SeriesCategory];
 
   if (!currentFestival) {
     return (
@@ -107,15 +143,12 @@ export default function AchievementsPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 {Object.entries(stats.breakdown_by_rarity).map(([rarity, rarityData]) => {
-                  const data = rarityData as {
-                    unlocked: number;
-                    total: number;
-                  };
+                  const breakdown = rarityData as { unlocked: number; total: number };
                   return (
                     <div key={rarity} className="flex items-center justify-between text-sm">
                       <span className="capitalize">{t(`achievements.rarity.${rarity}`)}:</span>
                       <span className="font-medium">
-                        {data.unlocked}/{data.total}
+                        {breakdown.unlocked}/{breakdown.total}
                       </span>
                     </div>
                   );
@@ -133,17 +166,17 @@ export default function AchievementsPage() {
             <CardContent className="pt-0">
               <div className="space-y-1">
                 {Object.entries(stats.breakdown_by_category)
-                  .filter(([_, catData]) => (catData as { total: number }).total > 0)
+                  .filter(([_, categoryData]) => (categoryData as { total: number }).total > 0)
                   .slice(0, 3)
-                  .map(([category, catData]) => {
-                    const data = catData as { unlocked: number; total: number };
+                  .map(([category, categoryData]) => {
+                    const breakdown = categoryData as { unlocked: number; total: number };
                     return (
                       <div key={category} className="flex items-center justify-between text-sm">
                         <span className="capitalize">
                           {t(`achievements.categories.${category}`)}:
                         </span>
                         <span className="font-medium">
-                          {data.unlocked}/{data.total}
+                          {breakdown.unlocked}/{breakdown.total}
                         </span>
                       </div>
                     );
@@ -154,88 +187,27 @@ export default function AchievementsPage() {
         </div>
       )}
 
-      <div className="space-y-6">
-        <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-          <SingleSelect
-            value={activeTab}
-            buttonClassName="w-full sm:w-[200px]"
-            options={[
-              {
-                title: t("achievements.filter.categoriesTitle"),
-                options: [
-                  { value: "all", label: t("achievements.filter.all") },
-                  {
-                    value: "drinking",
-                    label: t("achievements.filter.drinking"),
-                  },
-                  {
-                    value: "attendance",
-                    label: t("achievements.filter.attendance"),
-                  },
-                  {
-                    value: "explorer",
-                    label: t("achievements.filter.explorer"),
-                  },
-                  { value: "social", label: t("achievements.filter.social") },
-                  {
-                    value: "competitive",
-                    label: t("achievements.filter.competitive"),
-                  },
-                  {
-                    value: "dedication",
-                    label: t("achievements.filter.dedication"),
-                  },
-                ],
-              },
-            ]}
-            placeholder={t("achievements.filter.selectCategory")}
-            onSelect={(option) => setActiveTab(option.value as typeof activeTab)}
-          />
+      <CategoryChips value={activeCategory} onChange={setActiveCategory} />
+
+      {cards.length === 0 ? (
+        <div className="py-12 text-center">
+          <div className="mb-4 text-4xl">🎯</div>
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">
+            {t("achievements.empty.title")}
+          </h3>
+          <p className="text-gray-600">{t("achievements.empty.description")}</p>
         </div>
-
-        <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <h2 className="text-xl font-semibold">
-              {activeTab === "all"
-                ? t("achievements.filter.all")
-                : t(`achievements.filter.${activeTab}`)}
-            </h2>
-
-            <div className="flex items-center gap-2">
-              <Badge variant="default" className="border-green-200 bg-green-100 text-green-800">
-                {unlockedAchievements.length} {t("achievements.unlocked")}
-              </Badge>
-              <Badge variant="outline">
-                {lockedAchievements.length} {t("achievements.locked")}
-              </Badge>
-            </div>
-          </div>
-
-          {unlockedAchievements.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-green-700">{t("achievements.completed")}</h3>
-              <AchievementGrid achievements={unlockedAchievements} showProgress={true} />
-            </div>
-          )}
-
-          {lockedAchievements.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-700">{t("achievements.inProgress")}</h3>
-              <AchievementGrid achievements={lockedAchievements} showProgress={true} />
-            </div>
-          )}
-
-          {filteredAchievements.length === 0 && (
-            <div className="py-12 text-center">
-              <div className="mb-4 text-4xl">🎯</div>
-              <h3 className="mb-2 text-lg font-semibold text-gray-900">
-                {t("achievements.empty.title")}
-              </h3>
-              <p className="text-gray-600">{t("achievements.empty.description")}</p>
-            </div>
-          )}
+      ) : (
+        <div className="space-y-8">
+          {visibleCategories.map((category) => (
+            <CategorySection
+              key={category}
+              category={category}
+              cards={cards.filter((card: SeriesCardData) => card.category === category)}
+            />
+          ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,8 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import type {
   AchievementLeaderboardEntry,
-  AchievementStats,
-  AchievementWithProgress,
   AvailableAchievement,
 } from "@prostcounter/shared";
 import {
@@ -14,33 +12,15 @@ import {
   ListAchievementsResponseSchema,
   ListAvailableAchievementsResponseSchema,
 } from "@prostcounter/shared";
-import { SERIES } from "@prostcounter/shared/achievements";
 
 import type { AuthContext } from "../middleware/auth";
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
 import { SupabaseAchievementRepository } from "../repositories/supabase";
-import { AchievementService } from "../services/achievement.service";
-
-/**
- * Temporary bridge: the current UI still renders by rarity. Plan 2 drops the
- * rarity column and Plan 3 replaces the UI with tier frames. Until then, map
- * tier onto the rarity vocabulary the existing components expect.
- *
- * Takes `number | null` rather than a 1..4 union because `row.tier` comes from
- * the database as a nullable number and cannot be narrowed at the type level.
- */
-function tierToRarity(tier: number | null): "common" | "rare" | "epic" | "legendary" {
-  switch (tier) {
-    case 2:
-      return "rare";
-    case 3:
-      return "epic";
-    case 4:
-      return "legendary";
-    default:
-      return "common";
-  }
-}
+import {
+  buildRecentUnlocks,
+  buildSeriesCards,
+  buildStats,
+} from "../services/achievement-cards";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -212,139 +192,22 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
   const query = c.req.valid("query");
 
   const metricsRepo = new AchievementMetricsRepository(supabase);
-  const achievementService = new AchievementService(metricsRepo);
 
-  const [{ progress }, heldSlugs, unlockDates, registry] = await Promise.all([
-    achievementService.getProgress(user.id, query.festivalId),
-    metricsRepo.getHeldSlugs(user.id, query.festivalId),
-    metricsRepo.getHeldSlugsWithUnlockDates(user.id, query.festivalId),
-    supabase
-      .from("achievements")
-      .select("id, slug, series_id, tier, scope, category, points, icon, name, description")
-      .not("slug", "is", null)
-      .order("category")
-      .order("points"),
-  ]);
+  // The definition tables already describe every card; the only thing the
+  // database has to answer is which slugs this user holds and when they
+  // landed. Deriving currentTier from those rows rather than from live
+  // metrics keeps it from contradicting the per-rung unlocked flags.
+  const unlockDates = await metricsRepo.getHeldSlugsWithUnlockDates(user.id, query.festivalId);
+  const cards = buildSeriesCards(unlockDates);
 
-  if (registry.error) {
-    throw new Error(`Failed to fetch achievement registry: ${registry.error.message}`);
-  }
-
-  const progressBySeries = new Map(progress.map((entry) => [entry.seriesId, entry]));
-  const seriesById = new Map(SERIES.map((series) => [series.id, series]));
-
-  // `progress` from evaluate() has ONE entry per series: the series' overall
-  // standing toward whichever locked tier comes next. But `registry.data`
-  // has one ROW PER TIER (80 of the 90 rows: 20 series x 4 tiers), and
-  // AchievementWithProgressSchema gives every row its own user_progress. If
-  // every tier row of a series just reused the single series-level entry,
-  // every locked tier beyond the immediately-next one would display the
-  // WRONG target and percentage (borrowed from whatever tier happens to be
-  // "next", not its own threshold) — e.g. a tier-3 row with target 25 would
-  // show target 10 (tier 2's number) while the user is still working on
-  // tier 2. So each row computes its own target from that tier's definition,
-  // and its own percentage using the same floor/span formula evaluate() uses
-  // for the "next" tier, just anchored to THIS row's tier instead.
-  const achievements: AchievementWithProgress[] = (registry.data ?? []).map((row) => {
-    const isUnlocked = row.slug ? heldSlugs.has(row.slug) : false;
-    const seriesProgress = row.series_id ? progressBySeries.get(row.series_id) : undefined;
-
-    let currentValue = isUnlocked ? 1 : 0;
-    let targetValue = 1;
-    let percentage = isUnlocked ? 100 : 0;
-
-    if (row.series_id && row.tier && seriesProgress) {
-      const series = seriesById.get(row.series_id);
-      const ownTierDef = series?.tiers.find((t) => t.tier === row.tier);
-      const priorTierDef = series?.tiers.find((t) => t.tier === row.tier - 1);
-      const floor = priorTierDef?.target ?? 0;
-      const target = ownTierDef?.target ?? seriesProgress.nextTarget ?? 1;
-
-      currentValue = seriesProgress.currentValue;
-      targetValue = target;
-
-      if (isUnlocked) {
-        percentage = 100;
-      } else {
-        // Same formula as evaluate()'s progress calc, anchored to this row's
-        // own tier rather than only ever the next one.
-        const span = target - floor;
-        const gained = currentValue - floor;
-        percentage =
-          span <= 0 ? 100 : Math.max(0, Math.min(100, Math.round((gained / span) * 100)));
-      }
-    }
-
-    return {
-      id: row.id,
-      name: row.name,
-      description: row.description,
-      category: row.category,
-      icon: row.icon,
-      points: row.points,
-      rarity: tierToRarity(row.tier),
-      tier: row.tier ?? 1,
-      conditions: {},
-      is_active: true,
-      created_at: "",
-      updated_at: "",
-      is_unlocked: isUnlocked,
-      unlocked_at: isUnlocked && row.slug ? (unlockDates.get(row.slug) ?? null) : null,
-      user_progress: {
-        current_value: currentValue,
-        target_value: targetValue,
-        percentage,
-        last_updated: new Date().toISOString(),
-      },
-    } as AchievementWithProgress;
-  });
-
-  const stats: AchievementStats = {
-    total_achievements: achievements.length,
-    unlocked_achievements: achievements.filter((a) => a.is_unlocked).length,
-    total_points: achievements.filter((a) => a.is_unlocked).reduce((sum, a) => sum + a.points, 0),
-    breakdown_by_category: {
-      consumption: { total: 0, unlocked: 0, points: 0 },
-      attendance: { total: 0, unlocked: 0, points: 0 },
-      explorer: { total: 0, unlocked: 0, points: 0 },
-      social: { total: 0, unlocked: 0, points: 0 },
-      competitive: { total: 0, unlocked: 0, points: 0 },
-      special: { total: 0, unlocked: 0, points: 0 },
-      drinking: { total: 0, unlocked: 0, points: 0 },
-      dedication: { total: 0, unlocked: 0, points: 0 },
-    } as AchievementStats["breakdown_by_category"],
-    breakdown_by_rarity: {
-      common: { total: 0, unlocked: 0, points: 0 },
-      rare: { total: 0, unlocked: 0, points: 0 },
-      epic: { total: 0, unlocked: 0, points: 0 },
-      legendary: { total: 0, unlocked: 0, points: 0 },
+  return c.json(
+    {
+      cards,
+      recentUnlocks: buildRecentUnlocks(cards),
+      stats: buildStats(cards),
     },
-  };
-
-  achievements.forEach((achievement) => {
-    const categoryBucket = stats.breakdown_by_category[achievement.category];
-    const rarityBucket = stats.breakdown_by_rarity[achievement.rarity];
-
-    if (categoryBucket) {
-      categoryBucket.total++;
-    }
-    if (rarityBucket) {
-      rarityBucket.total++;
-    }
-
-    if (achievement.is_unlocked) {
-      if (categoryBucket) {
-        categoryBucket.unlocked++;
-        categoryBucket.points += achievement.points;
-      }
-      if (rarityBucket) {
-        rarityBucket.unlocked++;
-        rarityBucket.points += achievement.points;
-      }
-    }
-  });
-
-  return c.json({ data: achievements, stats }, 200);
+    200,
+  );
 });
 
 // GET /achievements/leaderboard - Get achievement leaderboard

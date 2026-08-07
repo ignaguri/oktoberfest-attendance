@@ -14,7 +14,7 @@ import { runUploadFileOp } from "../photo-queue";
 import { type ProcessorResult, QueueProcessor } from "../queue-processor";
 import { MUTABLE_TABLES } from "../schema";
 import { cleanupOrphanConsumptions, getQueueStats, getSyncMetadata } from "../sync-queue";
-import { pullGroupMembers, pullGroups, pullUserAchievements } from "./pull-groups";
+import { pullGroupMembers, pullGroups } from "./pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "./pull-reference";
 import { pullAttendances, pullConsumptions, pullProfile } from "./pull-user-data";
 import { pushDelete, pushInsert, pushUpdate } from "./push-handlers";
@@ -139,7 +139,6 @@ export class SyncManager {
         results.push(await pullConsumptions(this.db, festivalId));
         results.push(await pullGroups(this.db, festivalId));
         results.push(await pullGroupMembers(this.db, festivalId));
-        results.push(await pullUserAchievements(this.db, festivalId));
 
         // Heal: drop local consumption rows that will never sync (orphan ghosts
         // from the pre-idempotency-key duplicate-row bug). Only after a

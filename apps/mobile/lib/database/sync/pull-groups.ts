@@ -10,7 +10,7 @@ import type * as SQLite from "expo-sqlite";
 import { logger } from "@/lib/logger";
 
 import { apiClient } from "../../api-client";
-import type { LocalGroup, LocalGroupMember, LocalUserAchievement } from "../schema";
+import type { LocalGroup, LocalGroupMember } from "../schema";
 import { generateUUID, updateLastSyncAt } from "../sync-queue";
 import type { PullResult } from "./types";
 
@@ -162,66 +162,6 @@ export async function pullGroupMembers(
     await updateLastSyncAt(db, "group_members", now);
   } catch (error) {
     logger.error("[SyncManager] Pull group members failed:", error);
-  }
-
-  return result;
-}
-
-/**
- * Pull user achievements from server
- */
-export async function pullUserAchievements(
-  db: SQLite.SQLiteDatabase,
-  festivalId: string,
-): Promise<PullResult> {
-  const result: PullResult = {
-    table: "user_achievements",
-    inserted: 0,
-    updated: 0,
-    deleted: 0,
-  };
-
-  try {
-    const response = await apiClient.achievements.getWithProgress(festivalId);
-    const achievements = response.data;
-    const now = new Date().toISOString();
-
-    for (const ach of achievements) {
-      // Check if user has unlocked this achievement (100% progress)
-      const userProgress = ach.user_progress;
-      if (!userProgress || userProgress.percentage < 100) continue;
-
-      const existing = await db.getFirstAsync<LocalUserAchievement>(
-        "SELECT * FROM user_achievements WHERE achievement_id = ? AND festival_id = ?",
-        [ach.id, festivalId],
-      );
-
-      if (!existing) {
-        await db.runAsync(
-          `INSERT INTO user_achievements (
-            id, user_id, achievement_id, festival_id, unlocked_at, progress,
-            _synced_at, _dirty, _deleted
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)`,
-          [
-            generateUUID(),
-            "", // Will be set by trigger/context
-            ach.id,
-            festivalId,
-            userProgress.last_updated ?? now,
-            JSON.stringify({
-              current_value: userProgress.current_value,
-              target_value: userProgress.target_value,
-            }),
-            now,
-          ],
-        );
-        result.inserted++;
-      }
-    }
-
-    await updateLastSyncAt(db, "user_achievements", now);
-  } catch (error) {
-    logger.error("[SyncManager] Pull user achievements failed:", error);
   }
 
   return result;

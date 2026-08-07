@@ -24,6 +24,31 @@ export const AchievementRaritySchema = z.enum(["common", "rare", "epic", "legend
 export type AchievementRarity = z.infer<typeof AchievementRaritySchema>;
 
 /**
+ * The six live achievement categories, matching the `AchievementCategory` TS
+ * type in packages/shared/src/achievements/types.ts.
+ *
+ * Deliberately separate from `AchievementCategorySchema` above, which is the
+ * wider legacy database enum: it also carries `consumption` and `special`,
+ * two buckets nothing can be filed under any more but old rows still use.
+ * Anything describing the current engine uses this narrower schema.
+ */
+export const SeriesCategorySchema = z.enum([
+  "drinking",
+  "attendance",
+  "explorer",
+  "social",
+  "competitive",
+  "dedication",
+]);
+
+export type SeriesCategory = z.infer<typeof SeriesCategorySchema>;
+
+/** Festival-scoped achievements re-earn each festival; lifetime ones unlock once. */
+export const SeriesScopeSchema = z.enum(["festival", "lifetime"]);
+
+export type SeriesScope = z.infer<typeof SeriesScopeSchema>;
+
+/**
  * Achievement schema
  */
 export const AchievementSchema = z.object({
@@ -98,39 +123,67 @@ export const EvaluateAchievementsResponseSchema = z.object({
 export type EvaluateAchievementsResponse = z.infer<typeof EvaluateAchievementsResponseSchema>;
 
 /**
- * Achievement progress (for locked achievements)
+ * One rung of a card. For a tiered series this is one of four; for a one-off
+ * it is the only entry, and its `tier` is the one-off's difficulty rather
+ * than a position in a ladder.
  */
-export const AchievementProgressSchema = z.object({
-  current_value: z.number(),
-  target_value: z.number(),
-  percentage: z.number(),
-  last_updated: z.string(),
+export const SeriesTierSchema = z.object({
+  tier: z.number().int().min(1).max(4),
+  /** i18n key, e.g. "achievements.drinks_total.t2.name". */
+  name: z.string(),
+  points: z.number().int(),
+  isUnlocked: z.boolean(),
+  unlockedAt: z.iso.datetime().nullable(),
 });
 
-export type AchievementProgress = z.infer<typeof AchievementProgressSchema>;
+export type SeriesTier = z.infer<typeof SeriesTierSchema>;
 
 /**
- * Achievement with progress (includes both locked and unlocked)
+ * One card on the achievements screen. Covers both tiered series and one-offs:
+ * a one-off is the same shape with `tiers.length === 1`, which is also the only
+ * discriminant callers need.
+ *
+ * `tiers` is enforced non-empty and `currentTier` is enforced not to exceed
+ * `tiers.length` so `getActiveTier()` can safely index `tiers[currentTier - 1]`
+ * without an out-of-bounds read.
  */
-export const AchievementWithProgressSchema = z.object({
-  id: z.string().uuid(),
+export const SeriesCardSchema = z
+  .object({
+    /** The series id for a series, the one-off's own id otherwise. */
+    id: z.string(),
+    category: SeriesCategorySchema,
+    scope: SeriesScopeSchema,
+    glyph: z.string(),
+    /**
+     * Rungs cleared, 0 when nothing is unlocked yet. NOT the badge tier: for a
+     * one-off this is 0 or 1 while its difficulty lives in `tiers[0].tier`.
+     * Anything user-visible reads getActiveTier(card).tier instead.
+     */
+    currentTier: z.number().int().min(0).max(4),
+    tiers: z.array(SeriesTierSchema).min(1),
+  })
+  .refine((card) => card.currentTier <= card.tiers.length, {
+    message: "currentTier cannot exceed the number of tiers",
+    path: ["currentTier"],
+  });
+
+export type SeriesCard = z.infer<typeof SeriesCardSchema>;
+
+/** A single unlocked rung, newest-first, for the home screen highlight. */
+export const RecentUnlockSchema = z.object({
+  /** The unlock's slug: "drinks_total.t2" for a series, "first_drink" for a one-off. */
+  id: z.string(),
+  /** i18n key of the specific tier that unlocked. */
   name: z.string(),
-  description: z.string(),
-  category: AchievementCategorySchema,
-  icon: z.string(),
-  points: z.number().int(),
-  rarity: AchievementRaritySchema,
+  glyph: z.string(),
+  category: SeriesCategorySchema,
   tier: z.number().int().min(1).max(4),
-  conditions: z.record(z.string(), z.unknown()).default({}),
-  is_active: z.boolean(),
-  created_at: z.string(),
-  updated_at: z.string(),
-  is_unlocked: z.boolean(),
-  unlocked_at: z.string().nullable().optional(),
-  user_progress: AchievementProgressSchema.optional(),
+  scope: SeriesScopeSchema,
+  points: z.number().int(),
+  unlockedAt: z.iso.datetime(),
 });
 
-export type AchievementWithProgress = z.infer<typeof AchievementWithProgressSchema>;
+export type RecentUnlock = z.infer<typeof RecentUnlockSchema>;
 
 /**
  * Category/rarity breakdown stats
@@ -141,6 +194,8 @@ export const BreakdownStatsSchema = z.object({
   points: z.number().int(),
 });
 
+export type BreakdownStats = z.infer<typeof BreakdownStatsSchema>;
+
 /**
  * Achievement stats
  */
@@ -148,7 +203,7 @@ export const AchievementStatsSchema = z.object({
   total_achievements: z.number().int(),
   unlocked_achievements: z.number().int(),
   total_points: z.number().int(),
-  breakdown_by_category: z.record(AchievementCategorySchema, BreakdownStatsSchema),
+  breakdown_by_category: z.record(SeriesCategorySchema, BreakdownStatsSchema),
   breakdown_by_rarity: z.record(AchievementRaritySchema, BreakdownStatsSchema),
 });
 
@@ -170,9 +225,15 @@ export type AchievementLeaderboardEntry = z.infer<typeof AchievementLeaderboardE
 
 /**
  * GET /achievements/with-progress response
+ *
+ * `cards` holds one entry per definition — 20 tiered series then 10 one-offs,
+ * in definition order. Consumers rely on that order as the tie-break when
+ * sorting cards of equal tier, so the route must not reorder it.
  */
 export const GetAchievementsWithProgressResponseSchema = z.object({
-  data: z.array(AchievementWithProgressSchema),
+  cards: z.array(SeriesCardSchema),
+  /** Newest unlocks first, capped at 10. */
+  recentUnlocks: z.array(RecentUnlockSchema),
   stats: AchievementStatsSchema,
 });
 
@@ -226,15 +287,8 @@ export const UnlockedAchievementSchema = z.object({
   slug: z.string(),
   seriesId: z.string().nullable(),
   tier: z.number().int().min(1).max(4),
-  category: z.enum([
-    "drinking",
-    "attendance",
-    "explorer",
-    "social",
-    "competitive",
-    "dedication",
-  ]),
-  scope: z.enum(["festival", "lifetime"]),
+  category: SeriesCategorySchema,
+  scope: SeriesScopeSchema,
   glyph: z.string(),
   points: z.number().int(),
 });

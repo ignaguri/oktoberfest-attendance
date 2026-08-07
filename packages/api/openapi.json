@@ -6726,108 +6726,137 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "data": {
+                    "cards": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "properties": {
                           "id": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "description": {
                             "type": "string"
                           },
                           "category": {
                             "type": "string",
                             "enum": [
-                              "consumption",
+                              "drinking",
                               "attendance",
                               "explorer",
                               "social",
                               "competitive",
-                              "special",
-                              "drinking",
                               "dedication"
                             ]
                           },
-                          "icon": {
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "festival",
+                              "lifetime"
+                            ]
+                          },
+                          "glyph": {
                             "type": "string"
+                          },
+                          "currentTier": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 4
+                          },
+                          "tiers": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "tier": {
+                                  "type": "integer",
+                                  "minimum": 1,
+                                  "maximum": 4
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "points": {
+                                  "type": "integer"
+                                },
+                                "isUnlocked": {
+                                  "type": "boolean"
+                                },
+                                "unlockedAt": {
+                                  "type": "string",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "tier",
+                                "name",
+                                "points",
+                                "isUnlocked",
+                                "unlockedAt"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "category",
+                          "scope",
+                          "glyph",
+                          "currentTier",
+                          "tiers"
+                        ]
+                      }
+                    },
+                    "recentUnlocks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "glyph": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "drinking",
+                              "attendance",
+                              "explorer",
+                              "social",
+                              "competitive",
+                              "dedication"
+                            ]
+                          },
+                          "tier": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "festival",
+                              "lifetime"
+                            ]
                           },
                           "points": {
                             "type": "integer"
                           },
-                          "rarity": {
-                            "type": "string",
-                            "enum": [
-                              "common",
-                              "rare",
-                              "epic",
-                              "legendary"
-                            ]
-                          },
-                          "conditions": {
-                            "type": "object",
-                            "additionalProperties": {
-                              "nullable": true
-                            },
-                            "default": {}
-                          },
-                          "is_active": {
-                            "type": "boolean"
-                          },
-                          "created_at": {
+                          "unlockedAt": {
                             "type": "string"
-                          },
-                          "updated_at": {
-                            "type": "string"
-                          },
-                          "is_unlocked": {
-                            "type": "boolean"
-                          },
-                          "unlocked_at": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "user_progress": {
-                            "type": "object",
-                            "properties": {
-                              "current_value": {
-                                "type": "number"
-                              },
-                              "target_value": {
-                                "type": "number"
-                              },
-                              "percentage": {
-                                "type": "number"
-                              },
-                              "last_updated": {
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "current_value",
-                              "target_value",
-                              "percentage",
-                              "last_updated"
-                            ]
                           }
                         },
                         "required": [
                           "id",
                           "name",
-                          "description",
+                          "glyph",
                           "category",
-                          "icon",
+                          "tier",
+                          "scope",
                           "points",
-                          "rarity",
-                          "is_active",
-                          "created_at",
-                          "updated_at",
-                          "is_unlocked"
+                          "unlockedAt"
                         ]
                       }
                     },
@@ -6846,7 +6875,7 @@
                         "breakdown_by_category": {
                           "type": "object",
                           "properties": {
-                            "consumption": {
+                            "drinking": {
                               "type": "object",
                               "properties": {
                                 "total": {
@@ -6923,44 +6952,6 @@
                               ]
                             },
                             "competitive": {
-                              "type": "object",
-                              "properties": {
-                                "total": {
-                                  "type": "integer"
-                                },
-                                "unlocked": {
-                                  "type": "integer"
-                                },
-                                "points": {
-                                  "type": "integer"
-                                }
-                              },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
-                            },
-                            "special": {
-                              "type": "object",
-                              "properties": {
-                                "total": {
-                                  "type": "integer"
-                                },
-                                "unlocked": {
-                                  "type": "integer"
-                                },
-                                "points": {
-                                  "type": "integer"
-                                }
-                              },
-                              "required": [
-                                "total",
-                                "unlocked",
-                                "points"
-                              ]
-                            },
-                            "drinking": {
                               "type": "object",
                               "properties": {
                                 "total": {
@@ -7092,7 +7083,8 @@
                     }
                   },
                   "required": [
-                    "data",
+                    "cards",
+                    "recentUnlocks",
                     "stats"
                   ]
                 }

@@ -28,7 +28,6 @@ import {
   queryGroupsByFestival,
   queryProfileById,
   queryTents,
-  queryUserAchievementsByFestival,
 } from "./queries";
 import { localKeys } from "./query-keys";
 import type {
@@ -39,7 +38,6 @@ import type {
   LocalGroup,
   LocalProfile,
   LocalTent,
-  LocalUserAchievement,
   SyncableTable,
 } from "./schema";
 import {
@@ -664,24 +662,6 @@ export function useLocalAchievements() {
       return await queryAchievements(drizzleDb);
     },
     enabled: isReady,
-    staleTime: Infinity,
-  });
-}
-
-/**
- * Hook to get user's unlocked achievements.
- */
-export function useLocalUserAchievements(festivalId: string | undefined) {
-  const { isReady, getDb } = useOfflineWithContext();
-
-  return useQuery<LocalUserAchievement[], Error>({
-    queryKey: localKeys.userAchievements.all(festivalId),
-    queryFn: async () => {
-      if (!isReady || !festivalId) return [];
-      const drizzleDb = createDrizzleDb(getDb());
-      return await queryUserAchievementsByFestival(drizzleDb, festivalId);
-    },
-    enabled: isReady && !!festivalId,
     staleTime: Infinity,
   });
 }

@@ -15,41 +15,6 @@ export interface AchievementConditions {
   comparison_operator?: "gte" | "eq" | "lte";
 }
 
-export interface AchievementProgress {
-  current_value: number;
-  target_value: number;
-  percentage: number;
-  last_updated: string;
-}
-
-export interface AchievementWithProgress extends Achievement {
-  user_progress?: AchievementProgress;
-  is_unlocked: boolean;
-  unlocked_at?: string | null;
-}
-
-export interface AchievementStats {
-  total_achievements: number;
-  unlocked_achievements: number;
-  total_points: number;
-  breakdown_by_category: Record<
-    AchievementCategory,
-    {
-      total: number;
-      unlocked: number;
-      points: number;
-    }
-  >;
-  breakdown_by_rarity: Record<
-    AchievementRarity,
-    {
-      total: number;
-      unlocked: number;
-      points: number;
-    }
-  >;
-}
-
 export interface AchievementNotification {
   achievement: Achievement;
   unlocked_at: string;

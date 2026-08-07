@@ -9,7 +9,7 @@
 import { and, desc, eq, getTableName, sql } from "drizzle-orm";
 
 import type { DrizzleDb } from "./db";
-import { achievements, userAchievements } from "./schema/achievements";
+import { achievements } from "./schema/achievements";
 import { attendances } from "./schema/attendances";
 import { consumptions } from "./schema/consumptions";
 import { festivals } from "./schema/festivals";
@@ -336,36 +336,6 @@ export async function queryAchievements(db: DrizzleDb) {
     .from(achievements)
     .where(and(eq(achievements._deleted, 0), eq(achievements.is_active, 1)))
     .orderBy(desc(achievements.points));
-}
-
-/**
- * Query user achievements for a festival by user and festival.
- */
-export async function queryUserAchievements(db: DrizzleDb, userId: string, festivalId: string) {
-  return await db
-    .select()
-    .from(userAchievements)
-    .where(
-      and(
-        eq(userAchievements.user_id, userId),
-        eq(userAchievements.festival_id, festivalId),
-        eq(userAchievements._deleted, 0),
-      ),
-    )
-    .orderBy(sql`${userAchievements.unlocked_at} DESC`);
-}
-
-/**
- * Query user achievements for a festival (no user filter).
- * Since the local SQLite only stores the current user's data,
- * filtering by user_id is unnecessary for local queries.
- */
-export async function queryUserAchievementsByFestival(db: DrizzleDb, festivalId: string) {
-  return await db
-    .select()
-    .from(userAchievements)
-    .where(and(eq(userAchievements.festival_id, festivalId), eq(userAchievements._deleted, 0)))
-    .orderBy(sql`${userAchievements.unlocked_at} DESC`);
 }
 
 // =============================================================================
