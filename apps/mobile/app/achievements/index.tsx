@@ -1,13 +1,15 @@
+import { SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AchievementWithProgress } from "@prostcounter/shared/schemas";
+import type { SeriesCard as SeriesCardData, SeriesCategory } from "@prostcounter/shared/schemas";
 import { Award } from "lucide-react-native";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 
-import { AchievementCard } from "@/components/achievements/achievement-card";
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
+import { CategoryChips, type CategoryFilter } from "@/components/achievements/category-chips";
+import { SeriesCard } from "@/components/achievements/series-card";
 import { AchievementsSkeleton } from "@/components/skeletons";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -17,21 +19,65 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
 
+function CategorySection({
+  category,
+  cards,
+}: {
+  category: SeriesCategory;
+  cards: SeriesCardData[];
+}) {
+  const { t } = useTranslation();
+  const { completed, inProgress } = splitCardsByCompletion(cards);
+
+  if (cards.length === 0) {
+    return null;
+  }
+
+  return (
+    <VStack space="sm">
+      <Heading size="md" className="text-typography-900">
+        {t(`achievements.categories.${category}`)}
+      </Heading>
+
+      {completed.length > 0 && (
+        <VStack space="xs">
+          <Text className="text-sm font-medium text-green-700">
+            {t("achievements.completed")} ({completed.length})
+          </Text>
+          <VStack space="sm">
+            {completed.map((card) => (
+              <SeriesCard key={card.id} card={card} />
+            ))}
+          </VStack>
+        </VStack>
+      )}
+
+      {inProgress.length > 0 && (
+        <VStack space="xs">
+          <Text className="text-sm font-medium text-typography-700">
+            {t("achievements.inProgress")} ({inProgress.length})
+          </Text>
+          <VStack space="sm">
+            {inProgress.map((card) => (
+              <SeriesCard key={card.id} card={card} />
+            ))}
+          </VStack>
+        </VStack>
+      )}
+    </VStack>
+  );
+}
+
 /**
- * Achievements screen showing user's achievement progress
- *
- * Features:
- * - Stats summary (unlocked/total, percentage, points)
- * - Completed achievements section
- * - In Progress achievements section
- * - Pull-to-refresh
+ * Achievements screen: stats summary, category chips, then one section per
+ * category split into completed and in-progress cards.
  */
 export default function AchievementsScreen() {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const { isOnline } = useOfflineSafe();
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
 
-  // Fetch achievements with progress
   const {
     data: achievementsResponse,
     loading,
@@ -40,25 +86,20 @@ export default function AchievementsScreen() {
     isRefetching = false,
   } = useAchievementsWithProgress(currentFestival?.id);
 
-  // Parse achievements and stats from response
-  const achievements = useMemo(() => {
-    return (achievementsResponse?.data || []) as AchievementWithProgress[];
+  const cards = useMemo(() => {
+    return achievementsResponse?.cards || [];
   }, [achievementsResponse]);
 
   const stats = useMemo(() => {
     return achievementsResponse?.stats || null;
   }, [achievementsResponse]);
 
-  // Split into unlocked and locked
-  const unlockedAchievements = useMemo(() => {
-    return achievements.filter((a) => a.is_unlocked);
-  }, [achievements]);
+  const visibleCategories = useMemo(() => {
+    return activeCategory === "all"
+      ? SERIES_CATEGORY_ORDER
+      : [activeCategory as SeriesCategory];
+  }, [activeCategory]);
 
-  const lockedAchievements = useMemo(() => {
-    return achievements.filter((a) => !a.is_unlocked);
-  }, [achievements]);
-
-  // Handle refresh
   const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
@@ -69,7 +110,7 @@ export default function AchievementsScreen() {
   }
 
   // Loading state (initial or festival loading)
-  if (festivalLoading || (loading && achievements.length === 0)) {
+  if (festivalLoading || (loading && cards.length === 0)) {
     return (
       <ScrollView className="flex-1 bg-background-50">
         <AchievementsSkeleton />
@@ -94,7 +135,7 @@ export default function AchievementsScreen() {
   }
 
   // Error state
-  if (error && achievements.length === 0) {
+  if (error && cards.length === 0) {
     return (
       <ScrollView
         className="flex-1 bg-background-50"
@@ -133,43 +174,23 @@ export default function AchievementsScreen() {
       }
     >
       <VStack space="lg" className="p-4 pb-8">
-        {/* Stats Summary */}
         {stats && <AchievementStatsSummary stats={stats} />}
 
-        {/* Completed Section */}
-        {unlockedAchievements.length > 0 && (
-          <VStack space="sm">
-            <Heading size="md" className="text-green-700">
-              {t("achievements.completed")} ({unlockedAchievements.length})
-            </Heading>
-            <VStack space="sm">
-              {unlockedAchievements.map((achievement) => (
-                <AchievementCard key={achievement.id} achievement={achievement} />
-              ))}
-            </VStack>
-          </VStack>
-        )}
+        <CategoryChips value={activeCategory} onChange={setActiveCategory} />
 
-        {/* In Progress Section */}
-        {lockedAchievements.length > 0 && (
-          <VStack space="sm">
-            <Heading size="md" className="text-typography-700">
-              {t("achievements.inProgress")} ({lockedAchievements.length})
-            </Heading>
-            <VStack space="sm">
-              {lockedAchievements.map((achievement) => (
-                <AchievementCard key={achievement.id} achievement={achievement} showProgress />
-              ))}
-            </VStack>
-          </VStack>
-        )}
-
-        {/* Empty State */}
-        {achievements.length === 0 && (
+        {cards.length === 0 ? (
           <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Award size={48} color={IconColors.muted} />
             <Text className="mt-2 text-center text-typography-500">{t("achievements.empty")}</Text>
           </Card>
+        ) : (
+          visibleCategories.map((category) => (
+            <CategorySection
+              key={category}
+              category={category}
+              cards={cards.filter((card: SeriesCardData) => card.category === category)}
+            />
+          ))
         )}
       </VStack>
     </ScrollView>

@@ -9,7 +9,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { pullGroups, pullUserAchievements } from "../sync/pull-groups";
+import { pullGroups } from "../sync/pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "../sync/pull-reference";
 import { pullAttendances, pullProfile } from "../sync/pull-user-data";
 import { createSyncManager, SyncManager } from "../sync/sync-manager";
@@ -67,27 +67,6 @@ vi.mock("../../api-client", () => ({
             is_active: true,
           },
         ],
-      }),
-      getWithProgress: vi.fn().mockResolvedValue({
-        data: [
-          {
-            id: "ach-1",
-            name: "First Beer",
-            description: "Log your first beer",
-            icon: "beer",
-            category: "attendance",
-            rarity: "common",
-            points: 10,
-            is_active: true,
-            user_progress: {
-              current_value: 5,
-              target_value: 1,
-              percentage: 100,
-              last_updated: "2024-09-21T12:00:00Z",
-            },
-          },
-        ],
-        stats: {},
       }),
     },
     profile: {
@@ -393,15 +372,6 @@ describe("Pull functions", () => {
       const result = await pullGroups(db, "festival-1");
 
       expect(result.table).toBe("groups");
-    });
-  });
-
-  describe("pullUserAchievements", () => {
-    it("should pull unlocked achievements", async () => {
-      const db = mockDb as unknown as Parameters<typeof pullUserAchievements>[0];
-      const result = await pullUserAchievements(db, "festival-1");
-
-      expect(result.table).toBe("user_achievements");
     });
   });
 });
