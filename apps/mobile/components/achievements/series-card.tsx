@@ -35,7 +35,7 @@ export function SeriesCard({ card }: SeriesCardProps) {
     <Card
       variant="outline"
       size="sm"
-      className={cn(isUnlocked ? "border-green-200 bg-green-50" : "border-gray-200 bg-white")}
+      className={cn(isUnlocked ? "border-green-200 bg-green-50/30" : "border-gray-200 bg-white")}
     >
       <HStack space="sm" className="items-center p-3">
         <AchievementBadge
