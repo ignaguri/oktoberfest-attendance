@@ -6781,7 +6781,8 @@
                                 },
                                 "unlockedAt": {
                                   "type": "string",
-                                  "nullable": true
+                                  "nullable": true,
+                                  "format": "date-time"
                                 }
                               },
                               "required": [
@@ -6791,7 +6792,27 @@
                                 "isUnlocked",
                                 "unlockedAt"
                               ]
-                            }
+                            },
+                            "minItems": 1
+                          },
+                          "progress": {
+                            "type": "object",
+                            "nullable": true,
+                            "properties": {
+                              "currentValue": {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              "nextTarget": {
+                                "type": "number",
+                                "minimum": 0,
+                                "exclusiveMinimum": true
+                              }
+                            },
+                            "required": [
+                              "currentValue",
+                              "nextTarget"
+                            ]
                           }
                         },
                         "required": [
@@ -6800,7 +6821,8 @@
                           "scope",
                           "glyph",
                           "currentTier",
-                          "tiers"
+                          "tiers",
+                          "progress"
                         ]
                       }
                     },
@@ -6845,7 +6867,8 @@
                             "type": "integer"
                           },
                           "unlockedAt": {
-                            "type": "string"
+                            "type": "string",
+                            "format": "date-time"
                           }
                         },
                         "required": [

@@ -7,6 +7,7 @@ import type {
   SeriesCategory,
   SeriesTier,
 } from "@prostcounter/shared";
+import type { SeriesProgress } from "@prostcounter/shared/achievements";
 import { ONE_OFFS, SERIES, slugFor, tierToRarity } from "@prostcounter/shared/achievements";
 
 const DEFAULT_RECENT_UNLOCK_LIMIT = 10;
@@ -26,6 +27,39 @@ function emptyBreakdown(): BreakdownStats {
 }
 
 /**
+ * Progress toward the rung after the last one the user actually holds.
+ *
+ * `nextTarget` comes from the definition table indexed by the card's
+ * `currentTier` — which counts unlock rows — rather than from
+ * `SeriesProgress.nextTarget`, which counts metrics. The two disagree while a
+ * metric has passed a target whose unlock row has not been written yet, and
+ * the metrics answer would point the card past the rung whose pip is still
+ * unfilled.
+ *
+ * `currentValue` is capped at that target so the same window can never render
+ * "30/25", and so no consumer has to clamp a negative remainder.
+ */
+function buildCardProgress(
+  series: (typeof SERIES)[number],
+  currentTier: number,
+  seriesProgress: SeriesProgress | undefined,
+): SeriesCard["progress"] {
+  if (seriesProgress === undefined) {
+    return null;
+  }
+
+  const nextTierDef = series.tiers.find((tierDef) => tierDef.tier === currentTier + 1);
+  if (nextTierDef === undefined) {
+    return null;
+  }
+
+  return {
+    currentValue: Math.min(seriesProgress.currentValue, nextTierDef.target),
+    nextTarget: nextTierDef.target,
+  };
+}
+
+/**
  * One card per definition: the 20 tiered series, then the 10 one-offs.
  *
  * The order is part of the contract — both apps sort cards by rungs cleared
@@ -37,8 +71,12 @@ function emptyBreakdown(): BreakdownStats {
  * `isUnlocked` flags the pips render.
  *
  * @param unlockDates slug -> ISO unlock timestamp, for slugs the user holds.
+ * @param progressBySeriesId seriesId -> live metrics standing, for the 20 series.
  */
-export function buildSeriesCards(unlockDates: Map<string, string>): SeriesCard[] {
+export function buildSeriesCards(
+  unlockDates: Map<string, string>,
+  progressBySeriesId: Map<string, SeriesProgress>,
+): SeriesCard[] {
   const seriesCards: SeriesCard[] = SERIES.map((series) => {
     const tiers: SeriesTier[] = series.tiers.map((tierDef) => {
       const unlockedAt = unlockDates.get(slugFor(series, tierDef.tier)) ?? null;
@@ -65,6 +103,7 @@ export function buildSeriesCards(unlockDates: Map<string, string>): SeriesCard[]
       glyph: series.glyph,
       currentTier,
       tiers,
+      progress: buildCardProgress(series, currentTier, progressBySeriesId.get(series.id)),
     };
   });
 
@@ -88,6 +127,8 @@ export function buildSeriesCards(unlockDates: Map<string, string>): SeriesCard[]
           unlockedAt,
         },
       ],
+      // One-offs are binary: there is no partial state to report.
+      progress: null,
     };
   });
 

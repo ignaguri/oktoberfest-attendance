@@ -21,6 +21,7 @@ import {
   buildSeriesCards,
   buildStats,
 } from "../services/achievement-cards";
+import { AchievementService } from "../services/achievement.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -192,13 +193,22 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
   const query = c.req.valid("query");
 
   const metricsRepo = new AchievementMetricsRepository(supabase);
+  const achievementService = new AchievementService(metricsRepo);
 
-  // The definition tables already describe every card; the only thing the
-  // database has to answer is which slugs this user holds and when they
-  // landed. Deriving currentTier from those rows rather than from live
-  // metrics keeps it from contradicting the per-rung unlocked flags.
-  const unlockDates = await metricsRepo.getHeldSlugsWithUnlockDates(user.id, query.festivalId);
-  const cards = buildSeriesCards(unlockDates);
+  // The definition tables already describe every card; the database answers
+  // which slugs this user holds and when they landed, plus the raw metric
+  // values the rail needs. currentTier still comes from the unlock rows, so it
+  // cannot contradict the per-rung unlocked flags — see buildCardProgress for
+  // why the metrics-derived nextTarget is deliberately ignored.
+  const [unlockDates, evaluation] = await Promise.all([
+    metricsRepo.getHeldSlugsWithUnlockDates(user.id, query.festivalId),
+    achievementService.getProgress(user.id, query.festivalId),
+  ]);
+
+  const progressBySeriesId = new Map(
+    evaluation.progress.map((seriesProgress) => [seriesProgress.seriesId, seriesProgress]),
+  );
+  const cards = buildSeriesCards(unlockDates, progressBySeriesId);
 
   return c.json(
     {
