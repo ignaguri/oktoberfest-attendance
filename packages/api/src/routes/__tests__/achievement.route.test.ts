@@ -525,7 +525,7 @@ describe("Achievement Routes - Unit Tests", () => {
         ),
       );
 
-      // getProgress -> getMetrics
+      // getMetrics
       vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: emptyMetrics({ drinks_total: 7 }),
         error: null,
