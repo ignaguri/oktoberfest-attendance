@@ -133,7 +133,7 @@ export const SeriesTierSchema = z.object({
   name: z.string(),
   points: z.number().int(),
   isUnlocked: z.boolean(),
-  unlockedAt: z.string().nullable(),
+  unlockedAt: z.iso.datetime().nullable(),
 });
 
 export type SeriesTier = z.infer<typeof SeriesTierSchema>;
@@ -142,21 +142,30 @@ export type SeriesTier = z.infer<typeof SeriesTierSchema>;
  * One card on the achievements screen. Covers both tiered series and one-offs:
  * a one-off is the same shape with `tiers.length === 1`, which is also the only
  * discriminant callers need.
+ *
+ * `tiers` is enforced non-empty and `currentTier` is enforced not to exceed
+ * `tiers.length` so `getActiveTier()` can safely index `tiers[currentTier - 1]`
+ * without an out-of-bounds read.
  */
-export const SeriesCardSchema = z.object({
-  /** The series id for a series, the one-off's own id otherwise. */
-  id: z.string(),
-  category: SeriesCategorySchema,
-  scope: SeriesScopeSchema,
-  glyph: z.string(),
-  /**
-   * Rungs cleared, 0 when nothing is unlocked yet. NOT the badge tier: for a
-   * one-off this is 0 or 1 while its difficulty lives in `tiers[0].tier`.
-   * Anything user-visible reads getActiveTier(card).tier instead.
-   */
-  currentTier: z.number().int().min(0).max(4),
-  tiers: z.array(SeriesTierSchema),
-});
+export const SeriesCardSchema = z
+  .object({
+    /** The series id for a series, the one-off's own id otherwise. */
+    id: z.string(),
+    category: SeriesCategorySchema,
+    scope: SeriesScopeSchema,
+    glyph: z.string(),
+    /**
+     * Rungs cleared, 0 when nothing is unlocked yet. NOT the badge tier: for a
+     * one-off this is 0 or 1 while its difficulty lives in `tiers[0].tier`.
+     * Anything user-visible reads getActiveTier(card).tier instead.
+     */
+    currentTier: z.number().int().min(0).max(4),
+    tiers: z.array(SeriesTierSchema).min(1),
+  })
+  .refine((card) => card.currentTier <= card.tiers.length, {
+    message: "currentTier cannot exceed the number of tiers",
+    path: ["currentTier"],
+  });
 
 export type SeriesCard = z.infer<typeof SeriesCardSchema>;
 
@@ -171,7 +180,7 @@ export const RecentUnlockSchema = z.object({
   tier: z.number().int().min(1).max(4),
   scope: SeriesScopeSchema,
   points: z.number().int(),
-  unlockedAt: z.string(),
+  unlockedAt: z.iso.datetime(),
 });
 
 export type RecentUnlock = z.infer<typeof RecentUnlockSchema>;

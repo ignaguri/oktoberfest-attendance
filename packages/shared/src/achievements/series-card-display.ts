@@ -29,9 +29,14 @@ export const SERIES_CATEGORY_ORDER: SeriesCategory[] = (
  * `card.currentTier`, which counts rungs cleared. The two agree for the 20
  * tiered series and diverge for the 10 one-offs, whose single rung carries a
  * difficulty tier (`full_festival` is platinum) while `currentTier` is 0 or 1.
+ *
+ * `currentTier` is clamped to `tiers.length` so a malformed payload (schema
+ * validation caught it, this is the runtime backstop) can't index past the
+ * end of the array.
  */
 export function getActiveTier(card: SeriesCard): SeriesTier {
-  return card.currentTier > 0 ? card.tiers[card.currentTier - 1] : card.tiers[0];
+  const clearedTier = Math.min(card.currentTier, card.tiers.length);
+  return clearedTier > 0 ? card.tiers[clearedTier - 1] : card.tiers[0];
 }
 
 /** Maxed out: every rung unlocked — all four for a series, the only one for a one-off. */
