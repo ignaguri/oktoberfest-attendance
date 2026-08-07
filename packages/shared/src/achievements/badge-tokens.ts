@@ -37,3 +37,24 @@ export const TIER_RING_WIDTH: Record<AchievementTier, number> = {
   3: 4,
   4: 5,
 };
+
+/**
+ * Tier onto the rarity vocabulary the stats breakdown and the web
+ * `AchievementBadge` still speak. Takes a plain number because callers read
+ * the tier off wire-shaped data (`z.number()`), which cannot be narrowed to
+ * `AchievementTier` at the type level.
+ */
+export function tierToRarity(
+  tier: number | null | undefined,
+): "common" | "rare" | "epic" | "legendary" {
+  switch (tier) {
+    case 2:
+      return "rare";
+    case 3:
+      return "epic";
+    case 4:
+      return "legendary";
+    default:
+      return "common";
+  }
+}
