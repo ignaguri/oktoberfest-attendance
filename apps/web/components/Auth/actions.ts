@@ -5,7 +5,7 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { reportSupabaseAuthException } from "@/utils/sentry";
+import { INVALID_CREDENTIALS_MESSAGE, reportSupabaseAuthException } from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 
 function revalidateBase() {
@@ -30,7 +30,7 @@ export async function login(
   if (error) {
     reportSupabaseAuthException("login", error, { email: formData.email });
     // Don't reveal if email exists - use generic message
-    throw new Error("Invalid email or password");
+    throw new Error(INVALID_CREDENTIALS_MESSAGE);
   }
 
   revalidateBase();
