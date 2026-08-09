@@ -3,6 +3,7 @@ import type {
   AchievementMetrics,
   BooleanMetricKey,
   NumericMetricKey,
+  PersistedUnlock,
   UnlockedAchievement,
 } from "@prostcounter/shared/achievements";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -142,14 +143,17 @@ export class AchievementMetricsRepository {
   }
 
   /**
-   * Inserts unlock rows. Lifetime unlocks are stored with a NULL festival_id.
-   * Conflicts are ignored so concurrent evaluations cannot double-insert.
+   * Inserts unlock rows and returns only the ones this call genuinely created,
+   * each carrying its outbox event id. Lifetime unlocks are stored with a NULL
+   * festival_id. Conflicts are ignored so concurrent evaluations cannot
+   * double-insert — and, because only real inserts come back, cannot
+   * double-report either.
    */
   async insertUnlocks(
     userId: string,
     festivalId: string | null,
     unlocks: UnlockedAchievement[],
-  ): Promise<UnlockedAchievement[]> {
+  ): Promise<PersistedUnlock[]> {
     if (unlocks.length === 0) {
       return [];
     }
@@ -213,17 +217,69 @@ export class AchievementMetricsRepository {
       return [];
     }
 
-    const { error: insertError } = await this.supabase
+    // .select() with ignoreDuplicates returns only the rows this call actually
+    // inserted. Without it the method returned everything it attempted, so two
+    // concurrent evaluations both reported the same unlock and the user saw a
+    // duplicate toast.
+    const { data: insertedRows, error: insertError } = await this.supabase
       .from("user_achievements")
       .upsert(payload, {
         onConflict: "user_id,achievement_id,festival_id",
         ignoreDuplicates: true,
-      });
+      })
+      .select("achievement_id");
 
     if (insertError) {
       throw new DatabaseError(`Failed to insert unlocks: ${insertError.message}`);
     }
 
-    return unlocks.filter((unlock) => slugToId.has(unlock.slug));
+    const insertedAchievementIds = new Set(
+      (insertedRows ?? []).map((row) => row.achievement_id),
+    );
+
+    if (insertedAchievementIds.size === 0) {
+      return [];
+    }
+
+    // The outbox row is written by trg_user_achievements_insert_event, an AFTER
+    // INSERT trigger in the same transaction, so it exists by the time the
+    // upsert returns. It is looked up rather than returned because a trigger's
+    // output cannot reach the inserting statement's RETURNING clause.
+    const { data: eventRows, error: eventError } = await this.supabase
+      .from("achievement_events")
+      .select("id, achievement_id")
+      .eq("user_id", userId)
+      .in("achievement_id", [...insertedAchievementIds])
+      .is("user_notified_at", null);
+
+    if (eventError) {
+      throw new DatabaseError(`Failed to resolve unlock events: ${eventError.message}`);
+    }
+
+    const eventIdByAchievementId = new Map<string, string>();
+    for (const row of eventRows ?? []) {
+      eventIdByAchievementId.set(row.achievement_id, row.id);
+    }
+
+    return unlocks.flatMap((unlock) => {
+      const achievementId = slugToId.get(unlock.slug);
+      if (!achievementId || !insertedAchievementIds.has(achievementId)) {
+        return [];
+      }
+
+      const eventId = eventIdByAchievementId.get(achievementId);
+      if (!eventId) {
+        // The unlock row is committed but its outbox event is missing, which
+        // means the trigger did not fire. The user will never be told about
+        // this unlock through any channel, so it must not be silent here.
+        logger.error(
+          { userId, festivalId, slug: unlock.slug },
+          "Unlock persisted but no achievement_events row was found",
+        );
+        return [];
+      }
+
+      return [{ ...unlock, eventId }];
+    });
   }
 }
