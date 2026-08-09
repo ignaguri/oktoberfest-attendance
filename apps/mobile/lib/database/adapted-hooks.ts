@@ -147,7 +147,7 @@ export function useSyncRefresh() {
     try {
       // Step 1: Pull fresh data from API into SQLite
       if (context?.isOnline && context?.sync) {
-        await context.sync({ direction: "pull" });
+        await context.sync({ direction: "pull", trigger: "manual" });
       }
     } catch (error) {
       logger.error("[useSyncRefresh] Sync pull failed:", error);
@@ -164,7 +164,10 @@ export function useSyncRefresh() {
 
   return {
     syncAndRefresh,
-    isSyncing: context?.syncStatus === "syncing",
+    // Only user-initiated syncs drive the pull-to-refresh spinner. Background
+    // syncs are surfaced by the SyncStatusBar instead, so binding this to the
+    // global sync status would show two indicators for a single sync.
+    isSyncing: context?.syncStatus === "syncing" && context?.syncTrigger === "manual",
   };
 }
 

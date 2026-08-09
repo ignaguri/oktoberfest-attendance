@@ -381,7 +381,6 @@ export default function RootLayout() {
                                     <StoreUpdatePromptHandler />
                                     <WatchInstallPromptHandler />
                                     <TutorialOverlay />
-                                    <SyncStatusBar />
                                     <Stack
                                       screenOptions={{
                                         headerShown: false,
@@ -449,6 +448,8 @@ export default function RootLayout() {
                                       />
                                       <Stack.Screen name="+not-found" />
                                     </Stack>
+                                    {/* Rendered after Stack so the floating pill paints above screen content */}
+                                    <SyncStatusBar />
                                   </NavigationGuard>
                                 </LocationProvider>
                               </NovuProviderWrapper>
