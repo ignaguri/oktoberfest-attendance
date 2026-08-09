@@ -107,7 +107,11 @@ export function SyncStatusBar({ onViewErrors, alwaysShow = false }: SyncStatusBa
     borderColor = "border border-success-200";
   }
 
-  const isInteractive = hasError || hasPending;
+  // Stay inert while a sync runs. Retrying mid-sync would flash a second
+  // progress indicator next to the one already showing, and the retry itself
+  // bounces off the provider's in-flight guard anyway.
+  const isSyncInFlight = syncStatus === "syncing" || isRetrying;
+  const isInteractive = (hasError || hasPending) && !isSyncInFlight;
 
   const content = (
     <HStack
