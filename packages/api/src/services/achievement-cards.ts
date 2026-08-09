@@ -1,6 +1,6 @@
 import type { RecentUnlock, SeriesCard, SeriesTier } from "@prostcounter/shared";
 import type { SeriesProgress } from "@prostcounter/shared/achievements";
-import { ONE_OFFS, SERIES, nameKeyFor, slugFor } from "@prostcounter/shared/achievements";
+import { nameKeyFor, ONE_OFFS, SERIES, slugFor } from "@prostcounter/shared/achievements";
 
 const DEFAULT_RECENT_UNLOCK_LIMIT = 10;
 

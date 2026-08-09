@@ -321,7 +321,7 @@ export type UnlockedAchievement = z.infer<typeof UnlockedAchievementSchema>;
  * the write paths that can toast immediately.
  */
 export const PersistedUnlockSchema = UnlockedAchievementSchema.extend({
-  eventId: z.string().uuid(),
+  eventId: z.uuid(),
 });
 
 export type PersistedUnlock = z.infer<typeof PersistedUnlockSchema>;
