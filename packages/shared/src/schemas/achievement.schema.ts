@@ -315,3 +315,13 @@ export const UnlockedAchievementSchema = z.object({
 });
 
 export type UnlockedAchievement = z.infer<typeof UnlockedAchievementSchema>;
+
+/**
+ * An unlock plus the outbox event id the client acks with. Returned inline by
+ * the write paths that can toast immediately.
+ */
+export const PersistedUnlockSchema = UnlockedAchievementSchema.extend({
+  eventId: z.string().uuid(),
+});
+
+export type PersistedUnlock = z.infer<typeof PersistedUnlockSchema>;
