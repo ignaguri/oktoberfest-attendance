@@ -1,5 +1,14 @@
 // packages/shared/src/achievements/series-card-display.ts
-import type { SeriesCard, SeriesCategory, SeriesTier } from "../schemas/achievement.schema";
+import type {
+  AchievementRarity,
+  AchievementStats,
+  BreakdownStats,
+  SeriesCard,
+  SeriesCategory,
+  SeriesTier,
+} from "../schemas/achievement.schema";
+
+import { tierToRarity } from "./badge-tokens";
 
 /**
  * Render order of the category sections, shared so web and mobile cannot
@@ -71,5 +80,108 @@ export function splitCardsByCompletion(cards: SeriesCard[]): {
   return {
     completed: completed.sort(byRungsClearedDesc),
     inProgress: inProgress.sort(byRungsClearedDesc),
+  };
+}
+
+/** One rail entry: a card plus the numbers the rail prints beside it. */
+export interface CloseToUnlockingEntry {
+  card: SeriesCard;
+  currentValue: number;
+  nextTarget: number;
+  /** Units still needed for the next rung. Never negative — the API caps currentValue. */
+  remaining: number;
+  /** 0-100, currentValue as a share of nextTarget, so the bar agrees with the "22/25" text. */
+  percentage: number;
+}
+
+/**
+ * The cards closest to their next rung, nearest first.
+ *
+ * Ranked by raw remaining count rather than percentage: "3 to go" is a more
+ * useful prompt than "88% of the way" regardless of how large the target is.
+ * `progress === null` already excludes one-offs and fully cleared series, so
+ * there is no separate completion test here.
+ *
+ * The sort is stable, so cards needing the same amount keep the order the API
+ * sent them in — definition order, the same tie-break splitCardsByCompletion uses.
+ */
+export function selectCloseToUnlocking(cards: SeriesCard[], limit = 3): CloseToUnlockingEntry[] {
+  const entries: CloseToUnlockingEntry[] = [];
+
+  for (const card of cards) {
+    if (card.progress == null) {
+      continue;
+    }
+
+    const { currentValue, nextTarget } = card.progress;
+
+    entries.push({
+      card,
+      currentValue,
+      nextTarget,
+      remaining: nextTarget - currentValue,
+      percentage: Math.round((currentValue / nextTarget) * 100),
+    });
+  }
+
+  return entries.toSorted((a, b) => a.remaining - b.remaining).slice(0, limit);
+}
+
+function emptyBreakdown(): BreakdownStats {
+  return { total: 0, unlocked: 0, points: 0 };
+}
+
+/**
+ * Totals over rungs, not cards: 90 unlockable slugs across 30 cards. Rarity
+ * buckets come from each rung's own tier, so a card contributes to several.
+ */
+export function buildStats(cards: SeriesCard[]): AchievementStats {
+  const breakdownByCategory: Record<SeriesCategory, BreakdownStats> = {
+    drinking: emptyBreakdown(),
+    attendance: emptyBreakdown(),
+    explorer: emptyBreakdown(),
+    social: emptyBreakdown(),
+    competitive: emptyBreakdown(),
+    dedication: emptyBreakdown(),
+  };
+
+  const breakdownByRarity: Record<AchievementRarity, BreakdownStats> = {
+    common: emptyBreakdown(),
+    rare: emptyBreakdown(),
+    epic: emptyBreakdown(),
+    legendary: emptyBreakdown(),
+  };
+
+  let totalAchievements = 0;
+  let unlockedAchievements = 0;
+  let totalPoints = 0;
+
+  for (const card of cards) {
+    const categoryBucket = breakdownByCategory[card.category];
+
+    for (const tier of card.tiers) {
+      const rarityBucket = breakdownByRarity[tierToRarity(tier.tier)];
+
+      totalAchievements++;
+      categoryBucket.total++;
+      rarityBucket.total++;
+
+      if (tier.isUnlocked) {
+        unlockedAchievements++;
+        totalPoints += tier.points;
+        categoryBucket.unlocked++;
+        categoryBucket.points += tier.points;
+        rarityBucket.unlocked++;
+        rarityBucket.points += tier.points;
+      }
+    }
+  }
+
+  return {
+    total_achievements: totalAchievements,
+    unlocked_achievements: unlockedAchievements,
+    total_points: totalPoints,
+    breakdown_by_category: breakdownByCategory,
+    breakdown_by_rarity: breakdownByRarity,
   };
 }

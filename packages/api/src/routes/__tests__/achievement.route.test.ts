@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { emptyMetrics } from "../../__tests__/helpers/achievement-metrics";
 import {
   createMockChain,
   createMockSupabase,
@@ -524,6 +525,12 @@ describe("Achievement Routes - Unit Tests", () => {
         ),
       );
 
+      // getMetrics
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: emptyMetrics({ drinks_total: 7 }),
+        error: null,
+      } as any);
+
       const req = createAuthRequest(`/achievements/with-progress?festivalId=${festivalId}`, {
         method: "GET",
       });
@@ -555,14 +562,19 @@ describe("Achievement Routes - Unit Tests", () => {
       expect(body.stats.unlocked_achievements).toBe(3);
       expect(body.stats.total_achievements).toBe(90);
       expect(Object.keys(body.stats.breakdown_by_category)).not.toContain("consumption");
+      expect(drinksTotal.progress).toEqual({ currentValue: 7, nextTarget: expect.any(Number) });
+      expect(firstDrink.progress).toBeNull();
     });
 
     it("returns every card locked when the user holds nothing", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
 
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(mockSupabaseSuccess([])),
-      );
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])));
+
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: emptyMetrics(),
+        error: null,
+      } as any);
 
       const req = createAuthRequest(`/achievements/with-progress?festivalId=${festivalId}`, {
         method: "GET",
@@ -581,6 +593,7 @@ describe("Achievement Routes - Unit Tests", () => {
       expect(body.recentUnlocks).toEqual([]);
       expect(body.stats.unlocked_achievements).toBe(0);
       expect(body.stats.total_points).toBe(0);
+      expect(body.cards.every((card: any) => card.progress !== undefined)).toBe(true);
     });
   });
 

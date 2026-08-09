@@ -17,6 +17,7 @@ const validCard = {
     { tier: 3, name: "achievements.drinks_total.t3.name", points: 150, isUnlocked: false, unlockedAt: null },
     { tier: 4, name: "achievements.drinks_total.t4.name", points: 400, isUnlocked: false, unlockedAt: null },
   ],
+  progress: { currentValue: 12, nextTarget: 25 },
 };
 
 const emptyBreakdown = { total: 0, unlocked: 0, points: 0 };
@@ -56,6 +57,7 @@ describe("SeriesCardSchema", () => {
       tiers: [
         { tier: 1, name: "achievements.first_drink.name", points: 10, isUnlocked: true, unlockedAt: "2026-09-20T10:00:00Z" },
       ],
+      progress: null,
     };
     expect(SeriesCardSchema.parse(oneOff)).toEqual(oneOff);
   });
@@ -70,6 +72,33 @@ describe("SeriesCardSchema", () => {
 
   it("rejects a currentTier above 4", () => {
     expect(SeriesCardSchema.safeParse({ ...validCard, currentTier: 5 }).success).toBe(false);
+  });
+
+  it("accepts a null progress for a card with nothing left to earn", () => {
+    expect(SeriesCardSchema.parse({ ...validCard, progress: null }).progress).toBeNull();
+  });
+
+  it("rejects a missing progress field", () => {
+    const withoutProgress = { ...validCard, progress: undefined };
+    expect(SeriesCardSchema.safeParse(withoutProgress).success).toBe(false);
+  });
+
+  it("rejects a non-positive nextTarget", () => {
+    expect(
+      SeriesCardSchema.safeParse({
+        ...validCard,
+        progress: { currentValue: 0, nextTarget: 0 },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects a currentValue above nextTarget", () => {
+    expect(
+      SeriesCardSchema.safeParse({
+        ...validCard,
+        progress: { currentValue: 30, nextTarget: 25 },
+      }).success,
+    ).toBe(false);
   });
 });
 

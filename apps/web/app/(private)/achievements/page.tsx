@@ -1,11 +1,17 @@
 "use client";
 
-import { SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
+import { buildStats, SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
-import type { SeriesCard as SeriesCardData, SeriesCategory } from "@prostcounter/shared/schemas";
+import type {
+  SeriesCard as SeriesCardData,
+  SeriesCategory,
+  SeriesScope,
+} from "@prostcounter/shared/schemas";
 import { useState } from "react";
 
 import { CategoryChips, type CategoryFilter } from "@/components/achievements/CategoryChips";
+import { CloseToUnlockingRail } from "@/components/achievements/CloseToUnlockingRail";
+import { ScopeTabs } from "@/components/achievements/ScopeTabs";
 import { SeriesCard } from "@/components/achievements/SeriesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAchievementsWithProgress } from "@/hooks/useAchievements";
@@ -61,9 +67,12 @@ export default function AchievementsPage() {
   const { currentFestival } = useFestival();
   const { data, loading: isLoading } = useAchievementsWithProgress(currentFestival?.id);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
+  const [activeScope, setActiveScope] = useState<SeriesScope>("festival");
 
-  const cards = data?.cards || [];
-  const stats = data?.stats;
+  const allCards: SeriesCardData[] = data?.cards || [];
+  // Both scopes arrive in one response — the tabs are a filter, not a refetch.
+  const cards = allCards.filter((card) => card.scope === activeScope);
+  const stats = data ? buildStats(cards) : undefined;
 
   const visibleCategories =
     activeCategory === "all" ? SERIES_CATEGORY_ORDER : [activeCategory as SeriesCategory];
@@ -187,7 +196,14 @@ export default function AchievementsPage() {
         </div>
       )}
 
+      <ScopeTabs value={activeScope} onChange={setActiveScope} />
+
       <CategoryChips value={activeCategory} onChange={setActiveCategory} />
+
+      {/* Scope-filtered but deliberately not category-filtered: the rail is a
+          cross-category prompt, and narrowing it to one chip would routinely
+          empty it. */}
+      <CloseToUnlockingRail cards={cards} />
 
       {cards.length === 0 ? (
         <div className="py-12 text-center">

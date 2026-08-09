@@ -3791,8 +3791,13 @@ export interface paths {
                                     name: string;
                                     points: number;
                                     isUnlocked: boolean;
+                                    /** Format: date-time */
                                     unlockedAt: string | null;
                                 }[];
+                                progress: {
+                                    currentValue: number;
+                                    nextTarget: number;
+                                } | null;
                             }[];
                             recentUnlocks: {
                                 id: string;
@@ -3804,6 +3809,7 @@ export interface paths {
                                 /** @enum {string} */
                                 scope: "festival" | "lifetime";
                                 points: number;
+                                /** Format: date-time */
                                 unlockedAt: string;
                             }[];
                             stats: {

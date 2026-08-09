@@ -1,8 +1,5 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import type {
-  AchievementLeaderboardEntry,
-  AvailableAchievement,
-} from "@prostcounter/shared";
+import type { AchievementLeaderboardEntry, AvailableAchievement } from "@prostcounter/shared";
 import {
   EvaluateAchievementsResponseSchema,
   EvaluateAchievementsSchema,
@@ -12,15 +9,12 @@ import {
   ListAchievementsResponseSchema,
   ListAvailableAchievementsResponseSchema,
 } from "@prostcounter/shared";
+import { buildStats, evaluate } from "@prostcounter/shared/achievements";
 
 import type { AuthContext } from "../middleware/auth";
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
 import { SupabaseAchievementRepository } from "../repositories/supabase";
-import {
-  buildRecentUnlocks,
-  buildSeriesCards,
-  buildStats,
-} from "../services/achievement-cards";
+import { buildRecentUnlocks, buildSeriesCards } from "../services/achievement-cards";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -193,12 +187,28 @@ app.openapi(getAchievementsWithProgressRoute, async (c) => {
 
   const metricsRepo = new AchievementMetricsRepository(supabase);
 
-  // The definition tables already describe every card; the only thing the
-  // database has to answer is which slugs this user holds and when they
-  // landed. Deriving currentTier from those rows rather than from live
-  // metrics keeps it from contradicting the per-rung unlocked flags.
-  const unlockDates = await metricsRepo.getHeldSlugsWithUnlockDates(user.id, query.festivalId);
-  const cards = buildSeriesCards(unlockDates);
+  // The definition tables already describe every card; the database answers
+  // which slugs this user holds and when they landed, plus the raw metric
+  // values the rail needs. currentTier still comes from the unlock rows, so it
+  // cannot contradict the per-rung unlocked flags — see buildCardProgress for
+  // why the metrics-derived nextTarget is deliberately ignored.
+  //
+  // Calls getMetrics + evaluate() directly instead of going through
+  // AchievementService.getProgress(), which would also issue its own
+  // getHeldSlugs() query — a second, redundant read of the exact same
+  // user_achievements rows unlockDates below already fetched, whose only
+  // output (evaluation.unlocked) this route never uses.
+  const [unlockDates, metrics] = await Promise.all([
+    metricsRepo.getHeldSlugsWithUnlockDates(user.id, query.festivalId),
+    metricsRepo.getMetrics(user.id, query.festivalId),
+  ]);
+
+  const { progress } = evaluate(metrics, new Set(unlockDates.keys()));
+
+  const progressBySeriesId = new Map(
+    progress.map((seriesProgress) => [seriesProgress.seriesId, seriesProgress]),
+  );
+  const cards = buildSeriesCards(unlockDates, progressBySeriesId);
 
   return c.json(
     {

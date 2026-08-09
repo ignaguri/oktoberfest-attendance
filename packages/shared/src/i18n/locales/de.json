@@ -643,6 +643,12 @@
     "trackProgress": "Verfolge deinen Fortschritt und schalte Erfolge beim {{festival}} frei",
     "completed": "Abgeschlossen",
     "inProgress": "In Bearbeitung",
+    "closeToUnlocking": "Fast freigeschaltet",
+    "progressToNext": "{{current}}/{{target}} · noch {{remaining}}",
+    "scope": {
+      "festival": "Dieses Festival",
+      "allTime": "Gesamt"
+    },
     "stats": {
       "totalProgress": "Gesamtfortschritt",
       "percentUnlocked": "{{percent}}% freigeschaltet",

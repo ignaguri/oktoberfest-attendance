@@ -161,6 +161,27 @@ export const SeriesCardSchema = z
      */
     currentTier: z.number().int().min(0).max(4),
     tiers: z.array(SeriesTierSchema).min(1),
+    /**
+     * Progress toward the rung after the last one the user holds. Null for
+     * one-offs (binary — no partial state) and for series with every rung
+     * unlocked.
+     *
+     * `nextTarget` is the definition's target for tier `currentTier + 1`, not
+     * the metrics-derived target: the two diverge while metrics run ahead of
+     * unlock rows, and the definition answer is the one that agrees with the
+     * pips. `currentValue` is capped at `nextTarget` by the builder, so
+     * `nextTarget - currentValue` is never negative.
+     */
+    progress: z
+      .object({
+        currentValue: z.number().nonnegative(),
+        nextTarget: z.number().positive(),
+      })
+      .refine((progress) => progress.currentValue <= progress.nextTarget, {
+        message: "currentValue cannot exceed nextTarget",
+        path: ["currentValue"],
+      })
+      .nullable(),
   })
   .refine((card) => card.currentTier <= card.tiers.length, {
     message: "currentTier cannot exceed the number of tiers",

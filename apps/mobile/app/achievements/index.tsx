@@ -1,14 +1,20 @@
-import { SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
+import { buildStats, SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { SeriesCard as SeriesCardData, SeriesCategory } from "@prostcounter/shared/schemas";
+import type {
+  SeriesCard as SeriesCardData,
+  SeriesCategory,
+  SeriesScope,
+} from "@prostcounter/shared/schemas";
 import { Award } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
 import { CategoryChips, type CategoryFilter } from "@/components/achievements/category-chips";
+import { CloseToUnlockingRail } from "@/components/achievements/close-to-unlocking-rail";
+import { ScopeToggle } from "@/components/achievements/scope-toggle";
 import { SeriesCard } from "@/components/achievements/series-card";
 import { AchievementsSkeleton } from "@/components/skeletons";
 import { Card } from "@/components/ui/card";
@@ -77,6 +83,7 @@ export default function AchievementsScreen() {
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const { isOnline } = useOfflineSafe();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
+  const [activeScope, setActiveScope] = useState<SeriesScope>("festival");
 
   const {
     data: achievementsResponse,
@@ -86,13 +93,15 @@ export default function AchievementsScreen() {
     isRefetching = false,
   } = useAchievementsWithProgress(currentFestival?.id);
 
+  // Both scopes arrive in one response — the toggle is a filter, not a refetch.
   const cards = useMemo(() => {
-    return achievementsResponse?.cards || [];
-  }, [achievementsResponse]);
+    const allCards = achievementsResponse?.cards || [];
+    return allCards.filter((card: SeriesCardData) => card.scope === activeScope);
+  }, [achievementsResponse, activeScope]);
 
   const stats = useMemo(() => {
-    return achievementsResponse?.stats || null;
-  }, [achievementsResponse]);
+    return achievementsResponse ? buildStats(cards) : null;
+  }, [achievementsResponse, cards]);
 
   const visibleCategories = useMemo(() => {
     return activeCategory === "all"
@@ -176,7 +185,13 @@ export default function AchievementsScreen() {
       <VStack space="lg" className="p-4 pb-8">
         {stats && <AchievementStatsSummary stats={stats} />}
 
+        <ScopeToggle value={activeScope} onChange={setActiveScope} />
+
         <CategoryChips value={activeCategory} onChange={setActiveCategory} />
+
+        {/* Scope-filtered but deliberately not category-filtered — the rail is
+            a cross-category prompt. */}
+        <CloseToUnlockingRail cards={cards} />
 
         {cards.length === 0 ? (
           <Card variant="outline" size="md" className="items-center bg-white p-6">

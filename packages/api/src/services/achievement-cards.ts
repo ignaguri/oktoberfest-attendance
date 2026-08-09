@@ -1,13 +1,6 @@
-import type {
-  AchievementRarity,
-  AchievementStats,
-  BreakdownStats,
-  RecentUnlock,
-  SeriesCard,
-  SeriesCategory,
-  SeriesTier,
-} from "@prostcounter/shared";
-import { ONE_OFFS, SERIES, slugFor, tierToRarity } from "@prostcounter/shared/achievements";
+import type { RecentUnlock, SeriesCard, SeriesTier } from "@prostcounter/shared";
+import type { SeriesProgress } from "@prostcounter/shared/achievements";
+import { ONE_OFFS, SERIES, slugFor } from "@prostcounter/shared/achievements";
 
 const DEFAULT_RECENT_UNLOCK_LIMIT = 10;
 
@@ -21,8 +14,37 @@ function slugForCardTier(card: SeriesCard, tier: SeriesTier): string {
   return card.tiers.length > 1 ? `${card.id}.t${tier.tier}` : card.id;
 }
 
-function emptyBreakdown(): BreakdownStats {
-  return { total: 0, unlocked: 0, points: 0 };
+/**
+ * Progress toward the rung after the last one the user actually holds.
+ *
+ * `nextTarget` comes from the definition table indexed by the card's
+ * `currentTier` — which counts unlock rows — rather than from
+ * `SeriesProgress.nextTarget`, which counts metrics. The two disagree while a
+ * metric has passed a target whose unlock row has not been written yet, and
+ * the metrics answer would point the card past the rung whose pip is still
+ * unfilled.
+ *
+ * `currentValue` is capped at that target so the same window can never render
+ * "30/25", and so no consumer has to clamp a negative remainder.
+ */
+function buildCardProgress(
+  series: (typeof SERIES)[number],
+  currentTier: number,
+  seriesProgress: SeriesProgress | undefined,
+): SeriesCard["progress"] {
+  if (seriesProgress === undefined) {
+    return null;
+  }
+
+  const nextTierDef = series.tiers.find((tierDef) => tierDef.tier === currentTier + 1);
+  if (nextTierDef === undefined) {
+    return null;
+  }
+
+  return {
+    currentValue: Math.min(seriesProgress.currentValue, nextTierDef.target),
+    nextTarget: nextTierDef.target,
+  };
 }
 
 /**
@@ -37,8 +59,12 @@ function emptyBreakdown(): BreakdownStats {
  * `isUnlocked` flags the pips render.
  *
  * @param unlockDates slug -> ISO unlock timestamp, for slugs the user holds.
+ * @param progressBySeriesId seriesId -> live metrics standing, for the 20 series.
  */
-export function buildSeriesCards(unlockDates: Map<string, string>): SeriesCard[] {
+export function buildSeriesCards(
+  unlockDates: Map<string, string>,
+  progressBySeriesId: Map<string, SeriesProgress>,
+): SeriesCard[] {
   const seriesCards: SeriesCard[] = SERIES.map((series) => {
     const tiers: SeriesTier[] = series.tiers.map((tierDef) => {
       const unlockedAt = unlockDates.get(slugFor(series, tierDef.tier)) ?? null;
@@ -65,6 +91,7 @@ export function buildSeriesCards(unlockDates: Map<string, string>): SeriesCard[]
       glyph: series.glyph,
       currentTier,
       tiers,
+      progress: buildCardProgress(series, currentTier, progressBySeriesId.get(series.id)),
     };
   });
 
@@ -88,6 +115,8 @@ export function buildSeriesCards(unlockDates: Map<string, string>): SeriesCard[]
           unlockedAt,
         },
       ],
+      // One-offs are binary: there is no partial state to report.
+      progress: null,
     };
   });
 
@@ -123,59 +152,4 @@ export function buildRecentUnlocks(
   unlocks.sort((a, b) => Date.parse(b.unlockedAt) - Date.parse(a.unlockedAt));
 
   return unlocks.slice(0, limit);
-}
-
-/**
- * Totals over rungs, not cards: 90 unlockable slugs across 30 cards. Rarity
- * buckets come from each rung's own tier, so a card contributes to several.
- */
-export function buildStats(cards: SeriesCard[]): AchievementStats {
-  const breakdownByCategory: Record<SeriesCategory, BreakdownStats> = {
-    drinking: emptyBreakdown(),
-    attendance: emptyBreakdown(),
-    explorer: emptyBreakdown(),
-    social: emptyBreakdown(),
-    competitive: emptyBreakdown(),
-    dedication: emptyBreakdown(),
-  };
-
-  const breakdownByRarity: Record<AchievementRarity, BreakdownStats> = {
-    common: emptyBreakdown(),
-    rare: emptyBreakdown(),
-    epic: emptyBreakdown(),
-    legendary: emptyBreakdown(),
-  };
-
-  let totalAchievements = 0;
-  let unlockedAchievements = 0;
-  let totalPoints = 0;
-
-  for (const card of cards) {
-    const categoryBucket = breakdownByCategory[card.category];
-
-    for (const tier of card.tiers) {
-      const rarityBucket = breakdownByRarity[tierToRarity(tier.tier)];
-
-      totalAchievements++;
-      categoryBucket.total++;
-      rarityBucket.total++;
-
-      if (tier.isUnlocked) {
-        unlockedAchievements++;
-        totalPoints += tier.points;
-        categoryBucket.unlocked++;
-        categoryBucket.points += tier.points;
-        rarityBucket.unlocked++;
-        rarityBucket.points += tier.points;
-      }
-    }
-  }
-
-  return {
-    total_achievements: totalAchievements,
-    unlocked_achievements: unlockedAchievements,
-    total_points: totalPoints,
-    breakdown_by_category: breakdownByCategory,
-    breakdown_by_rarity: breakdownByRarity,
-  };
 }
