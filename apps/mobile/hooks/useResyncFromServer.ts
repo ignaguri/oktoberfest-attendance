@@ -20,7 +20,9 @@ export function useResyncFromServer() {
       await clearAllData(db);
 
       logger.debug("[Resync] Pulling fresh data from server");
-      const result = await offline.sync({ direction: "pull", force: true });
+      // Manual trigger: this screen already shows its own spinner, so the
+      // SyncStatusBar stays quiet instead of adding a second indicator.
+      const result = await offline.sync({ direction: "pull", force: true, trigger: "manual" });
 
       if (!result.success) {
         throw new Error(result.errors[0] ?? "Sync failed");

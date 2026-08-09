@@ -39,6 +39,14 @@ import { getQueueStats } from "./sync-queue";
 
 export type SyncStatus = "idle" | "syncing" | "error" | "offline";
 
+/**
+ * What kicked off the current sync.
+ * "auto" covers background syncs (app start, coming online, foregrounding);
+ * "manual" covers user gestures like pull-to-refresh.
+ * Consumers use this to avoid showing two progress indicators for one sync.
+ */
+export type SyncTrigger = "auto" | "manual";
+
 export interface OfflineContextType {
   /** Whether the database is initialized and ready */
   isReady: boolean;
@@ -46,6 +54,8 @@ export interface OfflineContextType {
   isOnline: boolean;
   /** Current sync status */
   syncStatus: SyncStatus;
+  /** What kicked off the most recent sync */
+  syncTrigger: SyncTrigger;
   /** Last sync result (if any) */
   lastSyncResult: SyncResult | null;
   /** Number of pending operations in the sync queue */
@@ -54,8 +64,8 @@ export interface OfflineContextType {
   lastSyncAt: Date | null;
   /** Error message if sync failed */
   error: string | null;
-  /** Trigger a manual sync */
-  sync: (options?: SyncOptions) => Promise<SyncResult>;
+  /** Trigger a sync (defaults to the "auto" trigger) */
+  sync: (options?: SyncOptions & { trigger?: SyncTrigger }) => Promise<SyncResult>;
   /** Abort any in-progress sync */
   abortSync: () => void;
   /** Get the database instance (throws if not ready) */
@@ -116,6 +126,7 @@ export function OfflineDataProvider({
   // Effective online status (respects simulation for testing)
   const effectiveIsOnline = isOnline && !simulateOffline;
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("idle");
+  const [syncTrigger, setSyncTrigger] = useState<SyncTrigger>("auto");
   const [lastSyncResult, setLastSyncResult] = useState<SyncResult | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
   const [lastSyncAt, setLastSyncAt] = useState<Date | null>(null);
@@ -184,7 +195,9 @@ export function OfflineDataProvider({
 
   // Perform sync operation (defined before useEffects that depend on it)
   const performSync = useCallback(
-    async (options: SyncOptions): Promise<SyncResult> => {
+    async ({ trigger = "auto", ...options }: SyncOptions & { trigger?: SyncTrigger }): Promise<
+      SyncResult
+    > => {
       if (!syncManagerRef.current) {
         return {
           success: false,
@@ -209,6 +222,23 @@ export function OfflineDataProvider({
         };
       }
 
+      // The SyncManager rejects concurrent syncs, so bail out before touching any
+      // state. Stamping the trigger here would hand the in-flight sync's indicator
+      // to the wrong owner (e.g. a background push flipping a pull-to-refresh to
+      // "auto" mid-gesture), and the call is about to bounce regardless.
+      if (syncManagerRef.current.syncing) {
+        return {
+          success: false,
+          direction: options.direction ?? "both",
+          pulled: 0,
+          pushed: 0,
+          failed: 0,
+          errors: ["Sync already in progress"],
+          duration: 0,
+        };
+      }
+
+      setSyncTrigger(trigger);
       setSyncStatus("syncing");
       setError(null);
 
@@ -259,14 +289,13 @@ export function OfflineDataProvider({
 
   // Manual sync trigger
   const sync = useCallback(
-    async (options?: SyncOptions): Promise<SyncResult> => {
-      const syncOptions: SyncOptions = {
+    async (options?: SyncOptions & { trigger?: SyncTrigger }): Promise<SyncResult> => {
+      return performSync({
         festivalId,
         userId,
         direction: "both",
         ...options,
-      };
-      return performSync(syncOptions);
+      });
     },
     [festivalId, userId, performSync],
   );
@@ -377,6 +406,7 @@ export function OfflineDataProvider({
       isReady,
       isOnline: effectiveIsOnline,
       syncStatus,
+      syncTrigger,
       lastSyncResult,
       pendingCount,
       lastSyncAt,
@@ -393,6 +423,7 @@ export function OfflineDataProvider({
       isReady,
       effectiveIsOnline,
       syncStatus,
+      syncTrigger,
       lastSyncResult,
       pendingCount,
       lastSyncAt,
@@ -458,6 +489,7 @@ const DEFAULT_OFFLINE_CONTEXT: OfflineContextType = {
   isReady: false,
   isOnline: true,
   syncStatus: "idle",
+  syncTrigger: "auto",
   lastSyncResult: null,
   pendingCount: 0,
   lastSyncAt: null,
