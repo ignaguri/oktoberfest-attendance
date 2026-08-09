@@ -124,7 +124,7 @@ export function selectCloseToUnlocking(cards: SeriesCard[], limit = 3): CloseToU
     });
   }
 
-  return entries.sort((a, b) => a.remaining - b.remaining).slice(0, limit);
+  return entries.toSorted((a, b) => a.remaining - b.remaining).slice(0, limit);
 }
 
 function emptyBreakdown(): BreakdownStats {

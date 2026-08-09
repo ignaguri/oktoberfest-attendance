@@ -91,6 +91,15 @@ describe("SeriesCardSchema", () => {
       }).success,
     ).toBe(false);
   });
+
+  it("rejects a currentValue above nextTarget", () => {
+    expect(
+      SeriesCardSchema.safeParse({
+        ...validCard,
+        progress: { currentValue: 30, nextTarget: 25 },
+      }).success,
+    ).toBe(false);
+  });
 });
 
 describe("GetAchievementsWithProgressResponseSchema", () => {

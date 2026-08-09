@@ -177,6 +177,10 @@ export const SeriesCardSchema = z
         currentValue: z.number().nonnegative(),
         nextTarget: z.number().positive(),
       })
+      .refine((progress) => progress.currentValue <= progress.nextTarget, {
+        message: "currentValue cannot exceed nextTarget",
+        path: ["currentValue"],
+      })
       .nullable(),
   })
   .refine((card) => card.currentTier <= card.tiers.length, {

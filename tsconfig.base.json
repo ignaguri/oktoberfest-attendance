@@ -10,7 +10,7 @@
     "noEmit": true,
     "declaration": true,
     "declarationMap": true,
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "ES2023"],
     "module": "ESNext",
     "target": "ES2022",
     "jsx": "react-jsx"
