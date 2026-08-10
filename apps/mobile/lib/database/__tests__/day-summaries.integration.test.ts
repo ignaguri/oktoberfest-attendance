@@ -17,7 +17,9 @@ import {
   queryDrinkCountsByDate,
   queryPhotoCountsByDate,
   queryTentNamesByDate,
+  type DrinkCountRow,
   type SQLiteLike,
+  type TentNameRow,
 } from "../day-summaries";
 import { CREATE_TABLES_SQL } from "../schema";
 
@@ -37,6 +39,29 @@ function createDb(database: Database.Database): SQLiteLike {
  */
 function toPositionalParams(params: SQLiteBindParams): unknown[] {
   return Array.isArray(params) ? params : Object.values(params);
+}
+
+/**
+ * Wraps createDb() to record the exact SQL string and params each getAllAsync call was
+ * given. This lets a test re-run the *shipped* query constant directly (via
+ * `db.getAllAsync(calls[0].sql, calls[0].params)`) and assert on the raw row set, before
+ * groupTentNames/groupDrinkCounts/groupPhotoCounts do any JS-side deduplication or summing
+ * that could mask a SQL-level regression (e.g. UNION -> UNION ALL, or a GROUP BY that loses
+ * a COALESCE the SELECT list still has).
+ */
+function createSpyDb(database: Database.Database): {
+  db: SQLiteLike;
+  calls: { sql: string; params: SQLiteBindParams }[];
+} {
+  const plainDb = createDb(database);
+  const calls: { sql: string; params: SQLiteBindParams }[] = [];
+  const db: SQLiteLike = {
+    getAllAsync: async <T>(sql: string, params: SQLiteBindParams) => {
+      calls.push({ sql, params });
+      return plainDb.getAllAsync<T>(sql, params);
+    },
+  };
+  return { db, calls };
 }
 
 /**
@@ -163,6 +188,7 @@ describe("day-summaries SQL against real SQLite", () => {
 
   describe("queryTentNamesByDate", () => {
     it("deduplicates a tent that appears via both tent_visits and consumptions (proves UNION, not UNION ALL)", async () => {
+      const { db: spyDb, calls } = createSpyDb(database);
       insertAttendance(database, { id: "a1", userId: "u1", festivalId: "f1", date: "2026-09-23" });
       insertTent(database, { id: "t1", name: "Hofbräu" });
       insertTentVisit(database, {
@@ -174,9 +200,17 @@ describe("day-summaries SQL against real SQLite", () => {
       });
       insertConsumption(database, { id: "c1", attendanceId: "a1", tentId: "t1" });
 
-      const result = await queryTentNamesByDate(db, "f1");
+      const result = await queryTentNamesByDate(spyDb, "f1");
 
       expect(result.get("2026-09-23")).toEqual(["Hofbräu"]);
+
+      // groupTentNames() already de-duplicates identical tent names per date in JS, so the
+      // assertion above alone would still pass byte-for-byte under UNION ALL (two
+      // "Hofbräu" rows collapsed to one by the JS grouping). Re-running the exact SQL and
+      // params queryTentNamesByDate issued proves the dedup happens in SQLite itself:
+      // UNION returns 1 raw row here; UNION ALL would return 2.
+      const rawRows = await spyDb.getAllAsync<TentNameRow>(calls[0].sql, calls[0].params);
+      expect(rawRows).toHaveLength(1);
     });
 
     it("keeps a tent visit's name when there is no consumption at that tent (the reason the UNION exists)", async () => {
@@ -259,15 +293,16 @@ describe("day-summaries SQL against real SQLite", () => {
 
     it("drops the tent name (without dropping the day) when the tent itself is soft-deleted", async () => {
       // Commit 92dbce7f moved `t._deleted = 0` from the WHERE clause into the LEFT JOIN's
-      // ON clause. That placement matters: with it in the ON clause, the tent_visits row
-      // still survives the join (with tent_name = NULL) instead of being filtered out
-      // entirely. groupTentNames() then drops rows whose tent_name is null (see its
-      // `if (!row.tent_name) continue;`), so in this single-row scenario the date never
-      // gets a Map entry at all. The distinction matters when a day has OTHER, non-deleted
-      // tent signals too: with the predicate in the ON clause those other rows still
-      // surface the day; if the predicate were in WHERE instead, the entire UNION branch's
-      // row would vanish, which happens to look identical here (no other rows exist) but
-      // would silently swallow other tents' data in a busier day.
+      // ON clause. This test proves the actual bug that guards against: with NO
+      // `t._deleted` check at all, a soft-deleted tent's name would leak into the result.
+      // It does NOT prove ON is a better placement than WHERE for this predicate — verified
+      // directly (outside this suite) that both placements produce identical output through
+      // queryTentNamesByDate, because groupTentNames() drops null-name rows either way,
+      // normalizing the difference away before it's observable here. ON is preferred for
+      // intent and robustness (a soft-deleted tent shouldn't risk swallowing a whole UNION
+      // branch's row if the WHERE clause predicate were ever combined with an AND that
+      // touches other columns), but that preference isn't something this function's return
+      // value can distinguish.
       insertAttendance(database, { id: "a1", userId: "u1", festivalId: "f1", date: "2026-09-23" });
       insertTent(database, { id: "t1", name: "Hofbräu", deleted: 1 });
       insertTentVisit(database, {
@@ -373,13 +408,24 @@ describe("day-summaries SQL against real SQLite", () => {
     });
 
     it("sums a NULL-type row and a real beer row into a single beer entry, not two", async () => {
+      const { db: spyDb, calls } = createSpyDb(database);
       insertAttendance(database, { id: "a1", userId: "u1", festivalId: "f1", date: "2026-09-23" });
       insertConsumption(database, { id: "c1", attendanceId: "a1", drinkType: null });
       insertConsumption(database, { id: "c2", attendanceId: "a1", drinkType: "beer" });
 
-      const result = await queryDrinkCountsByDate(db, "f1");
+      const result = await queryDrinkCountsByDate(spyDb, "f1");
 
       expect(result.get("2026-09-23")).toEqual({ beer: 2 });
+
+      // groupDrinkCounts() sums counts per computed key in JS, so the assertion above alone
+      // would still pass if GROUP BY used the raw (uncoalesced) c.drink_type while only the
+      // SELECT list applied COALESCE: that would produce two raw rows — one for the NULL
+      // group, one for the 'beer' group — each labelled "beer" after the SELECT-list
+      // COALESCE, and JS would sum them to the same { beer: 2 }. Re-running the shipped SQL
+      // directly proves the GROUP BY itself coalesces: exactly one raw row for "beer".
+      const rawRows = await spyDb.getAllAsync<DrinkCountRow>(calls[0].sql, calls[0].params);
+      expect(rawRows).toHaveLength(1);
+      expect(rawRows[0]).toEqual({ date: "2026-09-23", drink_type: "beer", count: 2 });
     });
 
     it("produces no entry for an attendance with zero consumptions", async () => {
@@ -429,6 +475,21 @@ describe("day-summaries SQL against real SQLite", () => {
     it("excludes a soft-deleted photo", async () => {
       insertAttendance(database, { id: "a1", userId: "u1", festivalId: "f1", date: "2026-09-23" });
       insertBeerPicture(database, { id: "bp1", attendanceId: "a1", userId: "u1", deleted: 1 });
+
+      const result = await queryPhotoCountsByDate(db, "f1");
+
+      expect(result.has("2026-09-23")).toBe(false);
+    });
+
+    it("excludes photos under a soft-deleted attendance", async () => {
+      insertAttendance(database, {
+        id: "a1",
+        userId: "u1",
+        festivalId: "f1",
+        date: "2026-09-23",
+        deleted: 1,
+      });
+      insertBeerPicture(database, { id: "bp1", attendanceId: "a1", userId: "u1" });
 
       const result = await queryPhotoCountsByDate(db, "f1");
 
