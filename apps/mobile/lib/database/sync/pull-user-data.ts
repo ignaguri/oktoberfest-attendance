@@ -14,6 +14,7 @@ import { apiClient } from "../../api-client";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
 import { updateLastSyncAt } from "../sync-queue";
 import {
+  clearDeletedTentVisits,
   clearSupersededTentVisits,
   isPendingLocalRemoval,
   purgeConfirmedTentVisitTombstones,
@@ -137,6 +138,15 @@ export async function pullAttendances(
     await processAttendances(db, festivalId, attendances, attendancesResult, now, isFullSnapshot);
     await updateLastSyncAt(db, "attendances", now);
 
+    // The day key is read in the festival's calendar, matching the server since
+    // 20260811100000_bucket_tent_visits_by_festival_timezone. Previously this used
+    // the app-wide default, so any festival outside Europe/Berlin filed visits
+    // under a different day here than the server did.
+    const festivalRow = await db.getFirstAsync<{ timezone: string | null }>(
+      "SELECT timezone FROM festivals WHERE id = ?",
+      [festivalId],
+    );
+
     await processTentVisits(
       db,
       festivalId,
@@ -144,6 +154,7 @@ export async function pullAttendances(
       tentVisitsResult,
       now,
       isFullSnapshot,
+      festivalRow?.timezone ?? undefined,
     );
     await updateLastSyncAt(db, "tent_visits", now);
   } catch (error) {
@@ -336,11 +347,12 @@ async function processTentVisits(
   result: PullResult,
   now: string,
   isFullSnapshot: boolean,
+  timezone?: string,
 ): Promise<void> {
   const groups = new Map<string, TentVisitDayGroup>();
 
   for (const tv of tentVisits) {
-    const visitDate = formatDateForDatabase(new Date(tv.visitDate));
+    const visitDate = formatDateForDatabase(new Date(tv.visitDate), timezone);
     const createdAt = tv.visitDate;
 
     const groupKey = `${tv.userId}|${tv.tentId}|${tv.festivalId}|${visitDate}`;
@@ -421,11 +433,13 @@ async function processTentVisits(
     return;
   }
 
-  result.deleted += await purgeConfirmedTentVisitTombstones(
-    db,
-    festivalId,
-    new Set(tentVisits.map((tv) => tv.id)),
-  );
+  const serverIds = new Set(tentVisits.map((tv) => tv.id));
+  result.deleted += await purgeConfirmedTentVisitTombstones(db, festivalId, serverIds);
+
+  // And reconcile deletes made elsewhere: a visit removed on the web or another
+  // device is simply absent from the response, and nothing else would ever notice
+  // - its day-group is gone, so clearSupersededTentVisits is never called for it.
+  result.deleted += await clearDeletedTentVisits(db, festivalId, serverIds);
 }
 
 

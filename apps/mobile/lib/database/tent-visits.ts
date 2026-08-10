@@ -80,11 +80,23 @@ export interface TentVisitDayGroup {
  *   carry a server id but a timestamp visit_date that no UI query can see. Only
  *   the ones the server has stopped returning are dropped; the rest were
  *   rewritten by the caller's upsert.
+ *
+ * 'processing' counts as queued alongside 'pending' and 'failed'. Two
+ * SyncManagers exist over one database (see sync/background-sync.ts), so a
+ * background pull can overlap a foreground push, and a row whose push is mid
+ * flight must not be mistaken for a ghost.
  */
 export async function clearSupersededTentVisits(
   db: TentVisitsDb,
   group: TentVisitDayGroup,
 ): Promise<number> {
+  // Enforced rather than merely documented: an empty list would render as
+  // `id NOT IN ()`, which is a syntax error, and the caller builds these groups
+  // from whatever the pull returned.
+  if (group.serverIds.length === 0) {
+    return 0;
+  }
+
   const serverIdPlaceholders = group.serverIds.map(() => "?").join(", ");
 
   const result = await db.runAsync(
@@ -97,7 +109,8 @@ export async function clearSupersededTentVisits(
            _synced_at IS NULL
            AND id NOT IN (
              SELECT record_id FROM _sync_queue
-             WHERE table_name = 'tent_visits' AND status IN ('pending', 'failed')
+             WHERE table_name = 'tent_visits'
+               AND status IN ('pending', 'processing', 'failed')
            )
          )
          OR (_synced_at IS NOT NULL AND visit_date != ?)
@@ -234,6 +247,50 @@ export async function reconcileTentVisits(
   }
 
   return { tentsAdded, tentsRemoved };
+}
+
+/**
+ * Drop synced rows the server has stopped returning, and report how many went.
+ *
+ * A visit deleted on the web or on another device otherwise stayed on this phone
+ * forever: the pull only ever iterated the rows the response contained, and
+ * clearSupersededTentVisits only runs for day-groups that appear in it, so a row
+ * whose group is gone entirely was never reconsidered. attendances has had this
+ * sweep for a while (see the stale reconcile in sync/pull-user-data.ts);
+ * tent_visits had nothing, which the revisit work made easier to notice - delete
+ * one of two same-tent visits on the web and the phone kept showing both.
+ *
+ * Only touches rows that are synced and clean, so an unpushed local write or a
+ * pending removal is never mistaken for a server-side delete. Requires a full
+ * snapshot for the same reason the attendance sweep does: a row absent from a
+ * partial page may still exist.
+ */
+export async function clearDeletedTentVisits(
+  db: TentVisitsDb,
+  festivalId: string,
+  serverIds: Set<string>,
+): Promise<number> {
+  const localRows = await db.getAllAsync<{ id: string }>(
+    `SELECT id FROM tent_visits
+     WHERE festival_id = ?
+       AND _deleted = 0
+       AND _dirty = 0
+       AND _synced_at IS NOT NULL`,
+    [festivalId],
+  );
+
+  const stale = localRows.filter((row) => !serverIds.has(row.id));
+  if (stale.length === 0) {
+    return 0;
+  }
+
+  const placeholders = stale.map(() => "?").join(", ");
+  const result = await db.runAsync(
+    `DELETE FROM tent_visits WHERE id IN (${placeholders})`,
+    stale.map((row) => row.id),
+  );
+
+  return getChanges(result);
 }
 
 /**

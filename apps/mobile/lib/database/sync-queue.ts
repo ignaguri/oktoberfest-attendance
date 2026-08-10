@@ -432,6 +432,63 @@ export async function cleanupOrphanConsumptions(
   return orphans.length;
 }
 
+/**
+ * Drop local tent visits whose push can never succeed, and the dead queue entry
+ * with them. Returns how many rows went.
+ *
+ * The server rejects a visit it considers a no-op - logging the tent you are
+ * already in - with a validation error, and a rejection is not a transient
+ * failure: retrying cannot change the answer. Once the op has exhausted its
+ * retries it is skipped forever, and without this the local row sat there
+ * `_dirty` with no way to sync, counted in the pending badge, so the app claimed
+ * unsynced work it would never do anything about.
+ *
+ * The local guard and the server's disagree only at the edges - the local one
+ * reads the device's day while the server reads the festival's - so this is the
+ * backstop for the window where the phone thinks a visit is a move and the
+ * server does not.
+ *
+ * Mirrors cleanupOrphanConsumptions, including the age floor: a row whose push
+ * is merely in flight or briefly failing must not be swept.
+ */
+export async function cleanupOrphanTentVisits(
+  db: SQLite.SQLiteDatabase,
+  maxRetries: number = 3,
+  minAgeHours: number = 1,
+): Promise<number> {
+  const orphans = await db.getAllAsync<{ id: string; queue_id: string | null }>(
+    `SELECT tv.id as id, q.id as queue_id
+       FROM tent_visits tv
+       LEFT JOIN _sync_queue q
+         ON q.table_name = 'tent_visits'
+        AND q.record_id = tv.id
+        AND q.operation = 'INSERT'
+      WHERE tv._dirty = 1
+        AND tv._deleted = 0
+        AND tv._synced_at IS NULL
+        AND q.status = 'failed'
+        AND q.retry_count >= ?
+        AND tv.created_at < datetime('now', ?)`,
+    [maxRetries, `-${minAgeHours} hours`],
+  );
+
+  if (orphans.length === 0) return 0;
+
+  const placeholders = orphans.map(() => "?").join(",");
+  const visitIds = orphans.map((o) => o.id);
+  const queueIds = orphans.map((o) => o.queue_id).filter((q): q is string => !!q);
+
+  await db.runAsync(`DELETE FROM tent_visits WHERE id IN (${placeholders})`, visitIds);
+
+  if (queueIds.length > 0) {
+    const qPlaceholders = queueIds.map(() => "?").join(",");
+    await db.runAsync(`DELETE FROM _sync_queue WHERE id IN (${qPlaceholders})`, queueIds);
+  }
+
+  logger.debug(`[SyncQueue] Cleaned up ${orphans.length} unsyncable tent visit rows`);
+  return orphans.length;
+}
+
 // =============================================================================
 // Soft Delete Operations
 // =============================================================================

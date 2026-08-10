@@ -16,6 +16,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { CREATE_TABLES_SQL } from "../schema";
 import {
+  clearDeletedTentVisits,
   clearSupersededTentVisits,
   isPendingLocalRemoval,
   purgeConfirmedTentVisitTombstones,
@@ -589,5 +590,128 @@ describe("reconcileTentVisits timestamp staggering", () => {
     });
 
     expect(allVisits(database)[0].created_at).toBe("2026-09-24T10:00:00Z");
+  });
+});
+
+describe("clearDeletedTentVisits against real SQLite", () => {
+  let database: Database.Database;
+  let db: TentVisitsDb;
+
+  beforeEach(() => {
+    database = new Database(":memory:");
+    for (const createTableSql of Object.values(CREATE_TABLES_SQL)) {
+      database.exec(createTableSql);
+    }
+    database.pragma("foreign_keys = ON");
+    insertFestival(database, FESTIVAL);
+    insertTent(database, "t1");
+    insertTent(database, "t2");
+    db = createDb(database);
+  });
+
+  afterEach(() => {
+    database.close();
+  });
+
+  it("drops a synced row the server no longer returns", async () => {
+    insertTentVisit(database, { id: "gone", tentId: "t1" });
+
+    // Deleted on the web or another device. Nothing else notices: the row's
+    // day-group is absent from the pull, so clearSupersededTentVisits is never
+    // called for it, and the phone kept showing the visit indefinitely.
+    const cleared = await clearDeletedTentVisits(db, FESTIVAL, new Set(["other"]));
+
+    expect(cleared).toBe(1);
+    expect(allVisits(database)).toEqual([]);
+  });
+
+  it("keeps a row the server still returns", async () => {
+    insertTentVisit(database, { id: "kept", tentId: "t1" });
+
+    const cleared = await clearDeletedTentVisits(db, FESTIVAL, new Set(["kept"]));
+
+    expect(cleared).toBe(0);
+    expect(allVisits(database).map((row) => row.id)).toEqual(["kept"]);
+  });
+
+  it("never touches an unpushed local write", async () => {
+    // _dirty with no _synced_at is a visit logged here that the server has not
+    // seen yet, so its absence from the response says nothing.
+    insertTentVisit(database, { id: "local", tentId: "t1", syncedAt: null, dirty: 1 });
+    insertTentVisit(database, { id: "removal", tentId: "t2", deleted: 1, dirty: 1 });
+
+    const cleared = await clearDeletedTentVisits(db, FESTIVAL, new Set());
+
+    expect(cleared).toBe(0);
+    expect(allVisits(database).map((row) => row.id).sort()).toEqual(["local", "removal"]);
+  });
+
+  it("stays inside its own festival", async () => {
+    insertFestival(database, "f2");
+    database
+      .prepare(
+        `INSERT INTO tent_visits
+          (id, user_id, tent_id, festival_id, visit_date, created_at, _synced_at, _deleted, _dirty)
+         VALUES ('other-festival', ?, 't1', 'f2', ?, ?, ?, 0, 0)`,
+      )
+      .run(USER, DATE, "2026-09-23T20:57:00Z", "2026-09-23T21:00:00Z");
+
+    const cleared = await clearDeletedTentVisits(db, FESTIVAL, new Set());
+
+    expect(cleared).toBe(0);
+    expect(allVisits(database).map((row) => row.id)).toEqual(["other-festival"]);
+  });
+});
+
+describe("clearSupersededTentVisits guards", () => {
+  let database: Database.Database;
+  let db: TentVisitsDb;
+
+  beforeEach(() => {
+    database = new Database(":memory:");
+    for (const createTableSql of Object.values(CREATE_TABLES_SQL)) {
+      database.exec(createTableSql);
+    }
+    database.pragma("foreign_keys = ON");
+    insertFestival(database, FESTIVAL);
+    insertTent(database, "t1");
+    db = createDb(database);
+  });
+
+  afterEach(() => {
+    database.close();
+  });
+
+  it("does nothing rather than emitting `id NOT IN ()` for an empty group", async () => {
+    insertTentVisit(database, { id: "tv1", tentId: "t1" });
+
+    await expect(
+      clearSupersededTentVisits(db, {
+        userId: USER,
+        tentId: "t1",
+        festivalId: FESTIVAL,
+        visitDate: DATE,
+        serverIds: [],
+      }),
+    ).resolves.toBe(0);
+    expect(allVisits(database)).toHaveLength(1);
+  });
+
+  it("spares a ghost whose push is mid-flight", async () => {
+    // Two SyncManagers share one database, so a background pull can overlap a
+    // foreground push. 'processing' has to count as queued.
+    insertTentVisit(database, { id: "inflight", tentId: "t1", syncedAt: null, dirty: 1 });
+    insertQueueOp(database, { recordId: "inflight", status: "processing" });
+
+    const cleared = await clearSupersededTentVisits(db, {
+      userId: USER,
+      tentId: "t1",
+      festivalId: FESTIVAL,
+      visitDate: DATE,
+      serverIds: ["server-1"],
+    });
+
+    expect(cleared).toBe(0);
+    expect(allVisits(database).map((row) => row.id)).toEqual(["inflight"]);
   });
 });

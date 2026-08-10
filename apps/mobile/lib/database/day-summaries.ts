@@ -6,8 +6,10 @@
  * per-day hooks (useAdaptedConsumptionsByDate and friends) — one query per row
  * is an N+1 of both a SQLite read and a React Query cache entry.
  *
- * Raw SQL rather than Drizzle: UNION is awkward in the query builder, and the
- * test suite mocks getAllAsync (there is no real SQLite in tests).
+ * Raw SQL rather than Drizzle: UNION is awkward in the query builder, and having
+ * the statements as plain strings lets ./__tests__/day-summaries.integration.test.ts
+ * run them against a real SQLite database, where a wrong column or a missing
+ * `_deleted` filter fails instead of passing silently against a mock.
  *
  * The local `attendances` table (and every table that joins to it here) holds
  * only the signed-in user's rows, so user scoping is implicit throughout this

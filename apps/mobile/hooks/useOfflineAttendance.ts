@@ -230,18 +230,27 @@ export function useOfflineLogTentVisit() {
       }
 
       const tentVisitId = generateUUID();
-      await db.runAsync(
-        `INSERT INTO tent_visits (
-          id, user_id, tent_id, festival_id, visit_date, created_at,
-          _synced_at, _deleted, _dirty
-        ) VALUES (?, ?, ?, ?, ?, ?, NULL, 0, 1)`,
-        [tentVisitId, userId, input.tentId, input.festivalId, input.date, visitedAt],
-      );
 
-      const queueOpId = await enqueueOperation(db, "INSERT", "tent_visits", tentVisitId, {
-        festival_id: input.festivalId,
-        tent_id: input.tentId,
-        visited_at: visitedAt,
+      // One transaction: the row and the operation that pushes it have to appear
+      // together. Killed between them, the row existed `_dirty` with nothing
+      // queued to push it, and the next pull then deleted it as a ghost - because
+      // a revisit's day-group does have server rows, which is exactly what makes
+      // it a revisit. The user's visit disappeared with no trace.
+      let queueOpId = "";
+      await db.withTransactionAsync(async () => {
+        await db.runAsync(
+          `INSERT INTO tent_visits (
+            id, user_id, tent_id, festival_id, visit_date, created_at,
+            _synced_at, _deleted, _dirty
+          ) VALUES (?, ?, ?, ?, ?, ?, NULL, 0, 1)`,
+          [tentVisitId, userId, input.tentId, input.festivalId, input.date, visitedAt],
+        );
+
+        queueOpId = await enqueueOperation(db, "INSERT", "tent_visits", tentVisitId, {
+          festival_id: input.festivalId,
+          tent_id: input.tentId,
+          visited_at: visitedAt,
+        });
       });
 
       logger.debug("[OfflineAttendance] Logged tent visit:", { tentVisitId, visitedAt });

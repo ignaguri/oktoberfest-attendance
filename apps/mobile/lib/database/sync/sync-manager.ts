@@ -13,7 +13,12 @@ import { apiClient } from "../../api-client";
 import { runUploadFileOp } from "../photo-queue";
 import { type ProcessorResult, QueueProcessor } from "../queue-processor";
 import { MUTABLE_TABLES } from "../schema";
-import { cleanupOrphanConsumptions, getQueueStats, getSyncMetadata } from "../sync-queue";
+import {
+  cleanupOrphanConsumptions,
+  cleanupOrphanTentVisits,
+  getQueueStats,
+  getSyncMetadata,
+} from "../sync-queue";
 import { pullGroupMembers, pullGroups } from "./pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "./pull-reference";
 import { pullAttendances, pullConsumptions, pullProfile } from "./pull-user-data";
@@ -144,6 +149,10 @@ export class SyncManager {
         // from the pre-idempotency-key duplicate-row bug). Only after a
         // successful pull so we know the server view is loaded locally.
         await cleanupOrphanConsumptions(this.db);
+        // Same for tent visits the server keeps rejecting: a validation error is
+        // terminal, so the row would otherwise stay dirty and unsyncable while
+        // padding the pending count.
+        await cleanupOrphanTentVisits(this.db);
       }
     } catch (error) {
       logger.error("[SyncManager] Pull failed:", error);
