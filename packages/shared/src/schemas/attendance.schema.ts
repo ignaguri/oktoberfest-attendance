@@ -125,6 +125,17 @@ export const LogTentVisitSchema = z.object({
    * 20:00, not the push time.
    */
   visitedAt: z.iso.datetime(),
+  /**
+   * Id for the new row, supplied by offline clients.
+   *
+   * The mobile app writes the visit to its own database before it can reach the
+   * network, so it already has an id. Honouring it keeps the local row and the
+   * server row the same row: otherwise the server mints its own id and the next
+   * pull sees a stranger next to an orphan, which is the ghost-row problem
+   * reconcileTentVisits already has to work around. It also makes a retried push
+   * idempotent instead of logging the visit twice.
+   */
+  tentVisitId: z.uuid().optional(),
 });
 
 export type LogTentVisitInput = z.infer<typeof LogTentVisitSchema>;

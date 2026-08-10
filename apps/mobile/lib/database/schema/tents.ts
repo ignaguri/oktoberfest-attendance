@@ -68,15 +68,12 @@ export const tentVisits = sqliteTable(
     created_at: text(),
     ...offlineColumns,
   },
-  (t) => [
-    unique("tent_visits_user_tent_festival_date").on(
-      t.user_id,
-      t.tent_id,
-      t.festival_id,
-      t.visit_date,
-    ),
-    index("idx_tent_visits_user_festival").on(t.user_id, t.festival_id),
-  ],
+  // Deliberately no uniqueness over (user_id, tent_id, festival_id, visit_date).
+  // A day is a sequence of visits, not a set of tents: leaving a tent and coming
+  // back later is two rows sharing that key. visit_date holds the day (YYYY-MM-DD)
+  // and created_at the visit time, so created_at is what orders them.
+  // Migration v2 -> v3 drops the index this used to declare.
+  (t) => [index("idx_tent_visits_user_festival").on(t.user_id, t.festival_id)],
 );
 
 export type TentVisit = typeof tentVisits.$inferSelect;

@@ -1381,6 +1381,10 @@
                   "visitedAt": {
                     "type": "string",
                     "format": "date-time"
+                  },
+                  "tentVisitId": {
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "required": [

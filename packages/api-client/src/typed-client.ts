@@ -285,6 +285,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         festivalId: string;
         tentId: string;
         visitedAt: string;
+        tentVisitId?: string;
       }): Promise<{
         tentVisitId: string;
         attendanceId: string;

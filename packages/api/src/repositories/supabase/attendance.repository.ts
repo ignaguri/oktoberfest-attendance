@@ -328,6 +328,37 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     // update_personal_attendance_with_tents buckets visit_date (visit_date::date)
     // and how the mobile pull derives its local day key.
     const date = visitedAt.toISOString().split("T")[0];
+    const tentVisitId = input.tentVisitId ?? crypto.randomUUID();
+
+    // A client-supplied id that already exists is a replayed push, not a new
+    // visit. Return the stored row instead of falling through to the guard
+    // below, which would reject the replay as "you are already in this tent"
+    // and hide the fact that the original call had actually succeeded.
+    if (input.tentVisitId) {
+      const { data: replayed, error: replayedError } = await this.supabase
+        .from("tent_visits")
+        .select("id, visit_date")
+        .eq("id", input.tentVisitId)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (replayedError) {
+        throw new DatabaseError(`Failed to look up tent visit: ${replayedError.message}`);
+      }
+
+      if (replayed?.visit_date) {
+        const { attendanceId } = await this.updatePersonal(userId, {
+          festivalId: input.festivalId,
+          date,
+          amount: 0,
+        });
+        return {
+          tentVisitId: replayed.id,
+          attendanceId,
+          visitedAt: new Date(replayed.visit_date).toISOString(),
+        };
+      }
+    }
 
     // The day's most recent visit. Logging the tent you are already in is a
     // stray tap, not a revisit, so it is rejected rather than silently stored -
@@ -367,7 +398,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     const { data: tentVisit, error: insertError } = await this.supabase
       .from("tent_visits")
       .insert({
-        id: crypto.randomUUID(),
+        id: tentVisitId,
         user_id: userId,
         festival_id: input.festivalId,
         tent_id: input.tentId,

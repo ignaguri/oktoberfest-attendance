@@ -13,6 +13,7 @@ import { logger } from "@/lib/logger";
 import { apiClient } from "../../api-client";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
 import { updateLastSyncAt } from "../sync-queue";
+import { clearSupersededTentVisits, type TentVisitDayGroup } from "../tent-visits";
 import { logConflict, shouldUpdate } from "./conflict";
 import type { PullResult } from "./types";
 
@@ -300,18 +301,21 @@ async function processAttendances(
  * visit_date is normalized to YYYY-MM-DD to match the local write path in
  * useOfflineUpdateAttendance and the UI query in useAdaptedAttendanceByDate
  * (which compares on exact date-string match). The server stores visit_date
- * as an ISO timestamp, but the local schema's
- * UNIQUE(user_id, tent_id, festival_id, visit_date) index and adapted-hook
- * query both assume "one row per tent per day".
+ * as an ISO timestamp; created_at keeps it, and is what orders several visits
+ * to the same tent within one day.
  *
- * Ghost-row reconciliation: useOfflineUpdateAttendance writes tent_visits
- * locally with a client-generated UUID and _dirty=1. The parent attendance
- * push creates server tent_visits with different UUIDs — the local client-UUID
- * rows are never cleared because there's no direct push handler for
- * tent_visits. Also, earlier mixed-format pulls may have left rows with
- * timestamp visit_dates that are invisible to the UI. Both are cleaned up
- * here by deleting any row sharing the natural key (date-only match, or a
- * timestamp prefix-matching the date) whose id differs from the server's.
+ * Ghost-row reconciliation: reconcileTentVisits writes a row with a
+ * client-generated UUID and _dirty=1, and the parent attendance push then
+ * creates the server row under a UUID of its own, so the local one is orphaned.
+ * Earlier mixed-format pulls also left rows whose visit_date is a timestamp,
+ * invisible to the UI. Both are cleared per (user, tent, festival, day) group
+ * once the server's own rows for that group are in place.
+ *
+ * The cleanup deliberately runs per group rather than per row. It used to delete
+ * every row sharing the natural key with a different id, which was fine while a
+ * unique index held the day to one visit per tent, but now erases the very rows
+ * that make a revisit a revisit: pulling A@10:00 and A@20:00 would have had the
+ * second delete the first.
  */
 async function processTentVisits(
   db: SQLite.SQLiteDatabase,
@@ -319,30 +323,24 @@ async function processTentVisits(
   result: PullResult,
   now: string,
 ): Promise<void> {
+  const groups = new Map<string, TentVisitDayGroup>();
+
   for (const tv of tentVisits) {
     const visitDate = formatDateForDatabase(new Date(tv.visitDate));
     const createdAt = tv.visitDate;
 
-    // Clean up any other local row with the same natural key — both ghost
-    // rows (date-only visit_date, _dirty=1) and stale pulled rows from an
-    // earlier mixed-format pull (timestamp visit_date starting with this date).
-    // Only fires when such a row actually exists to avoid per-sync write churn.
-    const ghost = await db.getFirstAsync<{ id: string }>(
-      `SELECT id FROM tent_visits
-       WHERE user_id = ? AND tent_id = ? AND festival_id = ?
-         AND (visit_date = ? OR visit_date LIKE ?)
-         AND id != ?
-       LIMIT 1`,
-      [tv.userId, tv.tentId, tv.festivalId, visitDate, `${visitDate}%`, tv.id],
-    );
-    if (ghost) {
-      await db.runAsync(
-        `DELETE FROM tent_visits
-         WHERE user_id = ? AND tent_id = ? AND festival_id = ?
-           AND (visit_date = ? OR visit_date LIKE ?)
-           AND id != ?`,
-        [tv.userId, tv.tentId, tv.festivalId, visitDate, `${visitDate}%`, tv.id],
-      );
+    const groupKey = `${tv.userId}|${tv.tentId}|${tv.festivalId}|${visitDate}`;
+    const group = groups.get(groupKey);
+    if (group) {
+      group.serverIds.push(tv.id);
+    } else {
+      groups.set(groupKey, {
+        userId: tv.userId,
+        tentId: tv.tentId,
+        festivalId: tv.festivalId,
+        visitDate,
+        serverIds: [tv.id],
+      });
     }
 
     const existing = await db.getFirstAsync<LocalTentVisit>(
@@ -377,7 +375,15 @@ async function processTentVisits(
       result.inserted++;
     }
   }
+
+  // Second pass on purpose: a group's superseded rows can only be identified
+  // once every server row in it has been written, or the last row pulled would
+  // look like a stranger to the ones before it.
+  for (const group of groups.values()) {
+    result.deleted += await clearSupersededTentVisits(db, group);
+  }
 }
+
 
 /**
  * Pull consumptions for all attendances

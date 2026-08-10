@@ -68,6 +68,16 @@ const MIGRATIONS: MigrationFn[] = [
   async (db) => {
     await addColumnIfNotExists(db, "tent_visits", "created_at", "TEXT");
   },
+
+  // v2 -> v3: Allow more than one visit per tent per day.
+  //
+  // A day was modelled as a set of tents, so this index made "back at the tent I
+  // was in this morning" unrepresentable on device. Dropping it is enough: the
+  // constraint shipped as a standalone index (Drizzle migration 0000), not as an
+  // inline table constraint, so no table rebuild and no row copying is needed.
+  async (db) => {
+    await dropIndexIfExists(db, "tent_visits_user_tent_festival_date");
+  },
 ];
 
 /**

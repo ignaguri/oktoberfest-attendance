@@ -705,6 +705,8 @@ export interface paths {
                         tentId: string;
                         /** Format: date-time */
                         visitedAt: string;
+                        /** Format: uuid */
+                        tentVisitId?: string;
                     };
                 };
             };

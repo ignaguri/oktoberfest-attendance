@@ -1,5 +1,6 @@
 /**
- * Local tent_visits reconciliation for the attendance form's tent selector.
+ * Local tent_visits row management: reconciling the attendance form's tent
+ * selector, and clearing the rows a pull has superseded.
  *
  * The local write path used to only ever ADD rows, so deselecting a tent left
  * it on screen: the pull only iterates the tent visits the server returned, and
@@ -40,6 +41,76 @@ export interface ReconcileTentVisitsParams {
 export interface ReconcileTentVisitsResult {
   tentsAdded: string[];
   tentsRemoved: string[];
+}
+
+/** One (user, tent, festival, day) worth of tent visits the server returned. */
+export interface TentVisitDayGroup {
+  userId: string;
+  tentId: string;
+  festivalId: string;
+  /** YYYY-MM-DD. */
+  visitDate: string;
+  /** Ids the server holds for this group. Never empty. */
+  serverIds: string[];
+}
+
+/**
+ * Delete the local rows in one day-group that the server's rows have replaced,
+ * and only those.
+ *
+ * What must survive is the point of being this specific. A second visit to the
+ * same tent that day is an ordinary row sharing the group's natural key, and so
+ * is a visit logged offline that has not pushed yet. The old rule deleted every
+ * row in the group whose id differed from the server's, which was safe only while
+ * a unique index held each day to one visit per tent.
+ *
+ * Two kinds go:
+ *
+ * - Ghosts. reconcileTentVisits writes a row with a client id and _dirty = 1, and
+ *   the attendance push then creates the server row under an id of its own,
+ *   orphaning the local one. Recognised by never having synced and having no
+ *   tent_visits operation queued: nothing is going to push it. A row the queue
+ *   still references has not been materialized server-side yet, so it stays.
+ *   Visits logged through logTentVisit are not affected either way, since the
+ *   server honours the id the client supplies and they come back as themselves.
+ * - Legacy rows. Pulled before visit_date was normalized to the day, so they
+ *   carry a server id but a timestamp visit_date that no UI query can see. Only
+ *   the ones the server has stopped returning are dropped; the rest were
+ *   rewritten by the caller's upsert.
+ */
+export async function clearSupersededTentVisits(
+  db: TentVisitsDb,
+  group: TentVisitDayGroup,
+): Promise<number> {
+  const serverIdPlaceholders = group.serverIds.map(() => "?").join(", ");
+
+  const result = await db.runAsync(
+    `DELETE FROM tent_visits
+     WHERE user_id = ? AND tent_id = ? AND festival_id = ?
+       AND (visit_date = ? OR visit_date LIKE ?)
+       AND id NOT IN (${serverIdPlaceholders})
+       AND (
+         (
+           _synced_at IS NULL
+           AND id NOT IN (
+             SELECT record_id FROM _sync_queue
+             WHERE table_name = 'tent_visits' AND status IN ('pending', 'failed')
+           )
+         )
+         OR (_synced_at IS NOT NULL AND visit_date != ?)
+       )`,
+    [
+      group.userId,
+      group.tentId,
+      group.festivalId,
+      group.visitDate,
+      `${group.visitDate}%`,
+      ...group.serverIds,
+      group.visitDate,
+    ],
+  );
+
+  return getChanges(result);
 }
 
 /**
@@ -85,23 +156,53 @@ export async function reconcileTentVisits(
   }
 
   for (const tentId of tentsAdded) {
-    // INSERT OR REPLACE with a COALESCE'd id: a soft-deleted row for this tent
-    // still occupies UNIQUE(user_id, tent_id, festival_id, visit_date), so
-    // reuse its id and revive it rather than hitting a constraint error.
+    // Revive a soft-deleted row for this tent rather than inserting alongside it.
+    // Nothing forces this any more now that the unique index is gone (migration
+    // v2 -> v3), but keeping the id stable matters: the pull matches a pending
+    // local row to the server row it became by (natural key, created_at), and a
+    // second tombstoned row sharing that key would be a needless near-miss.
+    const revived = await db.runAsync(
+      `UPDATE tent_visits
+       SET created_at = ?, _synced_at = NULL, _deleted = 0, _dirty = 1
+       WHERE id = (
+         SELECT id FROM tent_visits
+         WHERE user_id = ? AND tent_id = ? AND festival_id = ? AND visit_date = ?
+           AND _deleted = 1
+         ORDER BY created_at DESC
+         LIMIT 1
+       )`,
+      [now, userId, tentId, festivalId, date],
+    );
+
+    if (getChanges(revived) > 0) {
+      continue;
+    }
+
     await db.runAsync(
-      `INSERT OR REPLACE INTO tent_visits (
+      `INSERT INTO tent_visits (
         id, user_id, tent_id, festival_id, visit_date, created_at,
         _synced_at, _deleted, _dirty
-      ) VALUES (
-        COALESCE(
-          (SELECT id FROM tent_visits WHERE user_id = ? AND tent_id = ? AND festival_id = ? AND visit_date = ?),
-          ?
-        ),
-        ?, ?, ?, ?, ?, NULL, 0, 1
-      )`,
-      [userId, tentId, festivalId, date, generateId(), userId, tentId, festivalId, date, now],
+      ) VALUES (?, ?, ?, ?, ?, ?, NULL, 0, 1)`,
+      [generateId(), userId, tentId, festivalId, date, now],
     );
   }
 
   return { tentsAdded, tentsRemoved };
+}
+
+/**
+ * Rows affected by a write.
+ *
+ * expo-sqlite resolves runAsync to a result carrying `changes`, and so does the
+ * better-sqlite3 harness the tests run against, but TentVisitsDb intentionally
+ * types it as unknown so the interface stays minimal. Anything else counts as
+ * zero, which falls back to inserting - the safe direction, since a missed revive
+ * writes a row while a wrongly assumed one would silently drop the visit.
+ */
+function getChanges(result: unknown): number {
+  if (typeof result === "object" && result !== null && "changes" in result) {
+    const { changes } = result as { changes: unknown };
+    return typeof changes === "number" ? changes : 0;
+  }
+  return 0;
 }
