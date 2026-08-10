@@ -701,6 +701,12 @@
       "festival": "Este festival",
       "allTime": "Histórico"
     },
+    "unlock": {
+      "single": "¡Logro desbloqueado!",
+      "multiple": "¡{{count}} logros desbloqueados!",
+      "points": "+{{points}} pts",
+      "viewAction": "Ver"
+    },
     "stats": {
       "totalProgress": "Progreso total",
       "percentUnlocked": "{{percent}}% desbloqueado",

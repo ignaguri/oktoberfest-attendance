@@ -701,6 +701,12 @@
       "festival": "This festival",
       "allTime": "All time"
     },
+    "unlock": {
+      "single": "Achievement unlocked",
+      "multiple": "{{count}} achievements unlocked",
+      "points": "+{{points}} pts",
+      "viewAction": "View"
+    },
     "stats": {
       "totalProgress": "Total Progress",
       "percentUnlocked": "{{percent}}% unlocked",
