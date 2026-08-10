@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { ReactNode } from "react";
 
 import type { PersistedUnlock } from "../achievements";
@@ -33,6 +41,15 @@ const UnlockQueueContext = createContext<UnlockQueueValue | null>(null);
 export function UnlockQueueProvider({ children }: { children: ReactNode }) {
   const apiClient = useApiClient();
   const [batch, setBatch] = useState<PersistedUnlock[]>([]);
+  // Mirrors `batch` so consume() can read the current value without putting a
+  // side effect (the markSeen call) inside the setState updater — React
+  // requires updater functions to be pure, and Strict Mode double-invokes
+  // them in dev, which would double-fire the request.
+  const batchRef = useRef(batch);
+
+  useEffect(() => {
+    batchRef.current = batch;
+  }, [batch]);
 
   const { data: pending } = useQuery(
     QueryKeys.pendingUnlocks(),
@@ -61,23 +78,22 @@ export function UnlockQueueProvider({ children }: { children: ReactNode }) {
   }, [pending]);
 
   const consume = useCallback(() => {
-    setBatch((current) => {
-      if (current.length === 0) {
-        return current;
-      }
+    const current = batchRef.current;
+    if (current.length === 0) {
+      return;
+    }
 
-      const eventIds = current.map((entry) => entry.eventId);
-      // Acked on display, not dismissal: an unacked event is re-pushed by the
-      // notification sweep, and a user who never dismisses would be pushed
-      // every time it runs. A lost ack costs one redundant push instead.
-      void apiClient.achievements.markSeen(eventIds).catch(() => {
-        // Swallowed deliberately. The sweep's ten-minute delay is the backstop,
-        // and surfacing a failed ack to the user would be noise about a
-        // celebration they already saw.
-      });
-
-      return [];
+    const eventIds = current.map((entry) => entry.eventId);
+    // Acked on display, not dismissal: an unacked event is re-pushed by the
+    // notification sweep, and a user who never dismisses would be pushed
+    // every time it runs. A lost ack costs one redundant push instead.
+    void apiClient.achievements.markSeen(eventIds).catch(() => {
+      // Swallowed deliberately. The sweep's ten-minute delay is the backstop,
+      // and surfacing a failed ack to the user would be noise about a
+      // celebration they already saw.
     });
+
+    setBatch([]);
   }, [apiClient]);
 
   const value = useMemo(() => ({ batch, push, consume }), [batch, push, consume]);
