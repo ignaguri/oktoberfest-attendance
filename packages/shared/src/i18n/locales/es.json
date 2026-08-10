@@ -639,6 +639,17 @@
       "hasReservation": "Reserva",
       "selected": "Seleccionado"
     },
+    "view": {
+      "calendar": "Calendario",
+      "list": "Lista"
+    },
+    "list": {
+      "a11yDrinks": "{{total}} bebidas",
+      "a11ySpent": "{{amount}} gastado",
+      "moreTents": "+{{amount}}",
+      "reserved": "Reservado",
+      "tip": "+{{amount}} propina"
+    },
     "tabs": {
       "attendance": "Asistencia",
       "reservation": "Reserva"
@@ -2018,6 +2029,10 @@
       "saving": "Guardando...",
       "cancelConfirmTitle": "¿Cancelar reserva?",
       "cancelConfirmMessage": "¿Estás seguro de que querés cancelar esta reserva? Esta acción no se puede deshacer."
+    },
+    "past": {
+      "title": "Reserva pasada",
+      "description": "Este día ya pasó, así que esta reserva ya no se puede modificar."
     },
     "checkIn": {
       "title": "¡Hora de hacer check-in!",

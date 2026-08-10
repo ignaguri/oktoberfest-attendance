@@ -7,7 +7,7 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Reservation } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
-import { format, setHours, setMinutes } from "date-fns";
+import { format, parseISO, setHours, setMinutes } from "date-fns";
 import { ChevronDown, MapPin, Trash2 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -54,8 +54,25 @@ interface ReservationTabContentProps {
   festivalId: string;
   selectedDate: Date;
   existingReservation?: Reservation | null;
+  /**
+   * Show the reservation as a read-only summary instead of an editable form.
+   * Used for dates that have already passed: the reservation is still worth
+   * reading back, but editing or cancelling something that already happened is
+   * meaningless.
+   */
+  readOnly?: boolean;
   onSuccess?: () => void;
   onClose: () => void;
+}
+
+/** One label/value pair in the read-only summary. */
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <VStack space="xs">
+      <Text className="text-xs font-medium uppercase text-typography-500">{label}</Text>
+      <Text className="text-base text-typography-900">{value}</Text>
+    </VStack>
+  );
 }
 
 /**
@@ -68,11 +85,14 @@ interface ReservationTabContentProps {
  * - Optional notes
  * - Visible to groups toggle
  * - Cancel reservation (edit mode)
+ *
+ * With `readOnly`, renders a summary of the existing reservation instead.
  */
 export function ReservationTabContent({
   festivalId,
   selectedDate,
   existingReservation,
+  readOnly = false,
   onSuccess,
   onClose,
 }: ReservationTabContentProps) {
@@ -272,6 +292,37 @@ export function ReservationTabContent({
   const isSaving = createReservation.loading || updateReservation.loading;
   const isCancelling = cancelReservation.loading;
   const isProcessing = isSaving || isCancelling;
+
+  // Read-only summary for dates that have already passed. Placed after every
+  // hook above so the hook order stays identical in both modes.
+  if (readOnly && existingReservation) {
+    return (
+      <VStack space="lg" className="px-2 pb-4">
+        <VStack space="xs" className="rounded-lg bg-background-100 p-3">
+          <Text className="text-sm font-medium text-typography-900">
+            {t("reservation.past.title")}
+          </Text>
+          <Text className="text-sm text-typography-500">{t("reservation.past.description")}</Text>
+        </VStack>
+
+        <DetailRow
+          label={t("reservation.form.tent")}
+          value={existingReservation.tentName || t("reservation.checkIn.unknownTent")}
+        />
+        <DetailRow
+          label={t("reservation.form.arrivalTime")}
+          value={format(parseISO(existingReservation.startAt), "HH:mm")}
+        />
+        {existingReservation.note ? (
+          <DetailRow label={t("reservation.checkIn.note")} value={existingReservation.note} />
+        ) : null}
+
+        <Button variant="outline" action="secondary" className="w-full" onPress={onClose}>
+          <ButtonText>{t("common.buttons.close")}</ButtonText>
+        </Button>
+      </VStack>
+    );
+  }
 
   return (
     <>

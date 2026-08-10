@@ -13,6 +13,7 @@ import { OfflineContext } from "@/lib/database/offline-provider";
 import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import type { LocalAttendance } from "@/lib/database/schema";
 import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
+import { reconcileTentVisits } from "@/lib/database/tent-visits";
 import { logger } from "@/lib/logger";
 
 interface UpdateAttendanceInput {
@@ -104,36 +105,20 @@ export function useOfflineUpdateAttendance() {
         });
       }
 
-      // Write tent_visits locally so adapted hooks see them immediately
-      if (input.tents && input.tents.length > 0) {
-        const nowIso = new Date().toISOString();
-        for (const tentId of input.tents) {
-          const visitId = generateUUID();
-          await db.runAsync(
-            `INSERT OR REPLACE INTO tent_visits (
-              id, user_id, tent_id, festival_id, visit_date, created_at,
-              _synced_at, _deleted, _dirty
-            ) VALUES (
-              COALESCE(
-                (SELECT id FROM tent_visits WHERE user_id = ? AND tent_id = ? AND festival_id = ? AND visit_date = ?),
-                ?
-              ),
-              ?, ?, ?, ?, ?, NULL, 0, 1
-            )`,
-            [
-              userId,
-              tentId,
-              input.festivalId,
-              input.date,
-              visitId,
-              userId,
-              tentId,
-              input.festivalId,
-              input.date,
-              nowIso,
-            ],
-          );
-        }
+      // Reconcile tent_visits locally so adapted hooks see both additions and
+      // removals immediately. `undefined` means "not supplied" and leaves the
+      // day's visits alone, mirroring the server contract for p_tent_ids.
+      let tentsAdded: string[] = [];
+      let tentsRemoved: string[] = [];
+      if (input.tents) {
+        ({ tentsAdded, tentsRemoved } = await reconcileTentVisits(db, {
+          userId,
+          festivalId: input.festivalId,
+          date: input.date,
+          tentIds: input.tents,
+          now: new Date().toISOString(),
+          generateId: generateUUID,
+        }));
       }
 
       await refreshPendingCount();
@@ -142,12 +127,13 @@ export function useOfflineUpdateAttendance() {
         "local-attendances",
         "local-tents",
         "local-consumptions",
+        "local-day-summaries",
       ]);
 
       return {
         attendanceId,
-        tentsAdded: input.tents ?? [],
-        tentsRemoved: [],
+        tentsAdded,
+        tentsRemoved,
         attendanceQueueOpId,
       };
     },

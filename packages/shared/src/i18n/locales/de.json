@@ -604,6 +604,17 @@
       "hasReservation": "Reservierung",
       "selected": "Ausgewählt"
     },
+    "view": {
+      "calendar": "Kalender",
+      "list": "Liste"
+    },
+    "list": {
+      "a11yDrinks": "{{total}} Getränke",
+      "a11ySpent": "{{amount}} ausgegeben",
+      "moreTents": "+{{amount}}",
+      "reserved": "Reserviert",
+      "tip": "+{{amount}} Trinkgeld"
+    },
     "tabs": {
       "attendance": "Besuche",
       "reservation": "Reservierung"
@@ -1771,6 +1782,10 @@
       "saving": "Speichert...",
       "cancelConfirmTitle": "Reservierung stornieren?",
       "cancelConfirmMessage": "Bist du sicher, dass du diese Reservierung stornieren möchten? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "past": {
+      "title": "Vergangene Reservierung",
+      "description": "Dieser Tag ist bereits vorbei, daher kann diese Reservierung nicht mehr geändert werden."
     },
     "checkIn": {
       "title": "Zeit zum Einchecken!",
