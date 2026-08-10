@@ -2030,6 +2030,10 @@
       "cancelConfirmTitle": "¿Cancelar reserva?",
       "cancelConfirmMessage": "¿Estás seguro de que querés cancelar esta reserva? Esta acción no se puede deshacer."
     },
+    "past": {
+      "title": "Reserva pasada",
+      "description": "Este día ya pasó, así que esta reserva ya no se puede modificar."
+    },
     "checkIn": {
       "title": "¡Hora de hacer check-in!",
       "description": "Tu reserva está lista. ¿Querés hacer check-in ahora?",

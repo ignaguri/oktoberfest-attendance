@@ -1783,6 +1783,10 @@
       "cancelConfirmTitle": "Reservierung stornieren?",
       "cancelConfirmMessage": "Bist du sicher, dass du diese Reservierung stornieren möchten? Diese Aktion kann nicht rückgängig gemacht werden."
     },
+    "past": {
+      "title": "Vergangene Reservierung",
+      "description": "Dieser Tag ist bereits vorbei, daher kann diese Reservierung nicht mehr geändert werden."
+    },
     "checkIn": {
       "title": "Zeit zum Einchecken!",
       "description": "deine Reservierung ist bereit. Möchten du jetzt einchecken?",

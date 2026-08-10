@@ -43,10 +43,14 @@ export interface CalendarActionSheetProps {
 /**
  * Calendar action sheet with tabs for attendance and reservations
  *
- * Tab availability is determined by the selected date:
- * - Past dates: Only attendance tab
+ * Tab availability is determined by the selected date and the data that exists:
+ * - Past dates: attendance, plus a read-only reservation tab if one exists
  * - Today: Both tabs available
  * - Future dates: Only reservation tab
+ *
+ * Whether you can *create* a reservation is a date question; whether you can
+ * *read* the one already there is not. A past reservation stays viewable so
+ * reservation history isn't write-only.
  *
  * Features:
  * - Smart default tab based on date and existing data
@@ -86,11 +90,13 @@ export function CalendarActionSheet({
     const reservationTab: Tab = {
       key: "reservation",
       label: t("attendance.tabs.reservation"),
-      disabled: isPastDate,
+      // Past dates can't take a new reservation, but an existing one stays
+      // readable (the tab renders read-only below).
+      disabled: isPastDate && !existingReservation,
     };
 
     return [attendanceTab, reservationTab];
-  }, [t, isPastDate, isFutureDate]);
+  }, [t, isPastDate, isFutureDate, existingReservation]);
 
   // Determine default tab when sheet opens
   const determineDefaultTab = useCallback((): TabKey => {
@@ -100,8 +106,11 @@ export function CalendarActionSheet({
     // Future date - reservation only
     if (isFutureDate) return "reservation";
 
-    // Past date - attendance only
-    if (isPastDate) return "attendance";
+    // Past date - attendance, unless the only thing logged that day was a
+    // reservation, in which case an empty attendance form is the wrong landing.
+    if (isPastDate) {
+      return !existingAttendance && existingReservation ? "reservation" : "attendance";
+    }
 
     // Today - prefer attendance if exists, else reservation if exists, else attendance
     if (existingAttendance) return "attendance";
@@ -176,11 +185,12 @@ export function CalendarActionSheet({
             />
           )}
 
-          {activeTab === "reservation" && !isPastDate && (
+          {activeTab === "reservation" && (!isPastDate || Boolean(existingReservation)) && (
             <ReservationTabContent
               festivalId={festivalId}
               selectedDate={selectedDate}
               existingReservation={existingReservation}
+              readOnly={isPastDate}
               onSuccess={onSuccess ? handleReservationSuccess : undefined}
               onClose={onClose}
             />
