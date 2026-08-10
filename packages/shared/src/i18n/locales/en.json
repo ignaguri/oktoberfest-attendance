@@ -639,6 +639,14 @@
       "hasReservation": "Reservation",
       "selected": "Selected"
     },
+    "view": {
+      "calendar": "Calendar",
+      "list": "List"
+    },
+    "list": {
+      "moreTents": "+{{count}}",
+      "tip": "+{{amount}} tip"
+    },
     "tabs": {
       "attendance": "Attendance",
       "reservation": "Reservation"

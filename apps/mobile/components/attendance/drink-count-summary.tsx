@@ -11,7 +11,10 @@ import { DrinkTypeColors, IconColors } from "@/lib/constants/colors";
 import { VISIBLE_DRINK_TYPES } from "./drink-type-picker";
 
 interface DrinkCountSummaryProps {
-  consumptions: Consumption[];
+  /** Raw consumptions; counted internally. Ignored when `counts` is provided. */
+  consumptions?: Consumption[];
+  /** Pre-aggregated counts per drink type, for callers that already have them. */
+  counts?: Partial<Record<DrinkType, number>>;
   totalDrinks?: number;
   showTotal?: boolean;
   compact?: boolean;
@@ -60,7 +63,8 @@ function getDrinkColor(type: DrinkType): string {
  * 🍺 3  🍷 2
  */
 export function DrinkCountSummary({
-  consumptions,
+  consumptions = [],
+  counts: providedCounts,
   totalDrinks,
   showTotal = true,
   compact = false,
@@ -78,6 +82,15 @@ export function DrinkCountSummary({
       other: 0,
     };
 
+    if (providedCounts) {
+      for (const [type, count] of Object.entries(providedCounts)) {
+        if (result[type as DrinkType] !== undefined) {
+          result[type as DrinkType] = count ?? 0;
+        }
+      }
+      return result;
+    }
+
     consumptions.forEach((c) => {
       if (result[c.drinkType] !== undefined) {
         result[c.drinkType]++;
@@ -85,7 +98,7 @@ export function DrinkCountSummary({
     });
 
     return result;
-  }, [consumptions]);
+  }, [consumptions, providedCounts]);
 
   // Filter to only visible types with non-zero counts
   const visibleCounts = useMemo(() => {

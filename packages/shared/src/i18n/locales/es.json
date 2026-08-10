@@ -639,6 +639,14 @@
       "hasReservation": "Reserva",
       "selected": "Seleccionado"
     },
+    "view": {
+      "calendar": "Calendario",
+      "list": "Lista"
+    },
+    "list": {
+      "moreTents": "+{{count}}",
+      "tip": "+{{amount}} propina"
+    },
     "tabs": {
       "attendance": "Asistencia",
       "reservation": "Reserva"

@@ -25,6 +25,9 @@ export const localKeys = {
     adaptedByDate: (festivalId: string, date: string) =>
       ["local-attendances", festivalId, date, "adapted-bydate"] as const,
   },
+  daySummaries: {
+    byFestival: (festivalId?: string) => ["local-day-summaries", festivalId] as const,
+  },
   consumptions: {
     byFestival: (festivalId?: string) => ["local-consumptions", festivalId] as const,
     byDate: (festivalId: string, date: string) => ["local-consumptions", festivalId, date] as const,
