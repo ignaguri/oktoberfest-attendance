@@ -16,6 +16,7 @@ import {
   UpdatePersonalAttendanceSchema,
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
 
 import { logger } from "../lib/logger";
 import { PgErrorCode } from "../lib/postgres-errors";
@@ -610,9 +611,12 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     throw new NotFoundError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
 
-  // Convert start_at to festival timezone date (YYYY-MM-DD)
+  // Convert start_at to festival timezone date (YYYY-MM-DD). The timezone was
+  // already being fetched above and then discarded in favour of toISOString(),
+  // which is UTC: a reservation starting just after local midnight was filed
+  // under the previous day.
   const startDate = new Date(reservation.start_at);
-  const festivalDate = startDate.toISOString().split("T")[0];
+  const festivalDate = formatDateForDatabase(startDate, festival.timezone);
 
   // Check if user already has attendance for this date
   const { data: existingAttendance, error: attendanceError } = await supabase
@@ -648,46 +652,37 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     attendanceId = newAttendance?.id;
   }
 
-  // Add a tent visit unless this tent is already recorded for the date.
+  // Record the check-in as one more visit in the day's sequence.
   //
-  // The check has to be an explicit lookup: tent_visits carries no unique index
-  // on (user_id, tent_id, festival_id, visit_date), so the insert below could
-  // never raise 23505 and the old `!== UNIQUE_VIOLATION` guard was dead code -
-  // every check-in inserted unconditionally. The extra row was not harmless.
-  // update_personal_attendance_with_tents and the mobile sync both treat one
-  // tent per day as the natural key, and the mobile pull deletes whichever row
-  // shares that key with a different id, so a check-in for a tent the
-  // attendance form had already logged silently displaced the form's row.
-  const dayStart = new Date(`${festivalDate}T00:00:00.000Z`);
-  const dayEnd = new Date(dayStart);
-  dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
-
-  const { data: existingTentVisit, error: existingTentVisitError } = await supabase
-    .from("tent_visits")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("festival_id", reservation.festival_id)
-    .eq("tent_id", reservation.tent_id)
-    .gte("visit_date", dayStart.toISOString())
-    .lt("visit_date", dayEnd.toISOString())
-    .limit(1)
-    .maybeSingle();
-
-  if (existingTentVisitError) {
-    throw new Error("Error checking existing tent visit");
-  }
-
-  if (!existingTentVisit) {
-    const { error: tentVisitError } = await supabase.from("tent_visits").insert({
-      id: crypto.randomUUID(),
-      user_id: user.id,
-      festival_id: reservation.festival_id,
-      tent_id: reservation.tent_id,
-      visit_date: startDate.toISOString(),
+  // This used to skip the insert whenever the tent had any visit that day,
+  // which contradicts the whole point of same-day revisits: walking Hofbräu ->
+  // Paulaner -> back to Hofbräu for a 19:00 reservation dropped the third visit
+  // and left the day reading as if the user never returned. The rule it was
+  // enforcing - one visit per tent per day - was justified by the mobile pull
+  // deleting whichever row shared that natural key with a different id, and the
+  // pull stopped doing that when revisits landed (see
+  // sync/pull-user-data.ts processTentVisits).
+  //
+  // Delegating to the repository also means one implementation of "is this
+  // actually a move", instead of a second copy of the day-window arithmetic
+  // that had drifted to a different rule. Its own attendance upsert is
+  // idempotent, so it costs a redundant touch and keeps attendanceId defined
+  // above even when the visit turns out to be a no-op.
+  const attendanceRepo = new SupabaseAttendanceRepository(supabase);
+  try {
+    await attendanceRepo.logTentVisit(user.id, {
+      festivalId: reservation.festival_id,
+      tentId: reservation.tent_id,
+      visitedAt: startDate.toISOString(),
     });
-
-    if (tentVisitError) {
-      throw new Error("Error creating tent visit");
+  } catch (error) {
+    // Already the day's current tent, so the check-in adds nothing: the user is
+    // confirming a tent they are recorded as being in. Not a failed check-in.
+    if (
+      !(error instanceof ValidationError) ||
+      error.code !== ErrorCodes.TENT_ALREADY_CURRENT_VISIT
+    ) {
+      throw error;
     }
   }
 
