@@ -92,11 +92,16 @@ export function useOfflineLogConsumption() {
           ) VALUES (?, ?, ?, ?, 0, ?, ?, NULL, 1, 0)`,
           [attendanceId, userId, input.festivalId, input.date, now, now],
         );
+        // No `tents` key on purpose. This path only wants the day to have an
+        // attendance row to hang the drink off; it has no opinion about tents.
+        // Sending [] would state one: the update RPC reads an empty array as
+        // "this day holds no tents" and deletes every tent visit for the date,
+        // so logging a drink before the first pull had populated the day would
+        // wipe visits logged on the web or by a reservation check-in.
         await enqueueOperation(db, "INSERT", "attendances", attendanceId, {
           festival_id: input.festivalId,
           date: input.date,
           beer_count: 0,
-          tents: [],
         });
       }
 
