@@ -450,6 +450,19 @@ describe("Attendance Routes Integration (Local DB)", () => {
     // let the first test's seeded visit leak into the second's count.
     const nullCaseDate = "2024-09-25T14:00:00Z";
     const clearCaseDate = "2024-09-26T14:00:00Z";
+    const duplicateCaseDate = "2024-09-27T14:00:00Z";
+
+    // The outer beforeEach resets createdTentVisitIds, so the outer afterAll only
+    // ever sees ids the LAST test registered: a row this block deliberately keeps
+    // alive (the null case) would leak into the local database on every run. Clean
+    // up by probe date instead of relying on that tracking.
+    afterAll(async () => {
+      await supabaseAdmin
+        .from("tent_visits")
+        .delete()
+        .eq("user_id", testUser.id)
+        .in("visit_date", [nullCaseDate, clearCaseDate, duplicateCaseDate]);
+    });
 
     /** Seeds one tent visit on the given date and returns its id. */
     async function seedTentVisit(
@@ -537,6 +550,39 @@ describe("Attendance Routes Integration (Local DB)", () => {
       // so the deletion was unobservable to callers.
       expect(data![0].tents_removed).toEqual([testTent.id]);
       expect(await countVisitsOnDate(userSupabase, clearCaseDate)).toBe(0);
+    });
+
+    // p_tent_ids is a set to reconcile to, but nothing upstream guarantees it is
+    // distinct and tent_visits has no unique index to fall back on, so a repeated
+    // id used to write one row per occurrence and report the tent twice.
+    it("writes one tent visit when p_tent_ids repeats a tent", async () => {
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+
+      const { data, error } = await userSupabase.rpc("update_personal_attendance_with_tents", {
+        p_user_id: testUser.id,
+        p_date: duplicateCaseDate,
+        p_beer_count: 0,
+        p_tent_ids: [testTent.id, testTent.id],
+        p_festival_id: testFestival.id,
+      });
+
+      expect(error).toBeNull();
+      createdAttendanceIds.push(data![0].attendance_id);
+
+      // Register whatever the RPC inserted so afterAll can clean it up, since
+      // these rows were not seeded through seedTentVisit.
+      const dayStart = `${duplicateCaseDate.slice(0, 10)}T00:00:00Z`;
+      const { data: written } = await userSupabase
+        .from("tent_visits")
+        .select("id")
+        .eq("user_id", testUser.id)
+        .eq("festival_id", testFestival.id)
+        .gte("visit_date", dayStart)
+        .lt("visit_date", new Date(Date.parse(dayStart) + 24 * 60 * 60 * 1000).toISOString());
+      createdTentVisitIds.push(...(written ?? []).map((row) => row.id));
+
+      expect(data![0].tents_added).toEqual([testTent.id]);
+      expect(await countVisitsOnDate(userSupabase, duplicateCaseDate)).toBe(1);
     });
   });
 });

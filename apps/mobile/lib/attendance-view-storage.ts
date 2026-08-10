@@ -15,10 +15,15 @@ export type AttendanceViewMode = "calendar" | "list";
 
 export const DEFAULT_ATTENDANCE_VIEW_MODE: AttendanceViewMode = "calendar";
 
+/** Guards both the value read back from storage and the key a tab press supplies. */
+export function isAttendanceViewMode(value: string | null): value is AttendanceViewMode {
+  return value === "calendar" || value === "list";
+}
+
 export async function getAttendanceViewMode(): Promise<AttendanceViewMode> {
   try {
     const stored = await AsyncStorage.getItem(STORAGE_KEY);
-    return stored === "list" || stored === "calendar" ? stored : DEFAULT_ATTENDANCE_VIEW_MODE;
+    return isAttendanceViewMode(stored) ? stored : DEFAULT_ATTENDANCE_VIEW_MODE;
   } catch (error) {
     logger.error("Failed to read attendance view mode, falling back to default:", error);
     return DEFAULT_ATTENDANCE_VIEW_MODE;

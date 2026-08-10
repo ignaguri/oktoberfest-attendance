@@ -33,8 +33,18 @@ type DayListEntry =
   | { kind: "attendance"; date: string; attendance: AttendanceWithTotals }
   | { kind: "reservationOnly"; date: string; reservation: Reservation };
 
+/**
+ * Whole euros when the amount has none, two decimals when it does.
+ *
+ * The festival summary card above this list renders whole euros, and under the
+ * default tip mode every price paid lands on one, so most rows read the same
+ * either way. Sub-euro amounts are the exception that matters: rounding a €1.80
+ * tip to €2, or a €0.20 one to €0 on a row that only renders because the tip is
+ * non-zero, states an amount the user never paid.
+ */
 function formatEuros(cents: number): string {
-  return `€${Math.round(cents / 100)}`;
+  const euros = cents / 100;
+  return `€${cents % 100 === 0 ? euros : euros.toFixed(2)}`;
 }
 
 /**

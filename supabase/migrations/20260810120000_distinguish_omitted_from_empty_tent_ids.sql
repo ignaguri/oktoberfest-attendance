@@ -15,6 +15,10 @@
 --   p_tent_ids = {...}   -> reconcile to exactly that set (unchanged behaviour)
 --
 -- Both branches now report what they actually removed.
+--
+-- The insert loop also treats p_tent_ids as a genuine set: a duplicated id used
+-- to write one tent_visits row per occurrence, since the table has no unique
+-- index to stop it.
 
 CREATE OR REPLACE FUNCTION "public"."update_personal_attendance_with_tents"(
     "p_user_id" "uuid",
@@ -113,8 +117,15 @@ BEGIN
         IF v_last_tent_id IS NULL OR v_tent_id != v_last_tent_id THEN
             -- Check if we just removed this tent - if so, skip adding to avoid immediate re-add
             IF NOT (v_tent_id = ANY(v_tents_to_remove)) THEN
-                -- Only add if this tent isn't already in the existing visits
-                IF NOT (v_tent_id = ANY(v_unique_existing_tent_ids)) THEN
+                -- Only add if this tent isn't already in the existing visits, and not
+                -- already inserted earlier in this same call. p_tent_ids is a set to
+                -- reconcile to, but nothing upstream guarantees it is distinct, and
+                -- tent_visits has no unique index on
+                -- (user_id, tent_id, festival_id, visit_date) - so without this guard
+                -- a duplicated id silently writes two rows and reports the tent twice
+                -- in tents_added.
+                IF NOT (v_tent_id = ANY(v_unique_existing_tent_ids))
+                   AND NOT (v_tent_id = ANY(v_tents_to_add)) THEN
                     INSERT INTO tent_visits (id, user_id, tent_id, visit_date, festival_id)
                     VALUES (uuid_generate_v4(), p_user_id, v_tent_id, p_date, p_festival_id);
                     v_tents_to_add := array_append(v_tents_to_add, v_tent_id);

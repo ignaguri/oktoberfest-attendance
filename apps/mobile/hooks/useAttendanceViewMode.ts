@@ -6,6 +6,7 @@ import {
   type AttendanceViewMode,
   DEFAULT_ATTENDANCE_VIEW_MODE,
   getAttendanceViewMode,
+  isAttendanceViewMode,
   setAttendanceViewMode,
 } from "@/lib/attendance-view-storage";
 import { logger } from "@/lib/logger";
@@ -50,9 +51,14 @@ export function useAttendanceViewMode(): UseAttendanceViewModeResult {
   }, []);
 
   const handleViewModeChange = useCallback((key: string) => {
-    const nextMode = key as AttendanceViewMode;
-    setViewModeState(nextMode);
-    setAttendanceViewMode(nextMode).catch((error) => {
+    // SegmentedControl hands back a plain string, so narrow rather than cast:
+    // persisting an unknown key would leave the control with no active segment.
+    if (!isAttendanceViewMode(key)) {
+      logger.warn("Ignoring unknown attendance view mode", { key });
+      return;
+    }
+    setViewModeState(key);
+    setAttendanceViewMode(key).catch((error) => {
       logger.error("Failed to persist attendance view mode:", error);
     });
   }, []);
