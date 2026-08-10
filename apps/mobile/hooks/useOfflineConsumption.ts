@@ -203,7 +203,11 @@ export function useOfflineDeleteConsumption() {
       if (!skipSideEffects) {
         await refreshPendingCount();
 
-        await invalidateLocalQueries(queryClient, ["local-consumptions", "local-attendances"]);
+        await invalidateLocalQueries(queryClient, [
+          "local-consumptions",
+          "local-attendances",
+          "local-day-summaries",
+        ]);
       }
 
       logger.debug("[OfflineConsumption] Soft-deleted consumption locally:", {

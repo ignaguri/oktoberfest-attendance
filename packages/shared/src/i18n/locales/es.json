@@ -639,6 +639,17 @@
       "hasReservation": "Reserva",
       "selected": "Seleccionado"
     },
+    "view": {
+      "calendar": "Calendario",
+      "list": "Lista"
+    },
+    "list": {
+      "a11yDrinks": "{{total}} bebidas",
+      "a11ySpent": "{{amount}} gastado",
+      "moreTents": "+{{amount}}",
+      "reserved": "Reservado",
+      "tip": "+{{amount}} propina"
+    },
     "tabs": {
       "attendance": "Asistencia",
       "reservation": "Reserva"

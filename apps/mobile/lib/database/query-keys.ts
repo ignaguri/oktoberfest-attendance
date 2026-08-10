@@ -25,6 +25,9 @@ export const localKeys = {
     adaptedByDate: (festivalId: string, date: string) =>
       ["local-attendances", festivalId, date, "adapted-bydate"] as const,
   },
+  daySummaries: {
+    byFestival: (festivalId?: string) => ["local-day-summaries", festivalId] as const,
+  },
   consumptions: {
     byFestival: (festivalId?: string) => ["local-consumptions", festivalId] as const,
     byDate: (festivalId: string, date: string) => ["local-consumptions", festivalId, date] as const,
@@ -49,6 +52,7 @@ export const localKeys = {
 /** All local query key prefixes for bulk invalidation (e.g., pull-to-refresh) */
 export const ALL_LOCAL_PREFIXES = [
   "local-attendances",
+  "local-day-summaries",
   "local-tents",
   "local-groups",
   "local-profile",

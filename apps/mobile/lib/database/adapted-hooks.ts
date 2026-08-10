@@ -25,6 +25,11 @@ import { useCallback, useContext, useMemo } from "react";
 import { logger } from "@/lib/logger";
 
 import { createDrizzleDb } from "./db";
+import {
+  queryDrinkCountsByDate,
+  queryPhotoCountsByDate,
+  queryTentNamesByDate,
+} from "./day-summaries";
 import { useLocalProfile, useLocalTents } from "./hooks";
 import { OfflineContext } from "./offline-provider";
 import {
@@ -35,6 +40,7 @@ import {
 } from "./queries";
 import { ALL_LOCAL_PREFIXES, localKeys } from "./query-keys";
 import type { LocalProfile, LocalTent } from "./schema";
+import type { DrinkType } from "./schema/enums";
 
 // =============================================================================
 // Helpers
@@ -494,6 +500,49 @@ export function useAdaptedConsumptionsByDate(
       })) as SharedConsumption[];
     },
     enabled: isReady && !!festivalId && !!date,
+    staleTime: Infinity,
+  });
+
+  return toDataQueryResult(query);
+}
+
+// =============================================================================
+// Day Summaries
+// =============================================================================
+
+/**
+ * Per-day summary data for the attendance day list: tent names, drink counts by
+ * type, and photo counts, each as one bulk query keyed by date.
+ *
+ * Deliberately NOT built from the per-day hooks — one query per list row would
+ * be an N+1 of both SQLite reads and React Query cache entries.
+ */
+export interface DaySummaries {
+  tentNames: Map<string, string[]>;
+  drinkCounts: Map<string, Partial<Record<DrinkType, number>>>;
+  photoCounts: Map<string, number>;
+}
+
+export function useAdaptedDaySummaries(
+  festivalId: string | undefined,
+): DataQueryResult<DaySummaries> {
+  const { isReady, getDb } = useOfflineContext();
+
+  const query = useQuery<DaySummaries, Error>({
+    queryKey: localKeys.daySummaries.byFestival(festivalId),
+    queryFn: async () => {
+      if (!isReady || !getDb || !festivalId) {
+        return { tentNames: new Map(), drinkCounts: new Map(), photoCounts: new Map() };
+      }
+      const db = getDb();
+      const [tentNames, drinkCounts, photoCounts] = await Promise.all([
+        queryTentNamesByDate(db, festivalId),
+        queryDrinkCountsByDate(db, festivalId),
+        queryPhotoCountsByDate(db, festivalId),
+      ]);
+      return { tentNames, drinkCounts, photoCounts };
+    },
+    enabled: isReady && !!festivalId,
     staleTime: Infinity,
   });
 

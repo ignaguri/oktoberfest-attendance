@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { AttendanceDayList } from "@/components/attendance/attendance-day-list";
 import { AttendanceStrip } from "@/components/attendance/attendance-strip";
 import { CalendarActionSheet } from "@/components/attendance/calendar-action-sheet";
 import { CheckInDialog } from "@/components/attendance/check-in-dialog";
@@ -25,9 +26,16 @@ import {
 import { Button, ButtonText } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
-import { useAdaptedAttendances, useSyncRefresh } from "@/lib/database/adapted-hooks";
+import { VStack } from "@/components/ui/vstack";
+import { useAttendanceViewMode } from "@/hooks/useAttendanceViewMode";
+import {
+  useAdaptedAttendances,
+  useAdaptedDaySummaries,
+  useSyncRefresh,
+} from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
 import { isActiveReservation } from "@/lib/utils/reservation";
 
@@ -50,6 +58,7 @@ export default function AttendanceScreen() {
     refetch,
   } = useAdaptedAttendances(currentFestival?.id);
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
+  const { data: daySummaries } = useAdaptedDaySummaries(currentFestival?.id);
 
   const {
     data: reservationsData,
@@ -74,6 +83,8 @@ export default function AttendanceScreen() {
   );
   const [checkInMode, setCheckInMode] = useState(false);
   const [prefillTentId, setPrefillTentId] = useState<string | undefined>();
+
+  const { viewMode, setViewMode: handleViewModeChange, viewTabs } = useAttendanceViewMode();
 
   // Handle check-in from deep link
   // This effect intentionally sets state when a deep link is detected
@@ -218,7 +229,7 @@ export default function AttendanceScreen() {
   ]);
 
   // Loading state - festival or initial data load
-  if (festivalLoading || ((isLoading || reservationsLoading) && !attendances)) {
+  if (viewMode === null || festivalLoading || ((isLoading || reservationsLoading) && !attendances)) {
     return (
       <View className="flex-1 bg-background-50">
         <AttendanceSkeleton />
@@ -252,14 +263,32 @@ export default function AttendanceScreen() {
       >
         <View className="p-4 pb-20">
           {/* Calendar */}
-          <AttendanceStrip
-            festivalStartDate={festivalStartDate}
-            festivalEndDate={festivalEndDate}
-            attendances={calendarAttendances}
-            reservations={reservations}
-            selectedDate={selectedDate}
-            onDateSelect={handleDateSelect}
-          />
+          <VStack space="md">
+            <SegmentedControl
+              tabs={viewTabs}
+              activeTab={viewMode}
+              onTabChange={handleViewModeChange}
+            />
+
+            {viewMode === "calendar" ? (
+              <AttendanceStrip
+                festivalStartDate={festivalStartDate}
+                festivalEndDate={festivalEndDate}
+                attendances={calendarAttendances}
+                reservations={reservations}
+                selectedDate={selectedDate}
+                onDateSelect={handleDateSelect}
+              />
+            ) : (
+              <AttendanceDayList
+                attendances={(attendances ?? []) as AttendanceWithTotals[]}
+                summaries={daySummaries}
+                reservations={reservations}
+                selectedDate={selectedDate}
+                onDateSelect={handleDateSelect}
+              />
+            )}
+          </VStack>
 
           {/* Stats Summary */}
           {attendances && (attendances as AttendanceWithTotals[]).length > 0 && (

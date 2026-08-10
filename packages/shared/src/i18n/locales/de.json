@@ -604,6 +604,17 @@
       "hasReservation": "Reservierung",
       "selected": "Ausgewählt"
     },
+    "view": {
+      "calendar": "Kalender",
+      "list": "Liste"
+    },
+    "list": {
+      "a11yDrinks": "{{total}} Getränke",
+      "a11ySpent": "{{amount}} ausgegeben",
+      "moreTents": "+{{amount}}",
+      "reserved": "Reserviert",
+      "tip": "+{{amount}} Trinkgeld"
+    },
     "tabs": {
       "attendance": "Besuche",
       "reservation": "Reservierung"

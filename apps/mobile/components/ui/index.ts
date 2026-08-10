@@ -51,6 +51,7 @@ export * from "./toast";
 
 // Interactive Elements
 export * from "./fab";
+export * from "./segmented-control";
 
 // Loading States
 export * from "./skeleton";
