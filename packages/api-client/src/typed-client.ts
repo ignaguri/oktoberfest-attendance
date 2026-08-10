@@ -8,7 +8,6 @@
 // Import shared schema types
 import type {
   AttendanceByDate,
-  AttendanceWithTotals,
   Consumption,
   CreateMessageResponse,
   CrowdLevel,
@@ -43,6 +42,7 @@ import type {
   ListFriendSuggestionsResponse,
   ListGroupsResponse,
   LogConsumptionInput,
+  LogConsumptionResponse,
   MarkUnlocksSeenResponse,
   MissingProfileFields,
   Profile,
@@ -52,6 +52,7 @@ import type {
   SubmitCrowdReportResponse,
   TutorialStatus,
   UpdateGroupMessageResponse,
+  UpdatePersonalAttendanceResponse,
   WinningCriteriaListResponse,
 } from "@prostcounter/shared/schemas";
 
@@ -255,11 +256,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         date: string;
         tents?: string[];
         amount?: number;
-      }): Promise<{
-        attendanceId: string;
-        tentsAdded: string[];
-        tentsRemoved: string[];
-      }> {
+      }): Promise<UpdatePersonalAttendanceResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/attendance/personal`, {
           method: "POST",
@@ -269,11 +266,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         if (!response.ok) {
           await extractApiError(response, "Failed to update attendance");
         }
-        return parseJsonResponse<{
-          attendanceId: string;
-          tentsAdded: string[];
-          tentsRemoved: string[];
-        }>(response);
+        return parseJsonResponse<UpdatePersonalAttendanceResponse>(response);
       },
 
       /**
@@ -358,7 +351,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
      * Consumption API
      */
     consumption: {
-      async log(data: LogConsumptionInput): Promise<AttendanceWithTotals> {
+      async log(data: LogConsumptionInput): Promise<LogConsumptionResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/consumption`, {
           method: "POST",
@@ -368,7 +361,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         if (!response.ok) {
           await extractApiError(response, "Failed to log consumption");
         }
-        return parseJsonResponse<AttendanceWithTotals>(response);
+        return parseJsonResponse<LogConsumptionResponse>(response);
       },
 
       async list(query: {

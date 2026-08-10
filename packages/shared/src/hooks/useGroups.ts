@@ -91,6 +91,7 @@ export function useCreateGroup() {
         }
         // Invalidate activity feed (group creation appears in feed)
         invalidateQueries(["activity-feed"]);
+        invalidateQueries(QueryKeys.pendingUnlocks());
       },
     },
   );
@@ -144,6 +145,7 @@ export function useJoinGroup() {
         invalidateQueries(["groups"]);
         // Invalidate activity feed (joining group appears in feed)
         invalidateQueries(["activity-feed"]);
+        invalidateQueries(QueryKeys.pendingUnlocks());
       },
     },
   );
@@ -170,6 +172,7 @@ export function useJoinGroupByToken() {
         invalidateQueries(["groups"]);
         // Invalidate activity feed (joining group appears in feed)
         invalidateQueries(["activity-feed"]);
+        invalidateQueries(QueryKeys.pendingUnlocks());
       },
     },
   );

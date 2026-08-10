@@ -41,6 +41,7 @@ export function useAddReaction() {
     {
       onSuccess: (_data, { photoId, groupId }) => {
         invalidateQueries(QueryKeys.photoReactions(photoId, groupId));
+        invalidateQueries(QueryKeys.pendingUnlocks());
       },
     },
   );

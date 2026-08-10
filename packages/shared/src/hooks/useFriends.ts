@@ -113,6 +113,7 @@ export function useAcceptFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestCount());
         invalidateQueries(QueryKeys.friendSuggestions());
         invalidateQueries(["public-profile"] as const);
+        invalidateQueries(QueryKeys.pendingUnlocks());
       },
     },
   );

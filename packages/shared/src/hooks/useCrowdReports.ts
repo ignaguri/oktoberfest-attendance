@@ -102,6 +102,7 @@ export function useSubmitCrowdReport() {
         // Invalidate crowd status and tent reports
         invalidateQueries(QueryKeys.crowdStatus(variables.festivalId));
         invalidateQueries(QueryKeys.tentCrowdReports(variables.tentId, variables.festivalId));
+        invalidateQueries(QueryKeys.pendingUnlocks());
       },
     },
   );

@@ -54,6 +54,7 @@ export {
   useAvailableAchievements,
   useUserAchievements,
 } from "./useAchievements";
+export { UnlockQueueProvider, useUnlockQueue } from "./useUnlockQueue";
 
 // Attendance hooks
 export {

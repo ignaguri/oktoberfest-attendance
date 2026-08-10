@@ -4,7 +4,7 @@
  * Uses ApiClientContext to get the platform-specific API client
  */
 
-import { useApiClient, useQuery, QueryKeys } from "../data";
+import { useApiClient, useInvalidateQueries, useQuery, QueryKeys } from "../data";
 import type { WrappedAccessResult, WrappedData } from "../wrapped/types";
 
 /**
@@ -49,11 +49,16 @@ export function useAvailableWrappedFestivals() {
  */
 export function useWrappedDataApi(festivalId?: string) {
   const apiClient = useApiClient();
+  const invalidateQueries = useInvalidateQueries();
 
   return useQuery(
     QueryKeys.wrapped(festivalId || ""),
     async (): Promise<WrappedData | null> => {
       const response = await apiClient.wrapped.get(festivalId!);
+      // Evaluate-only route: the unlock (if any) reaches the client through
+      // the outbox, not this response. Nudge the pending query so it's not
+      // waiting on the next window focus to pick it up.
+      invalidateQueries(QueryKeys.pendingUnlocks());
       return response.wrapped ?? null;
     },
     {
