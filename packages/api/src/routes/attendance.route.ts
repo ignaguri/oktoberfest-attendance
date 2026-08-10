@@ -570,22 +570,47 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     attendanceId = newAttendance?.id;
   }
 
-  // Add tent visit if not already present
-  const { error: tentVisitError } = await supabase
+  // Add a tent visit unless this tent is already recorded for the date.
+  //
+  // The check has to be an explicit lookup: tent_visits carries no unique index
+  // on (user_id, tent_id, festival_id, visit_date), so the insert below could
+  // never raise 23505 and the old `!== UNIQUE_VIOLATION` guard was dead code -
+  // every check-in inserted unconditionally. The extra row was not harmless.
+  // update_personal_attendance_with_tents and the mobile sync both treat one
+  // tent per day as the natural key, and the mobile pull deletes whichever row
+  // shares that key with a different id, so a check-in for a tent the
+  // attendance form had already logged silently displaced the form's row.
+  const dayStart = new Date(`${festivalDate}T00:00:00.000Z`);
+  const dayEnd = new Date(dayStart);
+  dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+
+  const { data: existingTentVisit, error: existingTentVisitError } = await supabase
     .from("tent_visits")
-    .insert({
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("festival_id", reservation.festival_id)
+    .eq("tent_id", reservation.tent_id)
+    .gte("visit_date", dayStart.toISOString())
+    .lt("visit_date", dayEnd.toISOString())
+    .limit(1)
+    .maybeSingle();
+
+  if (existingTentVisitError) {
+    throw new Error("Error checking existing tent visit");
+  }
+
+  if (!existingTentVisit) {
+    const { error: tentVisitError } = await supabase.from("tent_visits").insert({
       id: crypto.randomUUID(),
       user_id: user.id,
       festival_id: reservation.festival_id,
       tent_id: reservation.tent_id,
       visit_date: startDate.toISOString(),
-    })
-    .select()
-    .single();
+    });
 
-  // Ignore unique constraint violation (tent visit already exists)
-  if (tentVisitError && tentVisitError.code !== PgErrorCode.UNIQUE_VIOLATION) {
-    throw new Error("Error creating tent visit");
+    if (tentVisitError) {
+      throw new Error("Error creating tent visit");
+    }
   }
 
   // Mark reservation as completed
