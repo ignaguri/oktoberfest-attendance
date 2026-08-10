@@ -16,7 +16,7 @@ struct ResolvedTent {
 }
 
 /// Resolves which tent to use, following the priority chain:
-///   1. First tentId from today's attendance (user already checked in on phone)
+///   1. The tent of today's most recent visit (user already checked in on phone)
 ///   2. Nearest tent from GPS (server pre-sorts by distance)
 ///   3. None — surfaces a CTA label prompting the user to pick a tent.
 enum TentResolver {
@@ -31,9 +31,22 @@ enum TentResolver {
         nearbyTents: [NearbyTent]
     ) -> ResolvedTent {
         // 1. Attendance tent — user already picked one via the phone app.
-        if let tentId = attendance?.tentIds.first, !tentId.isEmpty {
-            // Prefer the name from tentVisits (always present when tentIds is), then nearby, then fallback.
-            let visitName: String? = attendance?.tentVisits.first { $0.tentId == tentId }?.tentName
+        //
+        // The day's last visit, not tentIds.first. tentVisits is the full
+        // sequence of visits in visit-time order (the API orders it ascending),
+        // so its last element is the tent the user is in now. tentIds is a
+        // deduplicated set in first-visit order, so on a day that went A, then
+        // B, then back to A, its first entry is A only by luck and its last
+        // entry is B, a tent already left. Reading either one attributes every
+        // drink logged from the watch to the wrong tent.
+        //
+        // Falls back to tentIds only if tentVisits is empty, which the API does
+        // not currently produce alongside a non-empty tentIds (both are built
+        // from the same rows) — kept so a tent id is never dropped outright.
+        let currentVisit = attendance?.tentVisits.last
+        if let tentId = currentVisit?.tentId ?? attendance?.tentIds.last, !tentId.isEmpty {
+            // Prefer the name carried by that visit, then nearby, then fallback.
+            let visitName: String? = currentVisit?.tentName
             let nearbyName: String? = nearbyTents.first { $0.tentId == tentId }?.tentName
             let name: String = visitName ?? nearbyName ?? "—"
             return ResolvedTent(tentId: tentId, tentName: name, source: .attendance)
@@ -89,6 +102,22 @@ extension TentResolver {
         assert(r4.tentId == "tent-z", "Test 4 failed: expected tent-z, got \(r4.tentId ?? "nil")")
         assert(r4.tentName == "—", "Test 4 name failed: expected —, got \(r4.tentName)")
         assert(r4.source == .attendance, "Test 4 source failed")
+
+        // 5. Revisited tent — the day went B, then A, then back to B, so tentIds
+        //    is [tent-b, tent-a] and its last entry names the tent already left.
+        //    The resolver must follow the visit sequence and land on tent-b.
+        let revisitAttendance = AttendanceByDate(id: "a3", date: "2026-04-19", festivalId: "f1",
+                                                 drinkCount: 3, beerCount: 3,
+                                                 tentIds: ["tent-b", "tent-a"],
+                                                 tentVisits: [
+                                                     TentVisit(tentId: "tent-b", tentName: "Paulaner"),
+                                                     TentVisit(tentId: "tent-a", tentName: "Hofbräu"),
+                                                     TentVisit(tentId: "tent-b", tentName: "Paulaner"),
+                                                 ])
+        let r5 = resolve(attendance: revisitAttendance, nearbyTents: nearby)
+        assert(r5.tentId == "tent-b", "Test 5 failed: expected tent-b (latest visit), got \(r5.tentId ?? "nil")")
+        assert(r5.tentName == "Paulaner", "Test 5 name failed: expected Paulaner, got \(r5.tentName)")
+        assert(r5.source == .attendance, "Test 5 source failed")
 
         print("[TentResolver] All debug assertions passed ✓")
     }
