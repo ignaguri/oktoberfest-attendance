@@ -609,7 +609,9 @@
       "list": "Liste"
     },
     "list": {
-      "moreTents": "+{{count}}",
+      "a11yDrinks": "{{total}} Getränke",
+      "a11ySpent": "{{amount}} ausgegeben",
+      "moreTents": "+{{amount}}",
       "tip": "+{{amount}} Trinkgeld"
     },
     "tabs": {

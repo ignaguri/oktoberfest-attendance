@@ -4,7 +4,6 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { isSameDay, parseISO } from "date-fns";
 import { Image as ImageIcon } from "lucide-react-native";
-import { useCallback } from "react";
 
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -44,12 +43,9 @@ export function AttendanceDayList({
 }: AttendanceDayListProps) {
   const { t } = useTranslation();
 
-  const handlePress = useCallback(
-    (dateStr: string) => {
-      onDateSelect(parseISO(dateStr));
-    },
-    [onDateSelect],
-  );
+  function handlePress(dateStr: string) {
+    onDateSelect(parseISO(dateStr));
+  }
 
   if (attendances.length === 0) {
     return (
@@ -76,12 +72,26 @@ export function AttendanceDayList({
         const visibleTents = tentNames.slice(0, MAX_VISIBLE_TENTS);
         const hiddenTentCount = tentNames.length - visibleTents.length;
 
+        const accessibilityLabelParts = [
+          formatLocalized(date, "EEEE, MMMM d"),
+          t("attendance.list.a11ySpent", { amount: formatEuros(attendance.totalSpentCents) }),
+          t("attendance.list.a11yDrinks", { total: attendance.drinkCount }),
+        ];
+        if (attendance.totalTipCents > 0) {
+          accessibilityLabelParts.push(
+            t("attendance.list.tip", { amount: formatEuros(attendance.totalTipCents) }),
+          );
+        }
+        if (tentNames.length > 0) {
+          accessibilityLabelParts.push(tentNames.join(", "));
+        }
+
         return (
           <Pressable
             key={attendance.date}
             onPress={() => handlePress(attendance.date)}
             className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
-            accessibilityLabel={formatLocalized(date, "EEEE, MMMM d")}
+            accessibilityLabel={accessibilityLabelParts.join(", ")}
             accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
           >
             <VStack space="xs">
@@ -116,7 +126,7 @@ export function AttendanceDayList({
                   </Text>
                   {hiddenTentCount > 0 && (
                     <Text className="text-xs text-typography-400">
-                      {t("attendance.list.moreTents", { count: hiddenTentCount })}
+                      {t("attendance.list.moreTents", { amount: hiddenTentCount })}
                     </Text>
                   )}
                 </HStack>

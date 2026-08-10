@@ -8,6 +8,13 @@
  *
  * Raw SQL rather than Drizzle: UNION is awkward in the query builder, and the
  * test suite mocks getAllAsync (there is no real SQLite in tests).
+ *
+ * The local `attendances` table (and every table that joins to it here) holds
+ * only the signed-in user's rows, so user scoping is implicit throughout this
+ * file — queryAttendancesWithTotals makes the same assumption. The `user_id`
+ * join in TENT_NAMES_SQL's tent_visits branch is incidental (it disambiguates
+ * the join keys), not load-bearing; DRINK_COUNTS_SQL and PHOTO_COUNTS_SQL
+ * don't scope by user_id at all, and that's fine for the same reason.
  */
 
 import type { SQLiteBindParams } from "expo-sqlite";

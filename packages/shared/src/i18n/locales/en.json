@@ -644,7 +644,9 @@
       "list": "List"
     },
     "list": {
-      "moreTents": "+{{count}}",
+      "a11yDrinks": "{{total}} drinks",
+      "a11ySpent": "{{amount}} spent",
+      "moreTents": "+{{amount}}",
       "tip": "+{{amount}} tip"
     },
     "tabs": {

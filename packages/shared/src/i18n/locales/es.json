@@ -644,7 +644,9 @@
       "list": "Lista"
     },
     "list": {
-      "moreTents": "+{{count}}",
+      "a11yDrinks": "{{total}} bebidas",
+      "a11ySpent": "{{amount}} gastado",
+      "moreTents": "+{{amount}}",
       "tip": "+{{amount}} propina"
     },
     "tabs": {

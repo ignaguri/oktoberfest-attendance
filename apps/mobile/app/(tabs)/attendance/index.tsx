@@ -32,6 +32,7 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import {
   type AttendanceViewMode,
+  DEFAULT_ATTENDANCE_VIEW_MODE,
   getAttendanceViewMode,
   setAttendanceViewMode,
 } from "@/lib/attendance-view-storage";
@@ -94,13 +95,22 @@ export default function AttendanceScreen() {
 
   useEffect(() => {
     let isMounted = true;
+    const fallbackTimerId = setTimeout(() => {
+      if (isMounted) {
+        setViewMode(DEFAULT_ATTENDANCE_VIEW_MODE);
+      }
+    }, 1000);
+
     getAttendanceViewMode().then((storedMode) => {
       if (isMounted) {
+        clearTimeout(fallbackTimerId);
         setViewMode(storedMode);
       }
     });
+
     return () => {
       isMounted = false;
+      clearTimeout(fallbackTimerId);
     };
   }, []);
 
