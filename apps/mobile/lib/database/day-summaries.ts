@@ -51,13 +51,13 @@ const TENT_NAMES_SQL = `
     ON a.user_id = tv.user_id
    AND a.festival_id = tv.festival_id
    AND a.date = tv.visit_date
-  LEFT JOIN tents t ON t.id = tv.tent_id
+  LEFT JOIN tents t ON t.id = tv.tent_id AND t._deleted = 0
   WHERE tv.festival_id = ? AND tv._deleted = 0 AND a._deleted = 0
   UNION
   SELECT a.date AS date, t.name AS tent_name
   FROM consumptions c
   JOIN attendances a ON a.id = c.attendance_id
-  LEFT JOIN tents t ON t.id = c.tent_id
+  LEFT JOIN tents t ON t.id = c.tent_id AND t._deleted = 0
   WHERE a.festival_id = ? AND c.tent_id IS NOT NULL AND c._deleted = 0 AND a._deleted = 0
   ORDER BY date, tent_name
 `;
