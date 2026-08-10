@@ -4,8 +4,9 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { format, isSameDay, parseISO } from "date-fns";
 import { CalendarClock, Image as ImageIcon } from "lucide-react-native";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 
+import { Divider } from "@/components/ui/divider";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -101,121 +102,126 @@ export function AttendanceDayList({
     );
   }
 
+  function renderEntry(entry: DayListEntry) {
+    if (entry.kind === "reservationOnly") {
+      const date = parseISO(entry.date);
+      const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
+      const { reservation } = entry;
+
+      const accessibilityLabelParts = [
+        formatLocalized(date, "EEEE, MMMM d"),
+        t("attendance.list.reserved"),
+      ];
+      if (reservation.tentName) {
+        accessibilityLabelParts.push(reservation.tentName);
+      }
+
+      return (
+        <Pressable
+          onPress={() => handlePress(entry.date)}
+          className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
+          accessibilityLabel={accessibilityLabelParts.join(", ")}
+          accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+        >
+          <HStack className="items-center justify-between">
+            <Text className="font-medium text-typography-900">
+              {formatLocalized(date, "EEE, MMM d")}
+            </Text>
+            <HStack space="xs" className="items-center">
+              <CalendarClock size={14} color={IconColors.reservation} />
+              <Text className="text-sm text-teal-700">{t("attendance.list.reserved")}</Text>
+              {reservation.tentName && (
+                <Text className="text-sm text-typography-500">{reservation.tentName}</Text>
+              )}
+            </HStack>
+          </HStack>
+        </Pressable>
+      );
+    }
+
+    const { attendance } = entry;
+    const date = parseISO(attendance.date);
+    const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
+    const tentNames = summaries?.tentNames.get(attendance.date) ?? [];
+    const drinkCounts = summaries?.drinkCounts.get(attendance.date);
+    const photoCount = summaries?.photoCounts.get(attendance.date) ?? 0;
+    const hasReservation = reservationMap.has(attendance.date);
+
+    const visibleTents = tentNames.slice(0, MAX_VISIBLE_TENTS);
+    const hiddenTentCount = tentNames.length - visibleTents.length;
+
+    const accessibilityLabelParts = [
+      formatLocalized(date, "EEEE, MMMM d"),
+      t("attendance.list.a11ySpent", { amount: formatEuros(attendance.totalSpentCents) }),
+      t("attendance.list.a11yDrinks", { total: attendance.drinkCount }),
+    ];
+    if (attendance.totalTipCents > 0) {
+      accessibilityLabelParts.push(
+        t("attendance.list.tip", { amount: formatEuros(attendance.totalTipCents) }),
+      );
+    }
+    if (tentNames.length > 0) {
+      accessibilityLabelParts.push(tentNames.join(", "));
+    }
+
+    return (
+      <Pressable
+        onPress={() => handlePress(attendance.date)}
+        className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
+        accessibilityLabel={accessibilityLabelParts.join(", ")}
+        accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+      >
+        <VStack space="xs">
+          <HStack className="items-center justify-between">
+            <Text className="font-medium text-typography-900">
+              {formatLocalized(date, "EEE, MMM d")}
+            </Text>
+            <Text className="font-semibold text-primary-600">
+              {formatEuros(attendance.totalSpentCents)}
+            </Text>
+          </HStack>
+
+          <HStack className="items-center justify-between">
+            <DrinkCountSummary counts={drinkCounts} compact showTotal={false} />
+
+            <HStack space="sm" className="items-center">
+              {attendance.totalTipCents > 0 && (
+                <Text className="text-xs text-success-600">
+                  {t("attendance.list.tip", {
+                    amount: formatEuros(attendance.totalTipCents),
+                  })}
+                </Text>
+              )}
+              {hasReservation && <CalendarClock size={14} color={IconColors.reservation} />}
+              {photoCount > 0 && <ImageIcon size={14} color={IconColors.muted} />}
+            </HStack>
+          </HStack>
+
+          {visibleTents.length > 0 && (
+            <HStack space="xs" className="items-center">
+              <Text className="text-xs text-typography-500" numberOfLines={1}>
+                {visibleTents.join(", ")}
+              </Text>
+              {hiddenTentCount > 0 && (
+                <Text className="text-xs text-typography-400">
+                  {t("attendance.list.moreTents", { amount: hiddenTentCount })}
+                </Text>
+              )}
+            </HStack>
+          )}
+        </VStack>
+      </Pressable>
+    );
+  }
+
   return (
     <VStack space="xs" className="rounded-xl bg-background-0 p-2">
-      {entries.map((entry) => {
-        if (entry.kind === "reservationOnly") {
-          const date = parseISO(entry.date);
-          const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
-          const { reservation } = entry;
-
-          const accessibilityLabelParts = [
-            formatLocalized(date, "EEEE, MMMM d"),
-            t("attendance.list.reserved"),
-          ];
-          if (reservation.tentName) {
-            accessibilityLabelParts.push(reservation.tentName);
-          }
-
-          return (
-            <Pressable
-              key={entry.date}
-              onPress={() => handlePress(entry.date)}
-              className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
-              accessibilityLabel={accessibilityLabelParts.join(", ")}
-              accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
-            >
-              <HStack className="items-center justify-between">
-                <Text className="font-medium text-typography-900">
-                  {formatLocalized(date, "EEE, MMM d")}
-                </Text>
-                <HStack space="xs" className="items-center">
-                  <CalendarClock size={14} color={IconColors.reservation} />
-                  <Text className="text-sm text-teal-700">{t("attendance.list.reserved")}</Text>
-                  {reservation.tentName && (
-                    <Text className="text-sm text-typography-500">{reservation.tentName}</Text>
-                  )}
-                </HStack>
-              </HStack>
-            </Pressable>
-          );
-        }
-
-        const { attendance } = entry;
-        const date = parseISO(attendance.date);
-        const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
-        const tentNames = summaries?.tentNames.get(attendance.date) ?? [];
-        const drinkCounts = summaries?.drinkCounts.get(attendance.date);
-        const photoCount = summaries?.photoCounts.get(attendance.date) ?? 0;
-        const hasReservation = reservationMap.has(attendance.date);
-
-        const visibleTents = tentNames.slice(0, MAX_VISIBLE_TENTS);
-        const hiddenTentCount = tentNames.length - visibleTents.length;
-
-        const accessibilityLabelParts = [
-          formatLocalized(date, "EEEE, MMMM d"),
-          t("attendance.list.a11ySpent", { amount: formatEuros(attendance.totalSpentCents) }),
-          t("attendance.list.a11yDrinks", { total: attendance.drinkCount }),
-        ];
-        if (attendance.totalTipCents > 0) {
-          accessibilityLabelParts.push(
-            t("attendance.list.tip", { amount: formatEuros(attendance.totalTipCents) }),
-          );
-        }
-        if (tentNames.length > 0) {
-          accessibilityLabelParts.push(tentNames.join(", "));
-        }
-
-        return (
-          <Pressable
-            key={attendance.date}
-            onPress={() => handlePress(attendance.date)}
-            className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
-            accessibilityLabel={accessibilityLabelParts.join(", ")}
-            accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
-          >
-            <VStack space="xs">
-              <HStack className="items-center justify-between">
-                <Text className="font-medium text-typography-900">
-                  {formatLocalized(date, "EEE, MMM d")}
-                </Text>
-                <Text className="font-semibold text-primary-600">
-                  {formatEuros(attendance.totalSpentCents)}
-                </Text>
-              </HStack>
-
-              <HStack className="items-center justify-between">
-                <DrinkCountSummary counts={drinkCounts} compact showTotal={false} />
-
-                <HStack space="sm" className="items-center">
-                  {attendance.totalTipCents > 0 && (
-                    <Text className="text-xs text-success-600">
-                      {t("attendance.list.tip", {
-                        amount: formatEuros(attendance.totalTipCents),
-                      })}
-                    </Text>
-                  )}
-                  {hasReservation && <CalendarClock size={14} color={IconColors.reservation} />}
-                  {photoCount > 0 && <ImageIcon size={14} color={IconColors.muted} />}
-                </HStack>
-              </HStack>
-
-              {visibleTents.length > 0 && (
-                <HStack space="xs" className="items-center">
-                  <Text className="text-xs text-typography-500" numberOfLines={1}>
-                    {visibleTents.join(", ")}
-                  </Text>
-                  {hiddenTentCount > 0 && (
-                    <Text className="text-xs text-typography-400">
-                      {t("attendance.list.moreTents", { amount: hiddenTentCount })}
-                    </Text>
-                  )}
-                </HStack>
-              )}
-            </VStack>
-          </Pressable>
-        );
-      })}
+      {entries.map((entry, index) => (
+        <Fragment key={entry.date}>
+          {index > 0 && <Divider />}
+          {renderEntry(entry)}
+        </Fragment>
+      ))}
     </VStack>
   );
 }
