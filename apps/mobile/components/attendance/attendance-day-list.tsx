@@ -20,7 +20,7 @@ const MAX_VISIBLE_TENTS = 2;
 
 interface AttendanceDayListProps {
   attendances: AttendanceWithTotals[];
-  summaries: DaySummaries | undefined;
+  summaries: DaySummaries | null;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
 }
