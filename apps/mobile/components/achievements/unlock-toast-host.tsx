@@ -106,8 +106,7 @@ export function UnlockToastHost() {
     }
 
     consume();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- batch is the only trigger; consume/toast/router/t are stable
-  }, [batch]);
+  }, [batch, consume, router, t, toast]);
 
   return isExploding ? (
     <View className="absolute inset-0 z-50" pointerEvents="none">

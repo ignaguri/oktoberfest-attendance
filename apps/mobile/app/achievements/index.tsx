@@ -183,7 +183,14 @@ export default function AchievementsScreen() {
     setHighlightedCardId(matchedCard.id);
 
     const cardNode = cardRefs.current.get(matchedCard.id);
-    const relativeNode = scrollViewRef.current?.getNativeScrollRef();
+    // Measured against the ScrollView's inner content view, not the ScrollView
+    // itself: measuring against the scroll responder is ambiguous about
+    // whether the returned offset already accounts for the current scroll
+    // position (iOS's UIScrollView.convertRect:toView: semantics subtract
+    // it), which would land scrollTo() in the wrong place on a second
+    // highlight while the screen is already scrolled. The inner content view
+    // has no scroll offset of its own, so its coordinates are unambiguous.
+    const relativeNode = scrollViewRef.current?.getInnerViewNode();
     if (cardNode && relativeNode) {
       cardNode.measureLayout(
         relativeNode,
