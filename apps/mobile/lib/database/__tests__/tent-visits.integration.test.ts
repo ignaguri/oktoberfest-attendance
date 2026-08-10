@@ -540,3 +540,54 @@ describe("purgeConfirmedTentVisitTombstones against real SQLite", () => {
     expect(allVisits(database).map((row) => row.id)).toEqual(["other-festival"]);
   });
 });
+
+describe("reconcileTentVisits timestamp staggering", () => {
+  let database: Database.Database;
+  let db: TentVisitsDb;
+
+  beforeEach(() => {
+    database = new Database(":memory:");
+    for (const createTableSql of Object.values(CREATE_TABLES_SQL)) {
+      database.exec(createTableSql);
+    }
+    database.pragma("foreign_keys = ON");
+    insertFestival(database, FESTIVAL);
+    insertTent(database, "t1");
+    insertTent(database, "t2");
+    db = createDb(database);
+  });
+
+  afterEach(() => {
+    database.close();
+  });
+
+  it("gives several tents added in one save distinct created_at values", async () => {
+    let counter = 0;
+    await reconcileTentVisits(db, {
+      userId: USER,
+      festivalId: FESTIVAL,
+      date: DATE,
+      tentIds: ["t1", "t2"],
+      now: "2026-09-24T10:00:00.000Z",
+      generateId: () => `new-${++counter}`,
+    });
+
+    // Identical timestamps left nothing to order the day by, and "the tent you
+    // are in" is the latest visit - so the answer depended on SQLite's row order.
+    const stamps = allVisits(database).map((row) => row.created_at);
+    expect(new Set(stamps).size).toBe(2);
+  });
+
+  it("stores the timestamp verbatim when only one tent is added", async () => {
+    await reconcileTentVisits(db, {
+      userId: USER,
+      festivalId: FESTIVAL,
+      date: DATE,
+      tentIds: ["t1"],
+      now: "2026-09-24T10:00:00Z",
+      generateId: () => "new-1",
+    });
+
+    expect(allVisits(database)[0].created_at).toBe("2026-09-24T10:00:00Z");
+  });
+});

@@ -189,7 +189,19 @@ export async function reconcileTentVisits(
     );
   }
 
-  for (const tentId of tentsAdded) {
+  // One millisecond apart, matching what the RPC does server-side. Writing every
+  // tent of one save at the same instant leaves nothing to order them by, and
+  // "the tent you are in" is defined as the latest visit - so an identical
+  // created_at made that answer depend on SQLite's row order.
+  // The first tent keeps `now` verbatim rather than a re-serialized copy of it,
+  // so a single-tent save stores exactly the string it was handed.
+  const baseTime = new Date(now).getTime();
+  const stampFor = (index: number): string =>
+    index === 0 || !Number.isFinite(baseTime) ? now : new Date(baseTime + index).toISOString();
+
+  for (const [index, tentId] of tentsAdded.entries()) {
+    const createdAt = stampFor(index);
+
     // Revive a soft-deleted row for this tent rather than inserting alongside it.
     // Nothing forces this any more now that the unique index is gone (migration
     // v2 -> v3), but keeping the id stable matters: the pull matches a pending
@@ -205,7 +217,7 @@ export async function reconcileTentVisits(
          ORDER BY created_at DESC
          LIMIT 1
        )`,
-      [now, userId, tentId, festivalId, date],
+      [createdAt, userId, tentId, festivalId, date],
     );
 
     if (getChanges(revived) > 0) {
@@ -217,7 +229,7 @@ export async function reconcileTentVisits(
         id, user_id, tent_id, festival_id, visit_date, created_at,
         _synced_at, _deleted, _dirty
       ) VALUES (?, ?, ?, ?, ?, ?, NULL, 0, 1)`,
-      [generateId(), userId, tentId, festivalId, date, now],
+      [generateId(), userId, tentId, festivalId, date, createdAt],
     );
   }
 

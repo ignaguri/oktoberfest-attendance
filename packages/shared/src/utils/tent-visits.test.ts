@@ -43,13 +43,39 @@ describe("getCurrentTentId", () => {
     expect(getCurrentTentId(visits)).toBe(HOFBRAU);
   });
 
-  it("resolves visits sharing a timestamp to the last one given", () => {
+  it("resolves a tie on a stable key, not on argument order", () => {
+    // Two visits can genuinely share a timestamp, and for a caller reading rows
+    // out of SQLite in arbitrary order "the last one given" is a coin toss that
+    // can land differently on two devices. Same answer either way round.
     const visits = [
       visit(HOFBRAU, "2026-08-10T20:00:00Z"),
       visit(PAULANER, "2026-08-10T20:00:00Z"),
     ];
 
     expect(getCurrentTentId(visits)).toBe(PAULANER);
+    expect(getCurrentTentId([...visits].reverse())).toBe(PAULANER);
+  });
+
+  it("ignores a visit whose date cannot be parsed", () => {
+    const visits = [visit(HOFBRAU, "not a date"), visit(PAULANER, "2026-08-10T17:00:00Z")];
+
+    expect(getCurrentTentId(visits)).toBe(PAULANER);
+  });
+
+  it("still answers when the unparseable visit comes first", () => {
+    // NaN loses every comparison, so taking the bad row as the running best
+    // pinned the result to it and returned a tent that is not the current one.
+    const visits = [
+      visit(HOFBRAU, ""),
+      visit(PAULANER, "2026-08-10T17:00:00Z"),
+      visit(HOFBRAU, "2026-08-10T20:00:00Z"),
+    ];
+
+    expect(getCurrentTentId(visits)).toBe(HOFBRAU);
+  });
+
+  it("returns undefined when no visit has a usable date", () => {
+    expect(getCurrentTentId([visit(HOFBRAU, "nonsense")])).toBeUndefined();
   });
 
   it("returns undefined for a day with no visits", () => {
