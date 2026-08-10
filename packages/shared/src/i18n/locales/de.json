@@ -558,6 +558,8 @@
       "editTitle": "Besuch bearbeiten",
       "addTitle": "Besuch hinzufügen",
       "selectTents": "Zelte auswählen...",
+      "logAnotherVisit": "Weiteren Besuch eintragen",
+      "logAnotherVisitHint": "Fügt einen Besuch mit der aktuellen Zeit für das gewählte Zelt hinzu.",
       "photos": "Fotos",
       "saving": "Speichert...",
       "deleteConfirmTitle": "Besuch löschen?",

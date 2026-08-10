@@ -593,6 +593,8 @@
       "editTitle": "Edit Attendance",
       "addTitle": "Add Attendance",
       "selectTents": "Select tents...",
+      "logAnotherVisit": "Log another visit",
+      "logAnotherVisitHint": "Adds a visit with the current time for the tent you pick.",
       "photos": "Photos",
       "saving": "Saving...",
       "deleteConfirmTitle": "Delete Attendance?",

@@ -593,6 +593,8 @@
       "editTitle": "Editar asistencia",
       "addTitle": "Agregar asistencia",
       "selectTents": "Seleccioná carpas...",
+      "logAnotherVisit": "Registrar otra visita",
+      "logAnotherVisitHint": "Agrega una visita con la hora actual para la carpa que elijas.",
       "photos": "Fotos",
       "saving": "Guardando...",
       "deleteConfirmTitle": "¿Eliminar asistencia?",

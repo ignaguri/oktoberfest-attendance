@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AttendanceWithTotals, TentVisit } from "@prostcounter/shared/schemas";
 import {
@@ -6,9 +7,9 @@ import {
   type DetailedAttendanceForm,
   type DrinkType,
 } from "@prostcounter/shared/schemas";
-import { format, parseISO } from "date-fns";
-import { Trash2 } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { format, isToday, parseISO } from "date-fns";
+import { Plus, Trash2 } from "lucide-react-native";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -27,7 +28,9 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { type PendingPhoto } from "@/hooks/useBeerPictureUpload";
+import { TentAlreadyCurrentVisitError, useOfflineLogTentVisit } from "@/hooks/useOfflineAttendance";
 import { useSaveAttendance } from "@/hooks/useSaveAttendance";
+import { buildTentVisitRows, type TentVisitRow } from "@/lib/attendance/tent-visit-rows";
 import { IconColors } from "@/lib/constants/colors";
 import {
   useAdaptedAttendanceByDate,
@@ -35,6 +38,7 @@ import {
   useAdaptedTents,
 } from "@/lib/database/adapted-hooks";
 import { useLocalDeleteAttendance } from "@/lib/database/hooks";
+import { OfflineContext, triggerBackgroundPush } from "@/lib/database/offline-provider";
 import { logger } from "@/lib/logger";
 
 import { TentSelectorSheet } from "../../tent-selector/tent-selector-sheet";
@@ -80,7 +84,10 @@ export function AttendanceTabContent({
   prefillTentId,
 }: AttendanceTabContentProps) {
   const { t } = useTranslation();
+  const offlineContext = useContext(OfflineContext);
   const [showTentSelector, setShowTentSelector] = useState(false);
+  const [showRevisitSelector, setShowRevisitSelector] = useState(false);
+  const [revisitError, setRevisitError] = useState<string | null>(null);
   const [photos, setPhotos] = useState<BeerPicture[]>([]);
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
   const [photosMarkedForRemoval, setPhotosMarkedForRemoval] = useState<string[]>([]);
@@ -99,6 +106,7 @@ export function AttendanceTabContent({
   const { tents } = useAdaptedTents(festivalId);
   const { saveAttendance, isSaving } = useSaveAttendance();
   const deleteAttendance = useLocalDeleteAttendance();
+  const logTentVisit = useOfflineLogTentVisit();
 
   // Format date string for API calls
   const dateString =
@@ -148,9 +156,13 @@ export function AttendanceTabContent({
     [festivalStartDate, festivalEndDate],
   );
 
-  // Use fresh tent visits from API when available
-  const freshTentVisits: TentVisit[] =
-    attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [];
+  // Use fresh tent visits from API when available.
+  // Memoized because several effects and memos below take it as a dependency; a
+  // fresh array literal every render would re-run all of them every render.
+  const freshTentVisits: TentVisit[] = useMemo(
+    () => attendanceWithPhotos?.tentVisits ?? existingAttendance?.tentVisits ?? [],
+    [attendanceWithPhotos?.tentVisits, existingAttendance?.tentVisits],
+  );
 
   // Default values based on existing attendance
   const defaultValues = useMemo(() => {
@@ -219,6 +231,7 @@ export function AttendanceTabContent({
       other: 0,
     });
     setSelectedDrinkType("beer");
+    setRevisitError(null);
     hasInitializedRef.current = false;
     hasSeededTentsRef.current = false;
   }, [dateString, existingAttendance, freshTentVisits, prefillTentId, selectedDate, reset]);
@@ -268,33 +281,31 @@ export function AttendanceTabContent({
     setValue("amount", totalLocalDrinks);
   }, [totalLocalDrinks, setValue]);
 
-  // Combined tent display with timestamps
-  const combinedTentDisplay = useMemo(() => {
+  // One badge per visit rather than per tent - see buildTentVisitRows for the rules.
+  const combinedTentDisplay = useMemo((): TentVisitRow[] => {
     const allOptions = tents.flatMap((group) => group.options);
-
-    const latestVisitByTent = new Map<string, { visitDate: string; checkInTime: string }>();
-    for (const visit of freshTentVisits) {
-      const existing = latestVisitByTent.get(visit.tentId);
-      if (!existing || new Date(visit.visitDate) > new Date(existing.visitDate)) {
-        latestVisitByTent.set(visit.tentId, {
-          visitDate: visit.visitDate,
-          checkInTime: format(parseISO(visit.visitDate), "HH:mm"),
-        });
-      }
-    }
-
-    return selectedTents.map((tentId) => {
-      const option = allOptions.find((opt) => opt.value === tentId);
-      const label = option?.label || "Unknown Tent";
-      const visitInfo = latestVisitByTent.get(tentId);
-
-      return {
-        id: tentId,
-        label,
-        checkInTime: visitInfo?.checkInTime || null,
-      };
+    return buildTentVisitRows({
+      selectedTents,
+      visits: freshTentVisits,
+      labelFor: (tentId, fallback) =>
+        allOptions.find((opt) => opt.value === tentId)?.label || fallback || "Unknown Tent",
+      formatTime: (visitDate) => format(parseISO(visitDate), "HH:mm"),
     });
   }, [selectedTents, freshTentVisits, tents]);
+
+  /*
+   * When "log another visit" is offered.
+   *
+   * Needs a visit to revisit: with none yet there is nothing the tent selector
+   * cannot already express, and the local guard has no day to read.
+   *
+   * Today only, because the visit is stamped with the current time. On a past day
+   * that timestamp lands outside the day being edited, so the badge sorts after
+   * every real visit and the server - which derives the visit's day from the
+   * timestamp - files it under today instead. Backdating a visit to an invented
+   * hour is a different feature; this one means "I just moved tents".
+   */
+  const canLogRevisit = freshTentVisits.length > 0 && isToday(selectedDate);
 
   // Handle form submission
   const onSubmit = useCallback(
@@ -339,6 +350,48 @@ export function AttendanceTabContent({
     [setValue],
   );
 
+  /*
+   * Log one more visit to a tent.
+   *
+   * Immediate, unlike the rest of this form: it writes the visit and queues the
+   * push straight away, because "I am in this tent now" is only true now.
+   * Cancelling the form afterwards leaves the visit in place.
+   *
+   * Feedback is inline rather than a toast: this form lives inside an
+   * actionsheet, and the overlay portal draws the sheet over the toast, so a
+   * toast here is invisible and the rejection would look like a dead tap. On
+   * success the new badge appearing with its time is the confirmation.
+   */
+  const handleLogRevisit = useCallback(
+    async (tentId: string) => {
+      if (!dateString) {
+        return;
+      }
+      setRevisitError(null);
+
+      try {
+        await logTentVisit.mutateAsync({ festivalId, date: dateString, tentId });
+
+        // Keep the form's tent set in step with the visit just written. Saving
+        // reconciles the day to this set, so a tent missing from it would have its
+        // brand-new visit deleted again.
+        if (!selectedTents.includes(tentId)) {
+          setValue("tents", [...selectedTents, tentId], { shouldValidate: true });
+        }
+
+        triggerBackgroundPush(offlineContext);
+      } catch (error) {
+        if (error instanceof TentAlreadyCurrentVisitError) {
+          setRevisitError(t(`apiErrors.${ErrorCodes.TENT_ALREADY_CURRENT_VISIT}`));
+          return;
+        }
+        logger.error("Failed to log tent visit:", error);
+        setRevisitError(t("common.errors.generic"));
+      }
+    },
+    [dateString, festivalId, logTentVisit, selectedTents, setValue, offlineContext, t],
+  );
+
   const handleLocalDrinkCountChange = useCallback((drinkType: DrinkType, newCount: number) => {
     setLocalDrinkCounts((prev) => ({
       ...prev,
@@ -377,6 +430,7 @@ export function AttendanceTabContent({
   }, []);
 
   const isDeleting = deleteAttendance.isPending;
+  const isLoggingVisit = logTentVisit.isPending;
   const isProcessing = isSaving || isDeleting;
 
   return (
@@ -440,10 +494,10 @@ export function AttendanceTabContent({
           >
             {combinedTentDisplay.length > 0 ? (
               <HStack className="flex-wrap gap-2">
-                {combinedTentDisplay.map((tent) => (
-                  <Badge key={tent.id} action="info" variant="outline" size="md">
+                {combinedTentDisplay.map((visit) => (
+                  <Badge key={visit.key} action="info" variant="outline" size="md">
                     <BadgeText className="normal-case">
-                      {tent.checkInTime ? `${tent.label} (${tent.checkInTime})` : tent.label}
+                      {visit.checkInTime ? `${visit.label} (${visit.checkInTime})` : visit.label}
                     </BadgeText>
                   </Badge>
                 ))}
@@ -454,6 +508,25 @@ export function AttendanceTabContent({
               </Text>
             )}
           </Pressable>
+          {/* The selector above holds a set of tents, so it cannot say "this tent
+              again, later". Only offered once the day has a visit: a first visit is
+              what selecting a tent already means. */}
+          {canLogRevisit && (
+            <Button
+              variant="outline"
+              action="secondary"
+              size="sm"
+              className="self-start"
+              onPress={() => setShowRevisitSelector(true)}
+              isDisabled={isProcessing || isLoggingVisit}
+              accessibilityLabel={t("attendance.form.logAnotherVisit")}
+              accessibilityHint={t("attendance.form.logAnotherVisitHint")}
+            >
+              <Plus size={16} color={IconColors.default} />
+              <ButtonText className="ml-2">{t("attendance.form.logAnotherVisit")}</ButtonText>
+            </Button>
+          )}
+          {revisitError && <Text className="text-sm text-error-600">{revisitError}</Text>}
           {errors.tents && (
             <Text className="text-sm text-error-600">
               {t(errors.tents.message || "validation.required")}
@@ -504,6 +577,15 @@ export function AttendanceTabContent({
         mode="multi"
         selectedTents={selectedTents}
         onSelectTents={handleTentsSelect}
+      />
+
+      {/* Revisit selector: single mode, so picking a tent closes it and logs at once */}
+      <TentSelectorSheet
+        isOpen={showRevisitSelector}
+        onClose={() => setShowRevisitSelector(false)}
+        festivalId={festivalId}
+        mode="single"
+        onSelectTent={handleLogRevisit}
       />
 
       {/* Delete Confirmation Dialog */}

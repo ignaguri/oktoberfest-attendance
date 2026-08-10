@@ -148,7 +148,15 @@ export function useOfflineUpdateAttendance() {
 
 interface LogTentVisitInput {
   festivalId: string;
-  /** YYYY-MM-DD, the day the visit belongs to. */
+  /**
+   * YYYY-MM-DD, the day the visit belongs to.
+   *
+   * The caller's local day, matching what reconcileTentVisits writes for visits
+   * created by a form save. The server instead derives the day from visitedAt in
+   * UTC, so for roughly two hours after local midnight the two disagree - the
+   * same UTC-bucketing that already applies to check-ins and to the RPC's
+   * visit_date::date. Callers should only log visits for the current day.
+   */
   date: string;
   tentId: string;
   /** ISO timestamp. Defaults to now, which is what the UI passes. */
