@@ -1,5 +1,5 @@
 import { cn } from "@prostcounter/ui";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
 import Animated, {
@@ -35,8 +35,20 @@ interface SegmentedControlProps {
  * - Accessible with proper roles
  */
 export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedControlProps) {
-  const tabWidth = useSharedValue(0);
   const indicatorPosition = useSharedValue(0);
+
+  /*
+   * Segment width lives in React state, not a shared value. This component can
+   * remount between its layout callback and its effects (it does inside the
+   * calendar action sheet), and a shared value written from that callback reads
+   * back as 0 on the fresh instance — the effect below would then bail and never
+   * position the indicator at all. As state, a measurement re-runs the effect.
+   */
+  const [tabWidth, setTabWidth] = useState(0);
+
+  // Whether the indicator has been placed at least once on this instance. The
+  // first placement snaps; later ones animate.
+  const hasPositionedRef = useRef(false);
 
   // Calculate indicator position based on active tab index
   const activeIndex = tabs.findIndex((tab) => tab.key === activeTab);
@@ -45,43 +57,43 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
    * The style only reads the position. Wrapping the read in an animation
    * (withSpring/withTiming inside useAnimatedStyle) restarts that animation on
    * every recompute, which is what made the pill bounce and overshoot the
-   * track: the switch below owns the animation, the style just follows it.
+   * track: the effect below owns the animation, the style just follows it.
    */
   const animatedIndicatorStyle = useAnimatedStyle(() => {
     return {
-      width: tabWidth.value,
+      width: tabWidth,
       transform: [{ translateX: indicatorPosition.value }],
     };
   });
 
-  // Handle tab layout to calculate widths
-  const handleTabLayout = useCallback(
-    (event: LayoutChangeEvent, index: number) => {
-      const { width } = event.nativeEvent.layout;
-      // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
-      tabWidth.value = width;
+  // Every segment is flex-1, so any one of them reports the width we need.
+  const handleTabLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setTabWidth((current) => (current === width ? current : width));
+  }, []);
 
-      // Snap, don't animate: this is first paint, not a user switch.
-      if (index === activeIndex) {
-        // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
-        indicatorPosition.value = index * width;
-      }
-    },
-    [activeIndex, indicatorPosition, tabWidth],
-  );
-
-  // Slide to the active tab whenever it changes, including changes driven by the
-  // parent rather than by a press here. Skipped until the first layout lands.
+  // Position the indicator: on the active tab changing (including changes driven
+  // by the parent rather than a press here) and on the geometry first arriving.
   useEffect(() => {
-    if (tabWidth.value === 0) {
+    if (tabWidth === 0) {
       return;
     }
-    // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
-    indicatorPosition.value = withTiming(activeIndex * tabWidth.value, {
-      duration: 180,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [activeIndex, indicatorPosition, tabWidth]);
+
+    const target = activeIndex * tabWidth;
+
+    if (hasPositionedRef.current) {
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
+      indicatorPosition.value = withTiming(target, {
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      // First placement is not a switch — snap, so nothing slides in on open.
+      hasPositionedRef.current = true;
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
+      indicatorPosition.value = target;
+    }
+  }, [activeIndex, tabWidth, indicatorPosition]);
 
   const handleTabPress = useCallback(
     (tab: Tab) => {
@@ -106,7 +118,7 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
 
       {/* Tab buttons */}
       <HStack className="relative z-10">
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const isActive = tab.key === activeTab;
           const isDisabled = tab.disabled;
 
@@ -114,7 +126,7 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
             <Pressable
               key={tab.key}
               onPress={() => handleTabPress(tab)}
-              onLayout={(e) => handleTabLayout(e, index)}
+              onLayout={handleTabLayout}
               disabled={isDisabled}
               className="flex-1 items-center justify-center py-2"
               accessibilityRole="tab"
