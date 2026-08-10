@@ -676,6 +676,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/attendance/tent-visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Log a tent visit
+         * @description Appends a timestamped visit to a tent, creating the day's attendance if needed. Use this to record returning to a tent later the same day; POST /attendance/personal reconciles the day's set of tents and cannot express a second visit.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        festivalId: string;
+                        /** Format: uuid */
+                        tentId: string;
+                        /** Format: date-time */
+                        visitedAt: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Tent visit logged */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            tentVisitId: string;
+                            /** Format: uuid */
+                            attendanceId: string;
+                            /** Format: date-time */
+                            visitedAt: string;
+                        };
+                    };
+                };
+                /** @description Validation error, or the tent is already the day's latest visit */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/attendance/check-in/{reservationId}": {
         parameters: {
             query?: never;

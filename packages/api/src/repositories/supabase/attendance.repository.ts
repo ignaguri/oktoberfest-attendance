@@ -5,14 +5,17 @@ import type {
   CreateAttendanceInput,
   CreateAttendanceResponse,
   ListAttendancesQuery,
+  LogTentVisitInput,
+  LogTentVisitResponse,
   TentVisitRow,
   UpdatePersonalAttendanceInput,
   UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { DatabaseError } from "../../middleware/error";
+import { DatabaseError, ValidationError } from "../../middleware/error";
 import type { IAttendanceRepository } from "../interfaces";
 
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
@@ -319,6 +322,71 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     };
   }
 
+  async logTentVisit(userId: string, input: LogTentVisitInput): Promise<LogTentVisitResponse> {
+    const visitedAt = new Date(input.visitedAt);
+    // The day the visit belongs to, in UTC, matching how
+    // update_personal_attendance_with_tents buckets visit_date (visit_date::date)
+    // and how the mobile pull derives its local day key.
+    const date = visitedAt.toISOString().split("T")[0];
+
+    // The day's most recent visit. Logging the tent you are already in is a
+    // stray tap, not a revisit, so it is rejected rather than silently stored -
+    // two adjacent rows for one tent would read as leaving and coming back.
+    const dayStart = new Date(`${date}T00:00:00.000Z`);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+
+    const { data: latestVisit, error: latestVisitError } = await this.supabase
+      .from("tent_visits")
+      .select("tent_id")
+      .eq("user_id", userId)
+      .eq("festival_id", input.festivalId)
+      .gte("visit_date", dayStart.toISOString())
+      .lt("visit_date", dayEnd.toISOString())
+      .order("visit_date", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (latestVisitError) {
+      throw new DatabaseError(`Failed to read the day's tent visits: ${latestVisitError.message}`);
+    }
+
+    if (latestVisit?.tent_id === input.tentId) {
+      throw new ValidationError(ErrorCodes.TENT_ALREADY_CURRENT_VISIT);
+    }
+
+    // Reuse the attendance upsert the form path goes through, so a visit logged
+    // on a day with no attendance yet still produces one. Passing no tents
+    // leaves existing visits untouched.
+    const { attendanceId } = await this.updatePersonal(userId, {
+      festivalId: input.festivalId,
+      date,
+      amount: 0,
+    });
+
+    const { data: tentVisit, error: insertError } = await this.supabase
+      .from("tent_visits")
+      .insert({
+        id: crypto.randomUUID(),
+        user_id: userId,
+        festival_id: input.festivalId,
+        tent_id: input.tentId,
+        visit_date: visitedAt.toISOString(),
+      })
+      .select("id, visit_date")
+      .single();
+
+    if (insertError || !tentVisit?.visit_date) {
+      throw new DatabaseError(`Failed to log tent visit: ${insertError?.message ?? "no row"}`);
+    }
+
+    return {
+      tentVisitId: tentVisit.id,
+      attendanceId,
+      visitedAt: new Date(tentVisit.visit_date).toISOString(),
+    };
+  }
+
   async festivalExists(
     festivalId: string,
   ): Promise<{ id: string; timezone: string | null } | null> {
@@ -388,17 +456,25 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     // Filter tent visits for this specific date
     // Use UTC methods to avoid timezone shifting the date comparison
     // (new Date("YYYY-MM-DD") creates UTC midnight; getDate() uses local time)
-    const tentIdsForDate = (tentVisits || [])
-      .filter((visit) => {
-        if (!visit.visit_date) return false;
-        const visitDate = new Date(visit.visit_date);
-        return (
-          visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
-          visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
-          visitDate.getUTCDate() === attendanceDate.getUTCDate()
-        );
-      })
-      .map((visit) => visit.tent_id);
+    // Deduplicated: a day can hold several visits to the same tent (see
+    // logTentVisit), but this field feeds the form's tent selector, which is a
+    // set. Repeats there would render the same tent twice and, on save, ask the
+    // RPC to reconcile to a list with duplicates.
+    const tentIdsForDate = [
+      ...new Set(
+        (tentVisits || [])
+          .filter((visit) => {
+            if (!visit.visit_date) return false;
+            const visitDate = new Date(visit.visit_date);
+            return (
+              visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
+              visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
+              visitDate.getUTCDate() === attendanceDate.getUTCDate()
+            );
+          })
+          .map((visit) => visit.tent_id),
+      ),
+    ];
 
     // Fetch beer pictures for this attendance (including IDs for deletion)
     const { data: beerPictures, error: picturesError } = await this.supabase

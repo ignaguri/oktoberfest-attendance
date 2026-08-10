@@ -2660,6 +2660,7 @@
     "FESTIVAL_NOT_FOUND": "Festival not found.",
     "NO_ACTIVE_FESTIVAL": "No active festival found.",
     "TENT_NOT_FOUND": "Tent not found.",
+    "TENT_ALREADY_CURRENT_VISIT": "You're already checked in here. Visit another tent first.",
     "RESERVATION_NOT_FOUND": "Reservation not found.",
     "RESERVATION_ALREADY_CHECKED_IN": "You have already checked in.",
     "RESERVATION_CANCELLED": "This reservation has been cancelled.",

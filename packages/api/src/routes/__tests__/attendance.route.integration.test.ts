@@ -3,11 +3,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { ErrorCodes } from "@prostcounter/shared/errors";
+
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
   createTestSupabaseWithAuth,
 } from "../../__tests__/helpers/test-supabase";
+import { SupabaseAttendanceRepository } from "../../repositories/supabase";
 
 // Integration tests using real local Supabase database
 // These tests verify the complete flow including RLS policies, triggers, and constraints
@@ -583,6 +586,212 @@ describe("Attendance Routes Integration (Local DB)", () => {
 
       expect(data![0].tents_added).toEqual([testTent.id]);
       expect(await countVisitsOnDate(userSupabase, duplicateCaseDate)).toBe(1);
+    });
+  });
+
+  // A day is a sequence of visits, not just a set of tents: leaving a tent and
+  // coming back later is two visits. logTentVisit is the only writer that can
+  // say so. update_personal_attendance_with_tents reconciles the day to a set,
+  // so it skips any tent already visited and cannot carry the second visit.
+  describe("logTentVisit same-day revisits", () => {
+    const sequenceDate = "2024-09-28";
+    const rejectDate = "2024-09-29";
+    const survivesSaveDate = "2024-09-30";
+    const deselectDate = "2024-10-01";
+    const probeDates = [sequenceDate, rejectDate, survivesSaveDate, deselectDate];
+
+    let secondTent: { id: string; name: string };
+
+    beforeAll(async () => {
+      const { data: tent, error } = await supabaseAdmin
+        .from("tents")
+        .insert({ id: randomUUID(), name: `Second Test Tent ${Date.now()}`, category: "large" })
+        .select()
+        .single();
+
+      if (error || !tent) {
+        throw new Error(`Failed to create second test tent: ${error?.message || "Unknown error"}`);
+      }
+
+      secondTent = { id: tent.id, name: tent.name };
+
+      await supabaseAdmin
+        .from("festival_tents")
+        .insert({ festival_id: testFestival.id, tent_id: secondTent.id });
+    });
+
+    // Cleanup by probe date rather than by tracked id, for the same reason the
+    // block above does: the outer beforeEach clears the id arrays between tests.
+    afterAll(async () => {
+      for (const date of probeDates) {
+        await supabaseAdmin
+          .from("tent_visits")
+          .delete()
+          .eq("user_id", testUser.id)
+          .gte("visit_date", `${date}T00:00:00Z`)
+          .lt("visit_date", nextDay(date));
+        await supabaseAdmin
+          .from("attendances")
+          .delete()
+          .eq("user_id", testUser.id)
+          .eq("festival_id", testFestival.id)
+          .eq("date", date);
+      }
+
+      await supabaseAdmin.from("festival_tents").delete().eq("tent_id", secondTent.id);
+      await supabaseAdmin.from("tents").delete().eq("id", secondTent.id);
+    });
+
+    function nextDay(date: string): string {
+      return new Date(Date.parse(`${date}T00:00:00Z`) + 24 * 60 * 60 * 1000).toISOString();
+    }
+
+    function repoFor(token: string): SupabaseAttendanceRepository {
+      return new SupabaseAttendanceRepository(createTestSupabaseWithAuth(token));
+    }
+
+    async function visitsOnDate(
+      date: string,
+    ): Promise<{ tent_id: string; visit_date: string | null }[]> {
+      const { data } = await supabaseAdmin
+        .from("tent_visits")
+        .select("tent_id, visit_date")
+        .eq("user_id", testUser.id)
+        .eq("festival_id", testFestival.id)
+        .gte("visit_date", `${date}T00:00:00Z`)
+        .lt("visit_date", nextDay(date))
+        .order("visit_date", { ascending: true });
+      return data ?? [];
+    }
+
+    it("records a second visit to the same tent after visiting another", async () => {
+      const repo = repoFor(testUser.token);
+
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${sequenceDate}T10:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: secondTent.id,
+        visitedAt: `${sequenceDate}T15:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${sequenceDate}T20:00:00.000Z`,
+      });
+
+      const visits = await visitsOnDate(sequenceDate);
+      expect(visits.map((visit) => visit.tent_id)).toEqual([
+        testTent.id,
+        secondTent.id,
+        testTent.id,
+      ]);
+      expect(visits.map((visit) => new Date(visit.visit_date!).toISOString())).toEqual([
+        `${sequenceDate}T10:00:00.000Z`,
+        `${sequenceDate}T15:00:00.000Z`,
+        `${sequenceDate}T20:00:00.000Z`,
+      ]);
+    });
+
+    // Logging the tent you are standing in is a stray tap, not a revisit, and
+    // two adjacent rows for one tent would read as having left and returned.
+    it("rejects logging the tent that is already the day's latest visit", async () => {
+      const repo = repoFor(testUser.token);
+
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${rejectDate}T10:00:00.000Z`,
+      });
+
+      await expect(
+        repo.logTentVisit(testUser.id, {
+          festivalId: testFestival.id,
+          tentId: testTent.id,
+          visitedAt: `${rejectDate}T11:00:00.000Z`,
+        }),
+      ).rejects.toThrow(ErrorCodes.TENT_ALREADY_CURRENT_VISIT);
+
+      expect(await visitsOnDate(rejectDate)).toHaveLength(1);
+    });
+
+    // The form's save path must not undo a revisit. It reconciles the day to a
+    // set of tents, and both tents are still in that set, so it has nothing to
+    // add or remove - the extra visit has to survive untouched.
+    it("keeps a revisit when the attendance form saves the same tents afterwards", async () => {
+      const repo = repoFor(testUser.token);
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${survivesSaveDate}T10:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: secondTent.id,
+        visitedAt: `${survivesSaveDate}T15:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${survivesSaveDate}T20:00:00.000Z`,
+      });
+
+      const { data, error } = await userSupabase.rpc("update_personal_attendance_with_tents", {
+        p_user_id: testUser.id,
+        p_date: `${survivesSaveDate}T22:00:00Z`,
+        p_beer_count: 0,
+        p_tent_ids: [testTent.id, secondTent.id],
+        p_festival_id: testFestival.id,
+      });
+
+      expect(error).toBeNull();
+      expect(data![0].tents_added).toEqual([]);
+      expect(data![0].tents_removed).toEqual([]);
+
+      const visits = await visitsOnDate(survivesSaveDate);
+      expect(visits.map((visit) => visit.tent_id)).toEqual([
+        testTent.id,
+        secondTent.id,
+        testTent.id,
+      ]);
+    });
+
+    // Deselecting a tent still clears the whole day for it, every visit included.
+    it("removes every visit to a tent the form deselects", async () => {
+      const repo = repoFor(testUser.token);
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+
+      for (const [tentId, hour] of [
+        [testTent.id, "09"],
+        [secondTent.id, "12"],
+        [testTent.id, "18"],
+      ] as const) {
+        await repo.logTentVisit(testUser.id, {
+          festivalId: testFestival.id,
+          tentId,
+          visitedAt: `${deselectDate}T${hour}:00:00.000Z`,
+        });
+      }
+      expect(await visitsOnDate(deselectDate)).toHaveLength(3);
+
+      const { data, error } = await userSupabase.rpc("update_personal_attendance_with_tents", {
+        p_user_id: testUser.id,
+        p_date: `${deselectDate}T23:00:00Z`,
+        p_beer_count: 0,
+        p_tent_ids: [secondTent.id],
+        p_festival_id: testFestival.id,
+      });
+
+      expect(error).toBeNull();
+      expect(data![0].tents_removed).toEqual([testTent.id]);
+
+      const visits = await visitsOnDate(deselectDate);
+      expect(visits.map((visit) => visit.tent_id)).toEqual([secondTent.id]);
     });
   });
 });

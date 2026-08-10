@@ -45,6 +45,7 @@ export const ErrorCodes = {
 
   // Tent errors
   TENT_NOT_FOUND: "TENT_NOT_FOUND",
+  TENT_ALREADY_CURRENT_VISIT: "TENT_ALREADY_CURRENT_VISIT",
 
   // Reservation errors
   RESERVATION_NOT_FOUND: "RESERVATION_NOT_FOUND",

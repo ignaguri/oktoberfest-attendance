@@ -105,6 +105,42 @@ export type UpdatePersonalAttendanceResponse = z.infer<
 >;
 
 /**
+ * Log one more visit to a tent
+ * POST /api/v1/attendance/tent-visits
+ *
+ * Separate from UpdatePersonalAttendanceSchema because the two mean different
+ * things. `tents` there is the set of tents the day should end up with, so
+ * saving it twice is a no-op. This appends a visit, which is what makes
+ * revisiting a tent later the same day (A, then B, then back to A) expressible
+ * at all: a set cannot carry the second A.
+ */
+export const LogTentVisitSchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+  tentId: z.uuid({ error: "Invalid tent ID" }),
+  /**
+   * When the visit happened.
+   *
+   * Sent by the client rather than defaulted to now() server-side so a device
+   * that logs a visit offline at 20:00 and pushes it at midnight still records
+   * 20:00, not the push time.
+   */
+  visitedAt: z.iso.datetime(),
+});
+
+export type LogTentVisitInput = z.infer<typeof LogTentVisitSchema>;
+
+/**
+ * Log tent visit response
+ */
+export const LogTentVisitResponseSchema = z.object({
+  tentVisitId: z.uuid(),
+  attendanceId: z.uuid(),
+  visitedAt: z.iso.datetime(),
+});
+
+export type LogTentVisitResponse = z.infer<typeof LogTentVisitResponseSchema>;
+
+/**
  * Check-in from reservation path param
  * POST /api/v1/attendance/check-in/{reservationId}
  */

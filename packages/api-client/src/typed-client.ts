@@ -274,6 +274,38 @@ export function createTypedApiClient(config: ApiClientConfig) {
         }>(response);
       },
 
+      /**
+       * Append one visit to a tent.
+       *
+       * Distinct from updatePersonal, whose `tents` is the set the day should
+       * end up with: this records returning to a tent later the same day, which
+       * a set cannot express.
+       */
+      async logTentVisit(data: {
+        festivalId: string;
+        tentId: string;
+        visitedAt: string;
+      }): Promise<{
+        tentVisitId: string;
+        attendanceId: string;
+        visitedAt: string;
+      }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("POST", `${baseUrl}/v1/attendance/tent-visits`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to log tent visit");
+        }
+        return parseJsonResponse<{
+          tentVisitId: string;
+          attendanceId: string;
+          visitedAt: string;
+        }>(response);
+      },
+
       async checkInFromReservation(
         reservationId: string,
       ): Promise<{ success: boolean; message: string; attendanceId?: string }> {

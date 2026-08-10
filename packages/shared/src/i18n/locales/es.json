@@ -2660,6 +2660,7 @@
     "FESTIVAL_NOT_FOUND": "Festival no encontrado.",
     "NO_ACTIVE_FESTIVAL": "No se encontró ningún festival activo.",
     "TENT_NOT_FOUND": "Carpa no encontrada.",
+    "TENT_ALREADY_CURRENT_VISIT": "Ya estás acá. Visitá otra carpa primero.",
     "RESERVATION_NOT_FOUND": "Reserva no encontrada.",
     "RESERVATION_ALREADY_CHECKED_IN": "Ya hiciste check-in.",
     "RESERVATION_CANCELLED": "Esta reserva fue cancelada.",

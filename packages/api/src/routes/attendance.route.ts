@@ -10,6 +10,8 @@ import {
   GetAttendanceByDateResponseSchema,
   ListAttendancesQuerySchema,
   ListAttendancesResponseSchema,
+  LogTentVisitResponseSchema,
+  LogTentVisitSchema,
   UpdatePersonalAttendanceResponseSchema,
   UpdatePersonalAttendanceSchema,
 } from "@prostcounter/shared";
@@ -447,6 +449,82 @@ app.openapi(updatePersonalAttendanceRoute, async (c) => {
   }
 
   return c.json(result, 200);
+});
+
+// POST /attendance/tent-visits - Log one more visit to a tent
+const logTentVisitRoute = createRoute({
+  method: "post",
+  path: "/attendance/tent-visits",
+  tags: ["attendance"],
+  summary: "Log a tent visit",
+  description:
+    "Appends a timestamped visit to a tent, creating the day's attendance if needed. Use this to record returning to a tent later the same day; POST /attendance/personal reconciles the day's set of tents and cannot express a second visit.",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: LogTentVisitSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: "Tent visit logged",
+      content: {
+        "application/json": {
+          schema: LogTentVisitResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Validation error, or the tent is already the day's latest visit",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(logTentVisitRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const data = c.req.valid("json");
+
+  const attendanceRepo = new SupabaseAttendanceRepository(supabase);
+
+  const festival = await attendanceRepo.festivalExists(data.festivalId);
+  if (!festival) {
+    throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
+  }
+
+  const result = await attendanceRepo.logTentVisit(user.id, data);
+
+  try {
+    const wrappedRepo = new SupabaseWrappedRepository(supabase);
+    await wrappedRepo.invalidateCache(user.id, data.festivalId);
+  } catch (cacheError) {
+    logger.error({ error: cacheError }, "Failed to invalidate wrapped cache after tent visit");
+  }
+
+  return c.json(result, 201);
 });
 
 // POST /attendance/check-in/:reservationId - Check in from reservation
