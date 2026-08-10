@@ -647,6 +647,7 @@
       "a11yDrinks": "{{total}} bebidas",
       "a11ySpent": "{{amount}} gastado",
       "moreTents": "+{{amount}}",
+      "reserved": "Reservado",
       "tip": "+{{amount}} propina"
     },
     "tabs": {

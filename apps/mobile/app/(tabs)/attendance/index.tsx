@@ -327,6 +327,7 @@ export default function AttendanceScreen() {
               <AttendanceDayList
                 attendances={(attendances ?? []) as AttendanceWithTotals[]}
                 summaries={daySummaries}
+                reservations={reservations}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />

@@ -647,6 +647,7 @@
       "a11yDrinks": "{{total}} drinks",
       "a11ySpent": "{{amount}} spent",
       "moreTents": "+{{amount}}",
+      "reserved": "Reserved",
       "tip": "+{{amount}} tip"
     },
     "tabs": {

@@ -1,9 +1,10 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AttendanceWithTotals } from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { isSameDay, parseISO } from "date-fns";
-import { Image as ImageIcon } from "lucide-react-native";
+import { format, isSameDay, parseISO } from "date-fns";
+import { CalendarClock, Image as ImageIcon } from "lucide-react-native";
+import { useMemo } from "react";
 
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -11,6 +12,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 import type { DaySummaries } from "@/lib/database/adapted-hooks";
+import { isActiveReservation } from "@/lib/utils/reservation";
 
 import { DrinkCountSummary } from "./drink-count-summary";
 
@@ -20,24 +22,34 @@ const MAX_VISIBLE_TENTS = 2;
 interface AttendanceDayListProps {
   attendances: AttendanceWithTotals[];
   summaries: DaySummaries | null;
+  reservations?: Reservation[];
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
 }
+
+/** One row in the merged, date-descending list. */
+type DayListEntry =
+  | { kind: "attendance"; date: string; attendance: AttendanceWithTotals }
+  | { kind: "reservationOnly"; date: string; reservation: Reservation };
 
 function formatEuros(cents: number): string {
   return `€${Math.round(cents / 100)}`;
 }
 
 /**
- * List of days that have an attendance record, most recent first.
+ * List of days that have an attendance record or an active reservation, most
+ * recent first.
  *
  * Complements the strip: the strip shows which days exist and is where you plan
  * and log, the list shows what each logged day actually cost and where it
- * happened — detail a 48pt cell cannot carry.
+ * happened — detail a 48pt cell cannot carry. Reservation-only days (an active
+ * reservation with no attendance yet) render as a lightweight row so this view
+ * doesn't hide reservations the way the calendar strip does not.
  */
 export function AttendanceDayList({
   attendances,
   summaries,
+  reservations = [],
   selectedDate,
   onDateSelect,
 }: AttendanceDayListProps) {
@@ -47,7 +59,36 @@ export function AttendanceDayList({
     onDateSelect(parseISO(dateStr));
   }
 
-  if (attendances.length === 0) {
+  const reservationMap = useMemo(() => {
+    const map = new Map<string, Reservation>();
+    reservations.filter(isActiveReservation).forEach((reservation) => {
+      map.set(format(new Date(reservation.startAt), "yyyy-MM-dd"), reservation);
+    });
+    return map;
+  }, [reservations]);
+
+  const entries = useMemo((): DayListEntry[] => {
+    const attendanceDates = new Set(attendances.map((attendance) => attendance.date));
+
+    const attendanceEntries: DayListEntry[] = attendances.map((attendance) => ({
+      kind: "attendance",
+      date: attendance.date,
+      attendance,
+    }));
+
+    const reservationOnlyEntries: DayListEntry[] = [];
+    reservationMap.forEach((reservation, date) => {
+      if (!attendanceDates.has(date)) {
+        reservationOnlyEntries.push({ kind: "reservationOnly", date, reservation });
+      }
+    });
+
+    return [...attendanceEntries, ...reservationOnlyEntries].sort((a, b) =>
+      b.date.localeCompare(a.date),
+    );
+  }, [attendances, reservationMap]);
+
+  if (entries.length === 0) {
     return (
       <VStack space="xs" className="items-center rounded-xl bg-background-0 p-8">
         <Text className="text-center font-medium text-typography-700">
@@ -62,12 +103,51 @@ export function AttendanceDayList({
 
   return (
     <VStack space="xs" className="rounded-xl bg-background-0 p-2">
-      {attendances.map((attendance) => {
+      {entries.map((entry) => {
+        if (entry.kind === "reservationOnly") {
+          const date = parseISO(entry.date);
+          const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
+          const { reservation } = entry;
+
+          const accessibilityLabelParts = [
+            formatLocalized(date, "EEEE, MMMM d"),
+            t("attendance.list.reserved"),
+          ];
+          if (reservation.tentName) {
+            accessibilityLabelParts.push(reservation.tentName);
+          }
+
+          return (
+            <Pressable
+              key={entry.date}
+              onPress={() => handlePress(entry.date)}
+              className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
+              accessibilityLabel={accessibilityLabelParts.join(", ")}
+              accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+            >
+              <HStack className="items-center justify-between">
+                <Text className="font-medium text-typography-900">
+                  {formatLocalized(date, "EEE, MMM d")}
+                </Text>
+                <HStack space="xs" className="items-center">
+                  <CalendarClock size={14} color={IconColors.reservation} />
+                  <Text className="text-sm text-teal-700">{t("attendance.list.reserved")}</Text>
+                  {reservation.tentName && (
+                    <Text className="text-sm text-typography-500">{reservation.tentName}</Text>
+                  )}
+                </HStack>
+              </HStack>
+            </Pressable>
+          );
+        }
+
+        const { attendance } = entry;
         const date = parseISO(attendance.date);
         const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
         const tentNames = summaries?.tentNames.get(attendance.date) ?? [];
         const drinkCounts = summaries?.drinkCounts.get(attendance.date);
         const photoCount = summaries?.photoCounts.get(attendance.date) ?? 0;
+        const hasReservation = reservationMap.has(attendance.date);
 
         const visibleTents = tentNames.slice(0, MAX_VISIBLE_TENTS);
         const hiddenTentCount = tentNames.length - visibleTents.length;
@@ -115,6 +195,7 @@ export function AttendanceDayList({
                       })}
                     </Text>
                   )}
+                  {hasReservation && <CalendarClock size={14} color={IconColors.reservation} />}
                   {photoCount > 0 && <ImageIcon size={14} color={IconColors.muted} />}
                 </HStack>
               </HStack>
