@@ -1253,8 +1253,7 @@
                     "items": {
                       "type": "string",
                       "format": "uuid"
-                    },
-                    "default": []
+                    }
                   },
                   "amount": {
                     "type": "integer",

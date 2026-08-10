@@ -134,6 +134,7 @@ export function AttendanceTabContent({
   // Track initialization - keyed by date to handle date changes
   const hasInitializedRef = useRef(false);
   const lastDateRef = useRef<string | null>(null);
+  const hasSeededTentsRef = useRef(false);
 
   // Fetch complete attendance data with beer pictures when editing (offline-first)
   const { data: attendanceWithPhotos } = useAdaptedAttendanceByDate(
@@ -219,7 +220,28 @@ export function AttendanceTabContent({
     });
     setSelectedDrinkType("beer");
     hasInitializedRef.current = false;
+    hasSeededTentsRef.current = false;
   }, [dateString, existingAttendance, freshTentVisits, prefillTentId, selectedDate, reset]);
+
+  /*
+   * Seed the tent field once the real tent visits arrive.
+   *
+   * The reset above runs before useAdaptedAttendanceByDate resolves, and the
+   * list-derived `existingAttendance` always reports `tentVisits: []` (see
+   * rowToAttendanceWithTotals), so the reset seeds an empty selection and its
+   * own date guard then blocks every later run. Without this the field stays
+   * empty for every day that already has tent visits.
+   *
+   * Seeds rather than resets so it cannot clobber a selection the user is in the
+   * middle of editing, and runs at most once per date.
+   */
+  useEffect(() => {
+    if (!isEditMode || hasSeededTentsRef.current || freshTentVisits.length === 0) {
+      return;
+    }
+    hasSeededTentsRef.current = true;
+    setValue("tents", [...new Set(freshTentVisits.map((tv: TentVisit) => tv.tentId))]);
+  }, [freshTentVisits, isEditMode, setValue]);
 
   // Initialize local drink counts when consumptions are loaded
   useEffect(() => {
