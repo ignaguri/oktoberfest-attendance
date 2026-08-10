@@ -77,7 +77,15 @@ export type CreateAttendanceResponse = z.infer<typeof CreateAttendanceResponseSc
 export const UpdatePersonalAttendanceSchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
-  tents: z.array(z.uuid()).default([]),
+  /**
+   * Tent visits to reconcile the day to.
+   *
+   * Deliberately optional rather than defaulting to `[]`: omitting it means
+   * "leave tent visits alone", while an empty array means "the user cleared the
+   * selection, remove them". Defaulting would make those indistinguishable and
+   * turn any caller that loses the array into silent data loss.
+   */
+  tents: z.array(z.uuid()).optional(),
   amount: z.number().int().min(0).default(0),
 });
 

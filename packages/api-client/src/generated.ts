@@ -623,7 +623,6 @@ export interface paths {
                         /** Format: uuid */
                         festivalId: string;
                         date: string;
-                        /** @default [] */
                         tents?: string[];
                         /** @default 0 */
                         amount?: number;

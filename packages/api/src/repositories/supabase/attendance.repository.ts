@@ -292,7 +292,15 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       p_user_id: userId,
       p_date: dateWithTime.toISOString(),
       p_beer_count: 0,
-      p_tent_ids: input.tents.length > 0 ? input.tents : [],
+      /*
+       * null (not supplied) leaves tent visits untouched; [] clears them for the
+       * date. The cast is needed because the generated Database types mirror the
+       * SQL signature, which cannot mark an argument nullable without giving it a
+       * DEFAULT — and p_tent_ids cannot take one while p_festival_id follows it.
+       * Postgres accepts NULL here; see migration
+       * 20260810120000_distinguish_omitted_from_empty_tent_ids.
+       */
+      p_tent_ids: (input.tents ?? null) as unknown as string[],
       p_festival_id: input.festivalId,
     });
 
