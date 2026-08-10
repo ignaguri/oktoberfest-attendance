@@ -13,7 +13,12 @@ import { logger } from "@/lib/logger";
 import { apiClient } from "../../api-client";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
 import { updateLastSyncAt } from "../sync-queue";
-import { clearSupersededTentVisits, type TentVisitDayGroup } from "../tent-visits";
+import {
+  clearSupersededTentVisits,
+  isPendingLocalRemoval,
+  purgeConfirmedTentVisitTombstones,
+  type TentVisitDayGroup,
+} from "../tent-visits";
 import { logConflict, shouldUpdate } from "./conflict";
 import type { PullResult } from "./types";
 
@@ -132,7 +137,14 @@ export async function pullAttendances(
     await processAttendances(db, festivalId, attendances, attendancesResult, now, isFullSnapshot);
     await updateLastSyncAt(db, "attendances", now);
 
-    await processTentVisits(db, response.tentVisits ?? [], tentVisitsResult, now);
+    await processTentVisits(
+      db,
+      festivalId,
+      response.tentVisits ?? [],
+      tentVisitsResult,
+      now,
+      isFullSnapshot,
+    );
     await updateLastSyncAt(db, "tent_visits", now);
   } catch (error) {
     logger.error("[SyncManager] Pull attendances failed:", error);
@@ -319,9 +331,11 @@ async function processAttendances(
  */
 async function processTentVisits(
   db: SQLite.SQLiteDatabase,
+  festivalId: string,
   tentVisits: ServerTentVisit[],
   result: PullResult,
   now: string,
+  isFullSnapshot: boolean,
 ): Promise<void> {
   const groups = new Map<string, TentVisitDayGroup>();
 
@@ -349,6 +363,17 @@ async function processTentVisits(
     );
 
     if (existing) {
+      // A tombstone with _dirty set is a removal the user made here that has not
+      // reached the server yet - the attendance UPDATE carrying it is still
+      // queued. The server naturally still returns the row, so treating that as
+      // truth would undo the removal on screen, and after the push did land the
+      // server would stop returning the row, leaving the resurrected copy in a
+      // group nothing pulls again. Leave it tombstoned; the purge below clears it
+      // once the server confirms the removal.
+      if (isPendingLocalRemoval(existing)) {
+        continue;
+      }
+
       const needsUpdate =
         existing.visit_date !== visitDate ||
         existing.created_at !== createdAt ||
@@ -382,6 +407,25 @@ async function processTentVisits(
   for (const group of groups.values()) {
     result.deleted += await clearSupersededTentVisits(db, group);
   }
+
+  // Purge the tombstones the server has acted on. A row the user removed here
+  // stays tombstoned (see the skip above) until the attendance push carrying the
+  // removal lands; once it has, the server stops returning that row, and this is
+  // the only thing that then reaps the tombstone - the row's day-group no longer
+  // appears in any pull, so clearSupersededTentVisits is never called for it.
+  //
+  // Only on a full snapshot: a row absent from a partial page may still exist
+  // server-side, and dropping the tombstone early would hide a removal that has
+  // not actually happened.
+  if (!isFullSnapshot) {
+    return;
+  }
+
+  result.deleted += await purgeConfirmedTentVisitTombstones(
+    db,
+    festivalId,
+    new Set(tentVisits.map((tv) => tv.id)),
+  );
 }
 
 

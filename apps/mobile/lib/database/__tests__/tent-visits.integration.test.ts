@@ -1,9 +1,10 @@
 /**
  * Runs the raw SQL in ../tent-visits against a real SQLite database.
  *
- * Both operations are entirely SQL: a soft-delete-aware read, hard DELETEs with
- * generated IN lists, a revive-or-insert pair, and a delete whose predicate spans
- * a subquery against _sync_queue. Mocking runAsync would only prove "these
+ * These operations are entirely SQL: a soft-delete-aware read, tombstoning
+ * UPDATEs and DELETEs with generated IN lists, a revive-or-insert pair, and a
+ * delete whose predicate spans a subquery against _sync_queue. Mocking runAsync
+ * would only prove "these
  * strings were passed somewhere" — a wrong column, a missing `_deleted` filter,
  * or a predicate that catches one row too many would fail silently in a mock and
  * loudly on a device. So this seeds real rows into a real SQLite database built
@@ -16,6 +17,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { CREATE_TABLES_SQL } from "../schema";
 import {
   clearSupersededTentVisits,
+  isPendingLocalRemoval,
+  purgeConfirmedTentVisitTombstones,
   reconcileTentVisits,
   type TentVisitsDb,
 } from "../tent-visits";
@@ -122,6 +125,18 @@ function allVisits(database: Database.Database): VisitRow[] {
     .all() as VisitRow[];
 }
 
+/**
+ * The rows the app can actually see.
+ *
+ * Every read path filters `_deleted = 0` (adapted-hooks, day-summaries, the
+ * revisit guard), so this is what a removal has to affect. Kept separate from
+ * allVisits because a removal is a tombstone, and the tests need to assert both
+ * that the row is gone from the UI and that the row is still there to be pushed.
+ */
+function visibleVisits(database: Database.Database): VisitRow[] {
+  return allVisits(database).filter((row) => row._deleted === 0);
+}
+
 describe("reconcileTentVisits against real SQLite", () => {
   let database: Database.Database;
   let db: TentVisitsDb;
@@ -164,16 +179,22 @@ describe("reconcileTentVisits against real SQLite", () => {
     database.close();
   });
 
-  it("deletes a deselected tent's visit and reports it as removed", async () => {
+  it("tombstones a deselected tent's visit and reports it as removed", async () => {
     insertTentVisit(database, { id: "tv1", tentId: "t1" });
     insertTentVisit(database, { id: "tv2", tentId: "t2" });
 
     const result = await reconcile(["t1"]);
 
     expect(result).toEqual({ tentsAdded: [], tentsRemoved: ["t2"] });
-    // A hard delete, not a tombstone: nothing pushes tent_visits deletions, so a
-    // `_deleted = 1` row would linger locally and never reach the server.
-    expect(allVisits(database).map((row) => row.tent_id)).toEqual(["t1"]);
+    expect(visibleVisits(database).map((row) => row.tent_id)).toEqual(["t1"]);
+    // A tombstone rather than a hard delete, because a sync pulls before it
+    // pushes: a deleted row was re-inserted by that pull while the removal was
+    // still queued, and once the push landed the server stopped returning it, so
+    // nothing reaped the resurrected copy and the tent stayed on screen for good.
+    expect(allVisits(database).find((row) => row.id === "tv2")).toMatchObject({
+      _deleted: 1,
+      _dirty: 1,
+    });
   });
 
   it("clears every visit for the day when given an empty selection", async () => {
@@ -183,7 +204,8 @@ describe("reconcileTentVisits against real SQLite", () => {
     const result = await reconcile([]);
 
     expect(result).toEqual({ tentsAdded: [], tentsRemoved: ["t1", "t2"] });
-    expect(allVisits(database)).toEqual([]);
+    expect(visibleVisits(database)).toEqual([]);
+    expect(allVisits(database).map((row) => row._deleted)).toEqual([1, 1]);
   });
 
   it("leaves other days alone when clearing one day", async () => {
@@ -193,7 +215,7 @@ describe("reconcileTentVisits against real SQLite", () => {
     const result = await reconcile([]);
 
     expect(result.tentsRemoved).toEqual(["t1"]);
-    expect(allVisits(database).map((row) => row.visit_date)).toEqual(["2026-09-24"]);
+    expect(visibleVisits(database).map((row) => row.visit_date)).toEqual(["2026-09-24"]);
   });
 
   it("keeps an already-visited tent's row byte-for-byte and only inserts the new one", async () => {
@@ -271,7 +293,38 @@ describe("reconcileTentVisits against real SQLite", () => {
     const result = await reconcile(["t2"]);
 
     expect(result).toEqual({ tentsAdded: [], tentsRemoved: ["t1"] });
-    expect(allVisits(database).map((row) => row.id)).toEqual(["tv2"]);
+    expect(visibleVisits(database).map((row) => row.id)).toEqual(["tv2"]);
+    // Both visits to t1, not just the one the day started with.
+    expect(
+      allVisits(database)
+        .filter((row) => row._deleted === 1)
+        .map((row) => row.id),
+    ).toEqual(["tv1", "tv3"]);
+  });
+
+  it("drops a queued push for a visit it tombstones", async () => {
+    insertTentVisit(database, { id: "tv1", tentId: "t1", syncedAt: null, dirty: 1 });
+    insertQueueOp(database, { recordId: "tv1" });
+
+    await reconcile([]);
+
+    // Left in place, the op would create the visit on the server after the
+    // attendance UPDATE had removed it - and a failed op is worse, since
+    // retryFailed revives it on every later push.
+    expect(database.prepare(`SELECT id FROM _sync_queue`).all()).toEqual([]);
+  });
+
+  it("leaves another record's queued push alone", async () => {
+    insertTentVisit(database, { id: "tv1", tentId: "t1", syncedAt: null, dirty: 1 });
+    insertTentVisit(database, { id: "tv2", tentId: "t2", syncedAt: null, dirty: 1 });
+    insertQueueOp(database, { recordId: "tv1" });
+    insertQueueOp(database, { recordId: "tv2" });
+
+    await reconcile(["t2"]);
+
+    expect(database.prepare(`SELECT record_id FROM _sync_queue`).all()).toEqual([
+      { record_id: "tv2" },
+    ]);
   });
 });
 
@@ -396,5 +449,94 @@ describe("clearSupersededTentVisits against real SQLite", () => {
       "other-tent",
       "server-1",
     ]);
+  });
+});
+
+/*
+ * The pull's half of the removal contract.
+ *
+ * reconcileTentVisits tombstones a deselected tent and the removal then travels
+ * on the queued attendance UPDATE, which means a pull happens first: a sync pulls
+ * before it pushes, and the app-foreground sync only pulls. These two functions
+ * are what stop that pull undoing the removal, and what eventually reap the
+ * tombstone once the server has acted on it.
+ */
+describe("isPendingLocalRemoval", () => {
+  it("recognises a removal the user made here", () => {
+    expect(isPendingLocalRemoval({ _deleted: 1, _dirty: 1 })).toBe(true);
+  });
+
+  it("does not claim a tombstone the server already agreed with", () => {
+    // _dirty = 0: a previous pull recorded a removal that had already happened
+    // server-side, so the server stays authoritative for this row.
+    expect(isPendingLocalRemoval({ _deleted: 0, _dirty: 1 })).toBe(false);
+    expect(isPendingLocalRemoval({ _deleted: 1, _dirty: 0 })).toBe(false);
+    expect(isPendingLocalRemoval({ _deleted: 0, _dirty: 0 })).toBe(false);
+  });
+});
+
+describe("purgeConfirmedTentVisitTombstones against real SQLite", () => {
+  let database: Database.Database;
+  let db: TentVisitsDb;
+
+  beforeEach(() => {
+    database = new Database(":memory:");
+    for (const createTableSql of Object.values(CREATE_TABLES_SQL)) {
+      database.exec(createTableSql);
+    }
+    database.pragma("foreign_keys = ON");
+    insertFestival(database, FESTIVAL);
+    insertTent(database, "t1");
+    insertTent(database, "t2");
+    db = createDb(database);
+  });
+
+  afterEach(() => {
+    database.close();
+  });
+
+  it("drops a tombstone the server has stopped returning", async () => {
+    insertTentVisit(database, { id: "tv1", tentId: "t1", deleted: 1, dirty: 1 });
+
+    const purged = await purgeConfirmedTentVisitTombstones(db, FESTIVAL, new Set(["other"]));
+
+    expect(purged).toBe(1);
+    expect(allVisits(database)).toEqual([]);
+  });
+
+  it("keeps a tombstone the server still returns", async () => {
+    // The removal has not pushed yet, so the row is legitimately still there.
+    insertTentVisit(database, { id: "tv1", tentId: "t1", deleted: 1, dirty: 1 });
+
+    const purged = await purgeConfirmedTentVisitTombstones(db, FESTIVAL, new Set(["tv1"]));
+
+    expect(purged).toBe(0);
+    expect(allVisits(database).map((row) => row.id)).toEqual(["tv1"]);
+  });
+
+  it("leaves live rows and server-agreed tombstones alone", async () => {
+    insertTentVisit(database, { id: "live", tentId: "t1" });
+    insertTentVisit(database, { id: "agreed", tentId: "t2", deleted: 1, dirty: 0 });
+
+    const purged = await purgeConfirmedTentVisitTombstones(db, FESTIVAL, new Set());
+
+    expect(purged).toBe(0);
+    expect(allVisits(database).map((row) => row.id).sort()).toEqual(["agreed", "live"]);
+  });
+
+  it("does not reach into another festival", async () => {
+    insertFestival(database, "f2");
+    database
+      .prepare(
+        `INSERT INTO tent_visits
+          (id, user_id, tent_id, festival_id, visit_date, created_at, _synced_at, _deleted, _dirty)
+         VALUES ('other-festival', ?, 't1', 'f2', ?, '2026-09-23T20:57:00Z', NULL, 1, 1)`,
+      )
+      .run(USER, DATE);
+
+    const purged = await purgeConfirmedTentVisitTombstones(db, FESTIVAL, new Set());
+
+    expect(purged).toBe(0);
+    expect(allVisits(database).map((row) => row.id)).toEqual(["other-festival"]);
   });
 });
