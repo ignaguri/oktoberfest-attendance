@@ -1,5 +1,5 @@
 import { cn } from "@prostcounter/ui";
-import { useCallback } from "react";
+import { Fragment, useCallback } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -26,6 +26,7 @@ interface SegmentedControlProps {
  * Features:
  * - iOS-style segmented control appearance
  * - Animated sliding indicator
+ * - Hairline dividers between segments so the tap targets read as separate
  * - Disabled tab support
  * - Accessible with proper roles
  */
@@ -79,11 +80,15 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
   );
 
   return (
-    <View className="relative w-full rounded-lg bg-background-100 p-1">
-      {/* Animated sliding indicator */}
+    <View className="relative w-full rounded-lg border border-outline-200 bg-background-200 p-1">
+      {/*
+       * Animated sliding indicator. Vertical size comes from top/bottom insets,
+       * not a percentage height: `calc()` is a web-only CSS value and resolves to
+       * nothing on native, which collapses the indicator to zero height.
+       */}
       <Animated.View
         style={animatedIndicatorStyle}
-        className="absolute left-1 top-1 h-[calc(100%-8px)] rounded-md bg-background-0 shadow-sm"
+        className="absolute bottom-1 left-1 top-1 rounded-md border border-outline-200 bg-background-0 shadow-md"
       />
 
       {/* Tab buttons */}
@@ -93,27 +98,30 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
           const isDisabled = tab.disabled;
 
           return (
-            <Pressable
-              key={tab.key}
-              onPress={() => handleTabPress(tab, index)}
-              onLayout={(e) => handleTabLayout(e, index)}
-              disabled={isDisabled}
-              className="flex-1 items-center justify-center py-2"
-              accessibilityRole="tab"
-              accessibilityState={{ selected: isActive, disabled: isDisabled }}
-              accessibilityLabel={tab.label}
-            >
-              <Text
-                className={cn(
-                  "text-sm font-medium",
-                  isActive && "text-typography-900",
-                  !isActive && isDisabled && "text-typography-300",
-                  !isActive && !isDisabled && "text-typography-500",
-                )}
+            <Fragment key={tab.key}>
+              {index > 0 && <View className="my-1.5 w-px self-stretch bg-outline-400" />}
+              <Pressable
+                onPress={() => handleTabPress(tab, index)}
+                onLayout={(e) => handleTabLayout(e, index)}
+                disabled={isDisabled}
+                className="flex-1 items-center justify-center py-2"
+                accessibilityRole="tab"
+                accessibilityState={{ selected: isActive, disabled: isDisabled }}
+                accessibilityLabel={tab.label}
               >
-                {tab.label}
-              </Text>
-            </Pressable>
+                <Text
+                  className={cn(
+                    "text-sm",
+                    isActive && "font-semibold text-typography-900",
+                    !isActive && "font-medium",
+                    !isActive && isDisabled && "text-typography-300",
+                    !isActive && !isDisabled && "text-typography-600",
+                  )}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            </Fragment>
           );
         })}
       </HStack>
