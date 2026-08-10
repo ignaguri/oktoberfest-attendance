@@ -18,6 +18,7 @@ import {
 
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseProfileRepository } from "../repositories/supabase";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { deleteAuthUser } from "../utils/admin-client";
 
 // Create router
@@ -173,6 +174,10 @@ app.openapi(updateProfileRoute, async (c) => {
 
   const profileRepo = new SupabaseProfileRepository(supabase);
   const profile = await profileRepo.updateProfile(user.id, input);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, null, "PUT /profile");
 
   return c.json({ profile }, 200);
 });
@@ -530,6 +535,10 @@ app.openapi(confirmAvatarUploadRoute, async (c) => {
 
   const profileRepo = new SupabaseProfileRepository(supabase);
   const confirmedFileName = await profileRepo.confirmAvatarUpload(user.id, fileName);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, null, "POST /profile/avatar/confirm");
 
   return c.json({ success: true, fileName: confirmedFileName }, 200);
 });

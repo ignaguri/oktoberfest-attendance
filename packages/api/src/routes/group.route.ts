@@ -21,6 +21,7 @@ import {
 
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseGroupRepository } from "../repositories/supabase";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
 
 // Create router
@@ -75,6 +76,10 @@ app.openapi(createGroupRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   const group = await service.createGroup(user.id, data);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, data.festivalId, "POST /groups");
 
   return c.json(group, 200);
 });
@@ -402,6 +407,12 @@ app.openapi(joinGroupRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   await service.joinGroup(id, user.id, body.inviteToken);
+
+  const { data: group } = await supabase.from("groups").select("festival_id").eq("id", id).single();
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, group?.festival_id ?? null, "POST /groups/{id}/join");
 
   return c.json(
     {
@@ -840,6 +851,21 @@ app.openapi(joinByTokenRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   const group = await service.joinByToken(inviteToken, user.id);
+
+  const { data: joinedGroup } = await supabase
+    .from("groups")
+    .select("festival_id")
+    .eq("id", group.id)
+    .single();
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(
+    supabase,
+    user.id,
+    joinedGroup?.festival_id ?? null,
+    "POST /groups/join-by-token",
+  );
 
   return c.json(
     {

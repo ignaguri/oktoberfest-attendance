@@ -497,10 +497,14 @@ describe("Crowd Report Routes - Unit Tests", () => {
         waitTimeMinutes: 10,
         createdAt: "2026-02-25T14:35:00Z",
       });
-      // Verify both from() calls happened
-      expect(mockSupabase.from).toHaveBeenCalledTimes(2);
+      // Verify both from() calls happened, plus the achievement evaluation
+      // this route now triggers after a successful submission (evaluate-only:
+      // getHeldSlugs reads user_achievements; the unlock itself is never
+      // surfaced in this response).
+      expect(mockSupabase.from).toHaveBeenCalledTimes(3);
       expect(mockSupabase.from).toHaveBeenNthCalledWith(1, "tent_crowd_reports");
       expect(mockSupabase.from).toHaveBeenNthCalledWith(2, "tent_crowd_reports");
+      expect(mockSupabase.from).toHaveBeenNthCalledWith(3, "user_achievements");
     });
 
     it("should submit a report without waitTimeMinutes", async () => {

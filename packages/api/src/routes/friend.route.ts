@@ -16,6 +16,7 @@ import {
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseFriendRepository } from "../repositories/supabase";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { FriendService } from "../services/friend.service";
 import { NotificationService } from "../services/notification.service";
 
@@ -231,6 +232,11 @@ app.openapi(acceptRequestRoute, async (c) => {
   const repo = new SupabaseFriendRepository(supabase);
   const service = new FriendService(repo);
   const result = await service.acceptRequest(id, user.id);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, null, "POST /friends/request/{id}/accept");
+
   return c.json({ success: result.success, message: result.message }, 200);
 });
 

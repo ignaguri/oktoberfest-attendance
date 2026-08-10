@@ -13,6 +13,7 @@ import {
 
 import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -189,7 +190,7 @@ app.openapi(addReactionRoute, async (c) => {
   // Verify group membership
   const { data: membership } = await supabase
     .from("group_members")
-    .select("user_id")
+    .select("user_id, groups(festival_id)")
     .eq("group_id", groupId)
     .eq("user_id", user.id)
     .single();
@@ -213,6 +214,16 @@ app.openapi(addReactionRoute, async (c) => {
     }
     throw new Error(`Failed to add reaction: ${error.message}`);
   }
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(
+    supabase,
+    user.id,
+    (membership as unknown as { groups: { festival_id: string } | null }).groups?.festival_id ??
+      null,
+    "POST /photos/{photoId}/reactions",
+  );
 
   return c.json({ success: true }, 200);
 });

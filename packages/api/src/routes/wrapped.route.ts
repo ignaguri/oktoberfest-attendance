@@ -10,6 +10,7 @@ import {
 
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseWrappedRepository } from "../repositories/supabase";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { WrappedService } from "../services/wrapped.service";
 
 // Create router
@@ -70,6 +71,10 @@ app.openapi(getWrappedRoute, async (c) => {
   const wrappedService = new WrappedService(wrappedRepo);
 
   const result = await wrappedService.getWrapped(user.id, festivalId);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, festivalId, "GET /wrapped/{festivalId}");
 
   return c.json(result, 200);
 });
