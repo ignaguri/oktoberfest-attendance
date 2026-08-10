@@ -9,7 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { AttendanceCalendar } from "@/components/attendance/attendance-calendar";
+import { AttendanceStrip } from "@/components/attendance/attendance-strip";
 import { CalendarActionSheet } from "@/components/attendance/calendar-action-sheet";
 import { CheckInDialog } from "@/components/attendance/check-in-dialog";
 import { AttendanceSkeleton } from "@/components/skeletons";
@@ -252,7 +252,7 @@ export default function AttendanceScreen() {
       >
         <View className="p-4 pb-20">
           {/* Calendar */}
-          <AttendanceCalendar
+          <AttendanceStrip
             festivalStartDate={festivalStartDate}
             festivalEndDate={festivalEndDate}
             attendances={calendarAttendances}
