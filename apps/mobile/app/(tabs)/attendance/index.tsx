@@ -58,7 +58,6 @@ export default function AttendanceScreen() {
     refetch,
   } = useAdaptedAttendances(currentFestival?.id);
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
-  const { data: daySummaries } = useAdaptedDaySummaries(currentFestival?.id);
 
   const {
     data: reservationsData,
@@ -85,6 +84,14 @@ export default function AttendanceScreen() {
   const [prefillTentId, setPrefillTentId] = useState<string | undefined>();
 
   const { viewMode, setViewMode: handleViewModeChange, viewTabs } = useAttendanceViewMode();
+
+  // Only the list renders these, and its error matters: without them every row
+  // silently loses its tents, chips and photo dot with nothing said, so it is
+  // surfaced alongside the attendances error rather than dropped.
+  const { data: daySummaries, error: daySummariesError } = useAdaptedDaySummaries(
+    currentFestival?.id,
+    { enabled: viewMode === "list" },
+  );
 
   // Handle check-in from deep link
   // This effect intentionally sets state when a deep link is detected
@@ -246,11 +253,14 @@ export default function AttendanceScreen() {
     );
   }
 
-  // Error state
-  if (attendancesError) {
+  // Error state. The day summaries count too: without them every list row loses
+  // its tents, chips and photo dot, and saying nothing would leave the user
+  // reading a list that quietly understates their days.
+  const blockingError = attendancesError ?? daySummariesError;
+  if (blockingError) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <ErrorState error={attendancesError} onRetry={refetch} />
+        <ErrorState error={blockingError} onRetry={refetch} />
       </View>
     );
   }

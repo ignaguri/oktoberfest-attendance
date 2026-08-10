@@ -612,8 +612,10 @@
       "list": "Liste"
     },
     "list": {
-      "a11yDrinks": "{{total}} Getränke",
+      "today": "Heute",
       "a11ySpent": "{{amount}} ausgegeben",
+      "a11yPhotos": "{{count}} Foto",
+      "a11yPhotos_other": "{{count}} Fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserviert",
       "tip": "+{{amount}} Trinkgeld"

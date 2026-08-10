@@ -122,13 +122,29 @@ export function AttendanceStrip({
 
       const indicatorColor = isSelected ? Colors.white : Colors.primary[600];
 
+      const cellAccessibilityLabel = [
+        formatLocalized(date, "EEEE, MMMM d"),
+        isToday ? t("attendance.list.today") : null,
+        hasAttendance ? t("attendance.drinkCount", { count: drinkCount }) : null,
+        hasReservation ? t("attendance.list.reserved") : null,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
       return (
         <Pressable
           key={dateStr}
           onPress={() => onDateSelect(date)}
           className={cellClassName}
-          accessibilityLabel={formatLocalized(date, "EEEE, MMMM d")}
+          accessibilityRole="button"
+          // Everything the cell conveys visually goes in the label. Colour and a
+          // badge carry the drink count, the reservation and today, and a label of
+          // only the date left a screen-reader user swiping past sixteen
+          // indistinguishable days with no way to tell which ones they had logged
+          // - on the view that opens by default.
+          accessibilityLabel={cellAccessibilityLabel}
           accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+          accessibilityState={{ selected: isSelected }}
         >
           <VStack className="items-center">
             {isToday && <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />}

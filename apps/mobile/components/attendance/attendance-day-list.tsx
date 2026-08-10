@@ -127,15 +127,26 @@ export function AttendanceDayList({
     const visibleTents = tentNames.slice(0, MAX_VISIBLE_TENTS);
     const hiddenTentCount = tentNames.length - visibleTents.length;
 
+    // Everything the row shows, including the two bare icons: a reservation and a
+    // photo are rendered as glyphs with no text anywhere near them, so leaving
+    // them out made them invisible to a screen reader.
+    // drinkCount rather than a dedicated string, because it is already pluralized
+    // in all three locales - the old key said "1 drinks".
     const accessibilityLabelParts = [
       formatLocalized(date, "EEEE, MMMM d"),
       t("attendance.list.a11ySpent", { amount: formatEuros(attendance.totalSpentCents) }),
-      t("attendance.list.a11yDrinks", { total: attendance.drinkCount }),
+      t("attendance.drinkCount", { count: attendance.drinkCount }),
     ];
     if (attendance.totalTipCents > 0) {
       accessibilityLabelParts.push(
         t("attendance.list.tip", { amount: formatEuros(attendance.totalTipCents) }),
       );
+    }
+    if (hasReservation) {
+      accessibilityLabelParts.push(t("attendance.list.reserved"));
+    }
+    if (photoCount > 0) {
+      accessibilityLabelParts.push(t("attendance.list.a11yPhotos", { count: photoCount }));
     }
     if (tentNames.length > 0) {
       accessibilityLabelParts.push(tentNames.join(", "));
@@ -145,8 +156,10 @@ export function AttendanceDayList({
       <Pressable
         onPress={() => handlePress(attendance.date)}
         className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
+        accessibilityRole="button"
         accessibilityLabel={accessibilityLabelParts.join(", ")}
         accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+        accessibilityState={{ selected: isSelected }}
       >
         <VStack space="xs">
           <HStack className="items-center justify-between">

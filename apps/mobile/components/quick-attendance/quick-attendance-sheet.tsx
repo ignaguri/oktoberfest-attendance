@@ -3,8 +3,6 @@ import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { getCurrentTentId } from "@prostcounter/shared/utils";
-
-import { deriveQuickSaveActions } from "@/lib/attendance/quick-save-actions";
 import { cn } from "@prostcounter/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -20,7 +18,7 @@ import {
   Wine,
   X,
 } from "lucide-react-native";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -40,6 +38,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
+import { deriveQuickSaveActions } from "@/lib/attendance/quick-save-actions";
 import { type PendingPhoto, useBeerPictureUpload } from "@/hooks/useBeerPictureUpload";
 import {
   TentAlreadyCurrentVisitError,
@@ -243,16 +242,31 @@ export function QuickAttendanceSheet({
     [attendance?.tentVisits],
   );
 
-  // Reset state when sheet opens, preselect tent from prop or last attendance
+  /*
+   * Reset state when the sheet opens, preselecting the tent from the prop or from
+   * today's latest visit.
+   *
+   * Latched on the closed -> open transition, and the preselect is read through a
+   * ref. With currentTentId in the dependency array this re-ran whenever today's
+   * visits changed while the sheet was open: a background sync landing mid-edit
+   * cleared the drink and the chosen photos, so the user's selections vanished and
+   * Save went disabled with no explanation. It also fired during a save, since the
+   * write invalidates and the refetch resolves while the sheet is still open,
+   * making the photo thumbnails disappear behind the spinner.
+   */
+  const preselectRef = useRef<string | undefined>(undefined);
+  preselectRef.current = preselectedTentId || currentTentId;
+  const wasOpenRef = useRef(false);
+
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !wasOpenRef.current) {
       setSelectedDrinkType(null);
       setPendingPhotos([]);
       // Prioritize: 1) preselectedTentId from map/banner, 2) today's attendance tent
-      const tentToSelect = preselectedTentId || currentTentId;
-      setSelectedTentId(tentToSelect);
+      setSelectedTentId(preselectRef.current);
     }
-  }, [isOpen, preselectedTentId, currentTentId]);
+    wasOpenRef.current = isOpen;
+  }, [isOpen]);
 
   // Handle drink type selection (toggle behavior)
   const handleDrinkTypeSelect = useCallback((type: DrinkType) => {

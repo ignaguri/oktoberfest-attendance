@@ -530,6 +530,7 @@ export interface DaySummaries {
 
 export function useAdaptedDaySummaries(
   festivalId: string | undefined,
+  options: { enabled?: boolean } = {},
 ): DataQueryResult<DaySummaries> {
   const { isReady, getDb } = useOfflineContext();
 
@@ -547,7 +548,9 @@ export function useAdaptedDaySummaries(
       ]);
       return { tentNames, drinkCounts, photoCounts };
     },
-    enabled: isReady && !!festivalId,
+    // Three SQLite reads that only the day list consumes, so the calendar view
+    // has no reason to run them.
+    enabled: isReady && !!festivalId && (options.enabled ?? true),
     staleTime: Infinity,
   });
 

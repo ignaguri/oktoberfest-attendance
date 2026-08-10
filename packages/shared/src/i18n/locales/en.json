@@ -647,8 +647,10 @@
       "list": "List"
     },
     "list": {
-      "a11yDrinks": "{{total}} drinks",
+      "today": "Today",
       "a11ySpent": "{{amount}} spent",
+      "a11yPhotos": "{{count}} photo",
+      "a11yPhotos_other": "{{count}} photos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserved",
       "tip": "+{{amount}} tip"

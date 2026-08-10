@@ -647,8 +647,10 @@
       "list": "Lista"
     },
     "list": {
-      "a11yDrinks": "{{total}} bebidas",
+      "today": "Hoy",
       "a11ySpent": "{{amount}} gastado",
+      "a11yPhotos": "{{count}} foto",
+      "a11yPhotos_other": "{{count}} fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reservado",
       "tip": "+{{amount}} propina"
