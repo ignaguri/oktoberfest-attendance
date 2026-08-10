@@ -618,6 +618,7 @@
       "a11yPhotos_other": "{{count}} Fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserviert",
+      "reservationsUnavailable": "Reservierungen konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einer Reservierung.",
       "tip": "+{{amount}} Trinkgeld"
     },
     "tabs": {

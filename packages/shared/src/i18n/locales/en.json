@@ -653,6 +653,7 @@
       "a11yPhotos_other": "{{count}} photos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserved",
+      "reservationsUnavailable": "Reservations couldn't be loaded, so days with only a reservation are missing.",
       "tip": "+{{amount}} tip"
     },
     "tabs": {

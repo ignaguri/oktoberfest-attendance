@@ -29,6 +29,14 @@ interface AttendanceDayListProps {
   attendances: AttendanceWithTotals[];
   summaries: DaySummaries | null;
   reservations?: Reservation[];
+  /**
+   * Reservations could not be loaded, so reservation-only rows are missing.
+   *
+   * Worth saying out loud: this list is the one view whose row *set* depends on
+   * reservation data, and reservations are API-only, so offline it is simply
+   * shorter with no explanation. Silence reads as days having been lost.
+   */
+  reservationsUnavailable?: boolean;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
 }
@@ -47,6 +55,7 @@ export function AttendanceDayList({
   attendances,
   summaries,
   reservations = [],
+  reservationsUnavailable = false,
   selectedDate,
   onDateSelect,
 }: AttendanceDayListProps) {
@@ -66,6 +75,18 @@ export function AttendanceDayList({
     [attendances, reservationMap],
   );
 
+  // Sits above the rows and inside the empty state, because a list that is merely
+  // shorter than usual is the case that misleads: the user cannot tell a day they
+  // never logged from a reservation row that failed to load.
+  const reservationNotice = reservationsUnavailable ? (
+    <HStack space="xs" className="items-center justify-center px-3 py-2">
+      <CalendarClock size={14} color={IconColors.muted} />
+      <Text className="text-xs text-typography-500">
+        {t("attendance.list.reservationsUnavailable")}
+      </Text>
+    </HStack>
+  ) : null;
+
   if (entries.length === 0) {
     return (
       <VStack space="xs" className="items-center rounded-xl bg-background-0 p-8">
@@ -75,6 +96,7 @@ export function AttendanceDayList({
         <Text className="text-center text-sm text-typography-500">
           {t("attendance.noAttendancesDescription")}
         </Text>
+        {reservationNotice}
       </VStack>
     );
   }
@@ -206,6 +228,7 @@ export function AttendanceDayList({
 
   return (
     <VStack space="xs" className="rounded-xl bg-background-0 p-2">
+      {reservationNotice}
       {entries.map((entry, index) => (
         <Fragment key={entry.date}>
           {index > 0 && <Divider />}

@@ -31,6 +31,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAttendanceViewMode } from "@/hooks/useAttendanceViewMode";
+import { useOffline } from "@/lib/database/offline-provider";
 import {
   useAdaptedAttendances,
   useAdaptedDaySummaries,
@@ -58,10 +59,12 @@ export default function AttendanceScreen() {
     refetch,
   } = useAdaptedAttendances(currentFestival?.id);
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
+  const { isOnline } = useOffline();
 
   const {
     data: reservationsData,
     loading: reservationsLoading,
+    error: reservationsError,
     refetch: refetchReservations,
   } = useReservations(currentFestival?.id);
 
@@ -69,6 +72,18 @@ export default function AttendanceScreen() {
     () => reservationsData?.reservations ?? [],
     [reservationsData?.reservations],
   );
+
+  /*
+   * Whether reservations could not be loaded at all.
+   *
+   * The day list renders reservation-only rows, and reservations are API-only:
+   * there is no local table and no persisted query cache, so after a cold start
+   * without a connection there are none. Without saying so the list would simply
+   * be shorter offline than online, which reads as data having been lost rather
+   * than as data being unavailable.
+   */
+  const reservationsUnavailable =
+    !!reservationsError || (!isOnline && !reservationsLoading && !reservationsData);
 
   // Check-in mutation
   const checkInReservation = useCheckInReservation();
@@ -294,6 +309,7 @@ export default function AttendanceScreen() {
                 attendances={(attendances ?? []) as AttendanceWithTotals[]}
                 summaries={daySummaries}
                 reservations={reservations}
+                reservationsUnavailable={reservationsUnavailable}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />
