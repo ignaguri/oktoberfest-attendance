@@ -852,20 +852,9 @@ app.openapi(joinByTokenRoute, async (c) => {
 
   const group = await service.joinByToken(inviteToken, user.id);
 
-  const { data: joinedGroup } = await supabase
-    .from("groups")
-    .select("festival_id")
-    .eq("id", group.id)
-    .single();
-
   // Evaluate-only: the unlock reaches the client through the outbox, not this
   // response. Awaited so the outbox row exists before the client's next read.
-  await evaluateAfterWrite(
-    supabase,
-    user.id,
-    joinedGroup?.festival_id ?? null,
-    "POST /groups/join-by-token",
-  );
+  await evaluateAfterWrite(supabase, user.id, group.festivalId ?? null, "POST /groups/join-by-token");
 
   return c.json(
     {
