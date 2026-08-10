@@ -3,6 +3,8 @@ import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { getCurrentTentId } from "@prostcounter/shared/utils";
+
+import { deriveQuickSaveActions } from "@/lib/attendance/quick-save-actions";
 import { cn } from "@prostcounter/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -279,19 +281,26 @@ export function QuickAttendanceSheet({
     setPendingPhotos((prev) => prev.filter((p) => p.id !== photoId));
   }, []);
 
-  // Check if there's anything to save
-  const hasChanges =
-    selectedDrinkType !== null ||
-    pendingPhotos.length > 0 ||
-    (selectedTentId && selectedTentId !== currentTentId);
+  // What this save should do. Derived in lib/attendance/quick-save-actions so the
+  // combinations are covered by a table test - the mobile vitest config cannot
+  // reach a .tsx file, and this is where both of the day-wiping bugs lived.
+  const saveActions = useMemo(
+    () =>
+      deriveQuickSaveActions({
+        selectedDrinkType,
+        pendingPhotoCount: pendingPhotos.length,
+        selectedTentId,
+        currentTentId,
+      }),
+    [selectedDrinkType, pendingPhotos.length, selectedTentId, currentTentId],
+  );
+  const hasChanges = saveActions.hasChanges;
 
   // Handle save
   const handleSave = useCallback(async () => {
     if (!festivalId) return;
 
-    // Must have at least a drink, photos, or tent change (using same logic as hasChanges)
-    const hasTentChange = selectedTentId && selectedTentId !== currentTentId;
-    if (!selectedDrinkType && pendingPhotos.length === 0 && !hasTentChange) return;
+    if (!saveActions.hasChanges) return;
 
     setIsSaving(true);
 
@@ -299,7 +308,7 @@ export function QuickAttendanceSheet({
       // Moving tent is a new visit appended to the day, not a new set of tents for
       // it. Sending the tent through `tents` below would reconcile the day to just
       // this one and delete every earlier visit, on the phone and on the server.
-      if (hasTentChange && selectedTentId) {
+      if (saveActions.shouldLogVisit && selectedTentId) {
         try {
           await logTentVisit.mutateAsync({
             festivalId,
@@ -316,7 +325,7 @@ export function QuickAttendanceSheet({
       }
 
       // Log the consumption only if a drink is selected
-      if (selectedDrinkType) {
+      if (saveActions.shouldLogConsumption && selectedDrinkType) {
         // beerCost is in euros, we need cents
         const priceCents = currentFestival?.beerCost
           ? Math.round(currentFestival.beerCost * 100)
@@ -337,7 +346,7 @@ export function QuickAttendanceSheet({
       // calendar reads it. No `tents` on purpose, which is what leaves the day's
       // visits alone - passing [] would not, since reconciliation treats an empty
       // array as "the day holds no tents" and clears it.
-      if (selectedTentId || pendingPhotos.length > 0) {
+      if (saveActions.shouldTouchAttendance) {
         const result = await updateAttendance.mutateAsync({
           festivalId,
           date: today,

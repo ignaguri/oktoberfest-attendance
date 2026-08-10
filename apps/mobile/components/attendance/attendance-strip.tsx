@@ -12,7 +12,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { isActiveReservation } from "@/lib/utils/reservation";
+import { buildActiveReservationsByDate } from "@/lib/attendance/day-list-entries";
 
 interface AttendanceData {
   date: string;
@@ -79,13 +79,12 @@ export function AttendanceStrip({
     return map;
   }, [attendances]);
 
-  const reservationMap = useMemo(() => {
-    const map = new Map<string, Reservation>();
-    reservations.filter(isActiveReservation).forEach((reservation) => {
-      map.set(format(new Date(reservation.startAt), "yyyy-MM-dd"), reservation);
-    });
-    return map;
-  }, [reservations]);
+  // Shared with the day list: both views need the same one-reservation-per-day
+  // map, and two copies of it would drift.
+  const reservationMap = useMemo(
+    () => buildActiveReservationsByDate(reservations),
+    [reservations],
+  );
 
   const rangeLabel = useMemo(
     () =>

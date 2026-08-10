@@ -13,7 +13,12 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 import type { DaySummaries } from "@/lib/database/adapted-hooks";
-import { isActiveReservation } from "@/lib/utils/reservation";
+import {
+  buildActiveReservationsByDate,
+  buildDayListEntries,
+  type DayListEntry,
+  formatEuros,
+} from "@/lib/attendance/day-list-entries";
 
 import { DrinkCountSummary } from "./drink-count-summary";
 
@@ -26,25 +31,6 @@ interface AttendanceDayListProps {
   reservations?: Reservation[];
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
-}
-
-/** One row in the merged, date-descending list. */
-type DayListEntry =
-  | { kind: "attendance"; date: string; attendance: AttendanceWithTotals }
-  | { kind: "reservationOnly"; date: string; reservation: Reservation };
-
-/**
- * Whole euros when the amount has none, two decimals when it does.
- *
- * The festival summary card above this list renders whole euros, and under the
- * default tip mode every price paid lands on one, so most rows read the same
- * either way. Sub-euro amounts are the exception that matters: rounding a €1.80
- * tip to €2, or a €0.20 one to €0 on a row that only renders because the tip is
- * non-zero, states an amount the user never paid.
- */
-function formatEuros(cents: number): string {
-  const euros = cents / 100;
-  return `€${cents % 100 === 0 ? euros : euros.toFixed(2)}`;
 }
 
 /**
@@ -70,34 +56,15 @@ export function AttendanceDayList({
     onDateSelect(parseISO(dateStr));
   }
 
-  const reservationMap = useMemo(() => {
-    const map = new Map<string, Reservation>();
-    reservations.filter(isActiveReservation).forEach((reservation) => {
-      map.set(format(new Date(reservation.startAt), "yyyy-MM-dd"), reservation);
-    });
-    return map;
-  }, [reservations]);
+  const reservationMap = useMemo(
+    () => buildActiveReservationsByDate(reservations),
+    [reservations],
+  );
 
-  const entries = useMemo((): DayListEntry[] => {
-    const attendanceDates = new Set(attendances.map((attendance) => attendance.date));
-
-    const attendanceEntries: DayListEntry[] = attendances.map((attendance) => ({
-      kind: "attendance",
-      date: attendance.date,
-      attendance,
-    }));
-
-    const reservationOnlyEntries: DayListEntry[] = [];
-    reservationMap.forEach((reservation, date) => {
-      if (!attendanceDates.has(date)) {
-        reservationOnlyEntries.push({ kind: "reservationOnly", date, reservation });
-      }
-    });
-
-    return [...attendanceEntries, ...reservationOnlyEntries].sort((a, b) =>
-      b.date.localeCompare(a.date),
-    );
-  }, [attendances, reservationMap]);
+  const entries = useMemo(
+    () => buildDayListEntries(attendances, reservationMap),
+    [attendances, reservationMap],
+  );
 
   if (entries.length === 0) {
     return (
