@@ -1,4 +1,6 @@
 import { z } from "zod";
+
+import { PersistedUnlockSchema } from "./achievement.schema";
 import { AttendanceWithTotalsSchema, TentVisitRowSchema } from "./consumption.schema";
 
 /**
@@ -61,11 +63,21 @@ export const CreateAttendanceSchema = z.object({
 export type CreateAttendanceInput = z.infer<typeof CreateAttendanceSchema>;
 
 /**
- * Create attendance response
+ * Create attendance result (repository-level, before achievement evaluation)
  */
-export const CreateAttendanceResponseSchema = z.object({
+export const CreateAttendanceResultSchema = z.object({
   attendanceId: z.uuid(),
   tentsChanged: z.boolean(),
+});
+
+export type CreateAttendanceResult = z.infer<typeof CreateAttendanceResultSchema>;
+
+/**
+ * Create attendance response
+ */
+export const CreateAttendanceResponseSchema = CreateAttendanceResultSchema.extend({
+  /** Achievements this write unlocked. Empty on every call that crossed no threshold. */
+  unlocked: z.array(PersistedUnlockSchema),
 });
 
 export type CreateAttendanceResponse = z.infer<typeof CreateAttendanceResponseSchema>;
@@ -92,12 +104,22 @@ export const UpdatePersonalAttendanceSchema = z.object({
 export type UpdatePersonalAttendanceInput = z.infer<typeof UpdatePersonalAttendanceSchema>;
 
 /**
- * Update personal attendance response
+ * Update personal attendance result (repository-level, before achievement evaluation)
  */
-export const UpdatePersonalAttendanceResponseSchema = z.object({
+export const UpdatePersonalAttendanceResultSchema = z.object({
   attendanceId: z.uuid(),
   tentsAdded: z.array(z.uuid()),
   tentsRemoved: z.array(z.uuid()),
+});
+
+export type UpdatePersonalAttendanceResult = z.infer<typeof UpdatePersonalAttendanceResultSchema>;
+
+/**
+ * Update personal attendance response
+ */
+export const UpdatePersonalAttendanceResponseSchema = UpdatePersonalAttendanceResultSchema.extend({
+  /** Achievements this write unlocked. Empty on every call that crossed no threshold. */
+  unlocked: z.array(PersistedUnlockSchema),
 });
 
 export type UpdatePersonalAttendanceResponse = z.infer<
@@ -168,6 +190,8 @@ export const CheckInFromReservationResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
   attendanceId: z.uuid().optional(),
+  /** Achievements this write unlocked. Empty on every call that crossed no threshold. */
+  unlocked: z.array(PersistedUnlockSchema),
 });
 
 /**

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { PersistedUnlockSchema } from "./achievement.schema";
+
 /**
  * Photo upload URL request
  * GET /api/v1/photos/upload-url
@@ -54,6 +56,8 @@ export const ConfirmPhotoUploadResponseSchema = z.object({
     attendanceId: z.uuid(),
     uploadedAt: z.iso.datetime(),
   }),
+  /** Achievements this write unlocked. Empty on every call that crossed no threshold. */
+  unlocked: z.array(PersistedUnlockSchema),
 });
 
 export type ConfirmPhotoUploadResponse = z.infer<typeof ConfirmPhotoUploadResponseSchema>;

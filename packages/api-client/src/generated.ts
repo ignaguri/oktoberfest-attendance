@@ -410,6 +410,19 @@ export interface paths {
                             /** Format: uuid */
                             attendanceId: string;
                             tentsChanged: boolean;
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };
@@ -645,6 +658,19 @@ export interface paths {
                             attendanceId: string;
                             tentsAdded: string[];
                             tentsRemoved: string[];
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };
@@ -798,6 +824,19 @@ export interface paths {
                             message: string;
                             /** Format: uuid */
                             attendanceId?: string;
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };
@@ -6313,6 +6352,19 @@ export interface paths {
                                 /** Format: date-time */
                                 uploadedAt: string;
                             };
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };

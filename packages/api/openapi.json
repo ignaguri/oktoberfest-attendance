@@ -885,11 +885,70 @@
                     },
                     "tentsChanged": {
                       "type": "boolean"
+                    },
+                    "unlocked": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slug": {
+                            "type": "string"
+                          },
+                          "seriesId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "tier": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "drinking",
+                              "attendance",
+                              "explorer",
+                              "social",
+                              "competitive",
+                              "dedication"
+                            ]
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "festival",
+                              "lifetime"
+                            ]
+                          },
+                          "glyph": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          },
+                          "eventId": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "seriesId",
+                          "tier",
+                          "category",
+                          "scope",
+                          "glyph",
+                          "points",
+                          "eventId"
+                        ]
+                      }
                     }
                   },
                   "required": [
                     "attendanceId",
-                    "tentsChanged"
+                    "tentsChanged",
+                    "unlocked"
                   ]
                 }
               }
@@ -1303,12 +1362,71 @@
                         "type": "string",
                         "format": "uuid"
                       }
+                    },
+                    "unlocked": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slug": {
+                            "type": "string"
+                          },
+                          "seriesId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "tier": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "drinking",
+                              "attendance",
+                              "explorer",
+                              "social",
+                              "competitive",
+                              "dedication"
+                            ]
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "festival",
+                              "lifetime"
+                            ]
+                          },
+                          "glyph": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          },
+                          "eventId": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "seriesId",
+                          "tier",
+                          "category",
+                          "scope",
+                          "glyph",
+                          "points",
+                          "eventId"
+                        ]
+                      }
                     }
                   },
                   "required": [
                     "attendanceId",
                     "tentsAdded",
-                    "tentsRemoved"
+                    "tentsRemoved",
+                    "unlocked"
                   ]
                 }
               }
@@ -1522,11 +1640,70 @@
                     "attendanceId": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "unlocked": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slug": {
+                            "type": "string"
+                          },
+                          "seriesId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "tier": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "drinking",
+                              "attendance",
+                              "explorer",
+                              "social",
+                              "competitive",
+                              "dedication"
+                            ]
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "festival",
+                              "lifetime"
+                            ]
+                          },
+                          "glyph": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          },
+                          "eventId": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "seriesId",
+                          "tier",
+                          "category",
+                          "scope",
+                          "glyph",
+                          "points",
+                          "eventId"
+                        ]
+                      }
                     }
                   },
                   "required": [
                     "success",
-                    "message"
+                    "message",
+                    "unlocked"
                   ]
                 }
               }
@@ -11651,11 +11828,70 @@
                         "attendanceId",
                         "uploadedAt"
                       ]
+                    },
+                    "unlocked": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "slug": {
+                            "type": "string"
+                          },
+                          "seriesId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "tier": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 4
+                          },
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "drinking",
+                              "attendance",
+                              "explorer",
+                              "social",
+                              "competitive",
+                              "dedication"
+                            ]
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": [
+                              "festival",
+                              "lifetime"
+                            ]
+                          },
+                          "glyph": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          },
+                          "eventId": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "required": [
+                          "slug",
+                          "seriesId",
+                          "tier",
+                          "category",
+                          "scope",
+                          "glyph",
+                          "points",
+                          "eventId"
+                        ]
+                      }
                     }
                   },
                   "required": [
                     "success",
-                    "picture"
+                    "picture",
+                    "unlocked"
                   ]
                 }
               }

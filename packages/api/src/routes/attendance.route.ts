@@ -27,6 +27,7 @@ import {
   SupabasePhotoRepository,
   SupabaseWrappedRepository,
 } from "../repositories/supabase";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { NotificationService } from "../services/notification.service";
 
 // Create router
@@ -367,7 +368,14 @@ app.openapi(createAttendanceRoute, async (c) => {
     }
   }
 
-  return c.json(result, 200);
+  const unlocked = await evaluateAfterWrite(
+    supabase,
+    user.id,
+    data.festivalId,
+    "POST /attendance",
+  );
+
+  return c.json({ ...result, unlocked }, 200);
 });
 
 // POST /attendance/personal - Update personal attendance (no notifications)
@@ -449,7 +457,14 @@ app.openapi(updatePersonalAttendanceRoute, async (c) => {
     );
   }
 
-  return c.json(result, 200);
+  const unlocked = await evaluateAfterWrite(
+    supabase,
+    user.id,
+    data.festivalId,
+    "POST /attendance/personal",
+  );
+
+  return c.json({ ...result, unlocked }, 200);
 });
 
 // POST /attendance/tent-visits - Log one more visit to a tent
@@ -711,11 +726,19 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     );
   }
 
+  const unlocked = await evaluateAfterWrite(
+    supabase,
+    user.id,
+    reservation.festival_id,
+    "POST /attendance/check-in",
+  );
+
   return c.json(
     {
       success: true,
       message: "Check-in successful",
       attendanceId,
+      unlocked,
     },
     200,
   );

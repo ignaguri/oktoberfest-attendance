@@ -2,13 +2,13 @@ import type {
   AttendanceByDate,
   AttendanceWithTotals,
   CreateAttendanceInput,
-  CreateAttendanceResponse,
+  CreateAttendanceResult,
   ListAttendancesQuery,
   LogTentVisitInput,
   LogTentVisitResponse,
   TentVisitRow,
   UpdatePersonalAttendanceInput,
-  UpdatePersonalAttendanceResponse,
+  UpdatePersonalAttendanceResult,
 } from "@prostcounter/shared";
 
 /**
@@ -64,7 +64,7 @@ export interface IAttendanceRepository {
    * @param input - Attendance data including tents
    * @returns Attendance ID and whether tents changed
    */
-  createWithTents(userId: string, input: CreateAttendanceInput): Promise<CreateAttendanceResponse>;
+  createWithTents(userId: string, input: CreateAttendanceInput): Promise<CreateAttendanceResult>;
 
   /**
    * Update personal attendance without triggering notifications
@@ -76,7 +76,7 @@ export interface IAttendanceRepository {
   updatePersonal(
     userId: string,
     input: UpdatePersonalAttendanceInput,
-  ): Promise<UpdatePersonalAttendanceResponse>;
+  ): Promise<UpdatePersonalAttendanceResult>;
 
   /**
    * Append one visit to a tent, creating the day's attendance row if needed.
