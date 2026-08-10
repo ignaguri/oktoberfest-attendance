@@ -14,7 +14,7 @@ import { apiClient } from "../../api-client";
  */
 export async function pushInsert(
   tableName: string,
-  _recordId: string,
+  recordId: string,
   payload: Record<string, unknown>,
   idempotencyKey?: string | null,
 ): Promise<void> {
@@ -42,6 +42,19 @@ export async function pushInsert(
         pricePaidCents: (payload.price_paid_cents as number) ?? 0,
         volumeMl: (payload.volume_ml as number) ?? 1000,
         ...(idempotencyKey ? { idempotencyKey } : {}),
+      });
+      break;
+    // A revisit: the day already holds this tent, so the attendance push cannot
+    // carry it - `tents` there is the set the day reconciles to. Passing the local
+    // row's id keeps the server row and the local row identical, so a retry
+    // returns the stored visit rather than logging a second one, and the pull
+    // recognises it instead of treating it as a ghost.
+    case "tent_visits":
+      await apiClient.attendance.logTentVisit({
+        festivalId: payload.festival_id as string,
+        tentId: payload.tent_id as string,
+        visitedAt: payload.visited_at as string,
+        tentVisitId: recordId,
       });
       break;
     default:
