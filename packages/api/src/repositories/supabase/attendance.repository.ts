@@ -129,11 +129,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
 
     // Fetch all tent visits for this festival (also used for sync-grade
     // projection when include === "tent_visits").
+    // Ordered because a day is a sequence of visits, not a set of tents: with
+    // revisits, "Hofbräu 14:00, Paulaner 17:00, Hofbräu 20:00" only reads
+    // correctly in time order, and Postgres gives no order without ORDER BY.
+    // Callers render this list as-is.
     const { data: tentVisits, error: tentVisitsError } = await this.supabase
       .from("tent_visits")
       .select("id, user_id, tent_id, festival_id, visit_date, tents(name)")
       .eq("user_id", userId)
-      .eq("festival_id", festivalId);
+      .eq("festival_id", festivalId)
+      .order("visit_date", { ascending: true });
 
     if (tentVisitsError) {
       throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);
@@ -473,12 +478,13 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
 
     const attendanceDate = new Date(date);
 
-    // Fetch tent visits for this date
+    // Fetch tent visits for this date, in time order (see list() for why)
     const { data: tentVisits, error: tentVisitsError } = await this.supabase
       .from("tent_visits")
       .select("tent_id, visit_date, tents(name)")
       .eq("user_id", userId)
-      .eq("festival_id", festivalId);
+      .eq("festival_id", festivalId)
+      .order("visit_date", { ascending: true });
 
     if (tentVisitsError) {
       throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);

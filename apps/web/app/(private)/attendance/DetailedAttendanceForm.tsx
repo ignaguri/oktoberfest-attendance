@@ -12,7 +12,7 @@ import type {
   DrinkType,
 } from "@prostcounter/shared/schemas";
 import { createDetailedAttendanceFormSchema } from "@prostcounter/shared/schemas";
-import { isWithinInterval } from "date-fns";
+import { isToday, isWithinInterval } from "date-fns";
 import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ import { useTranslation } from "@/lib/i18n/client";
 
 import { AttendanceDatePicker } from "./AttendanceDatePicker";
 import { BeerPicturesUpload } from "./BeerPicturesUpload";
+import { LogAnotherVisit } from "./LogAnotherVisit";
 
 interface DetailedAttendanceFormProps {
   onAttendanceUpdate: () => void;
@@ -268,6 +269,29 @@ export default function DetailedAttendanceForm({
     setCurrentDate(date);
   };
 
+  /*
+   * When "log another visit" is offered.
+   *
+   * Needs a visit to revisit: with none yet the tent selector already expresses
+   * everything, since a first visit is what selecting a tent means.
+   *
+   * Today only, because the visit is stamped with the current time and the server
+   * derives the visit's day from that timestamp - on a past day it would file the
+   * visit under today instead. Backdating to an invented hour is a different
+   * feature; this one means "I just moved tents".
+   */
+  const canLogRevisit = (existingAttendance?.tentVisits?.length ?? 0) > 0 && isToday(currentDate);
+
+  // Refetching is what keeps the tent field in step: the effect above resets
+  // `tents` from the server's tentIds, which already includes the logged tent.
+  // Without that, submitting would reconcile the day to a set missing the tent
+  // and delete its brand-new visit.
+  const handleVisitLogged = useCallback(async () => {
+    await fetchAttendanceForDate(currentDate);
+    onAttendanceUpdate();
+    toast.success(t("notifications.success.attendanceUpdated"));
+  }, [fetchAttendanceForDate, currentDate, onAttendanceUpdate, t]);
+
   const handlePicturesUpdate = (newUrls: string[]) => {
     if (existingAttendance) {
       setExistingAttendance({
@@ -366,6 +390,16 @@ export default function DetailedAttendanceForm({
             {existingAttendance ? t("attendance.form.update") : t("attendance.form.submit")}
           </Button>
         </form>
+
+        {canLogRevisit && (
+          <div className="mt-8">
+            <LogAnotherVisit
+              festivalId={currentFestival.id}
+              disabled={isSubmitting}
+              onLogged={handleVisitLogged}
+            />
+          </div>
+        )}
 
         {existingAttendance && (
           <div className="mt-8">

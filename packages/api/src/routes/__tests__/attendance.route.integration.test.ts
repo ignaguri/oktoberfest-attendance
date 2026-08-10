@@ -598,7 +598,14 @@ describe("Attendance Routes Integration (Local DB)", () => {
     const rejectDate = "2024-09-29";
     const survivesSaveDate = "2024-09-30";
     const deselectDate = "2024-10-01";
-    const probeDates = [sequenceDate, rejectDate, survivesSaveDate, deselectDate];
+    const readOrderDate = "2024-10-02";
+    const probeDates = [
+      sequenceDate,
+      rejectDate,
+      survivesSaveDate,
+      deselectDate,
+      readOrderDate,
+    ];
 
     let secondTent: { id: string; name: string };
 
@@ -694,6 +701,59 @@ describe("Attendance Routes Integration (Local DB)", () => {
         `${sequenceDate}T15:00:00.000Z`,
         `${sequenceDate}T20:00:00.000Z`,
       ]);
+    });
+
+    // Order is meaning now that a day is a sequence rather than a set: the web
+    // visited-tents dialog renders getByDate's tentVisits in the order it
+    // receives them, so the query has to sort. Rows are inserted directly, out of
+    // time order, because logTentVisit's guard forbids the "A at 20:00 then A at
+    // 10:00" sequence that would otherwise produce them.
+    it("returns a day's visits in time order, whatever order they were stored in", async () => {
+      const { error: attendanceError } = await supabaseAdmin.from("attendances").insert({
+        user_id: testUser.id,
+        festival_id: testFestival.id,
+        date: readOrderDate,
+      });
+      expect(attendanceError).toBeNull();
+
+      const { error: visitsError } = await supabaseAdmin.from("tent_visits").insert([
+        {
+          id: randomUUID(),
+          user_id: testUser.id,
+          festival_id: testFestival.id,
+          tent_id: testTent.id,
+          visit_date: `${readOrderDate}T20:00:00.000Z`,
+        },
+        {
+          id: randomUUID(),
+          user_id: testUser.id,
+          festival_id: testFestival.id,
+          tent_id: secondTent.id,
+          visit_date: `${readOrderDate}T15:00:00.000Z`,
+        },
+        {
+          id: randomUUID(),
+          user_id: testUser.id,
+          festival_id: testFestival.id,
+          tent_id: testTent.id,
+          visit_date: `${readOrderDate}T10:00:00.000Z`,
+        },
+      ]);
+      expect(visitsError).toBeNull();
+
+      const attendance = await repoFor(testUser.token).getByDate(
+        testUser.id,
+        testFestival.id,
+        readOrderDate,
+      );
+
+      expect(attendance?.tentVisits.map((visit) => visit.visitDate)).toEqual([
+        `${readOrderDate}T10:00:00+00:00`,
+        `${readOrderDate}T15:00:00+00:00`,
+        `${readOrderDate}T20:00:00+00:00`,
+      ]);
+      // The same day, read as a set for the tent selector: three visits, two tents.
+      expect(attendance?.tentIds).toEqual([testTent.id, secondTent.id]);
     });
 
     // Logging the tent you are standing in is a stray tap, not a revisit, and
