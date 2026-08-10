@@ -2,6 +2,7 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
+import { getCurrentTentId } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -227,16 +228,24 @@ export function QuickAttendanceSheet({
     return `${count} ${drinkName}`;
   }, [selectedDrinkType, drinkCounts, isSaving, t]);
 
+  // The tent the user is in: their latest visit today. Not tentIds[0], which is
+  // the first tent of the day, nor its last entry, which a revisit leaves
+  // pointing at a tent already left.
+  const currentTentId = useMemo(
+    () => getCurrentTentId(attendance?.tentVisits ?? []),
+    [attendance?.tentVisits],
+  );
+
   // Reset state when sheet opens, preselect tent from prop or last attendance
   useEffect(() => {
     if (isOpen) {
       setSelectedDrinkType(null);
       setPendingPhotos([]);
       // Prioritize: 1) preselectedTentId from map/banner, 2) today's attendance tent
-      const tentToSelect = preselectedTentId || attendance?.tentIds?.[0];
+      const tentToSelect = preselectedTentId || currentTentId;
       setSelectedTentId(tentToSelect);
     }
-  }, [isOpen, preselectedTentId, attendance?.tentIds]);
+  }, [isOpen, preselectedTentId, currentTentId]);
 
   // Handle drink type selection (toggle behavior)
   const handleDrinkTypeSelect = useCallback((type: DrinkType) => {
@@ -269,14 +278,14 @@ export function QuickAttendanceSheet({
   const hasChanges =
     selectedDrinkType !== null ||
     pendingPhotos.length > 0 ||
-    (selectedTentId && selectedTentId !== attendance?.tentIds?.[0]);
+    (selectedTentId && selectedTentId !== currentTentId);
 
   // Handle save
   const handleSave = useCallback(async () => {
     if (!festivalId) return;
 
     // Must have at least a drink, photos, or tent change (using same logic as hasChanges)
-    const hasTentChange = selectedTentId && selectedTentId !== attendance?.tentIds?.[0];
+    const hasTentChange = selectedTentId && selectedTentId !== currentTentId;
     if (!selectedDrinkType && pendingPhotos.length === 0 && !hasTentChange) return;
 
     setIsSaving(true);
@@ -374,7 +383,7 @@ export function QuickAttendanceSheet({
     today,
     pendingPhotos,
     attendance?.id,
-    attendance?.tentIds,
+    currentTentId,
     currentFestival?.beerCost,
     calculatePricePaid,
     logConsumption,

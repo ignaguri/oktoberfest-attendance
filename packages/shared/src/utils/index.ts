@@ -38,3 +38,6 @@ export { getFestivalStatus } from "./festival-status";
 
 // Festival day model
 export { buildFestivalWeeks, type FestivalDayCell } from "./festival-days";
+
+// Tent visit helpers
+export { getCurrentTentId } from "./tent-visits";
