@@ -560,6 +560,7 @@
       "selectTents": "Zelte auswählen...",
       "logAnotherVisit": "Weiteren Besuch eintragen",
       "logAnotherVisitHint": "Fügt einen Besuch mit der aktuellen Zeit für das gewählte Zelt hinzu.",
+      "logAnotherVisitUnavailable": "Die Zelte konnten nicht geladen werden, daher ist das Eintragen eines weiteren Besuchs gerade nicht möglich.",
       "photos": "Fotos",
       "saving": "Speichert...",
       "deleteConfirmTitle": "Besuch löschen?",

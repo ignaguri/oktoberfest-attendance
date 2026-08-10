@@ -595,6 +595,7 @@
       "selectTents": "Select tents...",
       "logAnotherVisit": "Log another visit",
       "logAnotherVisitHint": "Adds a visit with the current time for the tent you pick.",
+      "logAnotherVisitUnavailable": "Tents could not be loaded, so logging another visit is unavailable right now.",
       "photos": "Photos",
       "saving": "Saving...",
       "deleteConfirmTitle": "Delete Attendance?",

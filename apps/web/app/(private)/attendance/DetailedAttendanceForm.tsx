@@ -154,9 +154,10 @@ export default function DetailedAttendanceForm({
     }));
   }, []);
 
+  /** Returns whether the refresh actually landed, so callers can stay honest. */
   const fetchAttendanceForDate = useCallback(
-    async (date: Date) => {
-      if (!currentFestival) return;
+    async (date: Date): Promise<boolean> => {
+      if (!currentFestival) return false;
 
       try {
         const dateString = formatDateForDatabase(date);
@@ -167,8 +168,10 @@ export default function DetailedAttendanceForm({
         startTransition(() => {
           setExistingAttendance(attendance);
         });
+        return true;
       } catch {
         toast.error(t("notifications.error.attendanceLoadFailed"));
+        return false;
       }
     },
     [currentFestival, t],
@@ -286,10 +289,27 @@ export default function DetailedAttendanceForm({
   // `tents` from the server's tentIds, which already includes the logged tent.
   // Without that, submitting would reconcile the day to a set missing the tent
   // and delete its brand-new visit.
+  //
+  // So the form has to stay un-submittable until the refetch lands. The window is
+  // small but the loss is silent and server-side: on a slow connection, pressing
+  // Update while the old tent set was still in the field sent that set, and the
+  // RPC reconciled the day to it - deleting the visit just logged.
+  const [isRefreshingAfterVisit, setIsRefreshingAfterVisit] = useState(false);
+
   const handleVisitLogged = useCallback(async () => {
-    await fetchAttendanceForDate(currentDate);
-    onAttendanceUpdate();
-    toast.success(t("notifications.success.attendanceUpdated"));
+    setIsRefreshingAfterVisit(true);
+    try {
+      const refreshed = await fetchAttendanceForDate(currentDate);
+      onAttendanceUpdate();
+      // Only claim success once the visit is actually visible. fetch already
+      // reported its own failure, and following it with "attendance updated"
+      // told the user two contradictory things about one action.
+      if (refreshed) {
+        toast.success(t("notifications.success.attendanceUpdated"));
+      }
+    } finally {
+      setIsRefreshingAfterVisit(false);
+    }
   }, [fetchAttendanceForDate, currentDate, onAttendanceUpdate, t]);
 
   const handlePicturesUpdate = (newUrls: string[]) => {
@@ -385,7 +405,7 @@ export default function DetailedAttendanceForm({
             variant="yellowOutline"
             className="self-center"
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isRefreshingAfterVisit}
           >
             {existingAttendance ? t("attendance.form.update") : t("attendance.form.submit")}
           </Button>
@@ -395,7 +415,7 @@ export default function DetailedAttendanceForm({
           <div className="mt-8">
             <LogAnotherVisit
               festivalId={currentFestival.id}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isRefreshingAfterVisit}
               onLogged={handleVisitLogged}
             />
           </div>
