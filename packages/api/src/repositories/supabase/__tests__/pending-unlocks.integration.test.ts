@@ -4,7 +4,11 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { describeUnlock } from "@prostcounter/shared/achievements";
 
-import { createTestSupabaseAdmin } from "../../../__tests__/helpers/test-supabase";
+import {
+  createTestSupabaseAdmin,
+  createTestSupabaseAnon,
+  createTestSupabaseWithAuth,
+} from "../../../__tests__/helpers/test-supabase";
 import { AchievementMetricsRepository } from "../achievement-metrics.repository";
 
 async function getTwoUserIds(
@@ -147,6 +151,44 @@ describe("pending unlocks outbox against a real database", () => {
 
     expect(first).toBe(1);
     expect(second).toBe(0);
+  });
+
+  // Regression: every other test here drives the repository with the service-role
+  // client, which bypasses RLS, so all of them passed while the route — which uses
+  // the request-scoped user client — silently wrote nothing for want of an UPDATE
+  // policy. Acking has to be exercised as the user to mean anything.
+  it("stamps through a user-scoped client, so RLS actually permits the write", async () => {
+    const supabaseAdmin = createTestSupabaseAdmin();
+    const anon = createTestSupabaseAnon();
+
+    const { data: auth, error: signInError } = await anon.auth.signInWithPassword({
+      email: "user1@example.com",
+      password: "password",
+    });
+    if (signInError || !auth.session) {
+      throw new Error(
+        `Could not sign in as the seeded user1@example.com: ${signInError?.message}; seed the local database first`,
+      );
+    }
+
+    const userId = auth.session.user.id;
+    const achievementId = await getRealAchievementId(supabaseAdmin, "first_drink");
+    const eventId = await insertEvent(supabaseAdmin, userId, achievementId);
+    insertedEventIds.push(eventId);
+
+    const repo = new AchievementMetricsRepository(
+      createTestSupabaseWithAuth(auth.session.access_token),
+    );
+    const acknowledged = await repo.markUnlocksSeen(userId, [eventId]);
+
+    expect(acknowledged).toBe(1);
+
+    const { data } = await supabaseAdmin
+      .from("achievement_events")
+      .select("user_notified_at")
+      .eq("id", eventId)
+      .single();
+    expect(data?.user_notified_at).not.toBeNull();
   });
 
   it("does not stamp another user's events", async () => {

@@ -376,8 +376,20 @@ export class AchievementMetricsRepository {
    * Stamps events as shown in-app. Scoped to the caller's own rows, and only
    * those not already stamped, so the returned count is the number of events
    * this call actually acked.
+   *
+   * Acking fewer than asked is usually legitimate: the `user_notified_at IS NULL`
+   * filter makes a re-send idempotent, and two tabs racing the same batch means
+   * whoever loses acks nothing. What is *not* legitimate is a row that is still
+   * un-acked after we tried, which is what a missing RLS UPDATE policy looks
+   * like — Postgres filters the rows out and reports success on zero writes.
+   * That shape shipped once already and stayed invisible because this method
+   * reported the no-op as an ordinary short ack, so it is now an error.
    */
   async markUnlocksSeen(userId: string, eventIds: string[]): Promise<number> {
+    if (eventIds.length === 0) {
+      return 0;
+    }
+
     const { data, error } = await this.supabase
       .from("achievement_events")
       .update({ user_notified_at: new Date().toISOString() })
@@ -390,6 +402,40 @@ export class AchievementMetricsRepository {
       throw new DatabaseError(`Failed to mark unlocks seen: ${error.message}`);
     }
 
-    return (data ?? []).length;
+    const acknowledged = (data ?? []).length;
+
+    // Only pay for the check when something looks short. A full ack is the
+    // steady state, so this costs nothing on the happy path.
+    if (acknowledged < eventIds.length) {
+      const { data: stillPending, error: verifyError } = await this.supabase
+        .from("achievement_events")
+        .select("id")
+        .eq("user_id", userId)
+        .in("id", eventIds)
+        .is("user_notified_at", null);
+
+      if (verifyError) {
+        throw new DatabaseError(
+          `Failed to verify marked unlocks: ${verifyError.message}`,
+        );
+      }
+
+      if (stillPending && stillPending.length > 0) {
+        logger.error(
+          {
+            userId,
+            requested: eventIds.length,
+            acknowledged,
+            stillPending: stillPending.map((row) => row.id),
+          },
+          "Acknowledging unlocks wrote nothing for rows that are still pending; check the achievement_events UPDATE policy and column grants",
+        );
+        throw new DatabaseError(
+          `Failed to mark unlocks seen: ${stillPending.length} of ${eventIds.length} events remain unacknowledged`,
+        );
+      }
+    }
+
+    return acknowledged;
   }
 }
