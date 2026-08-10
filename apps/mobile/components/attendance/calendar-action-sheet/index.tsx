@@ -15,13 +15,13 @@ import {
 } from "@/components/ui/actionsheet";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
+import { SegmentedControl, type Tab } from "@/components/ui/segmented-control";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
 import { type AttendanceSuccessData, AttendanceTabContent } from "./attendance-tab-content";
 import { ReservationTabContent } from "./reservation-tab-content";
-import { type Tab, TabBar } from "./tab-bar";
 
 export type TabKey = "attendance" | "reservation";
 
@@ -154,7 +154,11 @@ export function CalendarActionSheet({
 
         {/* Tab Bar */}
         <VStack className="mb-4 w-full px-2">
-          <TabBar tabs={availableTabs} activeTab={activeTab} onTabChange={handleTabChange} />
+          <SegmentedControl
+            tabs={availableTabs}
+            activeTab={activeTab}
+            onTabChange={handleTabChange}
+          />
         </VStack>
 
         {/* Tab Content */}
@@ -191,4 +195,4 @@ CalendarActionSheet.displayName = "CalendarActionSheet";
 
 // Re-export types for convenience
 export type { AttendanceSuccessData } from "./attendance-tab-content";
-export type { Tab } from "./tab-bar";
+export type { Tab } from "@/components/ui/segmented-control";

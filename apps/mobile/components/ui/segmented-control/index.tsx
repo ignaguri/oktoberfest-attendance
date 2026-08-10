@@ -14,14 +14,14 @@ export interface Tab {
   disabled?: boolean;
 }
 
-interface TabBarProps {
+interface SegmentedControlProps {
   tabs: Tab[];
   activeTab: string;
   onTabChange: (key: string) => void;
 }
 
 /**
- * Segmented control style tab bar for switching between form modes
+ * Segmented control for switching between mutually exclusive views
  *
  * Features:
  * - iOS-style segmented control appearance
@@ -29,7 +29,7 @@ interface TabBarProps {
  * - Disabled tab support
  * - Accessible with proper roles
  */
-export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
+export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedControlProps) {
   const tabWidth = useSharedValue(0);
   const indicatorPosition = useSharedValue(0);
 
@@ -121,4 +121,4 @@ export function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
   );
 }
 
-TabBar.displayName = "TabBar";
+SegmentedControl.displayName = "SegmentedControl";
