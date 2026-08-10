@@ -6,10 +6,13 @@ import type {
   SeriesCard as SeriesCardData,
   SeriesCategory,
   SeriesScope,
+  SeriesTier,
 } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
+import { useLocalSearchParams } from "expo-router";
 import { Award } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
 import { CategoryChips, type CategoryFilter } from "@/components/achievements/category-chips";
@@ -25,12 +28,30 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
 
+/** How long the highlighted card keeps its ring after a toast-driven navigation. */
+const HIGHLIGHT_DURATION_MS = 2000;
+
+/** A rung's slug, recovered from the card it belongs to. One-offs have a single rung. */
+function slugForCardTier(card: SeriesCardData, tier: SeriesTier): string {
+  return card.tiers.length > 1 ? `${card.id}.t${tier.tier}` : card.id;
+}
+
+function cardMatchesHighlight(card: SeriesCardData, highlight: string): boolean {
+  return (
+    card.id === highlight || card.tiers.some((tier) => slugForCardTier(card, tier) === highlight)
+  );
+}
+
 function CategorySection({
   category,
   cards,
+  highlightedCardId,
+  registerCardRef,
 }: {
   category: SeriesCategory;
   cards: SeriesCardData[];
+  highlightedCardId: string | null;
+  registerCardRef: (cardId: string, node: View | null) => void;
 }) {
   const { t } = useTranslation();
   const { completed, inProgress } = splitCardsByCompletion(cards);
@@ -52,7 +73,16 @@ function CategorySection({
           </Text>
           <VStack space="sm">
             {completed.map((card) => (
-              <SeriesCard key={card.id} card={card} />
+              <View
+                key={card.id}
+                ref={(node) => registerCardRef(card.id, node)}
+                className={cn(
+                  "rounded-lg",
+                  highlightedCardId === card.id && "ring-2 ring-yellow-500 ring-offset-2",
+                )}
+              >
+                <SeriesCard card={card} />
+              </View>
             ))}
           </VStack>
         </VStack>
@@ -65,7 +95,16 @@ function CategorySection({
           </Text>
           <VStack space="sm">
             {inProgress.map((card) => (
-              <SeriesCard key={card.id} card={card} />
+              <View
+                key={card.id}
+                ref={(node) => registerCardRef(card.id, node)}
+                className={cn(
+                  "rounded-lg",
+                  highlightedCardId === card.id && "ring-2 ring-yellow-500 ring-offset-2",
+                )}
+              >
+                <SeriesCard card={card} />
+              </View>
             ))}
           </VStack>
         </VStack>
@@ -84,6 +123,21 @@ export default function AchievementsScreen() {
   const { isOnline } = useOfflineSafe();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const [activeScope, setActiveScope] = useState<SeriesScope>("festival");
+  const { highlight } = useLocalSearchParams<{ highlight?: string }>();
+  const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  const cardRefs = useRef<Map<string, View>>(new Map());
+  // Guards against re-triggering the scroll/highlight on every re-render while
+  // the same `?highlight=` value is still in the route params.
+  const processedHighlightRef = useRef<string | null>(null);
+
+  const registerCardRef = useCallback((cardId: string, node: View | null) => {
+    if (node) {
+      cardRefs.current.set(cardId, node);
+    } else {
+      cardRefs.current.delete(cardId);
+    }
+  }, []);
 
   const {
     data: achievementsResponse,
@@ -112,6 +166,39 @@ export default function AchievementsScreen() {
   const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  useEffect(() => {
+    if (!highlight || !achievementsResponse || processedHighlightRef.current === highlight) {
+      return;
+    }
+
+    const matchedCard = achievementsResponse.cards.find((card: SeriesCardData) =>
+      cardMatchesHighlight(card, highlight),
+    );
+    if (!matchedCard) {
+      return;
+    }
+
+    processedHighlightRef.current = highlight;
+    setHighlightedCardId(matchedCard.id);
+
+    const cardNode = cardRefs.current.get(matchedCard.id);
+    const relativeNode = scrollViewRef.current?.getNativeScrollRef();
+    if (cardNode && relativeNode) {
+      cardNode.measureLayout(
+        relativeNode,
+        (_left, top) => {
+          scrollViewRef.current?.scrollTo({ y: Math.max(top - 24, 0), animated: true });
+        },
+        () => {
+          // No-op: the card may not be mounted yet (e.g. a collapsed section).
+        },
+      );
+    }
+
+    const timeoutId = setTimeout(() => setHighlightedCardId(null), HIGHLIGHT_DURATION_MS);
+    return () => clearTimeout(timeoutId);
+  }, [highlight, achievementsResponse]);
 
   // Offline state — achievements require server-side progress calculation
   if (!isOnline) {
@@ -172,6 +259,7 @@ export default function AchievementsScreen() {
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl
@@ -204,6 +292,8 @@ export default function AchievementsScreen() {
               key={category}
               category={category}
               cards={cards.filter((card: SeriesCardData) => card.category === category)}
+              highlightedCardId={highlightedCardId}
+              registerCardRef={registerCardRef}
             />
           ))
         )}

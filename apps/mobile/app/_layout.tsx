@@ -2,6 +2,7 @@ import "../global.css";
 
 import { FestivalProvider, useFestival } from "@prostcounter/shared/contexts";
 import { ApiClientProvider } from "@prostcounter/shared/data";
+import { UnlockQueueProvider } from "@prostcounter/shared/hooks";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
 import { Stack, useRouter, useSegments } from "expo-router";
@@ -12,6 +13,7 @@ import { Linking, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { UnlockToastHost } from "@/components/achievements/unlock-toast-host";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { NovuAutoSubscriber } from "@/components/notifications/NovuAutoSubscriber";
@@ -367,94 +369,99 @@ export default function RootLayout() {
                           to the OfflineDataProvider context */}
                       <OfflineDataBridge>
                         <GluestackUIProvider mode="light">
-                          <GlobalAlertProvider>
-                            <NotificationProvider>
-                              <NovuProviderWrapper>
-                                <LocationProvider>
-                                  <NavigationGuard>
-                                    <BackgroundSyncHandler />
-                                    <SentryUserContextHandler />
-                                    <WatchBridge />
-                                    <NovuAutoSubscriber />
-                                    <NotificationPromptHandler />
-                                    <UpdatePromptHandler />
-                                    <StoreUpdatePromptHandler />
-                                    <WatchInstallPromptHandler />
-                                    <TutorialOverlay />
-                                    <Stack
-                                      screenOptions={{
-                                        headerShown: false,
-                                        animation: "slide_from_right",
-                                        ...defaultScreenOptions,
-                                      }}
-                                    >
-                                      <Stack.Screen name="(auth)" />
-                                      <Stack.Screen name="(tabs)" />
-                                      <Stack.Screen
-                                        name="notifications"
-                                        options={{
+                          <UnlockQueueProvider>
+                            <GlobalAlertProvider>
+                              <NotificationProvider>
+                                <NovuProviderWrapper>
+                                  <LocationProvider>
+                                    <NavigationGuard>
+                                      <BackgroundSyncHandler />
+                                      <SentryUserContextHandler />
+                                      <WatchBridge />
+                                      <NovuAutoSubscriber />
+                                      <NotificationPromptHandler />
+                                      <UpdatePromptHandler />
+                                      <StoreUpdatePromptHandler />
+                                      <WatchInstallPromptHandler />
+                                      <TutorialOverlay />
+                                      <Stack
+                                        screenOptions={{
                                           headerShown: false,
-                                          presentation: "card",
+                                          animation: "slide_from_right",
+                                          ...defaultScreenOptions,
                                         }}
-                                      />
-                                      <Stack.Screen
-                                        name="settings"
-                                        options={{
-                                          headerShown: false,
-                                          presentation: "card",
-                                        }}
-                                      />
-                                      <Stack.Screen
-                                        name="group-detail"
-                                        options={{
-                                          headerShown: false,
-                                          presentation: "card",
-                                        }}
-                                      />
-                                      <Stack.Screen
-                                        name="friends"
-                                        options={{
-                                          headerShown: false,
-                                          presentation: "card",
-                                        }}
-                                      />
-                                      <Stack.Screen
-                                        name="achievements"
-                                        options={{
-                                          headerShown: false,
-                                          presentation: "card",
-                                        }}
-                                      />
-                                      <Stack.Screen
-                                        name="map"
-                                        options={{
-                                          headerShown: false,
-                                          presentation: "card",
-                                        }}
-                                      />
-                                      <Stack.Screen
-                                        name="wrapped"
-                                        options={{
-                                          headerShown: false,
-                                          presentation: "fullScreenModal",
-                                        }}
-                                      />
-                                      <Stack.Screen
-                                        name="join-group/[token]"
-                                        options={{
-                                          headerShown: false,
-                                          presentation: "fullScreenModal",
-                                        }}
-                                      />
-                                      <Stack.Screen name="+not-found" />
-                                    </Stack>
-                                    {/* Rendered after Stack so the floating pill paints above screen content */}
-                                    <SyncStatusBar />
-                                  </NavigationGuard>
-                                </LocationProvider>
-                              </NovuProviderWrapper>
-                            </NotificationProvider>
-                          </GlobalAlertProvider>
+                                      >
+                                        <Stack.Screen name="(auth)" />
+                                        <Stack.Screen name="(tabs)" />
+                                        <Stack.Screen
+                                          name="notifications"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "card",
+                                          }}
+                                        />
+                                        <Stack.Screen
+                                          name="settings"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "card",
+                                          }}
+                                        />
+                                        <Stack.Screen
+                                          name="group-detail"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "card",
+                                          }}
+                                        />
+                                        <Stack.Screen
+                                          name="friends"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "card",
+                                          }}
+                                        />
+                                        <Stack.Screen
+                                          name="achievements"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "card",
+                                          }}
+                                        />
+                                        <Stack.Screen
+                                          name="map"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "card",
+                                          }}
+                                        />
+                                        <Stack.Screen
+                                          name="wrapped"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "fullScreenModal",
+                                          }}
+                                        />
+                                        <Stack.Screen
+                                          name="join-group/[token]"
+                                          options={{
+                                            headerShown: false,
+                                            presentation: "fullScreenModal",
+                                          }}
+                                        />
+                                        <Stack.Screen name="+not-found" />
+                                      </Stack>
+                                      {/* Rendered after Stack so the floating pill paints above screen content */}
+                                      <SyncStatusBar />
+                                      {/* Last so confetti paints over the sync pill; it is
+                                          inset-0 but pointerEvents="none", so it blocks nothing. */}
+                                      <UnlockToastHost />
+                                    </NavigationGuard>
+                                  </LocationProvider>
+                                </NovuProviderWrapper>
+                              </NotificationProvider>
+                            </GlobalAlertProvider>
+                          </UnlockQueueProvider>
                         </GluestackUIProvider>
                       </OfflineDataBridge>
                     </TutorialProvider>
