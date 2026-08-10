@@ -245,20 +245,63 @@ export class AchievementMetricsRepository {
     // INSERT trigger in the same transaction, so it exists by the time the
     // upsert returns. It is looked up rather than returned because a trigger's
     // output cannot reach the inserting statement's RETURNING clause.
-    const { data: eventRows, error: eventError } = await this.supabase
-      .from("achievement_events")
-      .select("id, achievement_id")
-      .eq("user_id", userId)
-      .in("achievement_id", [...insertedAchievementIds])
-      .is("user_notified_at", null);
-
-    if (eventError) {
-      throw new DatabaseError(`Failed to resolve unlock events: ${eventError.message}`);
+    //
+    // Looked up per festival_id, not just per achievement_id: the same
+    // achievement can be unlocked separately in two festivals (the unique
+    // constraint is on user_id + achievement_id + festival_id), so a stale
+    // unacked event from a different festival could otherwise be matched to
+    // this call's new unlock and reported with the wrong event id.
+    const lifetimeInsertedIds = new Set<string>();
+    const festivalInsertedIds = new Set<string>();
+    for (const unlock of unlocks) {
+      const achievementId = slugToId.get(unlock.slug);
+      if (!achievementId || !insertedAchievementIds.has(achievementId)) {
+        continue;
+      }
+      if (unlock.scope === "lifetime") {
+        lifetimeInsertedIds.add(achievementId);
+      } else {
+        festivalInsertedIds.add(achievementId);
+      }
     }
 
     const eventIdByAchievementId = new Map<string, string>();
-    for (const row of eventRows ?? []) {
-      eventIdByAchievementId.set(row.achievement_id, row.id);
+
+    if (lifetimeInsertedIds.size > 0) {
+      const { data: lifetimeEventRows, error: lifetimeEventError } = await this.supabase
+        .from("achievement_events")
+        .select("id, achievement_id")
+        .eq("user_id", userId)
+        .in("achievement_id", [...lifetimeInsertedIds])
+        .is("festival_id", null)
+        .is("user_notified_at", null);
+
+      if (lifetimeEventError) {
+        throw new DatabaseError(`Failed to resolve unlock events: ${lifetimeEventError.message}`);
+      }
+      for (const row of lifetimeEventRows ?? []) {
+        eventIdByAchievementId.set(row.achievement_id, row.id);
+      }
+    }
+
+    // festivalId === null means only the lifetime pass ran, so no
+    // festival-scoped unlock can exist (see the orphanedFestivalUnlock guard
+    // above) and this query would be meaningless.
+    if (festivalInsertedIds.size > 0 && festivalId !== null) {
+      const { data: festivalEventRows, error: festivalEventError } = await this.supabase
+        .from("achievement_events")
+        .select("id, achievement_id")
+        .eq("user_id", userId)
+        .in("achievement_id", [...festivalInsertedIds])
+        .eq("festival_id", festivalId)
+        .is("user_notified_at", null);
+
+      if (festivalEventError) {
+        throw new DatabaseError(`Failed to resolve unlock events: ${festivalEventError.message}`);
+      }
+      for (const row of festivalEventRows ?? []) {
+        eventIdByAchievementId.set(row.achievement_id, row.id);
+      }
     }
 
     return unlocks.flatMap((unlock) => {
