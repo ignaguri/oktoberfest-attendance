@@ -1,8 +1,13 @@
 import { cn } from "@prostcounter/ui";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -30,73 +35,98 @@ interface SegmentedControlProps {
  * - Accessible with proper roles
  */
 export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedControlProps) {
-  const tabWidth = useSharedValue(0);
   const indicatorPosition = useSharedValue(0);
+
+  /*
+   * Segment width lives in React state, not a shared value. This component can
+   * remount between its layout callback and its effects (it does inside the
+   * calendar action sheet), and a shared value written from that callback reads
+   * back as 0 on the fresh instance — the effect below would then bail and never
+   * position the indicator at all. As state, a measurement re-runs the effect.
+   */
+  const [tabWidth, setTabWidth] = useState(0);
+
+  // Whether the indicator has been placed at least once on this instance. The
+  // first placement snaps; later ones animate.
+  const hasPositionedRef = useRef(false);
 
   // Calculate indicator position based on active tab index
   const activeIndex = tabs.findIndex((tab) => tab.key === activeTab);
 
+  /*
+   * The style only reads the position. Wrapping the read in an animation
+   * (withSpring/withTiming inside useAnimatedStyle) restarts that animation on
+   * every recompute, which is what made the pill bounce and overshoot the
+   * track: the effect below owns the animation, the style just follows it.
+   */
   const animatedIndicatorStyle = useAnimatedStyle(() => {
     return {
-      width: tabWidth.value,
-      transform: [
-        {
-          translateX: withSpring(indicatorPosition.value, {
-            damping: 20,
-            stiffness: 200,
-          }),
-        },
-      ],
+      width: tabWidth,
+      transform: [{ translateX: indicatorPosition.value }],
     };
   });
 
-  // Handle tab layout to calculate widths
-  const handleTabLayout = useCallback(
-    (event: LayoutChangeEvent, index: number) => {
-      const { width } = event.nativeEvent.layout;
+  // Every segment is flex-1, so any one of them reports the width we need.
+  const handleTabLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setTabWidth((current) => (current === width ? current : width));
+  }, []);
+
+  // Position the indicator: on the active tab changing (including changes driven
+  // by the parent rather than a press here) and on the geometry first arriving.
+  useEffect(() => {
+    if (tabWidth === 0) {
+      return;
+    }
+
+    const target = activeIndex * tabWidth;
+
+    if (hasPositionedRef.current) {
       // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
-      tabWidth.value = width;
+      indicatorPosition.value = withTiming(target, {
+        duration: 180,
+        easing: Easing.out(Easing.cubic),
+      });
+    } else {
+      // First placement is not a switch — snap, so nothing slides in on open.
+      hasPositionedRef.current = true;
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
+      indicatorPosition.value = target;
+    }
+  }, [activeIndex, tabWidth, indicatorPosition]);
 
-      // Update indicator position if this is the active tab
-      if (index === activeIndex) {
-        // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
-        indicatorPosition.value = index * width;
-      }
-    },
-    [activeIndex, indicatorPosition, tabWidth],
-  );
-
-  // Update indicator position when active tab changes
   const handleTabPress = useCallback(
-    (tab: Tab, index: number) => {
+    (tab: Tab) => {
       if (tab.disabled) return;
 
-      // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
-      indicatorPosition.value = index * tabWidth.value;
       onTabChange(tab.key);
     },
-    [indicatorPosition, onTabChange, tabWidth],
+    [onTabChange],
   );
 
   return (
-    <View className="relative w-full rounded-lg bg-background-100 p-1">
-      {/* Animated sliding indicator */}
+    <View className="relative w-full rounded-lg border border-outline-200 bg-background-200 p-1">
+      {/*
+       * Animated sliding indicator. Vertical size comes from top/bottom insets,
+       * not a percentage height: `calc()` is a web-only CSS value and resolves to
+       * nothing on native, which collapses the indicator to zero height.
+       */}
       <Animated.View
         style={animatedIndicatorStyle}
-        className="absolute left-1 top-1 h-[calc(100%-8px)] rounded-md bg-background-0 shadow-sm"
+        className="absolute bottom-1 left-1 top-1 rounded-md border border-outline-200 bg-background-0 shadow-md"
       />
 
       {/* Tab buttons */}
       <HStack className="relative z-10">
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const isActive = tab.key === activeTab;
           const isDisabled = tab.disabled;
 
           return (
             <Pressable
               key={tab.key}
-              onPress={() => handleTabPress(tab, index)}
-              onLayout={(e) => handleTabLayout(e, index)}
+              onPress={() => handleTabPress(tab)}
+              onLayout={handleTabLayout}
               disabled={isDisabled}
               className="flex-1 items-center justify-center py-2"
               accessibilityRole="tab"
@@ -105,10 +135,11 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
             >
               <Text
                 className={cn(
-                  "text-sm font-medium",
-                  isActive && "text-typography-900",
+                  "text-sm",
+                  isActive && "font-semibold text-typography-900",
+                  !isActive && "font-medium",
                   !isActive && isDisabled && "text-typography-300",
-                  !isActive && !isDisabled && "text-typography-500",
+                  !isActive && !isDisabled && "text-typography-600",
                 )}
               >
                 {tab.label}
