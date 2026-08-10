@@ -592,8 +592,8 @@
       "date": "Datum",
       "amount": "Anzahl",
       "tents": "Zelte",
-      "visitedTents": "Besuchte Zelte",
-      "visitedTentsDescription": "Details der von dir besuchten Zelte.",
+      "visitedTents": "Check-in-Verlauf",
+      "visitedTentsDescription": "Alle Check-ins an diesem Datum, in zeitlicher Reihenfolge. Ein Zelt kann mehrmals erscheinen.",
       "noTentsRegistered": "An diesem Datum keine Zelte erfasst.",
       "checkIn": "Check-in"
     },

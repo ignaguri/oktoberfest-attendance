@@ -627,8 +627,8 @@
       "date": "Date",
       "amount": "Amount",
       "tents": "Tents",
-      "visitedTents": "Visited Tents",
-      "visitedTentsDescription": "Details of the tents you visited.",
+      "visitedTents": "Check-in log",
+      "visitedTentsDescription": "Every check-in on this date, in order. A tent can appear more than once.",
       "noTentsRegistered": "No tents registered on this date.",
       "checkIn": "Check-in"
     },

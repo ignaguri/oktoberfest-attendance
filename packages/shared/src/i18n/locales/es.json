@@ -627,8 +627,8 @@
       "date": "Fecha",
       "amount": "Cantidad",
       "tents": "Carpas",
-      "visitedTents": "Carpas visitadas",
-      "visitedTentsDescription": "Detalles de las carpas que visitaste.",
+      "visitedTents": "Registro de check-ins",
+      "visitedTentsDescription": "Todos los check-ins de esta fecha, en orden. Una carpa puede aparecer más de una vez.",
       "noTentsRegistered": "No hay carpas registradas en esta fecha.",
       "checkIn": "Check-in"
     },

@@ -1,3 +1,4 @@
+import { startOfDay } from "date-fns";
 import { describe, expect, it } from "vitest";
 
 import { buildFestivalWeeks, type FestivalDayCell } from "./festival-days";
@@ -49,6 +50,36 @@ describe("buildFestivalWeeks", () => {
     expect(weeks[0].slice(0, 4)).toEqual([null, null, null, null]);
     expect(weeks[3][6]).not.toBeNull();
     expect(countDays(weeks)).toBe(24);
+
+    // Spec §9 asks for this and the plan dropped it: a festival crossing into a
+    // new month must flag the 1st, which is what puts the month label on the cell.
+    const flagged = weeks.flat().filter((cell) => cell !== null && cell.isFirstOfMonth);
+    expect(flagged).toHaveLength(1);
+    expect(flagged[0]!.date.getMonth()).toBe(4); // May
+    expect(flagged[0]!.date.getDate()).toBe(1);
+  });
+
+  it("returns cells already normalized to the start of their day", () => {
+    // eachDayOfInterval steps by adding a day, so in a timezone whose DST shift
+    // lands at midnight the day after the shift comes back at 01:00 and a consumer
+    // comparing against a startOfDay value would miss it.
+    //
+    // Asserted as idempotence rather than as literally 00:00:00, because on a
+    // spring-forward-at-midnight day that hour does not exist - the start of that
+    // day genuinely is 01:00. Run this file under TZ=America/Santiago to exercise
+    // it; 2026-09-06 is such a day there.
+    const weeks = buildFestivalWeeks({
+      startDate: new Date(2026, 8, 1),
+      endDate: new Date(2026, 8, 30),
+      weekStartsOn: 1,
+    });
+
+    for (const cell of weeks.flat()) {
+      if (cell === null) {
+        continue;
+      }
+      expect(cell.date.getTime()).toBe(startOfDay(cell.date).getTime());
+    }
   });
 
   it("flags no cell for a single-month festival (Starkbierfest 2026)", () => {

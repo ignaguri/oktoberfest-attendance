@@ -25,6 +25,19 @@ mv apps/mobile/.env.local.bkp apps/mobile/.env.local
 
 This also affects prebuild plugins that write env into native files at build time (e.g. the watch app's `Info.plist` via `withWatchInfoPlistEnv.js`).
 
+## Native devDependencies
+
+`apps/mobile` carries two devDependencies that build native code: `drizzle-kit`
+and `better-sqlite3`. `better-sqlite3` backs the SQLite integration tests under
+`lib/database/__tests__` — it is never imported by app code and never bundled.
+
+EAS installs devDependencies, so both have to resolve on the build machine.
+`better-sqlite3` ships prebuilds for current Node LTS and falls back to node-gyp
+if none matches, which is the failure mode to watch: it surfaces as a failed
+install rather than as a failed build step. If an EAS build ever breaks on it,
+move it to the workspace root rather than dropping the tests, since the mobile
+vitest run is the only thing that needs it.
+
 ## OTA Updates (`eas update`)
 
 For production OTAs, do **both**:

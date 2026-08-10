@@ -34,6 +34,14 @@ type MigrationFn = (db: SQLite.SQLiteDatabase) => Promise<void>;
  */
 const MIGRATIONS: MigrationFn[] = [
   // v0 -> v1: Initial schema from Drizzle
+  //
+  // Only migration 0000 is ever applied, and everything after it is a hand-written
+  // step below. So the Drizzle snapshot has drifted from schema/*.ts on purpose -
+  // tents dropped its unique() declaration and gained created_at in later steps,
+  // while drizzle/0000_busy_menace.sql still describes the original shape. A
+  // future `drizzle-kit generate` would emit a 0001 that nothing here executes:
+  // append a hand-written migration instead, or regenerate the snapshot and be
+  // sure 0000 still describes a v0 database.
   async (db) => {
     // Execute Drizzle-generated migration SQL
     const migration = drizzleMigrations.migrations[0];
