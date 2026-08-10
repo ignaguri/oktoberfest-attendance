@@ -35,3 +35,6 @@ export { splitFullName } from "./split-full-name";
 
 // Festival status
 export { getFestivalStatus } from "./festival-status";
+
+// Festival day model
+export { buildFestivalWeeks, type FestivalDayCell } from "./festival-days";
