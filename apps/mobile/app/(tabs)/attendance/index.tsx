@@ -26,16 +26,11 @@ import {
 import { Button, ButtonText } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
-import { SegmentedControl, type Tab } from "@/components/ui/segmented-control";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
-import {
-  type AttendanceViewMode,
-  DEFAULT_ATTENDANCE_VIEW_MODE,
-  getAttendanceViewMode,
-  setAttendanceViewMode,
-} from "@/lib/attendance-view-storage";
+import { useAttendanceViewMode } from "@/hooks/useAttendanceViewMode";
 import {
   useAdaptedAttendances,
   useAdaptedDaySummaries,
@@ -89,46 +84,7 @@ export default function AttendanceScreen() {
   const [checkInMode, setCheckInMode] = useState(false);
   const [prefillTentId, setPrefillTentId] = useState<string | undefined>();
 
-  // View mode is hydrated before first paint (see the loading gate below) so a
-  // user who chose "list" never sees the calendar flash first.
-  const [viewMode, setViewMode] = useState<AttendanceViewMode | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-    const fallbackTimerId = setTimeout(() => {
-      if (isMounted) {
-        setViewMode(DEFAULT_ATTENDANCE_VIEW_MODE);
-      }
-    }, 1000);
-
-    getAttendanceViewMode().then((storedMode) => {
-      if (isMounted) {
-        clearTimeout(fallbackTimerId);
-        setViewMode(storedMode);
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      clearTimeout(fallbackTimerId);
-    };
-  }, []);
-
-  const handleViewModeChange = useCallback((key: string) => {
-    const nextMode = key as AttendanceViewMode;
-    setViewMode(nextMode);
-    setAttendanceViewMode(nextMode).catch((error) => {
-      logger.error("Failed to persist attendance view mode:", error);
-    });
-  }, []);
-
-  const viewTabs = useMemo(
-    (): Tab[] => [
-      { key: "calendar", label: t("attendance.view.calendar") },
-      { key: "list", label: t("attendance.view.list") },
-    ],
-    [t],
-  );
+  const { viewMode, setViewMode: handleViewModeChange, viewTabs } = useAttendanceViewMode();
 
   // Handle check-in from deep link
   // This effect intentionally sets state when a deep link is detected
