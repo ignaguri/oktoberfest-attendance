@@ -1,6 +1,24 @@
 import type { Database } from "@prostcounter/db";
 import type { CalendarEvent, CalendarEventType } from "@prostcounter/shared";
+import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+/**
+ * Which festival day a visit timestamp belongs to.
+ *
+ * Comparing the ISO string's first 10 characters would bucket in UTC, and
+ * visits are stamped in the festival's timezone - a CEST visit at local
+ * midnight is 22:00 UTC the day before, so a UTC compare puts every one of
+ * them on the wrong day and never matches the attendance row it belongs to.
+ */
+export function visitFallsOnDay(
+  visitDate: string,
+  attendanceDate: string,
+  timezone: string,
+): boolean {
+  return formatDateForDatabase(new Date(visitDate), timezone) === attendanceDate.substring(0, 10);
+}
 
 export class SupabaseCalendarRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -16,9 +34,11 @@ export class SupabaseCalendarRepository {
     // Get festival dates
     const { data: festival } = await this.supabase
       .from("festivals")
-      .select("start_date, end_date")
+      .select("start_date, end_date, timezone")
       .eq("id", festivalId)
       .single();
+
+    const timezone = festival?.timezone ?? DEFAULT_TIMEZONE;
 
     // Get attendances using the view for consistent beer_count
     const { data: attendances, error: attError } = await this.supabase
@@ -78,7 +98,7 @@ export class SupabaseCalendarRepository {
       .forEach((a) => {
         const beerCount = Number(a.beer_count) || 0;
         const hasTentVisits = (tentVisits ?? []).some(
-          (tv) => tv.visit_date && tv.visit_date.substring(0, 10) === a.date.substring(0, 10),
+          (tv) => tv.visit_date && visitFallsOnDay(tv.visit_date, a.date, timezone),
         );
 
         if (hasTentVisits && beerCount > 0) {
@@ -126,7 +146,7 @@ export class SupabaseCalendarRepository {
     // Get group with festival info
     const { data: groupData, error: groupError } = await this.supabase
       .from("groups")
-      .select("festival_id, festivals(start_date, end_date)")
+      .select("festival_id, festivals(start_date, end_date, timezone)")
       .eq("id", groupId)
       .single();
 
@@ -135,6 +155,7 @@ export class SupabaseCalendarRepository {
     }
 
     const festivalId = groupData.festival_id;
+    const timezone = (groupData.festivals as any)?.timezone ?? DEFAULT_TIMEZONE;
 
     // Get group members
     const { data: members, error: membersError } = await this.supabase
@@ -237,7 +258,7 @@ export class SupabaseCalendarRepository {
           (tv) =>
             tv.visit_date &&
             tv.user_id === a.user_id &&
-            tv.visit_date.substring(0, 10) === a.date.substring(0, 10),
+            visitFallsOnDay(tv.visit_date, a.date, timezone),
         );
 
         if (hasTentVisits && beerCount > 0) {

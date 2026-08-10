@@ -245,24 +245,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     userId: string,
     input: CreateAttendanceInput,
   ): Promise<CreateAttendanceResponse> {
-    // Convert date string to ISO timestamp for the RPC function
-    // Use setUTCHours to avoid timezone shifting the date
-    // (new Date("YYYY-MM-DD") creates UTC midnight; setHours uses local time
-    // and can shift the date back in Western Hemisphere timezones)
-    const dateWithTime = new Date(input.date);
-    const now = new Date();
-    dateWithTime.setUTCHours(
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds(),
-      now.getUTCMilliseconds(),
-    );
-
     const { data, error } = await this.supabase.rpc("add_or_update_attendance_with_tents", {
       p_user_id: userId,
       p_beer_count: 0,
       p_tent_ids: input.tents,
-      p_date: dateWithTime.toISOString(),
+      // A bare date, not a timestamp. The RPC only reads `p_date::date` and
+      // stamps new visits at the festival's local midnight itself, so a
+      // time-of-day here is ignored. It is also the only form that survives a
+      // non-UTC session timezone: a bare date is parsed and cast back in the
+      // same zone, while "...T23:30:00Z" casts to the next day east of UTC.
+      p_date: input.date,
       p_festival_id: input.festivalId,
     });
 
@@ -284,22 +276,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     userId: string,
     input: UpdatePersonalAttendanceInput,
   ): Promise<UpdatePersonalAttendanceResponse> {
-    // Convert date string to ISO timestamp for the RPC function
-    // Use setUTCHours to avoid timezone shifting the date
-    // (new Date("YYYY-MM-DD") creates UTC midnight; setHours uses local time
-    // and can shift the date back in Western Hemisphere timezones)
-    const dateWithTime = new Date(input.date);
-    const now = new Date();
-    dateWithTime.setUTCHours(
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds(),
-      now.getUTCMilliseconds(),
-    );
-
     const { data, error } = await this.supabase.rpc("update_personal_attendance_with_tents", {
       p_user_id: userId,
-      p_date: dateWithTime.toISOString(),
+      // A bare date, for the reasons given in createWithTents above.
+      p_date: input.date,
       p_beer_count: 0,
       /*
        * null (not supplied) leaves tent visits untouched; [] clears them for the
