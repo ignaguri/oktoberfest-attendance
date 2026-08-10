@@ -39,7 +39,11 @@ import { Text } from "@/components/ui/text";
 import { useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
 import { type PendingPhoto, useBeerPictureUpload } from "@/hooks/useBeerPictureUpload";
-import { useOfflineUpdateAttendance } from "@/hooks/useOfflineAttendance";
+import {
+  TentAlreadyCurrentVisitError,
+  useOfflineLogTentVisit,
+  useOfflineUpdateAttendance,
+} from "@/hooks/useOfflineAttendance";
 import { useOfflineLogConsumption } from "@/hooks/useOfflineConsumption";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { BackgroundColors, Colors, DrinkTypeColors, IconColors } from "@/lib/constants/colors";
@@ -167,6 +171,7 @@ export function QuickAttendanceSheet({
   const queryClient = useQueryClient();
   const logConsumption = useOfflineLogConsumption();
   const updateAttendance = useOfflineUpdateAttendance();
+  const logTentVisit = useOfflineLogTentVisit();
 
   const { user } = useAuth();
 
@@ -291,6 +296,25 @@ export function QuickAttendanceSheet({
     setIsSaving(true);
 
     try {
+      // Moving tent is a new visit appended to the day, not a new set of tents for
+      // it. Sending the tent through `tents` below would reconcile the day to just
+      // this one and delete every earlier visit, on the phone and on the server.
+      if (hasTentChange && selectedTentId) {
+        try {
+          await logTentVisit.mutateAsync({
+            festivalId,
+            date: today,
+            tentId: selectedTentId,
+          });
+        } catch (error) {
+          // Already the day's latest visit, so there is nothing to append and
+          // nothing wrong. Reachable when currentTentId is read from a stale cache.
+          if (!(error instanceof TentAlreadyCurrentVisitError)) {
+            throw error;
+          }
+        }
+      }
+
       // Log the consumption only if a drink is selected
       if (selectedDrinkType) {
         // beerCost is in euros, we need cents
@@ -309,12 +333,14 @@ export function QuickAttendanceSheet({
         });
       }
 
-      // Update attendance with tent or enqueue photos
+      // Make sure the day has an attendance row: photos hang off it and the
+      // calendar reads it. No `tents` on purpose, which is what leaves the day's
+      // visits alone - passing [] would not, since reconciliation treats an empty
+      // array as "the day holds no tents" and clears it.
       if (selectedTentId || pendingPhotos.length > 0) {
         const result = await updateAttendance.mutateAsync({
           festivalId,
           date: today,
-          tents: selectedTentId ? [selectedTentId] : [],
         });
 
         if (pendingPhotos.length > 0) {
@@ -388,6 +414,7 @@ export function QuickAttendanceSheet({
     calculatePricePaid,
     logConsumption,
     updateAttendance,
+    logTentVisit,
     user?.id,
     offlineContext,
     queryClient,
