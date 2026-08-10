@@ -26,6 +26,7 @@ import type {
   GetFestivalResponse,
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
+  GetPendingUnlocksResponse,
   GetTentCrowdReportsResponse,
   Group,
   GroupActionResponse,
@@ -42,6 +43,7 @@ import type {
   ListFriendSuggestionsResponse,
   ListGroupsResponse,
   LogConsumptionInput,
+  MarkUnlocksSeenResponse,
   MissingProfileFields,
   Profile,
   ProfileShort,
@@ -735,6 +737,30 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to fetch available achievements");
         }
         return parseJsonResponse<ListAvailableAchievementsResponse>(response);
+      },
+
+      async pending(): Promise<GetPendingUnlocksResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("GET", `${baseUrl}/v1/achievements/pending`, {
+          headers,
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch pending unlocks");
+        }
+        return parseJsonResponse<GetPendingUnlocksResponse>(response);
+      },
+
+      async markSeen(eventIds: string[]): Promise<MarkUnlocksSeenResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("POST", `${baseUrl}/v1/achievements/seen`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ eventIds }),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to acknowledge unlocks");
+        }
+        return parseJsonResponse<MarkUnlocksSeenResponse>(response);
       },
     },
 

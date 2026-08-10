@@ -1,4 +1,5 @@
 import type { Database } from "@prostcounter/db";
+import type { PendingUnlock } from "@prostcounter/shared";
 import type {
   AchievementMetrics,
   BooleanMetricKey,
@@ -6,6 +7,7 @@ import type {
   PersistedUnlock,
   UnlockedAchievement,
 } from "@prostcounter/shared/achievements";
+import { describeUnlock } from "@prostcounter/shared/achievements";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
@@ -324,5 +326,70 @@ export class AchievementMetricsRepository {
 
       return [{ ...unlock, eventId }];
     });
+  }
+
+  /**
+   * Unacked unlocks for this user, newest first.
+   *
+   * The database supplies the event id, the slug and the timestamp; everything
+   * the toast renders comes from the TS definitions via describeUnlock, which
+   * is the source of truth (master-doc decision D3). A slug no definition owns
+   * is dropped with a log rather than rendered half-populated.
+   */
+  async listPendingUnlocks(userId: string, limit = 10): Promise<PendingUnlock[]> {
+    const { data, error } = await this.supabase
+      .from("achievement_events")
+      .select("id, created_at, achievements(slug)")
+      .eq("user_id", userId)
+      .is("user_notified_at", null)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      throw new DatabaseError(`Failed to fetch pending unlocks: ${error.message}`);
+    }
+
+    const pending: PendingUnlock[] = [];
+
+    for (const row of data ?? []) {
+      const slug = (row as { achievements: { slug: string | null } | null }).achievements?.slug;
+      if (!slug) {
+        continue;
+      }
+
+      const descriptor = describeUnlock(slug);
+      if (!descriptor) {
+        logger.error(
+          { userId, slug, eventId: row.id },
+          "Pending unlock references a slug no definition owns; run the registry sync",
+        );
+        continue;
+      }
+
+      pending.push({ ...descriptor, eventId: row.id, unlockedAt: row.created_at });
+    }
+
+    return pending;
+  }
+
+  /**
+   * Stamps events as shown in-app. Scoped to the caller's own rows, and only
+   * those not already stamped, so the returned count is the number of events
+   * this call actually acked.
+   */
+  async markUnlocksSeen(userId: string, eventIds: string[]): Promise<number> {
+    const { data, error } = await this.supabase
+      .from("achievement_events")
+      .update({ user_notified_at: new Date().toISOString() })
+      .eq("user_id", userId)
+      .in("id", eventIds)
+      .is("user_notified_at", null)
+      .select("id");
+
+    if (error) {
+      throw new DatabaseError(`Failed to mark unlocks seen: ${error.message}`);
+    }
+
+    return (data ?? []).length;
   }
 }

@@ -5,9 +5,12 @@ import {
   EvaluateAchievementsSchema,
   GetAchievementLeaderboardResponseSchema,
   GetAchievementsWithProgressResponseSchema,
+  GetPendingUnlocksResponseSchema,
   ListAchievementsQuerySchema,
   ListAchievementsResponseSchema,
   ListAvailableAchievementsResponseSchema,
+  MarkUnlocksSeenResponseSchema,
+  MarkUnlocksSeenSchema,
 } from "@prostcounter/shared";
 import { buildStats, evaluate } from "@prostcounter/shared/achievements";
 
@@ -335,6 +338,100 @@ app.openapi(listAvailableAchievementsRoute, async (c) => {
   }));
 
   return c.json({ data: achievements }, 200);
+});
+
+// GET /achievements/pending - Unlocks not yet shown to the user
+const getPendingUnlocksRoute = createRoute({
+  method: "get",
+  path: "/achievements/pending",
+  tags: ["achievements"],
+  summary: "List unlocks not yet shown in-app",
+  description:
+    "Returns achievement unlocks that have not been acknowledged with POST /achievements/seen. Newest first, capped at 10.",
+  responses: {
+    200: {
+      description: "Pending unlocks retrieved successfully",
+      content: {
+        "application/json": {
+          schema: GetPendingUnlocksResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getPendingUnlocksRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+
+  const metricsRepo = new AchievementMetricsRepository(supabase);
+  const data = await metricsRepo.listPendingUnlocks(user.id);
+
+  return c.json({ data }, 200);
+});
+
+// POST /achievements/seen - Acknowledge unlocks shown in-app
+const markUnlocksSeenRoute = createRoute({
+  method: "post",
+  path: "/achievements/seen",
+  tags: ["achievements"],
+  summary: "Acknowledge unlocks shown in-app",
+  description:
+    "Marks the given achievement events as shown to the user, which suppresses the redundant push notification for them.",
+  request: {
+    body: {
+      content: {
+        "application/json": {
+          schema: MarkUnlocksSeenSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Unlocks acknowledged",
+      content: {
+        "application/json": {
+          schema: MarkUnlocksSeenResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(markUnlocksSeenRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { eventIds } = c.req.valid("json");
+
+  const metricsRepo = new AchievementMetricsRepository(supabase);
+  const acknowledged = await metricsRepo.markUnlocksSeen(user.id, eventIds);
+
+  return c.json({ acknowledged }, 200);
 });
 
 export default app;
