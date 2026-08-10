@@ -45,11 +45,13 @@ export function UnlockQueueProvider({ children }: { children: ReactNode }) {
   // side effect (the markSeen call) inside the setState updater — React
   // requires updater functions to be pure, and Strict Mode double-invokes
   // them in dev, which would double-fire the request.
+  //
+  // Updated synchronously inside each setBatch updater below rather than via
+  // a separate useEffect: a descendant's effect (the toast host's, watching
+  // `batch`, built in Tasks 9/10) runs before this provider's own effects in
+  // the same commit, so a ref synced via useEffect would still hold the
+  // previous value when that descendant's effect calls consume().
   const batchRef = useRef(batch);
-
-  useEffect(() => {
-    batchRef.current = batch;
-  }, [batch]);
 
   const { data: pending } = useQuery(
     QueryKeys.pendingUnlocks(),
@@ -68,12 +70,20 @@ export function UnlockQueueProvider({ children }: { children: ReactNode }) {
     if (unlocks.length === 0) {
       return;
     }
-    setBatch((current) => mergeUnlocks(current, unlocks));
+    setBatch((current) => {
+      const merged = mergeUnlocks(current, unlocks);
+      batchRef.current = merged;
+      return merged;
+    });
   }, []);
 
   useEffect(() => {
     if (pending && pending.length > 0) {
-      setBatch((current) => mergeUnlocks(current, pending));
+      setBatch((current) => {
+        const merged = mergeUnlocks(current, pending);
+        batchRef.current = merged;
+        return merged;
+      });
     }
   }, [pending]);
 
@@ -93,6 +103,7 @@ export function UnlockQueueProvider({ children }: { children: ReactNode }) {
       // celebration they already saw.
     });
 
+    batchRef.current = [];
     setBatch([]);
   }, [apiClient]);
 
