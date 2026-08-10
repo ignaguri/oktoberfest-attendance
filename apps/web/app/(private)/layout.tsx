@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
+import { UnlockQueueProvider } from "@prostcounter/shared/hooks";
+
+import { UnlockToastHost } from "@/components/achievements/UnlockToastHost";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -34,26 +37,29 @@ async function AuthCheck() {
 
 export default function PrivateLayout({ children }: { children: React.ReactNode }) {
   return (
-    <WebFestivalProvider>
-      <NotificationProvider>
-        <div className="flex min-h-screen flex-col items-center justify-center pb-2">
-          <Navbar />
-          <OfflineBanner />
-          <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:justify-start sm:px-20">
-            <Breadcrumbs />
-            <ErrorBoundary>
-              <Suspense fallback={<LoadingSpinner />}>
-                <AuthCheck />
-                {children}
-                <WhatsNew />
-                <VersionChecker />
-                <AppInstallBanner />
-              </Suspense>
-            </ErrorBoundary>
-          </main>
-          <Footer isLoggedIn />
-        </div>
-      </NotificationProvider>
-    </WebFestivalProvider>
+    <UnlockQueueProvider>
+      <WebFestivalProvider>
+        <NotificationProvider>
+          <div className="flex min-h-screen flex-col items-center justify-center pb-2">
+            <Navbar />
+            <OfflineBanner />
+            <main className="flex w-full flex-1 shrink-0 flex-col items-center p-2 text-center sm:justify-start sm:px-20">
+              <Breadcrumbs />
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <AuthCheck />
+                  {children}
+                  <WhatsNew />
+                  <VersionChecker />
+                  <AppInstallBanner />
+                </Suspense>
+              </ErrorBoundary>
+            </main>
+            <Footer isLoggedIn />
+          </div>
+          <UnlockToastHost />
+        </NotificationProvider>
+      </WebFestivalProvider>
+    </UnlockQueueProvider>
   );
 }
