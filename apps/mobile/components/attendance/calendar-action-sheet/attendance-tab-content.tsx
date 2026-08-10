@@ -144,6 +144,23 @@ export function AttendanceTabContent({
   const lastDateRef = useRef<string | null>(null);
   const hasSeededTentsRef = useRef(false);
 
+  /*
+   * Whether the user touched the tent selector on this date.
+   *
+   * Gates whether a save sends `tents` at all, because the field cannot
+   * distinguish "this day has no tents" from "I have not learned this day's
+   * tents yet" - both are []. The seed below fills it in asynchronously and only
+   * fires once visits exist, so before that, and for any day whose visits the
+   * local query cannot see, an untouched field reads as empty. Sending that as
+   * [] tells the update RPC the day holds no tents and it deletes every visit
+   * for the date, on the server as well as here.
+   *
+   * Keying on the user's own edit rather than on the query's loading flag also
+   * covers the days where the visits never arrive at all, and keeps a genuine
+   * "clear all tents" working: that is an edit, so it still sends [].
+   */
+  const [hasEditedTents, setHasEditedTents] = useState(false);
+
   // Fetch complete attendance data with beer pictures when editing (offline-first)
   const { data: attendanceWithPhotos } = useAdaptedAttendanceByDate(
     isEditMode ? festivalId : undefined,
@@ -232,6 +249,7 @@ export function AttendanceTabContent({
     });
     setSelectedDrinkType("beer");
     setRevisitError(null);
+    setHasEditedTents(false);
     hasInitializedRef.current = false;
     hasSeededTentsRef.current = false;
   }, [dateString, existingAttendance, freshTentVisits, prefillTentId, selectedDate, reset]);
@@ -315,7 +333,7 @@ export function AttendanceTabContent({
           festivalId,
           date: data.date,
           amount: totalLocalDrinks,
-          tents: data.tents,
+          tents: hasEditedTents ? data.tents : undefined,
           existingAttendanceId: existingAttendance?.id,
           pendingPhotos,
           photosToDelete: photosMarkedForRemoval,
@@ -340,11 +358,13 @@ export function AttendanceTabContent({
       totalLocalDrinks,
       localDrinkCounts,
       consumptions,
+      hasEditedTents,
     ],
   );
 
   const handleTentsSelect = useCallback(
     (tentIds: string[]) => {
+      setHasEditedTents(true);
       setValue("tents", tentIds, { shouldValidate: true });
     },
     [setValue],
