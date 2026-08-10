@@ -142,6 +142,7 @@ export function useOfflineUpdateAttendance() {
         "local-attendances",
         "local-tents",
         "local-consumptions",
+        "local-day-summaries",
       ]);
 
       return {

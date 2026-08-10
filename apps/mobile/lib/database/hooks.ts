@@ -430,6 +430,9 @@ export function useLocalDeleteAttendance() {
       queryClient.invalidateQueries({
         queryKey: ["local-consumptions"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["local-day-summaries"],
+      });
       for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
         queryClient.invalidateQueries({ queryKey: [...key] });
       }

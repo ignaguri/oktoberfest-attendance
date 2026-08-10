@@ -154,7 +154,11 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
 
           // Refresh pending count and invalidate local caches once after all writes
           await offlineContext?.refreshPendingCount?.();
-          await invalidateLocalQueries(queryClient, ["local-consumptions", "local-attendances"]);
+          await invalidateLocalQueries(queryClient, [
+            "local-consumptions",
+            "local-attendances",
+            "local-day-summaries",
+          ]);
         }
 
         // Step 3: Delete photos marked for removal

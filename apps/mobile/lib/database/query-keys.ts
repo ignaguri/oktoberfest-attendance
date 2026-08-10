@@ -52,6 +52,7 @@ export const localKeys = {
 /** All local query key prefixes for bulk invalidation (e.g., pull-to-refresh) */
 export const ALL_LOCAL_PREFIXES = [
   "local-attendances",
+  "local-day-summaries",
   "local-tents",
   "local-groups",
   "local-profile",
