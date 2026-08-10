@@ -2120,7 +2120,7 @@ export type Database = {
       }
       record_user_active_day: {
         Args: { p_app_version?: string; p_platform?: string; p_user_id: string }
-        Returns: undefined
+        Returns: boolean
       }
       refresh_festival_group_standings: {
         Args: { p_festival_id: string }
