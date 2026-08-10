@@ -1,8 +1,13 @@
 import { cn } from "@prostcounter/ui";
-import { Fragment, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -26,7 +31,6 @@ interface SegmentedControlProps {
  * Features:
  * - iOS-style segmented control appearance
  * - Animated sliding indicator
- * - Hairline dividers between segments so the tap targets read as separate
  * - Disabled tab support
  * - Accessible with proper roles
  */
@@ -37,17 +41,16 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
   // Calculate indicator position based on active tab index
   const activeIndex = tabs.findIndex((tab) => tab.key === activeTab);
 
+  /*
+   * The style only reads the position. Wrapping the read in an animation
+   * (withSpring/withTiming inside useAnimatedStyle) restarts that animation on
+   * every recompute, which is what made the pill bounce and overshoot the
+   * track: the switch below owns the animation, the style just follows it.
+   */
   const animatedIndicatorStyle = useAnimatedStyle(() => {
     return {
       width: tabWidth.value,
-      transform: [
-        {
-          translateX: withSpring(indicatorPosition.value, {
-            damping: 20,
-            stiffness: 200,
-          }),
-        },
-      ],
+      transform: [{ translateX: indicatorPosition.value }],
     };
   });
 
@@ -58,7 +61,7 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
       // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
       tabWidth.value = width;
 
-      // Update indicator position if this is the active tab
+      // Snap, don't animate: this is first paint, not a user switch.
       if (index === activeIndex) {
         // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
         indicatorPosition.value = index * width;
@@ -67,16 +70,26 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
     [activeIndex, indicatorPosition, tabWidth],
   );
 
-  // Update indicator position when active tab changes
+  // Slide to the active tab whenever it changes, including changes driven by the
+  // parent rather than by a press here. Skipped until the first layout lands.
+  useEffect(() => {
+    if (tabWidth.value === 0) {
+      return;
+    }
+    // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
+    indicatorPosition.value = withTiming(activeIndex * tabWidth.value, {
+      duration: 180,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [activeIndex, indicatorPosition, tabWidth]);
+
   const handleTabPress = useCallback(
-    (tab: Tab, index: number) => {
+    (tab: Tab) => {
       if (tab.disabled) return;
 
-      // eslint-disable-next-line react-hooks/immutability -- Reanimated shared values are designed to be mutated
-      indicatorPosition.value = index * tabWidth.value;
       onTabChange(tab.key);
     },
-    [indicatorPosition, onTabChange, tabWidth],
+    [onTabChange],
   );
 
   return (
@@ -98,30 +111,28 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
           const isDisabled = tab.disabled;
 
           return (
-            <Fragment key={tab.key}>
-              {index > 0 && <View className="my-1.5 w-px self-stretch bg-outline-400" />}
-              <Pressable
-                onPress={() => handleTabPress(tab, index)}
-                onLayout={(e) => handleTabLayout(e, index)}
-                disabled={isDisabled}
-                className="flex-1 items-center justify-center py-2"
-                accessibilityRole="tab"
-                accessibilityState={{ selected: isActive, disabled: isDisabled }}
-                accessibilityLabel={tab.label}
+            <Pressable
+              key={tab.key}
+              onPress={() => handleTabPress(tab)}
+              onLayout={(e) => handleTabLayout(e, index)}
+              disabled={isDisabled}
+              className="flex-1 items-center justify-center py-2"
+              accessibilityRole="tab"
+              accessibilityState={{ selected: isActive, disabled: isDisabled }}
+              accessibilityLabel={tab.label}
+            >
+              <Text
+                className={cn(
+                  "text-sm",
+                  isActive && "font-semibold text-typography-900",
+                  !isActive && "font-medium",
+                  !isActive && isDisabled && "text-typography-300",
+                  !isActive && !isDisabled && "text-typography-600",
+                )}
               >
-                <Text
-                  className={cn(
-                    "text-sm",
-                    isActive && "font-semibold text-typography-900",
-                    !isActive && "font-medium",
-                    !isActive && isDisabled && "text-typography-300",
-                    !isActive && !isDisabled && "text-typography-600",
-                  )}
-                >
-                  {tab.label}
-                </Text>
-              </Pressable>
-            </Fragment>
+                {tab.label}
+              </Text>
+            </Pressable>
           );
         })}
       </HStack>
