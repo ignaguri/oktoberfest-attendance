@@ -10,11 +10,13 @@
  * test suite mocks getAllAsync (there is no real SQLite in tests).
  */
 
+import type { SQLiteBindParams } from "expo-sqlite";
+
 import { DRINK_TYPES, type DrinkType } from "./schema/enums";
 
 /** Minimal surface of expo-sqlite's database that these reads need. */
 export interface SQLiteLike {
-  getAllAsync<T>(sql: string, params: unknown[]): Promise<T[]>;
+  getAllAsync<T>(sql: string, params: SQLiteBindParams): Promise<T[]>;
 }
 
 export interface TentNameRow {
