@@ -259,6 +259,58 @@ describe("Achievement Routes - Unit Tests", () => {
 
       expect(res.status).toBe(500);
     });
+
+    // The joined achievement's rarity must come from its tier, not from the
+    // stored column PR 2 drops. The mock deliberately disagrees: tier 4 with a
+    // stored rarity of "common". Reading the column yields "common" and reading
+    // the tier yields "legendary", so only a derived implementation passes.
+    it("derives the joined achievement's rarity from its tier", async () => {
+      const festivalId = "123e4567-e89b-12d3-a456-426614174000";
+
+      const mockAchievements = [
+        {
+          id: "ae1e4567-e89b-12d3-a456-426614174003",
+          user_id: mockUser.id,
+          achievement_id: "ac1e4567-e89b-12d3-a456-426614174003",
+          festival_id: festivalId,
+          rarity: "legendary",
+          created_at: "2024-09-23T10:00:00Z",
+          user_notified_at: null,
+          group_notified_at: null,
+          achievements: {
+            id: "ac1e4567-e89b-12d3-a456-426614174003",
+            name: "achievements.drinks_total.t4.name",
+            description: "achievements.drinks_total.t4.description",
+            category: "drinking",
+            icon: "stein",
+            points: 100,
+            tier: 4,
+            rarity: "common",
+            created_at: "2024-01-01T00:00:00Z",
+            updated_at: "2024-01-01T00:00:00Z",
+          },
+        },
+      ];
+
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain(mockSupabaseSuccess(mockAchievements)),
+      );
+
+      const req = createAuthRequest(`/achievements?festivalId=${festivalId}`, {
+        method: "GET",
+      });
+
+      const res = await app.request(req.url, {
+        method: req.method,
+        headers: req.headers,
+      });
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.data[0].achievement.rarity).toBe("legendary");
+      // The event's own rarity is a different column and is not derived.
+      expect(body.data[0].rarity).toBe("legendary");
+    });
   });
 
   describe("GET /achievements/with-progress", () => {

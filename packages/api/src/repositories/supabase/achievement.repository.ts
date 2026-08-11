@@ -1,5 +1,6 @@
 import type { Database } from "@prostcounter/db";
 import type { ListAchievementsQuery, UserAchievement } from "@prostcounter/shared";
+import { tierToRarity } from "@prostcounter/shared/achievements";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
@@ -24,7 +25,7 @@ export class SupabaseAchievementRepository implements IAchievementRepository {
           category,
           icon,
           points,
-          rarity,
+          tier,
           created_at,
           updated_at
         )
@@ -86,7 +87,7 @@ export class SupabaseAchievementRepository implements IAchievementRepository {
         category: achievement.category,
         icon: achievement.icon,
         points: achievement.points,
-        rarity: achievement.rarity,
+        rarity: tierToRarity(achievement.tier),
         createdAt: achievement.created_at,
         updatedAt: achievement.updated_at,
       },
