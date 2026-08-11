@@ -107,7 +107,6 @@ export type Database = {
           is_active: boolean
           name: string
           points: number
-          rarity: Database["public"]["Enums"]["achievement_rarity_enum"]
           scope: string | null
           series_id: string | null
           slug: string | null
@@ -124,7 +123,6 @@ export type Database = {
           is_active?: boolean
           name: string
           points?: number
-          rarity?: Database["public"]["Enums"]["achievement_rarity_enum"]
           scope?: string | null
           series_id?: string | null
           slug?: string | null
@@ -141,7 +139,6 @@ export type Database = {
           is_active?: boolean
           name?: string
           points?: number
-          rarity?: Database["public"]["Enums"]["achievement_rarity_enum"]
           scope?: string | null
           series_id?: string | null
           slug?: string | null
@@ -1823,25 +1820,9 @@ export type Database = {
           tents_changed: boolean
         }[]
       }
-      calculate_achievement_progress: {
-        Args: {
-          p_achievement_id: string
-          p_festival_id: string
-          p_user_id: string
-        }
-        Returns: boolean
-      }
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }
         Returns: number
-      }
-      check_achievement_conditions: {
-        Args: {
-          p_achievement_id: string
-          p_festival_id: string
-          p_user_id: string
-        }
-        Returns: boolean
       }
       check_notification_rate_limit: {
         Args: {
@@ -1879,18 +1860,6 @@ export type Database = {
       }
       delete_attendance: {
         Args: { p_attendance_id: string }
-        Returns: undefined
-      }
-      evaluate_achievement_progress: {
-        Args: {
-          p_achievement_id: string
-          p_festival_id: string
-          p_user_id: string
-        }
-        Returns: Json
-      }
-      evaluate_user_achievements: {
-        Args: { p_festival_id: string; p_user_id: string }
         Returns: undefined
       }
       expire_old_location_sessions: { Args: never; Returns: undefined }
@@ -2007,21 +1976,6 @@ export type Database = {
           longitude: number
           tent_id: string
           tent_name: string
-        }[]
-      }
-      get_user_achievements: {
-        Args: { p_festival_id: string; p_user_id: string }
-        Returns: {
-          achievement_id: string
-          category: Database["public"]["Enums"]["achievement_category_enum"]
-          current_progress: Json
-          description: string
-          icon: string
-          is_unlocked: boolean
-          name: string
-          points: number
-          rarity: Database["public"]["Enums"]["achievement_rarity_enum"]
-          unlocked_at: string
         }[]
       }
       get_user_all_group_photo_settings: {
@@ -2160,13 +2114,9 @@ export type Database = {
         Args: { p_addressee_id: string; p_requester_id: string }
         Returns: Json
       }
-      unlock_achievement: {
-        Args: {
-          p_achievement_id: string
-          p_festival_id: string
-          p_user_id: string
-        }
-        Returns: boolean
+      tier_to_rarity: {
+        Args: { p_tier: number }
+        Returns: Database["public"]["Enums"]["achievement_rarity_enum"]
       }
       update_personal_attendance_with_tents: {
         Args: {
