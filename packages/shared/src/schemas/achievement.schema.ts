@@ -103,26 +103,6 @@ export const ListAchievementsResponseSchema = z.object({
 export type ListAchievementsResponse = z.infer<typeof ListAchievementsResponseSchema>;
 
 /**
- * Evaluate achievements request
- * POST /api/v1/achievements/evaluate
- */
-export const EvaluateAchievementsSchema = z.object({
-  festivalId: z.uuid({ error: "Invalid festival ID" }),
-});
-
-export type EvaluateAchievementsInput = z.infer<typeof EvaluateAchievementsSchema>;
-
-/**
- * Evaluate achievements response
- */
-export const EvaluateAchievementsResponseSchema = z.object({
-  newAchievements: z.array(UserAchievementSchema),
-  totalPoints: z.number().int(),
-});
-
-export type EvaluateAchievementsResponse = z.infer<typeof EvaluateAchievementsResponseSchema>;
-
-/**
  * One rung of a card. For a tiered series this is one of four; for a one-off
  * it is the only entry, and its `tier` is the one-off's difficulty rather
  * than a position in a ladder.

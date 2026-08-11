@@ -13,7 +13,6 @@ import type {
   CrowdLevel,
   DeleteAttendanceResponse,
   DeleteGroupMessageResponse,
-  EvaluateAchievementsResponse,
   FestivalTent,
   FriendActionResponse,
   FriendRequestCountResponse,
@@ -684,19 +683,6 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to fetch achievements");
         }
         return parseJsonResponse<ListAchievementsResponse>(response);
-      },
-
-      async evaluate(festivalId?: string): Promise<EvaluateAchievementsResponse> {
-        const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("POST", `${baseUrl}/v1/achievements/evaluate`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify({ festivalId }),
-        });
-        if (!response.ok) {
-          await extractApiError(response, "Failed to evaluate achievements");
-        }
-        return parseJsonResponse<EvaluateAchievementsResponse>(response);
       },
 
       async getWithProgress(festivalId: string): Promise<GetAchievementsWithProgressResponse> {
