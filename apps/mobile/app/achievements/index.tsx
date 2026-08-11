@@ -11,6 +11,7 @@ import type {
 import { cn } from "@prostcounter/ui";
 import { useLocalSearchParams } from "expo-router";
 import { Award } from "lucide-react-native";
+import type { RefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 
@@ -28,8 +29,25 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
 
-/** How long the highlighted card keeps its ring after a toast-driven navigation. */
+/** How long the highlighted card keeps its outline after a toast-driven navigation. */
 const HIGHLIGHT_DURATION_MS = 2000;
+
+/**
+ * The card wrapper, and the outline the highlighted one gets.
+ *
+ * A border rather than the web screen's `ring-2 ring-yellow-500 ring-offset-2`:
+ * Tailwind compiles the ring utilities to `box-shadow`, which NativeWind's
+ * native preset does not implement, and rendering one here threw a thoroughly
+ * misleading "Couldn't find a navigation context" error that took the whole
+ * screen down with it. (The `ring-2` in components/ui/pressable is not a
+ * counterexample — it sits behind `data-[focus-visible=true]`, which touch
+ * input never triggers, so it has never actually rendered.)
+ *
+ * The transparent border is always present so gaining the colour cannot shift
+ * layout.
+ */
+const CARD_CLASS = "rounded-lg border-2 border-transparent";
+const CARD_HIGHLIGHT_CLASS = "border-yellow-500";
 
 /** A rung's slug, recovered from the card it belongs to. One-offs have a single rung. */
 function slugForCardTier(card: SeriesCardData, tier: SeriesTier): string {
@@ -77,8 +95,8 @@ function CategorySection({
                 key={card.id}
                 ref={(node) => registerCardRef(card.id, node)}
                 className={cn(
-                  "rounded-lg",
-                  highlightedCardId === card.id && "ring-2 ring-yellow-500 ring-offset-2",
+                  CARD_CLASS,
+                  highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS,
                 )}
               >
                 <SeriesCard card={card} />
@@ -99,8 +117,8 @@ function CategorySection({
                 key={card.id}
                 ref={(node) => registerCardRef(card.id, node)}
                 className={cn(
-                  "rounded-lg",
-                  highlightedCardId === card.id && "ring-2 ring-yellow-500 ring-offset-2",
+                  CARD_CLASS,
+                  highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS,
                 )}
               >
                 <SeriesCard card={card} />
@@ -126,6 +144,9 @@ export default function AchievementsScreen() {
   const { highlight } = useLocalSearchParams<{ highlight?: string }>();
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
   const scrollViewRef = useRef<ScrollView>(null);
+  // The ScrollView's inner content view, held via the innerViewRef prop rather
+  // than getInnerViewRef() — the prop is the typed, documented way to reach it.
+  const contentViewRef = useRef<View>(null);
   const cardRefs = useRef<Map<string, View>>(new Map());
   // Guards against re-triggering the scroll/highlight on every re-render while
   // the same `?highlight=` value is still in the route params.
@@ -190,7 +211,13 @@ export default function AchievementsScreen() {
     // it), which would land scrollTo() in the wrong place on a second
     // highlight while the screen is already scrolled. The inner content view
     // has no scroll offset of its own, so its coordinates are unambiguous.
-    const relativeNode = scrollViewRef.current?.getInnerViewNode();
+    //
+    // It has to be the view instance, not getInnerViewNode()'s numeric handle:
+    // under the New Architecture measureLayout rejects a plain node handle
+    // outright, logging "must be called with a ref to a native component" and
+    // returning without invoking either callback — so the scroll silently never
+    // happened at all.
+    const relativeNode = contentViewRef.current;
     if (cardNode && relativeNode) {
       cardNode.measureLayout(
         relativeNode,
@@ -267,6 +294,11 @@ export default function AchievementsScreen() {
   return (
     <ScrollView
       ref={scrollViewRef}
+      // Cast only to bridge React 19's ref typing: useRef<View>(null) is a
+      // RefObject<View | null>, while react-native still types this prop as
+      // RefObject<View>. A null current is exactly what the prop expects
+      // before mount, so nothing is being papered over here.
+      innerViewRef={contentViewRef as RefObject<View>}
       className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl
