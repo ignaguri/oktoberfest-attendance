@@ -27,6 +27,13 @@ export function getCategoryColor(category: string): string {
 }
 
 /**
+ * Outline of a pip standing for a rung that has not been earned. Earned pips
+ * take the category colour instead, so this is the only pip colour that is
+ * not already derivable from CATEGORY_COLORS.
+ */
+export const LOCKED_PIP_COLOR = "#D1D5DB";
+
+/**
  * Ring stroke width in px per tier (1=bronze .. 4=platinum). The only
  * portable part of tier styling — glow is implemented natively per
  * platform (see AchievementBadge components), not shared as data.

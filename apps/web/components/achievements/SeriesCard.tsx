@@ -6,6 +6,7 @@ import type { AchievementTier } from "@prostcounter/shared/achievements";
 import {
   getActiveTier,
   getCategoryColor,
+  LOCKED_PIP_COLOR,
   TIER_NAMES,
   tierToRarity,
 } from "@prostcounter/shared/achievements";
@@ -17,8 +18,6 @@ import { cn } from "@/lib/utils";
 
 import { AchievementBadge } from "./AchievementBadge";
 import { SeriesCardDetailSheet } from "./SeriesCardDetailSheet";
-
-const LOCKED_PIP_COLOR = "#D1D5DB";
 
 interface SeriesCardProps {
   card: SeriesCardData;

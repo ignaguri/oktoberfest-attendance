@@ -10,6 +10,9 @@ import { cn } from "@/lib/utils";
 
 import { GlyphIcon } from "./GlyphIcon";
 
+/** `xl` exists for the detail sheet's hero badge; the lists use sm..lg. */
+type BadgeSize = "sm" | "md" | "lg" | "xl";
+
 interface AchievementBadgeProps {
   name: string;
   icon: string;
@@ -18,15 +21,16 @@ interface AchievementBadgeProps {
   rarity: AchievementRarity;
   points: number;
   isUnlocked: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: BadgeSize;
   showPoints?: boolean;
   className?: string;
 }
 
-const SIZE_PX: Record<"sm" | "md" | "lg", number> = {
+const SIZE_PX: Record<BadgeSize, number> = {
   sm: 32,
   md: 40,
   lg: 56,
+  xl: 96,
 };
 
 export function AchievementBadge({
