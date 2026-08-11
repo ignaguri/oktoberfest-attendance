@@ -2667,6 +2667,7 @@
     "NO_ACTIVE_FESTIVAL": "No active festival found.",
     "TENT_NOT_FOUND": "Tent not found.",
     "TENT_ALREADY_CURRENT_VISIT": "You're already checked in here. Visit another tent first.",
+    "TENT_VISIT_ID_MISMATCH": "That visit could not be saved. Please try again.",
     "RESERVATION_NOT_FOUND": "Reservation not found.",
     "RESERVATION_ALREADY_CHECKED_IN": "You have already checked in.",
     "RESERVATION_CANCELLED": "This reservation has been cancelled.",

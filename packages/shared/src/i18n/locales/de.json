@@ -2413,6 +2413,7 @@
     "NO_ACTIVE_FESTIVAL": "Kein aktives Festival gefunden.",
     "TENT_NOT_FOUND": "Zelt nicht gefunden.",
     "TENT_ALREADY_CURRENT_VISIT": "Du bist hier schon eingecheckt. Besuche zuerst ein anderes Zelt.",
+    "TENT_VISIT_ID_MISMATCH": "Dieser Besuch konnte nicht gespeichert werden. Bitte versuche es erneut.",
     "RESERVATION_NOT_FOUND": "Reservierung nicht gefunden.",
     "RESERVATION_ALREADY_CHECKED_IN": "du hast bereits eingecheckt.",
     "RESERVATION_CANCELLED": "Diese Reservierung wurde storniert.",
