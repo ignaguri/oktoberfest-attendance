@@ -391,6 +391,13 @@ export async function getDirtyRecordCount(
  *  - Its INSERT queue op is either missing OR permanently failed (retry_count >= maxRetries)
  *  - It was created at least `minAgeHours` ago (default 1h) — protects fresh in-flight logs
  *
+ * The age filter wraps created_at in datetime(): rows store an ISO string
+ * (2026-08-11T06:00:00.000Z) while datetime('now', ...) yields
+ * "2026-08-11 05:00:00", and comparing those as TEXT puts every ISO string
+ * above any same-day threshold, because "T" sorts above " ". Unwrapped, the
+ * floor silently became "created on an earlier UTC day" instead of "an hour
+ * old", so cleanup waited for midnight.
+ *
  * Healing for users who hit the pre-fix duplicate-row bug where retries created
  * extra ghost rows that were never deduped server-side.
  *
@@ -411,7 +418,7 @@ export async function cleanupOrphanConsumptions(
       WHERE c._dirty = 1
         AND c._synced_at IS NULL
         AND (q.id IS NULL OR (q.status = 'failed' AND q.retry_count >= ?))
-        AND c.created_at < datetime('now', ?)`,
+        AND datetime(c.created_at) < datetime('now', ?)`,
     [maxRetries, `-${minAgeHours} hours`],
   );
 
@@ -468,7 +475,7 @@ export async function cleanupOrphanTentVisits(
         AND tv._synced_at IS NULL
         AND q.status = 'failed'
         AND q.retry_count >= ?
-        AND tv.created_at < datetime('now', ?)`,
+        AND datetime(tv.created_at) < datetime('now', ?)`,
     [maxRetries, `-${minAgeHours} hours`],
   );
 
