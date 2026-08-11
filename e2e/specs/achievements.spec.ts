@@ -68,30 +68,28 @@ test.describe("Achievements Flows", () => {
   });
 
   test.describe("FLOW_ACH_003: Filter Achievements by Category", () => {
-    test("should have category filter dropdown", async ({ page }) => {
+    test("should filter by category through the chips", async ({ page }) => {
       const achievementsPage = new AchievementsPage(page);
 
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if category dropdown exists
-      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
+      // The chips only render once a festival is selected and the query has
+      // resolved, so a missing chip row is a valid state rather than a failure.
+      const hasChips = await achievementsPage.categoryChipAll.isVisible().catch(() => false);
 
-      if (hasDropdown) {
-        await achievementsPage.openCategoryDropdown();
-
-        // Should show options
-        const options = page.getByRole("option");
-        const optionCount = await options.count();
-
-        // Close dropdown
-        await page.keyboard.press("Escape");
-
-        expect(optionCount).toBeGreaterThan(0);
-      } else {
-        // Page should still be valid (might be loading or no festival)
+      if (!hasChips) {
         await achievementsPage.expectOnAchievementsPage();
+        return;
       }
+
+      await expect(achievementsPage.categoryChipAll).toHaveAttribute("aria-pressed", "true");
+
+      const drinking = achievementsPage.categoryChip("Drinking");
+      await drinking.click();
+
+      await expect(drinking).toHaveAttribute("aria-pressed", "true");
+      await expect(achievementsPage.categoryChipAll).toHaveAttribute("aria-pressed", "false");
     });
   });
 
@@ -103,12 +101,12 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.waitForLoad();
 
       // Check if badges are visible when data is loaded
-      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
+      const hasChips = await achievementsPage.categoryChipAll.isVisible().catch(() => false);
 
-      if (hasDropdown) {
-        // Unlocked and Locked badges should be visible
-        const hasUnlocked = await achievementsPage.unlockedBadge.isVisible().catch(() => false);
-        const hasLocked = await achievementsPage.lockedBadge.isVisible().catch(() => false);
+      if (hasChips) {
+        // Unlocked cards show a tier name, locked ones show "Locked".
+        const hasUnlocked = await achievementsPage.unlockedTierLabel.isVisible().catch(() => false);
+        const hasLocked = await achievementsPage.lockedCardLabel.isVisible().catch(() => false);
 
         // At least one badge type should be visible
         expect(hasUnlocked || hasLocked).toBeTruthy();
@@ -125,9 +123,9 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.waitForLoad();
 
       // Check if data is loaded
-      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
+      const hasChips = await achievementsPage.categoryChipAll.isVisible().catch(() => false);
 
-      if (hasDropdown) {
+      if (hasChips) {
         // Either completed, in-progress, or empty message should be visible
         const hasCompleted = await achievementsPage.hasCompletedAchievements();
         const hasInProgress = await achievementsPage.hasInProgressAchievements();

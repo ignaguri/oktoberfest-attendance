@@ -20,16 +20,16 @@ export class AchievementsPage extends BasePage {
   readonly rarityBreakdownCard: Locator;
   readonly categoriesCard: Locator;
 
-  // Filter
-  readonly categoryDropdown: Locator;
+  // Filter chips (replaced the category combobox in the achievements revamp)
+  readonly categoryChipAll: Locator;
 
   // Achievement sections
   readonly completedHeading: Locator;
   readonly inProgressHeading: Locator;
 
-  // Badges
-  readonly unlockedBadge: Locator;
-  readonly lockedBadge: Locator;
+  // Card state labels
+  readonly unlockedTierLabel: Locator;
+  readonly lockedCardLabel: Locator;
 
   // Loading/empty states
   readonly loadingMessage: Locator;
@@ -47,21 +47,29 @@ export class AchievementsPage extends BasePage {
     this.rarityBreakdownCard = page.getByText(/rarity breakdown/i);
     this.categoriesCard = page.getByText("Categories").first();
 
-    // Category filter dropdown
-    this.categoryDropdown = page.getByRole("combobox");
-
-    // Achievement sections
-    this.completedHeading = page.getByRole("heading", { name: /completed/i });
-    this.inProgressHeading = page.getByRole("heading", {
-      name: /in progress/i,
+    // Category filter chips: <button aria-pressed> wrapping a Badge
+    this.categoryChipAll = page.getByRole("button", {
+      name: "All Achievements",
+      exact: true,
     });
 
-    // Badges
-    this.unlockedBadge = page.getByText(/unlocked/i);
-    this.lockedBadge = page.getByText(/locked/i);
+    // Achievement sections - one pair renders per category, so scope to the first
+    this.completedHeading = page.getByRole("heading", { name: /completed/i }).first();
+    this.inProgressHeading = page
+      .getByRole("heading", {
+        name: /in progress/i,
+      })
+      .first();
 
-    // Loading/empty states
-    this.loadingMessage = page.getByText(/loading achievements/i);
+    // Card state labels: an unlocked card shows its tier name, a locked one
+    // shows "Locked". Exact matching keeps "Locked" from also catching the
+    // stats card's "12% unlocked".
+    this.unlockedTierLabel = page.getByText(/^(Bronze|Silver|Gold|Platinum)$/).first();
+    this.lockedCardLabel = page.getByText("Locked", { exact: true }).first();
+
+    // Loading/empty states - the page renders common.status.loading, not
+    // achievements.loading
+    this.loadingMessage = page.getByText("Loading...", { exact: true });
     this.noAchievementsMessage = page.getByText(/no achievements in this category/i);
   }
 
@@ -109,32 +117,10 @@ export class AchievementsPage extends BasePage {
   }
 
   /**
-   * Open category dropdown
+   * Locator for one category chip by its visible label
    */
-  async openCategoryDropdown(): Promise<void> {
-    await this.categoryDropdown.click();
-  }
-
-  /**
-   * Select a category from dropdown
-   */
-  async selectCategory(categoryName: string | RegExp): Promise<void> {
-    await this.categoryDropdown.click();
-    await this.page.getByRole("option", { name: categoryName }).click();
-  }
-
-  /**
-   * Get count text from unlocked badge
-   */
-  async getUnlockedCount(): Promise<string> {
-    return (await this.unlockedBadge.textContent()) || "";
-  }
-
-  /**
-   * Get count text from locked badge
-   */
-  async getLockedCount(): Promise<string> {
-    return (await this.lockedBadge.textContent()) || "";
+  categoryChip(label: string): Locator {
+    return this.page.getByRole("button", { name: label, exact: true });
   }
 
   /**
