@@ -50,25 +50,6 @@ export class SupabaseAchievementRepository implements IAchievementRepository {
     return data.map((item) => this.mapToUserAchievement(item));
   }
 
-  async getTotalPoints(userId: string, festivalId: string): Promise<number> {
-    const { data, error } = await this.supabase
-      .from("achievement_events")
-      .select("achievements(points)")
-      .eq("user_id", userId)
-      .eq("festival_id", festivalId);
-
-    if (error) {
-      throw new DatabaseError(`Failed to calculate points: ${error.message}`);
-    }
-
-    const totalPoints = data.reduce((sum, item) => {
-      const points = (item.achievements as any)?.points || 0;
-      return sum + points;
-    }, 0);
-
-    return totalPoints;
-  }
-
   private mapToUserAchievement(data: any): UserAchievement {
     const achievement = data.achievements as any;
     return {

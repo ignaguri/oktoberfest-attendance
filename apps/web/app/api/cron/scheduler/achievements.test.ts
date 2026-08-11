@@ -244,7 +244,10 @@ describe("processAchievementNotifications", () => {
           user_id: "u2",
           achievement_id: "a4_legendary",
           festival_id: "f1",
-          rarity: "legendary",
+          // Deliberately disagrees with the achievement's tier-derived rarity
+          // (legendary): if the code read this column instead of deriving
+          // from tier, the assertion below would fail.
+          rarity: "epic",
           group_notified_at: null,
         },
       ],
