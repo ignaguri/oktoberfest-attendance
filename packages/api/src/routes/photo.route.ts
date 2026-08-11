@@ -12,6 +12,7 @@ import {
   UpdatePhotoVisibilitySchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabasePhotoRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
@@ -149,11 +150,25 @@ app.openapi(confirmUploadRoute, async (c) => {
   // BeerPicture has no festivalId, so resolve it from the attendance the photo
   // hangs off. photos_uploaded is festival-scoped, so passing null here would
   // silently never unlock it.
-  const { data: attendance } = await supabase
+  const { data: attendance, error: attendanceError } = await supabase
     .from("attendances")
     .select("festival_id")
     .eq("id", picture.attendanceId)
     .single();
+
+  // The upload already succeeded, so a lookup failure must not fail the
+  // request. Log it instead: evaluation below degrades to lifetime-only scope,
+  // and the festival-scoped unlock is caught by the next evaluation.
+  if (attendanceError) {
+    logger.warn(
+      {
+        userId: user.id,
+        attendanceId: picture.attendanceId,
+        error: attendanceError.message,
+      },
+      "Could not resolve festival for photo upload; achievement evaluation degraded to lifetime scope",
+    );
+  }
 
   const unlocked = await evaluateAfterWrite(
     supabase,

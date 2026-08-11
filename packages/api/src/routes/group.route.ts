@@ -19,6 +19,7 @@ import {
   UpdateGroupSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseGroupRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
@@ -408,7 +409,21 @@ app.openapi(joinGroupRoute, async (c) => {
 
   await service.joinGroup(id, user.id, body.inviteToken);
 
-  const { data: group } = await supabase.from("groups").select("festival_id").eq("id", id).single();
+  const { data: group, error: groupError } = await supabase
+    .from("groups")
+    .select("festival_id")
+    .eq("id", id)
+    .single();
+
+  // The join already succeeded, so a lookup failure must not fail the request.
+  // Log it instead: evaluation below degrades to lifetime-only scope, and the
+  // festival-scoped unlock is caught by the next evaluation.
+  if (groupError) {
+    logger.warn(
+      { userId: user.id, groupId: id, error: groupError.message },
+      "Could not resolve festival for group join; achievement evaluation degraded to lifetime scope",
+    );
+  }
 
   // Evaluate-only: the unlock reaches the client through the outbox, not this
   // response. Awaited so the outbox row exists before the client's next read.

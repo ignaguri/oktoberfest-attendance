@@ -11,6 +11,7 @@ import {
   RemovePhotoReactionSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
@@ -215,15 +216,25 @@ app.openapi(addReactionRoute, async (c) => {
     throw new Error(`Failed to add reaction: ${error.message}`);
   }
 
+  const festivalId =
+    (membership as unknown as { groups: { festival_id: string } | null }).groups?.festival_id ??
+    null;
+
+  // Membership came back but the joined group row did not, so there is festival
+  // context we failed to read (RLS, or the group deleted between the two
+  // statements). The reaction already succeeded, so log it rather than failing
+  // the request: evaluation degrades to lifetime-only scope and the
+  // festival-scoped unlock is caught by the next evaluation.
+  if (festivalId === null) {
+    logger.warn(
+      { userId: user.id, groupId },
+      "Could not resolve festival for photo reaction; achievement evaluation degraded to lifetime scope",
+    );
+  }
+
   // Evaluate-only: the unlock reaches the client through the outbox, not this
   // response. Awaited so the outbox row exists before the client's next read.
-  await evaluateAfterWrite(
-    supabase,
-    user.id,
-    (membership as unknown as { groups: { festival_id: string } | null }).groups?.festival_id ??
-      null,
-    "POST /photos/{photoId}/reactions",
-  );
+  await evaluateAfterWrite(supabase, user.id, festivalId, "POST /photos/{photoId}/reactions");
 
   return c.json({ success: true }, 200);
 });
