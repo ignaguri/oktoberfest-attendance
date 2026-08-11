@@ -8,38 +8,53 @@ import { VStack } from "@/components/ui/vstack";
 /**
  * Skeleton loader for the Attendance screen
  *
- * Matches the layout of:
- * - Calendar with header and day grid
- * - Stats summary section
+ * Mirrors the festival strip that loads into it: a centred date-range label,
+ * weekday headers, and rounded 48pt cells. It previously drew a month grid with
+ * prev/next arrows and circular cells, which the strip replaced - so the screen
+ * resolved into a different shape than the one it had just promised.
+ *
+ * Three week rows: a 16-day festival spans three once weekday-aligned, and this
+ * is the taller, better guess for the shorter ones.
  */
 export function AttendanceSkeleton() {
   return (
     <View className="p-4">
-      {/* Calendar Skeleton */}
+      {/* Festival strip skeleton */}
       <Card variant="outline" size="md" className="bg-white">
-        <VStack space="md" className="p-2">
-          {/* Calendar Header */}
-          <HStack className="items-center justify-between px-2">
-            <Skeleton variant="circular" className="h-8 w-8" />
-            <Skeleton variant="rounded" className="h-6 w-32" />
-            <Skeleton variant="circular" className="h-8 w-8" />
+        <VStack className="p-2">
+          {/* Date range label */}
+          <HStack className="mb-4 justify-center">
+            <Skeleton variant="rounded" className="h-6 w-44" />
           </HStack>
 
-          {/* Day labels */}
-          <HStack className="justify-around">
+          {/* Weekday headers */}
+          <HStack className="mb-2 justify-around">
             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-              <Skeleton key={i} variant="rounded" className="h-4 w-8" />
+              <View key={i} className="w-12 items-center">
+                <Skeleton variant="rounded" className="h-3 w-8" />
+              </View>
             ))}
           </HStack>
 
-          {/* Calendar grid - 5 rows of 7 days */}
-          {[1, 2, 3, 4, 5].map((row) => (
-            <HStack key={row} className="justify-around py-1">
-              {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-                <Skeleton key={`${row}-${day}`} variant="circular" className="h-10 w-10" />
-              ))}
-            </HStack>
-          ))}
+          <VStack space="xs">
+            {[1, 2, 3].map((row) => (
+              <HStack key={row} className="justify-around">
+                {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                  <Skeleton key={`${row}-${day}`} variant="rounded" className="h-12 w-12" />
+                ))}
+              </HStack>
+            ))}
+          </VStack>
+
+          {/* Legend */}
+          <HStack space="lg" className="mt-4 justify-center border-t border-background-200 pt-4">
+            {[1, 2, 3].map((i) => (
+              <HStack key={i} space="sm" className="items-center">
+                <Skeleton variant="rounded" className="h-3 w-3" />
+                <Skeleton variant="rounded" className="h-3 w-16" />
+              </HStack>
+            ))}
+          </HStack>
         </VStack>
       </Card>
 

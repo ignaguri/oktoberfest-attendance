@@ -32,6 +32,15 @@ interface AttendanceStripProps {
 const WEEK_STARTS_ON = 1 as const;
 
 /**
+ * One size for both day indicators.
+ *
+ * The reservation glyph used to be 12 against the beer's 10, which cost the
+ * indicator row two points it does not have on a first-of-month cell and left
+ * the two icons visibly mismatched sitting side by side.
+ */
+const INDICATOR_ICON_SIZE = 10;
+
+/**
  * Weekday headers, generated from a known Monday so they always match the grid.
  * Jan 1 2024 is a Monday, so the seven days from it are one aligned week.
  */
@@ -149,10 +158,17 @@ export function AttendanceStrip({
           <VStack className="items-center">
             {isToday && <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />}
 
+            {/* leading-none on both rows, here and on the day number below.
+                The cell is a fixed 42pt and a first-of-month day stacks three
+                rows into it - month label, day, indicators - which at the
+                default line height comes to roughly 47pt. The overflow is
+                centred, so the month label rode up onto the top border while
+                the indicators crossed the bottom one. Oct 1 falls inside every
+                Oktoberfest, so this was the flagship festival's own strip. */}
             {isFirstOfMonth && (
               <Text
                 className={cn(
-                  "text-[9px] font-semibold uppercase",
+                  "text-[9px] font-semibold uppercase leading-none",
                   isSelected ? "text-white" : "text-typography-500",
                 )}
               >
@@ -160,7 +176,7 @@ export function AttendanceStrip({
               </Text>
             )}
 
-            <Text className={textClassName}>{format(date, "d")}</Text>
+            <Text className={cn(textClassName, "leading-none")}>{format(date, "d")}</Text>
 
             {/* Both indicators render when both exist; the previous calendar
                 suppressed the reservation whenever the day also had attendance. */}
@@ -168,10 +184,10 @@ export function AttendanceStrip({
               <HStack className="mt-0.5 items-center gap-1">
                 {drinkCount !== undefined && drinkCount > 0 && (
                   <HStack className="items-center gap-0.5">
-                    <Beer size={10} color={indicatorColor} />
+                    <Beer size={INDICATOR_ICON_SIZE} color={indicatorColor} />
                     <Text
                       className={cn(
-                        "text-[10px] font-semibold",
+                        "text-[9px] font-semibold leading-none",
                         isSelected ? "text-white" : "text-primary-600",
                       )}
                     >
@@ -181,7 +197,7 @@ export function AttendanceStrip({
                 )}
                 {hasReservation && (
                   <CalendarClock
-                    size={12}
+                    size={INDICATOR_ICON_SIZE}
                     color={isSelected ? Colors.white : IconColors.reservation}
                   />
                 )}

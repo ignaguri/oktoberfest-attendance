@@ -25,6 +25,19 @@ mv apps/mobile/.env.local.bkp apps/mobile/.env.local
 
 This also affects prebuild plugins that write env into native files at build time (e.g. the watch app's `Info.plist` via `withWatchInfoPlistEnv.js`).
 
+### `expo prebuild` dirties tracked native files
+
+`apps/mobile/targets/watch/Info.plist` is committed, and `withWatchInfoPlistEnv.js` writes `WATCH_SUPABASE_URL` / `WATCH_SUPABASE_ANON_KEY` into it from whatever env is loaded. So any local `expo prebuild`, `pnpm ios` or `pnpm ios:clean` leaves those keys in your working tree (`targets/watch/Assets.xcassets/AppIcon.appiconset/Contents.json` picks up a change too).
+
+Check `git status` after a prebuild and revert them unless you actually mean to change them:
+
+```bash
+git checkout -- apps/mobile/targets/watch/Info.plist \
+  apps/mobile/targets/watch/Assets.xcassets/AppIcon.appiconset/Contents.json
+```
+
+Committing them by accident pins someone else's build to your local Supabase, and doing it after a prebuild with production env in place would put the production key in the repo.
+
 ## Native devDependencies
 
 `apps/mobile` carries two devDependencies that build native code: `drizzle-kit`

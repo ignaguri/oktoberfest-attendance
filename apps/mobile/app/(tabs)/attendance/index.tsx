@@ -103,10 +103,11 @@ export default function AttendanceScreen() {
   // Only the list renders these, and its error matters: without them every row
   // silently loses its tents, chips and photo dot with nothing said, so it is
   // surfaced alongside the attendances error rather than dropped.
-  const { data: daySummaries, error: daySummariesError } = useAdaptedDaySummaries(
-    currentFestival?.id,
-    { enabled: viewMode === "list" },
-  );
+  const {
+    data: daySummaries,
+    error: daySummariesError,
+    loading: daySummariesLoading,
+  } = useAdaptedDaySummaries(currentFestival?.id, { enabled: viewMode === "list" });
 
   // Handle check-in from deep link
   // This effect intentionally sets state when a deep link is detected
@@ -308,6 +309,7 @@ export default function AttendanceScreen() {
               <AttendanceDayList
                 attendances={(attendances ?? []) as AttendanceWithTotals[]}
                 summaries={daySummaries}
+                summariesLoading={daySummariesLoading}
                 reservations={reservations}
                 reservationsUnavailable={reservationsUnavailable}
                 selectedDate={selectedDate}

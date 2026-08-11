@@ -2,13 +2,14 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { format, isSameDay, parseISO } from "date-fns";
+import { isSameDay, parseISO } from "date-fns";
 import { CalendarClock, Image as ImageIcon } from "lucide-react-native";
 import { Fragment, useMemo } from "react";
 
 import { Divider } from "@/components/ui/divider";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
@@ -37,6 +38,15 @@ interface AttendanceDayListProps {
    * shorter with no explanation. Silence reads as days having been lost.
    */
   reservationsUnavailable?: boolean;
+  /**
+   * Day summaries are still being read from SQLite.
+   *
+   * The rows themselves come from `attendances` and render immediately, so this
+   * only covers the two pieces that arrive later. Both are the row's own height:
+   * without a placeholder each row grows by two lines a frame after it appears,
+   * shoving the rest of the list down under the reader's thumb.
+   */
+  summariesLoading?: boolean;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
 }
@@ -56,6 +66,7 @@ export function AttendanceDayList({
   summaries,
   reservations = [],
   reservationsUnavailable = false,
+  summariesLoading = false,
   selectedDate,
   onDateSelect,
 }: AttendanceDayListProps) {
@@ -74,6 +85,10 @@ export function AttendanceDayList({
     () => buildDayListEntries(attendances, reservationMap),
     [attendances, reservationMap],
   );
+
+  // A refetch keeps the previous summaries, and showing placeholders over data
+  // the row can already display would be a step backwards.
+  const showSummarySkeleton = summariesLoading && summaries === null;
 
   // Sits above the rows and inside the empty state, because a list that is merely
   // shorter than usual is the case that misleads: the user cannot tell a day they
@@ -194,7 +209,16 @@ export function AttendanceDayList({
           </HStack>
 
           <HStack className="items-center justify-between">
-            <DrinkCountSummary counts={drinkCounts} compact showTotal={false} />
+            {/* h-4 matches the 14pt icon + text-xs count the real chips render at,
+                so the swap does not change this row's height. */}
+            {showSummarySkeleton ? (
+              <HStack space="md" className="items-center">
+                <Skeleton variant="rounded" className="h-4 w-10" />
+                <Skeleton variant="rounded" className="h-4 w-10" />
+              </HStack>
+            ) : (
+              <DrinkCountSummary counts={drinkCounts} compact showTotal={false} />
+            )}
 
             <HStack space="sm" className="items-center">
               {attendance.totalTipCents > 0 && (
@@ -209,7 +233,13 @@ export function AttendanceDayList({
             </HStack>
           </HStack>
 
-          {visibleTents.length > 0 && (
+          {showSummarySkeleton && (
+            <HStack space="xs" className="items-center">
+              <Skeleton variant="rounded" className="h-4 w-32" />
+            </HStack>
+          )}
+
+          {!showSummarySkeleton && visibleTents.length > 0 && (
             <HStack space="xs" className="items-center">
               <Text className="text-xs text-typography-500" numberOfLines={1}>
                 {visibleTents.join(", ")}
