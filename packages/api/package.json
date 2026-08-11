@@ -12,6 +12,7 @@
     "dev": "tsc --watch",
     "generate-spec": "tsx src/scripts/generate-openapi.ts",
     "sync:achievements": "tsx src/scripts/sync-achievement-registry.ts",
+    "seed:achievements": "tsx src/scripts/generate-achievements-seed.ts",
     "backfill:achievements": "tsx src/scripts/backfill-achievements.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
