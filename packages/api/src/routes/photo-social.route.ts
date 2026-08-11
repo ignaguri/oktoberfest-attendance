@@ -188,13 +188,20 @@ app.openapi(addReactionRoute, async (c) => {
   const { photoId } = c.req.valid("param");
   const { groupId, emoji } = c.req.valid("json");
 
-  // Verify group membership
-  const { data: membership } = await supabase
+  // Verify group membership. maybeSingle, not single: single treats zero rows
+  // as an error, so a genuinely broken query and a non-member are the same
+  // `data: null` and both used to report 403. Splitting them lets a real
+  // failure surface as a 500 instead of telling a member they are not one.
+  const { data: membership, error: membershipError } = await supabase
     .from("group_members")
     .select("user_id, groups(festival_id)")
     .eq("group_id", groupId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
+
+  if (membershipError) {
+    throw new Error(`Failed to verify group membership: ${membershipError.message}`);
+  }
 
   if (!membership) {
     return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
