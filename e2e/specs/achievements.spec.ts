@@ -55,43 +55,24 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if stats are visible (may not be if no festival selected)
-      const hasStats = await achievementsPage.totalProgressCard.isVisible().catch(() => false);
-
-      if (hasStats) {
-        await achievementsPage.expectStatsVisible();
-      } else {
-        // Page should still be valid
-        await achievementsPage.expectOnAchievementsPage();
-      }
+      await achievementsPage.expectStatsVisible();
     });
   });
 
   test.describe("FLOW_ACH_003: Filter Achievements by Category", () => {
-    test("should have category filter dropdown", async ({ page }) => {
+    test("should filter by category through the chips", async ({ page }) => {
       const achievementsPage = new AchievementsPage(page);
 
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if category dropdown exists
-      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
+      await expect(achievementsPage.categoryChipAll).toHaveAttribute("aria-pressed", "true");
 
-      if (hasDropdown) {
-        await achievementsPage.openCategoryDropdown();
+      const drinking = achievementsPage.categoryChip("Drinking");
+      await drinking.click();
 
-        // Should show options
-        const options = page.getByRole("option");
-        const optionCount = await options.count();
-
-        // Close dropdown
-        await page.keyboard.press("Escape");
-
-        expect(optionCount).toBeGreaterThan(0);
-      } else {
-        // Page should still be valid (might be loading or no festival)
-        await achievementsPage.expectOnAchievementsPage();
-      }
+      await expect(drinking).toHaveAttribute("aria-pressed", "true");
+      await expect(achievementsPage.categoryChipAll).toHaveAttribute("aria-pressed", "false");
     });
   });
 
@@ -102,20 +83,13 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if badges are visible when data is loaded
-      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
+      // Unlocked cards show a tier name, locked ones show "Locked". Which one
+      // the seed produces depends on the test user's progress, so assert that
+      // the grid rendered cards in one state or the other.
+      const hasUnlocked = await achievementsPage.unlockedTierLabel.isVisible();
+      const hasLocked = await achievementsPage.lockedCardLabel.isVisible();
 
-      if (hasDropdown) {
-        // Unlocked and Locked badges should be visible
-        const hasUnlocked = await achievementsPage.unlockedBadge.isVisible().catch(() => false);
-        const hasLocked = await achievementsPage.lockedBadge.isVisible().catch(() => false);
-
-        // At least one badge type should be visible
-        expect(hasUnlocked || hasLocked).toBeTruthy();
-      } else {
-        // Page should still be valid
-        await achievementsPage.expectOnAchievementsPage();
-      }
+      expect(hasUnlocked || hasLocked).toBeTruthy();
     });
 
     test("should show achievement progress sections", async ({ page }) => {
@@ -124,22 +98,12 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if data is loaded
-      const hasDropdown = await achievementsPage.categoryDropdown.isVisible().catch(() => false);
+      // Either completed, in-progress, or empty message should be visible
+      const hasCompleted = await achievementsPage.hasCompletedAchievements();
+      const hasInProgress = await achievementsPage.hasInProgressAchievements();
+      const hasEmpty = await achievementsPage.noAchievementsMessage.isVisible();
 
-      if (hasDropdown) {
-        // Either completed, in-progress, or empty message should be visible
-        const hasCompleted = await achievementsPage.hasCompletedAchievements();
-        const hasInProgress = await achievementsPage.hasInProgressAchievements();
-        const hasEmpty = await achievementsPage.noAchievementsMessage
-          .isVisible()
-          .catch(() => false);
-
-        expect(hasCompleted || hasInProgress || hasEmpty).toBeTruthy();
-      } else {
-        // Page should still be valid
-        await achievementsPage.expectOnAchievementsPage();
-      }
+      expect(hasCompleted || hasInProgress || hasEmpty).toBeTruthy();
     });
   });
 });

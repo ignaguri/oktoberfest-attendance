@@ -13,8 +13,17 @@ import type { AchievementCategory, AchievementScope } from "@prostcounter/shared
 import type { Database } from "@prostcounter/db";
 import { createClient } from "@supabase/supabase-js";
 
-type AchievementRarity = "common" | "rare" | "epic" | "legendary";
-
+/**
+ * Deliberately carries no `rarity`. Rarity is derived from `tier` via
+ * tierToRarity everywhere in TypeScript now, and the follow-up migration drops
+ * the column.
+ *
+ * Until that migration lands, three SQL readers still see the column (the
+ * outbox trigger, get_wrapped_data, get_user_achievements), so do NOT run this
+ * script with NEW achievement definitions in the meantime: a new row would take
+ * the NOT NULL DEFAULT 'common' whatever its tier. Re-running it against
+ * unchanged definitions is unaffected, since it inserts nothing.
+ */
 interface RegistryRow {
   slug: string;
   series_id: string | null;
@@ -23,30 +32,9 @@ interface RegistryRow {
   category: AchievementCategory;
   points: number;
   icon: string;
-  rarity: AchievementRarity;
   name: string;
   description: string;
   is_active: boolean;
-}
-
-/**
- * The achievements table still carries the legacy `rarity` enum, and the
- * notification cron filters on it. Until Plan 2 replaces rarity with tier,
- * derive one from the other so new achievements keep notifying.
- */
-const RARITY_BY_TIER: Record<number, AchievementRarity> = {
-  1: "common",
-  2: "rare",
-  3: "epic",
-  4: "legendary",
-};
-
-function rarityForTier(tier: number): AchievementRarity {
-  const rarity = RARITY_BY_TIER[tier];
-  if (!rarity) {
-    throw new Error(`No rarity mapping for tier ${tier}`);
-  }
-  return rarity;
 }
 
 export function buildRegistryRows(): RegistryRow[] {
@@ -64,7 +52,6 @@ export function buildRegistryRows(): RegistryRow[] {
           category: definition.category,
           points: tierDef.points,
           icon: definition.glyph,
-          rarity: rarityForTier(tierDef.tier),
           name: `achievements.${slug}.name`,
           description: `achievements.${slug}.description`,
           is_active: true,
@@ -80,7 +67,6 @@ export function buildRegistryRows(): RegistryRow[] {
         category: definition.category,
         points: definition.points,
         icon: definition.glyph,
-        rarity: rarityForTier(definition.tier),
         name: `achievements.${slug}.name`,
         description: `achievements.${slug}.description`,
         is_active: true,

@@ -4,6 +4,23 @@
 **Status:** Approved, ready for planning
 **Deadline:** Oktoberfest 2026 opens 2026-09-19 (6.5 weeks)
 
+> **Superseded 2026-08-11.** This design shipped across five plans, all merged. Two
+> things in it are wrong and were never built:
+>
+> - **§4 and §10 Step 3** describe `source`, `user_notified_at` and `group_notified_at`
+>   columns on `user_achievements`. None of them exist. Notification state lives on the
+>   `achievement_events` outbox instead, so the `source='backfill'` instruction describes
+>   something that was never built.
+> - **§10 Step 4's** drop list omits `get_user_achievements` and `unlock_achievement`; does
+>   not note that `evaluate_user_achievements` was pinned by the live
+>   `POST /achievements/evaluate` route; and does not note that
+>   `insert_achievement_event_from_unlock`, `get_wrapped_data` and the `activity_feed` view
+>   all read the `rarity` column it says to drop.
+>
+> Step 4 was completed separately on 2026-08-11 with those corrections. Every checkbox in
+> the five plan documents is unticked despite the work having shipped: they were not
+> maintained during execution, not left undone.
+
 ---
 
 ## 1. Why

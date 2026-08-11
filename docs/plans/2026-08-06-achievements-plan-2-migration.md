@@ -1,5 +1,10 @@
 # Achievements Revamp — Plan 2: Registry Migration & Backfill
 
+> **Superseded 2026-08-11.** Shipped and merged. The unticked checkboxes below are stale:
+> they were not maintained during execution, not left undone. The design §10 Step 4 cleanup
+> that line 736 defers to a follow-up landed on 2026-08-11, with corrections to its drop
+> list recorded in the design document's banner.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Seed the 90 new achievement definitions into the registry, remap all 403 existing unlocks onto them without any user losing a badge, populate competitive standings for concluded festivals, and backfill every achievement users have genuinely earned but never received.

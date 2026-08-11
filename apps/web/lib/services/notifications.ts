@@ -8,6 +8,7 @@ import {
   NOTIFICATION_WORKFLOWS,
   PROD_URL,
 } from "@prostcounter/shared/constants";
+import type { AchievementRarity } from "@prostcounter/shared/schemas";
 import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
@@ -124,7 +125,7 @@ export class NotificationService {
     payload: {
       achievementName: string;
       description?: string;
-      rarity: "common" | "rare" | "epic";
+      rarity: AchievementRarity;
       achievementId: string;
     },
   ): Promise<void> {
@@ -150,15 +151,19 @@ export class NotificationService {
   }
 
   /**
-   * Notify a list of recipients about someone else's rare/epic achievement
-   * (respects group_notifications_enabled)
+   * Notify a list of recipients about someone else's rare, epic or legendary
+   * achievement (respects group_notifications_enabled).
+   *
+   * The payload type is the full AchievementRarity so it matches what the
+   * database can produce, but the cron only ever calls this for the three
+   * rarities above. Common unlocks are filtered out before it gets here.
    */
   async notifyGroupAchievement(
     recipientIds: string[],
     payload: {
       achieverName: string;
       achievementName: string;
-      rarity: "rare" | "epic";
+      rarity: AchievementRarity;
       groupName?: string;
     },
   ): Promise<void> {

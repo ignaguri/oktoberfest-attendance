@@ -1,5 +1,8 @@
 # Achievements Revamp — Plan 1: Engine & Foundation
 
+> **Superseded 2026-08-11.** Shipped and merged. The unticked checkboxes below are stale:
+> they were not maintained during execution, not left undone.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the broken name-matching plpgsql achievement engine with a typed TypeScript definition set, a single SQL metrics function, and a pure TypeScript evaluator, so that achievements begin unlocking correctly again.
