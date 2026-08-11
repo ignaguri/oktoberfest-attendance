@@ -21,6 +21,14 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 - `pnpm lint` - Run ESLint
 - `pnpm lint:fix` - Auto-fix ESLint errors
 
+### Achievement Glyphs
+
+- `pnpm glyphs:build --src <dir>` - Rebuild the achievement glyph PNGs from raw renders
+- `pnpm glyphs:build --src <dir> --only <glyph-id>` - Rebuild a single glyph
+
+See **[scripts/glyphs/README.md](./scripts/glyphs/README.md)** for the pipeline, how to
+add a new glyph, and the traps in the source renders. Never hand-clean a render.
+
 ### Testing Commands
 
 - `pnpm test` - Run all tests (unit + integration)
@@ -167,3 +175,4 @@ GestureHandlerRootView → SafeAreaProvider → I18nextProvider → ErrorBoundar
 - **[BLOG.md](./docs/BLOG.md)** - Blog/MDX content authoring guide
 - **[Mobile PRD](./docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md)** - Mobile app plans
 - **[FRIENDSHIP_SYSTEM.md](./docs/FRIENDSHIP_SYSTEM.md)** - Friendship feature documentation
+- **[scripts/glyphs/README.md](./scripts/glyphs/README.md)** - Achievement glyph asset pipeline

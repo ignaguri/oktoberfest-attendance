@@ -37,6 +37,7 @@
     "release:major": "pnpm run version:major && git add . && git commit -m \"chore: bump version\" && git tag v$(pnpm exec tsx scripts/version.ts show) && git push && git push --tags",
     "prepare": "husky",
     "cron:trigger": "tsx scripts/trigger-cron.ts",
+    "glyphs:build": "tsx scripts/glyphs/build.ts",
     "e2e": "playwright test",
     "e2e:headed": "playwright test --headed",
     "e2e:install-browsers": "playwright install --with-deps",
