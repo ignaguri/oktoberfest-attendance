@@ -86,13 +86,16 @@ function createMockSupabase({
               id,
               name: id.includes("newengine") ? `achievements.${id}.name` : `Ach ${id}`,
               description: `Desc ${id}`,
-              rarity: id.includes("legendary")
-                ? "legendary"
+              // Tier, not rarity: the cron derives the notification's rarity
+              // with tierToRarity now, so the mock has to look like the row
+              // the query actually asks for.
+              tier: id.includes("legendary")
+                ? 4
                 : id.includes("epic")
-                  ? "epic"
+                  ? 3
                   : id.includes("rare")
-                    ? "rare"
-                    : "common",
+                    ? 2
+                    : 1,
               // New-engine achievements carry a slug; legacy ones don't.
               // Notification muting is keyed off this, not rarity or id shape.
               slug: id.includes("newengine") ? id : null,

@@ -8,6 +8,7 @@ import {
   NOTIFICATION_WORKFLOWS,
   PROD_URL,
 } from "@prostcounter/shared/constants";
+import type { AchievementRarity } from "@prostcounter/shared/schemas";
 import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { PostgrestError } from "@supabase/supabase-js";
 import { createClient as createBrowserClient } from "@supabase/supabase-js";
@@ -124,7 +125,7 @@ export class NotificationService {
     payload: {
       achievementName: string;
       description?: string;
-      rarity: "common" | "rare" | "epic";
+      rarity: AchievementRarity;
       achievementId: string;
     },
   ): Promise<void> {
@@ -158,7 +159,7 @@ export class NotificationService {
     payload: {
       achieverName: string;
       achievementName: string;
-      rarity: "rare" | "epic";
+      rarity: AchievementRarity;
       groupName?: string;
     },
   ): Promise<void> {

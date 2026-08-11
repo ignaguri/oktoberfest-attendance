@@ -1,4 +1,5 @@
 import type { Database } from "@prostcounter/db";
+import { tierToRarity } from "@prostcounter/shared/achievements";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type { NotificationService } from "@/lib/services/notifications";
@@ -17,7 +18,7 @@ export async function processAchievementNotifications(
     const achievementIds = Array.from(new Set(userEvents.map((e) => e.achievement_id)));
     const { data: achievements } = await supabase
       .from("achievements")
-      .select("id, name, description, rarity, slug")
+      .select("id, name, description, tier, slug")
       .in("id", achievementIds);
     const achIdToMeta = new Map<string, any>((achievements || []).map((a) => [a.id, a]));
 
@@ -35,7 +36,7 @@ export async function processAchievementNotifications(
           achievementId: e.achievement_id,
           achievementName: achIdToMeta.get(e.achievement_id)?.name || "",
           description: achIdToMeta.get(e.achievement_id)?.description || undefined,
-          rarity: (achIdToMeta.get(e.achievement_id)?.rarity as any) || "common",
+          rarity: tierToRarity(achIdToMeta.get(e.achievement_id)?.tier),
         }),
       ),
     );
@@ -72,7 +73,7 @@ export async function processAchievementNotifications(
     const achievementIds = Array.from(new Set(groupEvents.map((e) => e.achievement_id)));
     const { data: achievements } = await supabase
       .from("achievements")
-      .select("id, name, rarity, slug")
+      .select("id, name, tier, slug")
       .in("id", achievementIds);
     const achIdToMeta = new Map<string, any>((achievements || []).map((a) => [a.id, a]));
 
@@ -105,7 +106,7 @@ export async function processAchievementNotifications(
       return notifications.notifyGroupAchievement(recipientIds, {
         achieverName: userIdToName.get(e.user_id) || "Someone",
         achievementName: achIdToMeta.get(e.achievement_id)?.name || "",
-        rarity: (achIdToMeta.get(e.achievement_id)?.rarity as any) || "rare",
+        rarity: tierToRarity(achIdToMeta.get(e.achievement_id)?.tier),
       });
     });
     await Promise.allSettled(notificationPromises);
