@@ -151,8 +151,12 @@ export class NotificationService {
   }
 
   /**
-   * Notify a list of recipients about someone else's rare/epic achievement
-   * (respects group_notifications_enabled)
+   * Notify a list of recipients about someone else's rare, epic or legendary
+   * achievement (respects group_notifications_enabled).
+   *
+   * The payload type is the full AchievementRarity so it matches what the
+   * database can produce, but the cron only ever calls this for the three
+   * rarities above. Common unlocks are filtered out before it gets here.
    */
   async notifyGroupAchievement(
     recipientIds: string[],
