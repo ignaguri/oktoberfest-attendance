@@ -14,15 +14,11 @@ import type { Database } from "@prostcounter/db";
 import { createClient } from "@supabase/supabase-js";
 
 /**
- * Deliberately carries no `rarity`. Rarity is derived from `tier` via
- * tierToRarity everywhere in TypeScript now, and the follow-up migration drops
- * the column.
- *
- * Until that migration lands, three SQL readers still see the column (the
- * outbox trigger, get_wrapped_data, get_user_achievements), so do NOT run this
- * script with NEW achievement definitions in the meantime: a new row would take
- * the NOT NULL DEFAULT 'common' whatever its tier. Re-running it against
- * unchanged definitions is unaffected, since it inserts nothing.
+ * Deliberately carries no `rarity`. That column is gone as of the migration
+ * this comment ships with. Rarity is derived from `tier` in both languages now:
+ * tierToRarity in TypeScript, tier_to_rarity(int) in SQL. The between-pull-requests
+ * warning that used to live here is discharged, so syncing new definitions is
+ * safe again.
  */
 interface RegistryRow {
   slug: string;

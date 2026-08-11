@@ -186,50 +186,10 @@ ON CONFLICT (festival_id, tent_id) DO NOTHING;
 -- ACHIEVEMENTS
 -- =====================================================
 
--- Seed achievements (using i18n translation keys for name and description)
-INSERT INTO achievements (id, name, description, icon, category, rarity, points, conditions, is_active) VALUES
-  ('99887469-29c6-4608-8320-0e0ec2b4295d', 'achievements.items.firstDrop.name', 'achievements.items.firstDrop.description', 'first_beer', 'consumption', 'common', 10, '{"type":"threshold","target_value":1,"comparison_operator":"gte"}', true),
-  ('eca2f74f-ecac-4bf4-a61c-b256c04eefcf', 'achievements.items.beerRookie.name', 'achievements.items.beerRookie.description', 'beer_mug', 'consumption', 'common', 25, '{"type":"threshold","target_value":3,"comparison_operator":"gte"}', true),
-  ('16ce8ab4-f54a-4564-9b06-77630736ca5e', 'achievements.items.halfwayThere.name', 'achievements.items.halfwayThere.description', 'beer_mug', 'consumption', 'common', 40, '{"type":"threshold","target_value":5,"comparison_operator":"gte"}', true),
-  ('7cd82be0-0183-4f95-be19-9c4352970e94', 'achievements.items.seriousSession.name', 'achievements.items.seriousSession.description', 'fire', 'consumption', 'common', 35, '{"type":"threshold","target_value":3,"comparison_operator":"gte"}', true),
-  ('efe5949e-35c2-4ea6-9b13-70213094092b', 'achievements.items.seriousDrinker.name', 'achievements.items.seriousDrinker.description', 'beer_bottle', 'consumption', 'rare', 50, '{"type":"threshold","target_value":8,"comparison_operator":"gte"}', true),
-  ('46381a3d-eab6-47a2-b611-086ef75ec81a', 'achievements.items.doubleDigits.name', 'achievements.items.doubleDigits.description', 'beer_bottle', 'consumption', 'rare', 75, '{"type":"threshold","target_value":10,"comparison_operator":"gte"}', true),
-  ('1ea2d622-cc6c-45c0-b712-2fed0abf846e', 'achievements.items.dailyDouble.name', 'achievements.items.dailyDouble.description', 'fire', 'consumption', 'rare', 75, '{"type":"threshold","target_value":4,"comparison_operator":"gte"}', true),
-  ('aa297d17-22e9-4890-94de-7b7cdf15c8b2', 'achievements.items.beerEnthusiast.name', 'achievements.items.beerEnthusiast.description', 'beer_cheers', 'consumption', 'rare', 100, '{"type":"threshold","target_value":15,"comparison_operator":"gte"}', true),
-  ('4051ed2b-a909-4ef9-8e27-bec68e58219b', 'achievements.items.powerHour.name', 'achievements.items.powerHour.description', 'lightning', 'consumption', 'epic', 150, '{"type":"threshold","target_value":6,"comparison_operator":"gte"}', true),
-  ('ac5dfcb4-5711-4afc-b074-02f6ba5a778f', 'achievements.items.marathonDrinker.name', 'achievements.items.marathonDrinker.description', 'trophy', 'consumption', 'epic', 150, '{"type":"threshold","target_value":20,"comparison_operator":"gte"}', true),
-  ('06cf3cae-b9e8-49ac-b4f7-e83a02806a27', 'achievements.items.centuryClub.name', 'achievements.items.centuryClub.description', 'trophy', 'consumption', 'epic', 250, '{"type":"threshold","target_value":30,"comparison_operator":"gte"}', true),
-  ('9b9c483b-908d-4ec8-9616-21b56d224671', 'achievements.items.legendStatus.name', 'achievements.items.legendStatus.description', 'crown', 'consumption', 'legendary', 300, '{"type":"threshold","target_value":50,"comparison_operator":"gte"}', true),
-  ('715b340d-840c-4b9b-af9f-5e582e65e62a', 'achievements.items.festivalNewcomer.name', 'achievements.items.festivalNewcomer.description', 'wave', 'attendance', 'common', 10, '{"type":"threshold","target_value":1,"comparison_operator":"gte"}', true),
-  ('49a0a591-9f22-45b9-8cfe-a496dbe7cdde', 'achievements.items.regular.name', 'achievements.items.regular.description', 'calendar', 'attendance', 'common', 30, '{"type":"threshold","target_value":3,"comparison_operator":"gte"}', true),
-  ('e10c554d-7dec-46da-ae84-fa0fbcecb363', 'achievements.items.earlyBird.name', 'achievements.items.earlyBird.description', 'sunrise', 'attendance', 'rare', 50, '{"type":"special","date_specific":"first_day"}', true),
-  ('86facf10-075e-4cd3-96c7-061c2840ec27', 'achievements.items.dedicated.name', 'achievements.items.dedicated.description', 'star', 'attendance', 'rare', 75, '{"type":"threshold","target_value":5,"comparison_operator":"gte"}', true),
-  ('679f3df9-18eb-424b-89ff-681e8c8241da', 'achievements.items.streakMaster.name', 'achievements.items.streakMaster.description', 'flame', 'attendance', 'epic', 100, '{"type":"streak","min_days":3}', true),
-  ('4a33b3de-54b1-4c5e-a969-2525da02e602', 'achievements.items.weekendWarrior.name', 'achievements.items.weekendWarrior.description', 'weekend', 'attendance', 'epic', 150, '{"type":"special"}', true),
-  ('b426510e-747f-4bce-97f1-49ae4bc64388', 'achievements.items.festivalWarrior.name', 'achievements.items.festivalWarrior.description', 'crown', 'attendance', 'legendary', 200, '{"type":"special","comparison_operator":"eq"}', true),
-  ('cbbfd119-ec88-4df5-80fc-199ec0892082', 'achievements.items.tentCurious.name', 'achievements.items.tentCurious.description', 'tent', 'explorer', 'common', 25, '{"type":"variety","target_value":3}', true),
-  ('08d3c37c-ff26-4956-9bb2-6c9bc6d0c077', 'achievements.items.tentHopper.name', 'achievements.items.tentHopper.description', 'map', 'explorer', 'rare', 50, '{"type":"variety","target_value":5}', true),
-  ('42fca5ef-15c0-4b2e-830d-6ae7bbb662ce', 'achievements.items.wiesnWanderer.name', 'achievements.items.wiesnWanderer.description', 'compass', 'explorer', 'epic', 100, '{"type":"variety","tent_categories":["beer_tent","wine_tent","food_tent"]}', true),
-  ('7c15d1b3-4165-4e4e-8635-dc61248493f9', 'achievements.items.localGuide.name', 'achievements.items.localGuide.description', 'guide', 'explorer', 'epic', 150, '{"type":"variety","target_value":10}', true),
-  ('ab5c2066-ae04-4067-955b-ee902649c2ea', 'achievements.items.tentMaster.name', 'achievements.items.tentMaster.description', 'master', 'explorer', 'legendary', 250, '{"type":"variety","target_value":15}', true),
-  ('f76d4efa-8c34-443f-86a6-4b58572846f9', 'achievements.items.teamPlayer.name', 'achievements.items.teamPlayer.description', 'handshake', 'social', 'common', 20, '{"type":"threshold","target_value":1,"comparison_operator":"gte"}', true),
-  ('063f4ec6-5ff3-453d-b02f-a907d72b0e96', 'achievements.items.groupLeader.name', 'achievements.items.groupLeader.description', 'leader', 'social', 'rare', 50, '{"type":"threshold","target_value":1,"comparison_operator":"gte"}', true),
-  ('f17e7f74-5210-4e2d-9cb3-5b5168fede83', 'achievements.items.photoEnthusiast.name', 'achievements.items.photoEnthusiast.description', 'camera', 'social', 'rare', 50, '{"type":"threshold","target_value":10,"comparison_operator":"gte"}', true),
-  ('23476940-e972-454f-8c2d-908be103586e', 'achievements.items.socialButterfly.name', 'achievements.items.socialButterfly.description', 'butterfly', 'social', 'rare', 75, '{"type":"threshold","target_value":3,"comparison_operator":"gte"}', true),
-  ('78abd5ce-358c-45ee-acff-7aa792acb010', 'achievements.items.topContributor.name', 'achievements.items.topContributor.description', 'podium', 'social', 'rare', 75, '{"type":"special"}', true),
-  ('e3eade37-6f11-435f-af12-fb0a2dbb337a', 'achievements.items.groupChampion.name', 'achievements.items.groupChampion.description', 'medal', 'social', 'epic', 100, '{"type":"special"}', true),
-  ('567104dd-fda1-413e-9824-4a66979be3fe', 'achievements.items.memoryKeeper.name', 'achievements.items.memoryKeeper.description', 'photo_album', 'social', 'epic', 100, '{"type":"threshold","target_value":25,"comparison_operator":"gte"}', true),
-  ('36a4c5a2-8b3d-47a0-b45e-bce0763e8292', 'achievements.items.risingStar.name', 'achievements.items.risingStar.description', 'rising_star', 'competitive', 'epic', 150, '{"type":"special"}', true),
-  ('fc04f26e-87d7-40cf-87d7-d5c7bfda1460', 'achievements.items.multiGroupChampion.name', 'achievements.items.multiGroupChampion.description', 'multi_trophy', 'competitive', 'legendary', 200, '{"type":"threshold","target_value":2,"comparison_operator":"gte"}', true),
-  ('293be4f4-9c01-49a0-8d5e-021139c4fed7', 'achievements.items.leaderboardLegend.name', 'achievements.items.leaderboardLegend.description', 'legend', 'competitive', 'legendary', 300, '{"type":"special"}', true),
-  ('28ff2ae8-5e5a-4b71-95d2-148f045155e0', 'achievements.items.closingTime.name', 'achievements.items.closingTime.description', 'closing', 'special', 'rare', 75, '{"type":"special","date_specific":"last_day"}', true),
-  ('4ef9ced6-c34d-4464-aaf2-2f4bbe551339', 'achievements.items.openingDayLegend.name', 'achievements.items.openingDayLegend.description', 'first_day', 'special', 'rare', 100, '{"type":"special","date_specific":"opening_day"}', true),
-  ('f826973d-7db4-4944-8ed3-f4d3d4176ad5', 'achievements.items.consistencyKing.name', 'achievements.items.consistencyKing.description', 'consistency', 'special', 'epic', 100, '{"type":"special"}', true),
-  ('08349ebd-f05a-4e68-bc51-bb077966da48', 'achievements.items.festivalVeteran.name', 'achievements.items.festivalVeteran.description', 'veteran', 'special', 'epic', 150, '{"type":"threshold","target_value":2,"comparison_operator":"gte"}', true),
-  ('51ba02b9-f970-4103-8f74-7922afbe1a82', 'achievements.items.photoPerfect.name', 'achievements.items.photoPerfect.description', 'perfect', 'special', 'epic', 150, '{"type":"special"}', true),
-  ('8a32799d-a53f-414f-865b-b7a35ba57b34', 'achievements.items.highRoller.name', 'achievements.items.highRoller.description', 'money_bag', 'special', 'epic', 200, '{"type":"threshold","target_value":500,"comparison_operator":"gte"}', true),
-  ('ee6032e6-373d-457d-af9b-79a102d72bda', 'achievements.items.multiYearChampion.name', 'achievements.items.multiYearChampion.description', 'multi_year', 'special', 'legendary', 300, '{"type":"threshold","target_value":2,"comparison_operator":"gte"}', true)
-ON CONFLICT (id) DO NOTHING;
+-- The achievement registry lives in supabase/seeds/achievements.generated.sql,
+-- projected out of the TypeScript definitions and loaded before this file
+-- (see [db.seed] sql_paths in supabase/config.toml).
+-- Regenerate it with: pnpm --filter=@prostcounter/api seed:achievements
 
 -- =====================================================
 -- GROUPS (for Test Festival)
@@ -447,8 +407,9 @@ DECLARE
 BEGIN
   SELECT id INTO v_user3 FROM auth.users ORDER BY email LIMIT 1 OFFSET 3;
   SELECT id INTO v_user4 FROM auth.users ORDER BY email LIMIT 1 OFFSET 4;
-  SELECT id INTO v_common_ach FROM achievements WHERE rarity = 'common' LIMIT 1;
-  SELECT id INTO v_epic_ach FROM achievements WHERE rarity = 'epic' LIMIT 1;
+  -- Ordered by slug so a reset always demos the same two achievements.
+  SELECT id INTO v_common_ach FROM achievements WHERE tier = 1 ORDER BY slug LIMIT 1;
+  SELECT id INTO v_epic_ach FROM achievements WHERE tier = 3 ORDER BY slug LIMIT 1;
 
   IF v_common_ach IS NOT NULL THEN
     INSERT INTO user_achievements (user_id, festival_id, achievement_id, unlocked_at)

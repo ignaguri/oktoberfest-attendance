@@ -1,8 +1,9 @@
 // Integration test: requires a running local Supabase.
 // Run with: pnpm --filter=@prostcounter/api test -- --run pending-unlocks.integration
+import { randomUUID } from "crypto";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { describeUnlock } from "@prostcounter/shared/achievements";
+import { describeUnlock, tierToRarity } from "@prostcounter/shared/achievements";
 
 import {
   createTestSupabaseAdmin,
@@ -241,5 +242,83 @@ describe("pending unlocks outbox against a real database", () => {
     const pending = await repo.listPendingUnlocks(userId, 1);
 
     expect(pending).toEqual([]);
+  });
+});
+
+// The outbox trigger (trg_user_achievements_insert_event ->
+// insert_achievement_event_from_unlock) is the riskiest thing the rarity
+// migration touches: if it throws, the user_achievements INSERT fails, and
+// evaluateAfterWrite catches and logs, so unlocking breaks silently. It had no
+// coverage at all before this block. The tests above insert achievement_events
+// rows directly with a hardcoded rarity and never fire the trigger.
+describe("the unlock outbox trigger derives rarity from tier", () => {
+  const insertedAchievementIds: string[] = [];
+
+  afterEach(async () => {
+    const supabaseAdmin = createTestSupabaseAdmin();
+    if (insertedAchievementIds.length > 0) {
+      // user_achievements and achievement_events both cascade off the
+      // achievement FK, so deleting the achievement clears all three rows.
+      await supabaseAdmin.from("achievements").delete().in("id", insertedAchievementIds);
+      insertedAchievementIds.length = 0;
+    }
+  });
+
+  // Every real achievement's stored rarity agrees with its tier, so a test
+  // built on one could not distinguish a derived value from a stored one.
+  // These throwaway rows never set `rarity`, taking the column's 'common'
+  // default, so tiers 2 to 4 disagree with it on purpose: the assertion holds
+  // only if the trigger reads `tier`. Against the pre-migration trigger the
+  // tier-4 case fails with "expected 'common' to be 'legendary'".
+  it.each([
+    { tier: 1, expected: "common" },
+    { tier: 2, expected: "rare" },
+    { tier: 3, expected: "epic" },
+    { tier: 4, expected: "legendary" },
+  ])("stamps $expected on the outbox event for a tier-$tier unlock", async ({ tier, expected }) => {
+    const supabaseAdmin = createTestSupabaseAdmin();
+    const [userId] = await getTwoUserIds(supabaseAdmin);
+
+    const suffix = randomUUID();
+    const { data: achievement, error: achievementError } = await supabaseAdmin
+      .from("achievements")
+      .insert({
+        slug: `test-tier-derivation-${suffix}`,
+        name: `Test Tier Derivation ${suffix}`,
+        description: "Throwaway achievement for the outbox rarity derivation test",
+        category: "drinking",
+        icon: "test-icon",
+        tier,
+      })
+      .select("id")
+      .single();
+    if (achievementError || !achievement) {
+      throw new Error(`Failed to create the test achievement: ${achievementError?.message}`);
+    }
+    insertedAchievementIds.push(achievement.id);
+
+    const { error: unlockError } = await supabaseAdmin
+      .from("user_achievements")
+      .insert({ user_id: userId, achievement_id: achievement.id });
+    if (unlockError) {
+      throw new Error(`Failed to insert the unlock row: ${unlockError.message}`);
+    }
+
+    const { data: event, error: eventError } = await supabaseAdmin
+      .from("achievement_events")
+      .select("rarity")
+      .eq("user_id", userId)
+      .eq("achievement_id", achievement.id)
+      .single();
+    if (eventError || !event) {
+      throw new Error(
+        `The trigger wrote no outbox row for the unlock: ${eventError?.message ?? "no row"}`,
+      );
+    }
+
+    expect(event.rarity).toBe(expected);
+    // Pins the SQL helper and the TS helper to the same answer, which is the
+    // whole point of deriving rather than storing.
+    expect(event.rarity).toBe(tierToRarity(tier));
   });
 });

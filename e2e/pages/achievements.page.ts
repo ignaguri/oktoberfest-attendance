@@ -48,8 +48,10 @@ export class AchievementsPage extends BasePage {
 
     this.content = page.getByRole("main");
 
-    // Page heading
-    this.pageHeading = this.content.getByRole("heading", { name: /achievements/i });
+    // Page heading. Pinned to level 1: the empty state renders an <h3> reading
+    // "No achievements in this category", which also matches /achievements/i,
+    // and two matches is a strict-mode throw rather than a failed assertion.
+    this.pageHeading = this.content.getByRole("heading", { name: /achievements/i, level: 1 });
 
     // Stats cards - use title text
     this.totalProgressCard = this.content.getByText(/total progress/i);
