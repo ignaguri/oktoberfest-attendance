@@ -400,6 +400,53 @@ describe("Achievement Routes - Unit Tests", () => {
     });
   });
 
+  describe("GET /achievements/available", () => {
+    // Mobile reference sync (apps/mobile/lib/database/sync/pull-reference.ts)
+    // writes this rarity into a CHECK-constrained SQLite column, so the field
+    // has to keep its shape while its source moves from the stored column to
+    // the tier. The mock's stored rarity disagrees with its tier on purpose.
+    it("derives rarity from tier without changing the response shape", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain(
+          mockSupabaseSuccess([
+            {
+              id: "ac1e4567-e89b-12d3-a456-426614174010",
+              name: "achievements.tents_visited.t3.name",
+              description: "achievements.tents_visited.t3.description",
+              category: "explorer",
+              icon: "tent",
+              points: 50,
+              tier: 3,
+              rarity: "common",
+              is_active: true,
+            },
+          ]),
+        ),
+      );
+
+      const req = createAuthRequest("/achievements/available", { method: "GET" });
+
+      const res = await app.request(req.url, {
+        method: req.method,
+        headers: req.headers,
+      });
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.data).toHaveLength(1);
+      expect(body.data[0]).toEqual({
+        id: "ac1e4567-e89b-12d3-a456-426614174010",
+        name: "achievements.tents_visited.t3.name",
+        description: "achievements.tents_visited.t3.description",
+        category: "explorer",
+        icon: "tent",
+        points: 50,
+        rarity: "epic",
+        is_active: true,
+      });
+    });
+  });
+
   describe("Authentication", () => {
     it("should require authentication for GET /achievements", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";

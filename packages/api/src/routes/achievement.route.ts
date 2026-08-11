@@ -10,7 +10,7 @@ import {
   MarkUnlocksSeenResponseSchema,
   MarkUnlocksSeenSchema,
 } from "@prostcounter/shared";
-import { buildStats, evaluate } from "@prostcounter/shared/achievements";
+import { buildStats, evaluate, tierToRarity } from "@prostcounter/shared/achievements";
 
 import type { AuthContext } from "../middleware/auth";
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
@@ -233,7 +233,7 @@ app.openapi(listAvailableAchievementsRoute, async (c) => {
 
   const { data, error } = await supabase
     .from("achievements")
-    .select("id, name, description, category, icon, points, rarity, is_active")
+    .select("id, name, description, category, icon, points, tier, is_active")
     .eq("is_active", true)
     .order("category")
     .order("points");
@@ -249,7 +249,9 @@ app.openapi(listAvailableAchievementsRoute, async (c) => {
     category: achievement.category,
     icon: achievement.icon,
     points: achievement.points,
-    rarity: achievement.rarity,
+    // Derived, not stored: mobile reference sync persists this field, so it
+    // stays in the response even though achievements.rarity is going away.
+    rarity: tierToRarity(achievement.tier),
     is_active: achievement.is_active,
   }));
 
