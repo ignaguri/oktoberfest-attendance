@@ -12,7 +12,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { isActiveReservation } from "@/lib/utils/reservation";
+import { buildActiveReservationsByDate } from "@/lib/attendance/day-list-entries";
 
 interface AttendanceData {
   date: string;
@@ -30,6 +30,15 @@ interface AttendanceStripProps {
 
 // Week starts on Monday (ISO standard, used in Europe)
 const WEEK_STARTS_ON = 1 as const;
+
+/**
+ * One size for both day indicators.
+ *
+ * The reservation glyph used to be 12 against the beer's 10, which cost the
+ * indicator row two points it does not have on a first-of-month cell and left
+ * the two icons visibly mismatched sitting side by side.
+ */
+const INDICATOR_ICON_SIZE = 10;
 
 /**
  * Weekday headers, generated from a known Monday so they always match the grid.
@@ -79,13 +88,12 @@ export function AttendanceStrip({
     return map;
   }, [attendances]);
 
-  const reservationMap = useMemo(() => {
-    const map = new Map<string, Reservation>();
-    reservations.filter(isActiveReservation).forEach((reservation) => {
-      map.set(format(new Date(reservation.startAt), "yyyy-MM-dd"), reservation);
-    });
-    return map;
-  }, [reservations]);
+  // Shared with the day list: both views need the same one-reservation-per-day
+  // map, and two copies of it would drift.
+  const reservationMap = useMemo(
+    () => buildActiveReservationsByDate(reservations),
+    [reservations],
+  );
 
   const rangeLabel = useMemo(
     () =>
@@ -123,21 +131,44 @@ export function AttendanceStrip({
 
       const indicatorColor = isSelected ? Colors.white : Colors.primary[600];
 
+      const cellAccessibilityLabel = [
+        formatLocalized(date, "EEEE, MMMM d"),
+        isToday ? t("attendance.list.today") : null,
+        hasAttendance ? t("attendance.drinkCount", { count: drinkCount }) : null,
+        hasReservation ? t("attendance.list.reserved") : null,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
       return (
         <Pressable
           key={dateStr}
           onPress={() => onDateSelect(date)}
           className={cellClassName}
-          accessibilityLabel={formatLocalized(date, "EEEE, MMMM d")}
+          accessibilityRole="button"
+          // Everything the cell conveys visually goes in the label. Colour and a
+          // badge carry the drink count, the reservation and today, and a label of
+          // only the date left a screen-reader user swiping past sixteen
+          // indistinguishable days with no way to tell which ones they had logged
+          // - on the view that opens by default.
+          accessibilityLabel={cellAccessibilityLabel}
           accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+          accessibilityState={{ selected: isSelected }}
         >
           <VStack className="items-center">
             {isToday && <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />}
 
+            {/* leading-none on both rows, here and on the day number below.
+                The cell is a fixed 42pt and a first-of-month day stacks three
+                rows into it - month label, day, indicators - which at the
+                default line height comes to roughly 47pt. The overflow is
+                centred, so the month label rode up onto the top border while
+                the indicators crossed the bottom one. Oct 1 falls inside every
+                Oktoberfest, so this was the flagship festival's own strip. */}
             {isFirstOfMonth && (
               <Text
                 className={cn(
-                  "text-[9px] font-semibold uppercase",
+                  "text-[9px] font-semibold uppercase leading-none",
                   isSelected ? "text-white" : "text-typography-500",
                 )}
               >
@@ -145,7 +176,7 @@ export function AttendanceStrip({
               </Text>
             )}
 
-            <Text className={textClassName}>{format(date, "d")}</Text>
+            <Text className={cn(textClassName, "leading-none")}>{format(date, "d")}</Text>
 
             {/* Both indicators render when both exist; the previous calendar
                 suppressed the reservation whenever the day also had attendance. */}
@@ -153,10 +184,10 @@ export function AttendanceStrip({
               <HStack className="mt-0.5 items-center gap-1">
                 {drinkCount !== undefined && drinkCount > 0 && (
                   <HStack className="items-center gap-0.5">
-                    <Beer size={10} color={indicatorColor} />
+                    <Beer size={INDICATOR_ICON_SIZE} color={indicatorColor} />
                     <Text
                       className={cn(
-                        "text-[10px] font-semibold",
+                        "text-[9px] font-semibold leading-none",
                         isSelected ? "text-white" : "text-primary-600",
                       )}
                     >
@@ -166,7 +197,7 @@ export function AttendanceStrip({
                 )}
                 {hasReservation && (
                   <CalendarClock
-                    size={12}
+                    size={INDICATOR_ICON_SIZE}
                     color={isSelected ? Colors.white : IconColors.reservation}
                   />
                 )}

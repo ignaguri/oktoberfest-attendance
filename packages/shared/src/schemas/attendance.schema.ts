@@ -105,6 +105,53 @@ export type UpdatePersonalAttendanceResponse = z.infer<
 >;
 
 /**
+ * Log one more visit to a tent
+ * POST /api/v1/attendance/tent-visits
+ *
+ * Separate from UpdatePersonalAttendanceSchema because the two mean different
+ * things. `tents` there is the set of tents the day should end up with, so
+ * saving it twice is a no-op. This appends a visit, which is what makes
+ * revisiting a tent later the same day (A, then B, then back to A) expressible
+ * at all: a set cannot carry the second A.
+ */
+export const LogTentVisitSchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+  tentId: z.uuid({ error: "Invalid tent ID" }),
+  /**
+   * When the visit happened.
+   *
+   * Sent by the client rather than defaulted to now() server-side so a device
+   * that logs a visit offline at 20:00 and pushes it at midnight still records
+   * 20:00, not the push time.
+   */
+  visitedAt: z.iso.datetime(),
+  /**
+   * Id for the new row, supplied by offline clients.
+   *
+   * The mobile app writes the visit to its own database before it can reach the
+   * network, so it already has an id. Honouring it keeps the local row and the
+   * server row the same row: otherwise the server mints its own id and the next
+   * pull sees a stranger next to an orphan, which is the ghost-row problem
+   * reconcileTentVisits already has to work around. It also makes a retried push
+   * idempotent instead of logging the visit twice.
+   */
+  tentVisitId: z.uuid().optional(),
+});
+
+export type LogTentVisitInput = z.infer<typeof LogTentVisitSchema>;
+
+/**
+ * Log tent visit response
+ */
+export const LogTentVisitResponseSchema = z.object({
+  tentVisitId: z.uuid(),
+  attendanceId: z.uuid(),
+  visitedAt: z.iso.datetime(),
+});
+
+export type LogTentVisitResponse = z.infer<typeof LogTentVisitResponseSchema>;
+
+/**
  * Check-in from reservation path param
  * POST /api/v1/attendance/check-in/{reservationId}
  */

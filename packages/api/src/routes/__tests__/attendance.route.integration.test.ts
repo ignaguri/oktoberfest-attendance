@@ -3,11 +3,42 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { ErrorCodes } from "@prostcounter/shared/errors";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
+
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
   createTestSupabaseWithAuth,
 } from "../../__tests__/helpers/test-supabase";
+import { SupabaseAttendanceRepository } from "../../repositories/supabase";
+
+/*
+ * The test festival's timezone. Which day a tent visit belongs to is read in the
+ * festival's calendar, not UTC (see
+ * 20260811100000_bucket_tent_visits_by_festival_timezone), so a UTC day window
+ * both misses visits in the first hours of a local day and catches visits from
+ * the next one. These helpers do what the repository does: read a window wide
+ * enough to contain any instant that could bucket to the day, then filter by the
+ * bucket itself.
+ */
+const FESTIVAL_TZ = "Europe/Berlin";
+
+/** UTC bounds guaranteed to contain every instant that buckets to this day. */
+function festivalDayWindow(date: string): { start: string; end: string } {
+  const day = date.slice(0, 10);
+  const start = new Date(`${day}T00:00:00Z`);
+  start.setUTCDate(start.getUTCDate() - 1);
+  const end = new Date(`${day}T00:00:00Z`);
+  end.setUTCDate(end.getUTCDate() + 2);
+  return { start: start.toISOString(), end: end.toISOString() };
+}
+
+function isOnFestivalDay(visitDate: string | null, date: string): boolean {
+  return (
+    !!visitDate && formatDateForDatabase(new Date(visitDate), FESTIVAL_TZ) === date.slice(0, 10)
+  );
+}
 
 // Integration tests using real local Supabase database
 // These tests verify the complete flow including RLS policies, triggers, and constraints
@@ -125,15 +156,29 @@ describe("Attendance Routes Integration (Local DB)", () => {
   afterAll(async () => {
     // Cleanup: Delete all test data in correct order (respecting foreign keys)
     // Use admin client to bypass RLS policies
+    //
+    // By festival, not by the tracked id arrays: beforeEach resets those, so they
+    // only ever hold what the LAST test registered and every earlier test's rows
+    // survived. attendances_festival_id_fkey is RESTRICT, so the festival delete
+    // below then failed silently and each run left an orphan festival, tent and
+    // visits behind in the local database.
+    if (testFestival?.id) {
+      const { data: festivalAttendances } = await supabaseAdmin
+        .from("attendances")
+        .select("id")
+        .eq("festival_id", testFestival.id);
+      const attendanceIds = (festivalAttendances ?? []).map((row) => row.id);
 
-    // 1. Delete tent visits first
-    await supabaseAdmin.from("tent_visits").delete().in("id", createdTentVisitIds);
+      await supabaseAdmin.from("tent_visits").delete().eq("festival_id", testFestival.id);
 
-    // 2. Delete consumptions (must be before attendances due to FK)
-    await supabaseAdmin.from("consumptions").delete().in("id", createdConsumptionIds);
+      if (attendanceIds.length > 0) {
+        // Must precede attendances: consumptions.attendance_id has no cascade.
+        await supabaseAdmin.from("beer_pictures").delete().in("attendance_id", attendanceIds);
+        await supabaseAdmin.from("consumptions").delete().in("attendance_id", attendanceIds);
+      }
 
-    // 3. Delete attendances
-    await supabaseAdmin.from("attendances").delete().in("id", createdAttendanceIds);
+      await supabaseAdmin.from("attendances").delete().eq("festival_id", testFestival.id);
+    }
 
     // 4. Delete festival-tent association
     if (testFestival?.id && testTent?.id) {
@@ -456,12 +501,23 @@ describe("Attendance Routes Integration (Local DB)", () => {
     // ever sees ids the LAST test registered: a row this block deliberately keeps
     // alive (the null case) would leak into the local database on every run. Clean
     // up by probe date instead of relying on that tracking.
+    //
+    // By festival day, not by exact timestamp. The RPC no longer stores the
+    // instant it is handed - it stamps the day's local midnight - so matching
+    // `visit_date IN (...)` missed every row the RPC itself wrote. Those leaked
+    // on each run, and then collided with the day probes in the block below,
+    // where a stray visit to the same tent legitimately trips the revisit guard.
     afterAll(async () => {
-      await supabaseAdmin
-        .from("tent_visits")
-        .delete()
-        .eq("user_id", testUser.id)
-        .in("visit_date", [nullCaseDate, clearCaseDate, duplicateCaseDate]);
+      for (const date of [nullCaseDate, clearCaseDate, duplicateCaseDate]) {
+        const { start, end } = festivalDayWindow(date);
+        await supabaseAdmin
+          .from("tent_visits")
+          .delete()
+          .eq("user_id", testUser.id)
+          .eq("festival_id", testFestival.id)
+          .gte("visit_date", start)
+          .lt("visit_date", end);
+      }
     });
 
     /** Seeds one tent visit on the given date and returns its id. */
@@ -490,17 +546,16 @@ describe("Attendance Routes Integration (Local DB)", () => {
       userSupabase: SupabaseClient<Database>,
       date: string,
     ): Promise<number> {
-      const dayStart = `${date.slice(0, 10)}T00:00:00Z`;
-      const dayEnd = new Date(Date.parse(dayStart) + 24 * 60 * 60 * 1000).toISOString();
+      const { start, end } = festivalDayWindow(date);
 
-      const { count } = await userSupabase
+      const { data } = await userSupabase
         .from("tent_visits")
-        .select("*", { count: "exact", head: true })
+        .select("visit_date")
         .eq("user_id", testUser.id)
         .eq("festival_id", testFestival.id)
-        .gte("visit_date", dayStart)
-        .lt("visit_date", dayEnd);
-      return count ?? 0;
+        .gte("visit_date", start)
+        .lt("visit_date", end);
+      return (data ?? []).filter((row) => isOnFestivalDay(row.visit_date, date)).length;
     }
 
     // Regression: null and [] used to be treated identically, so a client that
@@ -571,18 +626,463 @@ describe("Attendance Routes Integration (Local DB)", () => {
 
       // Register whatever the RPC inserted so afterAll can clean it up, since
       // these rows were not seeded through seedTentVisit.
-      const dayStart = `${duplicateCaseDate.slice(0, 10)}T00:00:00Z`;
+      const dupWindow = festivalDayWindow(duplicateCaseDate);
       const { data: written } = await userSupabase
         .from("tent_visits")
-        .select("id")
+        .select("id, visit_date")
         .eq("user_id", testUser.id)
         .eq("festival_id", testFestival.id)
-        .gte("visit_date", dayStart)
-        .lt("visit_date", new Date(Date.parse(dayStart) + 24 * 60 * 60 * 1000).toISOString());
-      createdTentVisitIds.push(...(written ?? []).map((row) => row.id));
+        .gte("visit_date", dupWindow.start)
+        .lt("visit_date", dupWindow.end);
+      createdTentVisitIds.push(
+        ...(written ?? [])
+          .filter((row) => isOnFestivalDay(row.visit_date, duplicateCaseDate))
+          .map((row) => row.id),
+      );
 
       expect(data![0].tents_added).toEqual([testTent.id]);
       expect(await countVisitsOnDate(userSupabase, duplicateCaseDate)).toBe(1);
+    });
+  });
+
+  // A day is a sequence of visits, not just a set of tents: leaving a tent and
+  // coming back later is two visits. logTentVisit is the only writer that can
+  // say so. update_personal_attendance_with_tents reconciles the day to a set,
+  // so it skips any tent already visited and cannot carry the second visit.
+  describe("logTentVisit same-day revisits", () => {
+    const sequenceDate = "2024-09-28";
+    const rejectDate = "2024-09-29";
+    const survivesSaveDate = "2024-09-30";
+    const deselectDate = "2024-10-01";
+    const readOrderDate = "2024-10-02";
+    const replayDate = "2024-09-27";
+    const adjacencyDate = "2024-09-26";
+    const adjacencyOkDate = "2024-09-25";
+    const mismatchDate = "2024-09-24";
+    const intruderDate = "2024-09-23";
+    // The timezone probe stores its visit at 22:30Z on the 3rd, which belongs to
+    // the 4th in Europe/Berlin. Both dates are cleaned up because the teardown
+    // deletes by UTC window.
+    const midnightUtcDate = "2024-10-03";
+    const midnightLocalDate = "2024-10-04";
+    const probeDates = [
+      sequenceDate,
+      rejectDate,
+      survivesSaveDate,
+      deselectDate,
+      readOrderDate,
+      replayDate,
+      adjacencyDate,
+      adjacencyOkDate,
+      mismatchDate,
+      intruderDate,
+      midnightUtcDate,
+      midnightLocalDate,
+    ];
+
+    let secondTent: { id: string; name: string };
+
+    beforeAll(async () => {
+      const { data: tent, error } = await supabaseAdmin
+        .from("tents")
+        .insert({ id: randomUUID(), name: `Second Test Tent ${Date.now()}`, category: "large" })
+        .select()
+        .single();
+
+      if (error || !tent) {
+        throw new Error(`Failed to create second test tent: ${error?.message || "Unknown error"}`);
+      }
+
+      secondTent = { id: tent.id, name: tent.name };
+
+      await supabaseAdmin
+        .from("festival_tents")
+        .insert({ festival_id: testFestival.id, tent_id: secondTent.id });
+    });
+
+    // Cleanup by probe date rather than by tracked id, for the same reason the
+    // block above does: the outer beforeEach clears the id arrays between tests.
+    afterAll(async () => {
+      for (const date of probeDates) {
+        const { start, end } = festivalDayWindow(date);
+        await supabaseAdmin
+          .from("tent_visits")
+          .delete()
+          .eq("user_id", testUser.id)
+          .gte("visit_date", start)
+          .lt("visit_date", end);
+        await supabaseAdmin
+          .from("attendances")
+          .delete()
+          .eq("user_id", testUser.id)
+          .eq("festival_id", testFestival.id)
+          .eq("date", date);
+      }
+
+      await supabaseAdmin.from("festival_tents").delete().eq("tent_id", secondTent.id);
+      await supabaseAdmin.from("tents").delete().eq("id", secondTent.id);
+    });
+
+    function repoFor(token: string): SupabaseAttendanceRepository {
+      return new SupabaseAttendanceRepository(createTestSupabaseWithAuth(token));
+    }
+
+    async function visitsOnDate(
+      date: string,
+    ): Promise<{ tent_id: string; visit_date: string | null }[]> {
+      const { start, end } = festivalDayWindow(date);
+      const { data } = await supabaseAdmin
+        .from("tent_visits")
+        .select("tent_id, visit_date")
+        .eq("user_id", testUser.id)
+        .eq("festival_id", testFestival.id)
+        .gte("visit_date", start)
+        .lt("visit_date", end)
+        .order("visit_date", { ascending: true });
+      return (data ?? []).filter((row) => isOnFestivalDay(row.visit_date, date));
+    }
+
+    /*
+     * The client supplies the visit id so a retried push is idempotent. Nothing
+     * exercised that until now, which left the whole point of the field - and
+     * the negative cases around it - unverified.
+     */
+    it("treats a replayed tentVisitId as the same visit, not a second one", async () => {
+      const repo = repoFor(testUser.token);
+      const tentVisitId = randomUUID();
+      const input = {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${replayDate}T10:00:00.000Z`,
+        tentVisitId,
+      };
+
+      const first = await repo.logTentVisit(testUser.id, input);
+      const replayed = await repo.logTentVisit(testUser.id, input);
+
+      expect(replayed).toEqual(first);
+      expect(await visitsOnDate(replayDate)).toHaveLength(1);
+    });
+
+    it("rejects a tentVisitId that points at a different tent", async () => {
+      const repo = repoFor(testUser.token);
+      const tentVisitId = randomUUID();
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${mismatchDate}T12:00:00.000Z`,
+        tentVisitId,
+      });
+
+      // Same id, different tent. Answering with the stored row would describe a
+      // visit the caller did not ask about.
+      await expect(
+        repo.logTentVisit(testUser.id, {
+          festivalId: testFestival.id,
+          tentId: secondTent.id,
+          visitedAt: `${mismatchDate}T13:00:00.000Z`,
+          tentVisitId,
+        }),
+      ).rejects.toThrow(ErrorCodes.TENT_VISIT_ID_MISMATCH);
+    });
+
+    it("does not let one user replay another user's tentVisitId", async () => {
+      const ownerRepo = repoFor(testUser.token);
+      const tentVisitId = randomUUID();
+      await ownerRepo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${intruderDate}T14:00:00.000Z`,
+        tentVisitId,
+      });
+
+      // The replay lookup is scoped by user, so user2 finds nothing and falls
+      // through to the insert, where the id collides. That must surface as a
+      // rejected id, not a 500 carrying the raw constraint name.
+      const intruderRepo = repoFor(testUser2.token);
+      await expect(
+        intruderRepo.logTentVisit(testUser2.id, {
+          festivalId: testFestival.id,
+          tentId: secondTent.id,
+          visitedAt: `${intruderDate}T15:00:00.000Z`,
+          tentVisitId,
+        }),
+      ).rejects.toThrow(ErrorCodes.TENT_VISIT_ID_MISMATCH);
+
+      // And the owner's row is untouched.
+      const { data: stored } = await supabaseAdmin
+        .from("tent_visits")
+        .select("user_id, tent_id")
+        .eq("id", tentVisitId)
+        .single();
+      expect(stored).toMatchObject({ user_id: testUser.id, tent_id: testTent.id });
+    });
+
+    /*
+     * The guard protects adjacency, not recency. Those coincide only when visits
+     * arrive in time order, which an offline queue flushing a backlog does not
+     * guarantee.
+     */
+    it("rejects an out-of-order visit that would sit next to the same tent", async () => {
+      const repo = repoFor(testUser.token);
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${adjacencyDate}T10:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: secondTent.id,
+        visitedAt: `${adjacencyDate}T12:00:00.000Z`,
+      });
+
+      // 11:00 lands between them, directly after the 10:00 visit to the same
+      // tent. Comparing against the day's latest visit (secondTent at 12:00)
+      // would have accepted this and produced the adjacent pair the rule forbids.
+      await expect(
+        repo.logTentVisit(testUser.id, {
+          festivalId: testFestival.id,
+          tentId: testTent.id,
+          visitedAt: `${adjacencyDate}T11:00:00.000Z`,
+        }),
+      ).rejects.toThrow(ErrorCodes.TENT_ALREADY_CURRENT_VISIT);
+
+      expect(await visitsOnDate(adjacencyDate)).toHaveLength(2);
+    });
+
+    it("accepts an out-of-order visit whose neighbour is a different tent", async () => {
+      const repo = repoFor(testUser.token);
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${adjacencyOkDate}T18:00:00.000Z`,
+      });
+
+      // 16:00 arrives after the 18:00 visit was already stored, so it is out of
+      // order, but it lands before a different tent. A late-flushing queue does
+      // this and the visit is real, so it must not be refused.
+      const result = await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: secondTent.id,
+        visitedAt: `${adjacencyOkDate}T16:00:00.000Z`,
+      });
+
+      expect(result.tentVisitId).toBeTruthy();
+      expect((await visitsOnDate(adjacencyOkDate)).map((v) => v.tent_id)).toEqual([
+        secondTent.id,
+        testTent.id,
+      ]);
+    });
+
+    /*
+     * The festival's calendar decides the day, not UTC. Europe/Berlin is UTC+2 in
+     * September, so the first two hours of a local day are the previous day in
+     * UTC - and used to be filed there, where the day the user was looking at
+     * could not see them.
+     */
+    it("files a visit just after local midnight under the local day", async () => {
+      const repo = repoFor(testUser.token);
+
+      const result = await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        // 00:30 on the 4th in Europe/Berlin.
+        visitedAt: `${midnightUtcDate}T22:30:00.000Z`,
+      });
+
+      const { data: attendance } = await supabaseAdmin
+        .from("attendances")
+        .select("date")
+        .eq("id", result.attendanceId)
+        .single();
+      expect(attendance?.date).toBe(midnightLocalDate);
+
+      // And the day's read agrees, so the visit is visible where the user is.
+      const byDate = await repo.getByDate(testUser.id, testFestival.id, midnightLocalDate);
+      expect(byDate?.tentIds).toContain(testTent.id);
+    });
+
+    it("records a second visit to the same tent after visiting another", async () => {
+      const repo = repoFor(testUser.token);
+
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${sequenceDate}T10:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: secondTent.id,
+        visitedAt: `${sequenceDate}T15:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${sequenceDate}T20:00:00.000Z`,
+      });
+
+      const visits = await visitsOnDate(sequenceDate);
+      expect(visits.map((visit) => visit.tent_id)).toEqual([
+        testTent.id,
+        secondTent.id,
+        testTent.id,
+      ]);
+      expect(visits.map((visit) => new Date(visit.visit_date!).toISOString())).toEqual([
+        `${sequenceDate}T10:00:00.000Z`,
+        `${sequenceDate}T15:00:00.000Z`,
+        `${sequenceDate}T20:00:00.000Z`,
+      ]);
+    });
+
+    // Order is meaning now that a day is a sequence rather than a set: the web
+    // visited-tents dialog renders getByDate's tentVisits in the order it
+    // receives them, so the query has to sort. Rows are inserted directly, out of
+    // time order, because logTentVisit's guard forbids the "A at 20:00 then A at
+    // 10:00" sequence that would otherwise produce them.
+    it("returns a day's visits in time order, whatever order they were stored in", async () => {
+      const { error: attendanceError } = await supabaseAdmin.from("attendances").insert({
+        user_id: testUser.id,
+        festival_id: testFestival.id,
+        date: readOrderDate,
+      });
+      expect(attendanceError).toBeNull();
+
+      const { error: visitsError } = await supabaseAdmin.from("tent_visits").insert([
+        {
+          id: randomUUID(),
+          user_id: testUser.id,
+          festival_id: testFestival.id,
+          tent_id: testTent.id,
+          visit_date: `${readOrderDate}T20:00:00.000Z`,
+        },
+        {
+          id: randomUUID(),
+          user_id: testUser.id,
+          festival_id: testFestival.id,
+          tent_id: secondTent.id,
+          visit_date: `${readOrderDate}T15:00:00.000Z`,
+        },
+        {
+          id: randomUUID(),
+          user_id: testUser.id,
+          festival_id: testFestival.id,
+          tent_id: testTent.id,
+          visit_date: `${readOrderDate}T10:00:00.000Z`,
+        },
+      ]);
+      expect(visitsError).toBeNull();
+
+      const attendance = await repoFor(testUser.token).getByDate(
+        testUser.id,
+        testFestival.id,
+        readOrderDate,
+      );
+
+      expect(attendance?.tentVisits.map((visit) => visit.visitDate)).toEqual([
+        `${readOrderDate}T10:00:00+00:00`,
+        `${readOrderDate}T15:00:00+00:00`,
+        `${readOrderDate}T20:00:00+00:00`,
+      ]);
+      // The same day, read as a set for the tent selector: three visits, two tents.
+      expect(attendance?.tentIds).toEqual([testTent.id, secondTent.id]);
+    });
+
+    // Logging the tent you are standing in is a stray tap, not a revisit, and
+    // two adjacent rows for one tent would read as having left and returned.
+    it("rejects logging the tent that is already the day's latest visit", async () => {
+      const repo = repoFor(testUser.token);
+
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${rejectDate}T10:00:00.000Z`,
+      });
+
+      await expect(
+        repo.logTentVisit(testUser.id, {
+          festivalId: testFestival.id,
+          tentId: testTent.id,
+          visitedAt: `${rejectDate}T11:00:00.000Z`,
+        }),
+      ).rejects.toThrow(ErrorCodes.TENT_ALREADY_CURRENT_VISIT);
+
+      expect(await visitsOnDate(rejectDate)).toHaveLength(1);
+    });
+
+    // The form's save path must not undo a revisit. It reconciles the day to a
+    // set of tents, and both tents are still in that set, so it has nothing to
+    // add or remove - the extra visit has to survive untouched.
+    it("keeps a revisit when the attendance form saves the same tents afterwards", async () => {
+      const repo = repoFor(testUser.token);
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${survivesSaveDate}T10:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: secondTent.id,
+        visitedAt: `${survivesSaveDate}T15:00:00.000Z`,
+      });
+      await repo.logTentVisit(testUser.id, {
+        festivalId: testFestival.id,
+        tentId: testTent.id,
+        visitedAt: `${survivesSaveDate}T20:00:00.000Z`,
+      });
+
+      const { data, error } = await userSupabase.rpc("update_personal_attendance_with_tents", {
+        p_user_id: testUser.id,
+        p_date: `${survivesSaveDate}T22:00:00Z`,
+        p_beer_count: 0,
+        p_tent_ids: [testTent.id, secondTent.id],
+        p_festival_id: testFestival.id,
+      });
+
+      expect(error).toBeNull();
+      expect(data![0].tents_added).toEqual([]);
+      expect(data![0].tents_removed).toEqual([]);
+
+      const visits = await visitsOnDate(survivesSaveDate);
+      expect(visits.map((visit) => visit.tent_id)).toEqual([
+        testTent.id,
+        secondTent.id,
+        testTent.id,
+      ]);
+    });
+
+    // Deselecting a tent still clears the whole day for it, every visit included.
+    it("removes every visit to a tent the form deselects", async () => {
+      const repo = repoFor(testUser.token);
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+
+      for (const [tentId, hour] of [
+        [testTent.id, "09"],
+        [secondTent.id, "12"],
+        [testTent.id, "18"],
+      ] as const) {
+        await repo.logTentVisit(testUser.id, {
+          festivalId: testFestival.id,
+          tentId,
+          visitedAt: `${deselectDate}T${hour}:00:00.000Z`,
+        });
+      }
+      expect(await visitsOnDate(deselectDate)).toHaveLength(3);
+
+      const { data, error } = await userSupabase.rpc("update_personal_attendance_with_tents", {
+        p_user_id: testUser.id,
+        p_date: `${deselectDate}T23:00:00Z`,
+        p_beer_count: 0,
+        p_tent_ids: [secondTent.id],
+        p_festival_id: testFestival.id,
+      });
+
+      expect(error).toBeNull();
+      expect(data![0].tents_removed).toEqual([testTent.id]);
+
+      const visits = await visitsOnDate(deselectDate);
+      expect(visits.map((visit) => visit.tent_id)).toEqual([secondTent.id]);
     });
   });
 });

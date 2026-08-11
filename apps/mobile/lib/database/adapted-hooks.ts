@@ -343,7 +343,12 @@ export function useAdaptedAttendanceByDate(
       return {
         ...base,
         tentVisits,
-        tentIds: tentVisitRows.map((tv) => tv.tent_id),
+        // Deduplicated, unlike tentVisits: a day can hold several visits to the
+        // same tent, but this field answers "which tents" and feeds pickers that
+        // are sets - the crowd report prompt, the form's tent selector. Repeats
+        // there render the same tent twice under the same React key. Matches the
+        // set the API's getByDate returns for the same day.
+        tentIds: [...new Set(tentVisitRows.map((tv) => tv.tent_id))],
         pictureUrls: pictures.map((p) => p.pictureUrl),
         pictures,
       };
@@ -525,6 +530,7 @@ export interface DaySummaries {
 
 export function useAdaptedDaySummaries(
   festivalId: string | undefined,
+  options: { enabled?: boolean } = {},
 ): DataQueryResult<DaySummaries> {
   const { isReady, getDb } = useOfflineContext();
 
@@ -542,7 +548,9 @@ export function useAdaptedDaySummaries(
       ]);
       return { tentNames, drinkCounts, photoCounts };
     },
-    enabled: isReady && !!festivalId,
+    // Three SQLite reads that only the day list consumes, so the calendar view
+    // has no reason to run them.
+    enabled: isReady && !!festivalId && (options.enabled ?? true),
     staleTime: Infinity,
   });
 

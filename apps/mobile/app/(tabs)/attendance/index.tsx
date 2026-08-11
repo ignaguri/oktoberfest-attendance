@@ -31,6 +31,7 @@ import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAttendanceViewMode } from "@/hooks/useAttendanceViewMode";
+import { useOffline } from "@/lib/database/offline-provider";
 import {
   useAdaptedAttendances,
   useAdaptedDaySummaries,
@@ -58,11 +59,12 @@ export default function AttendanceScreen() {
     refetch,
   } = useAdaptedAttendances(currentFestival?.id);
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
-  const { data: daySummaries } = useAdaptedDaySummaries(currentFestival?.id);
+  const { isOnline } = useOffline();
 
   const {
     data: reservationsData,
     loading: reservationsLoading,
+    error: reservationsError,
     refetch: refetchReservations,
   } = useReservations(currentFestival?.id);
 
@@ -70,6 +72,18 @@ export default function AttendanceScreen() {
     () => reservationsData?.reservations ?? [],
     [reservationsData?.reservations],
   );
+
+  /*
+   * Whether reservations could not be loaded at all.
+   *
+   * The day list renders reservation-only rows, and reservations are API-only:
+   * there is no local table and no persisted query cache, so after a cold start
+   * without a connection there are none. Without saying so the list would simply
+   * be shorter offline than online, which reads as data having been lost rather
+   * than as data being unavailable.
+   */
+  const reservationsUnavailable =
+    !!reservationsError || (!isOnline && !reservationsLoading && !reservationsData);
 
   // Check-in mutation
   const checkInReservation = useCheckInReservation();
@@ -85,6 +99,15 @@ export default function AttendanceScreen() {
   const [prefillTentId, setPrefillTentId] = useState<string | undefined>();
 
   const { viewMode, setViewMode: handleViewModeChange, viewTabs } = useAttendanceViewMode();
+
+  // Only the list renders these, and its error matters: without them every row
+  // silently loses its tents, chips and photo dot with nothing said, so it is
+  // surfaced alongside the attendances error rather than dropped.
+  const {
+    data: daySummaries,
+    error: daySummariesError,
+    loading: daySummariesLoading,
+  } = useAdaptedDaySummaries(currentFestival?.id, { enabled: viewMode === "list" });
 
   // Handle check-in from deep link
   // This effect intentionally sets state when a deep link is detected
@@ -246,11 +269,14 @@ export default function AttendanceScreen() {
     );
   }
 
-  // Error state
-  if (attendancesError) {
+  // Error state. The day summaries count too: without them every list row loses
+  // its tents, chips and photo dot, and saying nothing would leave the user
+  // reading a list that quietly understates their days.
+  const blockingError = attendancesError ?? daySummariesError;
+  if (blockingError) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <ErrorState error={attendancesError} onRetry={refetch} />
+        <ErrorState error={blockingError} onRetry={refetch} />
       </View>
     );
   }
@@ -283,7 +309,9 @@ export default function AttendanceScreen() {
               <AttendanceDayList
                 attendances={(attendances ?? []) as AttendanceWithTotals[]}
                 summaries={daySummaries}
+                summariesLoading={daySummariesLoading}
                 reservations={reservations}
+                reservationsUnavailable={reservationsUnavailable}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />

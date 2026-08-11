@@ -94,17 +94,23 @@ const PersonalAttendanceTable = ({
       ),
     },
     {
-      accessorKey: "tentVisits",
+      id: "tentVisits",
+      // Distinct tents, not visits: the column is "Tents", and since a tent can
+      // be revisited the same day the two numbers differ. The dialog this opens
+      // is the day's visit log, so it can list more rows than the count shown.
+      // An accessorFn also gives the column something sortable - sorting the
+      // tentVisits array itself never meant anything.
+      accessorFn: (row) => new Set(row.tentVisits.map((visit) => visit.tentId)).size,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("attendance.table.tents")} />
       ),
-      cell: ({ row }) => (
+      cell: ({ row, getValue }) => (
         <Button
           variant="outline"
           className="flex items-center justify-center gap-1"
           onClick={() => handleTentClick(row.original.date)}
         >
-          <span>{row.original.tentVisits.length}</span>
+          <span>{getValue<number>()}</span>
           <Tent size={24} />
         </Button>
       ),

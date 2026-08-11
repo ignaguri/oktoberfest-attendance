@@ -2,18 +2,24 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { format, isSameDay, parseISO } from "date-fns";
+import { isSameDay, parseISO } from "date-fns";
 import { CalendarClock, Image as ImageIcon } from "lucide-react-native";
 import { Fragment, useMemo } from "react";
 
 import { Divider } from "@/components/ui/divider";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 import type { DaySummaries } from "@/lib/database/adapted-hooks";
-import { isActiveReservation } from "@/lib/utils/reservation";
+import {
+  buildActiveReservationsByDate,
+  buildDayListEntries,
+  type DayListEntry,
+  formatEuros,
+} from "@/lib/attendance/day-list-entries";
 
 import { DrinkCountSummary } from "./drink-count-summary";
 
@@ -24,27 +30,25 @@ interface AttendanceDayListProps {
   attendances: AttendanceWithTotals[];
   summaries: DaySummaries | null;
   reservations?: Reservation[];
+  /**
+   * Reservations could not be loaded, so reservation-only rows are missing.
+   *
+   * Worth saying out loud: this list is the one view whose row *set* depends on
+   * reservation data, and reservations are API-only, so offline it is simply
+   * shorter with no explanation. Silence reads as days having been lost.
+   */
+  reservationsUnavailable?: boolean;
+  /**
+   * Day summaries are still being read from SQLite.
+   *
+   * The rows themselves come from `attendances` and render immediately, so this
+   * only covers the two pieces that arrive later. Both are the row's own height:
+   * without a placeholder each row grows by two lines a frame after it appears,
+   * shoving the rest of the list down under the reader's thumb.
+   */
+  summariesLoading?: boolean;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
-}
-
-/** One row in the merged, date-descending list. */
-type DayListEntry =
-  | { kind: "attendance"; date: string; attendance: AttendanceWithTotals }
-  | { kind: "reservationOnly"; date: string; reservation: Reservation };
-
-/**
- * Whole euros when the amount has none, two decimals when it does.
- *
- * The festival summary card above this list renders whole euros, and under the
- * default tip mode every price paid lands on one, so most rows read the same
- * either way. Sub-euro amounts are the exception that matters: rounding a €1.80
- * tip to €2, or a €0.20 one to €0 on a row that only renders because the tip is
- * non-zero, states an amount the user never paid.
- */
-function formatEuros(cents: number): string {
-  const euros = cents / 100;
-  return `€${cents % 100 === 0 ? euros : euros.toFixed(2)}`;
 }
 
 /**
@@ -61,6 +65,8 @@ export function AttendanceDayList({
   attendances,
   summaries,
   reservations = [],
+  reservationsUnavailable = false,
+  summariesLoading = false,
   selectedDate,
   onDateSelect,
 }: AttendanceDayListProps) {
@@ -70,34 +76,31 @@ export function AttendanceDayList({
     onDateSelect(parseISO(dateStr));
   }
 
-  const reservationMap = useMemo(() => {
-    const map = new Map<string, Reservation>();
-    reservations.filter(isActiveReservation).forEach((reservation) => {
-      map.set(format(new Date(reservation.startAt), "yyyy-MM-dd"), reservation);
-    });
-    return map;
-  }, [reservations]);
+  const reservationMap = useMemo(
+    () => buildActiveReservationsByDate(reservations),
+    [reservations],
+  );
 
-  const entries = useMemo((): DayListEntry[] => {
-    const attendanceDates = new Set(attendances.map((attendance) => attendance.date));
+  const entries = useMemo(
+    () => buildDayListEntries(attendances, reservationMap),
+    [attendances, reservationMap],
+  );
 
-    const attendanceEntries: DayListEntry[] = attendances.map((attendance) => ({
-      kind: "attendance",
-      date: attendance.date,
-      attendance,
-    }));
+  // A refetch keeps the previous summaries, and showing placeholders over data
+  // the row can already display would be a step backwards.
+  const showSummarySkeleton = summariesLoading && summaries === null;
 
-    const reservationOnlyEntries: DayListEntry[] = [];
-    reservationMap.forEach((reservation, date) => {
-      if (!attendanceDates.has(date)) {
-        reservationOnlyEntries.push({ kind: "reservationOnly", date, reservation });
-      }
-    });
-
-    return [...attendanceEntries, ...reservationOnlyEntries].sort((a, b) =>
-      b.date.localeCompare(a.date),
-    );
-  }, [attendances, reservationMap]);
+  // Sits above the rows and inside the empty state, because a list that is merely
+  // shorter than usual is the case that misleads: the user cannot tell a day they
+  // never logged from a reservation row that failed to load.
+  const reservationNotice = reservationsUnavailable ? (
+    <HStack space="xs" className="items-center justify-center px-3 py-2">
+      <CalendarClock size={14} color={IconColors.muted} />
+      <Text className="text-xs text-typography-500">
+        {t("attendance.list.reservationsUnavailable")}
+      </Text>
+    </HStack>
+  ) : null;
 
   if (entries.length === 0) {
     return (
@@ -108,6 +111,7 @@ export function AttendanceDayList({
         <Text className="text-center text-sm text-typography-500">
           {t("attendance.noAttendancesDescription")}
         </Text>
+        {reservationNotice}
       </VStack>
     );
   }
@@ -160,15 +164,26 @@ export function AttendanceDayList({
     const visibleTents = tentNames.slice(0, MAX_VISIBLE_TENTS);
     const hiddenTentCount = tentNames.length - visibleTents.length;
 
+    // Everything the row shows, including the two bare icons: a reservation and a
+    // photo are rendered as glyphs with no text anywhere near them, so leaving
+    // them out made them invisible to a screen reader.
+    // drinkCount rather than a dedicated string, because it is already pluralized
+    // in all three locales - the old key said "1 drinks".
     const accessibilityLabelParts = [
       formatLocalized(date, "EEEE, MMMM d"),
       t("attendance.list.a11ySpent", { amount: formatEuros(attendance.totalSpentCents) }),
-      t("attendance.list.a11yDrinks", { total: attendance.drinkCount }),
+      t("attendance.drinkCount", { count: attendance.drinkCount }),
     ];
     if (attendance.totalTipCents > 0) {
       accessibilityLabelParts.push(
         t("attendance.list.tip", { amount: formatEuros(attendance.totalTipCents) }),
       );
+    }
+    if (hasReservation) {
+      accessibilityLabelParts.push(t("attendance.list.reserved"));
+    }
+    if (photoCount > 0) {
+      accessibilityLabelParts.push(t("attendance.list.a11yPhotos", { count: photoCount }));
     }
     if (tentNames.length > 0) {
       accessibilityLabelParts.push(tentNames.join(", "));
@@ -178,8 +193,10 @@ export function AttendanceDayList({
       <Pressable
         onPress={() => handlePress(attendance.date)}
         className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
+        accessibilityRole="button"
         accessibilityLabel={accessibilityLabelParts.join(", ")}
         accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+        accessibilityState={{ selected: isSelected }}
       >
         <VStack space="xs">
           <HStack className="items-center justify-between">
@@ -192,7 +209,16 @@ export function AttendanceDayList({
           </HStack>
 
           <HStack className="items-center justify-between">
-            <DrinkCountSummary counts={drinkCounts} compact showTotal={false} />
+            {/* h-4 matches the 14pt icon + text-xs count the real chips render at,
+                so the swap does not change this row's height. */}
+            {showSummarySkeleton ? (
+              <HStack space="md" className="items-center">
+                <Skeleton variant="rounded" className="h-4 w-10" />
+                <Skeleton variant="rounded" className="h-4 w-10" />
+              </HStack>
+            ) : (
+              <DrinkCountSummary counts={drinkCounts} compact showTotal={false} />
+            )}
 
             <HStack space="sm" className="items-center">
               {attendance.totalTipCents > 0 && (
@@ -207,7 +233,13 @@ export function AttendanceDayList({
             </HStack>
           </HStack>
 
-          {visibleTents.length > 0 && (
+          {showSummarySkeleton && (
+            <HStack space="xs" className="items-center">
+              <Skeleton variant="rounded" className="h-4 w-32" />
+            </HStack>
+          )}
+
+          {!showSummarySkeleton && visibleTents.length > 0 && (
             <HStack space="xs" className="items-center">
               <Text className="text-xs text-typography-500" numberOfLines={1}>
                 {visibleTents.join(", ")}
@@ -226,6 +258,7 @@ export function AttendanceDayList({
 
   return (
     <VStack space="xs" className="rounded-xl bg-background-0 p-2">
+      {reservationNotice}
       {entries.map((entry, index) => (
         <Fragment key={entry.date}>
           {index > 0 && <Divider />}

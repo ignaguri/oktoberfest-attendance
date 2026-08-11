@@ -593,6 +593,9 @@
       "editTitle": "Edit Attendance",
       "addTitle": "Add Attendance",
       "selectTents": "Select tents...",
+      "logAnotherVisit": "Log another visit",
+      "logAnotherVisitHint": "Adds a visit with the current time for the tent you pick.",
+      "logAnotherVisitUnavailable": "Tents could not be loaded, so logging another visit is unavailable right now.",
       "photos": "Photos",
       "saving": "Saving...",
       "deleteConfirmTitle": "Delete Attendance?",
@@ -624,8 +627,8 @@
       "date": "Date",
       "amount": "Amount",
       "tents": "Tents",
-      "visitedTents": "Visited Tents",
-      "visitedTentsDescription": "Details of the tents you visited.",
+      "visitedTents": "Check-in log",
+      "visitedTentsDescription": "Every check-in on this date, in order. A tent can appear more than once.",
       "noTentsRegistered": "No tents registered on this date.",
       "checkIn": "Check-in"
     },
@@ -644,10 +647,13 @@
       "list": "List"
     },
     "list": {
-      "a11yDrinks": "{{total}} drinks",
+      "today": "Today",
       "a11ySpent": "{{amount}} spent",
+      "a11yPhotos": "{{count}} photo",
+      "a11yPhotos_other": "{{count}} photos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserved",
+      "reservationsUnavailable": "Reservations couldn't be loaded, so days with only a reservation are missing.",
       "tip": "+{{amount}} tip"
     },
     "tabs": {
@@ -2660,6 +2666,8 @@
     "FESTIVAL_NOT_FOUND": "Festival not found.",
     "NO_ACTIVE_FESTIVAL": "No active festival found.",
     "TENT_NOT_FOUND": "Tent not found.",
+    "TENT_ALREADY_CURRENT_VISIT": "You're already checked in here. Visit another tent first.",
+    "TENT_VISIT_ID_MISMATCH": "That visit could not be saved. Please try again.",
     "RESERVATION_NOT_FOUND": "Reservation not found.",
     "RESERVATION_ALREADY_CHECKED_IN": "You have already checked in.",
     "RESERVATION_CANCELLED": "This reservation has been cancelled.",

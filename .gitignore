@@ -68,6 +68,7 @@ WARP.md
 .claude/skills/
 .claude/worktrees/
 .cursor/skills/
+.impeccable/
 
 # Claude MCP configuration
 .mcp.json

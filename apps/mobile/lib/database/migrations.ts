@@ -34,6 +34,14 @@ type MigrationFn = (db: SQLite.SQLiteDatabase) => Promise<void>;
  */
 const MIGRATIONS: MigrationFn[] = [
   // v0 -> v1: Initial schema from Drizzle
+  //
+  // Only migration 0000 is ever applied, and everything after it is a hand-written
+  // step below. So the Drizzle snapshot has drifted from schema/*.ts on purpose -
+  // tents dropped its unique() declaration and gained created_at in later steps,
+  // while drizzle/0000_busy_menace.sql still describes the original shape. A
+  // future `drizzle-kit generate` would emit a 0001 that nothing here executes:
+  // append a hand-written migration instead, or regenerate the snapshot and be
+  // sure 0000 still describes a v0 database.
   async (db) => {
     // Execute Drizzle-generated migration SQL
     const migration = drizzleMigrations.migrations[0];
@@ -67,6 +75,16 @@ const MIGRATIONS: MigrationFn[] = [
   // v1 -> v2: Add created_at to tent_visits (full timestamp for UI rendering).
   async (db) => {
     await addColumnIfNotExists(db, "tent_visits", "created_at", "TEXT");
+  },
+
+  // v2 -> v3: Allow more than one visit per tent per day.
+  //
+  // A day was modelled as a set of tents, so this index made "back at the tent I
+  // was in this morning" unrepresentable on device. Dropping it is enough: the
+  // constraint shipped as a standalone index (Drizzle migration 0000), not as an
+  // inline table constraint, so no table rebuild and no row copying is needed.
+  async (db) => {
+    await dropIndexIfExists(db, "tent_visits_user_tent_festival_date");
   },
 ];
 

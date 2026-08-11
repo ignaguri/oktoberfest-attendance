@@ -31,6 +31,17 @@ export const LogConsumptionSchema = z.object({
   volumeMl: z.number().int().min(1, "Volume must be positive").default(1000),
   recordedAt: z.iso.datetime().optional(),
   idempotencyKey: z.string().max(255).optional(),
+  /**
+   * Id to store the consumption under, supplied by an offline client.
+   *
+   * Without it the server mints its own, so the row the device pushed and the
+   * row the server returns are two different ids and the next pull inserts the
+   * server's as a stranger - one drink, counted twice, forever. The same
+   * reasoning already applies to `tentVisitId` on logTentVisit.
+   *
+   * Re-sending a stored id is a replay, not a second drink.
+   */
+  consumptionId: z.uuid({ error: "Invalid consumption ID" }).optional(),
 });
 
 export type LogConsumptionInput = z.infer<typeof LogConsumptionSchema>;
@@ -60,7 +71,18 @@ export type Consumption = z.infer<typeof ConsumptionSchema>;
  */
 export const TentVisitSchema = z.object({
   tentId: z.uuid(),
-  visitDate: z.iso.datetime(),
+  /*
+   * `offset: true` because this is what the API actually sends. Postgres renders
+   * a timestamptz as `2024-10-02T10:00:00+00:00`, and Zod v4's bare
+   * z.iso.datetime() rejects an offset - so any client parsing a response through
+   * this schema failed. Hono does not validate responses, which is why it went
+   * unnoticed.
+   *
+   * The mobile local read also fills this from a bare YYYY-MM-DD when created_at
+   * is not populated yet, so consumers must not assume a time is present:
+   * getCurrentTentId skips values it cannot parse for that reason.
+   */
+  visitDate: z.iso.datetime({ offset: true }),
   tentName: z.string().nullable(),
 });
 
@@ -78,7 +100,8 @@ export const TentVisitRowSchema = z.object({
   userId: z.uuid(),
   tentId: z.uuid(),
   festivalId: z.uuid(),
-  visitDate: z.iso.datetime(),
+  /** See TentVisitSchema.visitDate for why the offset is allowed. */
+  visitDate: z.iso.datetime({ offset: true }),
   tentName: z.string().nullable(),
 });
 

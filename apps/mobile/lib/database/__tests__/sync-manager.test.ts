@@ -158,6 +158,7 @@ vi.mock("../sync-queue", () => ({
   generateUUID: vi.fn().mockReturnValue("test-uuid"),
   generateConsumptionIdempotencyKey: vi.fn().mockReturnValue("idem-key"),
   cleanupOrphanConsumptions: vi.fn().mockResolvedValue(0),
+  cleanupOrphanTentVisits: vi.fn().mockResolvedValue(0),
   getQueueStats: vi.fn().mockResolvedValue({
     pending: 0,
     processing: 0,

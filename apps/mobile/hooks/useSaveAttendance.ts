@@ -34,7 +34,16 @@ interface SaveAttendanceInput {
   festivalId: string;
   date: Date;
   amount: number;
-  tents: string[];
+  /*
+   * The set of tents the day should reconcile to, or undefined to leave the
+   * day's tent visits alone.
+   *
+   * Optional because those are genuinely different requests and an empty array
+   * cannot express both: the update RPC reads [] as "this day holds no tents"
+   * and deletes every visit for the date. A caller that has not learned the
+   * day's visits yet must pass undefined, not [].
+   */
+  tents?: string[];
   existingAttendanceId?: string;
   pendingPhotos: PendingPhoto[];
   photosToDelete: string[];
@@ -117,7 +126,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
 
             if (delta > 0) {
               // Need to create more consumptions
-              const tentId = tents[0]; // Use first tent
+              const tentId = tents?.[0]; // Use first tent
               const priceCents = getDrinkPriceCents(drinkType, tentId);
               for (let i = 0; i < delta; i++) {
                 await logConsumption.mutateAsync({

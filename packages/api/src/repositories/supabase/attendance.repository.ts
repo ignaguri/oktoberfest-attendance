@@ -5,14 +5,19 @@ import type {
   CreateAttendanceInput,
   CreateAttendanceResponse,
   ListAttendancesQuery,
+  LogTentVisitInput,
+  LogTentVisitResponse,
   TentVisitRow,
   UpdatePersonalAttendanceInput,
   UpdatePersonalAttendanceResponse,
 } from "@prostcounter/shared";
+import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
+import { ErrorCodes } from "@prostcounter/shared/errors";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { DatabaseError } from "../../middleware/error";
+import { DatabaseError, ValidationError } from "../../middleware/error";
 import type { IAttendanceRepository } from "../interfaces";
 
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
@@ -126,31 +131,35 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
 
     // Fetch all tent visits for this festival (also used for sync-grade
     // projection when include === "tent_visits").
+    // Ordered because a day is a sequence of visits, not a set of tents: with
+    // revisits, "Hofbräu 14:00, Paulaner 17:00, Hofbräu 20:00" only reads
+    // correctly in time order, and Postgres gives no order without ORDER BY.
+    // Callers render this list as-is.
     const { data: tentVisits, error: tentVisitsError } = await this.supabase
       .from("tent_visits")
       .select("id, user_id, tent_id, festival_id, visit_date, tents(name)")
       .eq("user_id", userId)
-      .eq("festival_id", festivalId);
+      .eq("festival_id", festivalId)
+      .order("visit_date", { ascending: true });
 
     if (tentVisitsError) {
       throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);
     }
 
+    const timezone = await this.getFestivalTimezone(festivalId);
+
     // Map attendances and enrich with tent visits
     const enrichedData = data.map((item) => {
       const attendance = this.mapToAttendanceWithTotals(item);
-      const attendanceDate = new Date(attendance.date);
 
-      // Filter tent visits for this attendance date (UTC to avoid timezone shift)
+      // Which day a visit belongs to is read in the festival's timezone, the
+      // same calendar the DB functions bucket by. Comparing UTC components
+      // hid every visit in the first hours of a local day from that day, since
+      // those instants belong to the previous UTC date.
       const visitsForDate = (tentVisits || [])
         .filter((visit) => {
           if (!visit.visit_date) return false;
-          const visitDate = new Date(visit.visit_date);
-          return (
-            visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
-            visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
-            visitDate.getUTCDate() === attendanceDate.getUTCDate()
-          );
+          return formatDateForDatabase(new Date(visit.visit_date), timezone) === attendance.date;
         })
         .map((visit) => ({
           tentId: visit.tent_id,
@@ -236,24 +245,16 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     userId: string,
     input: CreateAttendanceInput,
   ): Promise<CreateAttendanceResponse> {
-    // Convert date string to ISO timestamp for the RPC function
-    // Use setUTCHours to avoid timezone shifting the date
-    // (new Date("YYYY-MM-DD") creates UTC midnight; setHours uses local time
-    // and can shift the date back in Western Hemisphere timezones)
-    const dateWithTime = new Date(input.date);
-    const now = new Date();
-    dateWithTime.setUTCHours(
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds(),
-      now.getUTCMilliseconds(),
-    );
-
     const { data, error } = await this.supabase.rpc("add_or_update_attendance_with_tents", {
       p_user_id: userId,
       p_beer_count: 0,
       p_tent_ids: input.tents,
-      p_date: dateWithTime.toISOString(),
+      // A bare date, not a timestamp. The RPC only reads `p_date::date` and
+      // stamps new visits at the festival's local midnight itself, so a
+      // time-of-day here is ignored. It is also the only form that survives a
+      // non-UTC session timezone: a bare date is parsed and cast back in the
+      // same zone, while "...T23:30:00Z" casts to the next day east of UTC.
+      p_date: input.date,
       p_festival_id: input.festivalId,
     });
 
@@ -275,22 +276,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     userId: string,
     input: UpdatePersonalAttendanceInput,
   ): Promise<UpdatePersonalAttendanceResponse> {
-    // Convert date string to ISO timestamp for the RPC function
-    // Use setUTCHours to avoid timezone shifting the date
-    // (new Date("YYYY-MM-DD") creates UTC midnight; setHours uses local time
-    // and can shift the date back in Western Hemisphere timezones)
-    const dateWithTime = new Date(input.date);
-    const now = new Date();
-    dateWithTime.setUTCHours(
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds(),
-      now.getUTCMilliseconds(),
-    );
-
     const { data, error } = await this.supabase.rpc("update_personal_attendance_with_tents", {
       p_user_id: userId,
-      p_date: dateWithTime.toISOString(),
+      // A bare date, for the reasons given in createWithTents above.
+      p_date: input.date,
       p_beer_count: 0,
       /*
        * null (not supplied) leaves tent visits untouched; [] clears them for the
@@ -316,6 +305,193 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       attendanceId: data[0].attendance_id,
       tentsAdded: data[0].tents_added || [],
       tentsRemoved: data[0].tents_removed || [],
+    };
+  }
+
+  /**
+   * The timezone whose calendar decides which day a festival's visits fall in.
+   *
+   * festivals.timezone is NOT NULL with a default, so a missing value means the
+   * festival row itself is missing.
+   *
+   * `strict` separates writes from reads. A write has to know the real timezone -
+   * stamping or bucketing a visit against a guess would put it on the wrong day -
+   * so it fails loudly. A read for a festival that does not exist has nothing to
+   * bucket anyway: it finds no attendances and no visits, and returning an empty
+   * result is the behaviour those endpoints already had. Turning that into an
+   * error would be a change of contract smuggled in with a timezone fix.
+   */
+  private async getFestivalTimezone(festivalId: string, strict = false): Promise<string> {
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("timezone")
+      .eq("id", festivalId)
+      .maybeSingle();
+
+    if (error) {
+      throw new DatabaseError(`Failed to read festival timezone: ${error.message}`);
+    }
+    if (!data?.timezone) {
+      if (strict) {
+        throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
+      }
+      return DEFAULT_TIMEZONE;
+    }
+
+    return data.timezone;
+  }
+
+  /**
+   * The user's visits on one festival day, oldest first.
+   *
+   * Reads a three-day UTC window and buckets in the festival's timezone in JS,
+   * because the day boundary is `(visit_date AT TIME ZONE tz)::date` and the
+   * query builder cannot express that. The window only has to be wide enough to
+   * contain any instant that could bucket to this day, which no real timezone
+   * offset comes close to exceeding, and it spans one user's visits over three
+   * days - a handful of rows.
+   */
+  private async getVisitsForFestivalDay(
+    userId: string,
+    festivalId: string,
+    date: string,
+    timezone: string,
+  ): Promise<{ tent_id: string; visit_date: string }[]> {
+    const windowStart = new Date(`${date}T00:00:00.000Z`);
+    windowStart.setUTCDate(windowStart.getUTCDate() - 1);
+    const windowEnd = new Date(`${date}T00:00:00.000Z`);
+    windowEnd.setUTCDate(windowEnd.getUTCDate() + 2);
+
+    const { data, error } = await this.supabase
+      .from("tent_visits")
+      .select("tent_id, visit_date")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .gte("visit_date", windowStart.toISOString())
+      .lt("visit_date", windowEnd.toISOString())
+      .order("visit_date", { ascending: true });
+
+    if (error) {
+      throw new DatabaseError(`Failed to read the day's tent visits: ${error.message}`);
+    }
+
+    return (data ?? []).filter(
+      (visit): visit is { tent_id: string; visit_date: string } =>
+        !!visit.visit_date && formatDateForDatabase(new Date(visit.visit_date), timezone) === date,
+    );
+  }
+
+  async logTentVisit(userId: string, input: LogTentVisitInput): Promise<LogTentVisitResponse> {
+    const visitedAt = new Date(input.visitedAt);
+    const timezone = await this.getFestivalTimezone(input.festivalId, true);
+    // The day the visit belongs to, read in the festival's timezone - the same
+    // calendar the DB functions bucket by since
+    // 20260811100000_bucket_tent_visits_by_festival_timezone. Deriving it in UTC
+    // filed a visit logged just after local midnight under the previous day.
+    const date = formatDateForDatabase(visitedAt, timezone);
+    const tentVisitId = input.tentVisitId ?? crypto.randomUUID();
+
+    // A client-supplied id that already exists is a replayed push, not a new
+    // visit. Return the stored row instead of falling through to the guard
+    // below, which would reject the replay as "you are already in this tent"
+    // and hide the fact that the original call had actually succeeded.
+    if (input.tentVisitId) {
+      const { data: replayed, error: replayedError } = await this.supabase
+        .from("tent_visits")
+        .select("id, visit_date, tent_id, festival_id")
+        .eq("id", input.tentVisitId)
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (replayedError) {
+        throw new DatabaseError(`Failed to look up tent visit: ${replayedError.message}`);
+      }
+
+      if (replayed?.visit_date) {
+        // The id has to point at the visit being described, not merely at some
+        // visit of this user's. Trusting it alone let a client that reused an id
+        // across days or festivals get a 201 describing a different row, and
+        // created an attendance row for a day the response did not belong to.
+        if (replayed.tent_id !== input.tentId || replayed.festival_id !== input.festivalId) {
+          throw new ValidationError(ErrorCodes.TENT_VISIT_ID_MISMATCH);
+        }
+
+        // The stored row's own day, not the request's: they differ exactly when
+        // the client is replaying with a different visitedAt, and the row that
+        // exists is the one that decides which day gained a visit.
+        const storedDate = formatDateForDatabase(new Date(replayed.visit_date), timezone);
+        const { attendanceId } = await this.updatePersonal(userId, {
+          festivalId: input.festivalId,
+          date: storedDate,
+          amount: 0,
+        });
+        return {
+          tentVisitId: replayed.id,
+          attendanceId,
+          visitedAt: new Date(replayed.visit_date).toISOString(),
+        };
+      }
+    }
+
+    // Logging the tent you are already in is a stray tap, not a revisit: two
+    // adjacent rows for one tent would read as leaving and coming back.
+    //
+    // Adjacency is the invariant, so this compares against the visits either
+    // side of visitedAt rather than against the day's latest. Those only
+    // coincide when visits arrive in time order, which the offline queue does
+    // not guarantee: comparing against the latest both rejected a valid older
+    // visit and, worse, accepted A@11:00 into A@10:00, B@12:00 - producing the
+    // adjacent pair it exists to forbid.
+    const dayVisits = await this.getVisitsForFestivalDay(
+      userId,
+      input.festivalId,
+      date,
+      timezone,
+    );
+    const visitedAtMs = visitedAt.getTime();
+    const previous = dayVisits.filter((v) => new Date(v.visit_date).getTime() <= visitedAtMs).at(-1);
+    const next = dayVisits.find((v) => new Date(v.visit_date).getTime() > visitedAtMs);
+
+    if (previous?.tent_id === input.tentId || next?.tent_id === input.tentId) {
+      throw new ValidationError(ErrorCodes.TENT_ALREADY_CURRENT_VISIT);
+    }
+
+    // Reuse the attendance upsert the form path goes through, so a visit logged
+    // on a day with no attendance yet still produces one. Passing no tents
+    // leaves existing visits untouched.
+    const { attendanceId } = await this.updatePersonal(userId, {
+      festivalId: input.festivalId,
+      date,
+      amount: 0,
+    });
+
+    const { data: tentVisit, error: insertError } = await this.supabase
+      .from("tent_visits")
+      .insert({
+        id: tentVisitId,
+        user_id: userId,
+        festival_id: input.festivalId,
+        tent_id: input.tentId,
+        visit_date: visitedAt.toISOString(),
+      })
+      .select("id, visit_date")
+      .single();
+
+    if (insertError || !tentVisit?.visit_date) {
+      // A primary-key collision here means the id belongs to another user's
+      // visit: the replay lookup above is scoped to this user, so it found
+      // nothing. Report it as a rejected id rather than letting the raw
+      // constraint message out through the 500 handler.
+      if (insertError?.code === PgErrorCode.UNIQUE_VIOLATION) {
+        throw new ValidationError(ErrorCodes.TENT_VISIT_ID_MISMATCH);
+      }
+      throw new DatabaseError(`Failed to log tent visit: ${insertError?.message ?? "no row"}`);
+    }
+
+    return {
+      tentVisitId: tentVisit.id,
+      attendanceId,
+      visitedAt: new Date(tentVisit.visit_date).toISOString(),
     };
   }
 
@@ -372,33 +548,34 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       throw new DatabaseError("Invalid attendance data from view");
     }
 
-    const attendanceDate = new Date(date);
+    const timezone = await this.getFestivalTimezone(festivalId);
 
-    // Fetch tent visits for this date
+    // Fetch tent visits for this date, in time order (see list() for why)
     const { data: tentVisits, error: tentVisitsError } = await this.supabase
       .from("tent_visits")
       .select("tent_id, visit_date, tents(name)")
       .eq("user_id", userId)
-      .eq("festival_id", festivalId);
+      .eq("festival_id", festivalId)
+      .order("visit_date", { ascending: true });
 
     if (tentVisitsError) {
       throw new DatabaseError(`Failed to fetch tent visits: ${tentVisitsError.message}`);
     }
 
-    // Filter tent visits for this specific date
-    // Use UTC methods to avoid timezone shifting the date comparison
-    // (new Date("YYYY-MM-DD") creates UTC midnight; getDate() uses local time)
-    const tentIdsForDate = (tentVisits || [])
-      .filter((visit) => {
-        if (!visit.visit_date) return false;
-        const visitDate = new Date(visit.visit_date);
-        return (
-          visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
-          visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
-          visitDate.getUTCDate() === attendanceDate.getUTCDate()
-        );
-      })
-      .map((visit) => visit.tent_id);
+    // Which day a visit belongs to is read in the festival's timezone, matching
+    // the DB functions. A UTC comparison put the first hours of a local day on
+    // the previous date, so a visit logged just after midnight vanished from the
+    // day the user was looking at.
+    const belongsToDate = (visit: { visit_date: string | null }): boolean =>
+      !!visit.visit_date && formatDateForDatabase(new Date(visit.visit_date), timezone) === date;
+
+    // Deduplicated: a day can hold several visits to the same tent (see
+    // logTentVisit), but this field feeds the form's tent selector, which is a
+    // set. Repeats there would render the same tent twice and, on save, ask the
+    // RPC to reconcile to a list with duplicates.
+    const tentIdsForDate = [
+      ...new Set((tentVisits || []).filter(belongsToDate).map((visit) => visit.tent_id)),
+    ];
 
     // Fetch beer pictures for this attendance (including IDs for deletion)
     const { data: beerPictures, error: picturesError } = await this.supabase
@@ -422,17 +599,9 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     // Keep pictureUrls for backward compatibility
     const pictureUrls = pictures.map((pic) => pic.pictureUrl);
 
-    // Build tent visits array for the schema (same UTC date comparison)
+    // Build tent visits array for the schema (same festival-day bucket)
     const visitsForDate = (tentVisits || [])
-      .filter((visit) => {
-        if (!visit.visit_date) return false;
-        const visitDate = new Date(visit.visit_date);
-        return (
-          visitDate.getUTCFullYear() === attendanceDate.getUTCFullYear() &&
-          visitDate.getUTCMonth() === attendanceDate.getUTCMonth() &&
-          visitDate.getUTCDate() === attendanceDate.getUTCDate()
-        );
-      })
+      .filter(belongsToDate)
       .map((visit) => ({
         tentId: visit.tent_id,
         visitDate: visit.visit_date!,

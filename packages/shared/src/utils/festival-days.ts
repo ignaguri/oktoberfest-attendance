@@ -37,7 +37,14 @@ export function buildFestivalWeeks({
 
   const cells: (FestivalDayCell | null)[] = [
     ...Array.from({ length: leadingBlankCount }, () => null),
-    ...days.map((date) => ({ date, isFirstOfMonth: date.getDate() === 1 })),
+    // startOfDay per cell, not just on the interval bounds. eachDayOfInterval
+    // steps by adding a day, so in a timezone whose DST shift lands at midnight
+    // (America/Santiago, for one) the day after the shift comes back at 01:00. The
+    // count and the weekday alignment are right either way, and the only current
+    // consumer compares with format/isSameDay, so nothing is broken today - but
+    // the type says "date" and a consumer doing timestamp equality against a
+    // startOfDay value would silently miss.
+    ...days.map((date) => ({ date: startOfDay(date), isFirstOfMonth: date.getDate() === 1 })),
   ];
 
   while (cells.length % 7 !== 0) {

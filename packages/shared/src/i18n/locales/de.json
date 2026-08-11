@@ -558,6 +558,9 @@
       "editTitle": "Besuch bearbeiten",
       "addTitle": "Besuch hinzufügen",
       "selectTents": "Zelte auswählen...",
+      "logAnotherVisit": "Weiteren Besuch eintragen",
+      "logAnotherVisitHint": "Fügt einen Besuch mit der aktuellen Zeit für das gewählte Zelt hinzu.",
+      "logAnotherVisitUnavailable": "Die Zelte konnten nicht geladen werden, daher ist das Eintragen eines weiteren Besuchs gerade nicht möglich.",
       "photos": "Fotos",
       "saving": "Speichert...",
       "deleteConfirmTitle": "Besuch löschen?",
@@ -589,8 +592,8 @@
       "date": "Datum",
       "amount": "Anzahl",
       "tents": "Zelte",
-      "visitedTents": "Besuchte Zelte",
-      "visitedTentsDescription": "Details der von dir besuchten Zelte.",
+      "visitedTents": "Check-in-Verlauf",
+      "visitedTentsDescription": "Alle Check-ins an diesem Datum, in zeitlicher Reihenfolge. Ein Zelt kann mehrmals erscheinen.",
       "noTentsRegistered": "An diesem Datum keine Zelte erfasst.",
       "checkIn": "Check-in"
     },
@@ -609,10 +612,13 @@
       "list": "Liste"
     },
     "list": {
-      "a11yDrinks": "{{total}} Getränke",
+      "today": "Heute",
       "a11ySpent": "{{amount}} ausgegeben",
+      "a11yPhotos": "{{count}} Foto",
+      "a11yPhotos_other": "{{count}} Fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserviert",
+      "reservationsUnavailable": "Reservierungen konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einer Reservierung.",
       "tip": "+{{amount}} Trinkgeld"
     },
     "tabs": {
@@ -2406,6 +2412,8 @@
     "FESTIVAL_NOT_FOUND": "Festival nicht gefunden.",
     "NO_ACTIVE_FESTIVAL": "Kein aktives Festival gefunden.",
     "TENT_NOT_FOUND": "Zelt nicht gefunden.",
+    "TENT_ALREADY_CURRENT_VISIT": "Du bist hier schon eingecheckt. Besuche zuerst ein anderes Zelt.",
+    "TENT_VISIT_ID_MISMATCH": "Dieser Besuch konnte nicht gespeichert werden. Bitte versuche es erneut.",
     "RESERVATION_NOT_FOUND": "Reservierung nicht gefunden.",
     "RESERVATION_ALREADY_CHECKED_IN": "du hast bereits eingecheckt.",
     "RESERVATION_CANCELLED": "Diese Reservierung wurde storniert.",

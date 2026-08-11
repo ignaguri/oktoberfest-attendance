@@ -5,6 +5,7 @@
  * the orchestrator (useSaveAttendance) triggers a single push after all writes.
  */
 
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext } from "react";
 
@@ -142,5 +143,132 @@ export function useOfflineUpdateAttendance() {
 
   return useMutation({
     mutationFn: updateAttendanceLocal,
+  });
+}
+
+interface LogTentVisitInput {
+  festivalId: string;
+  /**
+   * YYYY-MM-DD, the day the visit belongs to.
+   *
+   * The caller's local day, matching what reconcileTentVisits writes for visits
+   * created by a form save. The server instead derives the day from visitedAt in
+   * UTC, so for roughly two hours after local midnight the two disagree - the
+   * same UTC-bucketing that already applies to check-ins and to the RPC's
+   * visit_date::date. Callers should only log visits for the current day.
+   */
+  date: string;
+  tentId: string;
+  /** ISO timestamp. Defaults to now, which is what the UI passes. */
+  visitedAt?: string;
+}
+
+interface LogTentVisitResult {
+  tentVisitId: string;
+  visitedAt: string;
+  queueOpId: string;
+}
+
+/**
+ * Thrown when the tent is already the day's most recent visit.
+ *
+ * Its own class rather than a bare Error so the form can tell "you are already
+ * in this tent" from a real failure without matching on message text. Mirrors the
+ * server's TENT_ALREADY_CURRENT_VISIT guard so a doomed operation is never
+ * queued: the local check has the same day's rows to look at.
+ */
+export class TentAlreadyCurrentVisitError extends Error {
+  constructor() {
+    super(ErrorCodes.TENT_ALREADY_CURRENT_VISIT);
+    this.name = "TentAlreadyCurrentVisitError";
+  }
+}
+
+/**
+ * Local-first hook to log one more visit to a tent.
+ *
+ * Separate from useOfflineUpdateAttendance because the form's save reconciles the
+ * day to a set of tents: it has no way to say "the same tent again, later". This
+ * appends a row, and the id it generates is the id the server will store (see
+ * push-handlers.ts), so the visit survives the round trip as itself rather than
+ * coming back as a stranger next to an orphan.
+ */
+export function useOfflineLogTentVisit() {
+  const context = useContext(OfflineContext);
+  const isReady = context?.isReady ?? false;
+  const getDb = context?.getDb;
+  const refreshPendingCount = context?.refreshPendingCount;
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  const logTentVisitLocal = useCallback(
+    async (input: LogTentVisitInput): Promise<LogTentVisitResult> => {
+      if (!isReady || !getDb || !refreshPendingCount) {
+        throw new Error("Offline mode not available");
+      }
+
+      const userId = user?.id;
+      if (!userId) {
+        throw new Error("User not authenticated");
+      }
+
+      const db = getDb();
+      const visitedAt = input.visitedAt ?? new Date().toISOString();
+
+      // created_at, not visit_date: visit_date holds the day, so it is the same
+      // string for every visit in it and cannot order them.
+      const latestVisit = await db.getFirstAsync<{ tent_id: string }>(
+        `SELECT tent_id FROM tent_visits
+         WHERE user_id = ? AND festival_id = ? AND visit_date = ? AND _deleted = 0
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [userId, input.festivalId, input.date],
+      );
+
+      if (latestVisit?.tent_id === input.tentId) {
+        throw new TentAlreadyCurrentVisitError();
+      }
+
+      const tentVisitId = generateUUID();
+
+      // One transaction: the row and the operation that pushes it have to appear
+      // together. Killed between them, the row existed `_dirty` with nothing
+      // queued to push it, and the next pull then deleted it as a ghost - because
+      // a revisit's day-group does have server rows, which is exactly what makes
+      // it a revisit. The user's visit disappeared with no trace.
+      let queueOpId = "";
+      await db.withTransactionAsync(async () => {
+        await db.runAsync(
+          `INSERT INTO tent_visits (
+            id, user_id, tent_id, festival_id, visit_date, created_at,
+            _synced_at, _deleted, _dirty
+          ) VALUES (?, ?, ?, ?, ?, ?, NULL, 0, 1)`,
+          [tentVisitId, userId, input.tentId, input.festivalId, input.date, visitedAt],
+        );
+
+        queueOpId = await enqueueOperation(db, "INSERT", "tent_visits", tentVisitId, {
+          festival_id: input.festivalId,
+          tent_id: input.tentId,
+          visited_at: visitedAt,
+        });
+      });
+
+      logger.debug("[OfflineAttendance] Logged tent visit:", { tentVisitId, visitedAt });
+
+      await refreshPendingCount();
+
+      await invalidateLocalQueries(queryClient, [
+        "local-attendances",
+        "local-tents",
+        "local-day-summaries",
+      ]);
+
+      return { tentVisitId, visitedAt, queueOpId };
+    },
+    [isReady, getDb, refreshPendingCount, queryClient, user?.id],
+  );
+
+  return useMutation({
+    mutationFn: logTentVisitLocal,
   });
 }

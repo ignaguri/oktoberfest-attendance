@@ -86,6 +86,10 @@
                   "idempotencyKey": {
                     "type": "string",
                     "maxLength": 255
+                  },
+                  "consumptionId": {
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "required": [
@@ -1307,6 +1311,127 @@
           },
           "400": {
             "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/attendance/tent-visits": {
+      "post": {
+        "tags": [
+          "attendance"
+        ],
+        "summary": "Log a tent visit",
+        "description": "Appends a timestamped visit to a tent, creating the day's attendance if needed. Use this to record returning to a tent later the same day; POST /attendance/personal reconciles the day's set of tents and cannot express a second visit.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "festivalId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "tentId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "visitedAt": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "tentVisitId": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "festivalId",
+                  "tentId",
+                  "visitedAt"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tent visit logged",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tentVisitId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "attendanceId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "visitedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "tentVisitId",
+                    "attendanceId",
+                    "visitedAt"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error, or the tent is already the day's latest visit",
             "content": {
               "application/json": {
                 "schema": {

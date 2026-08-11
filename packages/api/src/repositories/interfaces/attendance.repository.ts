@@ -4,6 +4,8 @@ import type {
   CreateAttendanceInput,
   CreateAttendanceResponse,
   ListAttendancesQuery,
+  LogTentVisitInput,
+  LogTentVisitResponse,
   TentVisitRow,
   UpdatePersonalAttendanceInput,
   UpdatePersonalAttendanceResponse,
@@ -75,6 +77,20 @@ export interface IAttendanceRepository {
     userId: string,
     input: UpdatePersonalAttendanceInput,
   ): Promise<UpdatePersonalAttendanceResponse>;
+
+  /**
+   * Append one visit to a tent, creating the day's attendance row if needed.
+   *
+   * Unlike `updatePersonal`, this does not reconcile a set: it always adds a
+   * row, which is how a second visit to the same tent on the same day gets
+   * recorded. Rejects the call when the tent is already the day's most recent
+   * visit, so a stray double tap cannot log "back at the tent I'm standing in".
+   * @param userId - User ID
+   * @param input - Festival, tent, and when the visit happened
+   * @returns The created tent visit and the day's attendance ID
+   * @throws ValidationError(TENT_ALREADY_CURRENT_VISIT) if the tent is already the latest visit
+   */
+  logTentVisit(userId: string, input: LogTentVisitInput): Promise<LogTentVisitResponse>;
 
   /**
    * Check if a festival exists

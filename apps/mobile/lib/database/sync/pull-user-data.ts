@@ -11,8 +11,16 @@ import type * as SQLite from "expo-sqlite";
 import { logger } from "@/lib/logger";
 
 import { apiClient } from "../../api-client";
+import { clearDeletedConsumptions } from "../consumptions";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
 import { updateLastSyncAt } from "../sync-queue";
+import {
+  clearDeletedTentVisits,
+  clearSupersededTentVisits,
+  isPendingLocalRemoval,
+  purgeConfirmedTentVisitTombstones,
+  type TentVisitDayGroup,
+} from "../tent-visits";
 import { logConflict, shouldUpdate } from "./conflict";
 import type { PullResult } from "./types";
 
@@ -131,7 +139,24 @@ export async function pullAttendances(
     await processAttendances(db, festivalId, attendances, attendancesResult, now, isFullSnapshot);
     await updateLastSyncAt(db, "attendances", now);
 
-    await processTentVisits(db, response.tentVisits ?? [], tentVisitsResult, now);
+    // The day key is read in the festival's calendar, matching the server since
+    // 20260811100000_bucket_tent_visits_by_festival_timezone. Previously this used
+    // the app-wide default, so any festival outside Europe/Berlin filed visits
+    // under a different day here than the server did.
+    const festivalRow = await db.getFirstAsync<{ timezone: string | null }>(
+      "SELECT timezone FROM festivals WHERE id = ?",
+      [festivalId],
+    );
+
+    await processTentVisits(
+      db,
+      festivalId,
+      response.tentVisits ?? [],
+      tentVisitsResult,
+      now,
+      isFullSnapshot,
+      festivalRow?.timezone ?? undefined,
+    );
     await updateLastSyncAt(db, "tent_visits", now);
   } catch (error) {
     logger.error("[SyncManager] Pull attendances failed:", error);
@@ -300,49 +325,49 @@ async function processAttendances(
  * visit_date is normalized to YYYY-MM-DD to match the local write path in
  * useOfflineUpdateAttendance and the UI query in useAdaptedAttendanceByDate
  * (which compares on exact date-string match). The server stores visit_date
- * as an ISO timestamp, but the local schema's
- * UNIQUE(user_id, tent_id, festival_id, visit_date) index and adapted-hook
- * query both assume "one row per tent per day".
+ * as an ISO timestamp; created_at keeps it, and is what orders several visits
+ * to the same tent within one day.
  *
- * Ghost-row reconciliation: useOfflineUpdateAttendance writes tent_visits
- * locally with a client-generated UUID and _dirty=1. The parent attendance
- * push creates server tent_visits with different UUIDs — the local client-UUID
- * rows are never cleared because there's no direct push handler for
- * tent_visits. Also, earlier mixed-format pulls may have left rows with
- * timestamp visit_dates that are invisible to the UI. Both are cleaned up
- * here by deleting any row sharing the natural key (date-only match, or a
- * timestamp prefix-matching the date) whose id differs from the server's.
+ * Ghost-row reconciliation: reconcileTentVisits writes a row with a
+ * client-generated UUID and _dirty=1, and the parent attendance push then
+ * creates the server row under a UUID of its own, so the local one is orphaned.
+ * Earlier mixed-format pulls also left rows whose visit_date is a timestamp,
+ * invisible to the UI. Both are cleared per (user, tent, festival, day) group
+ * once the server's own rows for that group are in place.
+ *
+ * The cleanup deliberately runs per group rather than per row. It used to delete
+ * every row sharing the natural key with a different id, which was fine while a
+ * unique index held the day to one visit per tent, but now erases the very rows
+ * that make a revisit a revisit: pulling A@10:00 and A@20:00 would have had the
+ * second delete the first.
  */
 async function processTentVisits(
   db: SQLite.SQLiteDatabase,
+  festivalId: string,
   tentVisits: ServerTentVisit[],
   result: PullResult,
   now: string,
+  isFullSnapshot: boolean,
+  timezone?: string,
 ): Promise<void> {
+  const groups = new Map<string, TentVisitDayGroup>();
+
   for (const tv of tentVisits) {
-    const visitDate = formatDateForDatabase(new Date(tv.visitDate));
+    const visitDate = formatDateForDatabase(new Date(tv.visitDate), timezone);
     const createdAt = tv.visitDate;
 
-    // Clean up any other local row with the same natural key — both ghost
-    // rows (date-only visit_date, _dirty=1) and stale pulled rows from an
-    // earlier mixed-format pull (timestamp visit_date starting with this date).
-    // Only fires when such a row actually exists to avoid per-sync write churn.
-    const ghost = await db.getFirstAsync<{ id: string }>(
-      `SELECT id FROM tent_visits
-       WHERE user_id = ? AND tent_id = ? AND festival_id = ?
-         AND (visit_date = ? OR visit_date LIKE ?)
-         AND id != ?
-       LIMIT 1`,
-      [tv.userId, tv.tentId, tv.festivalId, visitDate, `${visitDate}%`, tv.id],
-    );
-    if (ghost) {
-      await db.runAsync(
-        `DELETE FROM tent_visits
-         WHERE user_id = ? AND tent_id = ? AND festival_id = ?
-           AND (visit_date = ? OR visit_date LIKE ?)
-           AND id != ?`,
-        [tv.userId, tv.tentId, tv.festivalId, visitDate, `${visitDate}%`, tv.id],
-      );
+    const groupKey = `${tv.userId}|${tv.tentId}|${tv.festivalId}|${visitDate}`;
+    const group = groups.get(groupKey);
+    if (group) {
+      group.serverIds.push(tv.id);
+    } else {
+      groups.set(groupKey, {
+        userId: tv.userId,
+        tentId: tv.tentId,
+        festivalId: tv.festivalId,
+        visitDate,
+        serverIds: [tv.id],
+      });
     }
 
     const existing = await db.getFirstAsync<LocalTentVisit>(
@@ -351,6 +376,17 @@ async function processTentVisits(
     );
 
     if (existing) {
+      // A tombstone with _dirty set is a removal the user made here that has not
+      // reached the server yet - the attendance UPDATE carrying it is still
+      // queued. The server naturally still returns the row, so treating that as
+      // truth would undo the removal on screen, and after the push did land the
+      // server would stop returning the row, leaving the resurrected copy in a
+      // group nothing pulls again. Leave it tombstoned; the purge below clears it
+      // once the server confirms the removal.
+      if (isPendingLocalRemoval(existing)) {
+        continue;
+      }
+
       const needsUpdate =
         existing.visit_date !== visitDate ||
         existing.created_at !== createdAt ||
@@ -377,7 +413,36 @@ async function processTentVisits(
       result.inserted++;
     }
   }
+
+  // Second pass on purpose: a group's superseded rows can only be identified
+  // once every server row in it has been written, or the last row pulled would
+  // look like a stranger to the ones before it.
+  for (const group of groups.values()) {
+    result.deleted += await clearSupersededTentVisits(db, group);
+  }
+
+  // Purge the tombstones the server has acted on. A row the user removed here
+  // stays tombstoned (see the skip above) until the attendance push carrying the
+  // removal lands; once it has, the server stops returning that row, and this is
+  // the only thing that then reaps the tombstone - the row's day-group no longer
+  // appears in any pull, so clearSupersededTentVisits is never called for it.
+  //
+  // Only on a full snapshot: a row absent from a partial page may still exist
+  // server-side, and dropping the tombstone early would hide a removal that has
+  // not actually happened.
+  if (!isFullSnapshot) {
+    return;
+  }
+
+  const serverIds = new Set(tentVisits.map((tv) => tv.id));
+  result.deleted += await purgeConfirmedTentVisitTombstones(db, festivalId, serverIds);
+
+  // And reconcile deletes made elsewhere: a visit removed on the web or another
+  // device is simply absent from the response, and nothing else would ever notice
+  // - its day-group is gone, so clearSupersededTentVisits is never called for it.
+  result.deleted += await clearDeletedTentVisits(db, festivalId, serverIds);
 }
+
 
 /**
  * Pull consumptions for all attendances
@@ -477,6 +542,15 @@ export async function pullConsumptions(
             result.inserted++;
           }
         }
+
+        // Reconcile deletes made elsewhere. The response is the day's complete,
+        // unpaginated set, so a local row missing from it was deleted on the web
+        // or another device — and nothing else would ever notice.
+        result.deleted += await clearDeletedConsumptions(
+          db,
+          att.id,
+          new Set(consumptions.map((cons) => cons.id)),
+        );
       } catch (error) {
         logger.error(`[SyncManager] Pull consumptions for ${att.date} failed:`, error);
       }

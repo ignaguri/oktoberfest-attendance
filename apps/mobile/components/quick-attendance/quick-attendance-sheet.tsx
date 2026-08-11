@@ -2,6 +2,7 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
+import { getCurrentTentId } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -17,7 +18,7 @@ import {
   Wine,
   X,
 } from "lucide-react-native";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -37,8 +38,13 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
+import { deriveQuickSaveActions } from "@/lib/attendance/quick-save-actions";
 import { type PendingPhoto, useBeerPictureUpload } from "@/hooks/useBeerPictureUpload";
-import { useOfflineUpdateAttendance } from "@/hooks/useOfflineAttendance";
+import {
+  TentAlreadyCurrentVisitError,
+  useOfflineLogTentVisit,
+  useOfflineUpdateAttendance,
+} from "@/hooks/useOfflineAttendance";
 import { useOfflineLogConsumption } from "@/hooks/useOfflineConsumption";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { BackgroundColors, Colors, DrinkTypeColors, IconColors } from "@/lib/constants/colors";
@@ -166,6 +172,7 @@ export function QuickAttendanceSheet({
   const queryClient = useQueryClient();
   const logConsumption = useOfflineLogConsumption();
   const updateAttendance = useOfflineUpdateAttendance();
+  const logTentVisit = useOfflineLogTentVisit();
 
   const { user } = useAuth();
 
@@ -227,16 +234,39 @@ export function QuickAttendanceSheet({
     return `${count} ${drinkName}`;
   }, [selectedDrinkType, drinkCounts, isSaving, t]);
 
-  // Reset state when sheet opens, preselect tent from prop or last attendance
+  // The tent the user is in: their latest visit today. Not tentIds[0], which is
+  // the first tent of the day, nor its last entry, which a revisit leaves
+  // pointing at a tent already left.
+  const currentTentId = useMemo(
+    () => getCurrentTentId(attendance?.tentVisits ?? []),
+    [attendance?.tentVisits],
+  );
+
+  /*
+   * Reset state when the sheet opens, preselecting the tent from the prop or from
+   * today's latest visit.
+   *
+   * Latched on the closed -> open transition, and the preselect is read through a
+   * ref. With currentTentId in the dependency array this re-ran whenever today's
+   * visits changed while the sheet was open: a background sync landing mid-edit
+   * cleared the drink and the chosen photos, so the user's selections vanished and
+   * Save went disabled with no explanation. It also fired during a save, since the
+   * write invalidates and the refetch resolves while the sheet is still open,
+   * making the photo thumbnails disappear behind the spinner.
+   */
+  const preselectRef = useRef<string | undefined>(undefined);
+  preselectRef.current = preselectedTentId || currentTentId;
+  const wasOpenRef = useRef(false);
+
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !wasOpenRef.current) {
       setSelectedDrinkType(null);
       setPendingPhotos([]);
       // Prioritize: 1) preselectedTentId from map/banner, 2) today's attendance tent
-      const tentToSelect = preselectedTentId || attendance?.tentIds?.[0];
-      setSelectedTentId(tentToSelect);
+      setSelectedTentId(preselectRef.current);
     }
-  }, [isOpen, preselectedTentId, attendance?.tentIds]);
+    wasOpenRef.current = isOpen;
+  }, [isOpen]);
 
   // Handle drink type selection (toggle behavior)
   const handleDrinkTypeSelect = useCallback((type: DrinkType) => {
@@ -265,25 +295,51 @@ export function QuickAttendanceSheet({
     setPendingPhotos((prev) => prev.filter((p) => p.id !== photoId));
   }, []);
 
-  // Check if there's anything to save
-  const hasChanges =
-    selectedDrinkType !== null ||
-    pendingPhotos.length > 0 ||
-    (selectedTentId && selectedTentId !== attendance?.tentIds?.[0]);
+  // What this save should do. Derived in lib/attendance/quick-save-actions so the
+  // combinations are covered by a table test - the mobile vitest config cannot
+  // reach a .tsx file, and this is where both of the day-wiping bugs lived.
+  const saveActions = useMemo(
+    () =>
+      deriveQuickSaveActions({
+        selectedDrinkType,
+        pendingPhotoCount: pendingPhotos.length,
+        selectedTentId,
+        currentTentId,
+      }),
+    [selectedDrinkType, pendingPhotos.length, selectedTentId, currentTentId],
+  );
+  const hasChanges = saveActions.hasChanges;
 
   // Handle save
   const handleSave = useCallback(async () => {
     if (!festivalId) return;
 
-    // Must have at least a drink, photos, or tent change (using same logic as hasChanges)
-    const hasTentChange = selectedTentId && selectedTentId !== attendance?.tentIds?.[0];
-    if (!selectedDrinkType && pendingPhotos.length === 0 && !hasTentChange) return;
+    if (!saveActions.hasChanges) return;
 
     setIsSaving(true);
 
     try {
+      // Moving tent is a new visit appended to the day, not a new set of tents for
+      // it. Sending the tent through `tents` below would reconcile the day to just
+      // this one and delete every earlier visit, on the phone and on the server.
+      if (saveActions.shouldLogVisit && selectedTentId) {
+        try {
+          await logTentVisit.mutateAsync({
+            festivalId,
+            date: today,
+            tentId: selectedTentId,
+          });
+        } catch (error) {
+          // Already the day's latest visit, so there is nothing to append and
+          // nothing wrong. Reachable when currentTentId is read from a stale cache.
+          if (!(error instanceof TentAlreadyCurrentVisitError)) {
+            throw error;
+          }
+        }
+      }
+
       // Log the consumption only if a drink is selected
-      if (selectedDrinkType) {
+      if (saveActions.shouldLogConsumption && selectedDrinkType) {
         // beerCost is in euros, we need cents
         const priceCents = currentFestival?.beerCost
           ? Math.round(currentFestival.beerCost * 100)
@@ -300,12 +356,14 @@ export function QuickAttendanceSheet({
         });
       }
 
-      // Update attendance with tent or enqueue photos
-      if (selectedTentId || pendingPhotos.length > 0) {
+      // Make sure the day has an attendance row: photos hang off it and the
+      // calendar reads it. No `tents` on purpose, which is what leaves the day's
+      // visits alone - passing [] would not, since reconciliation treats an empty
+      // array as "the day holds no tents" and clears it.
+      if (saveActions.shouldTouchAttendance) {
         const result = await updateAttendance.mutateAsync({
           festivalId,
           date: today,
-          tents: selectedTentId ? [selectedTentId] : [],
         });
 
         if (pendingPhotos.length > 0) {
@@ -374,11 +432,12 @@ export function QuickAttendanceSheet({
     today,
     pendingPhotos,
     attendance?.id,
-    attendance?.tentIds,
+    currentTentId,
     currentFestival?.beerCost,
     calculatePricePaid,
     logConsumption,
     updateAttendance,
+    logTentVisit,
     user?.id,
     offlineContext,
     queryClient,

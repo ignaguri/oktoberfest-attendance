@@ -6,12 +6,9 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useConsumptions } from "@prostcounter/shared/hooks";
-import type {
-  AttendanceByDate,
-  DrinkType,
-  QuickAttendanceForm,
-} from "@prostcounter/shared/schemas";
+import type { DrinkType, QuickAttendanceForm } from "@prostcounter/shared/schemas";
 import { QuickAttendanceFormSchema } from "@prostcounter/shared/schemas";
+import { getCurrentTentId } from "@prostcounter/shared/utils";
 import { useEffect, useMemo, useState } from "react";
 import ConfettiExplosion from "react-confetti-explosion";
 import { useForm } from "react-hook-form";
@@ -44,7 +41,6 @@ export const QuickAttendanceRegistrationForm = ({
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const { tents, isLoading: tentsLoading, error: tentsError } = useTents(currentFestival?.id);
   const { isExploding, triggerConfetti } = useConfetti();
-  const [attendanceData, setAttendanceData] = useState<AttendanceByDate | null>(null);
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
 
   // Get today's date string
@@ -103,9 +99,13 @@ export const QuickAttendanceRegistrationForm = ({
           date: dateString,
         });
         if (attendance) {
-          setAttendanceData(attendance);
           onAttendanceIdReceived(attendance.id);
-          setValue("tentId", attendance.tentIds[attendance.tentIds.length - 1] || "");
+          // The tent the user is in is their latest visit. Not the end of
+          // tentIds: that field is a set in first-visit order, so a day that
+          // went A, then B, then back to A leaves B sitting at the end of it
+          // while A is where the user actually is. This value feeds the drink
+          // stepper below, so reading it wrong misfiles every drink logged.
+          setValue("tentId", getCurrentTentId(attendance.tentVisits) ?? "");
         }
       } catch {
         toast.error(t("notifications.error.attendanceLoadFailed"));
@@ -122,15 +122,14 @@ export const QuickAttendanceRegistrationForm = ({
     }
 
     try {
-      // Only send the new tent ID if it's different from the last one and not empty
-      // This prevents duplicate tent visits in the database
-      const tentsToSend =
-        data.tentId && // Only if tent is selected (not empty)
-        (!attendanceData?.tentIds ||
-          attendanceData.tentIds.length === 0 ||
-          attendanceData.tentIds[attendanceData.tentIds.length - 1] !== data.tentId)
-          ? [data.tentId] // Only the new tent
-          : []; // No new tent to add
+      // Send whatever tent is selected and let the RPC decide whether it is a
+      // move. add_or_update_attendance_with_tents already skips the insert when
+      // the tent equals the day's most recent visit, and it compares against
+      // the real latest visit rather than against a deduplicated set, so the
+      // client second-guessing it here only ever got the answer wrong: on a day
+      // that revisited a tent it read the wrong "current" tent and dropped the
+      // move entirely.
+      const tentsToSend = data.tentId ? [data.tentId] : [];
 
       const dateString = formatDateForDatabase(new Date());
       const { attendanceId: newAttendanceId } = await apiClient.attendance.create({
@@ -147,14 +146,11 @@ export const QuickAttendanceRegistrationForm = ({
         festivalId: currentFestival.id,
         date: dateString,
       });
-      if (freshAttendance) {
-        setAttendanceData(freshAttendance);
-      }
-
-      // Update the tent selection to show the current tent (last tent in the array)
-      const currentTentIds = freshAttendance?.tentIds ?? [];
-      if (currentTentIds.length > 0) {
-        setValue("tentId", currentTentIds[currentTentIds.length - 1]);
+      // Re-read the current tent from the visits the save just produced, so the
+      // field agrees with what was stored.
+      const currentTentId = getCurrentTentId(freshAttendance?.tentVisits ?? []);
+      if (currentTentId) {
+        setValue("tentId", currentTentId);
       }
 
       toast.success(t("notifications.success.attendanceUpdated"));

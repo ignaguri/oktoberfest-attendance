@@ -17,6 +17,8 @@ export interface Tab {
   key: string;
   label: string;
   disabled?: boolean;
+  /** Spoken after the label, for what selecting this tab does. */
+  accessibilityHint?: string;
 }
 
 interface SegmentedControlProps {
@@ -50,8 +52,13 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
   // first placement snaps; later ones animate.
   const hasPositionedRef = useRef(false);
 
-  // Calculate indicator position based on active tab index
-  const activeIndex = tabs.findIndex((tab) => tab.key === activeTab);
+  // Clamped, because findIndex returns -1 for an activeTab that is not in `tabs`
+  // and the indicator would park a whole segment off the left edge. Both current
+  // callers pass a valid key, but a shared primitive should not rely on that.
+  const activeIndex = Math.max(
+    0,
+    tabs.findIndex((tab) => tab.key === activeTab),
+  );
 
   /*
    * The style only reads the position. Wrapping the read in an animation
@@ -97,7 +104,9 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
 
   const handleTabPress = useCallback(
     (tab: Tab) => {
-      if (tab.disabled) return;
+      if (tab.disabled) {
+        return;
+      }
 
       onTabChange(tab.key);
     },
@@ -116,8 +125,12 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
         className="absolute bottom-1 left-1 top-1 rounded-md border border-outline-200 bg-background-0 shadow-md"
       />
 
-      {/* Tab buttons */}
-      <HStack className="relative z-10">
+      {/*
+        Tab buttons. The container declares the tablist so the role="tab" children
+        sit inside the pattern they belong to, rather than being announced as
+        orphan tabs.
+      */}
+      <HStack className="relative z-10" accessibilityRole="tablist">
         {tabs.map((tab) => {
           const isActive = tab.key === activeTab;
           const isDisabled = tab.disabled;
@@ -128,10 +141,13 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
               onPress={() => handleTabPress(tab)}
               onLayout={handleTabLayout}
               disabled={isDisabled}
-              className="flex-1 items-center justify-center py-2"
+              // min-h-11 is 44pt, the smallest comfortable touch target. py-2
+              // around 14px text landed near 36.
+              className="min-h-11 flex-1 items-center justify-center py-2"
               accessibilityRole="tab"
               accessibilityState={{ selected: isActive, disabled: isDisabled }}
               accessibilityLabel={tab.label}
+              accessibilityHint={tab.accessibilityHint}
             >
               <Text
                 className={cn(

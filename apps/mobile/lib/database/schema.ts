@@ -115,7 +115,7 @@ export type MutableTable =
 // Constants
 // =============================================================================
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 export const DATABASE_NAME = "prostcounter.db";
 
 // =============================================================================
@@ -423,6 +423,9 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
     )
   `,
 
+  // No uniqueness over (user_id, tent_id, festival_id, visit_date): a day holds a
+  // sequence of visits, so returning to a tent later is a second row with the same
+  // key, ordered by created_at. See ./schema/tents.ts.
   tent_visits: `
     CREATE TABLE IF NOT EXISTS tent_visits (
       id TEXT PRIMARY KEY,
@@ -433,8 +436,7 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
       created_at TEXT,
       _synced_at TEXT,
       _deleted INTEGER DEFAULT 0,
-      _dirty INTEGER DEFAULT 0,
-      UNIQUE(user_id, tent_id, festival_id, visit_date)
+      _dirty INTEGER DEFAULT 0
     )
   `,
 

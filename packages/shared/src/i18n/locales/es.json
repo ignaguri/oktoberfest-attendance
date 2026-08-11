@@ -593,6 +593,9 @@
       "editTitle": "Editar asistencia",
       "addTitle": "Agregar asistencia",
       "selectTents": "Seleccioná carpas...",
+      "logAnotherVisit": "Registrar otra visita",
+      "logAnotherVisitHint": "Agrega una visita con la hora actual para la carpa que elijás.",
+      "logAnotherVisitUnavailable": "No se pudieron cargar las carpas, así que por ahora no se puede registrar otra visita.",
       "photos": "Fotos",
       "saving": "Guardando...",
       "deleteConfirmTitle": "¿Eliminar asistencia?",
@@ -624,8 +627,8 @@
       "date": "Fecha",
       "amount": "Cantidad",
       "tents": "Carpas",
-      "visitedTents": "Carpas visitadas",
-      "visitedTentsDescription": "Detalles de las carpas que visitaste.",
+      "visitedTents": "Registro de check-ins",
+      "visitedTentsDescription": "Todos los check-ins de esta fecha, en orden. Una carpa puede aparecer más de una vez.",
       "noTentsRegistered": "No hay carpas registradas en esta fecha.",
       "checkIn": "Check-in"
     },
@@ -644,10 +647,13 @@
       "list": "Lista"
     },
     "list": {
-      "a11yDrinks": "{{total}} bebidas",
+      "today": "Hoy",
       "a11ySpent": "{{amount}} gastado",
+      "a11yPhotos": "{{count}} foto",
+      "a11yPhotos_other": "{{count}} fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reservado",
+      "reservationsUnavailable": "No se pudieron cargar las reservas, así que faltan los días que solo tienen una reserva.",
       "tip": "+{{amount}} propina"
     },
     "tabs": {
@@ -2660,6 +2666,8 @@
     "FESTIVAL_NOT_FOUND": "Festival no encontrado.",
     "NO_ACTIVE_FESTIVAL": "No se encontró ningún festival activo.",
     "TENT_NOT_FOUND": "Carpa no encontrada.",
+    "TENT_ALREADY_CURRENT_VISIT": "Ya estás acá. Visitá otra carpa primero.",
+    "TENT_VISIT_ID_MISMATCH": "No se pudo guardar esa visita. Intentá de nuevo.",
     "RESERVATION_NOT_FOUND": "Reserva no encontrada.",
     "RESERVATION_ALREADY_CHECKED_IN": "Ya hiciste check-in.",
     "RESERVATION_CANCELLED": "Esta reserva fue cancelada.",
