@@ -55,15 +55,7 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if stats are visible (may not be if no festival selected)
-      const hasStats = await achievementsPage.totalProgressCard.isVisible().catch(() => false);
-
-      if (hasStats) {
-        await achievementsPage.expectStatsVisible();
-      } else {
-        // Page should still be valid
-        await achievementsPage.expectOnAchievementsPage();
-      }
+      await achievementsPage.expectStatsVisible();
     });
   });
 
@@ -73,15 +65,6 @@ test.describe("Achievements Flows", () => {
 
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
-
-      // The chips only render once a festival is selected and the query has
-      // resolved, so a missing chip row is a valid state rather than a failure.
-      const hasChips = await achievementsPage.categoryChipAll.isVisible().catch(() => false);
-
-      if (!hasChips) {
-        await achievementsPage.expectOnAchievementsPage();
-        return;
-      }
 
       await expect(achievementsPage.categoryChipAll).toHaveAttribute("aria-pressed", "true");
 
@@ -100,20 +83,13 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if badges are visible when data is loaded
-      const hasChips = await achievementsPage.categoryChipAll.isVisible().catch(() => false);
+      // Unlocked cards show a tier name, locked ones show "Locked". Which one
+      // the seed produces depends on the test user's progress, so assert that
+      // the grid rendered cards in one state or the other.
+      const hasUnlocked = await achievementsPage.unlockedTierLabel.isVisible();
+      const hasLocked = await achievementsPage.lockedCardLabel.isVisible();
 
-      if (hasChips) {
-        // Unlocked cards show a tier name, locked ones show "Locked".
-        const hasUnlocked = await achievementsPage.unlockedTierLabel.isVisible().catch(() => false);
-        const hasLocked = await achievementsPage.lockedCardLabel.isVisible().catch(() => false);
-
-        // At least one badge type should be visible
-        expect(hasUnlocked || hasLocked).toBeTruthy();
-      } else {
-        // Page should still be valid
-        await achievementsPage.expectOnAchievementsPage();
-      }
+      expect(hasUnlocked || hasLocked).toBeTruthy();
     });
 
     test("should show achievement progress sections", async ({ page }) => {
@@ -122,22 +98,12 @@ test.describe("Achievements Flows", () => {
       await achievementsPage.goto();
       await achievementsPage.waitForLoad();
 
-      // Check if data is loaded
-      const hasChips = await achievementsPage.categoryChipAll.isVisible().catch(() => false);
+      // Either completed, in-progress, or empty message should be visible
+      const hasCompleted = await achievementsPage.hasCompletedAchievements();
+      const hasInProgress = await achievementsPage.hasInProgressAchievements();
+      const hasEmpty = await achievementsPage.noAchievementsMessage.isVisible();
 
-      if (hasChips) {
-        // Either completed, in-progress, or empty message should be visible
-        const hasCompleted = await achievementsPage.hasCompletedAchievements();
-        const hasInProgress = await achievementsPage.hasInProgressAchievements();
-        const hasEmpty = await achievementsPage.noAchievementsMessage
-          .isVisible()
-          .catch(() => false);
-
-        expect(hasCompleted || hasInProgress || hasEmpty).toBeTruthy();
-      } else {
-        // Page should still be valid
-        await achievementsPage.expectOnAchievementsPage();
-      }
+      expect(hasCompleted || hasInProgress || hasEmpty).toBeTruthy();
     });
   });
 });

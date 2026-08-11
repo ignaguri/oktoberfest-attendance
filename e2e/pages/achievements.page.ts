@@ -31,31 +31,41 @@ export class AchievementsPage extends BasePage {
   readonly unlockedTierLabel: Locator;
   readonly lockedCardLabel: Locator;
 
-  // Loading/empty states
-  readonly loadingMessage: Locator;
+  // Empty state
   readonly noAchievementsMessage: Locator;
+
+  /**
+   * Every content locator scopes to <main>. React streams the pre-hydration
+   * tree into a hidden `<div id="S:0">` that sits outside <main>, so until
+   * hydration finishes both copies are in the DOM. Unscoped locators match
+   * twice, strict mode throws, and the `.catch(() => false)` guards in the
+   * specs swallow it - turning a gated assertion into a silent no-op.
+   */
+  private readonly content: Locator;
 
   constructor(page: Page) {
     super(page);
 
+    this.content = page.getByRole("main");
+
     // Page heading
-    this.pageHeading = page.getByRole("heading", { name: /achievements/i });
+    this.pageHeading = this.content.getByRole("heading", { name: /achievements/i });
 
     // Stats cards - use title text
-    this.totalProgressCard = page.getByText(/total progress/i);
-    this.totalPointsCard = page.getByText(/total points/i);
-    this.rarityBreakdownCard = page.getByText(/rarity breakdown/i);
-    this.categoriesCard = page.getByText("Categories").first();
+    this.totalProgressCard = this.content.getByText(/total progress/i);
+    this.totalPointsCard = this.content.getByText(/total points/i);
+    this.rarityBreakdownCard = this.content.getByText(/rarity breakdown/i);
+    this.categoriesCard = this.content.getByText("Categories").first();
 
     // Category filter chips: <button aria-pressed> wrapping a Badge
-    this.categoryChipAll = page.getByRole("button", {
+    this.categoryChipAll = this.content.getByRole("button", {
       name: "All Achievements",
       exact: true,
     });
 
     // Achievement sections - one pair renders per category, so scope to the first
-    this.completedHeading = page.getByRole("heading", { name: /completed/i }).first();
-    this.inProgressHeading = page
+    this.completedHeading = this.content.getByRole("heading", { name: /completed/i }).first();
+    this.inProgressHeading = this.content
       .getByRole("heading", {
         name: /in progress/i,
       })
@@ -64,13 +74,11 @@ export class AchievementsPage extends BasePage {
     // Card state labels: an unlocked card shows its tier name, a locked one
     // shows "Locked". Exact matching keeps "Locked" from also catching the
     // stats card's "12% unlocked".
-    this.unlockedTierLabel = page.getByText(/^(Bronze|Silver|Gold|Platinum)$/).first();
-    this.lockedCardLabel = page.getByText("Locked", { exact: true }).first();
+    this.unlockedTierLabel = this.content.getByText(/^(Bronze|Silver|Gold|Platinum)$/).first();
+    this.lockedCardLabel = this.content.getByText("Locked", { exact: true }).first();
 
-    // Loading/empty states - the page renders common.status.loading, not
-    // achievements.loading
-    this.loadingMessage = page.getByText("Loading...", { exact: true });
-    this.noAchievementsMessage = page.getByText(/no achievements in this category/i);
+    // Empty state, shown in place of the card grid
+    this.noAchievementsMessage = this.content.getByText(/no achievements in this category/i);
   }
 
   /**
@@ -82,15 +90,16 @@ export class AchievementsPage extends BasePage {
   }
 
   /**
-   * Wait for achievements to finish loading
+   * Wait for the achievements data to render.
+   *
+   * The chip row is the marker: it renders for any resolved festival, with or
+   * without cards. Neither the loading text nor the "select a festival" message
+   * works here - both are showing while the festival context is still
+   * resolving, so waiting on them returns during the initial render and every
+   * assertion downstream then samples a page that has not loaded yet.
    */
   async waitForLoad(): Promise<void> {
-    // Wait for loading message to disappear
-    try {
-      await this.loadingMessage.waitFor({ state: "hidden", timeout: 10000 });
-    } catch {
-      // Loading message may not appear if data loads quickly
-    }
+    await expect(this.categoryChipAll).toBeVisible({ timeout: 15000 });
   }
 
   /**
@@ -99,13 +108,7 @@ export class AchievementsPage extends BasePage {
   async expectAchievementsLoaded(): Promise<void> {
     await this.expectOnAchievementsPage();
     await this.waitForLoad();
-    // Either stats cards or no-festival message should be visible
-    const hasStats = await this.totalProgressCard.isVisible().catch(() => false);
-    const noFestival = await this.page
-      .getByText(/please select a festival/i)
-      .isVisible()
-      .catch(() => false);
-    expect(hasStats || noFestival).toBeTruthy();
+    await this.expectStatsVisible();
   }
 
   /**
@@ -120,7 +123,7 @@ export class AchievementsPage extends BasePage {
    * Locator for one category chip by its visible label
    */
   categoryChip(label: string): Locator {
-    return this.page.getByRole("button", { name: label, exact: true });
+    return this.content.getByRole("button", { name: label, exact: true });
   }
 
   /**
