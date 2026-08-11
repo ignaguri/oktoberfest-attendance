@@ -30,7 +30,7 @@ export type Views<
 
 /**
  * Helper type to extract return types from database functions
- * Usage: FunctionReturns<"get_user_achievements"> or FunctionReturns<"get_user_achievements", 0> for array elements
+ * Usage: FunctionReturns<"get_user_festival_stats"> or FunctionReturns<"get_wrapped_data", 0> for array elements
  */
 export type FunctionReturns<
   FunctionName extends keyof PublicSchema["Functions"],

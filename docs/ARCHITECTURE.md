@@ -407,7 +407,7 @@ All business logic reads from the database - no hardcoded constants!
 | **tent_visits**       | Location tracking         | Visit timestamps per tent              |
 | **groups**            | Competition groups        | Festival-scoped, invite tokens         |
 | **group_members**     | Group membership          | User-group relationships               |
-| **achievements**      | Achievement definitions   | Categories, rarity, conditions (JSONB) |
+| **achievements**      | Achievement definitions   | Categories, tier, conditions (JSONB)   |
 | **user_achievements** | Unlocked achievements     | Per user per festival                  |
 | **beer_pictures**     | Photo uploads             | Linked to attendances                  |
 | **tents**             | Tent master data          | Categories, capacity                   |
