@@ -215,7 +215,7 @@ The API follows a strict layered architecture for maintainability and testabilit
 
 | Route                         | Methods                | Description                        | Status      |
 | ----------------------------- | ---------------------- | ---------------------------------- | ----------- |
-| **`/achievements`**           | GET, POST              | User achievements & evaluation     | ✅ Complete |
+| **`/achievements`**           | GET                    | User achievements & progress       | ✅ Complete |
 | **`/attendance`**             | GET, POST, PUT, DELETE | Daily attendance records           | ✅ Complete |
 | **`/calendar`**               | GET                    | Calendar events (personal & group) | ✅ Complete |
 | **`/consumption`**            | POST                   | Log individual drinks              | ✅ Complete |
