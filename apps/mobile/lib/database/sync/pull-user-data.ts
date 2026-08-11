@@ -11,6 +11,7 @@ import type * as SQLite from "expo-sqlite";
 import { logger } from "@/lib/logger";
 
 import { apiClient } from "../../api-client";
+import { clearDeletedConsumptions } from "../consumptions";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
 import { updateLastSyncAt } from "../sync-queue";
 import {
@@ -541,6 +542,15 @@ export async function pullConsumptions(
             result.inserted++;
           }
         }
+
+        // Reconcile deletes made elsewhere. The response is the day's complete,
+        // unpaginated set, so a local row missing from it was deleted on the web
+        // or another device — and nothing else would ever notice.
+        result.deleted += await clearDeletedConsumptions(
+          db,
+          att.id,
+          new Set(consumptions.map((cons) => cons.id)),
+        );
       } catch (error) {
         logger.error(`[SyncManager] Pull consumptions for ${att.date} failed:`, error);
       }

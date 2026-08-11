@@ -77,6 +77,30 @@ describe("pushInsert", () => {
     });
   });
 
+  it("logs a consumption under the local row's id", async () => {
+    await pushInsert("consumptions", "local-cons-id", {
+      festival_id: "festival-1",
+      date: "2026-09-23",
+      drink_type: "beer",
+      tent_id: "tent-1",
+      price_paid_cents: 1550,
+      volume_ml: 1000,
+    });
+
+    // Same reason as the tent visit above. Without consumptionId the server
+    // minted its own, the local row kept the id it was pushed under, and the
+    // next pull inserted the server's row beside it — one drink, counted twice.
+    expect(logConsumption).toHaveBeenCalledWith({
+      festivalId: "festival-1",
+      date: "2026-09-23",
+      drinkType: "beer",
+      tentId: "tent-1",
+      pricePaidCents: 1550,
+      volumeMl: 1000,
+      consumptionId: "local-cons-id",
+    });
+  });
+
   it("still routes attendances to updatePersonal", async () => {
     await pushInsert("attendances", "local-att-id", {
       festival_id: "festival-1",

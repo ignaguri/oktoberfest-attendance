@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
+import { SupabaseConsumptionRepository } from "../../repositories/supabase";
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
@@ -611,5 +612,131 @@ describe("Consumption Routes Integration (Local DB)", () => {
 
     expect(stillExists).toBeDefined();
     expect(stillExists!.id).toBe(consumption!.id);
+  });
+
+  // An offline client owns the id: it has already written the row locally under
+  // that id and queued the push. If the server stores the drink under a
+  // different one, the next pull meets an id it has never seen and inserts the
+  // server's row beside the local one, so one drink counts twice on the device
+  // forever. Same contract as tentVisitId on logTentVisit.
+  describe("client-supplied consumption id", () => {
+    function repoFor(token: string): SupabaseConsumptionRepository {
+      return new SupabaseConsumptionRepository(createTestSupabaseWithAuth(token));
+    }
+
+    async function attendanceFor(date: string): Promise<string> {
+      const { data } = await createTestSupabaseWithAuth(testUser.token)
+        .from("attendances")
+        .insert({ user_id: testUser.id, festival_id: testFestival.id, date })
+        .select()
+        .single();
+      createdAttendanceIds.push(data!.id);
+      return data!.id;
+    }
+
+    it("stores the consumption under the id the client supplied", async () => {
+      const attendanceId = await attendanceFor("2024-09-28");
+      const consumptionId = randomUUID();
+
+      const created = await repoFor(testUser.token).create(testUser.id, attendanceId, {
+        drinkType: "beer",
+        pricePaidCents: 1620,
+        basePriceCents: 1620,
+        volumeMl: 1000,
+        consumptionId,
+      });
+      createdConsumptionIds.push(created.id);
+
+      expect(created.id).toBe(consumptionId);
+
+      const { data: stored } = await supabaseAdmin
+        .from("consumptions")
+        .select("id")
+        .eq("attendance_id", attendanceId);
+      expect(stored?.map((row) => row.id)).toEqual([consumptionId]);
+    });
+
+    it("treats a re-sent id as a replay rather than a second drink", async () => {
+      // A push whose response the device never saw is retried with the same id.
+      // Failing or inserting again would both be wrong.
+      const attendanceId = await attendanceFor("2024-09-29");
+      const consumptionId = randomUUID();
+      const repo = repoFor(testUser.token);
+
+      const input = {
+        drinkType: "beer" as const,
+        pricePaidCents: 1620,
+        basePriceCents: 1620,
+        volumeMl: 1000,
+        consumptionId,
+      };
+
+      const first = await repo.create(testUser.id, attendanceId, input);
+      const replay = await repo.create(testUser.id, attendanceId, input);
+      createdConsumptionIds.push(first.id);
+
+      expect(replay.id).toBe(consumptionId);
+
+      const { data: stored } = await supabaseAdmin
+        .from("consumptions")
+        .select("id")
+        .eq("attendance_id", attendanceId);
+      expect(stored).toHaveLength(1);
+    });
+
+    it("does not hand back another user's consumption on an id collision", async () => {
+      // The replay path must not become a way to read someone else's drink by
+      // guessing an id, so it is scoped to the caller's own attendance.
+      const victimAttendanceId = await attendanceFor("2024-09-30");
+      const consumptionId = randomUUID();
+
+      const victims = await repoFor(testUser.token).create(testUser.id, victimAttendanceId, {
+        drinkType: "wine",
+        pricePaidCents: 999,
+        basePriceCents: 999,
+        volumeMl: 200,
+        consumptionId,
+      });
+      createdConsumptionIds.push(victims.id);
+
+      const { data: attackerAttendance } = await createTestSupabaseWithAuth(testUser2.token)
+        .from("attendances")
+        .insert({ user_id: testUser2.id, festival_id: testFestival.id, date: "2024-09-30" })
+        .select()
+        .single();
+      createdAttendanceIds.push(attackerAttendance!.id);
+
+      await expect(
+        repoFor(testUser2.token).create(testUser2.id, attackerAttendance!.id, {
+          drinkType: "beer",
+          pricePaidCents: 1620,
+          basePriceCents: 1620,
+          volumeMl: 1000,
+          consumptionId,
+        }),
+      ).rejects.toThrow();
+
+      // And the victim's row is untouched.
+      const { data: untouched } = await supabaseAdmin
+        .from("consumptions")
+        .select("drink_type, price_paid_cents")
+        .eq("id", consumptionId)
+        .single();
+      expect(untouched).toMatchObject({ drink_type: "wine", price_paid_cents: 999 });
+    });
+
+    it("still lets the server mint an id when none is supplied", async () => {
+      const attendanceId = await attendanceFor("2024-10-01");
+
+      const created = await repoFor(testUser.token).create(testUser.id, attendanceId, {
+        drinkType: "beer",
+        pricePaidCents: 1620,
+        basePriceCents: 1620,
+        volumeMl: 1000,
+      });
+      createdConsumptionIds.push(created.id);
+
+      expect(created.id).toBeTruthy();
+    });
   });
 });

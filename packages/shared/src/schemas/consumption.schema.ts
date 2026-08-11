@@ -31,6 +31,17 @@ export const LogConsumptionSchema = z.object({
   volumeMl: z.number().int().min(1, "Volume must be positive").default(1000),
   recordedAt: z.iso.datetime().optional(),
   idempotencyKey: z.string().max(255).optional(),
+  /**
+   * Id to store the consumption under, supplied by an offline client.
+   *
+   * Without it the server mints its own, so the row the device pushed and the
+   * row the server returns are two different ids and the next pull inserts the
+   * server's as a stranger - one drink, counted twice, forever. The same
+   * reasoning already applies to `tentVisitId` on logTentVisit.
+   *
+   * Re-sending a stored id is a replay, not a second drink.
+   */
+  consumptionId: z.uuid({ error: "Invalid consumption ID" }).optional(),
 });
 
 export type LogConsumptionInput = z.infer<typeof LogConsumptionSchema>;

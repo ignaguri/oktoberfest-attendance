@@ -86,6 +86,10 @@
                   "idempotencyKey": {
                     "type": "string",
                     "maxLength": 255
+                  },
+                  "consumptionId": {
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "required": [

@@ -23,6 +23,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       volumeMl = 1000,
       recordedAt,
       idempotencyKey,
+      consumptionId,
     } = input;
 
     // If base price not provided, use the pricing cascade (tent -> festival -> default)
@@ -61,6 +62,9 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
     const { data, error } = await this.supabase
       .from("consumptions")
       .insert({
+        // Only set when the caller supplied one; otherwise let Postgres mint it,
+        // so web callers keep the behaviour they have always had.
+        ...(consumptionId ? { id: consumptionId } : {}),
         attendance_id: attendanceId,
         tent_id: tentId || null,
         drink_type: drinkType,
@@ -75,9 +79,42 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       .single();
 
     if (error || !data) {
+      // A client-supplied id that already exists is a replay of a push whose
+      // response the device never saw, not a second drink. Return the stored row
+      // so the retry settles instead of failing forever or duplicating.
+      if (consumptionId && error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+        const replayed = await this.findStoredById(consumptionId, attendanceId);
+        if (replayed) {
+          return replayed;
+        }
+      }
+
       throw new DatabaseError(
         `Failed to create consumption: ${error?.message || "No data returned"}`,
       );
+    }
+
+    return this.mapToConsumption(data);
+  }
+
+  /**
+   * The stored consumption behind a replayed id, or null if it is not this
+   * attendance's to return.
+   *
+   * Scoped to the attendance so a client cannot probe another user's rows by
+   * guessing ids: a collision on someone else's consumption reads as "not found"
+   * and falls through to the error path rather than handing back their drink.
+   */
+  private async findStoredById(id: string, attendanceId: string): Promise<Consumption | null> {
+    const { data, error } = await this.supabase
+      .from("consumptions")
+      .select("*")
+      .eq("id", id)
+      .eq("attendance_id", attendanceId)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
     }
 
     return this.mapToConsumption(data);

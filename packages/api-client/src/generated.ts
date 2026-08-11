@@ -117,6 +117,8 @@ export interface paths {
                         /** Format: date-time */
                         recordedAt?: string;
                         idempotencyKey?: string;
+                        /** Format: uuid */
+                        consumptionId?: string;
                     };
                 };
             };

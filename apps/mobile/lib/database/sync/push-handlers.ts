@@ -27,6 +27,10 @@ export async function pushInsert(
         tents: payload.tents as string[] | undefined,
       });
       break;
+    // Passing the local row's id, for the same reason tent_visits does below:
+    // the server used to mint its own, so the pull met an id it had never seen
+    // and inserted the server's row alongside the local one - one drink, counted
+    // twice on the device, permanently.
     case "consumptions":
       await apiClient.consumption.log({
         festivalId: payload.festival_id as string,
@@ -41,6 +45,7 @@ export async function pushInsert(
         tentId: payload.tent_id as string | undefined,
         pricePaidCents: (payload.price_paid_cents as number) ?? 0,
         volumeMl: (payload.volume_ml as number) ?? 1000,
+        consumptionId: recordId,
         ...(idempotencyKey ? { idempotencyKey } : {}),
       });
       break;
