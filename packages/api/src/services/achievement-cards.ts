@@ -1,13 +1,8 @@
 import type { RecentUnlock, SeriesCard, SeriesTier } from "@prostcounter/shared";
 import type { SeriesProgress } from "@prostcounter/shared/achievements";
-import { ONE_OFFS, SERIES, slugFor } from "@prostcounter/shared/achievements";
+import { nameKeyFor, ONE_OFFS, SERIES, slugFor } from "@prostcounter/shared/achievements";
 
 const DEFAULT_RECENT_UNLOCK_LIMIT = 10;
-
-/** The i18n key holding a slug's display name, e.g. "achievements.drinks_total.t2.name". */
-function nameKeyFor(slug: string): string {
-  return `achievements.${slug}.name`;
-}
 
 /** A rung's slug, recovered from the card it belongs to. One-offs have a single rung. */
 function slugForCardTier(card: SeriesCard, tier: SeriesTier): string {

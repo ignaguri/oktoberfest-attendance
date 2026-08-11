@@ -11,6 +11,7 @@ import {
 import type { AuthContext } from "../middleware/auth";
 import { ConflictError } from "../middleware/error";
 import { SupabaseCrowdReportRepository } from "../repositories/supabase";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -181,6 +182,10 @@ app.openapi(submitCrowdReportRoute, async (c) => {
   }
 
   const report = await repo.submitReport(tentId, user.id, body);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, body.festivalId, "POST /tents/{tentId}/crowd-report");
 
   return c.json({ report }, 201);
 });

@@ -112,6 +112,9 @@ export function useUpdateProfile() {
           setQueryData<ProfileCacheData>(QueryKeys.profile(), context.previousProfile);
         }
       },
+      onSuccess: () => {
+        invalidateQueries(QueryKeys.pendingUnlocks());
+      },
       onSettled: () => {
         // Always refetch after error or success to ensure cache is in sync
         invalidateQueries(QueryKeys.profile());

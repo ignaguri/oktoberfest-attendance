@@ -6,6 +6,8 @@
 
 import { QueryKeys, useApiClient, useInvalidateQueries, useMutation, useQuery } from "../data";
 
+import { useUnlockQueue } from "./useUnlockQueue";
+
 /**
  * Query-key prefixes to invalidate whenever an attendance is created,
  * updated, or deleted. Listed as prefixes (e.g. ["leaderboard"] matches
@@ -93,13 +95,15 @@ export function useAttendanceByDate(festivalId: string, date: string) {
 export function useUpdatePersonalAttendance() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
+  const { push } = useUnlockQueue();
 
   return useMutation(
     async (input: { festivalId: string; date: string; tents?: string[]; amount?: number }) => {
       return await apiClient.attendance.updatePersonal(input);
     },
     {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        push(data.unlocked ?? []);
         for (const key of ATTENDANCE_SIDE_EFFECT_KEYS) {
           invalidateQueries([...key]);
         }

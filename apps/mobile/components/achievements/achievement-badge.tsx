@@ -67,16 +67,21 @@ const FALLBACK_ICON_COMPONENTS = {
   Wallet,
 } as const;
 
-const SIZE_PX: Record<"sm" | "md" | "lg", number> = {
+/** `xl` exists for the detail sheet's hero badge; the lists use sm..lg. */
+type BadgeSize = "sm" | "md" | "lg" | "xl";
+
+const SIZE_PX: Record<BadgeSize, number> = {
   sm: 32,
   md: 40,
   lg: 56,
+  xl: 96,
 };
 
-const SIZE_CLASSES: Record<"sm" | "md" | "lg", string> = {
+const SIZE_CLASSES: Record<BadgeSize, string> = {
   sm: "w-8 h-8",
   md: "w-10 h-10",
   lg: "w-14 h-14",
+  xl: "w-24 h-24",
 };
 
 interface AchievementBadgeProps {
@@ -84,7 +89,7 @@ interface AchievementBadgeProps {
   category: AchievementCategory;
   tier: AchievementTier;
   isUnlocked: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: BadgeSize;
 }
 
 export function AchievementBadge({

@@ -3,13 +3,13 @@ import type {
   AttendanceByDate,
   AttendanceWithTotals,
   CreateAttendanceInput,
-  CreateAttendanceResponse,
+  CreateAttendanceResult,
   ListAttendancesQuery,
   LogTentVisitInput,
   LogTentVisitResponse,
   TentVisitRow,
   UpdatePersonalAttendanceInput,
-  UpdatePersonalAttendanceResponse,
+  UpdatePersonalAttendanceResult,
 } from "@prostcounter/shared";
 import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
@@ -244,7 +244,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
   async createWithTents(
     userId: string,
     input: CreateAttendanceInput,
-  ): Promise<CreateAttendanceResponse> {
+  ): Promise<CreateAttendanceResult> {
     const { data, error } = await this.supabase.rpc("add_or_update_attendance_with_tents", {
       p_user_id: userId,
       p_beer_count: 0,
@@ -275,7 +275,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
   async updatePersonal(
     userId: string,
     input: UpdatePersonalAttendanceInput,
-  ): Promise<UpdatePersonalAttendanceResponse> {
+  ): Promise<UpdatePersonalAttendanceResult> {
     const { data, error } = await this.supabase.rpc("update_personal_attendance_with_tents", {
       p_user_id: userId,
       // A bare date, for the reasons given in createWithTents above.

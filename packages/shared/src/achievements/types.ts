@@ -179,6 +179,17 @@ export interface UnlockedAchievement {
   points: number;
 }
 
+/**
+ * An unlock that has been written to user_achievements, carrying the
+ * achievement_events row the client acks with POST /achievements/seen.
+ *
+ * Separate from UnlockedAchievement because evaluate() is pure and cannot know
+ * event ids: only the repository that performed the insert can attach them.
+ */
+export interface PersistedUnlock extends UnlockedAchievement {
+  eventId: string;
+}
+
 export interface SeriesProgress {
   seriesId: string;
   category: AchievementCategory;

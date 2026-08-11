@@ -6,8 +6,10 @@ import type {
   SeriesCard as SeriesCardData,
   SeriesCategory,
   SeriesScope,
+  SeriesTier,
 } from "@prostcounter/shared/schemas";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CategoryChips, type CategoryFilter } from "@/components/achievements/CategoryChips";
 import { CloseToUnlockingRail } from "@/components/achievements/CloseToUnlockingRail";
@@ -16,12 +18,44 @@ import { SeriesCard } from "@/components/achievements/SeriesCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAchievementsWithProgress } from "@/hooks/useAchievements";
 import { useTranslation } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils";
 
-function CardGrid({ cards }: { cards: SeriesCardData[] }) {
+/** How long the highlighted card keeps its ring after a toast-driven navigation. */
+const HIGHLIGHT_DURATION_MS = 2000;
+
+/** A rung's slug, recovered from the card it belongs to. One-offs have a single rung. */
+function slugForCardTier(card: SeriesCardData, tier: SeriesTier): string {
+  return card.tiers.length > 1 ? `${card.id}.t${tier.tier}` : card.id;
+}
+
+function cardMatchesHighlight(card: SeriesCardData, highlight: string): boolean {
+  return (
+    card.id === highlight || card.tiers.some((tier) => slugForCardTier(card, tier) === highlight)
+  );
+}
+
+function CardGrid({
+  cards,
+  highlightedCardId,
+  registerCardRef,
+}: {
+  cards: SeriesCardData[];
+  highlightedCardId: string | null;
+  registerCardRef: (cardId: string, el: HTMLDivElement | null) => void;
+}) {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {cards.map((card) => (
-        <SeriesCard key={card.id} card={card} />
+        <div
+          key={card.id}
+          ref={(el) => registerCardRef(card.id, el)}
+          className={cn(
+            "rounded-lg transition-shadow duration-500",
+            highlightedCardId === card.id && "ring-2 ring-yellow-500 ring-offset-2",
+          )}
+        >
+          <SeriesCard card={card} />
+        </div>
       ))}
     </div>
   );
@@ -30,9 +64,13 @@ function CardGrid({ cards }: { cards: SeriesCardData[] }) {
 function CategorySection({
   category,
   cards,
+  highlightedCardId,
+  registerCardRef,
 }: {
   category: SeriesCategory;
   cards: SeriesCardData[];
+  highlightedCardId: string | null;
+  registerCardRef: (cardId: string, el: HTMLDivElement | null) => void;
 }) {
   const { t } = useTranslation();
   const { completed, inProgress } = splitCardsByCompletion(cards);
@@ -48,14 +86,22 @@ function CategorySection({
       {completed.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-lg font-medium text-green-700">{t("achievements.completed")}</h3>
-          <CardGrid cards={completed} />
+          <CardGrid
+            cards={completed}
+            highlightedCardId={highlightedCardId}
+            registerCardRef={registerCardRef}
+          />
         </div>
       )}
 
       {inProgress.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-lg font-medium text-gray-700">{t("achievements.inProgress")}</h3>
-          <CardGrid cards={inProgress} />
+          <CardGrid
+            cards={inProgress}
+            highlightedCardId={highlightedCardId}
+            registerCardRef={registerCardRef}
+          />
         </div>
       )}
     </section>
@@ -68,6 +114,21 @@ export default function AchievementsPage() {
   const { data, loading: isLoading } = useAchievementsWithProgress(currentFestival?.id);
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const [activeScope, setActiveScope] = useState<SeriesScope>("festival");
+  const searchParams = useSearchParams();
+  const highlight = searchParams.get("highlight");
+  const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
+  const cardRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  // Guards against re-triggering the scroll/highlight on every re-render while
+  // the same `?highlight=` value is still in the URL.
+  const processedHighlightRef = useRef<string | null>(null);
+
+  const registerCardRef = useCallback((cardId: string, el: HTMLDivElement | null) => {
+    if (el) {
+      cardRefs.current.set(cardId, el);
+    } else {
+      cardRefs.current.delete(cardId);
+    }
+  }, []);
 
   const allCards: SeriesCardData[] = data?.cards || [];
   // Both scopes arrive in one response — the tabs are a filter, not a refetch.
@@ -76,6 +137,26 @@ export default function AchievementsPage() {
 
   const visibleCategories =
     activeCategory === "all" ? SERIES_CATEGORY_ORDER : [activeCategory as SeriesCategory];
+
+  useEffect(() => {
+    if (!highlight || !data || processedHighlightRef.current === highlight) {
+      return;
+    }
+
+    const matchedCard: SeriesCardData | undefined = data.cards.find((card: SeriesCardData) =>
+      cardMatchesHighlight(card, highlight),
+    );
+    if (!matchedCard) {
+      return;
+    }
+
+    processedHighlightRef.current = highlight;
+    setHighlightedCardId(matchedCard.id);
+    cardRefs.current.get(matchedCard.id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const timeoutId = setTimeout(() => setHighlightedCardId(null), HIGHLIGHT_DURATION_MS);
+    return () => clearTimeout(timeoutId);
+  }, [highlight, data]);
 
   if (!currentFestival) {
     return (
@@ -220,6 +301,8 @@ export default function AchievementsPage() {
               key={category}
               category={category}
               cards={cards.filter((card: SeriesCardData) => card.category === category)}
+              highlightedCardId={highlightedCardId}
+              registerCardRef={registerCardRef}
             />
           ))}
         </div>

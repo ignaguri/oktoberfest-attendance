@@ -56,6 +56,7 @@ export class QueryKeys {
   static achievements = () => ["achievements"] as const;
   static userAchievements = (userId: string, festivalId: string) =>
     ["achievements", "user", userId, festivalId] as const;
+  static pendingUnlocks = () => ["achievements", "pending"] as const;
 
   // Activity feed queries
   static activityFeed = (festivalId: string) => ["activity-feed", festivalId] as const;

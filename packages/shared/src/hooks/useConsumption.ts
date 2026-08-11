@@ -7,6 +7,8 @@
 import { useApiClient, useQuery, useMutation, useInvalidateQueries, QueryKeys } from "../data";
 import type { LogConsumptionInput, Consumption } from "../schemas";
 
+import { useUnlockQueue } from "./useUnlockQueue";
+
 /**
  * Hook to log a new consumption (drink)
  * POST /v1/consumption
@@ -14,13 +16,15 @@ import type { LogConsumptionInput, Consumption } from "../schemas";
 export function useLogConsumption() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
+  const { push } = useUnlockQueue();
 
   return useMutation(
     async (input: LogConsumptionInput) => {
       return await apiClient.consumption.log(input);
     },
     {
-      onSuccess: (_data, variables) => {
+      onSuccess: (data, variables) => {
+        push(data.unlocked ?? []);
         // Invalidate attendance-related queries
         invalidateQueries(["attendances"]);
         invalidateQueries(["attendanceByDate"]);

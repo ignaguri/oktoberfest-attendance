@@ -124,7 +124,11 @@ export function selectCloseToUnlocking(cards: SeriesCard[], limit = 3): CloseToU
     });
   }
 
-  return entries.toSorted((a, b) => a.remaining - b.remaining).slice(0, limit);
+  // sort() rather than toSorted(): Hermes ships no Array.prototype.toSorted, so
+  // the latter crashed this whole screen on React Native. `entries` is built
+  // above and never escapes, so sorting it in place is unobservable, and sort()
+  // has been stable since ES2019 — the ordering guarantee above still holds.
+  return entries.sort((a, b) => a.remaining - b.remaining).slice(0, limit);
 }
 
 function emptyBreakdown(): BreakdownStats {

@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createMiddleware } from "hono/factory";
 
 import { logger } from "../lib/logger";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { UnauthorizedError } from "./error";
 
 // Extend Hono context to include user
@@ -36,14 +37,20 @@ function recordActiveDay(
       p_platform: platform ?? null,
       p_app_version: appVersion ?? null,
     })
-    .then(({ error }) => {
+    .then(({ data: isNewDay, error }) => {
       if (error) {
         // pino: mergingObject first, message second (see auth.ts:106, error.ts:107,159 for the
         // established convention) — the reverse order silently drops the fields from log output.
-        logger.warn(
-          { userId, error: error.message },
-          "Failed to record active day",
-        );
+        logger.warn({ userId, error: error.message }, "Failed to record active day");
+        return;
+      }
+
+      // active_days_total and active_day_streak_max only move when a new day
+      // row appears, so evaluating on every request would cost two queries per
+      // request to discover nothing changed. Fire-and-forget: no response is
+      // waiting on this, and the unlock reaches the client through the outbox.
+      if (isNewDay) {
+        void evaluateAfterWrite(supabase, userId, null, "auth middleware: new active day");
       }
     });
 }

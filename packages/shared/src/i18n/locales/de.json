@@ -666,6 +666,12 @@
       "festival": "Dieses Festival",
       "allTime": "Gesamt"
     },
+    "unlock": {
+      "single": "Erfolg freigeschaltet",
+      "multiple": "{{count}} Erfolge freigeschaltet",
+      "points": "+{{points}} Pkt.",
+      "viewAction": "Ansehen"
+    },
     "stats": {
       "totalProgress": "Gesamtfortschritt",
       "percentUnlocked": "{{percent}}% freigeschaltet",

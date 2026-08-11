@@ -1,5 +1,10 @@
 import type { AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
-import { getActiveTier, getCategoryColor, TIER_NAMES } from "@prostcounter/shared/achievements";
+import {
+  getActiveTier,
+  getCategoryColor,
+  LOCKED_PIP_COLOR,
+  TIER_NAMES,
+} from "@prostcounter/shared/achievements";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SeriesCard as SeriesCardData } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
@@ -14,8 +19,6 @@ import { VStack } from "@/components/ui/vstack";
 
 import { AchievementBadge } from "./achievement-badge";
 import { SeriesCardDetailSheet } from "./series-card-detail-sheet";
-
-const LOCKED_PIP_COLOR = "#D1D5DB";
 
 interface SeriesCardProps {
   card: SeriesCardData;

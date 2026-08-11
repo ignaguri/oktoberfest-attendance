@@ -5,3 +5,5 @@ export * from "./evaluator";
 export * from "./glyphs";
 export * from "./badge-tokens";
 export * from "./series-card-display";
+export * from "./unlock-display";
+export * from "./unlock-queue";

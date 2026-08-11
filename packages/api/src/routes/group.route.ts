@@ -19,8 +19,10 @@ import {
   UpdateGroupSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseGroupRepository } from "../repositories/supabase";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
 
 // Create router
@@ -75,6 +77,10 @@ app.openapi(createGroupRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   const group = await service.createGroup(user.id, data);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, data.festivalId, "POST /groups");
 
   return c.json(group, 200);
 });
@@ -402,6 +408,26 @@ app.openapi(joinGroupRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   await service.joinGroup(id, user.id, body.inviteToken);
+
+  const { data: group, error: groupError } = await supabase
+    .from("groups")
+    .select("festival_id")
+    .eq("id", id)
+    .single();
+
+  // The join already succeeded, so a lookup failure must not fail the request.
+  // Log it instead: evaluation below degrades to lifetime-only scope, and the
+  // festival-scoped unlock is caught by the next evaluation.
+  if (groupError) {
+    logger.warn(
+      { userId: user.id, groupId: id, error: groupError.message },
+      "Could not resolve festival for group join; achievement evaluation degraded to lifetime scope",
+    );
+  }
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, group?.festival_id ?? null, "POST /groups/{id}/join");
 
   return c.json(
     {
@@ -840,6 +866,10 @@ app.openapi(joinByTokenRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   const group = await service.joinByToken(inviteToken, user.id);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, group.festivalId ?? null, "POST /groups/join-by-token");
 
   return c.json(
     {

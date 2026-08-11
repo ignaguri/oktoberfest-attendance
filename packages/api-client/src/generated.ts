@@ -165,6 +165,8 @@ export interface paths {
                                 scope: "festival" | "lifetime";
                                 glyph: string;
                                 points: number;
+                                /** Format: uuid */
+                                eventId: string;
                             }[];
                         };
                     };
@@ -408,6 +410,19 @@ export interface paths {
                             /** Format: uuid */
                             attendanceId: string;
                             tentsChanged: boolean;
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };
@@ -643,6 +658,19 @@ export interface paths {
                             attendanceId: string;
                             tentsAdded: string[];
                             tentsRemoved: string[];
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };
@@ -796,6 +824,19 @@ export interface paths {
                             message: string;
                             /** Format: uuid */
                             attendanceId?: string;
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };
@@ -4109,6 +4150,132 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/achievements/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List unlocks not yet shown in-app
+         * @description Returns achievement unlocks that have not been acknowledged with POST /achievements/seen. Newest first, capped at 10.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Pending unlocks retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                                /** Format: date-time */
+                                unlockedAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/achievements/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge unlocks shown in-app
+         * @description Marks the given achievement events as shown to the user, which suppresses the redundant push notification for them.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        eventIds: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Unlocks acknowledged */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            acknowledged: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/notifications/token": {
         parameters: {
             query?: never;
@@ -6185,6 +6352,19 @@ export interface paths {
                                 /** Format: date-time */
                                 uploadedAt: string;
                             };
+                            unlocked: {
+                                slug: string;
+                                seriesId: string | null;
+                                tier: number;
+                                /** @enum {string} */
+                                category: "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
+                                /** @enum {string} */
+                                scope: "festival" | "lifetime";
+                                glyph: string;
+                                points: number;
+                                /** Format: uuid */
+                                eventId: string;
+                            }[];
                         };
                     };
                 };

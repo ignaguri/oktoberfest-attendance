@@ -279,6 +279,25 @@ describe("Photo Social Routes", () => {
       expect(json.error).toBe("FORBIDDEN");
     });
 
+    // Distinct from the 403 above: a failed membership query must not be
+    // reported as "you are not a member", which is what single() produced
+    // because it returns the same null data for zero rows and for a failure.
+    it("should return 500 when the membership query fails", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain(mockSupabaseError("Connection refused")),
+      );
+
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions`, {
+        method: "POST",
+        body: JSON.stringify({ groupId: GROUP_ID, emoji: "🍺" }),
+      });
+      const res = await app.request(req as Request);
+      const json = (await res.json()) as any;
+
+      expect(res.status).toBe(500);
+      expect(json.error).not.toBe("FORBIDDEN");
+    });
+
     it("should return 401 when not authenticated", async () => {
       const req = new Request(`http://localhost/photos/${PHOTO_ID}/reactions`, {
         method: "POST",

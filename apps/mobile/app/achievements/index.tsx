@@ -6,10 +6,14 @@ import type {
   SeriesCard as SeriesCardData,
   SeriesCategory,
   SeriesScope,
+  SeriesTier,
 } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
+import { useLocalSearchParams } from "expo-router";
 import { Award } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
-import { RefreshControl, ScrollView } from "react-native";
+import type { RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
 import { CategoryChips, type CategoryFilter } from "@/components/achievements/category-chips";
@@ -25,12 +29,47 @@ import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
 
+/** How long the highlighted card keeps its outline after a toast-driven navigation. */
+const HIGHLIGHT_DURATION_MS = 2000;
+
+/**
+ * The card wrapper, and the outline the highlighted one gets.
+ *
+ * A border rather than the web screen's `ring-2 ring-yellow-500 ring-offset-2`:
+ * Tailwind compiles the ring utilities to `box-shadow`, which NativeWind's
+ * native preset does not implement, and rendering one here threw a thoroughly
+ * misleading "Couldn't find a navigation context" error that took the whole
+ * screen down with it. (The `ring-2` in components/ui/pressable is not a
+ * counterexample — it sits behind `data-[focus-visible=true]`, which touch
+ * input never triggers, so it has never actually rendered.)
+ *
+ * The transparent border is always present so gaining the colour cannot shift
+ * layout.
+ */
+const CARD_CLASS = "rounded-lg border-2 border-transparent";
+const CARD_HIGHLIGHT_CLASS = "border-yellow-500";
+
+/** A rung's slug, recovered from the card it belongs to. One-offs have a single rung. */
+function slugForCardTier(card: SeriesCardData, tier: SeriesTier): string {
+  return card.tiers.length > 1 ? `${card.id}.t${tier.tier}` : card.id;
+}
+
+function cardMatchesHighlight(card: SeriesCardData, highlight: string): boolean {
+  return (
+    card.id === highlight || card.tiers.some((tier) => slugForCardTier(card, tier) === highlight)
+  );
+}
+
 function CategorySection({
   category,
   cards,
+  highlightedCardId,
+  registerCardRef,
 }: {
   category: SeriesCategory;
   cards: SeriesCardData[];
+  highlightedCardId: string | null;
+  registerCardRef: (cardId: string, node: View | null) => void;
 }) {
   const { t } = useTranslation();
   const { completed, inProgress } = splitCardsByCompletion(cards);
@@ -52,7 +91,16 @@ function CategorySection({
           </Text>
           <VStack space="sm">
             {completed.map((card) => (
-              <SeriesCard key={card.id} card={card} />
+              <View
+                key={card.id}
+                ref={(node) => registerCardRef(card.id, node)}
+                className={cn(
+                  CARD_CLASS,
+                  highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS,
+                )}
+              >
+                <SeriesCard card={card} />
+              </View>
             ))}
           </VStack>
         </VStack>
@@ -65,7 +113,16 @@ function CategorySection({
           </Text>
           <VStack space="sm">
             {inProgress.map((card) => (
-              <SeriesCard key={card.id} card={card} />
+              <View
+                key={card.id}
+                ref={(node) => registerCardRef(card.id, node)}
+                className={cn(
+                  CARD_CLASS,
+                  highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS,
+                )}
+              >
+                <SeriesCard card={card} />
+              </View>
             ))}
           </VStack>
         </VStack>
@@ -84,6 +141,24 @@ export default function AchievementsScreen() {
   const { isOnline } = useOfflineSafe();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const [activeScope, setActiveScope] = useState<SeriesScope>("festival");
+  const { highlight } = useLocalSearchParams<{ highlight?: string }>();
+  const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+  // The ScrollView's inner content view, held via the innerViewRef prop rather
+  // than getInnerViewRef() — the prop is the typed, documented way to reach it.
+  const contentViewRef = useRef<View>(null);
+  const cardRefs = useRef<Map<string, View>>(new Map());
+  // Guards against re-triggering the scroll/highlight on every re-render while
+  // the same `?highlight=` value is still in the route params.
+  const processedHighlightRef = useRef<string | null>(null);
+
+  const registerCardRef = useCallback((cardId: string, node: View | null) => {
+    if (node) {
+      cardRefs.current.set(cardId, node);
+    } else {
+      cardRefs.current.delete(cardId);
+    }
+  }, []);
 
   const {
     data: achievementsResponse,
@@ -112,6 +187,52 @@ export default function AchievementsScreen() {
   const handleRefresh = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  useEffect(() => {
+    if (!highlight || !achievementsResponse || processedHighlightRef.current === highlight) {
+      return;
+    }
+
+    const matchedCard = achievementsResponse.cards.find((card: SeriesCardData) =>
+      cardMatchesHighlight(card, highlight),
+    );
+    if (!matchedCard) {
+      return;
+    }
+
+    processedHighlightRef.current = highlight;
+    setHighlightedCardId(matchedCard.id);
+
+    const cardNode = cardRefs.current.get(matchedCard.id);
+    // Measured against the ScrollView's inner content view, not the ScrollView
+    // itself: measuring against the scroll responder is ambiguous about
+    // whether the returned offset already accounts for the current scroll
+    // position (iOS's UIScrollView.convertRect:toView: semantics subtract
+    // it), which would land scrollTo() in the wrong place on a second
+    // highlight while the screen is already scrolled. The inner content view
+    // has no scroll offset of its own, so its coordinates are unambiguous.
+    //
+    // It has to be the view instance, not getInnerViewNode()'s numeric handle:
+    // under the New Architecture measureLayout rejects a plain node handle
+    // outright, logging "must be called with a ref to a native component" and
+    // returning without invoking either callback — so the scroll silently never
+    // happened at all.
+    const relativeNode = contentViewRef.current;
+    if (cardNode && relativeNode) {
+      cardNode.measureLayout(
+        relativeNode,
+        (_left, top) => {
+          scrollViewRef.current?.scrollTo({ y: Math.max(top - 24, 0), animated: true });
+        },
+        () => {
+          // No-op: the card may not be mounted yet (e.g. a collapsed section).
+        },
+      );
+    }
+
+    const timeoutId = setTimeout(() => setHighlightedCardId(null), HIGHLIGHT_DURATION_MS);
+    return () => clearTimeout(timeoutId);
+  }, [highlight, achievementsResponse]);
 
   // Offline state — achievements require server-side progress calculation
   if (!isOnline) {
@@ -172,6 +293,12 @@ export default function AchievementsScreen() {
 
   return (
     <ScrollView
+      ref={scrollViewRef}
+      // Cast only to bridge React 19's ref typing: useRef<View>(null) is a
+      // RefObject<View | null>, while react-native still types this prop as
+      // RefObject<View>. A null current is exactly what the prop expects
+      // before mount, so nothing is being papered over here.
+      innerViewRef={contentViewRef as RefObject<View>}
       className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl
@@ -204,6 +331,8 @@ export default function AchievementsScreen() {
               key={category}
               category={category}
               cards={cards.filter((card: SeriesCardData) => card.category === category)}
+              highlightedCardId={highlightedCardId}
+              registerCardRef={registerCardRef}
             />
           ))
         )}

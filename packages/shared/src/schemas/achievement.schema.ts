@@ -315,3 +315,45 @@ export const UnlockedAchievementSchema = z.object({
 });
 
 export type UnlockedAchievement = z.infer<typeof UnlockedAchievementSchema>;
+
+/**
+ * An unlock plus the outbox event id the client acks with. Returned inline by
+ * the write paths that can toast immediately.
+ */
+export const PersistedUnlockSchema = UnlockedAchievementSchema.extend({
+  eventId: z.uuid(),
+});
+
+export type PersistedUnlock = z.infer<typeof PersistedUnlockSchema>;
+
+/**
+ * One unacked unlock from the achievement_events outbox. Same shape as
+ * PersistedUnlock plus when it happened, so a batch that arrives long after the
+ * fact can still be ordered.
+ */
+export const PendingUnlockSchema = PersistedUnlockSchema.extend({
+  unlockedAt: z.iso.datetime(),
+});
+
+export type PendingUnlock = z.infer<typeof PendingUnlockSchema>;
+
+/** GET /achievements/pending response. Newest first, capped at 10. */
+export const GetPendingUnlocksResponseSchema = z.object({
+  data: z.array(PendingUnlockSchema),
+});
+
+export type GetPendingUnlocksResponse = z.infer<typeof GetPendingUnlocksResponseSchema>;
+
+/** POST /achievements/seen request. */
+export const MarkUnlocksSeenSchema = z.object({
+  eventIds: z.array(z.uuid()).min(1).max(50),
+});
+
+export type MarkUnlocksSeenInput = z.infer<typeof MarkUnlocksSeenSchema>;
+
+/** POST /achievements/seen response. `acknowledged` counts rows actually stamped. */
+export const MarkUnlocksSeenResponseSchema = z.object({
+  acknowledged: z.number().int().nonnegative(),
+});
+
+export type MarkUnlocksSeenResponse = z.infer<typeof MarkUnlocksSeenResponseSchema>;

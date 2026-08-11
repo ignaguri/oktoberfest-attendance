@@ -11,8 +11,10 @@ import {
   RemovePhotoReactionSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -186,13 +188,20 @@ app.openapi(addReactionRoute, async (c) => {
   const { photoId } = c.req.valid("param");
   const { groupId, emoji } = c.req.valid("json");
 
-  // Verify group membership
-  const { data: membership } = await supabase
+  // Verify group membership. maybeSingle, not single: single treats zero rows
+  // as an error, so a genuinely broken query and a non-member are the same
+  // `data: null` and both used to report 403. Splitting them lets a real
+  // failure surface as a 500 instead of telling a member they are not one.
+  const { data: membership, error: membershipError } = await supabase
     .from("group_members")
-    .select("user_id")
+    .select("user_id, groups(festival_id)")
     .eq("group_id", groupId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
+
+  if (membershipError) {
+    throw new Error(`Failed to verify group membership: ${membershipError.message}`);
+  }
 
   if (!membership) {
     return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
@@ -213,6 +222,26 @@ app.openapi(addReactionRoute, async (c) => {
     }
     throw new Error(`Failed to add reaction: ${error.message}`);
   }
+
+  const festivalId =
+    (membership as unknown as { groups: { festival_id: string } | null }).groups?.festival_id ??
+    null;
+
+  // Membership came back but the joined group row did not, so there is festival
+  // context we failed to read (RLS, or the group deleted between the two
+  // statements). The reaction already succeeded, so log it rather than failing
+  // the request: evaluation degrades to lifetime-only scope and the
+  // festival-scoped unlock is caught by the next evaluation.
+  if (festivalId === null) {
+    logger.warn(
+      { userId: user.id, groupId },
+      "Could not resolve festival for photo reaction; achievement evaluation degraded to lifetime scope",
+    );
+  }
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, festivalId, "POST /photos/{photoId}/reactions");
 
   return c.json({ success: true }, 200);
 });

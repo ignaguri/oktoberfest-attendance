@@ -4,17 +4,14 @@ import {
   LogConsumptionResponseSchema,
   LogConsumptionSchema,
 } from "@prostcounter/shared";
-import type { UnlockedAchievement } from "@prostcounter/shared/achievements";
 
-import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import {
   SupabaseAttendanceRepository,
   SupabaseConsumptionRepository,
 } from "../repositories/supabase";
-import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
-import { AchievementService } from "../services/achievement.service";
 import { ConsumptionService } from "../services/consumption.service";
+import { evaluateAfterWrite } from "../services/evaluate-after-write";
 
 // Query schema for listing consumptions
 const ListConsumptionsQuerySchema = z.object({
@@ -107,21 +104,12 @@ app.openapi(logConsumptionRoute, async (c) => {
 
   // Evaluate achievements. This must never fail the mutation: a broken
   // achievement engine cannot be allowed to stop someone logging a drink.
-  let unlocked: UnlockedAchievement[] = [];
-  try {
-    const metricsRepo = new AchievementMetricsRepository(supabase);
-    const achievementService = new AchievementService(metricsRepo);
-    unlocked = await achievementService.evaluateAndUnlock(user.id, data.festivalId);
-  } catch (error) {
-    logger.error(
-      {
-        userId: user.id,
-        festivalId: data.festivalId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      "Achievement evaluation failed after logging consumption",
-    );
-  }
+  const unlocked = await evaluateAfterWrite(
+    supabase,
+    user.id,
+    data.festivalId,
+    "POST /consumption",
+  );
 
   return c.json({ ...attendance, unlocked }, 200);
 });

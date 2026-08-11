@@ -8,7 +8,6 @@
 // Import shared schema types
 import type {
   AttendanceByDate,
-  AttendanceWithTotals,
   Consumption,
   CreateMessageResponse,
   CrowdLevel,
@@ -26,6 +25,7 @@ import type {
   GetFestivalResponse,
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
+  GetPendingUnlocksResponse,
   GetTentCrowdReportsResponse,
   Group,
   GroupActionResponse,
@@ -42,6 +42,8 @@ import type {
   ListFriendSuggestionsResponse,
   ListGroupsResponse,
   LogConsumptionInput,
+  LogConsumptionResponse,
+  MarkUnlocksSeenResponse,
   MissingProfileFields,
   Profile,
   ProfileShort,
@@ -50,6 +52,7 @@ import type {
   SubmitCrowdReportResponse,
   TutorialStatus,
   UpdateGroupMessageResponse,
+  UpdatePersonalAttendanceResponse,
   WinningCriteriaListResponse,
 } from "@prostcounter/shared/schemas";
 
@@ -253,11 +256,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         date: string;
         tents?: string[];
         amount?: number;
-      }): Promise<{
-        attendanceId: string;
-        tentsAdded: string[];
-        tentsRemoved: string[];
-      }> {
+      }): Promise<UpdatePersonalAttendanceResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/attendance/personal`, {
           method: "POST",
@@ -267,11 +266,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         if (!response.ok) {
           await extractApiError(response, "Failed to update attendance");
         }
-        return parseJsonResponse<{
-          attendanceId: string;
-          tentsAdded: string[];
-          tentsRemoved: string[];
-        }>(response);
+        return parseJsonResponse<UpdatePersonalAttendanceResponse>(response);
       },
 
       /**
@@ -356,7 +351,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
      * Consumption API
      */
     consumption: {
-      async log(data: LogConsumptionInput): Promise<AttendanceWithTotals> {
+      async log(data: LogConsumptionInput): Promise<LogConsumptionResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/consumption`, {
           method: "POST",
@@ -366,7 +361,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         if (!response.ok) {
           await extractApiError(response, "Failed to log consumption");
         }
-        return parseJsonResponse<AttendanceWithTotals>(response);
+        return parseJsonResponse<LogConsumptionResponse>(response);
       },
 
       async list(query: {
@@ -735,6 +730,30 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to fetch available achievements");
         }
         return parseJsonResponse<ListAvailableAchievementsResponse>(response);
+      },
+
+      async pending(): Promise<GetPendingUnlocksResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("GET", `${baseUrl}/v1/achievements/pending`, {
+          headers,
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch pending unlocks");
+        }
+        return parseJsonResponse<GetPendingUnlocksResponse>(response);
+      },
+
+      async markSeen(eventIds: string[]): Promise<MarkUnlocksSeenResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("POST", `${baseUrl}/v1/achievements/seen`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ eventIds }),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to acknowledge unlocks");
+        }
+        return parseJsonResponse<MarkUnlocksSeenResponse>(response);
       },
     },
 
