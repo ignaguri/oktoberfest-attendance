@@ -1,4 +1,13 @@
 export const changelog: Record<string, string[]> = {
+  "1.2.0": [
+    "🏅 Achievements rebuilt with Bronze to Platinum tiers, grouped into series, with all-new badge artwork",
+    "🎉 Confetti and a banner the moment you unlock an achievement",
+    "📍 Share your location with friends, not just with your groups",
+    "💶 Choose how your tip gets calculated",
+    "🍻 Radler now counts as half a beer in the leaderboard",
+    "🎪 Oktoberfest 2026 dates and tents",
+    "🤖 ProstCounter is now on the Google Play Store",
+  ],
   "1.0.0": [
     "🤝 Friendship system — send and accept friend requests",
     "📱 ProstCounter is now available on iOS App Store!",
