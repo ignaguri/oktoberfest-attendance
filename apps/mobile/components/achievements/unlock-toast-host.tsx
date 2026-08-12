@@ -16,8 +16,8 @@ import { Toast, ToastDescription, ToastTitle, useToast } from "@/components/ui/t
 
 /** Beyond this a stacked toast would overflow — the rest still counted in the title. */
 const MAX_TOAST_BADGES = 3;
-const TOAST_DURATION_MS = 5000;
-const CONFETTI_DURATION_MS = 2200;
+const TOAST_DURATION_MS = 8000;
+const CONFETTI_DURATION_MS = 4000;
 
 function unlockDestination(batch: PersistedUnlock[]) {
   if (batch.length !== 1) {

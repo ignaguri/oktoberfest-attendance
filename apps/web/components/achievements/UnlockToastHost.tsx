@@ -17,7 +17,8 @@ import { AchievementBadge } from "./AchievementBadge";
 
 /** Beyond this a stacked toast would overflow — the rest still counted in the title. */
 const MAX_TOAST_BADGES = 3;
-const TOAST_DURATION_MS = 5000;
+const TOAST_DURATION_MS = 8000;
+const CONFETTI_DURATION_MS = 4000;
 
 function unlockDestination(batch: PersistedUnlock[]): string {
   if (batch.length !== 1) {
@@ -131,7 +132,12 @@ export function UnlockToastHost() {
 
   return isExploding ? (
     <div className="pointer-events-none fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2">
-      <ConfettiExplosion force={0.4} duration={2200} particleCount={30} width={400} />
+      <ConfettiExplosion
+        force={0.4}
+        duration={CONFETTI_DURATION_MS}
+        particleCount={30}
+        width={400}
+      />
     </div>
   ) : null;
 }
