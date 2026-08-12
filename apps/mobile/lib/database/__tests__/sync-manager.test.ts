@@ -426,6 +426,54 @@ describe("Pull functions", () => {
 
       expect(result.table).toBe("groups");
     });
+
+    // Without this reconciliation a group deleted server-side lingers locally
+    // and pullGroupMembers 404s on it on every sync, forever.
+    it("soft-deletes local groups the server no longer returns", async () => {
+      const db = mockDb as unknown as Parameters<typeof pullGroups>[0];
+      await pullGroups(db, "festival-1");
+
+      const [sql, params] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
+        ) ?? [];
+
+      expect(sql).toContain("NOT IN");
+      expect(params).toContain("festival-1");
+      // The group the server did return must be excluded from the delete.
+      expect(params).toContain("group-1");
+    });
+
+    // The prune above must not be one-way: rejoining a group has to bring the
+    // local row back rather than leave it permanently hidden.
+    it("resurrects a previously pruned group that the server returns again", async () => {
+      mockDb._records.groups.push({ id: "group-1" });
+      const db = mockDb as unknown as Parameters<typeof pullGroups>[0];
+
+      await pullGroups(db, "festival-1");
+
+      const [sql] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.startsWith("UPDATE groups SET\n"),
+        ) ?? [];
+
+      expect(sql).toContain("_deleted = 0");
+    });
+
+    it("soft-deletes every local group when the server returns none", async () => {
+      vi.mocked(apiClient.groups.list).mockResolvedValueOnce({ data: [] });
+      const db = mockDb as unknown as Parameters<typeof pullGroups>[0];
+
+      await pullGroups(db, "festival-1");
+
+      const [sql] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
+        ) ?? [];
+
+      expect(sql).toBeDefined();
+      expect(sql).not.toContain("NOT IN");
+    });
   });
 
   // A pull that threw must not be indistinguishable from a pull that found

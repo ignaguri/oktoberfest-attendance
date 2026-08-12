@@ -41,9 +41,12 @@ export async function pullGroups(
 
       if (existing) {
         await db.runAsync(
+          // _deleted = 0 resurrects a group that was pruned and later rejoined,
+          // otherwise the soft delete below would be one-way and the group
+          // would stay invisible locally forever.
           `UPDATE groups SET
             name = ?, description = ?, winning_criteria_id = ?,
-            _synced_at = ?, _dirty = 0
+            _synced_at = ?, _dirty = 0, _deleted = 0
           WHERE id = ?`,
           [group.name, group.description ?? null, group.winningCriteria, now, group.id],
         );
@@ -69,6 +72,29 @@ export async function pullGroups(
         );
         result.inserted++;
       }
+    }
+
+    // Reconcile deletes. The response is this festival's complete group set for
+    // the user, so a local group missing from it was deleted server-side or
+    // left elsewhere. Without this the row lingers forever and pullGroupMembers
+    // keeps calling getMembers on it, taking a 404 on every single sync.
+    const serverGroupIds = groups.map((group) => group.id);
+    if (serverGroupIds.length > 0) {
+      const placeholders = serverGroupIds.map(() => "?").join(",");
+      const deleteResult = await db.runAsync(
+        `UPDATE groups SET _deleted = 1, _synced_at = ?
+         WHERE festival_id = ? AND id NOT IN (${placeholders}) AND _deleted = 0`,
+        [now, festivalId, ...serverGroupIds],
+      );
+      result.deleted += deleteResult.changes;
+    } else {
+      // Server returned no groups — the user is in none for this festival.
+      const deleteResult = await db.runAsync(
+        `UPDATE groups SET _deleted = 1, _synced_at = ?
+         WHERE festival_id = ? AND _deleted = 0`,
+        [now, festivalId],
+      );
+      result.deleted += deleteResult.changes;
     }
 
     await updateLastSyncAt(db, "groups", now);
