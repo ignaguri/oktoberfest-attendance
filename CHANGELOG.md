@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.10.0] - 2026-08-12
+
+### ✨ Features
+
+- drop achievements.rarity and the legacy achievement engine (#276)
+- rebuild glyphs at 256px, track the asset pipeline
+- unlock moment with toasts, confetti and glyphs (#274)
+- same-day tent revisits, plus timezone and sync correctness fixes (#273)
+- attendance festival strip + toggled day list (#272)
+- scope tabs, close-to-unlocking rail, detail sheet (#269)
+- series cards and category chips (#268)
+- category-colored tier badges with glyph fallback icons (#267)
+- achievements registry migration and backfill (Plan 2) (#264)
+- achievements engine rebuild (Plan 1) (#263)
+- Oktoberfest 2026 data, beer price post, bulletin campaign tracking (#260)
+
+### 🐛 Bug Fixes
+
+- prune local groups the server no longer returns
+- stop the cold-start sync from racing the auth session
+- hold the unlock toast and confetti longer
+- show a single sync indicator, float it above tab bar (#271)
+- stop reporting expected auth failures to Sentry (#270)
+- add locale copy, fix category rendering bug (#266)
+- drop the sharp tracing config, it broke deploys
+- trace libvips through .pnpm, not the @img symlinks
+- point outputFileTracingIncludes at the workspace root
+- include sharp native binaries in output file tracing
+- mark sharp as a server-external package
+- pin sharp to one version, unblocking production sign-in (#265)
+- revoke anon EXECUTE on 16 SECURITY DEFINER functions (#262)
+- restore German umlauts, re-apply nearby-members festival scope (#261)
+
+### ♻️ Code Refactoring
+
+- derive rarity from tier, drop the dead route (#275)
+- load sharp lazily so image failures stay contained
+
 ## [0.9.3] - 2026-07-27
 
 ### 🐛 Bug Fixes
