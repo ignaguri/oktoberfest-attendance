@@ -21,7 +21,7 @@ import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext, triggerBackgroundPush } from "@/lib/database/offline-provider";
 import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
-import { invalidateLocalQueries } from "@/lib/database/query-keys";
+import { CONSUMPTION_WRITE_PREFIXES, invalidateLocalQueries } from "@/lib/database/query-keys";
 import { logger } from "@/lib/logger";
 
 import { type PendingPhoto } from "./useBeerPictureUpload";
@@ -163,11 +163,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
 
           // Refresh pending count and invalidate local caches once after all writes
           await offlineContext?.refreshPendingCount?.();
-          await invalidateLocalQueries(queryClient, [
-            "local-consumptions",
-            "local-attendances",
-            "local-day-summaries",
-          ]);
+          await invalidateLocalQueries(queryClient, CONSUMPTION_WRITE_PREFIXES);
         }
 
         // Step 3: Delete photos marked for removal

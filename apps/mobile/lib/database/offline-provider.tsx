@@ -246,8 +246,13 @@ export function OfflineDataProvider({
         const result = await syncManagerRef.current.sync(options);
 
         setLastSyncResult(result);
-        lastSyncTimeRef.current = Date.now();
-        setLastSyncAt(new Date());
+        // Only a sync that actually landed data may start the throttle window.
+        // Stamping on failure lets a broken sync suppress the retry that would
+        // have fixed it — for MIN_SYNC_INTERVAL, over stale rows shown as truth.
+        if (result.success) {
+          lastSyncTimeRef.current = Date.now();
+          setLastSyncAt(new Date());
+        }
 
         if (result.success) {
           setSyncStatus("idle");
@@ -367,7 +372,13 @@ export function OfflineDataProvider({
 
     // Delay slightly to let network stabilize
     const timeoutId = setTimeout(() => {
-      if (festivalId) {
+      // userId is the auth gate: it is the restored session's user, so it stays
+      // undefined until supabase-js finishes reading the session from storage.
+      // Every pull needs a token, and festivalId can arrive first (the festival
+      // cache falls back to its stored copy precisely when the unauthenticated
+      // festivals fetch comes back empty), so festivalId alone would fire a
+      // sync that cannot authenticate a single request.
+      if (festivalId && userId) {
         performSync({ festivalId, userId, direction: "both" });
       }
     }, ONLINE_SYNC_DELAY);
@@ -389,6 +400,7 @@ export function OfflineDataProvider({
           isReady &&
           effectiveIsOnline &&
           festivalId &&
+          userId &&
           now - lastSyncTimeRef.current >= MIN_SYNC_INTERVAL
         ) {
           performSync({ festivalId, userId, direction: "pull" });

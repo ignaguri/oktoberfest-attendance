@@ -34,6 +34,12 @@ export interface PullResult {
   inserted: number;
   updated: number;
   deleted: number;
+  /**
+   * Set when the pull could not complete. A pull that threw must stay
+   * distinguishable from one that simply found nothing to do, otherwise the
+   * sync reports success over data it never fetched.
+   */
+  error?: string;
 }
 
 export interface PushResult {

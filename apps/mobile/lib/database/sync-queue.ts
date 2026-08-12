@@ -611,7 +611,6 @@ export interface InsertConsumptionParams {
   volumeMl: number;
   pricePaidCents: number;
   basePriceCents?: number | null;
-  tipCents?: number | null;
   tentId?: string | null;
   idempotencyKey: string;
   now: string;
@@ -620,6 +619,16 @@ export interface InsertConsumptionParams {
 /**
  * Inserts a consumption into local SQLite and enqueues it for server sync.
  * Shared by useOfflineConsumption and useLocalLogConsumption to avoid duplicate SQL.
+ *
+ * tip_cents is derived here rather than taken from the caller, mirroring the
+ * server column:
+ *
+ *   tip_cents integer GENERATED ALWAYS AS ((price_paid_cents - base_price_cents))
+ *
+ * The local column is a plain nullable INTEGER, so nothing computes it for us.
+ * Leaving it NULL made SUM(tip_cents) silently skip every drink logged on the
+ * device until a pull replaced the row with the server's copy, which is what
+ * made the Festival Summary tips figure disagree with the database.
  */
 export async function insertConsumptionLocally(
   db: SQLite.SQLiteDatabase,
@@ -635,11 +644,13 @@ export async function insertConsumptionLocally(
     volumeMl,
     pricePaidCents,
     basePriceCents,
-    tipCents,
     tentId,
     idempotencyKey,
     now,
   } = params;
+
+  const resolvedBaseCents = basePriceCents ?? pricePaidCents;
+  const tipCents = pricePaidCents - resolvedBaseCents;
 
   await db.runAsync(
     `INSERT INTO consumptions (
@@ -655,8 +666,8 @@ export async function insertConsumptionLocally(
       drinkName ?? null,
       volumeMl,
       pricePaidCents,
-      basePriceCents ?? pricePaidCents,
-      tipCents ?? null,
+      resolvedBaseCents,
+      tipCents,
       tentId ?? null,
       now,
       idempotencyKey,

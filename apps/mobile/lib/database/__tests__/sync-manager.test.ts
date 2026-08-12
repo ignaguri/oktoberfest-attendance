@@ -9,6 +9,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { apiClient } from "../../api-client";
 import { pullGroups } from "../sync/pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "../sync/pull-reference";
 import { pullAttendances, pullProfile } from "../sync/pull-user-data";
@@ -133,6 +134,9 @@ vi.mock("../../api-client", () => ({
             memberCount: 3,
           },
         ],
+      }),
+      getMembers: vi.fn().mockResolvedValue({
+        data: [{ userId: "user-1", joinedAt: "2024-09-21T10:00:00Z" }],
       }),
     },
   },
@@ -281,6 +285,54 @@ describe("SyncManager", () => {
 
       expect(result.direction).toBe("push");
     });
+
+    // Reproduces the cold-start auth race: the sync fires before the Supabase
+    // session is restored, so every reference pull throws AuthRequiredError.
+    // Omitting userId mirrors production, where auth had not resolved yet.
+    it("reports failure when the reference pulls cannot authenticate", async () => {
+      const authError = new Error("No authenticated session available");
+      vi.mocked(apiClient.festivals.list).mockRejectedValueOnce(authError);
+      vi.mocked(apiClient.tents.list).mockRejectedValueOnce(authError);
+      vi.mocked(apiClient.achievements.available).mockRejectedValueOnce(authError);
+
+      const result = await syncManager.sync({
+        festivalId: "festival-1",
+        direction: "pull",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.failed).toBe(3);
+      expect(result.errors.join(" ")).toContain("No authenticated session available");
+    });
+
+    // The cold-start sync runs direction "both", so the push phase must not
+    // overwrite the pull failure count on its way through.
+    it("keeps pull failures when the push phase also runs", async () => {
+      vi.mocked(apiClient.tents.list).mockRejectedValueOnce(new Error("boom"));
+
+      const result = await syncManager.sync({
+        festivalId: "festival-1",
+        userId: "user-1",
+        direction: "both",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.failed).toBe(1);
+      expect(result.errors).toContain("tents: boom");
+    });
+
+    it("counts a partial pull failure without failing the clean pulls", async () => {
+      vi.mocked(apiClient.tents.list).mockRejectedValueOnce(new Error("boom"));
+
+      const result = await syncManager.sync({
+        festivalId: "festival-1",
+        direction: "pull",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.failed).toBe(1);
+      expect(result.errors).toEqual(["tents: boom"]);
+    });
   });
 
   describe("abort", () => {
@@ -373,6 +425,78 @@ describe("Pull functions", () => {
       const result = await pullGroups(db, "festival-1");
 
       expect(result.table).toBe("groups");
+    });
+
+    // Without this reconciliation a group deleted server-side lingers locally
+    // and pullGroupMembers 404s on it on every sync, forever.
+    it("soft-deletes local groups the server no longer returns", async () => {
+      const db = mockDb as unknown as Parameters<typeof pullGroups>[0];
+      await pullGroups(db, "festival-1");
+
+      const [sql, params] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
+        ) ?? [];
+
+      expect(sql).toContain("NOT IN");
+      expect(params).toContain("festival-1");
+      // The group the server did return must be excluded from the delete.
+      expect(params).toContain("group-1");
+    });
+
+    // The prune above must not be one-way: rejoining a group has to bring the
+    // local row back rather than leave it permanently hidden.
+    it("resurrects a previously pruned group that the server returns again", async () => {
+      mockDb._records.groups.push({ id: "group-1" });
+      const db = mockDb as unknown as Parameters<typeof pullGroups>[0];
+
+      await pullGroups(db, "festival-1");
+
+      const [sql] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.startsWith("UPDATE groups SET\n"),
+        ) ?? [];
+
+      expect(sql).toContain("_deleted = 0");
+    });
+
+    it("soft-deletes every local group when the server returns none", async () => {
+      vi.mocked(apiClient.groups.list).mockResolvedValueOnce({ data: [] });
+      const db = mockDb as unknown as Parameters<typeof pullGroups>[0];
+
+      await pullGroups(db, "festival-1");
+
+      const [sql] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
+        ) ?? [];
+
+      expect(sql).toBeDefined();
+      expect(sql).not.toContain("NOT IN");
+    });
+  });
+
+  // A pull that threw must not be indistinguishable from a pull that found
+  // nothing to do — that is what let the cold-start auth race ship silently.
+  describe("failure reporting", () => {
+    it("records the error on the PullResult when the API rejects", async () => {
+      vi.mocked(apiClient.festivals.list).mockRejectedValueOnce(
+        new Error("No authenticated session available"),
+      );
+      const db = mockDb as unknown as Parameters<typeof pullFestivals>[0];
+
+      const result = await pullFestivals(db);
+
+      expect(result.error).toBe("No authenticated session available");
+      expect(result.inserted).toBe(0);
+    });
+
+    it("leaves error unset on a successful pull", async () => {
+      const db = mockDb as unknown as Parameters<typeof pullFestivals>[0];
+
+      const result = await pullFestivals(db);
+
+      expect(result.error).toBeUndefined();
     });
   });
 });
