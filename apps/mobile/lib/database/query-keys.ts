@@ -49,6 +49,25 @@ export const localKeys = {
   },
 } as const;
 
+/**
+ * Prefixes every consumption write has to invalidate.
+ *
+ * A drink does not only change the consumption list. `local-attendances` carries
+ * the per-day SUM of price_paid/base/tip that the Festival Summary spending
+ * figures read, and `local-day-summaries` carries the per-row drink counts, so
+ * invalidating only `local-consumptions` leaves both showing pre-write numbers
+ * until an unrelated sync happens to refresh them.
+ *
+ * Shared so the log, delete and bulk-save paths cannot drift apart again: the
+ * log path used to invalidate two consumption keys and nothing else, which is
+ * how the summary tips value went stale after logging a drink.
+ */
+export const CONSUMPTION_WRITE_PREFIXES = [
+  "local-consumptions",
+  "local-attendances",
+  "local-day-summaries",
+] as const;
+
 /** All local query key prefixes for bulk invalidation (e.g., pull-to-refresh) */
 export const ALL_LOCAL_PREFIXES = [
   "local-attendances",

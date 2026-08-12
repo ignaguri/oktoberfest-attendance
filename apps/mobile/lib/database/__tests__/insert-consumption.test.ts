@@ -40,7 +40,6 @@ function createDefaultParams(
     volumeMl: 1000,
     pricePaidCents: 1620,
     basePriceCents: 1620,
-    tipCents: null,
     tentId: "tent-1",
     idempotencyKey: "key-1",
     now: "2024-10-01T12:00:00.000Z",
@@ -110,7 +109,6 @@ describe("insertConsumptionLocally", () => {
   it("should handle null optional fields", async () => {
     const params = createDefaultParams({
       drinkName: null,
-      tipCents: null,
       tentId: null,
     });
 
@@ -121,12 +119,18 @@ describe("insertConsumptionLocally", () => {
 
     const [, values] = mockDb.runAsync.mock.calls[0];
     expect(values[3]).toBeNull(); // drinkName
-    expect(values[7]).toBeNull(); // tipCents
     expect(values[8]).toBeNull(); // tentId
   });
 
-  it("should pass tipCents through when provided", async () => {
-    const params = createDefaultParams({ tipCents: 200 });
+  // tip_cents is GENERATED ALWAYS AS (price_paid_cents - base_price_cents) on the
+  // server. The local column is a plain INTEGER, so these cover the derivation
+  // that stands in for it. Leaving it NULL made SUM(tip_cents) skip the drink,
+  // which is how the Festival Summary tips figure drifted from the database.
+  it("should derive tip_cents from the price paid over the base price", async () => {
+    const params = createDefaultParams({
+      pricePaidCents: 1800,
+      basePriceCents: 1620,
+    });
 
     await insertConsumptionLocally(
       mockDb as unknown as Parameters<typeof insertConsumptionLocally>[0],
@@ -134,7 +138,39 @@ describe("insertConsumptionLocally", () => {
     );
 
     const [, values] = mockDb.runAsync.mock.calls[0];
-    expect(values[7]).toBe(200);
+    expect(values[7]).toBe(180);
+  });
+
+  it("should write a zero tip rather than NULL when no tip was given", async () => {
+    const params = createDefaultParams({
+      pricePaidCents: 1620,
+      basePriceCents: 1620,
+    });
+
+    await insertConsumptionLocally(
+      mockDb as unknown as Parameters<typeof insertConsumptionLocally>[0],
+      params,
+    );
+
+    const [, values] = mockDb.runAsync.mock.calls[0];
+    expect(values[7]).toBe(0);
+  });
+
+  it("should derive a zero tip when basePriceCents is omitted", async () => {
+    const params = createDefaultParams({
+      basePriceCents: undefined,
+      pricePaidCents: 1500,
+    });
+
+    await insertConsumptionLocally(
+      mockDb as unknown as Parameters<typeof insertConsumptionLocally>[0],
+      params,
+    );
+
+    const [, values] = mockDb.runAsync.mock.calls[0];
+    // base falls back to pricePaid, so there is no tip to record.
+    expect(values[6]).toBe(1500);
+    expect(values[7]).toBe(0);
   });
 
   it("should propagate database errors", async () => {

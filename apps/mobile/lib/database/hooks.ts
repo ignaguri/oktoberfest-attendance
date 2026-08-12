@@ -555,7 +555,6 @@ export function useLocalLogConsumption() {
         volumeMl: input.volumeMl,
         pricePaidCents: input.pricePaidCents,
         basePriceCents: input.basePriceCents,
-        tipCents: input.tipCents,
         tentId: input.tentId,
         idempotencyKey,
         now,

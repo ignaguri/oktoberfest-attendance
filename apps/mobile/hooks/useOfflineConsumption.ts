@@ -11,7 +11,7 @@ import { useCallback, useContext } from "react";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
-import { invalidateLocalQueries, localKeys } from "@/lib/database/query-keys";
+import { CONSUMPTION_WRITE_PREFIXES, invalidateLocalQueries } from "@/lib/database/query-keys";
 import {
   enqueueOperation,
   generateUUID,
@@ -39,7 +39,9 @@ function buildConsumptionResult(
     tentId: input.tentId ?? null,
     basePriceCents: input.basePriceCents ?? input.pricePaidCents,
     pricePaidCents: input.pricePaidCents,
-    tipCents: null,
+    // Same derivation as the row insertConsumptionLocally just wrote, so the
+    // object handed back to callers agrees with what is in the database.
+    tipCents: input.pricePaidCents - (input.basePriceCents ?? input.pricePaidCents),
     volumeMl: input.volumeMl ?? 1000,
     recordedAt: now,
     createdAt: now,
@@ -145,12 +147,7 @@ export function useOfflineLogConsumption() {
       if (!input.skipSideEffects) {
         await refreshPendingCount();
 
-        queryClient.invalidateQueries({
-          queryKey: localKeys.consumptions.byAttendance(attendanceId),
-        });
-        queryClient.invalidateQueries({
-          queryKey: localKeys.consumptions.byDate(input.festivalId, input.date),
-        });
+        await invalidateLocalQueries(queryClient, CONSUMPTION_WRITE_PREFIXES);
       }
 
       logger.debug("[OfflineConsumption] Saved consumption locally:", {
@@ -208,11 +205,7 @@ export function useOfflineDeleteConsumption() {
       if (!skipSideEffects) {
         await refreshPendingCount();
 
-        await invalidateLocalQueries(queryClient, [
-          "local-consumptions",
-          "local-attendances",
-          "local-day-summaries",
-        ]);
+        await invalidateLocalQueries(queryClient, CONSUMPTION_WRITE_PREFIXES);
       }
 
       logger.debug("[OfflineConsumption] Soft-deleted consumption locally:", {
