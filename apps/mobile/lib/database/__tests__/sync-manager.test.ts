@@ -9,6 +9,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { apiClient } from "../../api-client";
 import { pullGroups } from "../sync/pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "../sync/pull-reference";
 import { pullAttendances, pullProfile } from "../sync/pull-user-data";
@@ -133,6 +134,9 @@ vi.mock("../../api-client", () => ({
             memberCount: 3,
           },
         ],
+      }),
+      getMembers: vi.fn().mockResolvedValue({
+        data: [{ userId: "user-1", joinedAt: "2024-09-21T10:00:00Z" }],
       }),
     },
   },
@@ -281,6 +285,54 @@ describe("SyncManager", () => {
 
       expect(result.direction).toBe("push");
     });
+
+    // Reproduces the cold-start auth race: the sync fires before the Supabase
+    // session is restored, so every reference pull throws AuthRequiredError.
+    // Omitting userId mirrors production, where auth had not resolved yet.
+    it("reports failure when the reference pulls cannot authenticate", async () => {
+      const authError = new Error("No authenticated session available");
+      vi.mocked(apiClient.festivals.list).mockRejectedValueOnce(authError);
+      vi.mocked(apiClient.tents.list).mockRejectedValueOnce(authError);
+      vi.mocked(apiClient.achievements.available).mockRejectedValueOnce(authError);
+
+      const result = await syncManager.sync({
+        festivalId: "festival-1",
+        direction: "pull",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.failed).toBe(3);
+      expect(result.errors.join(" ")).toContain("No authenticated session available");
+    });
+
+    // The cold-start sync runs direction "both", so the push phase must not
+    // overwrite the pull failure count on its way through.
+    it("keeps pull failures when the push phase also runs", async () => {
+      vi.mocked(apiClient.tents.list).mockRejectedValueOnce(new Error("boom"));
+
+      const result = await syncManager.sync({
+        festivalId: "festival-1",
+        userId: "user-1",
+        direction: "both",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.failed).toBe(1);
+      expect(result.errors).toContain("tents: boom");
+    });
+
+    it("counts a partial pull failure without failing the clean pulls", async () => {
+      vi.mocked(apiClient.tents.list).mockRejectedValueOnce(new Error("boom"));
+
+      const result = await syncManager.sync({
+        festivalId: "festival-1",
+        direction: "pull",
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.failed).toBe(1);
+      expect(result.errors).toEqual(["tents: boom"]);
+    });
   });
 
   describe("abort", () => {
@@ -373,6 +425,30 @@ describe("Pull functions", () => {
       const result = await pullGroups(db, "festival-1");
 
       expect(result.table).toBe("groups");
+    });
+  });
+
+  // A pull that threw must not be indistinguishable from a pull that found
+  // nothing to do — that is what let the cold-start auth race ship silently.
+  describe("failure reporting", () => {
+    it("records the error on the PullResult when the API rejects", async () => {
+      vi.mocked(apiClient.festivals.list).mockRejectedValueOnce(
+        new Error("No authenticated session available"),
+      );
+      const db = mockDb as unknown as Parameters<typeof pullFestivals>[0];
+
+      const result = await pullFestivals(db);
+
+      expect(result.error).toBe("No authenticated session available");
+      expect(result.inserted).toBe(0);
+    });
+
+    it("leaves error unset on a successful pull", async () => {
+      const db = mockDb as unknown as Parameters<typeof pullFestivals>[0];
+
+      const result = await pullFestivals(db);
+
+      expect(result.error).toBeUndefined();
     });
   });
 });

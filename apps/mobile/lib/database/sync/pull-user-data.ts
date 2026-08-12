@@ -22,6 +22,7 @@ import {
   type TentVisitDayGroup,
 } from "../tent-visits";
 import { logConflict, shouldUpdate } from "./conflict";
+import { pullErrorMessage } from "./errors";
 import type { PullResult } from "./types";
 
 type ServerTentVisit = {
@@ -93,6 +94,7 @@ export async function pullProfile(db: SQLite.SQLiteDatabase, userId: string): Pr
     await updateLastSyncAt(db, "profiles", now);
   } catch (error) {
     logger.error("[SyncManager] Pull profile failed:", error);
+    result.error = pullErrorMessage(error);
   }
 
   return result;
@@ -160,6 +162,9 @@ export async function pullAttendances(
     await updateLastSyncAt(db, "tent_visits", now);
   } catch (error) {
     logger.error("[SyncManager] Pull attendances failed:", error);
+    // One request feeds both results, so a throw invalidates both.
+    attendancesResult.error = pullErrorMessage(error);
+    tentVisitsResult.error = pullErrorMessage(error);
   }
 
   return [attendancesResult, tentVisitsResult];
@@ -553,12 +558,16 @@ export async function pullConsumptions(
         );
       } catch (error) {
         logger.error(`[SyncManager] Pull consumptions for ${att.date} failed:`, error);
+        // Keep going for the other days, but the day we skipped means this
+        // table is now incomplete — the sync must not call itself clean.
+        result.error ??= pullErrorMessage(error);
       }
     }
 
     await updateLastSyncAt(db, "consumptions", now);
   } catch (error) {
     logger.error("[SyncManager] Pull consumptions failed:", error);
+    result.error = pullErrorMessage(error);
   }
 
   return result;

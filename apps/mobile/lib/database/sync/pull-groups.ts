@@ -12,6 +12,7 @@ import { logger } from "@/lib/logger";
 import { apiClient } from "../../api-client";
 import type { LocalGroup, LocalGroupMember } from "../schema";
 import { generateUUID, updateLastSyncAt } from "../sync-queue";
+import { pullErrorMessage } from "./errors";
 import type { PullResult } from "./types";
 
 /**
@@ -73,6 +74,7 @@ export async function pullGroups(
     await updateLastSyncAt(db, "groups", now);
   } catch (error) {
     logger.error("[SyncManager] Pull groups failed:", error);
+    result.error = pullErrorMessage(error);
   }
 
   return result;
@@ -156,12 +158,14 @@ export async function pullGroupMembers(
       } catch (error) {
         // Log per-group error but continue with other groups
         logger.error(`[SyncManager] Pull members for group ${group.id} failed:`, error);
+        result.error ??= pullErrorMessage(error);
       }
     }
 
     await updateLastSyncAt(db, "group_members", now);
   } catch (error) {
     logger.error("[SyncManager] Pull group members failed:", error);
+    result.error = pullErrorMessage(error);
   }
 
   return result;

@@ -87,6 +87,12 @@ export class SyncManager {
         const pullResults = await this.pullAll(options);
         for (const pr of pullResults) {
           result.pulled += pr.inserted + pr.updated;
+          // A pull that threw still returns a zeroed result, so success has to
+          // be decided on the error field rather than on the counts.
+          if (pr.error) {
+            result.failed++;
+            result.errors.push(`${pr.table}: ${pr.error}`);
+          }
         }
       }
 
@@ -94,7 +100,9 @@ export class SyncManager {
       if (direction === "push" || direction === "both") {
         const pushResult = await this.pushAll();
         result.pushed = pushResult.succeeded;
-        result.failed = pushResult.failed;
+        // Accumulate: on a "both" sync this must not discard the pull failures
+        // counted above.
+        result.failed += pushResult.failed;
         result.errors.push(...pushResult.errors.map((e) => e.error));
       }
 
