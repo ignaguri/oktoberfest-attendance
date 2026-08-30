@@ -60,6 +60,18 @@ For production OTAs, do **both**:
 
 `--environment production` alone is not enough — `.env.local` overrides it if present.
 
+### Native dependencies can't ship as an OTA
+
+Adding a dependency that bundles native code turns the next mobile release into a full store build — it can never go out via `eas update`, no matter how small the JS change around it looks.
+
+Case in point: the captcha work pulled in `@hcaptcha/react-native-hcaptcha`, which depends on `react-native-webview`. That package was never part of this project before — at the point captcha landed it only existed as an unresolved `optional: true` peer of `expo` — so it isn't autolinked into any binary already in users' hands.
+
+Feature flags and disabled config don't protect against this, because the crash isn't a render-time concern. `react-native-webview` resolves its native module with `TurboModuleRegistry.getEnforcing(...)` at module-evaluation time, so the moment something `import`s it (even transitively, even if the component that uses it is never mounted), it throws if the native module isn't linked. Shipping an OTA with that import reachable from a screen users hit unconditionally (e.g. sign-in) would crash that screen on every phone still running an older binary.
+
+The safeguard: whenever a change like this lands, bump `runtimeVersion` in the same commit. A new runtime fingerprint means EAS Update can't offer that JS bundle to a binary that doesn't already match it, so the incompatible code only ever reaches builds that were compiled with it in place.
+
+To catch this in review: check whether a change adds or updates anything under a package that ships an `ios/` or `android/` directory, or anything else Expo would autolink. If it does, treat the release as a required store build and bump `runtimeVersion`, not as something that can ride an OTA.
+
 ## Version Management
 
 ### App Version
