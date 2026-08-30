@@ -656,7 +656,6 @@
     "selectFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
     "noFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
     "error": "Fehler beim Laden der Erfolge. Zum Aktualisieren nach unten ziehen.",
-    "empty": "Keine Erfolge verfügbar",
     "trackProgress": "Verfolge deinen Fortschritt und schalte Erfolge beim {{festival}} frei",
     "completed": "Abgeschlossen",
     "inProgress": "In Bearbeitung",
@@ -1858,7 +1857,8 @@
       "disableTooltip": "Standortfreigabe beenden",
       "enabled": "Standortfreigabe aktiviert! Gruppenmitglieder können nun deinen Standort sehen.",
       "trackingStarted": "Standortverfolgung gestartet! Aktiviere die Standortfreigabe für bestimmte Gruppen in deinen Profileinstellungen.",
-      "noGroupsEnabled": "Standortfreigabe ist für keine Gruppe aktiviert. Bitte aktiviere zuerst die Standortfreigabe für mindestens eine Gruppe in deinen Profileinstellungen."
+      "noGroupsEnabled": "Standortfreigabe ist für keine Gruppe aktiviert. Bitte aktiviere zuerst die Standortfreigabe für mindestens eine Gruppe in deinen Profileinstellungen.",
+      "active": "Standortfreigabe aktiv"
     },
     "duration": {
       "30m": "30 Min",
@@ -1897,9 +1897,6 @@
       "veryClose": "Sehr nah",
       "hint": "Tippen, um auf Karte anzuzeigen und einzuchecken",
       "checkInButton": "Einchecken"
-    },
-    "sharing": {
-      "active": "Standortfreigabe aktiv"
     },
     "errors": {
       "startFailed": "Freigabe konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",

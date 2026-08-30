@@ -80,7 +80,6 @@
       },
       "pageNotFoundMessage": "The page you're looking for doesn't exist.",
       "somethingWentWrong": "Something went wrong!",
-      "unauthorized": "Please sign in to continue",
       "forbidden": "You don't have permission to do that",
       "networkError": "Network error. Please check your connection.",
       "unauthorized": {
@@ -691,7 +690,6 @@
     "selectFestival": "Please select a festival to view achievements.",
     "noFestival": "Please select a festival to view achievements.",
     "error": "Failed to load achievements. Pull to refresh.",
-    "empty": "No achievements available",
     "trackProgress": "Track your progress and unlock achievements at {{festival}}",
     "completed": "Completed",
     "inProgress": "In Progress",
@@ -1307,11 +1305,6 @@
       "markAllRead": "Mark all read",
       "tapToView": "Tap to view notification details",
       "archive": "Archive"
-    },
-    "privacy": {
-      "title": "Privacy Settings",
-      "locationSharing": "Location Sharing",
-      "profileVisibility": "Profile Visibility"
     },
     "photoPrivacy": {
       "title": "Photo Privacy",

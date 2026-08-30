@@ -80,7 +80,6 @@
       },
       "pageNotFoundMessage": "La página que buscás no existe.",
       "somethingWentWrong": "¡Algo salió mal!",
-      "unauthorized": "Iniciá sesión para continuar",
       "forbidden": "No tenés permiso para hacer eso",
       "networkError": "Error de red. Por favor, revisá tu conexión.",
       "notAuthenticated": "No autenticado",
@@ -691,7 +690,6 @@
     "selectFestival": "Por favor, seleccioná un festival para ver los logros.",
     "noFestival": "Por favor, seleccioná un festival para ver los logros.",
     "error": "Error al cargar los logros. Deslizá hacia abajo para actualizar.",
-    "empty": "No hay logros disponibles",
     "trackProgress": "Seguí tu progreso y desbloqueá logros en {{festival}}",
     "completed": "Completado",
     "inProgress": "En progreso",
@@ -1307,11 +1305,6 @@
       "markAllRead": "Marcar todas como leídas",
       "tapToView": "Tocá para ver los detalles",
       "archive": "Archivar"
-    },
-    "privacy": {
-      "title": "Configuración de privacidad",
-      "locationSharing": "Compartir ubicación",
-      "profileVisibility": "Visibilidad del perfil"
     },
     "photoPrivacy": {
       "title": "Privacidad de fotos",

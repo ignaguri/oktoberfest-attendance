@@ -48,12 +48,14 @@ export default function MapScreen() {
   const [selectedTent, setSelectedTent] = useState<NearbyTent | null>(null);
   const hasInitializedRef = useRef(false);
 
+  // refreshNearby must stay in the deps. Its identity changes with the current
+  // location, and pinning the mount-time copy captures a null location, so every
+  // tap hit its `if (!loc) return` guard and silently did nothing.
   const handleRefresh = useCallback(() => {
     if (currentFestival?.id) {
       refreshNearby(currentFestival.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFestival?.id]);
+  }, [currentFestival?.id, refreshNearby]);
 
   // Start local tracking when screen mounts (only if not already sharing)
   useEffect(() => {

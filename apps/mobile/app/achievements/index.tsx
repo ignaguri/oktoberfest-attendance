@@ -323,7 +323,7 @@ export default function AchievementsScreen() {
         {cards.length === 0 ? (
           <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Award size={48} color={IconColors.muted} />
-            <Text className="mt-2 text-center text-typography-500">{t("achievements.empty")}</Text>
+            <Text className="mt-2 text-center text-typography-500">{t("achievements.empty.title")}</Text>
           </Card>
         ) : (
           visibleCategories.map((category) => (
