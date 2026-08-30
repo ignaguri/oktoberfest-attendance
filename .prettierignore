@@ -3,6 +3,15 @@ public/sw.js
 public/sw.js.map
 public/workbox-*.js
 
+# Code generation output - reformatting these is churn, the generators
+# rewrite them on the next `generate-spec` / `generate` / `sup:db:types` run
+packages/api/openapi.json
+packages/api-client/src/generated.ts
+packages/db/src/types.ts
+
+# Archived email campaign - whitespace-sensitive table layout, already sent
+docs/email/2026-08-bulletin.html
+
 # Build outputs
 .next/
 dist/

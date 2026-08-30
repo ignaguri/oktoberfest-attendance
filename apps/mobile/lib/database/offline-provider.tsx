@@ -195,9 +195,10 @@ export function OfflineDataProvider({
 
   // Perform sync operation (defined before useEffects that depend on it)
   const performSync = useCallback(
-    async ({ trigger = "auto", ...options }: SyncOptions & { trigger?: SyncTrigger }): Promise<
-      SyncResult
-    > => {
+    async ({
+      trigger = "auto",
+      ...options
+    }: SyncOptions & { trigger?: SyncTrigger }): Promise<SyncResult> => {
       if (!syncManagerRef.current) {
         return {
           success: false,

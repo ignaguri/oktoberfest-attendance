@@ -81,7 +81,9 @@ async function main(): Promise<void> {
 
   if (isDryRun) {
     for (const row of rows) {
-      console.log(`  ${row.slug.padEnd(28)} ${row.category.padEnd(12)} t${row.tier} ${row.points}pts`);
+      console.log(
+        `  ${row.slug.padEnd(28)} ${row.category.padEnd(12)} t${row.tier} ${row.points}pts`,
+      );
     }
     console.log("Dry run: nothing written.");
     return;

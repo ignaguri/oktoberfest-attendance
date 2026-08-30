@@ -339,7 +339,10 @@ describe("processAchievementNotifications", () => {
       expect.objectContaining({ achievementId: "a7_legacy" }),
     );
     expect((supabase as any).__updates).toContainEqual(
-      expect.objectContaining({ table: "achievement_events", ids: expect.arrayContaining(["e7", "e8"]) }),
+      expect.objectContaining({
+        table: "achievement_events",
+        ids: expect.arrayContaining(["e7", "e8"]),
+      }),
     );
   });
 

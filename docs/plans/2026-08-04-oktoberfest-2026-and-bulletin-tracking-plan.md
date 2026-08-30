@@ -88,7 +88,7 @@ from `referrer`, App Store Connect installs from `pt`/`ct`.
 
 - **Question:** Should `radler` be priced the same as `beer` per tent?
   **Decision:** Yes. Every per-tent override inserts both a `beer` and a `radler` row at the same price, which is why Task 3 expects 30 override rows for 15 differing tents.
-  **Why:** This is exactly what `20260409174404_add_fruehlingsfest_2026.sql` did for Hippodrom. Note this is the per-tent *price* only; the separate rule that a radler counts as half a beer for leaderboard purposes lives in `20260325120000_radler_half_beer_leaderboard.sql` and is untouched here.
+  **Why:** This is exactly what `20260409174404_add_fruehlingsfest_2026.sql` did for Hippodrom. Note this is the per-tent _price_ only; the separate rule that a radler counts as half a beer for leaderboard purposes lives in `20260325120000_radler_half_beer_leaderboard.sql` and is untouched here.
   **If wrong:** STOP and ask.
 
 - **Question:** The spec did not name a `map_url` for the festival row.
@@ -148,6 +148,7 @@ No code. This is the review gate from the design doc. A wrong price is visible t
 **Files:** none.
 
 **Interfaces:**
+
 - Produces: an approved/rejected decision. Task 2 must not start until approval is explicit.
 
 **Provenance:** prices from wiesnkini.de and in-muenchen.de (2026 tables); lineup from oktoberfest.de's small-tent and Oide Wiesn pages plus muenchen.de's 2026 changes article; coordinates from OpenStreetMap via the Overpass API (ODbL), `timestamp_osm_base: 2026-08-04`.
@@ -163,58 +164,58 @@ Flag these specific uncertainties out loud when presenting:
 
 **Large tents (14)**
 
-| Tent ID | Name | Lat | Lon | Price |
-|---|---|---|---|---|
-| `55ff3af6-f1d6-481a-a8f4-58fa23f00f68` | Armbrustschützen Festzelt | 48.13474 | 11.54871 | 15.90 |
-| `631abb99-4237-4bbc-94d7-2a6c18e11e25` | Augustiner-Festhalle | 48.13286 | 11.55006 | 14.90 |
-| `9eb72005-8026-4665-be77-4a61fbcc3fa1` | Festhalle Schottenhamel | 48.13217 | 11.54814 | 15.80 (base) |
-| `da36b13f-1e75-4299-9f75-1de4eb38b416` | Fischer-Vroni | 48.13484 | 11.55018 | 15.75 |
-| `282d326c-0e14-43e2-b8c6-9bf098a0fde6` | Hacker-Festzelt | 48.13305 | 11.54816 | 15.80 (base) |
-| `253eb29d-8efe-4095-9671-4eff02704c4a` | Hofbräu-Festzelt | 48.13390 | 11.54841 | 15.80 (base) |
-| `37ad3fc4-9d52-4e19-91c7-a01ed11c6854` | Käfer Wiesn-Schänke | 48.13030 | 11.54729 | 15.80 (base) |
-| `2661d289-5ecd-42a0-9a59-eaf5ef94f92d` | Kufflers Weinzelt | 48.13006 | 11.54988 | 17.80 |
-| `dd7b4b6d-7a57-411a-baf8-8c0d20682b64` | Löwenbräu-Festzelt | 48.13098 | 11.54969 | 15.90 |
-| `49449d2f-c9b7-4b8b-9ed7-889690493c3d` | Marstall-Festzelt | 48.13537 | 11.54906 | 15.80 (base) |
-| `017977ea-a9c3-4865-b494-edc49efc6212` | Ochsenbraterei | 48.13412 | 11.55041 | 15.80 (base) |
-| `0935a117-4fe2-46fb-b8fa-fc45d9496af9` | Paulaner Festzelt | 48.13117 | 11.54788 | 15.80 (base) |
-| `4d140654-f235-44b8-8d6e-8f23e57274a2` | Pschorr-Festzelt Bräurosl | 48.13195 | 11.54992 | 15.90 |
-| `5deac267-6401-437f-adae-e81769e4e781` | Schützen-Festzelt | 48.13124 | 11.54692 | 15.80 (base) |
+| Tent ID                                | Name                      | Lat      | Lon      | Price        |
+| -------------------------------------- | ------------------------- | -------- | -------- | ------------ |
+| `55ff3af6-f1d6-481a-a8f4-58fa23f00f68` | Armbrustschützen Festzelt | 48.13474 | 11.54871 | 15.90        |
+| `631abb99-4237-4bbc-94d7-2a6c18e11e25` | Augustiner-Festhalle      | 48.13286 | 11.55006 | 14.90        |
+| `9eb72005-8026-4665-be77-4a61fbcc3fa1` | Festhalle Schottenhamel   | 48.13217 | 11.54814 | 15.80 (base) |
+| `da36b13f-1e75-4299-9f75-1de4eb38b416` | Fischer-Vroni             | 48.13484 | 11.55018 | 15.75        |
+| `282d326c-0e14-43e2-b8c6-9bf098a0fde6` | Hacker-Festzelt           | 48.13305 | 11.54816 | 15.80 (base) |
+| `253eb29d-8efe-4095-9671-4eff02704c4a` | Hofbräu-Festzelt          | 48.13390 | 11.54841 | 15.80 (base) |
+| `37ad3fc4-9d52-4e19-91c7-a01ed11c6854` | Käfer Wiesn-Schänke       | 48.13030 | 11.54729 | 15.80 (base) |
+| `2661d289-5ecd-42a0-9a59-eaf5ef94f92d` | Kufflers Weinzelt         | 48.13006 | 11.54988 | 17.80        |
+| `dd7b4b6d-7a57-411a-baf8-8c0d20682b64` | Löwenbräu-Festzelt        | 48.13098 | 11.54969 | 15.90        |
+| `49449d2f-c9b7-4b8b-9ed7-889690493c3d` | Marstall-Festzelt         | 48.13537 | 11.54906 | 15.80 (base) |
+| `017977ea-a9c3-4865-b494-edc49efc6212` | Ochsenbraterei            | 48.13412 | 11.55041 | 15.80 (base) |
+| `0935a117-4fe2-46fb-b8fa-fc45d9496af9` | Paulaner Festzelt         | 48.13117 | 11.54788 | 15.80 (base) |
+| `4d140654-f235-44b8-8d6e-8f23e57274a2` | Pschorr-Festzelt Bräurosl | 48.13195 | 11.54992 | 15.90        |
+| `5deac267-6401-437f-adae-e81769e4e781` | Schützen-Festzelt         | 48.13124 | 11.54692 | 15.80 (base) |
 
 **Oide Wiesn / `old` (4)**
 
-| Tent ID | Name | Lat | Lon | Price |
-|---|---|---|---|---|
-| `907342a2-ab22-4b27-8ebd-f7225a4d13e7` | Boandlkramerei | 48.12876 | 11.54607 | 15.30 |
-| `f2df3186-ec0d-467f-a560-fffa48a72897` | Festzelt Tradition | 48.12863 | 11.54748 | 15.80 (base) |
-| `655190b1-ca0d-4d5a-8def-74f8a20f1e2b` | Museumszelt *(renamed)* | 48.12781 | 11.54727 | 14.80 |
-| `e61d04d2-6a16-4069-bf79-85dcf4827c94` | Volkssängerzelt Schützenlisl | 48.12837 | 11.54617 | 14.90 |
+| Tent ID                                | Name                         | Lat      | Lon      | Price        |
+| -------------------------------------- | ---------------------------- | -------- | -------- | ------------ |
+| `907342a2-ab22-4b27-8ebd-f7225a4d13e7` | Boandlkramerei               | 48.12876 | 11.54607 | 15.30        |
+| `f2df3186-ec0d-467f-a560-fffa48a72897` | Festzelt Tradition           | 48.12863 | 11.54748 | 15.80 (base) |
+| `655190b1-ca0d-4d5a-8def-74f8a20f1e2b` | Museumszelt _(renamed)_      | 48.12781 | 11.54727 | 14.80        |
+| `e61d04d2-6a16-4069-bf79-85dcf4827c94` | Volkssängerzelt Schützenlisl | 48.12837 | 11.54617 | 14.90        |
 
 **Small tents (22)**
 
-| Tent ID | Name | Lat | Lon | Price |
-|---|---|---|---|---|
-| `c0000000-0000-4000-b000-000000000001` | Bartls Flößerstadl *(NEW)* | 48.13138 | 11.54925 | 15.70 |
-| `bbbf2c29-7b2e-487a-bcfc-c4b75547f83a` | Bodo's Cafézelt & Cocktailbar | 48.13340 | 11.55039 | 15.80 (base) |
-| `1764c5e2-6f01-4119-a55a-7d0efe3ae861` | Café Theres' | 48.13222 | 11.55073 | 15.80 (base) |
-| `28a517af-f440-4102-9ad3-beaed8347061` | Feisingers Kas- und Weinstubn | 48.13135 | 11.54857 | 15.80 (base) |
-| `f8e94181-3a63-4e68-9285-588038be343f` | Fisch-Bäda | 48.13144 | 11.55080 | 15.80 (base) |
-| `6fcea9eb-c5c5-4d8f-9363-cbd86119128e` | Glöckle-Wirt | 48.13147 | 11.54852 | 15.80 (base) |
-| `f02ae7eb-3c8c-4e38-ae4a-7b0f9fc5e404` | Goldener Hahn | 48.13325 | 11.54892 | 15.80 (base) |
+| Tent ID                                | Name                             | Lat      | Lon      | Price        |
+| -------------------------------------- | -------------------------------- | -------- | -------- | ------------ |
+| `c0000000-0000-4000-b000-000000000001` | Bartls Flößerstadl _(NEW)_       | 48.13138 | 11.54925 | 15.70        |
+| `bbbf2c29-7b2e-487a-bcfc-c4b75547f83a` | Bodo's Cafézelt & Cocktailbar    | 48.13340 | 11.55039 | 15.80 (base) |
+| `1764c5e2-6f01-4119-a55a-7d0efe3ae861` | Café Theres'                     | 48.13222 | 11.55073 | 15.80 (base) |
+| `28a517af-f440-4102-9ad3-beaed8347061` | Feisingers Kas- und Weinstubn    | 48.13135 | 11.54857 | 15.80 (base) |
+| `f8e94181-3a63-4e68-9285-588038be343f` | Fisch-Bäda                       | 48.13144 | 11.55080 | 15.80 (base) |
+| `6fcea9eb-c5c5-4d8f-9363-cbd86119128e` | Glöckle-Wirt                     | 48.13147 | 11.54852 | 15.80 (base) |
+| `f02ae7eb-3c8c-4e38-ae4a-7b0f9fc5e404` | Goldener Hahn                    | 48.13325 | 11.54892 | 15.80 (base) |
 | `6d4e022d-c033-4a56-a19b-441dfe8430fd` | Heimer Enten- und Hühnerbraterei | 48.13325 | 11.55104 | 15.80 (base) |
-| `e2eae4f6-8da8-46db-b76a-d1fb50eca8f6` | Heinz Wurst- und Hühnerbraterei | 48.13171 | 11.54857 | 15.80 (base) |
-| `ecaae5eb-9745-4359-826a-9a14aa91591b` | Hochreiters Haxnbraterei | 48.13343 | 11.54889 | 15.70 |
-| `24b50db1-f7c1-4132-a07c-00ad2cb8c2e1` | Hühner- und Entenbraterei Ammer | 48.13345 | 11.54979 | 14.95 |
-| `c0000000-0000-4000-b000-000000000002` | Hühnerbraterei Poschner *(NEW)* | 48.13266 | 11.54864 | 15.80 (base) |
-| `2196e0ea-1262-4f2c-97ef-bcd67104ae72` | Kalbsbraterei | 48.13232 | 11.54938 | 15.80 (base) |
-| `0898010d-693f-47be-b8f2-5916ad5a56d0` | Münchner Knödelei | 48.12919 | 11.54917 | 15.80 (base) |
-| `a20effb6-612e-4085-8de0-6fbc0dff1dc1` | Münchner Weißbiergarten | NULL | NULL | 14.80 |
-| `cb0a2849-159f-48f6-902f-fba73ae9c9a2` | Rischart's Café Kaiserschmarrn | 48.13067 | 11.55050 | 15.80 (base) |
-| `014c7c7e-f904-4fcc-931f-2b80c9ceff2b` | Schiebl's Kaffeehaferl | 48.13416 | 11.54924 | 15.80 (base) |
-| `949ee890-ee80-406c-af23-ded34e838b44` | Vinzenzmurr Metzger Stubn | 48.13437 | 11.54922 | 15.80 (base) |
-| `7b91d421-5052-4109-b47f-8136f3bb9a89` | Wiesn Guglhupf | NULL | NULL | 15.80 (base) |
-| `5162f382-2321-495c-b723-942a4708811e` | Wildstuben | 48.13008 | 11.55243 | 15.80 (base) |
-| `b349fe59-e104-42f1-9157-1859d829c1fa` | Wirtshaus im Schichtl | 48.13387 | 11.55242 | 14.90 |
-| `387574a0-8c63-4bf0-a4d0-a0bc37158ddd` | Zur Bratwurst | 48.13029 | 11.55261 | 15.70 |
+| `e2eae4f6-8da8-46db-b76a-d1fb50eca8f6` | Heinz Wurst- und Hühnerbraterei  | 48.13171 | 11.54857 | 15.80 (base) |
+| `ecaae5eb-9745-4359-826a-9a14aa91591b` | Hochreiters Haxnbraterei         | 48.13343 | 11.54889 | 15.70        |
+| `24b50db1-f7c1-4132-a07c-00ad2cb8c2e1` | Hühner- und Entenbraterei Ammer  | 48.13345 | 11.54979 | 14.95        |
+| `c0000000-0000-4000-b000-000000000002` | Hühnerbraterei Poschner _(NEW)_  | 48.13266 | 11.54864 | 15.80 (base) |
+| `2196e0ea-1262-4f2c-97ef-bcd67104ae72` | Kalbsbraterei                    | 48.13232 | 11.54938 | 15.80 (base) |
+| `0898010d-693f-47be-b8f2-5916ad5a56d0` | Münchner Knödelei                | 48.12919 | 11.54917 | 15.80 (base) |
+| `a20effb6-612e-4085-8de0-6fbc0dff1dc1` | Münchner Weißbiergarten          | NULL     | NULL     | 14.80        |
+| `cb0a2849-159f-48f6-902f-fba73ae9c9a2` | Rischart's Café Kaiserschmarrn   | 48.13067 | 11.55050 | 15.80 (base) |
+| `014c7c7e-f904-4fcc-931f-2b80c9ceff2b` | Schiebl's Kaffeehaferl           | 48.13416 | 11.54924 | 15.80 (base) |
+| `949ee890-ee80-406c-af23-ded34e838b44` | Vinzenzmurr Metzger Stubn        | 48.13437 | 11.54922 | 15.80 (base) |
+| `7b91d421-5052-4109-b47f-8136f3bb9a89` | Wiesn Guglhupf                   | NULL     | NULL     | 15.80 (base) |
+| `5162f382-2321-495c-b723-942a4708811e` | Wildstuben                       | 48.13008 | 11.55243 | 15.80 (base) |
+| `b349fe59-e104-42f1-9157-1859d829c1fa` | Wirtshaus im Schichtl            | 48.13387 | 11.55242 | 14.90        |
+| `387574a0-8c63-4bf0-a4d0-a0bc37158ddd` | Zur Bratwurst                    | 48.13029 | 11.55261 | 15.70        |
 
 **Sanity check to state when presenting:** the OSM coordinates put the Oide Wiesn tents (48.1278 to 48.1288) south of the main tents (48.1300 to 48.1354), which matches the real layout. The existing fabricated coordinates put them to the east, which is wrong.
 
@@ -229,9 +230,11 @@ If approved, proceed to Task 2. If any cell is corrected, update the table in th
 **Pre-check:** Verify `supabase/migrations/20260409174404_add_fruehlingsfest_2026.sql` exists and `git branch --show-current` prints `feat/oktoberfest-2026-and-bulletin-tracking`. If not, STOP.
 
 **Files:**
+
 - Create: `supabase/migrations/<generated_timestamp>_add_oktoberfest_2026.sql`
 
 **Interfaces:**
+
 - Consumes: the approved table from Task 1.
 - Produces: a migration file path, used by Tasks 3, 4 and 5.
 
@@ -459,6 +462,7 @@ git commit -m "feat(db): add Oktoberfest 2026 with OSM tent coordinates"
 **Files:** none created. Read-only verification plus one migration application.
 
 **Interfaces:**
+
 - Consumes: the migration file from Task 2.
 - Produces: confirmation that the SQL is correct. Task 4 depends on this passing.
 
@@ -506,17 +510,17 @@ SELECT
 
 Expected exactly:
 
-| Column | Expected |
-|---|---|
-| `festival_exists` | 1 |
-| `active_count` | 1 |
-| `active_festival` | `oktoberfest-2026` |
-| `linked_tents` | 40 |
-| `tents_missing_price` | 0 |
-| `festival_drink_prices` | 6 |
-| `tent_overrides` | 30 |
-| `old_typo_remaining` | 0 |
-| `tents_without_geometry` | 2 |
+| Column                   | Expected           |
+| ------------------------ | ------------------ |
+| `festival_exists`        | 1                  |
+| `active_count`           | 1                  |
+| `active_festival`        | `oktoberfest-2026` |
+| `linked_tents`           | 40                 |
+| `tents_missing_price`    | 0                  |
+| `festival_drink_prices`  | 6                  |
+| `tent_overrides`         | 30                 |
+| `old_typo_remaining`     | 0                  |
+| `tents_without_geometry` | 2                  |
 
 `tent_overrides` is 30 because 15 tents differ from the 1580 base and each gets a `beer` and a `radler` row. `tents_without_geometry` is 2: Münchner Weißbiergarten and Wiesn Guglhupf.
 
@@ -578,6 +582,7 @@ Human-gated because `pnpm sup:db:reset` wipes the shared local instance other ag
 **Files:** none.
 
 **Interfaces:**
+
 - Consumes: verified migration from Task 3.
 - Produces: Oktoberfest 2026 live in production.
 
@@ -635,6 +640,7 @@ The original steps are retained below for the record only.
 **Files:** none.
 
 **Interfaces:**
+
 - Produces: a verified `news.prostcounter.fun` domain ID, consumed by Task 7.
 
 - [ ] **Step 1: Create the domain**
@@ -693,6 +699,7 @@ Human-gated: requires an authenticated App Store Connect session and interactive
 **Files:** none.
 
 **Interfaces:**
+
 - Produces: either a provider token (`pt`) value, or an explicit "no token" outcome. Consumed by Task 7.
 
 - [ ] **Step 1: [HUMAN] Navigate to the campaign generator**
@@ -719,6 +726,7 @@ If a link was obtained, Task 7 uses it verbatim. If the campaign generator is no
 **Files:** none. The HTML snapshot file is created in Task 8.
 
 **Interfaces:**
+
 - Consumes: the Apple link decision from Task 6.
 - Produces: two updated draft broadcasts, ready to send in Tasks 8 and 9. The final HTML body, consumed by Task 8 Step 5.
 
@@ -737,6 +745,7 @@ Call `mcp__resend__get-broadcast` with `d193c030-d7a4-4ff9-b42c-93dc3bdf2940`. S
 In the HTML there are FIVE occurrences to change, not three, because the App Store and Play buttons each appear twice: once in an `<!--[if mso]>` VML `<v:roundrect href="...">` block for Outlook and once in the normal `<a href="...">`. Update every one.
 
 Occurrences to replace:
+
 1. `<v:roundrect ... href="https://apps.apple.com/app/prostcounter/id6758376527"` → Apple link
 2. `<a href="https://apps.apple.com/app/prostcounter/id6758376527"` → Apple link
 3. `<v:roundrect ... href="https://play.google.com/store/apps/details?id=com.prostcounter.app"` → Play link
@@ -752,6 +761,7 @@ Note: the Play URL already contains a `?`, so `referrer` is appended with `&`. T
 - [ ] **Step 3: Update Batch 1**
 
 Call `mcp__resend__update-broadcast` with:
+
 - `broadcastId`: `d193c030-d7a4-4ff9-b42c-93dc3bdf2940`
 - `from`: `Ignacio from ProstCounter <ignacio@account.prostcounter.fun>`
 - `segmentId`: `ab9269de-d777-42e3-a22e-3c67fe0d589b`
@@ -762,6 +772,7 @@ Call `mcp__resend__update-broadcast` with:
 - [ ] **Step 4: Update Batch 2 with the identical bodies**
 
 Same call, with:
+
 - `broadcastId`: `455968b3-3358-46fa-95c6-bc01fe2dae87`
 - `segmentId`: `e998142d-d562-4a5a-8778-8a582253ec20`
 - same `from`, `html`, `text`
@@ -783,6 +794,7 @@ Human-gated: requires reading a real inbox and judging rendering.
 **Pre-check:** Task 7 Step 5 passed. If not, STOP.
 
 **Files:**
+
 - Create: `docs/email/2026-08-bulletin.html`
 
 - [ ] **Step 1: Send a test to the author's own address**
@@ -803,6 +815,7 @@ here would mean click tracking got enabled on `account.prostcounter.fun` by mist
 condition because it puts password-reset links at risk.
 
 Confirm each href and then that each click lands correctly:
+
 - web link carries all four `utm_*` params
 - Play link carries `referrer` with its URL-encoded UTMs
 - Apple link carries `pt`/`ct`/`mt`, if Task 6 produced a token
@@ -894,9 +907,11 @@ More than 26 hours later, call `mcp__resend__get-broadcast` and `mcp__resend__li
 Order-independent: can run any time after Task 1. Not a dependency of any other task.
 
 **Files:**
+
 - Create: `docs/festivals/oktoberfest-2026-reference.md`
 
 **Interfaces:**
+
 - Consumes: the approved tables in Task 1 of this plan file.
 - Produces: nothing other tasks depend on.
 

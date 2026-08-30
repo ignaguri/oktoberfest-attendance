@@ -115,20 +115,14 @@ describe("evaluate — one-offs", () => {
   });
 
   it("suppresses a one-off the user already holds", () => {
-    const result = evaluate(
-      emptyMetrics({ attended_opening_day: true }),
-      new Set(["opening_day"]),
-    );
+    const result = evaluate(emptyMetrics({ attended_opening_day: true }), new Set(["opening_day"]));
     expect(result.unlocked.map((u) => u.slug)).not.toContain("opening_day");
   });
 });
 
 describe("evaluate — scope separation", () => {
   it("marks lifetime and festival unlocks with their declared scope", () => {
-    const result = evaluate(
-      emptyMetrics({ drinks_total: 3, friends_accepted: 1 }),
-      new Set(),
-    );
+    const result = evaluate(emptyMetrics({ drinks_total: 3, friends_accepted: 1 }), new Set());
     const festivalUnlock = result.unlocked.find((u) => u.slug === "drinks_total.t1");
     const lifetimeUnlock = result.unlocked.find((u) => u.slug === "friends_added.t1");
     expect(festivalUnlock!.scope).toBe("festival");

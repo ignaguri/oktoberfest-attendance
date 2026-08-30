@@ -1,5 +1,13 @@
-import type { AchievementCategory, AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
-import { GLYPH_FALLBACK_ICONS, getCategoryColor, TIER_RING_WIDTH } from "@prostcounter/shared/achievements";
+import type {
+  AchievementCategory,
+  AchievementTier,
+  GlyphId,
+} from "@prostcounter/shared/achievements";
+import {
+  GLYPH_FALLBACK_ICONS,
+  getCategoryColor,
+  TIER_RING_WIDTH,
+} from "@prostcounter/shared/achievements";
 import { cn } from "@prostcounter/ui";
 import {
   Award,

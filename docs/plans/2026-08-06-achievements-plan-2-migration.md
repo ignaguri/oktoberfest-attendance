@@ -99,7 +99,7 @@
 
 - **Question:** What if a user already holds the remap's target achievement via the new engine?
   **Decision:** Skip the repoint for that identity (the badge already exists) and pull the surviving row's `unlocked_at` back to the earliest legacy equivalent. The orphaned legacy row is removed by the cascade.
-  **Why:** Found by dry-running the migration on 2026-08-06: local data already had 29 unlocks on new achievements and the repoint hit `duplicate key value violates unique constraint "user_achievements_unique"`. Production has zero such rows *today*, but the live engine can create one at any moment between the registry sync and the migration, so the guard is load-bearing, not defensive decoration.
+  **Why:** Found by dry-running the migration on 2026-08-06: local data already had 29 unlocks on new achievements and the repoint hit `duplicate key value violates unique constraint "user_achievements_unique"`. Production has zero such rows _today_, but the live engine can create one at any moment between the registry sync and the migration, so the guard is load-bearing, not defensive decoration.
   **If wrong:** STOP and ask.
 
 - **Question:** How many rows should the remap produce?
@@ -130,7 +130,7 @@ Do not do any of the following in this plan, even if the code is nearby and look
 Follow conventions established in the files you are modifying and in `CLAUDE.md` at the repo root. Specifically:
 
 - **Scripts:** live in `packages/api/src/scripts/`, registered in `packages/api/package.json` `scripts`, run via `tsx`. Read `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` from env and throw if absent. See `sync-achievement-registry.ts` for the exact shape, including the `process.argv[1]?.endsWith(...)` guard that keeps the module importable by tests.
-- **Migrations:** header comment explaining *why*, not just what. Idempotent DDL (`IF NOT EXISTS`, `DROP ... IF EXISTS` then `CREATE`). See `supabase/migrations/20260805150000_harden_security_definer_grants.sql`.
+- **Migrations:** header comment explaining _why_, not just what. Idempotent DDL (`IF NOT EXISTS`, `DROP ... IF EXISTS` then `CREATE`). See `supabase/migrations/20260805150000_harden_security_definer_grants.sql`.
 - **Imports:** type-only imports use `import type`. Path alias `@/` maps to each package's `src/`.
 - **Tests:** Vitest. Despite `globals: true` in `vitest.config.ts`, every test file in this package imports `describe`/`expect`/`it` from `"vitest"` explicitly (verified 2026-08-06) — `tsc --noEmit` doesn't pick up vitest's ambient globals, so an unimported test file fails `pnpm type-check` even though `vitest run` passes it. Follow the established pattern: import explicitly. Unit tests live beside their subject as `*.test.ts`.
 - **Braces:** always use braces on `if`/`else` bodies, even single-line ones.
@@ -146,19 +146,19 @@ Task 3 produces application code and begins with a failing test, as it must. Tas
 
 **Created:**
 
-| Path | Responsibility |
-| --- | --- |
-| `supabase/migrations/<generated>_remap_legacy_achievements.sql` | The committed 23-row mapping, the repoint, and deletion of the 41 legacy rows |
-| `supabase/migrations/<generated>_populate_festival_group_standings.sql` | Runs `refresh_festival_group_standings` for every concluded festival |
-| `packages/api/src/scripts/backfill-achievements.ts` | Walks `(user, festival)` pairs, evaluates, inserts unlocks, stamps events |
-| `packages/api/src/scripts/backfill-achievements.test.ts` | Unit tests for the pair-enumeration and stamping logic |
+| Path                                                                    | Responsibility                                                                |
+| ----------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `supabase/migrations/<generated>_remap_legacy_achievements.sql`         | The committed 23-row mapping, the repoint, and deletion of the 41 legacy rows |
+| `supabase/migrations/<generated>_populate_festival_group_standings.sql` | Runs `refresh_festival_group_standings` for every concluded festival          |
+| `packages/api/src/scripts/backfill-achievements.ts`                     | Walks `(user, festival)` pairs, evaluates, inserts unlocks, stamps events     |
+| `packages/api/src/scripts/backfill-achievements.test.ts`                | Unit tests for the pair-enumeration and stamping logic                        |
 
 **Modified:**
 
-| Path | Change |
-| --- | --- |
+| Path                                                                       | Change                                                                                                                                                                                                             |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `packages/api/src/repositories/supabase/achievement-metrics.repository.ts` | Widen `getMetrics`/`getHeldSlugs`/`getHeldSlugsWithUnlockDates`/`insertUnlocks` to accept `festivalId: string \| null`, so the backfill's lifetime pass reuses the same tested class. See Open Questions Resolved. |
-| `packages/api/package.json` | Add `backfill:achievements` script entry |
+| `packages/api/package.json`                                                | Add `backfill:achievements` script entry                                                                                                                                                                           |
 
 **Read but not modified:** `packages/shared/src/achievements/{definitions,evaluator,types}.ts`, `packages/api/src/scripts/sync-achievement-registry.ts`, `apps/web/app/api/cron/scheduler/achievements.ts`.
 
@@ -168,31 +168,31 @@ Task 3 produces application code and begins with a failing test, as it must. Tas
 
 All 23 legacy achievements that carry unlocks, with the decision recorded per row. Rounding is **down** to the highest tier provably cleared (user decision 3). The 18 rows not listed here have zero unlocks and are deleted outright.
 
-| Legacy key | What it measured | Target | → New slug | Rationale |
-| --- | --- | --- | --- | --- |
-| `festivalNewcomer` | days attended | 1 | `days_attended.t1` | exact (t1 = 1) |
-| `regular` | days attended | 3 | `days_attended.t2` | exact (t2 = 3) |
-| `dedicated` | days attended | 5 | `days_attended.t2` | round down (t3 = 6) |
-| `streakMaster` | consecutive days | 3 | `attendance_streak.t2` | exact (t2 = 3) |
-| `earlyBird` | attended opening day | bool | `opening_day` | exact semantic match |
-| `firstDrop` | first drink logged | 1 | `first_drink` | exact semantic match; **lifetime scope** |
-| `beerRookie` | drinks in festival | 3 | `drinks_total.t1` | exact (t1 = 3) |
-| `halfwayThere` | drinks in festival | 5 | `drinks_total.t1` | round down (t2 = 10) |
-| `seriousDrinker` | drinks in festival | 8 | `drinks_total.t1` | round down (t2 = 10) |
-| `doubleDigits` | drinks in festival | 10 | `drinks_total.t2` | exact (t2 = 10) |
-| `beerEnthusiast` | drinks in festival | 15 | `drinks_total.t2` | round down (t3 = 25) |
-| `marathonDrinker` | drinks in festival | 20 | `drinks_total.t2` | round down (t3 = 25) |
-| `legendStatus` | drinks lifetime | 50 | `drinks_total.t3` | both holders peaked at 39 / 31 in one festival — cleared t3, not t4 |
-| `seriousSession` | drinks in a day | 3 | `drinks_day_max.t1` | exact (t1 = 3) |
-| `dailyDouble` | drinks in a day | 4 | `drinks_day_max.t1` | round down (t2 = 5) |
-| `powerHour` | drinks in a day | 6 | `drinks_day_max.t2` | round down (t3 = 8) |
-| `tentCurious` | distinct tents | 3 | `tents_visited.t1` | exact (t1 = 3) |
-| `tentHopper` | distinct tents | 5 | `tents_visited.t1` | round down (t2 = 6) |
-| `localGuide` | distinct tents | 10 | `tents_visited.t3` | exact (t3 = 10) |
-| `festivalVeteran` | distinct festivals | 2 | `festivals_attended.t1` | round down (t2 = 3); **lifetime scope** |
-| `groupLeader` | created a group | bool | `created_group` | exact semantic match |
-| `photoEnthusiast` | photos uploaded | 10 | `photos_uploaded.t2` | exact (t2 = 10) |
-| `multiGroupChampion` | groups joined (runtime truth) | 2 | `groups_joined.t2` | exact (t2 = 2); see Open Questions — copy claimed wins, runtime counted memberships |
+| Legacy key           | What it measured              | Target | → New slug              | Rationale                                                                           |
+| -------------------- | ----------------------------- | ------ | ----------------------- | ----------------------------------------------------------------------------------- |
+| `festivalNewcomer`   | days attended                 | 1      | `days_attended.t1`      | exact (t1 = 1)                                                                      |
+| `regular`            | days attended                 | 3      | `days_attended.t2`      | exact (t2 = 3)                                                                      |
+| `dedicated`          | days attended                 | 5      | `days_attended.t2`      | round down (t3 = 6)                                                                 |
+| `streakMaster`       | consecutive days              | 3      | `attendance_streak.t2`  | exact (t2 = 3)                                                                      |
+| `earlyBird`          | attended opening day          | bool   | `opening_day`           | exact semantic match                                                                |
+| `firstDrop`          | first drink logged            | 1      | `first_drink`           | exact semantic match; **lifetime scope**                                            |
+| `beerRookie`         | drinks in festival            | 3      | `drinks_total.t1`       | exact (t1 = 3)                                                                      |
+| `halfwayThere`       | drinks in festival            | 5      | `drinks_total.t1`       | round down (t2 = 10)                                                                |
+| `seriousDrinker`     | drinks in festival            | 8      | `drinks_total.t1`       | round down (t2 = 10)                                                                |
+| `doubleDigits`       | drinks in festival            | 10     | `drinks_total.t2`       | exact (t2 = 10)                                                                     |
+| `beerEnthusiast`     | drinks in festival            | 15     | `drinks_total.t2`       | round down (t3 = 25)                                                                |
+| `marathonDrinker`    | drinks in festival            | 20     | `drinks_total.t2`       | round down (t3 = 25)                                                                |
+| `legendStatus`       | drinks lifetime               | 50     | `drinks_total.t3`       | both holders peaked at 39 / 31 in one festival — cleared t3, not t4                 |
+| `seriousSession`     | drinks in a day               | 3      | `drinks_day_max.t1`     | exact (t1 = 3)                                                                      |
+| `dailyDouble`        | drinks in a day               | 4      | `drinks_day_max.t1`     | round down (t2 = 5)                                                                 |
+| `powerHour`          | drinks in a day               | 6      | `drinks_day_max.t2`     | round down (t3 = 8)                                                                 |
+| `tentCurious`        | distinct tents                | 3      | `tents_visited.t1`      | exact (t1 = 3)                                                                      |
+| `tentHopper`         | distinct tents                | 5      | `tents_visited.t1`      | round down (t2 = 6)                                                                 |
+| `localGuide`         | distinct tents                | 10     | `tents_visited.t3`      | exact (t3 = 10)                                                                     |
+| `festivalVeteran`    | distinct festivals            | 2      | `festivals_attended.t1` | round down (t2 = 3); **lifetime scope**                                             |
+| `groupLeader`        | created a group               | bool   | `created_group`         | exact semantic match                                                                |
+| `photoEnthusiast`    | photos uploaded               | 10     | `photos_uploaded.t2`    | exact (t2 = 10)                                                                     |
+| `multiGroupChampion` | groups joined (runtime truth) | 2      | `groups_joined.t2`      | exact (t2 = 2); see Open Questions — copy claimed wins, runtime counted memberships |
 
 **Deleted with zero unlocks (18):** `centuryClub`, `closingTime`, `consistencyKing`, `festivalWarrior`, `groupChampion`, `highRoller`, `leaderboardLegend`, `memoryKeeper`, `multiYearChampion`, `openingDayLegend`, `photoPerfect`, `risingStar`, `socialButterfly`, `teamPlayer`, `tentMaster`, `topContributor`, `weekendWarrior`, `wiesnWanderer`.
 
@@ -205,9 +205,11 @@ All 23 legacy achievements that carry unlocks, with the decision recorded per ro
 **Pre-check:** Verify `achievements` has columns `slug`, `series_id`, `tier`, `scope`, and that `user_achievements_unique` exists as `UNIQUE NULLS NOT DISTINCT (user_id, achievement_id, festival_id)`. If not, STOP.
 
 **Files:**
+
 - Create: `supabase/migrations/<generated>_remap_legacy_achievements.sql`
 
 **Interfaces:**
+
 - Consumes: the 90 slugged rows produced by `pnpm --filter=@prostcounter/api sync:achievements`.
 - Produces: a registry containing only slugged achievements, and `user_achievements` rows pointing exclusively at them.
 
@@ -412,9 +414,11 @@ git commit -m "feat(db): remap legacy achievement unlocks onto slug registry"
 **Pre-check:** Verify `public.refresh_festival_group_standings(uuid)` exists and `festival_group_standings` is empty or stale. If the function is missing, STOP.
 
 **Files:**
+
 - Create: `supabase/migrations/<generated>_populate_festival_group_standings.sql`
 
 **Interfaces:**
+
 - Consumes: `refresh_festival_group_standings(p_festival_id uuid)` from Plan 1.
 - Produces: `festival_group_standings` rows for every concluded festival, which `get_achievement_metrics` reads for `group_wins` and `podium_finishes`.
 
@@ -501,15 +505,18 @@ git commit -m "feat(db): populate group standings for concluded festivals"
 **Pre-check:** Verify `packages/shared/src/achievements/evaluator.ts` exports `evaluate` and that `packages/api/src/repositories/supabase/achievement-metrics.repository.ts` exports a class exposing `getMetrics` and `insertUnlocks`. If the names differ, STOP — read them and report.
 
 **Files:**
+
 - Create: `packages/api/src/scripts/backfill-achievements.ts`
 - Create: `packages/api/src/scripts/backfill-achievements.test.ts`
 - Modify: `packages/api/package.json`
 
 **Interfaces:**
+
 - Consumes: `evaluate()` from `@prostcounter/shared/achievements`; `get_achievement_metrics` RPC; `AchievementMetricsRepository`.
 - Produces: a `backfill:achievements` script with `--dry-run`.
 
 The script must:
+
 1. Enumerate every `(user_id, festival_id)` pair from `attendances`, **plus** one `(user_id, NULL)` lifetime pass for **every** user in `profiles` — not just those with attendance. On production only 80 of 377 users have ever attended a festival, and lifetime achievements like `profile_complete` and `friends_added.*` are earnable without attending anything. Skipping the other 297 users would silently deny them badges they hold.
 2. For each pair, call `get_achievement_metrics` and run `evaluate()`.
 3. Insert only unlocks the user does not already hold.
@@ -604,6 +611,7 @@ Expected: FAIL — module not found / exports undefined.
 Write `packages/api/src/scripts/backfill-achievements.ts`. Export `enumerateBackfillPairs` and `summariseDelta` as pure functions so the test above drives them, and keep `main()` behind the same `process.argv[1]?.endsWith(...)` guard used by `sync-achievement-registry.ts`.
 
 Required behaviours, in order:
+
 - Parse `--dry-run` from `process.argv`.
 - Read `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`; throw if either is absent.
 - Select `user_id, festival_id` from `attendances` and `id` from `profiles`, then feed both through `enumerateBackfillPairs(attendanceRows, allUserIds)`.
@@ -705,6 +713,7 @@ pnpm --filter=@prostcounter/api backfill:achievements --dry-run
 ```
 
 Review the per-user delta. Sanity checks before proceeding:
+
 - No user should gain a `active_days.*` or `active_day_streak.*` unlock — `user_active_days` is empty, so those must all read zero (user decision 2).
 - Users who held `multiGroupChampion` should gain real `group_wins.*` only if the standings actually show them at rank 1 with `member_count >= 2`.
 

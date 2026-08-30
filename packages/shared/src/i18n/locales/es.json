@@ -773,7 +773,10 @@
     },
     "drink_variety": {
       "t1": { "name": "Degustador", "description": "Probá 2 tipos de bebida diferentes" },
-      "t2": { "name": "Explorador de Sabores", "description": "Probá 3 tipos de bebida diferentes" },
+      "t2": {
+        "name": "Explorador de Sabores",
+        "description": "Probá 3 tipos de bebida diferentes"
+      },
       "t3": { "name": "Conocedor", "description": "Probá 4 tipos de bebida diferentes" },
       "t4": { "name": "Carta Completa", "description": "Probá 5 tipos de bebida diferentes" }
     },
@@ -784,10 +787,22 @@
       "t4": { "name": "Cien Litros", "description": "Tomá 100 litros en este festival" }
     },
     "tips_total": {
-      "t1": { "name": "Comienzo Generoso", "description": "Dejá un total de 5 € de propina en este festival" },
-      "t2": { "name": "Buen Propinador", "description": "Dejá un total de 20 € de propina en este festival" },
-      "t3": { "name": "Favorito del Público", "description": "Dejá un total de 50 € de propina en este festival" },
-      "t4": { "name": "Propinador Legendario", "description": "Dejá un total de 100 € de propina en este festival" }
+      "t1": {
+        "name": "Comienzo Generoso",
+        "description": "Dejá un total de 5 € de propina en este festival"
+      },
+      "t2": {
+        "name": "Buen Propinador",
+        "description": "Dejá un total de 20 € de propina en este festival"
+      },
+      "t3": {
+        "name": "Favorito del Público",
+        "description": "Dejá un total de 50 € de propina en este festival"
+      },
+      "t4": {
+        "name": "Propinador Legendario",
+        "description": "Dejá un total de 100 € de propina en este festival"
+      }
     },
     "spend_total": {
       "t1": { "name": "Billetera Abierta", "description": "Gastá 100 € en este festival" },
@@ -841,9 +856,15 @@
     },
     "festival_types": {
       "t1": { "name": "Primer Estilo", "description": "Asistí a tu primer tipo de festival" },
-      "t2": { "name": "Ampliando Horizontes", "description": "Asistí a 2 tipos de festival diferentes" },
+      "t2": {
+        "name": "Ampliando Horizontes",
+        "description": "Asistí a 2 tipos de festival diferentes"
+      },
       "t3": { "name": "Bien Viajado", "description": "Asistí a 3 tipos de festival diferentes" },
-      "t4": { "name": "Conocedor de Festivales", "description": "Asistí a 4 tipos de festival diferentes" }
+      "t4": {
+        "name": "Conocedor de Festivales",
+        "description": "Asistí a 4 tipos de festival diferentes"
+      }
     },
     "all_large_tents": {
       "name": "Gran Recorrido",
@@ -871,7 +892,10 @@
       "t1": { "name": "Mostrando Cariño", "description": "Reaccioná a 5 fotos en este festival" },
       "t2": { "name": "Solidario", "description": "Reaccioná a 25 fotos en este festival" },
       "t3": { "name": "Animador", "description": "Reaccioná a 75 fotos en este festival" },
-      "t4": { "name": "Máquina de Reacciones", "description": "Reaccioná a 150 fotos en este festival" }
+      "t4": {
+        "name": "Máquina de Reacciones",
+        "description": "Reaccioná a 150 fotos en este festival"
+      }
     },
     "first_photo": {
       "name": "Primera Foto",
@@ -882,22 +906,49 @@
       "description": "Creá un grupo"
     },
     "group_wins": {
-      "t1": { "name": "Primera Victoria", "description": "Ganá el primer puesto en un grupo una vez" },
-      "t2": { "name": "Ganador en Serie", "description": "Ganá el primer puesto en un grupo 3 veces" },
-      "t3": { "name": "Campeón de Grupo", "description": "Ganá el primer puesto en un grupo 6 veces" },
+      "t1": {
+        "name": "Primera Victoria",
+        "description": "Ganá el primer puesto en un grupo una vez"
+      },
+      "t2": {
+        "name": "Ganador en Serie",
+        "description": "Ganá el primer puesto en un grupo 3 veces"
+      },
+      "t3": {
+        "name": "Campeón de Grupo",
+        "description": "Ganá el primer puesto en un grupo 6 veces"
+      },
       "t4": { "name": "Dinastía", "description": "Ganá el primer puesto en un grupo 10 veces" }
     },
     "podium_finishes": {
-      "t1": { "name": "En el Podio", "description": "Terminá entre los 3 primeros de un grupo una vez" },
-      "t2": { "name": "Habitué del Podio", "description": "Terminá entre los 3 primeros de un grupo 5 veces" },
-      "t3": { "name": "Contendiente Constante", "description": "Terminá entre los 3 primeros de un grupo 12 veces" },
-      "t4": { "name": "Leyenda del Podio", "description": "Terminá entre los 3 primeros de un grupo 25 veces" }
+      "t1": {
+        "name": "En el Podio",
+        "description": "Terminá entre los 3 primeros de un grupo una vez"
+      },
+      "t2": {
+        "name": "Habitué del Podio",
+        "description": "Terminá entre los 3 primeros de un grupo 5 veces"
+      },
+      "t3": {
+        "name": "Contendiente Constante",
+        "description": "Terminá entre los 3 primeros de un grupo 12 veces"
+      },
+      "t4": {
+        "name": "Leyenda del Podio",
+        "description": "Terminá entre los 3 primeros de un grupo 25 veces"
+      }
     },
     "active_days": {
       "t1": { "name": "Buen Comienzo", "description": "Registrá actividad en 5 días diferentes" },
       "t2": { "name": "Cara Conocida", "description": "Registrá actividad en 25 días diferentes" },
-      "t3": { "name": "Veterano de Ley", "description": "Registrá actividad en 75 días diferentes" },
-      "t4": { "name": "Pilar de la Casa", "description": "Registrá actividad en 200 días diferentes" }
+      "t3": {
+        "name": "Veterano de Ley",
+        "description": "Registrá actividad en 75 días diferentes"
+      },
+      "t4": {
+        "name": "Pilar de la Casa",
+        "description": "Registrá actividad en 200 días diferentes"
+      }
     },
     "active_day_streak": {
       "t1": { "name": "Entrando en Calor", "description": "Registrá actividad 3 días seguidos" },
@@ -906,10 +957,22 @@
       "t4": { "name": "Racha Imparable", "description": "Registrá actividad 60 días seguidos" }
     },
     "crowd_reports": {
-      "t1": { "name": "Primer Reporte", "description": "Enviá 1 reporte de aglomeración en este festival" },
-      "t2": { "name": "Reportero Regular", "description": "Enviá 5 reportes de aglomeración en este festival" },
-      "t3": { "name": "Observador de Multitudes", "description": "Enviá 15 reportes de aglomeración en este festival" },
-      "t4": { "name": "Pilar de la Comunidad", "description": "Enviá 30 reportes de aglomeración en este festival" }
+      "t1": {
+        "name": "Primer Reporte",
+        "description": "Enviá 1 reporte de aglomeración en este festival"
+      },
+      "t2": {
+        "name": "Reportero Regular",
+        "description": "Enviá 5 reportes de aglomeración en este festival"
+      },
+      "t3": {
+        "name": "Observador de Multitudes",
+        "description": "Enviá 15 reportes de aglomeración en este festival"
+      },
+      "t4": {
+        "name": "Pilar de la Comunidad",
+        "description": "Enviá 30 reportes de aglomeración en este festival"
+      }
     },
     "profile_complete": {
       "name": "Perfil Completo",

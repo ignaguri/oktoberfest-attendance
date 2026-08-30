@@ -252,7 +252,11 @@ export default function AttendanceScreen() {
   ]);
 
   // Loading state - festival or initial data load
-  if (viewMode === null || festivalLoading || ((isLoading || reservationsLoading) && !attendances)) {
+  if (
+    viewMode === null ||
+    festivalLoading ||
+    ((isLoading || reservationsLoading) && !attendances)
+  ) {
     return (
       <View className="flex-1 bg-background-50">
         <AttendanceSkeleton />

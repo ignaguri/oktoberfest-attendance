@@ -739,7 +739,10 @@
     },
     "drink_variety": {
       "t1": { "name": "Kostprobe", "description": "Probier 2 verschiedene Getränkearten" },
-      "t2": { "name": "Geschmacks-Entdecker", "description": "Probier 3 verschiedene Getränkearten" },
+      "t2": {
+        "name": "Geschmacks-Entdecker",
+        "description": "Probier 3 verschiedene Getränkearten"
+      },
       "t3": { "name": "Kenner", "description": "Probier 4 verschiedene Getränkearten" },
       "t4": { "name": "Volle Karte", "description": "Probier 5 verschiedene Getränkearten" }
     },
@@ -750,10 +753,22 @@
       "t4": { "name": "Hundert Liter", "description": "Trink 100 Liter bei diesem Fest" }
     },
     "tips_total": {
-      "t1": { "name": "Großzügiger Start", "description": "Gib insgesamt 5 € Trinkgeld bei diesem Fest" },
-      "t2": { "name": "Guter Trinkgeldgeber", "description": "Gib insgesamt 20 € Trinkgeld bei diesem Fest" },
-      "t3": { "name": "Publikumsliebling", "description": "Gib insgesamt 50 € Trinkgeld bei diesem Fest" },
-      "t4": { "name": "Legendärer Trinkgeldgeber", "description": "Gib insgesamt 100 € Trinkgeld bei diesem Fest" }
+      "t1": {
+        "name": "Großzügiger Start",
+        "description": "Gib insgesamt 5 € Trinkgeld bei diesem Fest"
+      },
+      "t2": {
+        "name": "Guter Trinkgeldgeber",
+        "description": "Gib insgesamt 20 € Trinkgeld bei diesem Fest"
+      },
+      "t3": {
+        "name": "Publikumsliebling",
+        "description": "Gib insgesamt 50 € Trinkgeld bei diesem Fest"
+      },
+      "t4": {
+        "name": "Legendärer Trinkgeldgeber",
+        "description": "Gib insgesamt 100 € Trinkgeld bei diesem Fest"
+      }
     },
     "spend_total": {
       "t1": { "name": "Geldbeutel geöffnet", "description": "Gib 100 € bei diesem Fest aus" },
@@ -848,15 +863,30 @@
       "description": "Erstell eine Gruppe"
     },
     "group_wins": {
-      "t1": { "name": "Erster Sieg", "description": "Gewinn einmal den ersten Platz in einer Gruppe" },
-      "t2": { "name": "Serien-Sieger", "description": "Gewinn 3-mal den ersten Platz in einer Gruppe" },
-      "t3": { "name": "Gruppen-Champion", "description": "Gewinn 6-mal den ersten Platz in einer Gruppe" },
+      "t1": {
+        "name": "Erster Sieg",
+        "description": "Gewinn einmal den ersten Platz in einer Gruppe"
+      },
+      "t2": {
+        "name": "Serien-Sieger",
+        "description": "Gewinn 3-mal den ersten Platz in einer Gruppe"
+      },
+      "t3": {
+        "name": "Gruppen-Champion",
+        "description": "Gewinn 6-mal den ersten Platz in einer Gruppe"
+      },
       "t4": { "name": "Dynastie", "description": "Gewinn 10-mal den ersten Platz in einer Gruppe" }
     },
     "podium_finishes": {
       "t1": { "name": "Auf dem Podium", "description": "Erreich einmal die Top 3 in einer Gruppe" },
-      "t2": { "name": "Podium-Stammgast", "description": "Erreich 5-mal die Top 3 in einer Gruppe" },
-      "t3": { "name": "Beständiger Herausforderer", "description": "Erreich 12-mal die Top 3 in einer Gruppe" },
+      "t2": {
+        "name": "Podium-Stammgast",
+        "description": "Erreich 5-mal die Top 3 in einer Gruppe"
+      },
+      "t3": {
+        "name": "Beständiger Herausforderer",
+        "description": "Erreich 12-mal die Top 3 in einer Gruppe"
+      },
       "t4": { "name": "Podium-Legende", "description": "Erreich 25-mal die Top 3 in einer Gruppe" }
     },
     "active_days": {
@@ -872,10 +902,22 @@
       "t4": { "name": "Unaufhaltsame Serie", "description": "Sei 60 Tage in Folge aktiv" }
     },
     "crowd_reports": {
-      "t1": { "name": "Erste Meldung", "description": "Reich bei diesem Fest 1 Andrang-Meldung ein" },
-      "t2": { "name": "Regelmäßiger Melder", "description": "Reich bei diesem Fest 5 Andrang-Meldungen ein" },
-      "t3": { "name": "Andrang-Beobachter", "description": "Reich bei diesem Fest 15 Andrang-Meldungen ein" },
-      "t4": { "name": "Stütze der Gemeinschaft", "description": "Reich bei diesem Fest 30 Andrang-Meldungen ein" }
+      "t1": {
+        "name": "Erste Meldung",
+        "description": "Reich bei diesem Fest 1 Andrang-Meldung ein"
+      },
+      "t2": {
+        "name": "Regelmäßiger Melder",
+        "description": "Reich bei diesem Fest 5 Andrang-Meldungen ein"
+      },
+      "t3": {
+        "name": "Andrang-Beobachter",
+        "description": "Reich bei diesem Fest 15 Andrang-Meldungen ein"
+      },
+      "t4": {
+        "name": "Stütze der Gemeinschaft",
+        "description": "Reich bei diesem Fest 30 Andrang-Meldungen ein"
+      }
     },
     "profile_complete": {
       "name": "Profil vollständig",

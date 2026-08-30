@@ -100,7 +100,11 @@ export class AchievementMetricsRepository {
       .from("user_achievements")
       .select("achievements(slug)")
       .eq("user_id", userId)
-      .or(festivalId === null ? "festival_id.is.null" : `festival_id.eq.${festivalId},festival_id.is.null`);
+      .or(
+        festivalId === null
+          ? "festival_id.is.null"
+          : `festival_id.eq.${festivalId},festival_id.is.null`,
+      );
 
     if (error) {
       throw new DatabaseError(`Failed to fetch held achievements: ${error.message}`);
@@ -128,7 +132,11 @@ export class AchievementMetricsRepository {
       .from("user_achievements")
       .select("unlocked_at, achievements(slug)")
       .eq("user_id", userId)
-      .or(festivalId === null ? "festival_id.is.null" : `festival_id.eq.${festivalId},festival_id.is.null`);
+      .or(
+        festivalId === null
+          ? "festival_id.is.null"
+          : `festival_id.eq.${festivalId},festival_id.is.null`,
+      );
 
     if (error) {
       throw new DatabaseError(`Failed to fetch held achievement unlock dates: ${error.message}`);
@@ -235,9 +243,7 @@ export class AchievementMetricsRepository {
       throw new DatabaseError(`Failed to insert unlocks: ${insertError.message}`);
     }
 
-    const insertedAchievementIds = new Set(
-      (insertedRows ?? []).map((row) => row.achievement_id),
-    );
+    const insertedAchievementIds = new Set((insertedRows ?? []).map((row) => row.achievement_id));
 
     if (insertedAchievementIds.size === 0) {
       return [];
@@ -415,9 +421,7 @@ export class AchievementMetricsRepository {
         .is("user_notified_at", null);
 
       if (verifyError) {
-        throw new DatabaseError(
-          `Failed to verify marked unlocks: ${verifyError.message}`,
-        );
+        throw new DatabaseError(`Failed to verify marked unlocks: ${verifyError.message}`);
       }
 
       if (stillPending && stillPending.length > 0) {

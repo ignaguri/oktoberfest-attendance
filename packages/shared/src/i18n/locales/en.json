@@ -843,7 +843,10 @@
       "t1": { "name": "First Style", "description": "Attend your first type of festival" },
       "t2": { "name": "Branching Out", "description": "Attend 2 different types of festival" },
       "t3": { "name": "Well Travelled", "description": "Attend 3 different types of festival" },
-      "t4": { "name": "Festival Connoisseur", "description": "Attend 4 different types of festival" }
+      "t4": {
+        "name": "Festival Connoisseur",
+        "description": "Attend 4 different types of festival"
+      }
     },
     "all_large_tents": {
       "name": "Grand Tour",

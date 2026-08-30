@@ -448,7 +448,6 @@ async function processTentVisits(
   result.deleted += await clearDeletedTentVisits(db, festivalId, serverIds);
 }
 
-
 /**
  * Pull consumptions for all attendances
  */

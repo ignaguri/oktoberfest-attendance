@@ -1,7 +1,4 @@
-import type {
-  EvaluationResult,
-  PersistedUnlock,
-} from "@prostcounter/shared/achievements";
+import type { EvaluationResult, PersistedUnlock } from "@prostcounter/shared/achievements";
 import { evaluate } from "@prostcounter/shared/achievements";
 
 import type { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
@@ -17,10 +14,7 @@ export class AchievementService {
    * achievements. Null evaluates lifetime only, and is correct exclusively for
    * callers with no festival context.
    */
-  async evaluateAndUnlock(
-    userId: string,
-    festivalId: string | null,
-  ): Promise<PersistedUnlock[]> {
+  async evaluateAndUnlock(userId: string, festivalId: string | null): Promise<PersistedUnlock[]> {
     const [metrics, heldSlugs] = await Promise.all([
       this.metricsRepo.getMetrics(userId, festivalId),
       this.metricsRepo.getHeldSlugs(userId, festivalId),

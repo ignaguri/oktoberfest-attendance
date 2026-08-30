@@ -1,6 +1,10 @@
 "use client";
 
-import { buildStats, SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
+import {
+  buildStats,
+  SERIES_CATEGORY_ORDER,
+  splitCardsByCompletion,
+} from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
 import type {
   SeriesCard as SeriesCardData,

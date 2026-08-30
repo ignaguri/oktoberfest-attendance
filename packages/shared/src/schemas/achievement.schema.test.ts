@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  GetAchievementsWithProgressResponseSchema,
-  SeriesCardSchema,
-} from "./achievement.schema";
+import { GetAchievementsWithProgressResponseSchema, SeriesCardSchema } from "./achievement.schema";
 
 const validCard = {
   id: "drinks_total",
@@ -12,10 +9,34 @@ const validCard = {
   glyph: "masskrug",
   currentTier: 2,
   tiers: [
-    { tier: 1, name: "achievements.drinks_total.t1.name", points: 10, isUnlocked: true, unlockedAt: "2026-09-20T10:00:00Z" },
-    { tier: 2, name: "achievements.drinks_total.t2.name", points: 50, isUnlocked: true, unlockedAt: "2026-09-21T10:00:00Z" },
-    { tier: 3, name: "achievements.drinks_total.t3.name", points: 150, isUnlocked: false, unlockedAt: null },
-    { tier: 4, name: "achievements.drinks_total.t4.name", points: 400, isUnlocked: false, unlockedAt: null },
+    {
+      tier: 1,
+      name: "achievements.drinks_total.t1.name",
+      points: 10,
+      isUnlocked: true,
+      unlockedAt: "2026-09-20T10:00:00Z",
+    },
+    {
+      tier: 2,
+      name: "achievements.drinks_total.t2.name",
+      points: 50,
+      isUnlocked: true,
+      unlockedAt: "2026-09-21T10:00:00Z",
+    },
+    {
+      tier: 3,
+      name: "achievements.drinks_total.t3.name",
+      points: 150,
+      isUnlocked: false,
+      unlockedAt: null,
+    },
+    {
+      tier: 4,
+      name: "achievements.drinks_total.t4.name",
+      points: 400,
+      isUnlocked: false,
+      unlockedAt: null,
+    },
   ],
   progress: { currentValue: 12, nextTarget: 25 },
 };
@@ -55,7 +76,13 @@ describe("SeriesCardSchema", () => {
       glyph: "first-drop",
       currentTier: 1,
       tiers: [
-        { tier: 1, name: "achievements.first_drink.name", points: 10, isUnlocked: true, unlockedAt: "2026-09-20T10:00:00Z" },
+        {
+          tier: 1,
+          name: "achievements.first_drink.name",
+          points: 10,
+          isUnlocked: true,
+          unlockedAt: "2026-09-20T10:00:00Z",
+        },
       ],
       progress: null,
     };
@@ -67,7 +94,9 @@ describe("SeriesCardSchema", () => {
   });
 
   it("rejects a legacy category value", () => {
-    expect(SeriesCardSchema.safeParse({ ...validCard, category: "consumption" }).success).toBe(false);
+    expect(SeriesCardSchema.safeParse({ ...validCard, category: "consumption" }).success).toBe(
+      false,
+    );
   });
 
   it("rejects a currentTier above 4", () => {

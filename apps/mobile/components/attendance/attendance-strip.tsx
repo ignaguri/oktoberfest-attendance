@@ -90,10 +90,7 @@ export function AttendanceStrip({
 
   // Shared with the day list: both views need the same one-reservation-per-day
   // map, and two copies of it would drift.
-  const reservationMap = useMemo(
-    () => buildActiveReservationsByDate(reservations),
-    [reservations],
-  );
+  const reservationMap = useMemo(() => buildActiveReservationsByDate(reservations), [reservations]);
 
   const rangeLabel = useMemo(
     () =>

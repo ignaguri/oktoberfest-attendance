@@ -206,9 +206,27 @@ describe("achievement unlocking against a real database", () => {
     // drinks_total tier 1 unlocks at 3 drinks (see SERIES in
     // packages/shared/src/achievements/definitions.ts).
     const { error: consumptionsError } = await supabaseAdmin.from("consumptions").insert([
-      { attendance_id: attendance.id, drink_type: "beer", base_price_cents: 1620, price_paid_cents: 1620, volume_ml: 1000 },
-      { attendance_id: attendance.id, drink_type: "beer", base_price_cents: 1620, price_paid_cents: 1620, volume_ml: 1000 },
-      { attendance_id: attendance.id, drink_type: "beer", base_price_cents: 1620, price_paid_cents: 1620, volume_ml: 1000 },
+      {
+        attendance_id: attendance.id,
+        drink_type: "beer",
+        base_price_cents: 1620,
+        price_paid_cents: 1620,
+        volume_ml: 1000,
+      },
+      {
+        attendance_id: attendance.id,
+        drink_type: "beer",
+        base_price_cents: 1620,
+        price_paid_cents: 1620,
+        volume_ml: 1000,
+      },
+      {
+        attendance_id: attendance.id,
+        drink_type: "beer",
+        base_price_cents: 1620,
+        price_paid_cents: 1620,
+        volume_ml: 1000,
+      },
     ]);
     if (consumptionsError) {
       throw new Error(`Failed to create test consumptions: ${consumptionsError.message}`);
@@ -243,7 +261,12 @@ describe("inline unlock wiring on the write-path routes", () => {
     const festival = await createTestFestival(supabaseAdmin);
     const app = mountRoute(attendanceRoutes);
 
-    const body = JSON.stringify({ festivalId: festival.id, date: "2024-09-21", tents: [], amount: 0 });
+    const body = JSON.stringify({
+      festivalId: festival.id,
+      date: "2024-09-21",
+      tents: [],
+      amount: 0,
+    });
     const headers = { Authorization: `Bearer ${user.token}`, "Content-Type": "application/json" };
 
     const first = await app.request("/attendance", { method: "POST", headers, body });
@@ -262,7 +285,11 @@ describe("inline unlock wiring on the write-path routes", () => {
     const secondJson = await unlockedFrom(second);
     expect(secondJson.unlocked).toEqual([]);
 
-    await supabaseAdmin.from("attendances").delete().eq("user_id", user.id).eq("festival_id", festival.id);
+    await supabaseAdmin
+      .from("attendances")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("festival_id", festival.id);
     await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
@@ -273,7 +300,12 @@ describe("inline unlock wiring on the write-path routes", () => {
     const festival = await createTestFestival(supabaseAdmin);
     const app = mountRoute(attendanceRoutes);
 
-    const body = JSON.stringify({ festivalId: festival.id, date: "2024-09-21", tents: [], amount: 0 });
+    const body = JSON.stringify({
+      festivalId: festival.id,
+      date: "2024-09-21",
+      tents: [],
+      amount: 0,
+    });
     const headers = { Authorization: `Bearer ${user.token}`, "Content-Type": "application/json" };
 
     const first = await app.request("/attendance/personal", { method: "POST", headers, body });
@@ -290,7 +322,11 @@ describe("inline unlock wiring on the write-path routes", () => {
     const secondJson = await unlockedFrom(second);
     expect(secondJson.unlocked).toEqual([]);
 
-    await supabaseAdmin.from("attendances").delete().eq("user_id", user.id).eq("festival_id", festival.id);
+    await supabaseAdmin
+      .from("attendances")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("festival_id", festival.id);
     await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
@@ -375,9 +411,17 @@ describe("inline unlock wiring on the write-path routes", () => {
     const secondJson = await unlockedFrom(second);
     expect(secondJson.unlocked).toEqual([]);
 
-    await supabaseAdmin.from("tent_visits").delete().eq("user_id", user.id).eq("festival_id", festival.id);
+    await supabaseAdmin
+      .from("tent_visits")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("festival_id", festival.id);
     await supabaseAdmin.from("reservations").delete().in("id", [reservation1.id, reservation2.id]);
-    await supabaseAdmin.from("attendances").delete().eq("user_id", user.id).eq("festival_id", festival.id);
+    await supabaseAdmin
+      .from("attendances")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("festival_id", festival.id);
     await supabaseAdmin.from("tents").delete().in("id", [tent1.id, tent2.id]);
     await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
@@ -536,13 +580,10 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
 
     // friends_added tier 1 unlocks at 1 accepted friendship (see SERIES in
     // packages/shared/src/achievements/definitions.ts).
-    const acceptResponse = await app.request(
-      `/friends/request/${sendJson.friendshipId}/accept`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${addressee.token}` },
-      },
-    );
+    const acceptResponse = await app.request(`/friends/request/${sendJson.friendshipId}/accept`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${addressee.token}` },
+    });
     expect(acceptResponse.status).toBe(200);
     const acceptJson = await acceptResponse.json();
     expect(acceptJson).not.toHaveProperty("unlocked");
@@ -567,7 +608,10 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     const response = await app.request("/groups", {
       method: "POST",
       headers: { Authorization: `Bearer ${user.token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ name: `Created Group Unlock ${randomUUID()}`, festivalId: festival.id }),
+      body: JSON.stringify({
+        name: `Created Group Unlock ${randomUUID()}`,
+        festivalId: festival.id,
+      }),
     });
     expect(response.status).toBe(200);
     const json = await response.json();
@@ -575,7 +619,11 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
 
     await expectUnlockPersisted(supabaseAdmin, user.id, "created_group");
 
-    await supabaseAdmin.from("groups").delete().eq("created_by", user.id).eq("festival_id", festival.id);
+    await supabaseAdmin
+      .from("groups")
+      .delete()
+      .eq("created_by", user.id)
+      .eq("festival_id", festival.id);
     await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });

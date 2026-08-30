@@ -65,9 +65,7 @@ describe("groupDrinkCounts", () => {
   });
 
   it("treats an unrecognised drink type as beer", () => {
-    const result = groupDrinkCounts([
-      { date: "2026-09-23", drink_type: "not_a_drink", count: 3 },
-    ]);
+    const result = groupDrinkCounts([{ date: "2026-09-23", drink_type: "not_a_drink", count: 3 }]);
 
     expect(result.get("2026-09-23")).toEqual({ beer: 3 });
   });

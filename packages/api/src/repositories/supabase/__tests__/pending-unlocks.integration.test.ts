@@ -110,7 +110,12 @@ describe("pending unlocks outbox against a real database", () => {
     const supabaseAdmin = createTestSupabaseAdmin();
     const [userId] = await getTwoUserIds(supabaseAdmin);
     const achievementId = await getRealAchievementId(supabaseAdmin, "first_drink");
-    const eventId = await insertEvent(supabaseAdmin, userId, achievementId, new Date().toISOString());
+    const eventId = await insertEvent(
+      supabaseAdmin,
+      userId,
+      achievementId,
+      new Date().toISOString(),
+    );
     insertedEventIds.push(eventId);
 
     const repo = new AchievementMetricsRepository(supabaseAdmin);
