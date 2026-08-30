@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.10.1] - 2026-08-30
+
+### ✨ Features
+
+- add Dachauer Volksfest 2026 (active) and Rosenheimer Herbstfest 2026 (upcoming) (#278)
+
+### 🐛 Bug Fixes
+
+- drop useNavigation from map screen header
+- make the map refresh button work, de-dupe locale keys
+- tighten and clarify the official festival map link
+- repair de unauthorized shape, fill 55 German gaps
+
+### 🎨 Styling
+
+- format the repo with oxfmt, ignore generated artifacts
+
 ## [0.10.0] - 2026-08-12
 
 ### ✨ Features
