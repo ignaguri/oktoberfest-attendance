@@ -156,6 +156,9 @@
     "profile": "Profile"
   },
   "auth": {
+    "captcha": {
+      "updateRequired": "Please update the app to continue signing in."
+    },
     "signIn": {
       "title": "Sign In",
       "subtitle": "Welcome back!",

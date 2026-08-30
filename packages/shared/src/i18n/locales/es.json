@@ -156,6 +156,9 @@
     "profile": "Perfil"
   },
   "auth": {
+    "captcha": {
+      "updateRequired": "Actualiza la aplicación para poder iniciar sesión."
+    },
     "signIn": {
       "title": "Iniciar sesión",
       "subtitle": "¡Bienvenido de nuevo!",

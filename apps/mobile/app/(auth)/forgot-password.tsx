@@ -11,12 +11,15 @@ import { AuthHeader, FormInput } from "@/components/auth";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { isCaptchaRejection } from "@/lib/auth/captcha-errors";
+import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { resetPassword } = useAuth();
+  const { getToken, CaptchaModal, enabled: enabledCaptcha } = useCaptcha();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,10 +40,20 @@ export default function ForgotPasswordScreen() {
     setIsLoading(true);
     setError(null);
 
-    const { error: resetError } = await resetPassword(data.email);
+    const captchaToken = await getToken();
+    if (captchaToken === undefined && enabledCaptcha) {
+      setIsLoading(false);
+      return;
+    }
+
+    const { error: resetError } = await resetPassword(data.email, captchaToken);
 
     if (resetError) {
-      setError(resetError.message || t("auth.forgotPassword.errors.generic"));
+      setError(
+        isCaptchaRejection(resetError)
+          ? t("auth.captcha.updateRequired")
+          : resetError.message || t("auth.forgotPassword.errors.generic"),
+      );
       setIsLoading(false);
       return;
     }
@@ -149,6 +162,8 @@ export default function ForgotPasswordScreen() {
           <View className="h-8" />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <CaptchaModal />
     </SafeAreaView>
   );
 }

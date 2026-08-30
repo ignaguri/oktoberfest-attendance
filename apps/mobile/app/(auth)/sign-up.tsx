@@ -11,12 +11,15 @@ import { AuthFooterLink, AuthHeader, FormInput, OAuthButtons, OrDivider } from "
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { isCaptchaRejection } from "@/lib/auth/captcha-errors";
+import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function SignUpScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { signUp, signInWithGoogle, signInWithFacebook, signInWithApple } = useAuth();
+  const { getToken, CaptchaModal, enabled: enabledCaptcha } = useCaptcha();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -42,10 +45,20 @@ export default function SignUpScreen() {
     setIsLoading(true);
     setError(null);
 
-    const { error: signUpError } = await signUp(data.email, data.password);
+    const captchaToken = await getToken();
+    if (captchaToken === undefined && enabledCaptcha) {
+      setIsLoading(false);
+      return;
+    }
+
+    const { error: signUpError } = await signUp(data.email, data.password, captchaToken);
 
     if (signUpError) {
-      setError(signUpError.message || t("auth.signUp.errors.generic"));
+      setError(
+        isCaptchaRejection(signUpError)
+          ? t("auth.captcha.updateRequired")
+          : signUpError.message || t("auth.signUp.errors.generic"),
+      );
       setIsLoading(false);
       return;
     }
@@ -222,6 +235,8 @@ export default function SignUpScreen() {
           <View className="h-8" />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <CaptchaModal />
     </SafeAreaView>
   );
 }

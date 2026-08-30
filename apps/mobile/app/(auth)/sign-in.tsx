@@ -20,7 +20,9 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { isCaptchaRejection } from "@/lib/auth/captcha-errors";
 import { getStoredUserEmail } from "@/lib/auth/secure-storage";
+import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function SignInScreen() {
@@ -37,6 +39,8 @@ export default function SignInScreen() {
     authenticate: authenticateBiometric,
     enableBiometrics,
   } = useBiometrics();
+
+  const { getToken, CaptchaModal, enabled: enabledCaptcha } = useCaptcha();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -91,10 +95,21 @@ export default function SignInScreen() {
     setIsLoading(true);
     setError(null);
 
-    const { error: signInError } = await signIn(data.email, data.password);
+    const captchaToken = await getToken();
+    if (captchaToken === undefined && enabledCaptcha) {
+      // User dismissed the challenge. Not an error, just abort quietly.
+      setIsLoading(false);
+      return;
+    }
+
+    const { error: signInError } = await signIn(data.email, data.password, captchaToken);
 
     if (signInError) {
-      setError(t("auth.signIn.errors.invalidCredentials"));
+      setError(
+        isCaptchaRejection(signInError)
+          ? t("auth.captcha.updateRequired")
+          : t("auth.signIn.errors.invalidCredentials"),
+      );
       setIsLoading(false);
       return;
     }
@@ -318,6 +333,8 @@ export default function SignInScreen() {
           biometricType={biometricType}
         />
       </KeyboardAvoidingView>
+
+      <CaptchaModal />
     </SafeAreaView>
   );
 }
