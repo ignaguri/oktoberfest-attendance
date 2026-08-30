@@ -2096,7 +2096,9 @@
       "tentsNearby": "{{count}} tents",
       "tentsNearby_one": "{{count}} tent",
       "button": "Map",
-      "openAccessibility": "Open festival map"
+      "openAccessibility": "Open festival map",
+      "officialMap": "Official festival map",
+      "officialMapHint": "Opens the official map in your browser"
     },
     "tabs": {
       "friends": "Friends",
@@ -2349,9 +2351,6 @@
     "whatCanIDo": "What can I do with Prost Counter?",
     "baseCost": "Base",
     "tips": "Tips",
-    "mapLink": {
-      "title": "{{festivalName}} Map"
-    },
     "missingFields": {
       "title": "Complete Your Profile",
       "name": "Name",

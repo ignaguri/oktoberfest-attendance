@@ -1838,7 +1838,9 @@
       "tentsNearby": "{{count}} Zelte",
       "tentsNearby_one": "{{count}} Zelt",
       "button": "Karte",
-      "openAccessibility": "Festivalplan öffnen"
+      "openAccessibility": "Festivalplan öffnen",
+      "officialMap": "Offizielle Festivalkarte",
+      "officialMapHint": "Öffnet die offizielle Karte im Browser"
     },
     "tabs": {
       "friends": "Freunde",
@@ -2104,9 +2106,6 @@
     "whatCanIDo": "Was kann ich mit Prost Counter machen?",
     "baseCost": "Basis",
     "tips": "Trinkgeld",
-    "mapLink": {
-      "title": "{{festivalName}} Karte"
-    },
     "leaderboard": {
       "title": "🏆 Globale Rangliste",
       "description": "Top {{limit}} Teilnehmer",

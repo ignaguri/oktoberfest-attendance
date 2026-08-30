@@ -149,11 +149,6 @@ export default function MapScreen() {
           />
         </Box>
 
-        {/* Sharing toggle - global alerts work normally here */}
-        <Box className="px-3 py-1">
-          <LocationSharingToggle festivalId={currentFestival.id} />
-        </Box>
-
         {/* External festival map link */}
         {currentFestival.mapUrl && (
           <Pressable
@@ -164,22 +159,22 @@ export default function MapScreen() {
                 logger.error("Failed to open map URL:", error);
               }
             }}
-            className="mx-3 flex-row items-center justify-between rounded-lg bg-background-100 px-4 py-3"
-            accessibilityLabel={t("home.mapLink.title", {
-              festivalName: currentFestival.name,
-            })}
+            className="mx-3 flex-row items-center gap-2 self-start px-1 py-2 active:opacity-70"
+            hitSlop={5}
+            accessibilityRole="link"
+            accessibilityLabel={t("location.map.officialMap")}
+            accessibilityHint={t("location.map.officialMapHint")}
           >
-            <HStack space="sm" className="items-center">
-              <Map size={18} color={IconColors.primary} />
-              <Text className="font-medium text-typography-900">
-                {t("home.mapLink.title", {
-                  festivalName: currentFestival.name,
-                })}
-              </Text>
-            </HStack>
-            <ExternalLink size={16} color={IconColors.muted} />
+            <Map size={16} color={IconColors.primary} />
+            <Text className="font-medium text-primary-600">{t("location.map.officialMap")}</Text>
+            <ExternalLink size={14} color={IconColors.primary} />
           </Pressable>
         )}
+
+        {/* Sharing toggle - global alerts work normally here */}
+        <Box className="px-3 py-1">
+          <LocationSharingToggle festivalId={currentFestival.id} />
+        </Box>
 
         {/* Tabs */}
         <HStack className="px-3 py-1" space="sm">

@@ -2085,7 +2085,9 @@
       "tentsNearby": "{{count}} carpas",
       "tentsNearby_one": "{{count}} carpa",
       "button": "Mapa",
-      "openAccessibility": "Abrir mapa del festival"
+      "openAccessibility": "Abrir mapa del festival",
+      "officialMap": "Mapa oficial del festival",
+      "officialMapHint": "Abre el mapa oficial en tu navegador"
     },
     "tabs": {
       "friends": "Amigos",
@@ -2349,9 +2351,6 @@
     "whatCanIDo": "¿Qué puedo hacer con Prost Counter?",
     "baseCost": "Base",
     "tips": "Propinas",
-    "mapLink": {
-      "title": "Mapa de {{festivalName}}"
-    },
     "missingFields": {
       "title": "Completá tu perfil",
       "name": "Nombre",
