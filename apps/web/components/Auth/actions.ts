@@ -17,12 +17,14 @@ function revalidateBase() {
 export async function login(
   formData: { email: string; password: string },
   redirectTo?: string | null,
+  captchaToken?: string,
 ) {
   const supabase = await createClient();
 
   const data = {
     email: formData.email,
     password: formData.password,
+    ...(captchaToken ? { options: { captchaToken } } : {}),
   };
 
   const { error } = await supabase.auth.signInWithPassword(data);
@@ -56,12 +58,16 @@ export async function logout() {
   redirect("/");
 }
 
-export async function signUp(formData: { email: string; password: string }) {
+export async function signUp(
+  formData: { email: string; password: string },
+  captchaToken?: string,
+) {
   const supabase = await createClient();
 
   const data = {
     email: formData.email,
     password: formData.password,
+    ...(captchaToken ? { options: { captchaToken } } : {}),
   };
 
   const { error } = await supabase.auth.signUp(data);
@@ -72,12 +78,18 @@ export async function signUp(formData: { email: string; password: string }) {
   }
 }
 
-export async function resetPassword(formData: {
-  email: string;
-}): Promise<[boolean, string | null]> {
+export async function resetPassword(
+  formData: {
+    email: string;
+  },
+  captchaToken?: string,
+): Promise<[boolean, string | null]> {
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.resetPasswordForEmail(formData.email);
+  const { error } = await supabase.auth.resetPasswordForEmail(
+    formData.email,
+    captchaToken ? { captchaToken } : undefined,
+  );
 
   if (error) {
     reportSupabaseAuthException("resetPassword", error, {
