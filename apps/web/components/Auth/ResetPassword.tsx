@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
 
 import { resetPassword } from "./actions";
+import { CaptchaWidget, useCaptcha } from "./Captcha";
 
 const ResetPassword = () => {
   const { t } = useTranslation();
@@ -26,10 +27,15 @@ const ResetPassword = () => {
     resolver: standardSchemaResolver(resetPasswordSchema),
   });
 
+  const { captchaRef, token: captchaToken, setToken, reset: resetCaptcha } = useCaptcha();
+
   const onSubmit = async (data: ResetPasswordFormData) => {
-    const [_, errorMessage] = await resetPassword(data);
+    const [_, errorMessage] = await resetPassword(data, captchaToken);
 
     if (errorMessage) {
+      // The token is spent on a failed attempt too, so replace it before retry.
+      resetCaptcha();
+
       toast.error(t("common.status.error"), {
         description: errorMessage,
       });
@@ -50,6 +56,7 @@ const ResetPassword = () => {
           type="email"
           {...register("email")}
         />
+        <CaptchaWidget captchaRef={captchaRef} onVerify={setToken} onExpire={resetCaptcha} />
         <Button type="submit" className="self-center" variant="yellow" disabled={isSubmitting}>
           {t("auth.resetPassword.submit")}
         </Button>

@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
 
 import { login, signInWithOAuth } from "./actions";
+import { CaptchaWidget, useCaptcha } from "./Captcha";
 import { AppleIcon, GoogleIcon } from "./SocialIcons";
 
 export default function SignIn() {
@@ -35,6 +36,8 @@ export default function SignIn() {
     resolver: standardSchemaResolver(signInSchema),
   });
 
+  const { captchaRef, token: captchaToken, setToken, reset: resetCaptcha } = useCaptcha();
+
   // Show OAuth error if present
   useEffect(() => {
     if (error === "oauth_failed") {
@@ -51,13 +54,17 @@ export default function SignIn() {
 
   const onSubmit = async (data: SignInFormData) => {
     try {
-      await login(data, redirect);
+      await login(data, redirect, captchaToken);
     } catch (error: any) {
       // Check if this is a Next.js redirect response
       if (error?.digest?.startsWith("NEXT_REDIRECT")) {
         // This is a redirect response, let it pass through
         throw error;
       }
+
+      // The token is spent whether or not the credentials were right, so it
+      // has to be replaced before the user can try again.
+      resetCaptcha();
 
       // Only show error for actual authentication failures
       setError("password", {
@@ -116,6 +123,8 @@ export default function SignIn() {
           }
           {...register("password")}
         />
+
+        <CaptchaWidget captchaRef={captchaRef} onVerify={setToken} onExpire={resetCaptcha} />
 
         <Button variant="yellow" className="self-center" type="submit" disabled={isSubmitting}>
           {isSubmitting ? t("common.status.loading") : t("auth.signIn.submit")}
