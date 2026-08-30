@@ -14,7 +14,8 @@ const MOBILE_ROOT = path.resolve(__dirname, "../../..");
 const REGISTRY_PATH = path.join(MOBILE_ROOT, "components/achievements/glyph-images.ts");
 const GLYPHS_DIR = path.join(MOBILE_ROOT, "assets/achievements/glyphs");
 
-const ENTRY_PATTERN = /"?([a-z-]+)"?:\s*require\("@\/assets\/achievements\/glyphs\/([a-z-]+)\.png"\)/g;
+const ENTRY_PATTERN =
+  /"?([a-z-]+)"?:\s*require\("@\/assets\/achievements\/glyphs\/([a-z-]+)\.png"\)/g;
 
 function registryEntries(): { key: string; file: string }[] {
   const source = fs.readFileSync(REGISTRY_PATH, "utf8");

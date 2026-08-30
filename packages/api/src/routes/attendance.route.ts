@@ -368,12 +368,7 @@ app.openapi(createAttendanceRoute, async (c) => {
     }
   }
 
-  const unlocked = await evaluateAfterWrite(
-    supabase,
-    user.id,
-    data.festivalId,
-    "POST /attendance",
-  );
+  const unlocked = await evaluateAfterWrite(supabase, user.id, data.festivalId, "POST /attendance");
 
   return c.json({ ...result, unlocked }, 200);
 });

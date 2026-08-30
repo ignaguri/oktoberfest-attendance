@@ -445,11 +445,11 @@ describe("clearSupersededTentVisits against real SQLite", () => {
     });
 
     expect(await clear(["server-1"])).toBe(0);
-    expect(allVisits(database).map((row) => row.id).sort()).toEqual([
-      "other-day",
-      "other-tent",
-      "server-1",
-    ]);
+    expect(
+      allVisits(database)
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual(["other-day", "other-tent", "server-1"]);
   });
 });
 
@@ -522,7 +522,11 @@ describe("purgeConfirmedTentVisitTombstones against real SQLite", () => {
     const purged = await purgeConfirmedTentVisitTombstones(db, FESTIVAL, new Set());
 
     expect(purged).toBe(0);
-    expect(allVisits(database).map((row) => row.id).sort()).toEqual(["agreed", "live"]);
+    expect(
+      allVisits(database)
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual(["agreed", "live"]);
   });
 
   it("does not reach into another festival", async () => {
@@ -643,7 +647,11 @@ describe("clearDeletedTentVisits against real SQLite", () => {
     const cleared = await clearDeletedTentVisits(db, FESTIVAL, new Set());
 
     expect(cleared).toBe(0);
-    expect(allVisits(database).map((row) => row.id).sort()).toEqual(["local", "removal"]);
+    expect(
+      allVisits(database)
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual(["local", "removal"]);
   });
 
   it("stays inside its own festival", async () => {

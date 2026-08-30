@@ -117,7 +117,14 @@ function insertTentVisit(
       `INSERT INTO tent_visits (id, user_id, tent_id, festival_id, visit_date, _deleted)
        VALUES (?, ?, ?, ?, ?, ?)`,
     )
-    .run(params.id, params.userId, params.tentId, params.festivalId, params.visitDate, params.deleted ?? 0);
+    .run(
+      params.id,
+      params.userId,
+      params.tentId,
+      params.festivalId,
+      params.visitDate,
+      params.deleted ?? 0,
+    );
 }
 
 function insertConsumption(

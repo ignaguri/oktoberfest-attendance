@@ -442,14 +442,11 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     // not guarantee: comparing against the latest both rejected a valid older
     // visit and, worse, accepted A@11:00 into A@10:00, B@12:00 - producing the
     // adjacent pair it exists to forbid.
-    const dayVisits = await this.getVisitsForFestivalDay(
-      userId,
-      input.festivalId,
-      date,
-      timezone,
-    );
+    const dayVisits = await this.getVisitsForFestivalDay(userId, input.festivalId, date, timezone);
     const visitedAtMs = visitedAt.getTime();
-    const previous = dayVisits.filter((v) => new Date(v.visit_date).getTime() <= visitedAtMs).at(-1);
+    const previous = dayVisits
+      .filter((v) => new Date(v.visit_date).getTime() <= visitedAtMs)
+      .at(-1);
     const next = dayVisits.find((v) => new Date(v.visit_date).getTime() > visitedAtMs);
 
     if (previous?.tent_id === input.tentId || next?.tent_id === input.tentId) {
@@ -600,13 +597,11 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     const pictureUrls = pictures.map((pic) => pic.pictureUrl);
 
     // Build tent visits array for the schema (same festival-day bucket)
-    const visitsForDate = (tentVisits || [])
-      .filter(belongsToDate)
-      .map((visit) => ({
-        tentId: visit.tent_id,
-        visitDate: visit.visit_date!,
-        tentName: (visit.tents as any)?.name || null,
-      }));
+    const visitsForDate = (tentVisits || []).filter(belongsToDate).map((visit) => ({
+      tentId: visit.tent_id,
+      visitDate: visit.visit_date!,
+      tentName: (visit.tents as any)?.name || null,
+    }));
 
     return {
       id: attendance.id,

@@ -398,20 +398,20 @@ All business logic reads from the database - no hardcoded constants!
 
 ### Core Tables
 
-| Table                 | Purpose                   | Key Features                           |
-| --------------------- | ------------------------- | -------------------------------------- |
-| **festivals**         | Festival definitions      | Multi-year support, dynamic pricing    |
-| **profiles**          | User metadata             | Extends Supabase auth.users            |
-| **attendances**       | Daily attendance records  | Per festival, date unique constraint   |
-| **consumptions**      | Individual drink records  | Flexible drink types, price history    |
-| **tent_visits**       | Location tracking         | Visit timestamps per tent              |
-| **groups**            | Competition groups        | Festival-scoped, invite tokens         |
-| **group_members**     | Group membership          | User-group relationships               |
-| **achievements**      | Achievement definitions   | Categories, tier, conditions (JSONB)   |
-| **user_achievements** | Unlocked achievements     | Per user per festival                  |
-| **beer_pictures**     | Photo uploads             | Linked to attendances                  |
-| **tents**             | Tent master data          | Categories, capacity                   |
-| **festival_tents**    | Festival-tent association | Per-tent pricing overrides             |
+| Table                 | Purpose                   | Key Features                         |
+| --------------------- | ------------------------- | ------------------------------------ |
+| **festivals**         | Festival definitions      | Multi-year support, dynamic pricing  |
+| **profiles**          | User metadata             | Extends Supabase auth.users          |
+| **attendances**       | Daily attendance records  | Per festival, date unique constraint |
+| **consumptions**      | Individual drink records  | Flexible drink types, price history  |
+| **tent_visits**       | Location tracking         | Visit timestamps per tent            |
+| **groups**            | Competition groups        | Festival-scoped, invite tokens       |
+| **group_members**     | Group membership          | User-group relationships             |
+| **achievements**      | Achievement definitions   | Categories, tier, conditions (JSONB) |
+| **user_achievements** | Unlocked achievements     | Per user per festival                |
+| **beer_pictures**     | Photo uploads             | Linked to attendances                |
+| **tents**             | Tent master data          | Categories, capacity                 |
+| **festival_tents**    | Festival-tent association | Per-tent pricing overrides           |
 
 ### Flexible Drink Types
 

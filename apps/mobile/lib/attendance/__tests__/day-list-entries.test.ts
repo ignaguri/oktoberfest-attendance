@@ -103,7 +103,11 @@ describe("buildDayListEntries", () => {
     );
 
     expect(entries).toEqual([
-      { kind: "reservationOnly", date: "2026-09-21", reservation: expect.objectContaining({ id: "r1" }) },
+      {
+        kind: "reservationOnly",
+        date: "2026-09-21",
+        reservation: expect.objectContaining({ id: "r1" }),
+      },
     ]);
   });
 

@@ -1,4 +1,8 @@
-import { buildStats, SERIES_CATEGORY_ORDER, splitCardsByCompletion } from "@prostcounter/shared/achievements";
+import {
+  buildStats,
+  SERIES_CATEGORY_ORDER,
+  splitCardsByCompletion,
+} from "@prostcounter/shared/achievements";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useAchievementsWithProgress } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -94,10 +98,7 @@ function CategorySection({
               <View
                 key={card.id}
                 ref={(node) => registerCardRef(card.id, node)}
-                className={cn(
-                  CARD_CLASS,
-                  highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS,
-                )}
+                className={cn(CARD_CLASS, highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS)}
               >
                 <SeriesCard card={card} />
               </View>
@@ -116,10 +117,7 @@ function CategorySection({
               <View
                 key={card.id}
                 ref={(node) => registerCardRef(card.id, node)}
-                className={cn(
-                  CARD_CLASS,
-                  highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS,
-                )}
+                className={cn(CARD_CLASS, highlightedCardId === card.id && CARD_HIGHLIGHT_CLASS)}
               >
                 <SeriesCard card={card} />
               </View>
@@ -179,9 +177,7 @@ export default function AchievementsScreen() {
   }, [achievementsResponse, cards]);
 
   const visibleCategories = useMemo(() => {
-    return activeCategory === "all"
-      ? SERIES_CATEGORY_ORDER
-      : [activeCategory as SeriesCategory];
+    return activeCategory === "all" ? SERIES_CATEGORY_ORDER : [activeCategory as SeriesCategory];
   }, [activeCategory]);
 
   const handleRefresh = useCallback(() => {
@@ -323,7 +319,9 @@ export default function AchievementsScreen() {
         {cards.length === 0 ? (
           <Card variant="outline" size="md" className="items-center bg-white p-6">
             <Award size={48} color={IconColors.muted} />
-            <Text className="mt-2 text-center text-typography-500">{t("achievements.empty")}</Text>
+            <Text className="mt-2 text-center text-typography-500">
+              {t("achievements.empty.title")}
+            </Text>
           </Card>
         ) : (
           visibleCategories.map((category) => (

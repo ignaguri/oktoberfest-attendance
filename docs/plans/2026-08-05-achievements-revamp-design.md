@@ -55,14 +55,14 @@ achievement therefore falls through to `ELSE RETURN false` unconditionally.
 
 The `LIKE` heuristics broke the same way and are case-sensitive:
 
-| Pattern | Intended | Actual key | Matches? |
-| --- | --- | --- | --- |
-| `LIKE '%Photo%'` | Photo Enthusiast | `...photoEnthusiast.name` | No |
-| `LIKE '%Daily%'` | Daily Double | `...dailyDouble.name` | No |
-| `LIKE '%Power%'` | Power Hour | `...powerHour.name` | No |
-| `LIKE '%Legend Status%'` | Legend Status | `...legendStatus.name` | No |
-| `LIKE '%Session%'` | Serious Session | `...seriousSession.name` | Yes (accident) |
-| `LIKE '%group%'` | group achievements | `...groupLeader.name` | Yes (accident) |
+| Pattern                  | Intended           | Actual key                | Matches?       |
+| ------------------------ | ------------------ | ------------------------- | -------------- |
+| `LIKE '%Photo%'`         | Photo Enthusiast   | `...photoEnthusiast.name` | No             |
+| `LIKE '%Daily%'`         | Daily Double       | `...dailyDouble.name`     | No             |
+| `LIKE '%Power%'`         | Power Hour         | `...powerHour.name`       | No             |
+| `LIKE '%Legend Status%'` | Legend Status      | `...legendStatus.name`    | No             |
+| `LIKE '%Session%'`       | Serious Session    | `...seriousSession.name`  | Yes (accident) |
+| `LIKE '%group%'`         | group achievements | `...groupLeader.name`     | Yes (accident) |
 
 Where the pattern fails, the branch never assigns `current_value`, so it stays `0`
 and the achievement is unreachable. Where it matches by accident, the semantics are
@@ -86,32 +86,32 @@ Logging a drink does not even attempt evaluation.
 
 ### Secondary defects
 
-| Location | Defect |
-| --- | --- |
-| `achievement.repository.ts:28` | Selects column `condition`; the real column is `conditions`. |
-| `apps/web/app/api/cron/scheduler/achievements.ts:48` | Group notifications fire for `rare` and `epic` but **not** `legendary`. The rarest unlocks are the quietest. |
-| seed `wiesnWanderer` | `type:"variety"` with no `target_value` makes the comparison return SQL `NULL`, not `false`. |
-| `AchievementBadge.tsx:35` + mobile card | Emoji `iconMap` duplicated across platforms. |
-| `AchievementCard.tsx:48-49`, `AchievementBadge.tsx:112` | `t(name, { defaultValue: name })`, forbidden by `CLAUDE.md`. |
-| `get_user_achievements` | Runs a full evaluation per achievement per page load: 41 evaluations per request, uncached. |
-| `check_/calculate_/evaluate_` trio | ~600 lines of near-identical plpgsql that must stay in sync and does not. |
+| Location                                                | Defect                                                                                                       |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `achievement.repository.ts:28`                          | Selects column `condition`; the real column is `conditions`.                                                 |
+| `apps/web/app/api/cron/scheduler/achievements.ts:48`    | Group notifications fire for `rare` and `epic` but **not** `legendary`. The rarest unlocks are the quietest. |
+| seed `wiesnWanderer`                                    | `type:"variety"` with no `target_value` makes the comparison return SQL `NULL`, not `false`.                 |
+| `AchievementBadge.tsx:35` + mobile card                 | Emoji `iconMap` duplicated across platforms.                                                                 |
+| `AchievementCard.tsx:48-49`, `AchievementBadge.tsx:112` | `t(name, { defaultValue: name })`, forbidden by `CLAUDE.md`.                                                 |
+| `get_user_achievements`                                 | Runs a full evaluation per achievement per page load: 41 evaluations per request, uncached.                  |
+| `check_/calculate_/evaluate_` trio                      | ~600 lines of near-identical plpgsql that must stay in sync and does not.                                    |
 
 ---
 
 ## 2. Decisions
 
-| # | Decision | Choice |
-| --- | --- | --- |
-| D1 | Scope | Full revamp shipped before 2026-09-19 |
-| D2 | Achievement scope model | Two explicit scopes: `festival` and `lifetime` |
-| D3 | Engine location | TS definitions + SQL metrics + pure TS evaluator |
-| D4 | Structure | Tiered series **plus** standalone one-offs |
-| D5 | Categories | Six, organised by verb; `special` is retired |
-| D6 | Prestige axis | Tier only (Bronze/Silver/Gold/Platinum), fixed 4 rungs; `rarity` dropped |
-| D7 | Badge art | Composable SVG (frame + plate + glyph), placeholder glyphs + written art brief |
-| D8 | Migration | Remap old unlocks to new series, then retroactively re-evaluate everyone |
-| D9 | Unlock UX | Custom toast + existing confetti packages, no modal |
-| D10 | Notification dedup | Client-acknowledged, with a 10-minute cron grace window |
+| #   | Decision                | Choice                                                                         |
+| --- | ----------------------- | ------------------------------------------------------------------------------ |
+| D1  | Scope                   | Full revamp shipped before 2026-09-19                                          |
+| D2  | Achievement scope model | Two explicit scopes: `festival` and `lifetime`                                 |
+| D3  | Engine location         | TS definitions + SQL metrics + pure TS evaluator                               |
+| D4  | Structure               | Tiered series **plus** standalone one-offs                                     |
+| D5  | Categories              | Six, organised by verb; `special` is retired                                   |
+| D6  | Prestige axis           | Tier only (Bronze/Silver/Gold/Platinum), fixed 4 rungs; `rarity` dropped       |
+| D7  | Badge art               | Composable SVG (frame + plate + glyph), placeholder glyphs + written art brief |
+| D8  | Migration               | Remap old unlocks to new series, then retroactively re-evaluate everyone       |
+| D9  | Unlock UX               | Custom toast + existing confetti packages, no modal                            |
+| D10 | Notification dedup      | Client-acknowledged, with a 10-minute cron grace window                        |
 
 ---
 
@@ -171,7 +171,7 @@ Triggers were attractive because they need no call sites, but they are how root
 cause 3 happened: a new write path (`consumptions`) was added and nobody remembered
 the trigger. Evaluation on the write path is explicit, greppable, and returns the
 unlock to the client so the toast can fire. The nightly sweep covers what the write
-path cannot see: unlocks caused by *other people's* actions.
+path cannot see: unlocks caused by _other people's_ actions.
 
 All writes already funnel through the Hono API (`consumption.repository.ts` is the
 only writer of `consumptions`), so there is exactly one place per metric to hook.
@@ -310,13 +310,13 @@ WHERE user_notified_at IS NULL
 
 Failure analysis:
 
-| Scenario | Outcome |
-| --- | --- |
-| Toast shown, ack received | No push. Correct. |
-| Toast shown, ack lost | One redundant push after 10 min. Acceptable. |
-| Response lost, no toast | Push after 10 min. Correct. |
-| Unlock found by nightly sweep | Push. Correct, no toast was possible. |
-| Backfilled row | Pre-stamped notified. No push. Correct. |
+| Scenario                      | Outcome                                      |
+| ----------------------------- | -------------------------------------------- |
+| Toast shown, ack received     | No push. Correct.                            |
+| Toast shown, ack lost         | One redundant push after 10 min. Acceptable. |
+| Response lost, no toast       | Push after 10 min. Correct.                  |
+| Unlock found by nightly sweep | Push. Correct, no toast was possible.        |
+| Backfilled row                | Pre-stamped notified. No push. Correct.      |
 
 The `group_notified_at` channel is untouched: group members are told regardless of
 whether the achiever saw a toast.
@@ -361,17 +361,16 @@ sees the whole shape at once, rather than a plpgsql function issuing serial quer
 ```ts
 // packages/shared/src/achievements/types.ts
 export type AchievementCategory =
-  | "drinking" | "attendance" | "explorer"
-  | "social" | "competitive" | "dedication";
+  "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
 
 export type AchievementScope = "festival" | "lifetime";
 export type AchievementTier = 1 | 2 | 3 | 4; // bronze silver gold platinum
 
 export interface AchievementSeries {
-  id: string;                  // 'drinks_total'
+  id: string; // 'drinks_total'
   category: AchievementCategory;
   scope: AchievementScope;
-  metric: MetricKey;           // keyof AchievementMetrics — compile-time checked
+  metric: MetricKey; // keyof AchievementMetrics — compile-time checked
   glyph: GlyphId;
   tiers: [TierDef, TierDef, TierDef, TierDef];
 }
@@ -389,7 +388,7 @@ export interface AchievementOneOff {
   metric: MetricKey;
   op: "gte" | "eq" | "isTrue";
   target?: number;
-  tier: AchievementTier;       // difficulty, drives the frame
+  tier: AchievementTier; // difficulty, drives the frame
   glyph: GlyphId;
   points: number;
 }
@@ -409,7 +408,7 @@ Adding an achievement is one object plus three locale entries. No migration, no 
 export function evaluate(
   metrics: AchievementMetrics,
   unlocked: Set<string>,
-): { unlocked: UnlockedAchievement[]; progress: SeriesProgress[] }
+): { unlocked: UnlockedAchievement[]; progress: SeriesProgress[] };
 ```
 
 Test coverage must include, at minimum: each metric at target-1 / target / target+1,
@@ -425,23 +424,23 @@ rungs**, up from 41 flat badges of which 18 were unreachable.
 
 ### Drinking — what you drank
 
-| Series | Metric | Bronze | Silver | Gold | Platinum |
-| --- | --- | --- | --- | --- | --- |
-| Maß Master | `drinks_total` | 3 | 10 | 25 | 50 |
-| Big Day Out | `drinks_day_max` | 3 | 5 | 8 | 12 |
-| Connoisseur | `drink_types_distinct` | 2 | 3 | 4 | 5 |
-| By the Litre | `volume_ml_total` | 5 L | 20 L | 50 L | 100 L |
-| Generous Soul | `tip_cents_total` | €5 | €20 | €50 | €100 |
-| High Roller | `spend_cents_total` | €100 | €300 | €600 | €1000 |
+| Series        | Metric                 | Bronze | Silver | Gold | Platinum |
+| ------------- | ---------------------- | ------ | ------ | ---- | -------- |
+| Maß Master    | `drinks_total`         | 3      | 10     | 25   | 50       |
+| Big Day Out   | `drinks_day_max`       | 3      | 5      | 8    | 12       |
+| Connoisseur   | `drink_types_distinct` | 2      | 3      | 4    | 5        |
+| By the Litre  | `volume_ml_total`      | 5 L    | 20 L   | 50 L | 100 L    |
+| Generous Soul | `tip_cents_total`      | €5     | €20    | €50  | €100     |
+| High Roller   | `spend_cents_total`    | €100   | €300   | €600 | €1000    |
 
 One-off: **First Drop** — first drink ever logged (lifetime, bronze).
 
 ### Attendance — when you showed up
 
-| Series | Metric | Bronze | Silver | Gold | Platinum |
-| --- | --- | --- | --- | --- | --- |
-| Stammgast | `days_attended` | 1 | 3 | 6 | 10 |
-| On a Roll | `attendance_streak_max` | 2 | 3 | 5 | 7 |
+| Series    | Metric                  | Bronze | Silver | Gold | Platinum |
+| --------- | ----------------------- | ------ | ------ | ---- | -------- |
+| Stammgast | `days_attended`         | 1      | 3      | 6    | 10       |
+| On a Roll | `attendance_streak_max` | 2      | 3      | 5    | 7        |
 
 One-offs: **Opening Day** (silver), **Closing Time** (silver),
 **Weekend Warrior** — every weekend day of the festival (gold),
@@ -449,32 +448,32 @@ One-offs: **Opening Day** (silver), **Closing Time** (silver),
 
 ### Explorer — where you went
 
-| Series | Metric | Scope | Bronze | Silver | Gold | Platinum |
-| --- | --- | --- | --- | --- | --- | --- |
-| Tent Hopper | `tents_distinct` | festival | 3 | 6 | 10 | 15 |
-| Veteran | `festivals_attended` | lifetime | 1 | 3 | 5 | 8 |
-| Beyond the Wiesn | `festival_types_distinct` | lifetime | 1 | 2 | 3 | 4 |
+| Series           | Metric                    | Scope    | Bronze | Silver | Gold | Platinum |
+| ---------------- | ------------------------- | -------- | ------ | ------ | ---- | -------- |
+| Tent Hopper      | `tents_distinct`          | festival | 3      | 6      | 10   | 15       |
+| Veteran          | `festivals_attended`      | lifetime | 1      | 3      | 5    | 8        |
+| Beyond the Wiesn | `festival_types_distinct` | lifetime | 1      | 2      | 3    | 4        |
 
 One-off: **All Fourteen** — visited every big tent at one Oktoberfest (platinum).
 
 ### Social — who you were with
 
-| Series | Metric | Scope | Bronze | Silver | Gold | Platinum |
-| --- | --- | --- | --- | --- | --- | --- |
-| Team Player | `groups_joined` | festival | 1 | 2 | 4 | 6 |
-| Good Company | `friends_accepted` | lifetime | 1 | 5 | 15 | 30 |
-| Memory Keeper | `photos_uploaded` | festival | 1 | 10 | 25 | 50 |
-| Hype Man | `reactions_given` | festival | 5 | 25 | 75 | 150 |
+| Series        | Metric             | Scope    | Bronze | Silver | Gold | Platinum |
+| ------------- | ------------------ | -------- | ------ | ------ | ---- | -------- |
+| Team Player   | `groups_joined`    | festival | 1      | 2      | 4    | 6        |
+| Good Company  | `friends_accepted` | lifetime | 1      | 5      | 15   | 30       |
+| Memory Keeper | `photos_uploaded`  | festival | 1      | 10     | 25   | 50       |
+| Hype Man      | `reactions_given`  | festival | 5      | 25     | 75   | 150      |
 
 One-offs: **Say Prost** — first photo ever (lifetime, bronze),
 **Ringleader** — created a group (silver).
 
 ### Competitive — how you ranked
 
-| Series | Metric | Scope | Bronze | Silver | Gold | Platinum |
-| --- | --- | --- | --- | --- | --- | --- |
-| Champion | `group_wins` | lifetime | 1 | 3 | 6 | 10 |
-| Podium Regular | `podium_finishes` | lifetime | 1 | 5 | 12 | 25 |
+| Series         | Metric            | Scope    | Bronze | Silver | Gold | Platinum |
+| -------------- | ----------------- | -------- | ------ | ------ | ---- | -------- |
+| Champion       | `group_wins`      | lifetime | 1      | 3      | 6    | 10       |
+| Podium Regular | `podium_finishes` | lifetime | 1      | 5      | 12   | 25       |
 
 No one-offs. A "Day Leader" badge (topped a group leaderboard on any single day) was
 considered and **cut**: it needs per-day standings rather than final standings, which
@@ -486,11 +485,11 @@ Both series read `festival_group_standings`. Groups of one are excluded
 
 ### Dedication — using the app
 
-| Series | Metric | Scope | Bronze | Silver | Gold | Platinum |
-| --- | --- | --- | --- | --- | --- | --- |
-| Regular | `active_days_total` | lifetime | 5 | 25 | 75 | 200 |
-| Devoted | `active_day_streak_max` | lifetime | 3 | 7 | 21 | 60 |
-| Good Citizen | `crowd_reports` | festival | 1 | 5 | 15 | 30 |
+| Series       | Metric                  | Scope    | Bronze | Silver | Gold | Platinum |
+| ------------ | ----------------------- | -------- | ------ | ------ | ---- | -------- |
+| Regular      | `active_days_total`     | lifetime | 5      | 25     | 75   | 200      |
+| Devoted      | `active_day_streak_max` | lifetime | 3      | 7      | 21   | 60       |
+| Good Citizen | `crowd_reports`         | festival | 1      | 5      | 15   | 30       |
 
 One-offs: **Profile Complete** — avatar, username and full name set (lifetime, bronze),
 **Year in Review** — viewed your Wrapped (lifetime, silver).
@@ -621,10 +620,10 @@ per `CLAUDE.md`. Dynamic classNames go through `cn()` from `@prostcounter/ui`.
 
 Toast rather than modal, so rapid logging during a session is not interrupted.
 
-| Platform | Toast | Confetti |
-| --- | --- | --- |
-| Web | `sonner` custom toast | `react-confetti-explosion` via existing `useConfetti` hook |
-| Mobile | Gluestack `toast` | `react-native-confetti-cannon` |
+| Platform | Toast                 | Confetti                                                   |
+| -------- | --------------------- | ---------------------------------------------------------- |
+| Web      | `sonner` custom toast | `react-confetti-explosion` via existing `useConfetti` hook |
+| Mobile   | Gluestack `toast`     | `react-native-confetti-cannon`                             |
 
 All four packages are already installed. No new dependencies.
 
@@ -693,14 +692,14 @@ Deployed only after step 3 is verified in production.
 
 ## 11. Testing
 
-| Layer | Approach |
-| --- | --- |
-| Evaluator | vitest unit tests, pure function. Boundaries at target-1/target/target+1, multi-tier jumps, scope separation, idempotency. |
-| Metrics SQL | Integration tests against local Supabase with seeded fixtures, asserting each metric key against known data. |
-| Definitions | A test asserting every `metric` resolves, every `glyph` exists, every slug has `name`/`description` keys in all three locales, and tier targets are strictly increasing. |
-| Migration | Dry-run diff on a production snapshot, reviewed before the real run. |
-| Notification dedup | Integration test covering each row of the failure table in §4. |
-| E2E | Update `e2e/specs/achievements.spec.ts` and `e2e/pages/achievements.page.ts` for the new IA. |
+| Layer              | Approach                                                                                                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Evaluator          | vitest unit tests, pure function. Boundaries at target-1/target/target+1, multi-tier jumps, scope separation, idempotency.                                               |
+| Metrics SQL        | Integration tests against local Supabase with seeded fixtures, asserting each metric key against known data.                                                             |
+| Definitions        | A test asserting every `metric` resolves, every `glyph` exists, every slug has `name`/`description` keys in all three locales, and tier targets are strictly increasing. |
+| Migration          | Dry-run diff on a production snapshot, reviewed before the real run.                                                                                                     |
+| Notification dedup | Integration test covering each row of the failure table in §4.                                                                                                           |
+| E2E                | Update `e2e/specs/achievements.spec.ts` and `e2e/pages/achievements.page.ts` for the new IA.                                                                             |
 
 The definitions test is the safety net that would have caught the original outage:
 it fails loudly if a definition points at anything that does not exist.

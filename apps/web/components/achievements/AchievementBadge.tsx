@@ -1,6 +1,10 @@
 "use client";
 
-import type { AchievementCategory, AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
+import type {
+  AchievementCategory,
+  AchievementTier,
+  GlyphId,
+} from "@prostcounter/shared/achievements";
 import { getCategoryColor, TIER_RING_WIDTH } from "@prostcounter/shared/achievements";
 import { useState } from "react";
 
@@ -83,9 +87,7 @@ export function AchievementBadge({
 
       {name !== "" && <span className="truncate text-sm">{translatedName}</span>}
 
-      {showPoints && (
-        <span className="ml-1 text-xs font-normal opacity-75">{points}pts</span>
-      )}
+      {showPoints && <span className="ml-1 text-xs font-normal opacity-75">{points}pts</span>}
     </span>
   );
 }

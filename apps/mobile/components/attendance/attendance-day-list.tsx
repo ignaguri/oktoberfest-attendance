@@ -76,10 +76,7 @@ export function AttendanceDayList({
     onDateSelect(parseISO(dateStr));
   }
 
-  const reservationMap = useMemo(
-    () => buildActiveReservationsByDate(reservations),
-    [reservations],
-  );
+  const reservationMap = useMemo(() => buildActiveReservationsByDate(reservations), [reservations]);
 
   const entries = useMemo(
     () => buildDayListEntries(attendances, reservationMap),

@@ -78,10 +78,20 @@
         "title": "Seite nicht gefunden",
         "description": "Diese Seite hat sich wohl in ein anderes Zelt verirrt!"
       },
-      "unauthorized": "Bitte melde dich an, um fortzufahren",
+      "unauthorized": {
+        "title": "Zugriff verweigert",
+        "message": "Du hast leider keine Berechtigung, auf diese Seite zuzugreifen."
+      },
       "forbidden": "Du hast keine Berechtigung dafür",
       "networkError": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
-      "notAuthenticated": "Nicht authentifiziert"
+      "notAuthenticated": "Nicht authentifiziert",
+      "offline": {
+        "title": "Du bist offline",
+        "message": "Bitte überprüfe deine Internetverbindung und versuche es erneut.",
+        "tryAgain": "Erneut versuchen"
+      },
+      "pageNotFoundMessage": "Die Seite, die du suchst, existiert nicht.",
+      "somethingWentWrong": "Etwas ist schiefgelaufen!"
     },
     "offline": {
       "title": "Du bist offline",
@@ -125,7 +135,13 @@
     "loading": "Wird geladen",
     "tents": "Zelte",
     "unknownUser": "Unbekannter Benutzer",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "updates": {
+      "available": "Neue Version verfügbar! 🚀",
+      "description": "Eine neue Version der App ist verfügbar. Bitte aktualisiere, um die neuesten Funktionen und Verbesserungen zu erhalten.",
+      "refresh": "Zum Aktualisieren neu laden",
+      "updateNow": "Jetzt aktualisieren"
+    }
   },
   "tabs": {
     "home": "Start",
@@ -426,7 +442,10 @@
     "location": {
       "title": "Live-Standort der Gruppe",
       "shareDescription": "Teile deinen Standort, um Gruppenmitglieder in der Nähe zu sehen und sich von ihnen finden zu lassen.",
-      "controlNote": "Steuere, welche Gruppen deinen Standort sehen können in deinen"
+      "controlNote": "Steuere, welche Gruppen deinen Standort sehen können in deinen",
+      "shareLocation": "Standort teilen",
+      "enablePrompt": "Aktiviere die Standortfreigabe, um zu sehen, wo deine Freunde auf dem Festival sind",
+      "privacyNotice": "Dein Standort ist nur für Gruppenmitglieder sichtbar, solange du ihn teilst"
     },
     "members": {
       "title": "Mitglieder",
@@ -656,7 +675,6 @@
     "selectFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
     "noFestival": "Bitte wähle ein Festival aus, um Erfolge anzuzeigen.",
     "error": "Fehler beim Laden der Erfolge. Zum Aktualisieren nach unten ziehen.",
-    "empty": "Keine Erfolge verfügbar",
     "trackProgress": "Verfolge deinen Fortschritt und schalte Erfolge beim {{festival}} frei",
     "completed": "Abgeschlossen",
     "inProgress": "In Bearbeitung",
@@ -727,56 +745,152 @@
       "platinum": "Platin"
     },
     "drinks_total": {
-      "t1": { "name": "Erste Runde", "description": "Trink 3 Getränke bei diesem Fest" },
-      "t2": { "name": "Standfester Trinker", "description": "Trink 10 Getränke bei diesem Fest" },
-      "t3": { "name": "Maß-Meister", "description": "Trink 25 Getränke bei diesem Fest" },
-      "t4": { "name": "Legendärer Durst", "description": "Trink 50 Getränke bei diesem Fest" }
+      "t1": {
+        "name": "Erste Runde",
+        "description": "Trink 3 Getränke bei diesem Fest"
+      },
+      "t2": {
+        "name": "Standfester Trinker",
+        "description": "Trink 10 Getränke bei diesem Fest"
+      },
+      "t3": {
+        "name": "Maß-Meister",
+        "description": "Trink 25 Getränke bei diesem Fest"
+      },
+      "t4": {
+        "name": "Legendärer Durst",
+        "description": "Trink 50 Getränke bei diesem Fest"
+      }
     },
     "drinks_day_max": {
-      "t1": { "name": "Solide Session", "description": "Trink an einem Tag 3 Bier" },
-      "t2": { "name": "Großer Tag", "description": "Trink an einem Tag 5 Bier" },
-      "t3": { "name": "Schwergewicht", "description": "Trink an einem Tag 8 Bier" },
-      "t4": { "name": "Unaufhaltsam", "description": "Trink an einem Tag 12 Bier" }
+      "t1": {
+        "name": "Solide Session",
+        "description": "Trink an einem Tag 3 Bier"
+      },
+      "t2": {
+        "name": "Großer Tag",
+        "description": "Trink an einem Tag 5 Bier"
+      },
+      "t3": {
+        "name": "Schwergewicht",
+        "description": "Trink an einem Tag 8 Bier"
+      },
+      "t4": {
+        "name": "Unaufhaltsam",
+        "description": "Trink an einem Tag 12 Bier"
+      }
     },
     "drink_variety": {
-      "t1": { "name": "Kostprobe", "description": "Probier 2 verschiedene Getränkearten" },
-      "t2": { "name": "Geschmacks-Entdecker", "description": "Probier 3 verschiedene Getränkearten" },
-      "t3": { "name": "Kenner", "description": "Probier 4 verschiedene Getränkearten" },
-      "t4": { "name": "Volle Karte", "description": "Probier 5 verschiedene Getränkearten" }
+      "t1": {
+        "name": "Kostprobe",
+        "description": "Probier 2 verschiedene Getränkearten"
+      },
+      "t2": {
+        "name": "Geschmacks-Entdecker",
+        "description": "Probier 3 verschiedene Getränkearten"
+      },
+      "t3": {
+        "name": "Kenner",
+        "description": "Probier 4 verschiedene Getränkearten"
+      },
+      "t4": {
+        "name": "Volle Karte",
+        "description": "Probier 5 verschiedene Getränkearten"
+      }
     },
     "volume_total": {
-      "t1": { "name": "Erste Liter", "description": "Trink 5 Liter bei diesem Fest" },
-      "t2": { "name": "Zwanzig geschafft", "description": "Trink 20 Liter bei diesem Fest" },
-      "t3": { "name": "Halbes Hektoliter", "description": "Trink 50 Liter bei diesem Fest" },
-      "t4": { "name": "Hundert Liter", "description": "Trink 100 Liter bei diesem Fest" }
+      "t1": {
+        "name": "Erste Liter",
+        "description": "Trink 5 Liter bei diesem Fest"
+      },
+      "t2": {
+        "name": "Zwanzig geschafft",
+        "description": "Trink 20 Liter bei diesem Fest"
+      },
+      "t3": {
+        "name": "Halbes Hektoliter",
+        "description": "Trink 50 Liter bei diesem Fest"
+      },
+      "t4": {
+        "name": "Hundert Liter",
+        "description": "Trink 100 Liter bei diesem Fest"
+      }
     },
     "tips_total": {
-      "t1": { "name": "Großzügiger Start", "description": "Gib insgesamt 5 € Trinkgeld bei diesem Fest" },
-      "t2": { "name": "Guter Trinkgeldgeber", "description": "Gib insgesamt 20 € Trinkgeld bei diesem Fest" },
-      "t3": { "name": "Publikumsliebling", "description": "Gib insgesamt 50 € Trinkgeld bei diesem Fest" },
-      "t4": { "name": "Legendärer Trinkgeldgeber", "description": "Gib insgesamt 100 € Trinkgeld bei diesem Fest" }
+      "t1": {
+        "name": "Großzügiger Start",
+        "description": "Gib insgesamt 5 € Trinkgeld bei diesem Fest"
+      },
+      "t2": {
+        "name": "Guter Trinkgeldgeber",
+        "description": "Gib insgesamt 20 € Trinkgeld bei diesem Fest"
+      },
+      "t3": {
+        "name": "Publikumsliebling",
+        "description": "Gib insgesamt 50 € Trinkgeld bei diesem Fest"
+      },
+      "t4": {
+        "name": "Legendärer Trinkgeldgeber",
+        "description": "Gib insgesamt 100 € Trinkgeld bei diesem Fest"
+      }
     },
     "spend_total": {
-      "t1": { "name": "Geldbeutel geöffnet", "description": "Gib 100 € bei diesem Fest aus" },
-      "t2": { "name": "Großzügiger Ausgeber", "description": "Gib 300 € bei diesem Fest aus" },
-      "t3": { "name": "Hochroller", "description": "Gib 600 € bei diesem Fest aus" },
-      "t4": { "name": "Keine Grenzen", "description": "Gib 1.000 € bei diesem Fest aus" }
+      "t1": {
+        "name": "Geldbeutel geöffnet",
+        "description": "Gib 100 € bei diesem Fest aus"
+      },
+      "t2": {
+        "name": "Großzügiger Ausgeber",
+        "description": "Gib 300 € bei diesem Fest aus"
+      },
+      "t3": {
+        "name": "Hochroller",
+        "description": "Gib 600 € bei diesem Fest aus"
+      },
+      "t4": {
+        "name": "Keine Grenzen",
+        "description": "Gib 1.000 € bei diesem Fest aus"
+      }
     },
     "first_drink": {
       "name": "Erster Schluck",
       "description": "Erfasse dein allererstes Getränk"
     },
     "days_attended": {
-      "t1": { "name": "Dabei gewesen", "description": "Besuch das Fest an 1 Tag" },
-      "t2": { "name": "Stammgast", "description": "Besuch das Fest an 3 Tagen" },
-      "t3": { "name": "Treuer Besucher", "description": "Besuch das Fest an 6 Tagen" },
-      "t4": { "name": "Fest-Urgestein", "description": "Besuch das Fest an 10 Tagen" }
+      "t1": {
+        "name": "Dabei gewesen",
+        "description": "Besuch das Fest an 1 Tag"
+      },
+      "t2": {
+        "name": "Stammgast",
+        "description": "Besuch das Fest an 3 Tagen"
+      },
+      "t3": {
+        "name": "Treuer Besucher",
+        "description": "Besuch das Fest an 6 Tagen"
+      },
+      "t4": {
+        "name": "Fest-Urgestein",
+        "description": "Besuch das Fest an 10 Tagen"
+      }
     },
     "attendance_streak": {
-      "t1": { "name": "Zwei in Folge", "description": "Besuch das Fest 2 Tage in Folge" },
-      "t2": { "name": "Im Lauf", "description": "Besuch das Fest 3 Tage in Folge" },
-      "t3": { "name": "Serien-Meister", "description": "Besuch das Fest 5 Tage in Folge" },
-      "t4": { "name": "Ungebrochene Kette", "description": "Besuch das Fest 7 Tage in Folge" }
+      "t1": {
+        "name": "Zwei in Folge",
+        "description": "Besuch das Fest 2 Tage in Folge"
+      },
+      "t2": {
+        "name": "Im Lauf",
+        "description": "Besuch das Fest 3 Tage in Folge"
+      },
+      "t3": {
+        "name": "Serien-Meister",
+        "description": "Besuch das Fest 5 Tage in Folge"
+      },
+      "t4": {
+        "name": "Ungebrochene Kette",
+        "description": "Besuch das Fest 7 Tage in Folge"
+      }
     },
     "opening_day": {
       "name": "Eröffnungstag",
@@ -795,50 +909,134 @@
       "description": "Besuch jeden einzelnen Tag des Fests"
     },
     "tents_visited": {
-      "t1": { "name": "Zeltneugierig", "description": "Besuch 3 verschiedene Zelte" },
-      "t2": { "name": "Zelt-Hopper", "description": "Besuch 6 verschiedene Zelte" },
-      "t3": { "name": "Zelt-Entdecker", "description": "Besuch 10 verschiedene Zelte" },
-      "t4": { "name": "Zelt-Meister", "description": "Besuch 15 verschiedene Zelte" }
+      "t1": {
+        "name": "Zeltneugierig",
+        "description": "Besuch 3 verschiedene Zelte"
+      },
+      "t2": {
+        "name": "Zelt-Hopper",
+        "description": "Besuch 6 verschiedene Zelte"
+      },
+      "t3": {
+        "name": "Zelt-Entdecker",
+        "description": "Besuch 10 verschiedene Zelte"
+      },
+      "t4": {
+        "name": "Zelt-Meister",
+        "description": "Besuch 15 verschiedene Zelte"
+      }
     },
     "festivals_attended": {
-      "t1": { "name": "Erstes Fest", "description": "Besuch dein erstes Fest" },
-      "t2": { "name": "Fest-Stammgast", "description": "Besuch 3 verschiedene Feste" },
-      "t3": { "name": "Fest-Veteran", "description": "Besuch 5 verschiedene Feste" },
-      "t4": { "name": "Fest-Legende", "description": "Besuch 8 verschiedene Feste" }
+      "t1": {
+        "name": "Erstes Fest",
+        "description": "Besuch dein erstes Fest"
+      },
+      "t2": {
+        "name": "Fest-Stammgast",
+        "description": "Besuch 3 verschiedene Feste"
+      },
+      "t3": {
+        "name": "Fest-Veteran",
+        "description": "Besuch 5 verschiedene Feste"
+      },
+      "t4": {
+        "name": "Fest-Legende",
+        "description": "Besuch 8 verschiedene Feste"
+      }
     },
     "festival_types": {
-      "t1": { "name": "Erster Stil", "description": "Besuch deine erste Festart" },
-      "t2": { "name": "Horizont erweitert", "description": "Besuch 2 verschiedene Festarten" },
-      "t3": { "name": "Weitgereist", "description": "Besuch 3 verschiedene Festarten" },
-      "t4": { "name": "Fest-Kenner", "description": "Besuch 4 verschiedene Festarten" }
+      "t1": {
+        "name": "Erster Stil",
+        "description": "Besuch deine erste Festart"
+      },
+      "t2": {
+        "name": "Horizont erweitert",
+        "description": "Besuch 2 verschiedene Festarten"
+      },
+      "t3": {
+        "name": "Weitgereist",
+        "description": "Besuch 3 verschiedene Festarten"
+      },
+      "t4": {
+        "name": "Fest-Kenner",
+        "description": "Besuch 4 verschiedene Festarten"
+      }
     },
     "all_large_tents": {
       "name": "Große Tour",
       "description": "Besuch jedes große Zelt beim Fest"
     },
     "groups_joined": {
-      "t1": { "name": "Beigetreten", "description": "Tritt bei diesem Fest 1 Gruppe bei" },
-      "t2": { "name": "Teamplayer", "description": "Tritt bei diesem Fest 2 Gruppen bei" },
-      "t3": { "name": "Gut vernetzt", "description": "Tritt bei diesem Fest 4 Gruppen bei" },
-      "t4": { "name": "Sozialer Mittelpunkt", "description": "Tritt bei diesem Fest 6 Gruppen bei" }
+      "t1": {
+        "name": "Beigetreten",
+        "description": "Tritt bei diesem Fest 1 Gruppe bei"
+      },
+      "t2": {
+        "name": "Teamplayer",
+        "description": "Tritt bei diesem Fest 2 Gruppen bei"
+      },
+      "t3": {
+        "name": "Gut vernetzt",
+        "description": "Tritt bei diesem Fest 4 Gruppen bei"
+      },
+      "t4": {
+        "name": "Sozialer Mittelpunkt",
+        "description": "Tritt bei diesem Fest 6 Gruppen bei"
+      }
     },
     "friends_added": {
-      "t1": { "name": "Erster Freund", "description": "Füg deinen ersten Freund hinzu" },
-      "t2": { "name": "Wachsender Kreis", "description": "Füg 5 Freunde hinzu" },
-      "t3": { "name": "Beliebt", "description": "Füg 15 Freunde hinzu" },
-      "t4": { "name": "Geselliger Schmetterling", "description": "Füg 30 Freunde hinzu" }
+      "t1": {
+        "name": "Erster Freund",
+        "description": "Füg deinen ersten Freund hinzu"
+      },
+      "t2": {
+        "name": "Wachsender Kreis",
+        "description": "Füg 5 Freunde hinzu"
+      },
+      "t3": {
+        "name": "Beliebt",
+        "description": "Füg 15 Freunde hinzu"
+      },
+      "t4": {
+        "name": "Geselliger Schmetterling",
+        "description": "Füg 30 Freunde hinzu"
+      }
     },
     "photos_uploaded": {
-      "t1": { "name": "Sag Cheese", "description": "Lad 1 Foto bei diesem Fest hoch" },
-      "t2": { "name": "Foto-Fan", "description": "Lad 10 Fotos bei diesem Fest hoch" },
-      "t3": { "name": "Fotoalbum", "description": "Lad 25 Fotos bei diesem Fest hoch" },
-      "t4": { "name": "Erinnerungshüter", "description": "Lad 50 Fotos bei diesem Fest hoch" }
+      "t1": {
+        "name": "Sag Cheese",
+        "description": "Lad 1 Foto bei diesem Fest hoch"
+      },
+      "t2": {
+        "name": "Foto-Fan",
+        "description": "Lad 10 Fotos bei diesem Fest hoch"
+      },
+      "t3": {
+        "name": "Fotoalbum",
+        "description": "Lad 25 Fotos bei diesem Fest hoch"
+      },
+      "t4": {
+        "name": "Erinnerungshüter",
+        "description": "Lad 50 Fotos bei diesem Fest hoch"
+      }
     },
     "reactions_given": {
-      "t1": { "name": "Zuneigung zeigen", "description": "Reagier bei diesem Fest auf 5 Fotos" },
-      "t2": { "name": "Unterstützend", "description": "Reagier bei diesem Fest auf 25 Fotos" },
-      "t3": { "name": "Cheerleader", "description": "Reagier bei diesem Fest auf 75 Fotos" },
-      "t4": { "name": "Reaktions-Maschine", "description": "Reagier bei diesem Fest auf 150 Fotos" }
+      "t1": {
+        "name": "Zuneigung zeigen",
+        "description": "Reagier bei diesem Fest auf 5 Fotos"
+      },
+      "t2": {
+        "name": "Unterstützend",
+        "description": "Reagier bei diesem Fest auf 25 Fotos"
+      },
+      "t3": {
+        "name": "Cheerleader",
+        "description": "Reagier bei diesem Fest auf 75 Fotos"
+      },
+      "t4": {
+        "name": "Reaktions-Maschine",
+        "description": "Reagier bei diesem Fest auf 150 Fotos"
+      }
     },
     "first_photo": {
       "name": "Erster Schnappschuss",
@@ -849,34 +1047,94 @@
       "description": "Erstell eine Gruppe"
     },
     "group_wins": {
-      "t1": { "name": "Erster Sieg", "description": "Gewinn einmal den ersten Platz in einer Gruppe" },
-      "t2": { "name": "Serien-Sieger", "description": "Gewinn 3-mal den ersten Platz in einer Gruppe" },
-      "t3": { "name": "Gruppen-Champion", "description": "Gewinn 6-mal den ersten Platz in einer Gruppe" },
-      "t4": { "name": "Dynastie", "description": "Gewinn 10-mal den ersten Platz in einer Gruppe" }
+      "t1": {
+        "name": "Erster Sieg",
+        "description": "Gewinn einmal den ersten Platz in einer Gruppe"
+      },
+      "t2": {
+        "name": "Serien-Sieger",
+        "description": "Gewinn 3-mal den ersten Platz in einer Gruppe"
+      },
+      "t3": {
+        "name": "Gruppen-Champion",
+        "description": "Gewinn 6-mal den ersten Platz in einer Gruppe"
+      },
+      "t4": {
+        "name": "Dynastie",
+        "description": "Gewinn 10-mal den ersten Platz in einer Gruppe"
+      }
     },
     "podium_finishes": {
-      "t1": { "name": "Auf dem Podium", "description": "Erreich einmal die Top 3 in einer Gruppe" },
-      "t2": { "name": "Podium-Stammgast", "description": "Erreich 5-mal die Top 3 in einer Gruppe" },
-      "t3": { "name": "Beständiger Herausforderer", "description": "Erreich 12-mal die Top 3 in einer Gruppe" },
-      "t4": { "name": "Podium-Legende", "description": "Erreich 25-mal die Top 3 in einer Gruppe" }
+      "t1": {
+        "name": "Auf dem Podium",
+        "description": "Erreich einmal die Top 3 in einer Gruppe"
+      },
+      "t2": {
+        "name": "Podium-Stammgast",
+        "description": "Erreich 5-mal die Top 3 in einer Gruppe"
+      },
+      "t3": {
+        "name": "Beständiger Herausforderer",
+        "description": "Erreich 12-mal die Top 3 in einer Gruppe"
+      },
+      "t4": {
+        "name": "Podium-Legende",
+        "description": "Erreich 25-mal die Top 3 in einer Gruppe"
+      }
     },
     "active_days": {
-      "t1": { "name": "Guter Start", "description": "Sei an 5 verschiedenen Tagen aktiv" },
-      "t2": { "name": "Bekanntes Gesicht", "description": "Sei an 25 verschiedenen Tagen aktiv" },
-      "t3": { "name": "Alter Hase", "description": "Sei an 75 verschiedenen Tagen aktiv" },
-      "t4": { "name": "Urgestein", "description": "Sei an 200 verschiedenen Tagen aktiv" }
+      "t1": {
+        "name": "Guter Start",
+        "description": "Sei an 5 verschiedenen Tagen aktiv"
+      },
+      "t2": {
+        "name": "Bekanntes Gesicht",
+        "description": "Sei an 25 verschiedenen Tagen aktiv"
+      },
+      "t3": {
+        "name": "Alter Hase",
+        "description": "Sei an 75 verschiedenen Tagen aktiv"
+      },
+      "t4": {
+        "name": "Urgestein",
+        "description": "Sei an 200 verschiedenen Tagen aktiv"
+      }
     },
     "active_day_streak": {
-      "t1": { "name": "Warmlaufen", "description": "Sei 3 Tage in Folge aktiv" },
-      "t2": { "name": "In Fahrt", "description": "Sei 7 Tage in Folge aktiv" },
-      "t3": { "name": "Gewohnheit gebildet", "description": "Sei 21 Tage in Folge aktiv" },
-      "t4": { "name": "Unaufhaltsame Serie", "description": "Sei 60 Tage in Folge aktiv" }
+      "t1": {
+        "name": "Warmlaufen",
+        "description": "Sei 3 Tage in Folge aktiv"
+      },
+      "t2": {
+        "name": "In Fahrt",
+        "description": "Sei 7 Tage in Folge aktiv"
+      },
+      "t3": {
+        "name": "Gewohnheit gebildet",
+        "description": "Sei 21 Tage in Folge aktiv"
+      },
+      "t4": {
+        "name": "Unaufhaltsame Serie",
+        "description": "Sei 60 Tage in Folge aktiv"
+      }
     },
     "crowd_reports": {
-      "t1": { "name": "Erste Meldung", "description": "Reich bei diesem Fest 1 Andrang-Meldung ein" },
-      "t2": { "name": "Regelmäßiger Melder", "description": "Reich bei diesem Fest 5 Andrang-Meldungen ein" },
-      "t3": { "name": "Andrang-Beobachter", "description": "Reich bei diesem Fest 15 Andrang-Meldungen ein" },
-      "t4": { "name": "Stütze der Gemeinschaft", "description": "Reich bei diesem Fest 30 Andrang-Meldungen ein" }
+      "t1": {
+        "name": "Erste Meldung",
+        "description": "Reich bei diesem Fest 1 Andrang-Meldung ein"
+      },
+      "t2": {
+        "name": "Regelmäßiger Melder",
+        "description": "Reich bei diesem Fest 5 Andrang-Meldungen ein"
+      },
+      "t3": {
+        "name": "Andrang-Beobachter",
+        "description": "Reich bei diesem Fest 15 Andrang-Meldungen ein"
+      },
+      "t4": {
+        "name": "Stütze der Gemeinschaft",
+        "description": "Reich bei diesem Fest 30 Andrang-Meldungen ein"
+      }
     },
     "profile_complete": {
       "name": "Profil vollständig",
@@ -1749,7 +2007,19 @@
       "readyDescription": "Siehe deine personalisierte {{festivalName}}-Geschichte",
       "preparingDescription": "Wir bereiten deine personalisierte {{festivalName}}-Geschichte vor. Lade deine letzte Teilnahme hoch!",
       "viewButton": "deinen Rückblick ansehen"
-    }
+    },
+    "intro": {
+      "title": "Festival-Rückblick",
+      "subtitle": "Die Festival-Highlights von {{username}}"
+    },
+    "journey": {
+      "title": "Deine Reise",
+      "subtitle": "Tag für Tag"
+    },
+    "swipeToBegin": "Wische, um zu starten",
+    "close": "Schließen",
+    "error": "Beim Laden deines Rückblicks ist etwas schiefgelaufen",
+    "accessDenied": "Dein Rückblick ist noch nicht verfügbar"
   },
   "reservation": {
     "dialog": {
@@ -1838,7 +2108,9 @@
       "tentsNearby": "{{count}} Zelte",
       "tentsNearby_one": "{{count}} Zelt",
       "button": "Karte",
-      "openAccessibility": "Festivalplan öffnen"
+      "openAccessibility": "Festivalplan öffnen",
+      "officialMap": "Offizielle Festivalkarte",
+      "officialMapHint": "Öffnet die offizielle Karte im Browser"
     },
     "tabs": {
       "friends": "Freunde",
@@ -1856,7 +2128,8 @@
       "disableTooltip": "Standortfreigabe beenden",
       "enabled": "Standortfreigabe aktiviert! Gruppenmitglieder können nun deinen Standort sehen.",
       "trackingStarted": "Standortverfolgung gestartet! Aktiviere die Standortfreigabe für bestimmte Gruppen in deinen Profileinstellungen.",
-      "noGroupsEnabled": "Standortfreigabe ist für keine Gruppe aktiviert. Bitte aktiviere zuerst die Standortfreigabe für mindestens eine Gruppe in deinen Profileinstellungen."
+      "noGroupsEnabled": "Standortfreigabe ist für keine Gruppe aktiviert. Bitte aktiviere zuerst die Standortfreigabe für mindestens eine Gruppe in deinen Profileinstellungen.",
+      "active": "Standortfreigabe aktiv"
     },
     "duration": {
       "30m": "30 Min",
@@ -1895,9 +2168,6 @@
       "veryClose": "Sehr nah",
       "hint": "Tippen, um auf Karte anzuzeigen und einzuchecken",
       "checkInButton": "Einchecken"
-    },
-    "sharing": {
-      "active": "Standortfreigabe aktiv"
     },
     "errors": {
       "startFailed": "Freigabe konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
@@ -2104,9 +2374,6 @@
     "whatCanIDo": "Was kann ich mit Prost Counter machen?",
     "baseCost": "Basis",
     "tips": "Trinkgeld",
-    "mapLink": {
-      "title": "{{festivalName}} Karte"
-    },
     "leaderboard": {
       "title": "🏆 Globale Rangliste",
       "description": "Top {{limit}} Teilnehmer",
@@ -2135,6 +2402,15 @@
       "showQRCode": "QR-Code anzeigen",
       "hideQRCode": "QR-Code ausblenden",
       "qrCodeAlt": "QR-Code"
+    },
+    "datePicker": {
+      "title": "Datum wählen",
+      "description": "Lege das Datum deines Besuchs fest"
+    },
+    "wrapped": {
+      "generating": "Dein Rückblick-Bild wird erstellt...",
+      "generatingButton": "Wird erstellt...",
+      "downloadAgain": "Erneut herunterladen"
     }
   },
   "search": {
@@ -2846,6 +3122,50 @@
         "text": "Wenn Sie Bedenken zum Kinderschutz haben oder ein Problem melden möchten, kontaktieren Sie bitte unsere zuständige Kinderschutz-Kontaktstelle:",
         "boxTitle": "ProstCounter — Kinderschutz-Kontakt"
       }
+    }
+  },
+  "app": {
+    "logo": "ProstCounter Logo",
+    "name": "ProstCounter",
+    "namePart1": "Prost",
+    "namePart2": "Counter"
+  },
+  "dev": {
+    "title": "Entwicklerwerkzeuge",
+    "description": "UI-Komponenten-Showcase für die Entwicklung",
+    "buttons": {
+      "cancel": "Abbrechen"
+    },
+    "components": {
+      "title": "UI-Komponenten",
+      "showcase": "Komponenten-Showcase",
+      "openShowcase": "Komponenten-Showcase öffnen"
+    }
+  },
+  "footer": {
+    "madeWith": "Gemacht mit",
+    "by": "von",
+    "buyMeA": "Spendier mir ein",
+    "buyMeABeer": "Spendier mir ein Bier",
+    "copyright": "© 2024 ProstCounter. Alle Rechte vorbehalten.",
+    "links": {
+      "privacy": "Datenschutz",
+      "terms": "AGB",
+      "contact": "Kontakt",
+      "childSafety": "Kinderschutz"
+    },
+    "reportBug": "Fehler melden",
+    "requestFeature": "Feature vorschlagen"
+  },
+  "landing": {
+    "signIn": "Anmelden",
+    "description": "Tritt gegen Freunde an und verfolge deinen Fortschritt auf dem Festival",
+    "features": {
+      "title": "Was kann ich mit Prost Counter machen?",
+      "trackBeer": "Täglichen Bierkonsum erfassen",
+      "competeWithFriends": "In Gruppen gegen Freunde antreten",
+      "earnAchievements": "Erfolge sammeln",
+      "viewStatistics": "Statistiken und Bestenlisten ansehen"
     }
   }
 }

@@ -2,8 +2,7 @@ import type { LocationSessionMember, NearbyTent } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
-import { useNavigation } from "@react-navigation/native";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { Beer, ExternalLink, Map, MapPin, RefreshCw } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -32,7 +31,6 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
 export default function MapScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
   const { openSheet } = useQuickAttendance();
@@ -50,28 +48,14 @@ export default function MapScreen() {
   const [selectedTent, setSelectedTent] = useState<NearbyTent | null>(null);
   const hasInitializedRef = useRef(false);
 
+  // refreshNearby must stay in the deps. Its identity changes with the current
+  // location, and pinning the mount-time copy captures a null location, so every
+  // tap hit its `if (!loc) return` guard and silently did nothing.
   const handleRefresh = useCallback(() => {
     if (currentFestival?.id) {
       refreshNearby(currentFestival.id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFestival?.id]);
-
-  // Add refresh button to header
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Pressable
-          onPress={handleRefresh}
-          disabled={isNearbyLoading}
-          className="p-2"
-          accessibilityLabel={t("common.actions.retry")}
-        >
-          <RefreshCw size={22} color={isNearbyLoading ? Colors.neutral[400] : IconColors.white} />
-        </Pressable>
-      ),
-    });
-  }, [navigation, isNearbyLoading, handleRefresh, t]);
+  }, [currentFestival?.id, refreshNearby]);
 
   // Start local tracking when screen mounts (only if not already sharing)
   useEffect(() => {
@@ -129,106 +113,122 @@ export default function MapScreen() {
   }
 
   return (
-    <ScrollView
-      className="flex-1 bg-white"
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={{
-        paddingBottom: insets.bottom + 16,
-      }}
-    >
-      {/* Map */}
-      <Box className="mx-3 mb-2 mt-3 h-[250px] overflow-hidden rounded-2xl">
-        <FriendMap
-          showFriends
-          showTents
-          searchRadius={1000}
-          selectedTentId={selectedTent?.tentId}
-          onMarkerPress={handleMarkerPress}
-        />
-      </Box>
-
-      {/* Sharing toggle - global alerts work normally here */}
-      <Box className="px-3 py-1">
-        <LocationSharingToggle festivalId={currentFestival.id} />
-      </Box>
-
-      {/* External festival map link */}
-      {currentFestival.mapUrl && (
-        <Pressable
-          onPress={async () => {
-            try {
-              await WebBrowser.openBrowserAsync(currentFestival.mapUrl!);
-            } catch (error) {
-              logger.error("Failed to open map URL:", error);
-            }
-          }}
-          className="mx-3 flex-row items-center justify-between rounded-lg bg-background-100 px-4 py-3"
-          accessibilityLabel={t("home.mapLink.title", {
-            festivalName: currentFestival.name,
-          })}
-        >
-          <HStack space="sm" className="items-center">
-            <Map size={18} color={IconColors.primary} />
-            <Text className="font-medium text-typography-900">
-              {t("home.mapLink.title", {
-                festivalName: currentFestival.name,
-              })}
-            </Text>
-          </HStack>
-          <ExternalLink size={16} color={IconColors.muted} />
-        </Pressable>
-      )}
-
-      {/* Tabs */}
-      <HStack className="px-3 py-1" space="sm">
-        <Pressable
-          onPress={() => setSelectedTab("friends")}
-          className={cn(
-            "flex-1 rounded-lg py-2",
-            selectedTab === "friends" ? "bg-primary-500" : "bg-background-100",
-          )}
-        >
-          <Text
-            className={cn(
-              "text-center font-medium",
-              selectedTab === "friends" ? "text-white" : "text-typography-600",
-            )}
-          >
-            {t("location.tabs.friends")} ({nearbyMembers.length})
-          </Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setSelectedTab("tents")}
-          className={cn(
-            "flex-1 rounded-lg py-2",
-            selectedTab === "tents" ? "bg-primary-500" : "bg-background-100",
-          )}
-        >
-          <Text
-            className={cn(
-              "text-center font-medium",
-              selectedTab === "tents" ? "text-white" : "text-typography-600",
-            )}
-          >
-            {t("location.tabs.tents")} ({nearbyTents.length})
-          </Text>
-        </Pressable>
-      </HStack>
-
-      {/* List */}
-      <Box className="px-3">
-        {selectedTab === "friends" ? (
-          <NearbyFriendsList members={nearbyMembers} />
-        ) : (
-          <NearbyTentsList
-            tents={nearbyTents}
-            selectedTentId={selectedTent?.tentId ?? null}
-            onTentSelect={handleTentSelect}
-            onCheckIn={handleCheckIn}
+    <>
+      {/* Refresh button in the header. Declared here rather than via
+          navigation.setOptions so the screen never reads navigation context. */}
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <Pressable
+              onPress={handleRefresh}
+              disabled={isNearbyLoading}
+              className="p-2"
+              accessibilityLabel={t("common.actions.retry")}
+            >
+              <RefreshCw
+                size={22}
+                color={isNearbyLoading ? Colors.neutral[400] : IconColors.white}
+              />
+            </Pressable>
+          ),
+        }}
+      />
+      <ScrollView
+        className="flex-1 bg-white"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + 16,
+        }}
+      >
+        {/* Map */}
+        <Box className="mx-3 mb-2 mt-3 h-[250px] overflow-hidden rounded-2xl">
+          <FriendMap
+            showFriends
+            showTents
+            searchRadius={1000}
+            selectedTentId={selectedTent?.tentId}
+            onMarkerPress={handleMarkerPress}
           />
+        </Box>
+
+        {/* External festival map link */}
+        {currentFestival.mapUrl && (
+          <Pressable
+            onPress={async () => {
+              try {
+                await WebBrowser.openBrowserAsync(currentFestival.mapUrl!);
+              } catch (error) {
+                logger.error("Failed to open map URL:", error);
+              }
+            }}
+            className="mx-3 flex-row items-center gap-2 self-start px-1 py-2 active:opacity-70"
+            hitSlop={5}
+            accessibilityRole="link"
+            accessibilityLabel={t("location.map.officialMap")}
+            accessibilityHint={t("location.map.officialMapHint")}
+          >
+            <Map size={16} color={IconColors.primary} />
+            <Text className="font-medium text-primary-600">{t("location.map.officialMap")}</Text>
+            <ExternalLink size={14} color={IconColors.primary} />
+          </Pressable>
         )}
-      </Box>
-    </ScrollView>
+
+        {/* Sharing toggle - global alerts work normally here */}
+        <Box className="px-3 py-1">
+          <LocationSharingToggle festivalId={currentFestival.id} />
+        </Box>
+
+        {/* Tabs */}
+        <HStack className="px-3 py-1" space="sm">
+          <Pressable
+            onPress={() => setSelectedTab("friends")}
+            className={cn(
+              "flex-1 rounded-lg py-2",
+              selectedTab === "friends" ? "bg-primary-500" : "bg-background-100",
+            )}
+          >
+            <Text
+              className={cn(
+                "text-center font-medium",
+                selectedTab === "friends" ? "text-white" : "text-typography-600",
+              )}
+            >
+              {t("location.tabs.friends")} ({nearbyMembers.length})
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setSelectedTab("tents")}
+            className={cn(
+              "flex-1 rounded-lg py-2",
+              selectedTab === "tents" ? "bg-primary-500" : "bg-background-100",
+            )}
+          >
+            <Text
+              className={cn(
+                "text-center font-medium",
+                selectedTab === "tents" ? "text-white" : "text-typography-600",
+              )}
+            >
+              {t("location.tabs.tents")} ({nearbyTents.length})
+            </Text>
+          </Pressable>
+        </HStack>
+
+        {/* List */}
+        <Box className="px-3">
+          {selectedTab === "friends" ? (
+            <NearbyFriendsList members={nearbyMembers} />
+          ) : (
+            <NearbyTentsList
+              tents={nearbyTents}
+              selectedTentId={selectedTent?.tentId ?? null}
+              onTentSelect={handleTentSelect}
+              onCheckIn={handleCheckIn}
+            />
+          )}
+        </Box>
+      </ScrollView>
+    </>
   );
 }
 

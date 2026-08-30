@@ -170,9 +170,7 @@ export async function reconcileTentVisits(
   const tentsAdded = [...selected].filter((tentId) => !present.has(tentId));
 
   if (tentsRemoved.length > 0) {
-    const removedIds = visibleRows
-      .filter((row) => !selected.has(row.tent_id))
-      .map((row) => row.id);
+    const removedIds = visibleRows.filter((row) => !selected.has(row.tent_id)).map((row) => row.id);
     const idPlaceholders = removedIds.map(() => "?").join(", ");
 
     // Every visit to a removed tent that day, not just the latest: the day can

@@ -195,7 +195,10 @@ describe("selectCloseToUnlocking", () => {
 
 describe("buildStats", () => {
   it("counts every rung, not every card", () => {
-    const stats = buildStats([seriesCard("drinks_total", 0), oneOffCard("full_festival", 4, false)]);
+    const stats = buildStats([
+      seriesCard("drinks_total", 0),
+      oneOffCard("full_festival", 4, false),
+    ]);
 
     expect(stats.total_achievements).toBe(5); // 4 rungs + 1 one-off rung
     expect(stats.unlocked_achievements).toBe(0);

@@ -435,7 +435,8 @@ describe("Pull functions", () => {
 
       const [sql, params] =
         mockDb.runAsync.mock.calls.find(
-          ([query]) => typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
+          ([query]) =>
+            typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
         ) ?? [];
 
       expect(sql).toContain("NOT IN");
@@ -468,7 +469,8 @@ describe("Pull functions", () => {
 
       const [sql] =
         mockDb.runAsync.mock.calls.find(
-          ([query]) => typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
+          ([query]) =>
+            typeof query === "string" && query.includes("UPDATE groups SET _deleted = 1"),
         ) ?? [];
 
       expect(sql).toBeDefined();

@@ -111,7 +111,7 @@
 - **Question:** The spec listed tier targets but not point values for every rung, nor glyph identifiers.
   **Decision:** Point values and glyph id strings in `definitions.ts` were chosen by the planner. Points scale roughly 1x / 4x / 11x / 28x from bronze to platinum, weighted up for Competitive. Glyph ids are descriptive placeholders naming the intended artwork.
   **Why:** The plan cannot contain placeholders, so concrete values were required. Both are pure data and changing them later is a one-line edit with no migration.
-  **If wrong:** These are safe to tune without stopping — they are the one part of this plan where a different choice breaks nothing. Tier *targets*, by contrast, come from the approved spec: do not change those.
+  **If wrong:** These are safe to tune without stopping — they are the one part of this plan where a different choice breaks nothing. Tier _targets_, by contrast, come from the approved spec: do not change those.
 
 ---
 
@@ -158,41 +158,43 @@ Task 2 declares types only and produces no runtime behaviour; Tasks 3 and 4 test
 
 **Created:**
 
-| Path | Responsibility |
-| --- | --- |
-| `packages/shared/src/achievements/types.ts` | `AchievementMetrics`, `MetricKey`, category/scope/tier types, definition interfaces |
-| `packages/shared/src/achievements/definitions.ts` | The 20 series and 10 one-offs as data |
-| `packages/shared/src/achievements/evaluator.ts` | Pure `evaluate()` function |
-| `packages/shared/src/achievements/index.ts` | Barrel export |
-| `packages/shared/src/achievements/definitions.test.ts` | Integrity tests over the definition set |
-| `packages/shared/src/achievements/evaluator.test.ts` | Behavioural tests for the evaluator |
-| `packages/api/src/services/achievement.service.ts` | Orchestration: metrics → evaluate → persist |
-| `packages/api/src/services/__tests__/achievement.service.test.ts` | Service tests with a mocked repository |
-| `packages/api/src/repositories/supabase/achievement-metrics.repository.ts` | Wraps the `get_achievement_metrics` RPC and unlock inserts |
-| `supabase/migrations/<generated>_achievements_engine_schema.sql` | Task 1 schema |
-| `supabase/migrations/<generated>_achievement_metrics_function.sql` | Task 5 function |
-| `supabase/migrations/<generated>_festival_group_standings_refresh.sql` | Task 6 function |
+| Path                                                                       | Responsibility                                                                      |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `packages/shared/src/achievements/types.ts`                                | `AchievementMetrics`, `MetricKey`, category/scope/tier types, definition interfaces |
+| `packages/shared/src/achievements/definitions.ts`                          | The 20 series and 10 one-offs as data                                               |
+| `packages/shared/src/achievements/evaluator.ts`                            | Pure `evaluate()` function                                                          |
+| `packages/shared/src/achievements/index.ts`                                | Barrel export                                                                       |
+| `packages/shared/src/achievements/definitions.test.ts`                     | Integrity tests over the definition set                                             |
+| `packages/shared/src/achievements/evaluator.test.ts`                       | Behavioural tests for the evaluator                                                 |
+| `packages/api/src/services/achievement.service.ts`                         | Orchestration: metrics → evaluate → persist                                         |
+| `packages/api/src/services/__tests__/achievement.service.test.ts`          | Service tests with a mocked repository                                              |
+| `packages/api/src/repositories/supabase/achievement-metrics.repository.ts` | Wraps the `get_achievement_metrics` RPC and unlock inserts                          |
+| `supabase/migrations/<generated>_achievements_engine_schema.sql`           | Task 1 schema                                                                       |
+| `supabase/migrations/<generated>_achievement_metrics_function.sql`         | Task 5 function                                                                     |
+| `supabase/migrations/<generated>_festival_group_standings_refresh.sql`     | Task 6 function                                                                     |
 
 **Modified:**
 
-| Path | Change |
-| --- | --- |
-| `packages/shared/package.json` | Add `"./achievements"` export |
-| `packages/api/src/middleware/auth.ts` | Fire-and-forget `user_active_days` upsert |
-| `packages/api/src/routes/consumption.route.ts:91-105` | Await evaluation, return `unlocked[]` |
-| `packages/api/src/routes/achievement.route.ts:185-267` | Serve with-progress from the new engine |
+| Path                                                                  | Change                                           |
+| --------------------------------------------------------------------- | ------------------------------------------------ |
+| `packages/shared/package.json`                                        | Add `"./achievements"` export                    |
+| `packages/api/src/middleware/auth.ts`                                 | Fire-and-forget `user_active_days` upsert        |
+| `packages/api/src/routes/consumption.route.ts:91-105`                 | Await evaluation, return `unlocked[]`            |
+| `packages/api/src/routes/achievement.route.ts:185-267`                | Serve with-progress from the new engine          |
 | `packages/api/src/repositories/supabase/achievement.repository.ts:28` | Fix `condition` → remove (column does not exist) |
-| `packages/db/src/types.ts` | Regenerated after each migration |
+| `packages/db/src/types.ts`                                            | Regenerated after each migration                 |
 
 ---
 
 ## Task 1: Schema foundation
 
 **Files:**
+
 - Create: `supabase/migrations/<generated>_achievements_engine_schema.sql`
 - Modify: `packages/db/src/types.ts` (regenerated, do not hand-edit)
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: columns `achievements.slug`, `achievements.series_id`, `achievements.tier`, `achievements.scope`; nullable `user_achievements.festival_id`; tables `user_active_days`, `festival_group_standings`; column `wrapped_data_cache.first_viewed_at`.
 
@@ -380,10 +382,12 @@ git commit -m "feat(db): achievements engine schema foundation"
 ## Task 2: Metric and definition types
 
 **Files:**
+
 - Create: `packages/shared/src/achievements/types.ts`
 - Modify: `packages/shared/package.json`
 
 **Interfaces:**
+
 - Consumes: nothing.
 - Produces: `AchievementMetrics` (30 keys), `MetricKey`, `BooleanMetricKey`, `NumericMetricKey`, `AchievementCategory`, `AchievementScope`, `AchievementTier`, `TierDef`, `AchievementSeries`, `AchievementOneOff`, `AchievementDefinition`, `UnlockedAchievement`, `SeriesProgress`.
 
@@ -396,12 +400,7 @@ There is no test step in this task: it declares types only and produces no runti
 
 /** The six categories, organised by what the user did. */
 export type AchievementCategory =
-  | "drinking"
-  | "attendance"
-  | "explorer"
-  | "social"
-  | "competitive"
-  | "dedication";
+  "drinking" | "attendance" | "explorer" | "social" | "competitive" | "dedication";
 
 /** Festival-scoped achievements re-earn each festival; lifetime ones unlock once. */
 export type AchievementScope = "festival" | "lifetime";
@@ -576,11 +575,13 @@ git commit -m "feat(shared): achievement metric and definition types"
 ## Task 3: The definition set
 
 **Files:**
+
 - Create: `packages/shared/src/achievements/definitions.ts`
 - Create: `packages/shared/src/achievements/index.ts`
 - Create: `packages/shared/src/achievements/definitions.test.ts`
 
 **Interfaces:**
+
 - Consumes: everything from `./types`.
 - Produces: `SERIES: AchievementSeries[]` (20 entries), `ONE_OFFS: AchievementOneOff[]` (10 entries), `ALL_DEFINITIONS: AchievementDefinition[]`, `ALL_SLUGS: string[]` (90 entries).
 
@@ -1146,10 +1147,12 @@ git commit -m "feat(shared): achievement definition set with integrity tests"
 ## Task 4: The evaluator
 
 **Files:**
+
 - Create: `packages/shared/src/achievements/evaluator.ts`
 - Create: `packages/shared/src/achievements/evaluator.test.ts`
 
 **Interfaces:**
+
 - Consumes: `AchievementMetrics`, `AchievementDefinition`, `UnlockedAchievement`, `SeriesProgress`, `isSeries`, `slugFor` from `./types`; `ALL_DEFINITIONS`, `SERIES` from `./definitions`.
 - Produces: `evaluate(metrics: AchievementMetrics, alreadyUnlocked: Set<string>): EvaluationResult` where `EvaluationResult = { unlocked: UnlockedAchievement[]; progress: SeriesProgress[] }`.
 
@@ -1273,20 +1276,14 @@ describe("evaluate — one-offs", () => {
   });
 
   it("suppresses a one-off the user already holds", () => {
-    const result = evaluate(
-      emptyMetrics({ attended_opening_day: true }),
-      new Set(["opening_day"]),
-    );
+    const result = evaluate(emptyMetrics({ attended_opening_day: true }), new Set(["opening_day"]));
     expect(result.unlocked.map((u) => u.slug)).not.toContain("opening_day");
   });
 });
 
 describe("evaluate — scope separation", () => {
   it("marks lifetime and festival unlocks with their declared scope", () => {
-    const result = evaluate(
-      emptyMetrics({ drinks_total: 3, friends_accepted: 1 }),
-      new Set(),
-    );
+    const result = evaluate(emptyMetrics({ drinks_total: 3, friends_accepted: 1 }), new Set());
     const festivalUnlock = result.unlocked.find((u) => u.slug === "drinks_total.t1");
     const lifetimeUnlock = result.unlocked.find((u) => u.slug === "friends_added.t1");
     expect(festivalUnlock!.scope).toBe("festival");
@@ -1556,10 +1553,12 @@ git commit -m "feat(shared): pure achievement evaluator"
 ## Task 5: The metrics SQL function
 
 **Files:**
+
 - Create: `supabase/migrations/<generated>_achievement_metrics_function.sql`
 - Modify: `packages/db/src/types.ts` (regenerated)
 
 **Interfaces:**
+
 - Consumes: the indexes from Task 1; the key names in `AchievementMetrics` from Task 2.
 - Produces: `get_achievement_metrics(p_user_id uuid, p_festival_id uuid) RETURNS jsonb`, whose keys exactly match `AchievementMetrics`.
 
@@ -1807,11 +1806,13 @@ git commit -m "feat(db): add get_achievement_metrics function"
 ## Task 6: Competitive standings refresh
 
 **Files:**
+
 - Create: `supabase/migrations/<generated>_festival_group_standings_refresh.sql`
 - Modify: `apps/web/app/api/cron/scheduler/route.ts`
 - Modify: `packages/db/src/types.ts` (regenerated)
 
 **Interfaces:**
+
 - Consumes: `festival_group_standings` from Task 1; the existing `get_group_leaderboard(p_group_id uuid, p_winning_criteria_id integer)`.
 - Produces: `refresh_festival_group_standings(p_festival_id uuid) RETURNS integer` returning the number of standing rows written.
 
@@ -1948,12 +1949,14 @@ git commit -m "feat(db): materialise festival group standings"
 ## Task 7: Metrics repository and achievement service
 
 **Files:**
+
 - Create: `packages/api/src/repositories/supabase/achievement-metrics.repository.ts`
 - Create: `packages/api/src/services/achievement.service.ts`
 - Create: `packages/api/src/services/__tests__/achievement.service.test.ts`
 - Modify: `packages/api/src/repositories/supabase/index.ts`
 
 **Interfaces:**
+
 - Consumes: `evaluate`, `AchievementMetrics`, `UnlockedAchievement` from `@prostcounter/shared/achievements`; the RPC from Task 5.
 - Produces:
   - `AchievementMetricsRepository` with `getMetrics(userId, festivalId): Promise<AchievementMetrics>`, `getHeldSlugs(userId, festivalId): Promise<Set<string>>`, `insertUnlocks(userId, festivalId, unlocks): Promise<UnlockedAchievement[]>`.
@@ -2183,12 +2186,10 @@ export class AchievementMetricsRepository {
       return [];
     }
 
-    const { error: insertError } = await this.supabase
-      .from("user_achievements")
-      .upsert(payload, {
-        onConflict: "user_id,achievement_id,festival_id",
-        ignoreDuplicates: true,
-      });
+    const { error: insertError } = await this.supabase.from("user_achievements").upsert(payload, {
+      onConflict: "user_id,achievement_id,festival_id",
+      ignoreDuplicates: true,
+    });
 
     if (insertError) {
       throw new DatabaseError(`Failed to insert unlocks: ${insertError.message}`);
@@ -2273,10 +2274,12 @@ git commit -m "feat(api): achievement metrics repository and service"
 ## Task 8: Registry sync script
 
 **Files:**
+
 - Create: `packages/api/src/scripts/sync-achievement-registry.ts`
 - Modify: `packages/api/package.json`
 
 **Interfaces:**
+
 - Consumes: `ALL_DEFINITIONS`, `SERIES`, `isSeries`, `slugFor` from `@prostcounter/shared/achievements`; the `achievements` table columns from Task 1.
 - Produces: 90 rows in `achievements` carrying `slug`, `series_id`, `tier`, `scope`, `category`, `points`, `icon`. A `pnpm --filter=@prostcounter/api sync:achievements` script.
 
@@ -2388,7 +2391,9 @@ async function main(): Promise<void> {
 
   if (isDryRun) {
     for (const row of rows) {
-      console.log(`  ${row.slug.padEnd(28)} ${row.category.padEnd(12)} t${row.tier} ${row.points}pts`);
+      console.log(
+        `  ${row.slug.padEnd(28)} ${row.category.padEnd(12)} t${row.tier} ${row.points}pts`,
+      );
     }
     console.log("Dry run: nothing written.");
     return;
@@ -2502,9 +2507,11 @@ git commit -m "feat(api): sync achievement registry from definitions"
 ## Task 9: Activity tracking middleware
 
 **Files:**
+
 - Modify: `packages/api/src/middleware/auth.ts`
 
 **Interfaces:**
+
 - Consumes: `user_active_days` from Task 1.
 - Produces: one upsert per authenticated request, fire-and-forget.
 
@@ -2526,7 +2533,12 @@ Add this function to `packages/api/src/middleware/auth.ts`, above `authMiddlewar
  * and provides DAU/WAU/MAU and retention data that is otherwise unobtainable —
  * auth.users.last_sign_in_at keeps only the most recent value.
  */
-function recordActiveDay(supabase: SupabaseClient, userId: string, platform?: string, appVersion?: string): void {
+function recordActiveDay(
+  supabase: SupabaseClient,
+  userId: string,
+  platform?: string,
+  appVersion?: string,
+): void {
   void supabase
     .rpc("record_user_active_day", {
       p_user_id: userId,
@@ -2548,12 +2560,12 @@ function recordActiveDay(supabase: SupabaseClient, userId: string, platform?: st
 In `authMiddleware`, immediately after `c.set("supabase", supabase);` and before `await next();`, insert:
 
 ```ts
-  recordActiveDay(
-    supabase,
-    user.id,
-    c.req.header("X-Client-Platform"),
-    c.req.header("X-Client-Version"),
-  );
+recordActiveDay(
+  supabase,
+  user.id,
+  c.req.header("X-Client-Platform"),
+  c.req.header("X-Client-Version"),
+);
 ```
 
 - [ ] **Step 3: Create the RPC the helper calls**
@@ -2633,12 +2645,14 @@ git commit -m "feat(api): track daily user activity"
 ## Task 10: Wire evaluation into the write path and serve progress
 
 **Files:**
+
 - Modify: `packages/api/src/routes/consumption.route.ts:91-105`
 - Modify: `packages/api/src/routes/achievement.route.ts:185-267`
 - Modify: `packages/api/src/repositories/supabase/achievement.repository.ts:28`
 - Modify: `packages/shared/src/schemas/achievement.schema.ts`
 
 **Interfaces:**
+
 - Consumes: `AchievementService` and `AchievementMetricsRepository` from Task 7.
 - Produces: `POST /consumption` responses carrying `unlocked: UnlockedAchievement[]`; `GET /achievements/with-progress` served by the new engine while keeping its existing `{ data, stats }` shape.
 
@@ -2679,16 +2693,10 @@ describe("achievement unlocking against a real database", () => {
     const metrics = await repo.getMetrics(target.user_id as string, target.festival_id);
     expect(Object.keys(metrics)).toHaveLength(30);
 
-    const unlocked = await service.evaluateAndUnlock(
-      target.user_id as string,
-      target.festival_id,
-    );
+    const unlocked = await service.evaluateAndUnlock(target.user_id as string, target.festival_id);
 
     // Second call must be a no-op: everything is already held.
-    const second = await service.evaluateAndUnlock(
-      target.user_id as string,
-      target.festival_id,
-    );
+    const second = await service.evaluateAndUnlock(target.user_id as string, target.festival_id);
     expect(second).toEqual([]);
     expect(Array.isArray(unlocked)).toBe(true);
   });
@@ -2769,14 +2777,7 @@ export const UnlockedAchievementSchema = z.object({
   slug: z.string(),
   seriesId: z.string().nullable(),
   tier: z.number().int().min(1).max(4),
-  category: z.enum([
-    "drinking",
-    "attendance",
-    "explorer",
-    "social",
-    "competitive",
-    "dedication",
-  ]),
+  category: z.enum(["drinking", "attendance", "explorer", "social", "competitive", "dedication"]),
   scope: z.enum(["festival", "lifetime"]),
   glyph: z.string(),
   points: z.number().int(),
@@ -3049,7 +3050,7 @@ full stop. Do both once, after the migrations run, before calling Plan 1 live:
 2. **Backfill standings for every past and current festival**, not just the
    active one — the nightly cron only ever refreshes the currently-active
    festival. For each festival: `SELECT refresh_festival_group_standings(id)
-   FROM festivals;`. Without this, the two lifetime competitive series
+FROM festivals;`. Without this, the two lifetime competitive series
    (`group_wins`, `podium_finishes` — 8 of 90 rungs) read an empty table for
    any festival that predates the cron ever running for it.
 
