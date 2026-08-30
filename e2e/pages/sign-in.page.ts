@@ -41,6 +41,8 @@ export class SignInPage extends BasePage {
 
     // Ensure button is enabled (not in loading state)
     await expect(this.signInButton).toBeEnabled({ timeout: 5000 });
+
+    await this.waitForCaptcha();
   }
 
   /**

@@ -114,4 +114,39 @@ export abstract class BasePage {
   async screenshot(name: string): Promise<void> {
     await this.page.screenshot({ path: `e2e/screenshots/${name}.png` });
   }
+
+  /**
+   * Wait for hCaptcha to issue a token.
+   *
+   * The always-pass test sitekey needs no interaction, but the iframe still has
+   * to load and post the token back into the hidden textarea. Submitting before
+   * that sends an empty token and GoTrue rejects it.
+   *
+   * No-op when the widget is absent, so this stays safe in any environment
+   * where NEXT_PUBLIC_HCAPTCHA_SITEKEY is unset and no widget renders.
+   */
+  async waitForCaptcha(): Promise<void> {
+    const widget = this.page.locator("textarea[name='h-captcha-response']");
+
+    const isPresent = await widget
+      .first()
+      .waitFor({ state: "attached", timeout: 5000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!isPresent) {
+      return;
+    }
+
+    await this.page.waitForFunction(
+      () => {
+        const input = document.querySelector<HTMLTextAreaElement>(
+          "textarea[name='h-captcha-response']",
+        );
+        return Boolean(input?.value);
+      },
+      undefined,
+      { timeout: 15000 },
+    );
+  }
 }
