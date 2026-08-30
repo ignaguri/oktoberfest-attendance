@@ -126,6 +126,12 @@ export abstract class BasePage {
    * where NEXT_PUBLIC_HCAPTCHA_SITEKEY is unset and no widget renders.
    */
   async waitForCaptcha(): Promise<void> {
+    // While no sitekey is configured no widget renders, so the attach-wait below
+    // would burn its full timeout on every auth flow for nothing.
+    if (!process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY) {
+      return;
+    }
+
     const widget = this.page.locator("textarea[name='h-captcha-response']");
 
     const isPresent = await widget
