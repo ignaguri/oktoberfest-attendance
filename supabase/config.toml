@@ -177,6 +177,12 @@ content_path = "./supabase/templates/confirmation.html"
 subject = "Password Reset Request"
 content_path = "./supabase/templates/recovery.html"
 
+[auth.rate_limit]
+# Mirrors the production dashboard values so local and CI behave the same.
+# See docs/superpowers/specs/2026-08-30-auth-captcha-and-rate-limits-design.md §5
+email_sent = 30
+sign_in_sign_ups = 30
+
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
 enable_signup = false
