@@ -68,5 +68,11 @@ describe("auth actions forward the captcha token", () => {
     await signUp({ email: "a@b.com", password: "pw" });
 
     expect(signUpFn).toHaveBeenCalledWith({ email: "a@b.com", password: "pw" });
+
+    // toHaveBeenCalledWith treats a key holding `undefined` as absent, so the
+    // assertion above would also pass for `{ options: undefined }`. Pin the exact
+    // key set, which is what keeps the no-token call byte-identical to the
+    // pre-captcha call.
+    expect(Object.keys(signUpFn.mock.calls[0][0])).toEqual(["email", "password"]);
   });
 });
