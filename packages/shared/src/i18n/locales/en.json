@@ -157,7 +157,7 @@
   },
   "auth": {
     "captcha": {
-      "updateRequired": "Please update the app to continue signing in."
+      "updateRequired": "Please update the app to continue."
     },
     "signIn": {
       "title": "Sign In",

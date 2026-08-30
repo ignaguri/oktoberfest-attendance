@@ -152,7 +152,7 @@
   },
   "auth": {
     "captcha": {
-      "updateRequired": "Bitte aktualisiere die App, um dich weiter anzumelden."
+      "updateRequired": "Bitte aktualisiere die App, um fortzufahren."
     },
     "signIn": {
       "title": "Anmelden",

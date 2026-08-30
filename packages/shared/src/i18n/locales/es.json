@@ -157,7 +157,7 @@
   },
   "auth": {
     "captcha": {
-      "updateRequired": "Actualiza la aplicación para poder iniciar sesión."
+      "updateRequired": "Actualiza la aplicación para continuar."
     },
     "signIn": {
       "title": "Iniciar sesión",
