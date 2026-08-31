@@ -27,9 +27,24 @@ const ResetPassword = () => {
     resolver: standardSchemaResolver(resetPasswordSchema),
   });
 
-  const { captchaRef, token: captchaToken, setToken, reset: resetCaptcha } = useCaptcha();
+  const {
+    captchaRef,
+    token: captchaToken,
+    setToken,
+    reset: resetCaptcha,
+    enabled: isCaptchaEnabled,
+  } = useCaptcha();
 
   const onSubmit = async (data: ResetPasswordFormData) => {
+    // The widget renders as a visible checkbox, so the form can be submitted
+    // before it has been ticked.
+    if (isCaptchaEnabled && !captchaToken) {
+      toast.error(t("common.status.error"), {
+        description: t("auth.captcha.required"),
+      });
+      return;
+    }
+
     const [_, errorMessage] = await resetPassword(data, captchaToken);
 
     if (errorMessage) {
@@ -40,6 +55,12 @@ const ResetPassword = () => {
         description: errorMessage,
       });
     } else {
+      // This form stays mounted after a success, unlike sign-in (which
+      // redirects) and sign-up (which swaps views). The token that just
+      // succeeded is spent, so a second send from the same form would fail on
+      // the captcha rather than on anything the user did.
+      resetCaptcha();
+
       toast.success(t("auth.resetPassword.success"));
     }
   };

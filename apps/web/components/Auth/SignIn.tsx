@@ -36,7 +36,13 @@ export default function SignIn() {
     resolver: standardSchemaResolver(signInSchema),
   });
 
-  const { captchaRef, token: captchaToken, setToken, reset: resetCaptcha } = useCaptcha();
+  const {
+    captchaRef,
+    token: captchaToken,
+    setToken,
+    reset: resetCaptcha,
+    enabled: isCaptchaEnabled,
+  } = useCaptcha();
 
   // Show OAuth error if present
   useEffect(() => {
@@ -53,6 +59,15 @@ export default function SignIn() {
   }, [error, setError, searchParams, t]);
 
   const onSubmit = async (data: SignInFormData) => {
+    // The widget renders as a visible checkbox, so the form can be submitted
+    // before it has been ticked. Without this the request goes out with no
+    // token, Supabase rejects it, and the catch below reports it as a wrong
+    // password on credentials that were correct.
+    if (isCaptchaEnabled && !captchaToken) {
+      setError("password", { message: t("auth.captcha.required") });
+      return;
+    }
+
     try {
       await login(data, redirect, captchaToken);
     } catch (error: any) {

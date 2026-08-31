@@ -32,10 +32,27 @@ export default function SignUp() {
     resolver: standardSchemaResolver(signUpSchema),
   });
 
-  const { captchaRef, token: captchaToken, setToken, reset: resetCaptcha } = useCaptcha();
+  const {
+    captchaRef,
+    token: captchaToken,
+    setToken,
+    reset: resetCaptcha,
+    enabled: isCaptchaEnabled,
+  } = useCaptcha();
 
   const onSubmit = useCallback(
     async (data: SignUpFormData) => {
+      // The widget renders as a visible checkbox, so the form can be submitted
+      // before it has been ticked. Without this the request goes out with no
+      // token and Supabase rejects it with an error about captcha that the
+      // user has no way to act on.
+      if (isCaptchaEnabled && !captchaToken) {
+        toast.error(t("notifications.error.signUpFailed"), {
+          description: t("auth.captcha.required"),
+        });
+        return;
+      }
+
       try {
         await signUp({ email: data.email, password: data.password }, captchaToken);
         setIsAccountCreated(true);
@@ -57,7 +74,7 @@ export default function SignUp() {
         }
       }
     },
-    [t, captchaToken, resetCaptcha],
+    [t, captchaToken, resetCaptcha, isCaptchaEnabled],
   );
 
   const handleOAuthSignIn = async (provider: "google" | "apple") => {
