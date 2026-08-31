@@ -2,32 +2,12 @@ import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useCallback, useEffect, useRef } from "react";
 
+import { type CaptchaResult, classifyCaptchaEvent } from "./captcha-events";
+
 const SITEKEY = process.env.EXPO_PUBLIC_HCAPTCHA_SITEKEY ?? "";
 
 // hCaptcha requires a URL it treats as the request origin. It is not fetched.
 const BASE_URL = "https://prostcounter.fun";
-
-/**
- * The outcome of one challenge.
- *
- * Cancelling and failing are indistinguishable at the transport level (neither
- * produces a token) but mean opposite things to the user: a cancel is a
- * deliberate choice and must abort quietly, a failure needs to say so. Callers
- * that cannot tell them apart end up showing nothing at all when the challenge
- * fails to load, which looks like a dead button.
- */
-export type CaptchaResult =
-  | { status: "disabled" }
-  | { status: "token"; token: string }
-  | { status: "cancelled" }
-  | { status: "error" };
-
-/**
- * The two cancel paths. `cancel` is raised by the library itself for a backdrop
- * press or hardware back; `challenge-closed` comes from hCaptcha's own close
- * button inside the WebView, and is the one users actually hit.
- */
-const CANCEL_EVENTS = new Set(["cancel", "challenge-closed"]);
 
 /**
  * hCaptcha on React Native is a modal, not an inline widget: you show it, the
@@ -54,33 +34,15 @@ export function useCaptcha() {
 
   const onMessage = useCallback(
     (event: { nativeEvent: { data: string }; success?: boolean }) => {
-      const data = event.nativeEvent.data;
+      const outcome = classifyCaptchaEvent(event.nativeEvent.data, event.success);
 
-      // 'open' fires when the challenge becomes visible; it is not a result.
-      if (data === "open") {
+      // 'open' means the challenge just became visible: leave it on screen.
+      if (outcome.status === "pending") {
         return;
       }
 
       modalRef.current?.hide();
-
-      // Never classify by matching known strings. The library forwards plenty
-      // of non-token payloads through this same channel: 'challenge-closed',
-      // 'script-error', 'sms-open-failed', raw hCaptcha error codes such as
-      // 'rate-limited' or 'network-error', and even a bare exception name when
-      // the render throws. Anything unrecognised would otherwise be handed to
-      // GoTrue as a token, which fails and then reads as a wrong password.
-      //
-      // The library has already done this classification for us: it sets
-      // success=false on every event that is neither 'open' nor token-shaped
-      // (its own test is `data.length > 35`). Its type declares success as
-      // required, but the two cancel events it raises directly omit the field,
-      // so this tests for true rather than for falsiness.
-      if (event.success === true) {
-        settle({ status: "token", token: data });
-        return;
-      }
-
-      settle({ status: CANCEL_EVENTS.has(data) ? "cancelled" : "error" });
+      settle(outcome);
     },
     [settle],
   );
