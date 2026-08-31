@@ -8,8 +8,6 @@
  * The practical use is telling a user on a stale app bundle to update, rather
  * than showing them a generic auth failure they cannot act on.
  */
-export function isCaptchaRejection(
-  error: { message?: string } | null | undefined,
-): boolean {
+export function isCaptchaRejection(error: { message?: string } | null | undefined): boolean {
   return (error?.message ?? "").toLowerCase().includes("captcha");
 }

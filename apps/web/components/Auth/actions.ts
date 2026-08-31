@@ -71,10 +71,7 @@ export async function logout() {
   redirect("/");
 }
 
-export async function signUp(
-  formData: { email: string; password: string },
-  captchaToken?: string,
-) {
+export async function signUp(formData: { email: string; password: string }, captchaToken?: string) {
   const supabase = await createClient();
 
   const data = {

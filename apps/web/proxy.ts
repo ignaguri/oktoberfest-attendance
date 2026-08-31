@@ -4,7 +4,26 @@ import { NextResponse } from "next/server";
 
 import { updateSession } from "@/utils/supabase/middleware";
 
+// The apex domain used to be redirected to www at the Vercel domain level, but
+// that redirect also caught /.well-known/*, and neither Android App Links nor
+// Apple Universal Links follow redirects when fetching the association files
+// (Google's Digital Asset Links API reports ERROR_CODE_REDIRECT). Doing the
+// redirect here instead lets the apex serve those two files directly.
+const APEX_HOST = "prostcounter.fun";
+const CANONICAL_HOST = "www.prostcounter.fun";
+
 export async function proxy(request: NextRequest) {
+  const requestHost = (request.headers.get("x-forwarded-host") ?? request.headers.get("host"))
+    ?.split(",")[0]
+    ?.trim()
+    ?.toLowerCase()
+    ?.split(":")[0];
+  if (requestHost === APEX_HOST && !request.nextUrl.pathname.startsWith("/.well-known/")) {
+    const canonicalUrl = request.nextUrl.clone();
+    canonicalUrl.host = CANONICAL_HOST;
+    return NextResponse.redirect(canonicalUrl, 308);
+  }
+
   const publicPaths = [
     "/",
     "/api", // API routes handle their own auth via Authorization header
