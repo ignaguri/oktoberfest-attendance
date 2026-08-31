@@ -145,6 +145,13 @@ password_requirements = ""
 #   4. a secret matching that sitekey
 # Missing #3 is the easiest to forget and the most damaging: mobile fails on the
 # sign-in screen with a captcha rejection.
+#
+# The values above are the always-pass test pair, for local and e2e only. In
+# production the sitekeys come from elsewhere: web from the Vercel env, mobile
+# from the `production` / `production-apk` env blocks in apps/mobile/eas.json.
+# Metro inlines the mobile one at bundle time, so changing it takes a new store
+# build, never an OTA. A binary built without it sends no token and is rejected
+# outright once `enabled` is true here.
 [auth.captcha]
 enabled = false
 provider = "hcaptcha"
