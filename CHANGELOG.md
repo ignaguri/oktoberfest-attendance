@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.10.2] - 2026-08-31
+
+### ✨ Features
+
+- lower rate limits, add dormant hCaptcha for web and mobile (#280)
+
 ## [0.10.1] - 2026-08-30
 
 ### ✨ Features
