@@ -190,7 +190,13 @@ content_path = "./supabase/templates/recovery.html"
 
 [auth.rate_limit]
 # Mirrors the production dashboard values so local and CI behave the same.
-# See docs/superpowers/specs/2026-08-30-auth-captcha-and-rate-limits-design.md §5
+#
+# Both are lowered from the Supabase defaults (email_sent 30/h from 100/h;
+# sign_in_sign_ups 30 per 5 min per IP from 300). Sized against measured
+# production traffic: ~179 real users, and 74% of days see zero password
+# recovery requests at all, so 30 emails/hour leaves a wide margin over
+# organic use while cutting a scripted campaign's throughput by ~70%.
+# docs/plans/auth-abuse-monitoring.sql has the full distribution.
 email_sent = 30
 sign_in_sign_ups = 30
 
