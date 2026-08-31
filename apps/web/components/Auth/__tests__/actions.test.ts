@@ -24,6 +24,7 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("@/utils/sentry", () => ({
   INVALID_CREDENTIALS_MESSAGE: "Invalid email or password",
+  CAPTCHA_REJECTED_MESSAGE: "Captcha verification failed",
   reportSupabaseAuthException: vi.fn(),
 }));
 
