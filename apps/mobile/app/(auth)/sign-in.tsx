@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { isCaptchaRejection } from "@prostcounter/shared/utils";
 import { type SignInFormData, signInSchema } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -21,6 +22,7 @@ import { Text } from "@/components/ui/text";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { getStoredUserEmail } from "@/lib/auth/secure-storage";
+import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function SignInScreen() {
@@ -37,6 +39,8 @@ export default function SignInScreen() {
     authenticate: authenticateBiometric,
     enableBiometrics,
   } = useBiometrics();
+
+  const { getToken, CaptchaModal } = useCaptcha();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -91,10 +95,30 @@ export default function SignInScreen() {
     setIsLoading(true);
     setError(null);
 
-    const { error: signInError } = await signIn(data.email, data.password);
+    const captcha = await getToken();
+    if (captcha.status === "cancelled") {
+      // User dismissed the challenge. Not an error, just abort quietly.
+      setIsLoading(false);
+      return;
+    }
+    if (captcha.status === "error") {
+      // Distinct from a cancel: the challenge could not run (the WebView failed
+      // to load, the render threw). Aborting silently here would look like a
+      // dead button, so say something.
+      setError(t("auth.captcha.failed"));
+      setIsLoading(false);
+      return;
+    }
+    const captchaToken = captcha.status === "token" ? captcha.token : undefined;
+
+    const { error: signInError } = await signIn(data.email, data.password, captchaToken);
 
     if (signInError) {
-      setError(t("auth.signIn.errors.invalidCredentials"));
+      setError(
+        isCaptchaRejection(signInError)
+          ? t("auth.captcha.updateRequired")
+          : t("auth.signIn.errors.invalidCredentials"),
+      );
       setIsLoading(false);
       return;
     }
@@ -318,6 +342,8 @@ export default function SignInScreen() {
           biometricType={biometricType}
         />
       </KeyboardAvoidingView>
+
+      <CaptchaModal />
     </SafeAreaView>
   );
 }

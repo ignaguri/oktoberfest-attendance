@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useTranslation } from "@/lib/i18n/client";
 
 import { signInWithOAuth, signUp } from "./actions";
+import { CaptchaWidget, useCaptcha } from "./Captcha";
 import { AppleIcon, GoogleIcon } from "./SocialIcons";
 
 export default function SignUp() {
@@ -31,12 +32,34 @@ export default function SignUp() {
     resolver: standardSchemaResolver(signUpSchema),
   });
 
+  const {
+    captchaRef,
+    token: captchaToken,
+    setToken,
+    reset: resetCaptcha,
+    enabled: isCaptchaEnabled,
+  } = useCaptcha();
+
   const onSubmit = useCallback(
     async (data: SignUpFormData) => {
+      // The widget renders as a visible checkbox, so the form can be submitted
+      // before it has been ticked. Without this the request goes out with no
+      // token and Supabase rejects it with an error about captcha that the
+      // user has no way to act on.
+      if (isCaptchaEnabled && !captchaToken) {
+        toast.error(t("notifications.error.signUpFailed"), {
+          description: t("auth.captcha.required"),
+        });
+        return;
+      }
+
       try {
-        await signUp({ email: data.email, password: data.password });
+        await signUp({ email: data.email, password: data.password }, captchaToken);
         setIsAccountCreated(true);
       } catch (error) {
+        // The token is spent on a failed attempt too, so replace it before retry.
+        resetCaptcha();
+
         if (error instanceof Error) {
           toast.error(t("notifications.error.signUpFailed"), {
             description: error.message,
@@ -51,7 +74,7 @@ export default function SignUp() {
         }
       }
     },
-    [t],
+    [t, captchaToken, resetCaptcha, isCaptchaEnabled],
   );
 
   const handleOAuthSignIn = async (provider: "google" | "apple") => {
@@ -132,6 +155,8 @@ export default function SignUp() {
           disabled={isSubmitting}
           {...register("confirmPassword")}
         />
+
+        <CaptchaWidget captchaRef={captchaRef} onVerify={setToken} onExpire={resetCaptcha} />
 
         <Button className="self-center" type="submit" variant="yellow" disabled={isSubmitting}>
           {t("auth.signUp.submit")}

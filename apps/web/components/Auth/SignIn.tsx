@@ -14,9 +14,11 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CAPTCHA_REJECTED_MESSAGE } from "@/utils/sentry";
 import { useTranslation } from "@/lib/i18n/client";
 
 import { login, signInWithOAuth } from "./actions";
+import { CaptchaWidget, useCaptcha } from "./Captcha";
 import { AppleIcon, GoogleIcon } from "./SocialIcons";
 
 export default function SignIn() {
@@ -35,6 +37,14 @@ export default function SignIn() {
     resolver: standardSchemaResolver(signInSchema),
   });
 
+  const {
+    captchaRef,
+    token: captchaToken,
+    setToken,
+    reset: resetCaptcha,
+    enabled: isCaptchaEnabled,
+  } = useCaptcha();
+
   // Show OAuth error if present
   useEffect(() => {
     if (error === "oauth_failed") {
@@ -50,8 +60,17 @@ export default function SignIn() {
   }, [error, setError, searchParams, t]);
 
   const onSubmit = async (data: SignInFormData) => {
+    // The widget renders as a visible checkbox, so the form can be submitted
+    // before it has been ticked. Without this the request goes out with no
+    // token, Supabase rejects it, and the catch below reports it as a wrong
+    // password on credentials that were correct.
+    if (isCaptchaEnabled && !captchaToken) {
+      setError("password", { message: t("auth.captcha.required") });
+      return;
+    }
+
     try {
-      await login(data, redirect);
+      await login(data, redirect, captchaToken);
     } catch (error: any) {
       // Check if this is a Next.js redirect response
       if (error?.digest?.startsWith("NEXT_REDIRECT")) {
@@ -59,9 +78,16 @@ export default function SignIn() {
         throw error;
       }
 
+      // The token is spent whether or not the credentials were right, so it
+      // has to be replaced before the user can try again.
+      resetCaptcha();
+
       // Only show error for actual authentication failures
       setError("password", {
-        message: t("auth.signIn.errors.invalidCredentials"),
+        message:
+          error?.message === CAPTCHA_REJECTED_MESSAGE
+            ? t("auth.captcha.failed")
+            : t("auth.signIn.errors.invalidCredentials"),
       });
     }
   };
@@ -116,6 +142,8 @@ export default function SignIn() {
           }
           {...register("password")}
         />
+
+        <CaptchaWidget captchaRef={captchaRef} onVerify={setToken} onExpire={resetCaptcha} />
 
         <Button variant="yellow" className="self-center" type="submit" disabled={isSubmitting}>
           {isSubmitting ? t("common.status.loading") : t("auth.signIn.submit")}

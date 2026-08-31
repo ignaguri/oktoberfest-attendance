@@ -114,4 +114,59 @@ export abstract class BasePage {
   async screenshot(name: string): Promise<void> {
     await this.page.screenshot({ path: `e2e/screenshots/${name}.png` });
   }
+
+  /**
+   * Solve hCaptcha and wait for it to issue a token.
+   *
+   * The widget renders as hCaptcha's default visible checkbox, which does
+   * nothing until it is clicked. The always-pass test sitekey then completes
+   * without showing a challenge, but it does not execute the widget by itself:
+   * without the click the response field stays empty forever.
+   *
+   * No-op when no widget is on the page, so this stays safe wherever captcha
+   * is not configured.
+   */
+  async waitForCaptcha(): Promise<void> {
+    // Detected from the page, never from process.env. NEXT_PUBLIC_* values are
+    // inlined into the bundle when the app is built, so what the Playwright
+    // process sees says nothing about what the app under test was built with:
+    // against a preview deploy the two disagree in either direction.
+    //
+    // The library injects its API script on mount, so this is present as soon
+    // as the widget exists, and well before the iframe or response field are.
+    const isConfigured = (await this.page.locator("script[src*='hcaptcha.com']").count()) > 0;
+
+    if (!isConfigured) {
+      return;
+    }
+
+    const response = this.page.locator("textarea[name='h-captcha-response']").first();
+
+    // Deliberately not caught. If the script is on the page but the widget
+    // never materialises, something is wrong with the captcha configuration
+    // (a blocked host, a bad sitekey) and the run should say so loudly rather
+    // than submit an empty token and fail later as "invalid credentials".
+    await response.waitFor({ state: "attached", timeout: 15000 });
+
+    // An invisible widget, or an earlier call, may have solved it already.
+    if (await response.inputValue()) {
+      return;
+    }
+
+    await this.page
+      .frameLocator("iframe[title*='checkbox for hCaptcha']")
+      .locator("#checkbox")
+      .click();
+
+    await this.page.waitForFunction(
+      () => {
+        const input = document.querySelector<HTMLTextAreaElement>(
+          "textarea[name='h-captcha-response']",
+        );
+        return Boolean(input?.value);
+      },
+      undefined,
+      { timeout: 15000 },
+    );
+  }
 }

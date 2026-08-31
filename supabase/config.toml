@@ -133,11 +133,22 @@ minimum_password_length = 6
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
 password_requirements = ""
 
-# Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
-# [auth.captcha]
-# enabled = true
-# provider = "hcaptcha"
-# secret = ""
+# hCaptcha is wired end to end in both clients but deliberately switched OFF.
+# The test sitekey/secret pair below always passes with no user interaction, so
+# flipping `enabled` to true exercises the real code path locally and in e2e.
+#
+# Enabling requires ALL FOUR of these together, or auth fails closed:
+#   1. enabled = true here
+#   2. NEXT_PUBLIC_HCAPTCHA_SITEKEY  = 10000000-ffff-ffff-ffff-000000000001  (web)
+#   3. EXPO_PUBLIC_HCAPTCHA_SITEKEY  = 10000000-ffff-ffff-ffff-000000000001  (mobile;
+#      mind the .env.local rename step in docs/BUILDS.md)
+#   4. a secret matching that sitekey
+# Missing #3 is the easiest to forget and the most damaging: mobile fails on the
+# sign-in screen with a captcha rejection.
+[auth.captcha]
+enabled = false
+provider = "hcaptcha"
+secret = "0x0000000000000000000000000000000000000000"
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.
@@ -176,6 +187,18 @@ content_path = "./supabase/templates/confirmation.html"
 [auth.email.template.recovery]
 subject = "Password Reset Request"
 content_path = "./supabase/templates/recovery.html"
+
+[auth.rate_limit]
+# Mirrors the production dashboard values so local and CI behave the same.
+#
+# Both are lowered from the Supabase defaults (email_sent 30/h from 100/h;
+# sign_in_sign_ups 30 per 5 min per IP from 300). Sized against measured
+# production traffic: ~179 real users, and 74% of days see zero password
+# recovery requests at all, so 30 emails/hour leaves a wide margin over
+# organic use while cutting a scripted campaign's throughput by ~70%.
+# docs/plans/auth-abuse-monitoring.sql has the full distribution.
+email_sent = 30
+sign_in_sign_ups = 30
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.

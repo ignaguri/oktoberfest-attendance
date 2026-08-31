@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SignUpFormData, signUpSchema } from "@prostcounter/shared/schemas";
+import { isCaptchaRejection } from "@prostcounter/shared/utils";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,12 +12,14 @@ import { AuthFooterLink, AuthHeader, FormInput, OAuthButtons, OrDivider } from "
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function SignUpScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { signUp, signInWithGoogle, signInWithFacebook, signInWithApple } = useAuth();
+  const { getToken, CaptchaModal } = useCaptcha();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -42,10 +45,30 @@ export default function SignUpScreen() {
     setIsLoading(true);
     setError(null);
 
-    const { error: signUpError } = await signUp(data.email, data.password);
+    const captcha = await getToken();
+    if (captcha.status === "cancelled") {
+      // User dismissed the challenge. Not an error, just abort quietly.
+      setIsLoading(false);
+      return;
+    }
+    if (captcha.status === "error") {
+      // Distinct from a cancel: the challenge could not run (the WebView failed
+      // to load, the render threw). Aborting silently here would look like a
+      // dead button, so say something.
+      setError(t("auth.captcha.failed"));
+      setIsLoading(false);
+      return;
+    }
+    const captchaToken = captcha.status === "token" ? captcha.token : undefined;
+
+    const { error: signUpError } = await signUp(data.email, data.password, captchaToken);
 
     if (signUpError) {
-      setError(signUpError.message || t("auth.signUp.errors.generic"));
+      setError(
+        isCaptchaRejection(signUpError)
+          ? t("auth.captcha.updateRequired")
+          : signUpError.message || t("auth.signUp.errors.generic"),
+      );
       setIsLoading(false);
       return;
     }
@@ -222,6 +245,8 @@ export default function SignUpScreen() {
           <View className="h-8" />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <CaptchaModal />
     </SafeAreaView>
   );
 }

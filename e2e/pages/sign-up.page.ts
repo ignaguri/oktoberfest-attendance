@@ -81,6 +81,7 @@ export class SignUpPage extends BasePage {
    * Click the submit button
    */
   async clickSubmit(): Promise<void> {
+    await this.waitForCaptcha();
     await this.submitButton.click();
   }
 

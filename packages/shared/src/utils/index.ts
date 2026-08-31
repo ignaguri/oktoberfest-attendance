@@ -1,3 +1,6 @@
+// Captcha utilities
+export { isCaptchaRejection } from "./captcha-errors";
+
 // URL utilities
 export { buildGroupInviteUrl, getAppUrl, replaceLocalhostInUrl, safeHost } from "./url";
 

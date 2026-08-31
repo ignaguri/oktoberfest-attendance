@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type ResetPasswordFormData, resetPasswordSchema } from "@prostcounter/shared/schemas";
+import { isCaptchaRejection } from "@prostcounter/shared/utils";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,12 +12,14 @@ import { AuthHeader, FormInput } from "@/components/auth";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
+import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";
 
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { resetPassword } = useAuth();
+  const { getToken, CaptchaModal } = useCaptcha();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,10 +40,30 @@ export default function ForgotPasswordScreen() {
     setIsLoading(true);
     setError(null);
 
-    const { error: resetError } = await resetPassword(data.email);
+    const captcha = await getToken();
+    if (captcha.status === "cancelled") {
+      // User dismissed the challenge. Not an error, just abort quietly.
+      setIsLoading(false);
+      return;
+    }
+    if (captcha.status === "error") {
+      // Distinct from a cancel: the challenge could not run (the WebView failed
+      // to load, the render threw). Aborting silently here would look like a
+      // dead button, so say something.
+      setError(t("auth.captcha.failed"));
+      setIsLoading(false);
+      return;
+    }
+    const captchaToken = captcha.status === "token" ? captcha.token : undefined;
+
+    const { error: resetError } = await resetPassword(data.email, captchaToken);
 
     if (resetError) {
-      setError(resetError.message || t("auth.forgotPassword.errors.generic"));
+      setError(
+        isCaptchaRejection(resetError)
+          ? t("auth.captcha.updateRequired")
+          : resetError.message || t("auth.forgotPassword.errors.generic"),
+      );
       setIsLoading(false);
       return;
     }
@@ -149,6 +172,8 @@ export default function ForgotPasswordScreen() {
           <View className="h-8" />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <CaptchaModal />
     </SafeAreaView>
   );
 }
