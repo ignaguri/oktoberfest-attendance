@@ -157,7 +157,9 @@
   },
   "auth": {
     "captcha": {
-      "updateRequired": "Please update the app to continue."
+      "updateRequired": "Please update the app to continue.",
+      "required": "Please complete the captcha before continuing.",
+      "failed": "The captcha could not be completed. Please try again."
     },
     "signIn": {
       "title": "Sign In",

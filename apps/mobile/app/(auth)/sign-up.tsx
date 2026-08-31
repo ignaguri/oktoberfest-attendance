@@ -19,7 +19,7 @@ export default function SignUpScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { signUp, signInWithGoogle, signInWithFacebook, signInWithApple } = useAuth();
-  const { getToken, CaptchaModal, enabled: enabledCaptcha } = useCaptcha();
+  const { getToken, CaptchaModal } = useCaptcha();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -45,11 +45,21 @@ export default function SignUpScreen() {
     setIsLoading(true);
     setError(null);
 
-    const captchaToken = await getToken();
-    if (captchaToken === undefined && enabledCaptcha) {
+    const captcha = await getToken();
+    if (captcha.status === "cancelled") {
+      // User dismissed the challenge. Not an error, just abort quietly.
       setIsLoading(false);
       return;
     }
+    if (captcha.status === "error") {
+      // Distinct from a cancel: the challenge could not run (the WebView failed
+      // to load, the render threw). Aborting silently here would look like a
+      // dead button, so say something.
+      setError(t("auth.captcha.failed"));
+      setIsLoading(false);
+      return;
+    }
+    const captchaToken = captcha.status === "token" ? captcha.token : undefined;
 
     const { error: signUpError } = await signUp(data.email, data.password, captchaToken);
 
