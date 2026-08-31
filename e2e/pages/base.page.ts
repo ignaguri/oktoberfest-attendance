@@ -116,33 +116,47 @@ export abstract class BasePage {
   }
 
   /**
-   * Wait for hCaptcha to issue a token.
+   * Solve hCaptcha and wait for it to issue a token.
    *
-   * The always-pass test sitekey needs no interaction, but the iframe still has
-   * to load and post the token back into the hidden textarea. Submitting before
-   * that sends an empty token and GoTrue rejects it.
+   * The widget renders as hCaptcha's default visible checkbox, which does
+   * nothing until it is clicked. The always-pass test sitekey then completes
+   * without showing a challenge, but it does not execute the widget by itself:
+   * without the click the response field stays empty forever.
    *
-   * No-op when the widget is absent, so this stays safe in any environment
-   * where NEXT_PUBLIC_HCAPTCHA_SITEKEY is unset and no widget renders.
+   * No-op when no widget is on the page, so this stays safe wherever captcha
+   * is not configured.
    */
   async waitForCaptcha(): Promise<void> {
-    // While no sitekey is configured no widget renders, so the attach-wait below
-    // would burn its full timeout on every auth flow for nothing.
-    if (!process.env.NEXT_PUBLIC_HCAPTCHA_SITEKEY) {
+    // Detected from the page, never from process.env. NEXT_PUBLIC_* values are
+    // inlined into the bundle when the app is built, so what the Playwright
+    // process sees says nothing about what the app under test was built with:
+    // against a preview deploy the two disagree in either direction.
+    //
+    // The library injects its API script on mount, so this is present as soon
+    // as the widget exists, and well before the iframe or response field are.
+    const isConfigured = (await this.page.locator("script[src*='hcaptcha.com']").count()) > 0;
+
+    if (!isConfigured) {
       return;
     }
 
-    const widget = this.page.locator("textarea[name='h-captcha-response']");
+    const response = this.page.locator("textarea[name='h-captcha-response']").first();
 
-    const isPresent = await widget
-      .first()
-      .waitFor({ state: "attached", timeout: 5000 })
-      .then(() => true)
-      .catch(() => false);
+    // Deliberately not caught. If the script is on the page but the widget
+    // never materialises, something is wrong with the captcha configuration
+    // (a blocked host, a bad sitekey) and the run should say so loudly rather
+    // than submit an empty token and fail later as "invalid credentials".
+    await response.waitFor({ state: "attached", timeout: 15000 });
 
-    if (!isPresent) {
+    // An invisible widget, or an earlier call, may have solved it already.
+    if (await response.inputValue()) {
       return;
     }
+
+    await this.page
+      .frameLocator("iframe[title*='checkbox for hCaptcha']")
+      .locator("#checkbox")
+      .click();
 
     await this.page.waitForFunction(
       () => {
