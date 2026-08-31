@@ -39,8 +39,14 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Content-Security-Policy",
+            // hcaptcha.com covers js.hcaptcha.com (the API script) and
+            // newassets.hcaptcha.com (the challenge frame). Without them the
+            // widget is blocked before it can render, which reads as the
+            // captcha simply not existing. Only script-src is set here, and
+            // there is no default-src, so frames, XHR and styles are already
+            // unrestricted and need no entry of their own.
             value:
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com https://www.gstatic.com https://fcm.googleapis.com https://www.googleapis.com https://www.googletagmanager.com",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com https://www.gstatic.com https://fcm.googleapis.com https://www.googleapis.com https://www.googletagmanager.com https://hcaptcha.com https://*.hcaptcha.com",
           },
         ],
       },
