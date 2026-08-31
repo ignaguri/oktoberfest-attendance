@@ -2,10 +2,15 @@
 
 import "server-only";
 
+import { isCaptchaRejection } from "@prostcounter/shared/utils";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { INVALID_CREDENTIALS_MESSAGE, reportSupabaseAuthException } from "@/utils/sentry";
+import {
+  CAPTCHA_REJECTED_MESSAGE,
+  INVALID_CREDENTIALS_MESSAGE,
+  reportSupabaseAuthException,
+} from "@/utils/sentry";
 import { createClient } from "@/utils/supabase/server";
 
 function revalidateBase() {
@@ -31,6 +36,14 @@ export async function login(
 
   if (error) {
     reportSupabaseAuthException("login", error, { email: formData.email });
+
+    // A captcha rejection is not a credentials problem, and collapsing it into
+    // one sends the user back to retype a password that was already correct.
+    // It also reveals nothing about the account, so it is safe to surface.
+    if (isCaptchaRejection(error)) {
+      throw new Error(CAPTCHA_REJECTED_MESSAGE);
+    }
+
     // Don't reveal if email exists - use generic message
     throw new Error(INVALID_CREDENTIALS_MESSAGE);
   }

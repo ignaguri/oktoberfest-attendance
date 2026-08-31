@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CAPTCHA_REJECTED_MESSAGE } from "@/utils/sentry";
 import { useTranslation } from "@/lib/i18n/client";
 
 import { login, signInWithOAuth } from "./actions";
@@ -83,7 +84,10 @@ export default function SignIn() {
 
       // Only show error for actual authentication failures
       setError("password", {
-        message: t("auth.signIn.errors.invalidCredentials"),
+        message:
+          error?.message === CAPTCHA_REJECTED_MESSAGE
+            ? t("auth.captcha.failed")
+            : t("auth.signIn.errors.invalidCredentials"),
       });
     }
   };

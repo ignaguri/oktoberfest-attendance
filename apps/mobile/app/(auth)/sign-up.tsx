@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SignUpFormData, signUpSchema } from "@prostcounter/shared/schemas";
+import { isCaptchaRejection } from "@prostcounter/shared/utils";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -11,7 +12,6 @@ import { AuthFooterLink, AuthHeader, FormInput, OAuthButtons, OrDivider } from "
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { isCaptchaRejection } from "@/lib/auth/captcha-errors";
 import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";
 

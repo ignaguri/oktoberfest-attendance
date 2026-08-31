@@ -32,6 +32,17 @@ export const reportSupabaseException = (
 export const INVALID_CREDENTIALS_MESSAGE = "Invalid email or password";
 
 /**
+ * Thrown when GoTrue rejected the request over the captcha rather than the
+ * credentials. Kept distinct from INVALID_CREDENTIALS_MESSAGE so the form can
+ * say something the user can act on: a wrong password and a spent, expired or
+ * misconfigured captcha token are not the same problem, and reporting the
+ * second as the first leaves them retyping a password that was always right.
+ *
+ * Safe to disclose. It says nothing about whether the account exists.
+ */
+export const CAPTCHA_REJECTED_MESSAGE = "Captcha verification failed";
+
+/**
  * Auth failures that are ordinary user behavior rather than defects: a mistyped
  * password, an unconfirmed email, a duplicate signup.
  *

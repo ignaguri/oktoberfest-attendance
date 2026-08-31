@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { isCaptchaRejection } from "@prostcounter/shared/utils";
 import { type SignInFormData, signInSchema } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
@@ -20,7 +21,6 @@ import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { useBiometrics } from "@/hooks/useBiometrics";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { isCaptchaRejection } from "@/lib/auth/captcha-errors";
 import { getStoredUserEmail } from "@/lib/auth/secure-storage";
 import { useCaptcha } from "@/lib/auth/use-captcha";
 import { IconColors } from "@/lib/constants/colors";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isCaptchaRejection } from "../captcha-errors";
+import { isCaptchaRejection } from "./captcha-errors";
 
 describe("isCaptchaRejection", () => {
   it("matches the GoTrue captcha failure code", () => {
