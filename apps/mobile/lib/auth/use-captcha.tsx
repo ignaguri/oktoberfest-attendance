@@ -33,7 +33,7 @@ export function useCaptcha() {
   }, []);
 
   const onMessage = useCallback(
-    (event: { nativeEvent: { data: string }; success?: boolean }) => {
+    (event: { nativeEvent: { data: string }; success?: boolean; markUsed?: () => void }) => {
       const outcome = classifyCaptchaEvent(event.nativeEvent.data, event.success);
 
       // 'open' means the challenge just became visible: leave it on screen.
@@ -42,6 +42,16 @@ export function useCaptcha() {
       }
 
       modalRef.current?.hide();
+
+      // The library arms a 120s timer per issued token that fires 'expired',
+      // and hands back markUsed() to cancel it. The modal stays mounted for
+      // the life of the screen, so without this an orphaned timer from an
+      // earlier token can hide a challenge that is currently open and settle a
+      // later, unrelated getToken() promise as a failure.
+      if (outcome.status === "token") {
+        event.markUsed?.();
+      }
+
       settle(outcome);
     },
     [settle],
