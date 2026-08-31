@@ -13,7 +13,7 @@ const APEX_HOST = "prostcounter.fun";
 const CANONICAL_HOST = "www.prostcounter.fun";
 
 export async function proxy(request: NextRequest) {
-  const requestHost = request.headers.get("host");
+  const requestHost = (request.headers.get("x-forwarded-host") ?? request.headers.get("host"))?.split(",")[0]?.trim()?.toLowerCase()?.split(":")[0];
   if (requestHost === APEX_HOST && !request.nextUrl.pathname.startsWith("/.well-known/")) {
     const canonicalUrl = request.nextUrl.clone();
     canonicalUrl.host = CANONICAL_HOST;
