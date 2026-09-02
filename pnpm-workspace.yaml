@@ -2,8 +2,16 @@ packages:
   - "apps/*"
   - "packages/*"
 
-# Moved here from the "pnpm" field in package.json: pnpm 10.14 no longer reads
-# that field, which silently disabled every override below.
+# better-sqlite3 ships prebuilt binaries in its tarball (prebuilds/*.node) and has
+# no install/postinstall hook, only opt-in build-release / build-debug scripts. It
+# loads fine with scripts blocked, so it does not belong in onlyBuiltDependencies;
+# listing it here just silences pnpm's warning.
+ignoredBuiltDependencies:
+  - better-sqlite3
+
+# onlyBuiltDependencies and overrides moved here from the "pnpm" field in
+# package.json: pnpm 10.14 no longer reads that field, which silently disabled
+# both of them.
 onlyBuiltDependencies:
   - "@firebase/util"
   - "@sentry/cli"
