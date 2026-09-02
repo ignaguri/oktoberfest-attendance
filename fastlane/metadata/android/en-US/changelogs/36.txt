@@ -1,0 +1,3 @@
+- Links to prostcounter.fun now open directly in the app.
+- Added extra protection on the sign-in and sign-up screens to keep bots out.
+- Small fixes and polish. Prost!

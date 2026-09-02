@@ -1,0 +1,3 @@
+- Los enlaces a prostcounter.fun ahora se abren directamente en la app.
+- Más protección en las pantallas de inicio de sesión y registro para frenar a los bots.
+- Correcciones y mejoras menores. ¡Prost!

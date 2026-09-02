@@ -17,11 +17,13 @@ fastlane/metadata/android/
       icon/                         # 512×512 PNG, optional override
       featureGraphic/               # 1024×500 PNG (header image in listing)
       phoneScreenshots/             # 2-8 PNGs, see README in that folder
+    changelogs/
+      <versionCode>.txt             # localized "what's new", ≤ 500 characters
   de-DE/                            # same structure
   es-ES/                            # same structure
   changelogs/
-    default.txt                     # fallback "what's new" text
-    <versionCode>.txt               # optional, version-specific notes
+    default.txt                     # fallback "what's new", used when a
+                                    # locale has no <versionCode>.txt
 ```
 
 ## Updating for a release
@@ -34,13 +36,15 @@ fastlane/metadata/android/
 
 2. **Screenshots**: re-export images per the spec in each locale's `images/phoneScreenshots/README.md`. Capture from a `production-apk` build (`eas build --profile production-apk --platform android`), not a dev build.
 
-3. **Changelog**: either update `changelogs/default.txt` for a generic message, or drop a per-version file like `changelogs/120.txt` (matches the Android `versionCode`). See [`docs/VERSION_MANAGEMENT.md`](./VERSION_MANAGEMENT.md) for how versions are bumped.
+3. **Changelog**: drop a per-version file in each locale, `<locale>/changelogs/<versionCode>.txt` (matches the Android `versionCode`, ≤ 500 characters). Fall back to the shared `changelogs/default.txt` only when the release has nothing worth localizing. See [`docs/VERSION_MANAGEMENT.md`](./VERSION_MANAGEMENT.md) for how versions are bumped.
+
+   Write these **before** running `eas submit --platform android`. With `track: production` and no `changesNotSentForReview`, the submit both uploads and sends the release for review, which makes the release details read-only. A file added afterwards is a record for next time, not the notes that shipped.
 
 4. **Sync to Play Console** (manual until fastlane is wired):
    - Play Console → ProstCounter → **Main store listing** → switch language tab → paste `title.txt`, `short_description.txt`, `full_description.txt`.
    - Upload screenshots from `images/phoneScreenshots/` per locale.
    - Upload feature graphic from `images/featureGraphic/` (English only is fine — Play Console falls back to en-US for missing locales).
-   - **What's new** field on the release: paste from `changelogs/<versionCode>.txt` or `changelogs/default.txt`.
+   - **What's new** field on the release: paste from `<locale>/changelogs/<versionCode>.txt` per language, or `changelogs/default.txt` if the release has no localized notes.
 
 5. **Verify**: open the listing on a device in each locale (Play Store app → search "ProstCounter") to confirm the rendering.
 
