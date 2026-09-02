@@ -41,8 +41,8 @@
     "e2e": "playwright test",
     "e2e:headed": "playwright test --headed",
     "e2e:install-browsers": "playwright install --with-deps",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+    "android": "pnpm --filter @prostcounter/mobile android",
+    "ios": "pnpm --filter @prostcounter/mobile ios"
   },
   "devDependencies": {
     "@novu/api": "^3.18.2",
