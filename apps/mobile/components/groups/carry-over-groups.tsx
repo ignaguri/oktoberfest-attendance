@@ -19,10 +19,10 @@ export function CarryOverGroups({ onSuccess }: CarryOverGroupsProps) {
   const { currentFestival } = useFestival();
   const [pendingGroupId, setPendingGroupId] = useState<string | null>(null);
 
-  const { data: candidates = [], loading } = useCarryOverCandidates(currentFestival?.id) as {
-    data: CarryOverCandidate[];
-    loading: boolean;
-  };
+  // The shared useQuery wrapper returns `data: query.data ?? null`, so a
+  // destructuring default never fires and this is null while disabled.
+  const { data, loading } = useCarryOverCandidates(currentFestival?.id);
+  const candidates: CarryOverCandidate[] = data ?? [];
   const { mutateAsync: carryOverGroup } = useCarryOverGroup();
 
   // festivals.status and is_active are stale in prod, so gate on the date.
@@ -30,7 +30,7 @@ export function CarryOverGroups({ onSuccess }: CarryOverGroupsProps) {
     ? currentFestival.endDate < new Date().toISOString().slice(0, 10)
     : true;
 
-  if (loading || festivalHasEnded || candidates.length === 0 || !currentFestival) {
+  if (!currentFestival || loading || festivalHasEnded || candidates.length === 0) {
     return null;
   }
 

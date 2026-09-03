@@ -7,6 +7,7 @@ import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
+import { createAdminClient } from "../utils/admin-client";
 
 type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
@@ -656,7 +657,22 @@ export class NotificationService {
         return;
       }
 
-      const { data: prefsList, error } = await this.supabase
+      // The only SELECT policy on user_notification_preferences is
+      // `auth.uid() = user_id`, so the request-scoped client cannot read the
+      // recipients' rows at all: it returns zero rows and every notification is
+      // silently dropped. Reading other users' preferences needs the admin client.
+      let prefsClient;
+      try {
+        prefsClient = createAdminClient();
+      } catch (adminError) {
+        logger.error(
+          { error: adminError },
+          "Admin client unavailable; skipping group carry-over notifications rather than ignoring recipient preferences",
+        );
+        return;
+      }
+
+      const { data: prefsList, error } = await prefsClient
         .from("user_notification_preferences")
         .select("user_id, group_notifications_enabled")
         .in("user_id", recipientIds);
@@ -675,7 +691,7 @@ export class NotificationService {
         return;
       }
 
-      await Promise.allSettled(
+      const results = await Promise.allSettled(
         enabledRecipientIds.map((to) =>
           this.novu.trigger({
             workflowId: NOTIFICATION_WORKFLOWS.GROUP_CARRY_OVER,
@@ -684,6 +700,20 @@ export class NotificationService {
           }),
         ),
       );
+
+      // allSettled hides rejections, so surface them: a trigger that fails here
+      // is otherwise indistinguishable from one that was never sent.
+      const failures = results.filter((r) => r.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((f) => String((f as PromiseRejectedResult).reason)),
+          },
+          "Some group carry-over notifications failed to send",
+        );
+      }
     } catch (error) {
       logger.error({ error }, "Error sending group carry-over notification");
     }
