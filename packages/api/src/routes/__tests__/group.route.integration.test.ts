@@ -291,6 +291,46 @@ describe("Group Routes Integration (Local DB)", () => {
       expect(after.find((c) => c.groupId === source.group_id)).toBeUndefined();
     });
 
+    // Regression: the set_group_token BEFORE INSERT trigger overwrites whatever
+    // invite_token create_group_with_member is handed, so the function has to read
+    // the token back off the inserted row. Returning its own pre-trigger value gave
+    // callers a token that exists nowhere, which made every invite link built from
+    // a carry-over (including the one in the notification) dead on arrival. Only a
+    // real database catches this: with Supabase mocked, the trigger never runs.
+    it("returns the invite token that was actually stored", async () => {
+      const { data: created } = await supabaseAdmin.rpc("create_group_with_member", {
+        p_group_name: `Token Crew ${Date.now()}`,
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 1,
+      });
+      const source = created![0];
+      createdGroupIds.push(source.group_id);
+
+      // Plain group creation goes through the same function, so it had the same bug.
+      const { data: sourceRow } = await supabaseAdmin
+        .from("groups")
+        .select("invite_token")
+        .eq("id", source.group_id)
+        .single();
+      expect(source.invite_token).toBe(sourceRow!.invite_token);
+
+      const carried = await repo.carryOver(testUser.id, source.group_id, targetFestival.id);
+      createdGroupIds.push(carried.id);
+
+      const { data: carriedRow } = await supabaseAdmin
+        .from("groups")
+        .select("invite_token")
+        .eq("id", carried.id)
+        .single();
+      expect(carried.inviteToken).toBe(carriedRow!.invite_token);
+
+      // The clone gets its own token, and the link built from it actually resolves.
+      expect(carried.inviteToken).not.toBe(source.invite_token);
+      const resolved = await repo.findByInviteToken(carried.inviteToken);
+      expect(resolved?.id).toBe(carried.id);
+    });
+
     it("rejects a second carry-over of the same group with a name conflict", async () => {
       const { data: created } = await supabaseAdmin.rpc("create_group_with_member", {
         p_group_name: `Dup Crew ${Date.now()}`,
