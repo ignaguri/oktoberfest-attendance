@@ -23,6 +23,7 @@ export const NOTIFICATION_WORKFLOWS = {
   ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
+  GROUP_CARRY_OVER: "group-carryover-invite",
 } as const;
 
 export type NotificationWorkflowId =
@@ -41,6 +42,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   ACHIEVEMENT_UNLOCKED: "achievement-unlocked",
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
+  GROUP_CARRY_OVER: "group-carry-over",
 } as const;
 
 export type NotificationPushType =
@@ -56,6 +58,7 @@ interface NotificationPayload {
   reservationId?: string;
   achievementName?: string;
   senderName?: string;
+  inviteToken?: string;
   url?: string;
   [key: string]: unknown;
 }
@@ -78,6 +81,11 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
       case NOTIFICATION_PUSH_TYPES.GROUP_JOIN:
         return payload.groupId ? `/group-detail/${payload.groupId}` : "/groups";
 
+      // The recipient is not a member of the cloned group yet, so this must
+      // route to the join link, never to the group detail page.
+      case NOTIFICATION_PUSH_TYPES.GROUP_CARRY_OVER:
+        return payload.inviteToken ? `/join-group/${payload.inviteToken}` : "/groups";
+
       case NOTIFICATION_PUSH_TYPES.TENT_CHECKIN:
       case NOTIFICATION_PUSH_TYPES.LOCATION_SHARING:
         return payload.groupId ? `/group-detail/${payload.groupId}` : "/home";
@@ -99,6 +107,11 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
   // Fallback: infer route from payload shape (for in-app notifications)
   if (payload.achievementName) return "/achievements";
   if (payload.senderName && !payload.groupId) return "/friends?tab=requests";
+  // Before the groupId fallback: a push step's schema is {skip, subject, body},
+  // so it cannot carry data.type and the raw trigger payload arrives instead.
+  // A carry-over payload has both, and the recipient is not a member yet, so
+  // the invite link has to win over /group-detail.
+  if (payload.inviteToken) return `/join-group/${payload.inviteToken}`;
   if (payload.groupId) return `/group-detail/${payload.groupId}`;
 
   // Try URL if present

@@ -24,9 +24,10 @@ import {
 
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
-import { SupabaseGroupRepository } from "../repositories/supabase";
+import { SupabaseFestivalRepository, SupabaseGroupRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
+import { NotificationService } from "../services/notification.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -863,6 +864,28 @@ app.openapi(carryOverRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   const group = await service.carryOverGroup(id, user.id, targetFestivalId);
+
+  // Notify last year's crew once, right after the clone exists. Failures are
+  // swallowed inside the service: a missed push must not fail the carry-over.
+  // The constructor throws without an API key, so guard it like the other routes.
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (novuApiKey) {
+    const sourceMembers = await service.getMembers(id, user.id);
+    const recipientIds = sourceMembers
+      .map((member) => member.userId)
+      .filter((memberId) => memberId !== user.id);
+
+    const festivalRepo = new SupabaseFestivalRepository(supabase);
+    const targetFestival = await festivalRepo.findById(targetFestivalId);
+
+    const notificationService = new NotificationService(supabase, novuApiKey);
+    await notificationService.notifyGroupCarryOver(recipientIds, {
+      groupName: group.name,
+      festivalName: targetFestival?.name ?? "",
+      inviteToken: group.inviteToken,
+      groupId: group.id,
+    });
+  }
 
   // Evaluate-only: the unlock reaches the client through the outbox, not this
   // response. Awaited so the outbox row exists before the client's next read.

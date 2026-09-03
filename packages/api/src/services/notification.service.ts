@@ -639,6 +639,57 @@ export class NotificationService {
   }
 
   /**
+   * Notify the members of a past-festival group that it has been carried over
+   * Fans out to everyone except the creator, who triggered it
+   */
+  async notifyGroupCarryOver(
+    recipientIds: string[],
+    payload: {
+      groupName: string;
+      festivalName: string;
+      inviteToken: string;
+      groupId: string;
+    },
+  ): Promise<void> {
+    try {
+      if (recipientIds.length === 0) {
+        return;
+      }
+
+      const { data: prefsList, error } = await this.supabase
+        .from("user_notification_preferences")
+        .select("user_id, group_notifications_enabled")
+        .in("user_id", recipientIds);
+
+      if (error) {
+        logger.error({ error }, "Error fetching preferences for group carry-over");
+        return;
+      }
+
+      const enabledRecipientIds = (prefsList || [])
+        .filter((p) => p.group_notifications_enabled !== false)
+        .map((p) => p.user_id)
+        .filter(Boolean) as string[];
+
+      if (enabledRecipientIds.length === 0) {
+        return;
+      }
+
+      await Promise.allSettled(
+        enabledRecipientIds.map((to) =>
+          this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.GROUP_CARRY_OVER,
+            to,
+            payload,
+          }),
+        ),
+      );
+    } catch (error) {
+      logger.error({ error }, "Error sending group carry-over notification");
+    }
+  }
+
+  /**
    * Notify a user when they receive a friend request
    * (respects push_enabled preference)
    */
