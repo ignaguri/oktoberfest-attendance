@@ -259,6 +259,16 @@
     "noGroupsYet": "You are not a member of any group yet for this festival.",
     "noFestival": "Please select a festival to view groups",
     "joinOrCreate": "Join or Create a Group",
+    "carryOver": {
+      "title": "Bring your groups to {{festival}}",
+      "description": "Your crew from last time can pick up where they left off.",
+      "fromFestival": "From {{festival}}",
+      "action": "Bring to {{festival}}",
+      "pending": "Bringing over...",
+      "success": "{{name}} is ready for {{festival}}. Your members have been invited.",
+      "errorNameTaken": "You already have a group called {{name}} in this festival.",
+      "errorGeneric": "Could not bring this group over. Please try again."
+    },
     "memberCount": "{{count}} member",
     "memberCount_other": "{{count}} members",
     "createSuccess": "Group created successfully!",

@@ -259,6 +259,16 @@
     "noGroupsYet": "Todavía no sos miembro de ningún grupo para este festival.",
     "noFestival": "Por favor, seleccioná un festival para ver los grupos",
     "joinOrCreate": "Unite o creá un grupo",
+    "carryOver": {
+      "title": "Llevá tus grupos al {{festival}}",
+      "description": "Tu grupo de la última vez puede continuar donde lo dejó.",
+      "fromFestival": "De {{festival}}",
+      "action": "Llevar al {{festival}}",
+      "pending": "Llevando...",
+      "success": "{{name}} está listo para {{festival}}. Tus miembros ya fueron invitados.",
+      "errorNameTaken": "Ya tienes un grupo llamado {{name}} en este festival.",
+      "errorGeneric": "No se pudo llevar el grupo. Por favor, intentá de nuevo."
+    },
     "memberCount": "{{count}} miembro",
     "memberCount_other": "{{count}} miembros",
     "createSuccess": "¡Grupo creado exitosamente!",

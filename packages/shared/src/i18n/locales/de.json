@@ -254,6 +254,16 @@
     "noGroupsYet": "Du bist noch kein Mitglied einer Gruppe für dieses Festival.",
     "noFestival": "Bitte wähle ein Festival aus, um Gruppen anzuzeigen",
     "joinOrCreate": "Gruppe beitreten oder erstellen",
+    "carryOver": {
+      "title": "Bring deine Gruppen zum {{festival}}",
+      "description": "Deine Crew von letztem Mal kann dort weitermachen, wo sie aufgehört hat.",
+      "fromFestival": "Von {{festival}}",
+      "action": "Zum {{festival}} bringen",
+      "pending": "Wird übertragen...",
+      "success": "{{name}} ist bereit für {{festival}}. Deine Mitglieder wurden eingeladen.",
+      "errorNameTaken": "Du hast bereits eine Gruppe namens {{name}} bei diesem Festival.",
+      "errorGeneric": "Die Gruppe konnte nicht übertragen werden. Bitte versuche es erneut."
+    },
     "memberCount": "{{count}} Mitglied",
     "memberCount_other": "{{count}} Mitglieder",
     "createSuccess": "Gruppe erfolgreich erstellt!",

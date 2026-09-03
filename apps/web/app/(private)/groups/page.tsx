@@ -5,6 +5,7 @@ import MyGroups from "@/components/MyGroups/MyGroups";
 import { Separator } from "@/components/ui/separator";
 import { getTranslations } from "@/lib/i18n/server";
 
+import CarryOverGroups from "./CarryOverGroups";
 import { CreateGroupForm } from "./CreateGroupForm";
 import { JoinGroupForm } from "./JoinGroupForm";
 
@@ -19,6 +20,7 @@ export default async function GroupsPage() {
 
       <Suspense fallback={<LoadingSpinner />}>
         <div className="flex flex-col gap-6">
+          <CarryOverGroups />
           <section className="card">
             <MyGroups showGroupsLink={false} />
           </section>
