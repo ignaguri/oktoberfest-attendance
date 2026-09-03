@@ -33,6 +33,25 @@ export default function JoinGroupByTokenScreen() {
   const [status, setStatus] = useState<JoinStatus>("loading");
   const [result, setResult] = useState<JoinResult>({});
 
+  // Coded API errors set `message` to the error code itself (NotFoundError
+  // (ErrorCodes.INVALID_INVITE_TOKEN) sends message "INVALID_INVITE_TOKEN"), so
+  // showing `error.message` leaks a raw code to the user. Translate via the
+  // apiErrors map instead. i18next returns the key when it is missing, which is
+  // how we detect an unmapped code without a defaultValue.
+  const translateApiError = (error: any): string => {
+    const code: string | undefined = error?.code;
+
+    if (code) {
+      const key = `apiErrors.${code}`;
+      const translated = t(key);
+      if (translated !== key) {
+        return translated;
+      }
+    }
+
+    return t("groups.deepLink.joinFailed");
+  };
+
   // Join group when component mounts
   useEffect(() => {
     if (!token) {
@@ -54,14 +73,16 @@ export default function JoinGroupByTokenScreen() {
       } catch (error: any) {
         const errorMessage = error?.message || "";
 
-        // Check if user is already a member
+        // Check if user is already a member. This one stays a message check:
+        // the API throws it as ConflictError with a human sentence and the
+        // generic CONFLICT code, so there is no specific code to match on.
         if (errorMessage.toLowerCase().includes("already a member")) {
           setStatus("already_member");
           setResult({ errorMessage });
         } else {
           setStatus("error");
           setResult({
-            errorMessage: errorMessage || t("groups.deepLink.joinFailed"),
+            errorMessage: translateApiError(error),
           });
         }
       }

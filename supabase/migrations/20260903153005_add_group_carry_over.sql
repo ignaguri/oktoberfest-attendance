@@ -92,7 +92,13 @@ BEGIN
       p_group_name, v_password, p_user_id, p_winning_criteria_id,
       p_festival_id, v_invite_token, p_carried_over_from
     )
-    RETURNING id, groups.created_at INTO v_group_id, v_created_at;
+    -- Read invite_token back from the row, not from v_invite_token: the
+    -- set_group_token BEFORE INSERT trigger overwrites it with a fresh uuid,
+    -- so the value passed in above is never what gets stored. Returning the
+    -- pre-trigger value hands callers a token that does not exist, which
+    -- silently breaks every invite link built from this function's result.
+    RETURNING id, groups.created_at, groups.invite_token
+    INTO v_group_id, v_created_at, v_invite_token;
 
     -- Insert the creator as a member of the group
     INSERT INTO group_members (group_id, user_id)
