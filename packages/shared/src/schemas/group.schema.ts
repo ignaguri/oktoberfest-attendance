@@ -18,6 +18,7 @@ export const GroupSchema = z.object({
   winningCriteria: WinningCriteriaSchema,
   inviteToken: z.string(),
   createdBy: z.uuid(),
+  carriedOverFrom: z.uuid().nullable().optional(),
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),
 });
@@ -227,3 +228,43 @@ export const GroupGalleryResponseSchema = z.object({
 });
 
 export type GroupGalleryResponse = z.infer<typeof GroupGalleryResponseSchema>;
+
+/**
+ * Carry a group over into another festival
+ * POST /api/v1/groups/:id/carry-over
+ */
+export const CarryOverGroupSchema = z.object({
+  targetFestivalId: z.uuid({ error: "Invalid festival ID" }),
+});
+
+export type CarryOverGroupInput = z.infer<typeof CarryOverGroupSchema>;
+
+/**
+ * A past-festival group the caller created that is not yet in the target festival
+ */
+export const CarryOverCandidateSchema = z.object({
+  groupId: z.uuid(),
+  name: z.string(),
+  winningCriteria: WinningCriteriaSchema,
+  memberCount: z.number().int(),
+  sourceFestivalId: z.uuid(),
+  sourceFestivalName: z.string(),
+});
+
+export type CarryOverCandidate = z.infer<typeof CarryOverCandidateSchema>;
+
+/**
+ * Carry-over candidates query
+ * GET /api/v1/groups/carry-over-candidates
+ */
+export const CarryOverCandidatesQuerySchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+});
+
+export type CarryOverCandidatesQuery = z.infer<typeof CarryOverCandidatesQuerySchema>;
+
+export const CarryOverCandidatesResponseSchema = z.object({
+  data: z.array(CarryOverCandidateSchema),
+});
+
+export type CarryOverCandidatesResponse = z.infer<typeof CarryOverCandidatesResponseSchema>;
