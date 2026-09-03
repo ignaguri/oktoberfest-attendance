@@ -1,4 +1,5 @@
 import type { Database } from "@prostcounter/db";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
@@ -6,6 +7,7 @@ import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
 } from "../../__tests__/helpers/test-supabase";
+import { SupabaseGroupRepository } from "../../repositories/supabase";
 
 // Integration tests using real local Supabase database
 // These tests verify the complete flow including RLS policies, triggers, and constraints
@@ -18,6 +20,9 @@ describe("Group Routes Integration (Local DB)", () => {
   let testUser: { id: string; email: string; token: string };
   let testFestival: { id: string; name: string };
   let createdGroupIds: string[] = [];
+  // Festivals created by nested suites, cleaned up once at the end. Not reset
+  // per test, unlike createdGroupIds.
+  const createdFestivalIds: string[] = [];
 
   beforeAll(async () => {
     // Initialize Supabase clients
@@ -81,7 +86,13 @@ describe("Group Routes Integration (Local DB)", () => {
     // 2. Delete groups
     await supabaseAdmin.from("groups").delete().in("id", createdGroupIds);
 
-    // 3. Delete festival
+    // 3. Delete festivals. groups cascade from festivals, and group_members
+    // cascade from groups, so this also sweeps up anything the per-test
+    // createdGroupIds reset dropped track of.
+    if (createdFestivalIds.length > 0) {
+      await supabaseAdmin.from("festivals").delete().in("id", createdFestivalIds);
+    }
+
     if (testFestival?.id) {
       await supabaseAdmin.from("festivals").delete().eq("id", testFestival.id);
     }
@@ -204,5 +215,106 @@ describe("Group Routes Integration (Local DB)", () => {
 
     expect(secondError).not.toBeNull();
     expect(secondError!.code).toBe("23505"); // PostgreSQL unique violation
+  });
+
+  describe("carry-over", () => {
+    // Exercises SupabaseGroupRepository through the RLS-respecting anon client
+    // (signed in as testUser), not the service-role client, because the
+    // candidate query depends on RLS narrowing what the caller can see.
+    let repo: SupabaseGroupRepository;
+    let targetFestival: { id: string; endDate: string };
+
+    beforeAll(async () => {
+      repo = new SupabaseGroupRepository(supabase);
+
+      const { data: festival, error } = await supabaseAdmin
+        .from("festivals")
+        .insert({
+          name: `Carry Over Target ${Date.now()}`,
+          short_name: `carryover-${Date.now()}`,
+          festival_type: "oktoberfest",
+          start_date: "2099-09-19",
+          end_date: "2099-10-04",
+          beer_cost: 16.2,
+          location: "Test Location",
+          timezone: "Europe/Berlin",
+          is_active: false,
+          status: "upcoming",
+        })
+        .select()
+        .single();
+
+      if (error || !festival) {
+        throw new Error(`Failed to create target festival: ${error?.message}`);
+      }
+
+      targetFestival = { id: festival.id, endDate: festival.end_date };
+      createdFestivalIds.push(festival.id);
+    });
+
+    it("carries a group into another festival and records lineage", async () => {
+      const { data: created } = await supabaseAdmin.rpc("create_group_with_member", {
+        p_group_name: `Carry Crew ${Date.now()}`,
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 1, // days_attended, to prove criteria is copied
+      });
+      const source = created![0];
+      createdGroupIds.push(source.group_id);
+
+      // The source group shows up as a candidate for the target festival
+      const before = await repo.listCarryOverCandidates(testUser.id, targetFestival.id);
+      const candidate = before.find((c) => c.groupId === source.group_id);
+      expect(candidate).toBeDefined();
+      expect(candidate!.name).toBe(source.group_name);
+      expect(candidate!.winningCriteria).toBe("days_attended");
+      expect(candidate!.memberCount).toBe(1);
+      expect(candidate!.sourceFestivalId).toBe(testFestival.id);
+      expect(candidate!.sourceFestivalName).toBe(testFestival.name);
+
+      // Not carried over yet
+      expect(await repo.findCarryOverTarget(source.group_id, targetFestival.id)).toBeNull();
+
+      const carried = await repo.carryOver(testUser.id, source.group_id, targetFestival.id);
+      createdGroupIds.push(carried.id);
+
+      expect(carried.name).toBe(source.group_name);
+      expect(carried.festivalId).toBe(targetFestival.id);
+      expect(carried.winningCriteria).toBe("days_attended");
+      expect(carried.carriedOverFrom).toBe(source.group_id);
+      expect(carried.id).not.toBe(source.group_id);
+
+      // Lineage is queryable, and the candidate disappears from the list
+      expect(await repo.findCarryOverTarget(source.group_id, targetFestival.id)).toBe(carried.id);
+
+      const after = await repo.listCarryOverCandidates(testUser.id, targetFestival.id);
+      expect(after.find((c) => c.groupId === source.group_id)).toBeUndefined();
+    });
+
+    it("rejects a second carry-over of the same group with a name conflict", async () => {
+      const { data: created } = await supabaseAdmin.rpc("create_group_with_member", {
+        p_group_name: `Dup Crew ${Date.now()}`,
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 2,
+      });
+      const source = created![0];
+      createdGroupIds.push(source.group_id);
+
+      const carried = await repo.carryOver(testUser.id, source.group_id, targetFestival.id);
+      createdGroupIds.push(carried.id);
+
+      // UNIQUE (name, festival_id) surfaces as a typed conflict, not a raw 500
+      await expect(
+        repo.carryOver(testUser.id, source.group_id, targetFestival.id),
+      ).rejects.toThrow(ErrorCodes.GROUP_NAME_TAKEN);
+    });
+
+    it("returns the festival end date, and null for an unknown festival", async () => {
+      expect(await repo.getFestivalEndDate(targetFestival.id)).toBe(targetFestival.endDate);
+      expect(
+        await repo.getFestivalEndDate("00000000-0000-0000-0000-000000000000"),
+      ).toBeNull();
+    });
   });
 });
