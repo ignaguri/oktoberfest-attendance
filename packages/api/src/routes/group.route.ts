@@ -1,5 +1,8 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  CarryOverCandidatesQuerySchema,
+  CarryOverCandidatesResponseSchema,
+  CarryOverGroupSchema,
   CreateGroupSchema,
   GroupActionResponseSchema,
   GroupGalleryResponseSchema,
@@ -174,6 +177,55 @@ app.openapi(listGroupsRoute, async (c) => {
   const groups = await service.listUserGroups(user.id, query);
 
   return c.json({ data: groups }, 200);
+});
+
+// GET /groups/carry-over-candidates - Past groups that can be brought to a festival
+// Registered before /groups/{id} or the literal path gets captured as an id.
+const carryOverCandidatesRoute = createRoute({
+  method: "get",
+  path: "/groups/carry-over-candidates",
+  tags: ["groups"],
+  summary: "List carry-over candidates",
+  description:
+    "Past-festival groups the caller created that are not yet carried over into the given festival",
+  request: {
+    query: CarryOverCandidatesQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Candidates retrieved successfully",
+      content: {
+        "application/json": {
+          schema: CarryOverCandidatesResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(carryOverCandidatesRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { festivalId } = c.req.valid("query");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const data = await service.listCarryOverCandidates(user.id, festivalId);
+
+  return c.json({ data }, 200);
 });
 
 // GET /groups/:id - Get group details
@@ -724,6 +776,99 @@ app.openapi(renewTokenRoute, async (c) => {
   const inviteToken = await service.renewInviteToken(id, user.id);
 
   return c.json({ inviteToken }, 200);
+});
+
+// POST /groups/:id/carry-over - Clone a group into another festival
+const carryOverRoute = createRoute({
+  method: "post",
+  path: "/groups/{id}/carry-over",
+  tags: ["groups"],
+  summary: "Carry a group over to another festival",
+  description:
+    "Clones the group (name and winning criteria) into the target festival and notifies the original members. Only the group creator can do this.",
+  request: {
+    params: GroupIdParamSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: CarryOverGroupSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Group carried over successfully",
+      content: {
+        "application/json": {
+          schema: GroupSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not the group creator",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group or festival not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    409: {
+      description: "Already carried over, name taken, or festival ended",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(carryOverRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id } = c.req.valid("param");
+  const { targetFestivalId } = c.req.valid("json");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const group = await service.carryOverGroup(id, user.id, targetFestivalId);
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, targetFestivalId, "POST /groups/:id/carry-over");
+
+  return c.json(group, 200);
 });
 
 // GET /groups/:id/gallery - Get group photo gallery

@@ -2083,6 +2083,8 @@ export interface paths {
                                 inviteToken: string;
                                 /** Format: uuid */
                                 createdBy: string;
+                                /** Format: uuid */
+                                carriedOverFrom?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
@@ -2152,6 +2154,8 @@ export interface paths {
                             inviteToken: string;
                             /** Format: uuid */
                             createdBy: string;
+                            /** Format: uuid */
+                            carriedOverFrom?: string | null;
                             /** Format: date-time */
                             createdAt: string;
                             /** Format: date-time */
@@ -2243,6 +2247,71 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/groups/carry-over-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List carry-over candidates
+         * @description Past-festival groups the caller created that are not yet carried over into the given festival
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Candidates retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            data: {
+                                /** Format: uuid */
+                                groupId: string;
+                                name: string;
+                                /** @enum {string} */
+                                winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                                memberCount: number;
+                                /** Format: uuid */
+                                sourceFestivalId: string;
+                                sourceFestivalName: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/groups/{id}": {
         parameters: {
             query?: never;
@@ -2283,6 +2352,8 @@ export interface paths {
                             inviteToken: string;
                             /** Format: uuid */
                             createdBy: string;
+                            /** Format: uuid */
+                            carriedOverFrom?: string | null;
                             /** Format: date-time */
                             createdAt: string;
                             /** Format: date-time */
@@ -2371,6 +2442,8 @@ export interface paths {
                             inviteToken: string;
                             /** Format: uuid */
                             createdBy: string;
+                            /** Format: uuid */
+                            carriedOverFrom?: string | null;
                             /** Format: date-time */
                             createdAt: string;
                             /** Format: date-time */
@@ -2849,6 +2922,120 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/groups/{id}/carry-over": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Carry a group over to another festival
+         * @description Clones the group (name and winning criteria) into the target festival and notifies the original members. Only the group creator can do this.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        targetFestivalId: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Group carried over successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            festivalId: string;
+                            /** @enum {string} */
+                            winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                            inviteToken: string;
+                            /** Format: uuid */
+                            createdBy: string;
+                            /** Format: uuid */
+                            carriedOverFrom?: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - Not the group creator */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Group or festival not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Already carried over, name taken, or festival ended */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/groups/{id}/gallery": {
         parameters: {
             query?: never;
@@ -2992,6 +3179,8 @@ export interface paths {
                                 inviteToken: string;
                                 /** Format: uuid */
                                 createdBy: string;
+                                /** Format: uuid */
+                                carriedOverFrom?: string | null;
                                 /** Format: date-time */
                                 createdAt: string;
                                 /** Format: date-time */
