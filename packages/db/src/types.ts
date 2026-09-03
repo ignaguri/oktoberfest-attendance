@@ -682,6 +682,7 @@ export type Database = {
       }
       groups: {
         Row: {
+          carried_over_from: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
@@ -694,6 +695,7 @@ export type Database = {
           winning_criteria_id: number
         }
         Insert: {
+          carried_over_from?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -706,6 +708,7 @@ export type Database = {
           winning_criteria_id: number
         }
         Update: {
+          carried_over_from?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -718,6 +721,20 @@ export type Database = {
           winning_criteria_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "groups_carried_over_from_fkey"
+            columns: ["carried_over_from"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "groups_carried_over_from_fkey"
+            columns: ["carried_over_from"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["group_id"]
+          },
           {
             foreignKeyName: "groups_festival_id_fkey"
             columns: ["festival_id"]
@@ -1837,6 +1854,7 @@ export type Database = {
       cleanup_old_rate_limit_records: { Args: never; Returns: undefined }
       create_group_with_member: {
         Args: {
+          p_carried_over_from?: string
           p_festival_id: string
           p_group_name: string
           p_invite_token?: string
@@ -1845,6 +1863,7 @@ export type Database = {
           p_winning_criteria_id?: number
         }
         Returns: {
+          carried_over_from: string
           created_at: string
           created_by: string
           festival_id: string
