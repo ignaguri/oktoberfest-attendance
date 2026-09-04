@@ -62,6 +62,15 @@ import type {
 export type ApiHeaders = Record<string, string>;
 
 /**
+ * Which app is talking to the API.
+ *
+ * Recorded on `user_active_days.platform`, which gives the iOS/Android/web
+ * split and version-correlated churn. Deliberately a closed set: the column is
+ * free-text with no CHECK constraint, so the vocabulary is only enforced here.
+ */
+export type ClientPlatform = "ios" | "android" | "web";
+
+/**
  * Configuration for creating the API client
  */
 export interface ApiClientConfig {
@@ -69,6 +78,15 @@ export interface ApiClientConfig {
   baseUrl: string;
   /** Function to get auth headers for requests */
   getAuthHeaders: () => Promise<ApiHeaders>;
+  /**
+   * Platform this client runs on, sent as `X-Client-Platform`.
+   *
+   * Leave unset rather than guessing: the header is then omitted entirely and
+   * the server records NULL, which is honest, where a wrong value is not.
+   */
+  clientPlatform?: ClientPlatform;
+  /** App version of the calling client, sent as `X-Client-Version`. */
+  clientVersion?: string;
   /** Optional callback for logging requests */
   onRequest?: (method: string, url: string, headers: ApiHeaders) => void;
   /** Optional callback for logging responses */
@@ -148,7 +166,33 @@ async function extractApiError(response: Response, fallbackMessage: string): Pro
  * Create a typed API client with all endpoint methods
  */
 export function createTypedApiClient(config: ApiClientConfig) {
-  const { baseUrl, getAuthHeaders, onRequest, onResponse, onError } = config;
+  const {
+    baseUrl,
+    getAuthHeaders: getConfiguredAuthHeaders,
+    clientPlatform,
+    clientVersion,
+    onRequest,
+    onResponse,
+    onError,
+  } = config;
+
+  // packages/api/src/middleware/auth.ts reads these two headers on every
+  // authenticated request and feeds them to record_user_active_day. They are
+  // merged into getAuthHeaders rather than added per endpoint because every
+  // method below already awaits it, so one wrapper covers all of them instead
+  // of ~100 identical edits that would then have to be repeated on each new
+  // endpoint. Built once, since neither value changes over a client's lifetime.
+  const clientHeaders: ApiHeaders = {};
+  if (clientPlatform) {
+    clientHeaders["X-Client-Platform"] = clientPlatform;
+  }
+  if (clientVersion) {
+    clientHeaders["X-Client-Version"] = clientVersion;
+  }
+
+  async function getAuthHeaders(): Promise<ApiHeaders> {
+    return { ...(await getConfiguredAuthHeaders()), ...clientHeaders };
+  }
 
   /**
    * Wrapper around fetch that includes logging

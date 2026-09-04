@@ -9,9 +9,11 @@ import {
   ApiError,
   AuthRequiredError,
   type ApiHeaders,
+  type ClientPlatform,
   createTypedApiClient,
 } from "@prostcounter/api-client";
 import Constants from "expo-constants";
+import { Platform } from "react-native";
 
 import { logger } from "./logger";
 import { supabase } from "./supabase";
@@ -62,11 +64,23 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
 }
 
 /**
+ * Platform.OS also has "web" | "windows" | "macos", none of which this app
+ * ships. Anything unexpected sends no header at all, so the server records NULL
+ * instead of a value that would quietly misattribute the session.
+ */
+const CLIENT_PLATFORM: ClientPlatform | undefined =
+  Platform.OS === "ios" || Platform.OS === "android" ? Platform.OS : undefined;
+
+/**
  * Type-safe API client instance for the mobile app
  */
 export const apiClient = createTypedApiClient({
   baseUrl: API_BASE_URL,
   getAuthHeaders,
+  clientPlatform: CLIENT_PLATFORM,
+  // app.config.ts `version`, so this is the user-facing app version (1.7.0),
+  // not the runtimeVersion and not the mobile package.json version.
+  clientVersion: Constants.expoConfig?.version ?? undefined,
   onRequest: (method, url, headers) => {
     logger.logApiRequest(method, url, headers);
   },

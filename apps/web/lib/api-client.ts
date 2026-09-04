@@ -12,6 +12,7 @@ import {
   type TypedApiClient,
 } from "@prostcounter/api-client";
 
+import { APP_VERSION } from "@/lib/version";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
 
 // Re-export ApiError for convenience
@@ -54,6 +55,10 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
 const baseClient = createTypedApiClient({
   baseUrl: API_BASE_URL,
   getAuthHeaders,
+  clientPlatform: "web",
+  // next.config.ts injects this from apps/web/package.json at build time, so it
+  // tracks the web version rather than the repo one.
+  clientVersion: APP_VERSION,
 });
 
 /**
