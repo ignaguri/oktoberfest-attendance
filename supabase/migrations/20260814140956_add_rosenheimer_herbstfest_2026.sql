@@ -1,22 +1,12 @@
+-- Recovered from the remote migration history on 2026-09-04. Rosenheimer Herbstfest 2026 was applied
+-- straight to prod under this timestamp, while PR #278 committed the identical SQL as
+-- 20260814141500_add_rosenheimer_herbstfest_2026.sql. That left prod holding a version the repo did not
+-- have and the repo holding one prod had never run, so `supabase db push` refused to
+-- run at all. This file is the version that actually executed; the PR #278 copy was
+-- deleted, since re-running it would only collide with festivals_short_name_key.
+--
 -- Add Rosenheimer Herbstfest 2026 as an upcoming (not active) festival.
 -- Dates: 29 August - 13 September 2026 (16 days), Loretowiese, Rosenheim.
---
--- Data sourced by web research on 2026-08-14; unlike 20260804121948_add_oktoberfest_2026.sql
--- this has NO OpenStreetMap per-tent coordinates and NO confirmed beer price/brand for two of
--- the four tents (Tatzlwurm, Proseccostadl -- both wine/Prosecco-led venues; Tatzlwurm added a
--- beer garden in 2010 but no price was published). Those gaps are called out below and should
--- be verified against the official program (https://www.herbstfest-rosenheim.de/) before this
--- is treated as final.
---
--- Unlike the Dachau migration (20260814140000_add_dachauer_volksfest_2026.sql), this one does
--- NOT touch festivals.is_active: today (2026-08-14) is before the festival's start_date, so it
--- loads as status 'upcoming' and is_active stays false, leaving Dachauer Volksfest 2026 as the
--- active festival untouched. No is_active=true row is created here, so
--- idx_festivals_single_active (the "only one active festival" unique partial index) is never at
--- risk of a conflict.
---
--- festival_type_enum has no 'herbstfest' value ('oktoberfest' | 'starkbierfest' |
--- 'fruehlingsfest' | 'other'), so this uses 'other', same as the Dachau migration.
 BEGIN;
 
 -- Step 1: The four 2026 tents/gastro operators. All four share one venue-level coordinate
@@ -29,11 +19,7 @@ INSERT INTO tents (id, name, category, latitude, longitude) VALUES
   ('d2000000-0000-4000-b000-000000000004', 'Proseccostadl', 'small', 47.8599, 12.1255) -- wine/Prosecco/Champagne
 ON CONFLICT (id) DO NOTHING;
 
--- Step 2: The festival itself. status 'upcoming' matches the runtime value that
--- packages/shared/src/utils/festival-status.ts derives from the dates (today, 2026-08-14, is
--- before 2026-08-29). beer_cost/default_beer_price_cents use the average of the two flagship
--- tents' published Maß prices (13.40 AuerBräu + 13.60 Flötzinger = 13.50), since neither tent is
--- clearly "the" main tent the way Dachau's Großes Festzelt is.
+-- Step 2: The festival itself. status 'upcoming', is_active stays false.
 INSERT INTO festivals (
   name, short_name, festival_type, location,
   start_date, end_date, map_url,
@@ -58,9 +44,8 @@ INSERT INTO festivals (
 );
 
 -- Step 3: Link the two flagship tents with their published Maß prices. Tatzlwurm and
--- Proseccostadl have no confirmed beer price (both are wine/Prosecco-led venues) -- linked with
--- beer_price NULL/NULL so they fall back to the festival default (1350) rather than a guessed
--- value.
+-- Proseccostadl have no confirmed beer price -- linked with beer_price NULL/NULL so they fall
+-- back to the festival default (1350) rather than a guessed value.
 INSERT INTO festival_tents (festival_id, tent_id, beer_price, beer_price_cents)
 SELECT
   (SELECT id FROM festivals WHERE short_name = 'rosenheimer-herbstfest-2026'),
@@ -77,12 +62,7 @@ VALUES
   ((SELECT id FROM festivals WHERE short_name = 'rosenheimer-herbstfest-2026'), 'd2000000-0000-4000-b000-000000000003', NULL, NULL), -- Tatzlwurm
   ((SELECT id FROM festivals WHERE short_name = 'rosenheimer-herbstfest-2026'), 'd2000000-0000-4000-b000-000000000004', NULL, NULL); -- Proseccostadl
 
--- Step 4: Festival-level drink prices from the 1350 base. Only the beer price is sourced (as an
--- average of the two flagship tents); radler/alcohol_free/wine/soft_drink/other reuse the same
--- ratios as the Dachau and Oktoberfest migrations as a placeholder -- NOT independently
--- confirmed for Rosenheim and should be corrected if real prices are found. Note Proseccostadl's
--- actual specialty (Prosecco/Champagne) is not modeled here: drink_type has no 'sparkling_wine'
--- value, only 'wine'.
+-- Step 4: Festival-level drink prices from the 1350 base.
 DO $$
 DECLARE
   v_festival_id uuid;
@@ -100,8 +80,7 @@ BEGIN
 END $$;
 
 -- Step 5: Per-tent beer and radler overrides, only where the tent price differs from the base
--- and is actually known (excludes Tatzlwurm and Proseccostadl, which have no festival_tents
--- price set).
+-- and is actually known.
 INSERT INTO drink_type_prices (festival_tent_id, drink_type, price_cents)
 SELECT ft.id, d.drink_type, ft.beer_price_cents
 FROM festival_tents ft

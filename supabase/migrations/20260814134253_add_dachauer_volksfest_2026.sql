@@ -1,3 +1,10 @@
+-- Recovered from the remote migration history on 2026-09-04. Dachauer Volksfest 2026 was applied
+-- straight to prod under this timestamp, while PR #278 committed the identical SQL as
+-- 20260814140000_add_dachauer_volksfest_2026.sql. That left prod holding a version the repo did not
+-- have and the repo holding one prod had never run, so `supabase db push` refused to
+-- run at all. This file is the version that actually executed; the PR #278 copy was
+-- deleted, since re-running it would only collide with festivals_short_name_key.
+--
 -- Add Dachauer Volksfest 2026 (98th edition) as the active current festival.
 -- Dates: 8-17 August 2026 (ten days), Ludwig-Thoma-Wiese, Dachau.
 --
@@ -6,12 +13,10 @@
 -- coordinates and NO confirmed price for one tent (Festzelt Naumanns) or for any
 -- non-beer drink type. Those gaps are called out below and should be verified against
 -- the official program (https://www.dachau.de/dachauer-volksfest/) before this is treated
--- as final. Review before applying to the live DB.
+-- as final.
 --
 -- festival_type_enum has no 'dachauer_volksfest' / generic "Volksfest" value
 -- ('oktoberfest' | 'starkbierfest' | 'fruehlingsfest' | 'other'), so this uses 'other'.
--- Add an enum value first (ALTER TYPE ... ADD VALUE, in its own prior migration/transaction)
--- if a dedicated type is wanted instead.
 BEGIN;
 
 -- Step 1: Only one festival may be active (idx_festivals_single_active is a unique partial
