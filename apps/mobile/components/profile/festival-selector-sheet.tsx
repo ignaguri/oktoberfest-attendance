@@ -1,9 +1,13 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Festival, FestivalStatus } from "@prostcounter/shared/schemas";
-import { getFestivalStatus, groupFestivalsByStatus } from "@prostcounter/shared/utils";
+import {
+  formatLocalized,
+  getFestivalStatus,
+  groupFestivalsByStatus,
+} from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { Check, ChevronDown, ChevronUp } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 
@@ -55,7 +59,7 @@ export function FestivalSelectorSheet({ isOpen, onClose }: FestivalSelectorSheet
   const { t } = useTranslation();
   const { currentFestival, festivals, setCurrentFestival } = useFestival();
   const [showPast, setShowPast] = useState(false);
-  const [wasOpen, setWasOpen] = useState(isOpen);
+  const [wasOpen, setWasOpen] = useState(false);
 
   const { active, upcoming, past } = useMemo(
     () => groupFestivalsByStatus(festivals),
@@ -114,8 +118,8 @@ export function FestivalSelectorSheet({ isOpen, onClose }: FestivalSelectorSheet
                 </Badge>
               </HStack>
               <Text className="text-xs text-typography-400">
-                {format(parseISO(festival.startDate), "MMM d")} -{" "}
-                {format(parseISO(festival.endDate), "MMM d, yyyy")}
+                {formatLocalized(parseISO(festival.startDate), "MMM d")} -{" "}
+                {formatLocalized(parseISO(festival.endDate), "MMM d, yyyy")}
               </Text>
               {festival.location && (
                 <Text className="text-xs text-typography-400">{festival.location}</Text>

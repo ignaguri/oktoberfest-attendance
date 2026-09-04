@@ -107,9 +107,25 @@ describe("Group Routes Integration (Local DB)", () => {
       // attendances and tent_visits are also RESTRICT against festivals, so
       // sweep them defensively even though this suite doesn't create them.
       await supabaseAdmin.from("tent_visits").delete().eq("festival_id", festivalId);
+
+      const { data: festivalAttendances } = await supabaseAdmin
+        .from("attendances")
+        .select("id")
+        .eq("festival_id", festivalId);
+      const attendanceIds = (festivalAttendances ?? []).map((row) => row.id);
+
+      if (attendanceIds.length > 0) {
+        // Must precede attendances: beer_pictures.attendance_id has no cascade.
+        await supabaseAdmin.from("beer_pictures").delete().in("attendance_id", attendanceIds);
+      }
+
       await supabaseAdmin.from("attendances").delete().eq("festival_id", festivalId);
 
-      await supabaseAdmin.from("festivals").delete().eq("id", festivalId);
+      const { error } = await supabaseAdmin.from("festivals").delete().eq("id", festivalId);
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.warn(`Teardown left festival ${festivalId} behind: ${error.message}`);
+      }
     }
 
     // 4. Delete test user (requires admin API)

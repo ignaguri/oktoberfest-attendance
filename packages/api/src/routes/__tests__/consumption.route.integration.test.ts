@@ -168,7 +168,11 @@ describe("Consumption Routes Integration (Local DB)", () => {
 
     // 6. Delete festival
     if (testFestival?.id) {
-      await supabaseAdmin.from("festivals").delete().eq("id", testFestival.id);
+      const { error } = await supabaseAdmin.from("festivals").delete().eq("id", testFestival.id);
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.warn(`Teardown left festival ${testFestival.id} behind: ${error.message}`);
+      }
     }
 
     // 7. Delete test users (requires admin API)
