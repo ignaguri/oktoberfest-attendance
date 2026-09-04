@@ -60,6 +60,18 @@ BEGIN
         RAISE EXCEPTION 'User ID cannot be null';
     END IF;
 
+    -- Carried over verbatim from 20260805150000_harden_security_definer_grants.
+    -- DROP FUNCTION discards the body, so every guard the old signature had has
+    -- to be restored here: without this one, any authenticated caller can hit
+    -- the RPC directly with someone else's p_user_id and create a group owned by
+    -- them. Keep this block in sync if that migration's version ever changes.
+    IF auth.uid() IS NOT NULL
+       AND p_user_id <> auth.uid()
+       AND NOT public.is_super_admin() THEN
+        RAISE EXCEPTION 'Not authorized to create a group for another user'
+            USING ERRCODE = '42501';
+    END IF;
+
     -- This function is SECURITY DEFINER and reachable directly through PostgREST,
     -- so ownership of the carry-over source is re-checked here rather than
     -- trusting the service-layer isCreator check alone.
@@ -69,11 +81,16 @@ BEGIN
         WHERE g.id = p_carried_over_from;
 
         IF v_source_creator IS NULL THEN
-            RAISE EXCEPTION 'Source group % not found', p_carried_over_from;
+            RAISE EXCEPTION 'Source group % not found', p_carried_over_from
+                USING ERRCODE = 'P0002';
         END IF;
 
+        -- 42501 rather than the default P0001: the repository maps it to a 403,
+        -- so a direct PostgREST call gets the same answer as one through the API
+        -- instead of a generic 500.
         IF v_source_creator <> p_user_id THEN
-            RAISE EXCEPTION 'Only the creator of group % can carry it over', p_carried_over_from;
+            RAISE EXCEPTION 'Only the creator of group % can carry it over', p_carried_over_from
+                USING ERRCODE = '42501';
         END IF;
     END IF;
 

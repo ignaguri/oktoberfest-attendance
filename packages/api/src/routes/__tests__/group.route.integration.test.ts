@@ -223,9 +223,24 @@ describe("Group Routes Integration (Local DB)", () => {
     // candidate query depends on RLS narrowing what the caller can see.
     let repo: SupabaseGroupRepository;
     let targetFestival: { id: string; endDate: string };
+    // A second real account, so the ownership guard is tested against a
+    // created_by that would actually satisfy the foreign key if it got through.
+    let otherUserId: string;
 
     beforeAll(async () => {
       repo = new SupabaseGroupRepository(supabase);
+
+      const { data: otherUser, error: otherUserError } = await supabaseAdmin.auth.admin.createUser({
+        email: `other-${Date.now()}@integration-test.com`,
+        password: "test-password-123!",
+        email_confirm: true,
+      });
+
+      if (otherUserError || !otherUser.user) {
+        throw new Error(`Failed to create second test user: ${otherUserError?.message}`);
+      }
+
+      otherUserId = otherUser.user.id;
 
       const { data: festival, error } = await supabaseAdmin
         .from("festivals")
@@ -250,6 +265,39 @@ describe("Group Routes Integration (Local DB)", () => {
 
       targetFestival = { id: festival.id, endDate: festival.end_date };
       createdFestivalIds.push(festival.id);
+    });
+
+    afterAll(async () => {
+      await supabaseAdmin.auth.admin.deleteUser(otherUserId).catch(() => {
+        // eslint-disable-next-line no-console
+        console.warn("Could not delete second test user");
+      });
+    });
+
+    // Regression: create_group_with_member is SECURITY DEFINER, granted to
+    // authenticated, and reachable straight through PostgREST, so the only thing
+    // stopping a caller from passing someone else's p_user_id is a guard inside
+    // the function body. Any migration that DROPs and recreates the function
+    // drops that guard with it, which is exactly what the carry-over migration
+    // did. `supabase` is signed in as testUser, so this is the request an
+    // attacker would send verbatim.
+    it("refuses to create a group owned by another user", async () => {
+      const { error } = await supabase.rpc("create_group_with_member", {
+        p_group_name: `Hijack Crew ${Date.now()}`,
+        p_user_id: otherUserId,
+        p_festival_id: targetFestival.id,
+        p_winning_criteria_id: 2,
+      });
+
+      // A null error means the RPC went through, i.e. the guard is gone.
+      expect(error).not.toBeNull();
+      expect(error!.message).toContain("Not authorized to create a group for another user");
+
+      const { data: hijacked } = await supabaseAdmin
+        .from("groups")
+        .select("id")
+        .eq("created_by", otherUserId);
+      expect(hijacked).toEqual([]);
     });
 
     it("carries a group into another festival and records lineage", async () => {
