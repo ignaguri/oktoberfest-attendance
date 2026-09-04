@@ -172,7 +172,9 @@ describe("Attendance Routes Integration (Local DB)", () => {
       await supabaseAdmin.from("tent_visits").delete().eq("festival_id", testFestival.id);
 
       if (attendanceIds.length > 0) {
-        // Must precede attendances: consumptions.attendance_id has no cascade.
+        // Must precede attendances: beer_pictures.attendance_id has no cascade.
+        // consumptions.attendance_id does cascade, so this delete is redundant,
+        // but harmless and keeps the teardown order obvious.
         await supabaseAdmin.from("beer_pictures").delete().in("attendance_id", attendanceIds);
         await supabaseAdmin.from("consumptions").delete().in("attendance_id", attendanceIds);
       }
