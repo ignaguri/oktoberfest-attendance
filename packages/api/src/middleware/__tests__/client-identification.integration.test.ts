@@ -47,10 +47,22 @@ function createPingApp() {
 
 /**
  * recordActiveDay is deliberately not awaited by the middleware (it must add
- * zero latency to a request), so the row lands after the response. Poll rather
- * than sleep a fixed amount, to avoid a flaky test on a slow machine.
+ * zero latency to a request), so the row lands after the response, and a
+ * second ping's upsert can still be in flight when its response comes back.
+ * Poll rather than sleep a fixed amount, to avoid a flaky test on a slow
+ * machine.
+ *
+ * minRequestCount matters whenever a test pings more than once: the row from
+ * ping #1 already satisfies a plain existence check, so a caller asserting on
+ * the state after ping #2 would read stale data and could pass whether or not
+ * that second upsert ever ran. request_count starts at 1 (column DEFAULT) and
+ * the RPC's ON CONFLICT increments it, so it is what actually proves a
+ * specific ping was persisted.
  */
-async function waitForActiveDayRow(userId: string, timeoutMs = 5000) {
+async function waitForActiveDayRow(
+  userId: string,
+  { minRequestCount = 1, timeoutMs = 5000 } = {},
+) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const { data } = await supabaseAdmin
@@ -58,13 +70,13 @@ async function waitForActiveDayRow(userId: string, timeoutMs = 5000) {
       .select("platform, app_version, request_count")
       .eq("user_id", userId)
       .maybeSingle();
-    if (data) {
+    if (data && data.request_count >= minRequestCount) {
       return data;
     }
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
   throw new Error(
-    `No user_active_days row appeared for ${userId} within ${timeoutMs}ms`,
+    `No user_active_days row with request_count >= ${minRequestCount} appeared for ${userId} within ${timeoutMs}ms`,
   );
 }
 
@@ -143,10 +155,13 @@ describe("client identification headers reach user_active_days", () => {
 
     // record_user_active_day upserts with coalesce(excluded.platform, existing),
     // so an older binary that sends nothing must not blank out a row an
-    // identified request already populated for that day.
+    // identified request already populated for that day. minRequestCount: 2
+    // is what proves this second, header-less upsert actually ran — without
+    // it the assertion below would pass just as well if it never fired at
+    // all, since either way platform stays "android".
     await ping(user.token);
 
-    const row = await waitForActiveDayRow(user.id);
+    const row = await waitForActiveDayRow(user.id, { minRequestCount: 2 });
     expect(row.platform).toBe("android");
     expect(row.app_version).toBe("1.7.0");
   });
@@ -168,12 +183,7 @@ describe("client identification headers reach user_active_days", () => {
     // Documents a real limitation rather than an aspiration: user_active_days is
     // one row per user per day, so someone using phone and web the same day
     // collapses to whichever came last. Read the platform split as approximate.
-    const deadline = Date.now() + 5000;
-    let row = await waitForActiveDayRow(user.id);
-    while (row.platform !== "web" && Date.now() < deadline) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      row = await waitForActiveDayRow(user.id);
-    }
+    const row = await waitForActiveDayRow(user.id, { minRequestCount: 2 });
     expect(row.platform).toBe("web");
     expect(row.app_version).toBe("1.3.0");
   });
