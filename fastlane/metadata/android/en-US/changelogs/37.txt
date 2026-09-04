@@ -1,0 +1,3 @@
+- Bring a group from a past festival into the current one, members and all.
+- Everyone in the group gets an invite link, so nobody has to be re-added by hand.
+- Small fixes and polish. Prost!

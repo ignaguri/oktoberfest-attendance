@@ -1,4 +1,8 @@
 export const changelog: Record<string, string[]> = {
+  "1.3.0": [
+    "🎪 Bring a group from a past festival into the current one, members and all",
+    "🔗 Everyone in the group gets an invite link, no need to re-add anyone by hand",
+  ],
   "1.2.0": [
     "🏅 Achievements rebuilt with Bronze to Platinum tiers, grouped into series, with all-new badge artwork",
     "🎉 Confetti and a banner the moment you unlock an achievement",
