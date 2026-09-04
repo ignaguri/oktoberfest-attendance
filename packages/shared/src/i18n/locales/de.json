@@ -2451,7 +2451,10 @@
       "title": "Festival auswählen",
       "description": "Wähle aus, welches Festival du ansehen und an dem du teilnehmen möchtest.",
       "currentFestival": "Aktuelles Festival",
-      "noFestival": "Kein Festival ausgewählt"
+      "noFestival": "Kein Festival ausgewählt",
+      "pastFestivals": "Vergangenes Fest ({{count}})",
+      "pastFestivals_other": "Vergangene Feste ({{count}})",
+      "pastFestivalsHint": "Zeigt Feste, die bereits beendet sind"
     },
     "status": {
       "upcoming": "Demnächst",
