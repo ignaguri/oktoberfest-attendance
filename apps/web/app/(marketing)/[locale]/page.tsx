@@ -8,7 +8,7 @@ import { notFound } from "next/navigation";
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { NON_DEFAULT_LOCALES } from "@/lib/blog";
+import { NON_DEFAULT_LOCALES } from "@/lib/constants";
 
 export const revalidate = 86400;
 

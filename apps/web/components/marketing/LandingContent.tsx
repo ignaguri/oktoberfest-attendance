@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Beer, Calendar, Check, Download, MapPin, Trophy, Users, Watch } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
@@ -16,14 +16,13 @@ import AppLogo from "@/public/android-chrome-512x512.png";
 // state ships a blank page to anyone whose JS has not run yet, and it defers LCP
 // until the bundle has downloaded, hydrated and run the entrance animation. A
 // pure slide keeps every element painted from the first frame.
-const slideUp = {
+//
+// prefers-reduced-motion is handled by the .entrance-scope rule in globals.css,
+// not by branching on useReducedMotion here: the hook returns null on the server
+// and the real preference on the client's first render, so branching on it ships
+// two different transforms and React refuses to patch the mismatch.
+const entrance = {
   hidden: { y: 24 },
-  visible: { y: 0 },
-};
-
-// prefers-reduced-motion: render in place, no entrance at all.
-const noEntrance = {
-  hidden: { y: 0 },
   visible: { y: 0 },
 };
 
@@ -55,10 +54,9 @@ const festivalKeys = [
 export function LandingContent() {
   const { t } = useTranslation();
   const lang = i18n.language;
-  const entrance = useReducedMotion() ? noEntrance : slideUp;
 
   return (
-    <div className="overflow-hidden">
+    <div className="entrance-scope overflow-hidden">
       {/* Hero */}
       <section className="relative px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
         {/* Background gradient */}
