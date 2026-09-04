@@ -79,22 +79,37 @@ describe("Group Routes Integration (Local DB)", () => {
   afterAll(async () => {
     // Cleanup: Delete all test data in correct order (respecting foreign keys)
     // Use admin client to bypass RLS policies
+    //
+    // By festival, not by the tracked createdGroupIds array: beforeEach resets
+    // it, so it only ever holds what the LAST test registered and every earlier
+    // test's rows survived. groups_festival_id_fkey is RESTRICT, not CASCADE
+    // (same for attendances and tent_visits), so the festival delete below then
+    // failed silently and each run left orphan festivals behind in the local
+    // database. group_members does cascade from groups, but we still delete it
+    // explicitly first for clarity/defense in depth.
+    const festivalIds = [
+      ...(testFestival?.id ? [testFestival.id] : []),
+      ...createdFestivalIds,
+    ];
 
-    // 1. Delete group members first
-    await supabaseAdmin.from("group_members").delete().in("group_id", createdGroupIds);
+    for (const festivalId of festivalIds) {
+      const { data: festivalGroups } = await supabaseAdmin
+        .from("groups")
+        .select("id")
+        .eq("festival_id", festivalId);
+      const groupIds = (festivalGroups ?? []).map((row) => row.id);
 
-    // 2. Delete groups
-    await supabaseAdmin.from("groups").delete().in("id", createdGroupIds);
+      if (groupIds.length > 0) {
+        await supabaseAdmin.from("group_members").delete().in("group_id", groupIds);
+      }
+      await supabaseAdmin.from("groups").delete().eq("festival_id", festivalId);
 
-    // 3. Delete festivals. groups cascade from festivals, and group_members
-    // cascade from groups, so this also sweeps up anything the per-test
-    // createdGroupIds reset dropped track of.
-    if (createdFestivalIds.length > 0) {
-      await supabaseAdmin.from("festivals").delete().in("id", createdFestivalIds);
-    }
+      // attendances and tent_visits are also RESTRICT against festivals, so
+      // sweep them defensively even though this suite doesn't create them.
+      await supabaseAdmin.from("tent_visits").delete().eq("festival_id", festivalId);
+      await supabaseAdmin.from("attendances").delete().eq("festival_id", festivalId);
 
-    if (testFestival?.id) {
-      await supabaseAdmin.from("festivals").delete().eq("id", testFestival.id);
+      await supabaseAdmin.from("festivals").delete().eq("id", festivalId);
     }
 
     // 4. Delete test user (requires admin API)
