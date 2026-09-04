@@ -96,6 +96,7 @@ export {
   AuthRequiredError,
   type ApiClientConfig as TypedApiClientConfig,
   type ApiResponse as TypedApiResponse,
+  type ClientPlatform,
   type TypedApiClient,
   type ApiHeaders,
 } from "./typed-client";
