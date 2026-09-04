@@ -55,8 +55,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(unescapedUrl, request.url));
   }
 
-  // Handle OAuth code parameter at root level as fallback
-  if (request.nextUrl.pathname === "/" && request.nextUrl.searchParams.has("code")) {
+  // Handle OAuth code parameter on the landing pages. This is the only place that
+  // does it: the landing pages themselves must not read searchParams, because that
+  // opts them out of static prerendering.
+  if (/^\/(de|es)?$/.test(request.nextUrl.pathname) && request.nextUrl.searchParams.has("code")) {
     const code = request.nextUrl.searchParams.get("code");
     const redirectParam = request.nextUrl.searchParams.get("redirect");
 

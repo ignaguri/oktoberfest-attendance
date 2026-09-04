@@ -41,7 +41,11 @@ export function MarketingHeader() {
           href={isLoggedIn ? "/home" : marketingUrl("/", lang)}
           className="flex items-center gap-2 text-lg font-bold text-gray-900"
         >
-          <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" priority />
+          {/* sizes matches the hero logo in LandingContent on purpose: identical
+              sizes means both pick the same srcset candidate, so the two
+              priority-preloaded logos collapse into one 96px request instead of
+              pulling the 512px source. */}
+          <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" sizes="96px" priority />
           <span translate="no">ProstCounter</span>
         </Link>
 

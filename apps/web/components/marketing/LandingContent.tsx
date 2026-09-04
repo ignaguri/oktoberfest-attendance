@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Beer, Calendar, Check, Download, MapPin, Trophy, Users, Watch } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
@@ -11,9 +11,20 @@ import { i18n, useTranslation } from "@/lib/i18n/client";
 import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
+// No opacity in the hidden state on purpose. framer-motion serializes `initial`
+// into the server-rendered markup as an inline style, so an `opacity: 0` hidden
+// state ships a blank page to anyone whose JS has not run yet, and it defers LCP
+// until the bundle has downloaded, hydrated and run the entrance animation. A
+// pure slide keeps every element painted from the first frame.
+const slideUp = {
+  hidden: { y: 24 },
+  visible: { y: 0 },
+};
+
+// prefers-reduced-motion: render in place, no entrance at all.
+const noEntrance = {
+  hidden: { y: 0 },
+  visible: { y: 0 },
 };
 
 const stagger = {
@@ -44,6 +55,7 @@ const festivalKeys = [
 export function LandingContent() {
   const { t } = useTranslation();
   const lang = i18n.language;
+  const fadeUp = useReducedMotion() ? noEntrance : slideUp;
 
   return (
     <div className="overflow-hidden">
@@ -69,6 +81,7 @@ export function LandingContent() {
               src={AppLogo}
               alt="ProstCounter Logo"
               className="mx-auto size-20 drop-shadow-lg sm:size-24"
+              sizes="96px"
               priority
             />
           </motion.div>

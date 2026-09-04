@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Beer, Download, Globe, Smartphone, Watch } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
@@ -9,9 +9,16 @@ import { Button } from "@/components/ui/button";
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n/client";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
+// See LandingContent: an `opacity: 0` hidden state is serialized into the SSR
+// markup, blanking the page until hydration. Slide only.
+const slideUp = {
+  hidden: { y: 24 },
+  visible: { y: 0 },
+};
+
+const noEntrance = {
+  hidden: { y: 0 },
+  visible: { y: 0 },
 };
 
 const stagger = {
@@ -48,6 +55,7 @@ const platformKeys = [
 
 export function DownloadContent() {
   const { t } = useTranslation();
+  const fadeUp = useReducedMotion() ? noEntrance : slideUp;
 
   return (
     <div className="px-4 py-16 sm:px-6">

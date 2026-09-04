@@ -41,7 +41,8 @@ export function MarketingFooter() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href={marketingUrl("/", lang)} className="flex items-center gap-2">
-              <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" />
+              {/* Same sizes as the header and hero logos so all three share one request. */}
+              <Image src={AppLogo} alt="ProstCounter Logo" className="size-8" sizes="96px" />
               <span className="text-lg font-bold" translate="no">
                 ProstCounter
               </span>
