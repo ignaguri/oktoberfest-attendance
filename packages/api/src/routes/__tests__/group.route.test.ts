@@ -416,12 +416,21 @@ describe("Group Routes", () => {
       ];
 
       // 1st from(): target festival start_date. 2nd: past groups. 3rd: existing
-      // carry-overs. 4th: member count.
+      // carry-overs. 4th: every candidate's members, counted in one query.
+      const groupId = "123e4567-e89b-12d3-a456-426614174000";
       vi.mocked(mockSupabase.from)
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ start_date: "2026-09-19" })))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(pastGroups)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])))
-        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess([]), count: 4 }));
+        .mockReturnValueOnce(
+          createMockChain(
+            mockSupabaseSuccess([
+              { group_id: groupId },
+              { group_id: groupId },
+              { group_id: groupId },
+            ]),
+          ),
+        );
 
       const req = createAuthRequest(
         "/groups/carry-over-candidates?festivalId=323e4567-e89b-12d3-a456-426614174000",
@@ -429,15 +438,21 @@ describe("Group Routes", () => {
 
       const res = await app.request(req as Request);
       const json = (await res.json()) as {
-        data: Array<{ groupId: string; name: string; sourceFestivalName: string }>;
+        data: Array<{
+          groupId: string;
+          name: string;
+          sourceFestivalName: string;
+          memberCount: number;
+        }>;
       };
 
       expect(res.status).toBe(200);
       expect(json.data).toHaveLength(1);
       expect(json.data[0]).toMatchObject({
-        groupId: "123e4567-e89b-12d3-a456-426614174000",
+        groupId,
         name: "Wiesn Crew",
         sourceFestivalName: "Oktoberfest 2025",
+        memberCount: 3,
       });
     });
 

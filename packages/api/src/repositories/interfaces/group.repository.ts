@@ -139,9 +139,14 @@ export interface IGroupRepository {
   carryOver(userId: string, sourceGroupId: string, targetFestivalId: string): Promise<Group>;
 
   /**
-   * Get a festival's end date
+   * Get what is needed to decide whether a festival is over: its end date and
+   * the timezone that date is expressed in. Both travel together because
+   * comparing the end date against "today" in the wrong zone is off by a day at
+   * the boundary.
    * @param festivalId - Festival ID
-   * @returns end_date as YYYY-MM-DD, or null if the festival does not exist
+   * @returns end_date as YYYY-MM-DD plus its timezone, or null if no such festival
    */
-  getFestivalEndDate(festivalId: string): Promise<string | null>;
+  getFestivalSchedule(
+    festivalId: string,
+  ): Promise<{ endDate: string; timezone: string | null } | null>;
 }

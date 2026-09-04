@@ -517,23 +517,36 @@ export class SupabaseGroupRepository implements IGroupRepository {
       return true;
     });
 
-    return await Promise.all(
-      newestPerName.map(async (group) => {
-        const { count } = await this.supabase
-          .from("group_members")
-          .select("*", { count: "exact", head: true })
-          .eq("group_id", group.id);
+    // One query for every candidate's members rather than a head-count per
+    // candidate: this runs on the groups tab, and a per-row count also swallowed
+    // its own error, quietly rendering "0 members" for a query that failed.
+    const { data: memberRows, error: memberError } = await this.supabase
+      .from("group_members")
+      .select("group_id")
+      .in(
+        "group_id",
+        newestPerName.map((group) => group.id),
+      );
 
-        return {
-          groupId: group.id,
-          name: group.name,
-          winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
-          memberCount: count || 0,
-          sourceFestivalId: group.festival_id,
-          sourceFestivalName: group.festivals?.name || "",
-        };
-      }),
-    );
+    if (memberError) {
+      throw new DatabaseError(`Failed to count carry-over members: ${memberError.message}`);
+    }
+
+    const memberCounts = new Map<string, number>();
+    for (const row of memberRows ?? []) {
+      if (row.group_id) {
+        memberCounts.set(row.group_id, (memberCounts.get(row.group_id) ?? 0) + 1);
+      }
+    }
+
+    return newestPerName.map((group) => ({
+      groupId: group.id,
+      name: group.name,
+      winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
+      memberCount: memberCounts.get(group.id) ?? 0,
+      sourceFestivalId: group.festival_id,
+      sourceFestivalName: group.festivals?.name || "",
+    }));
   }
 
   async findCarryOverTarget(
@@ -614,10 +627,12 @@ export class SupabaseGroupRepository implements IGroupRepository {
     };
   }
 
-  async getFestivalEndDate(festivalId: string): Promise<string | null> {
+  async getFestivalSchedule(
+    festivalId: string,
+  ): Promise<{ endDate: string; timezone: string | null } | null> {
     const { data, error } = await this.supabase
       .from("festivals")
-      .select("end_date")
+      .select("end_date, timezone")
       .eq("id", festivalId)
       .maybeSingle();
 
@@ -625,7 +640,11 @@ export class SupabaseGroupRepository implements IGroupRepository {
       throw new DatabaseError(`Failed to fetch festival: ${error.message}`);
     }
 
-    return data?.end_date ?? null;
+    if (!data) {
+      return null;
+    }
+
+    return { endDate: data.end_date, timezone: data.timezone };
   }
 
   private mapToGroup(data: any): Group {

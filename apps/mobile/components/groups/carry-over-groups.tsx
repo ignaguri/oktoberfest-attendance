@@ -30,10 +30,11 @@ export function CarryOverGroups({ onSuccess, onError }: CarryOverGroupsProps) {
   const { mutateAsync: carryOverGroup } = useCarryOverGroup();
 
   // festivals.status and is_active are stale in prod, so gate on the date.
-  // formatDateForDatabase, not toISOString: the server guard resolves "today" in
-  // the festival timezone, and a UTC date disagrees with it on the last day.
+  // Resolved in the festival's own timezone to match the server guard: endDate is
+  // a wall-clock date there, and a UTC date disagrees with it on the last day.
   const festivalHasEnded = currentFestival
-    ? currentFestival.endDate < formatDateForDatabase(new Date())
+    ? currentFestival.endDate <
+      formatDateForDatabase(new Date(), currentFestival.timezone ?? undefined)
     : true;
 
   if (!currentFestival || loading || festivalHasEnded || candidates.length === 0) {

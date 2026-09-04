@@ -48,7 +48,7 @@ describe("GroupService carry-over", () => {
     repo = {
       findById: vi.fn().mockResolvedValue(buildSourceGroup()),
       isCreator: vi.fn().mockResolvedValue(true),
-      getFestivalEndDate: vi.fn().mockResolvedValue("2999-10-04"),
+      getFestivalSchedule: vi.fn().mockResolvedValue({ endDate: "2999-10-04", timezone: "Europe/Berlin" }),
       findCarryOverTarget: vi.fn().mockResolvedValue(null),
       carryOver: vi.fn().mockResolvedValue(buildCarriedGroup()),
       listCarryOverCandidates: vi.fn().mockResolvedValue([]),
@@ -91,7 +91,7 @@ describe("GroupService carry-over", () => {
   });
 
   it("rejects a target festival that does not exist", async () => {
-    vi.mocked(repo.getFestivalEndDate).mockResolvedValue(null);
+    vi.mocked(repo.getFestivalSchedule).mockResolvedValue(null);
 
     await expect(
       service.carryOverGroup(SOURCE_GROUP_ID, CREATOR_ID, TARGET_FESTIVAL_ID),
@@ -99,7 +99,7 @@ describe("GroupService carry-over", () => {
   });
 
   it("rejects a target festival that has already ended", async () => {
-    vi.mocked(repo.getFestivalEndDate).mockResolvedValue("2020-10-04");
+    vi.mocked(repo.getFestivalSchedule).mockResolvedValue({ endDate: "2020-10-04", timezone: "Europe/Berlin" });
 
     await expect(
       service.carryOverGroup(SOURCE_GROUP_ID, CREATOR_ID, TARGET_FESTIVAL_ID),

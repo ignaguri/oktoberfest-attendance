@@ -463,10 +463,13 @@ describe("Group Routes Integration (Local DB)", () => {
       expect(candidates.map((candidate) => candidate.groupId)).not.toContain(future.group_id);
     });
 
-    it("returns the festival end date, and null for an unknown festival", async () => {
-      expect(await repo.getFestivalEndDate(targetFestival.id)).toBe(targetFestival.endDate);
+    it("returns the festival end date and timezone, and null for an unknown festival", async () => {
+      expect(await repo.getFestivalSchedule(targetFestival.id)).toEqual({
+        endDate: targetFestival.endDate,
+        timezone: "Europe/Berlin",
+      });
       expect(
-        await repo.getFestivalEndDate("00000000-0000-0000-0000-000000000000"),
+        await repo.getFestivalSchedule("00000000-0000-0000-0000-000000000000"),
       ).toBeNull();
     });
   });

@@ -261,14 +261,19 @@ export class GroupService {
       throw new ConflictError(ErrorCodes.GROUP_ALREADY_CARRIED_OVER);
     }
 
-    const endDate = await this.groupRepo.getFestivalEndDate(targetFestivalId);
-    if (!endDate) {
+    const schedule = await this.groupRepo.getFestivalSchedule(targetFestivalId);
+    if (!schedule) {
       throw new NotFoundError(ErrorCodes.FESTIVAL_NOT_FOUND);
     }
 
     // festivals.status and is_active are stale in prod, so the guard compares
     // end_date directly. Both are YYYY-MM-DD, so string compare is safe.
-    if (endDate < formatDateForDatabase(new Date())) {
+    // "Today" is resolved in the festival's own timezone: end_date is a wall-clock
+    // date there, so using the app default would end the festival a day early or
+    // late for anything outside Europe/Berlin. `?? undefined` falls back to that
+    // default, since festivals.timezone is nullable.
+    const today = formatDateForDatabase(new Date(), schedule.timezone ?? undefined);
+    if (schedule.endDate < today) {
       throw new ConflictError(ErrorCodes.FESTIVAL_ENDED);
     }
 
