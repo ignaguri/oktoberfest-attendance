@@ -415,8 +415,10 @@ describe("Group Routes", () => {
         },
       ];
 
-      // 1st from(): past groups. 2nd: existing carry-overs. 3rd: member count.
+      // 1st from(): target festival start_date. 2nd: past groups. 3rd: existing
+      // carry-overs. 4th: member count.
       vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ start_date: "2026-09-19" })))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(pastGroups)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])))
         .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess([]), count: 4 }));
@@ -437,6 +439,74 @@ describe("Group Routes", () => {
         name: "Wiesn Crew",
         sourceFestivalName: "Oktoberfest 2025",
       });
+    });
+
+    // A crew that ran for several festivals leaves one row per year, all sharing
+    // a name. UNIQUE (name, festival_id) means only the newest can actually be
+    // carried over, so offering the older ones is offering a guaranteed failure.
+    it("offers only the newest source when a name repeats across festivals", async () => {
+      const pastGroups = [
+        {
+          id: "aaaaaaaa-e89b-12d3-a456-426614174000",
+          name: "Wiesn Crew",
+          winning_criteria_id: 2,
+          festival_id: "111e4567-e89b-12d3-a456-426614174000",
+          festivals: {
+            id: "111e4567-e89b-12d3-a456-426614174000",
+            name: "Oktoberfest 2024",
+            start_date: "2024-09-21",
+          },
+        },
+        {
+          id: "bbbbbbbb-e89b-12d3-a456-426614174000",
+          name: "Wiesn Crew",
+          winning_criteria_id: 2,
+          festival_id: "222e4567-e89b-12d3-a456-426614174000",
+          festivals: {
+            id: "222e4567-e89b-12d3-a456-426614174000",
+            name: "Oktoberfest 2025",
+            start_date: "2025-09-20",
+          },
+        },
+      ];
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ start_date: "2026-09-19" })))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(pastGroups)))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess([])))
+        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess([]), count: 4 }));
+
+      const req = createAuthRequest(
+        "/groups/carry-over-candidates?festivalId=323e4567-e89b-12d3-a456-426614174000",
+      );
+
+      const res = await app.request(req as Request);
+      const json = (await res.json()) as {
+        data: Array<{ groupId: string; sourceFestivalName: string }>;
+      };
+
+      expect(res.status).toBe(200);
+      expect(json.data).toHaveLength(1);
+      expect(json.data[0]).toMatchObject({
+        groupId: "bbbbbbbb-e89b-12d3-a456-426614174000",
+        sourceFestivalName: "Oktoberfest 2025",
+      });
+    });
+
+    it("returns nothing when the target festival is gone", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain(mockSupabaseSuccess(null)),
+      );
+
+      const req = createAuthRequest(
+        "/groups/carry-over-candidates?festivalId=323e4567-e89b-12d3-a456-426614174000",
+      );
+
+      const res = await app.request(req as Request);
+      const json = (await res.json()) as { data: unknown[] };
+
+      expect(res.status).toBe(200);
+      expect(json.data).toEqual([]);
     });
 
     it("should require a festivalId", async () => {

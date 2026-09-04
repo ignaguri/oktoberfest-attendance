@@ -82,9 +82,13 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
         return payload.groupId ? `/group-detail/${payload.groupId}` : "/groups";
 
       // The recipient is not a member of the cloned group yet, so this must
-      // route to the join link, never to the group detail page.
+      // route to the join link, never to the group detail page. Query form, not
+      // /join-group/<token>: this string is fed straight to router.push on both
+      // platforms, and web only has apps/web/app/(private)/join-group/page.tsx,
+      // which reads ?token=. Mobile's join-group/index.tsx accepts the query
+      // form and redirects to its own [token] route.
       case NOTIFICATION_PUSH_TYPES.GROUP_CARRY_OVER:
-        return payload.inviteToken ? `/join-group/${payload.inviteToken}` : "/groups";
+        return payload.inviteToken ? `/join-group?token=${payload.inviteToken}` : "/groups";
 
       case NOTIFICATION_PUSH_TYPES.TENT_CHECKIN:
       case NOTIFICATION_PUSH_TYPES.LOCATION_SHARING:
@@ -111,7 +115,7 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
   // so it cannot carry data.type and the raw trigger payload arrives instead.
   // A carry-over payload has both, and the recipient is not a member yet, so
   // the invite link has to win over /group-detail.
-  if (payload.inviteToken) return `/join-group/${payload.inviteToken}`;
+  if (payload.inviteToken) return `/join-group?token=${payload.inviteToken}`;
   if (payload.groupId) return `/group-detail/${payload.groupId}`;
 
   // Try URL if present

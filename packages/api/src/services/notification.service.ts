@@ -682,10 +682,18 @@ export class NotificationService {
         return;
       }
 
-      const enabledRecipientIds = (prefsList || [])
-        .filter((p) => p.group_notifications_enabled !== false)
-        .map((p) => p.user_id)
-        .filter(Boolean) as string[];
+      // Start from the recipients and subtract, rather than building the list
+      // out of the returned rows: an account that predates the default-
+      // preferences trigger has no row at all, and deriving the list from rows
+      // would silently drop it. A missing row means opted in, which is how every
+      // other method here reads it (see the `prefs &&` guard in notifyGroupJoin).
+      const disabledRecipientIds = new Set(
+        (prefsList || [])
+          .filter((p) => p.group_notifications_enabled === false)
+          .map((p) => p.user_id),
+      );
+
+      const enabledRecipientIds = recipientIds.filter((id) => !disabledRecipientIds.has(id));
 
       if (enabledRecipientIds.length === 0) {
         return;

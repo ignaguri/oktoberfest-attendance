@@ -3,6 +3,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { CarryOverCandidate } from "@prostcounter/shared/schemas";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,8 +23,10 @@ export default function CarryOverGroups() {
   const { mutateAsync: carryOverGroup } = useCarryOverGroup();
 
   // festivals.status and is_active are stale in prod, so gate on the date.
+  // formatDateForDatabase, not toISOString: the server guard resolves "today" in
+  // the festival timezone, and a UTC date disagrees with it on the last day.
   const festivalHasEnded = currentFestival
-    ? currentFestival.endDate < new Date().toISOString().slice(0, 10)
+    ? currentFestival.endDate < formatDateForDatabase(new Date())
     : true;
 
   if (!currentFestival || loading || festivalHasEnded || candidates.length === 0) {

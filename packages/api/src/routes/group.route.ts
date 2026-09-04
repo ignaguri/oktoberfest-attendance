@@ -865,26 +865,38 @@ app.openapi(carryOverRoute, async (c) => {
 
   const group = await service.carryOverGroup(id, user.id, targetFestivalId);
 
-  // Notify last year's crew once, right after the clone exists. Failures are
-  // swallowed inside the service: a missed push must not fail the carry-over.
-  // The constructor throws without an API key, so guard it like the other routes.
+  // Notify last year's crew once, right after the clone exists. The whole block
+  // is guarded because the clone is already committed by this point: a missed
+  // push must not turn a successful carry-over into an error the client reports
+  // as a failure, whose retry then hits GROUP_ALREADY_CARRIED_OVER. Only
+  // notifyGroupCarryOver swallows its own failures; getMembers throws
+  // NOT_GROUP_MEMBER for a creator who left the source group, and findById
+  // throws on any query error. The constructor throws without an API key, so
+  // guard that like the other routes.
   const novuApiKey = process.env.NOVU_API_KEY;
   if (novuApiKey) {
-    const sourceMembers = await service.getMembers(id, user.id);
-    const recipientIds = sourceMembers
-      .map((member) => member.userId)
-      .filter((memberId) => memberId !== user.id);
+    try {
+      const sourceMembers = await service.getMembers(id, user.id);
+      const recipientIds = sourceMembers
+        .map((member) => member.userId)
+        .filter((memberId) => memberId !== user.id);
 
-    const festivalRepo = new SupabaseFestivalRepository(supabase);
-    const targetFestival = await festivalRepo.findById(targetFestivalId);
+      const festivalRepo = new SupabaseFestivalRepository(supabase);
+      const targetFestival = await festivalRepo.findById(targetFestivalId);
 
-    const notificationService = new NotificationService(supabase, novuApiKey);
-    await notificationService.notifyGroupCarryOver(recipientIds, {
-      groupName: group.name,
-      festivalName: targetFestival?.name ?? "",
-      inviteToken: group.inviteToken,
-      groupId: group.id,
-    });
+      const notificationService = new NotificationService(supabase, novuApiKey);
+      await notificationService.notifyGroupCarryOver(recipientIds, {
+        groupName: group.name,
+        festivalName: targetFestival?.name ?? "",
+        inviteToken: group.inviteToken,
+        groupId: group.id,
+      });
+    } catch (error) {
+      logger.error(
+        { error, sourceGroupId: id, carriedOverGroupId: group.id },
+        "Group carried over, but notifying the source group's members failed",
+      );
+    }
   }
 
   // Evaluate-only: the unlock reaches the client through the outbox, not this

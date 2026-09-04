@@ -1,7 +1,9 @@
 import { useFestival } from "@prostcounter/shared/contexts";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useCarryOverCandidates, useCarryOverGroup } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CarryOverCandidate } from "@prostcounter/shared/schemas";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
 import { useState } from "react";
 
 import { Button, ButtonText } from "@/components/ui/button";
@@ -12,9 +14,11 @@ import { VStack } from "@/components/ui/vstack";
 
 interface CarryOverGroupsProps {
   onSuccess: (groupName: string) => void | Promise<void>;
+  /** Receives an already-translated message; the codes are only meaningful here. */
+  onError: (message: string) => void | Promise<void>;
 }
 
-export function CarryOverGroups({ onSuccess }: CarryOverGroupsProps) {
+export function CarryOverGroups({ onSuccess, onError }: CarryOverGroupsProps) {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const [pendingGroupId, setPendingGroupId] = useState<string | null>(null);
@@ -26,8 +30,10 @@ export function CarryOverGroups({ onSuccess }: CarryOverGroupsProps) {
   const { mutateAsync: carryOverGroup } = useCarryOverGroup();
 
   // festivals.status and is_active are stale in prod, so gate on the date.
+  // formatDateForDatabase, not toISOString: the server guard resolves "today" in
+  // the festival timezone, and a UTC date disagrees with it on the last day.
   const festivalHasEnded = currentFestival
-    ? currentFestival.endDate < new Date().toISOString().slice(0, 10)
+    ? currentFestival.endDate < formatDateForDatabase(new Date())
     : true;
 
   if (!currentFestival || loading || festivalHasEnded || candidates.length === 0) {
@@ -43,6 +49,16 @@ export function CarryOverGroups({ onSuccess }: CarryOverGroupsProps) {
         targetFestivalId: currentFestival.id,
       });
       await onSuccess(candidate.name);
+    } catch (error) {
+      // mutateAsync rejects, so without this the tap fails silently and the
+      // rejection escapes onPress unhandled. ApiError carries the server's error
+      // code; the message is human text not meant for display.
+      const code = (error as { code?: string })?.code;
+      await onError(
+        code === ErrorCodes.GROUP_NAME_TAKEN
+          ? t("groups.carryOver.errorNameTaken", { name: candidate.name })
+          : t("groups.carryOver.errorGeneric"),
+      );
     } finally {
       setPendingGroupId(null);
     }

@@ -12,8 +12,15 @@ ALTER TABLE public.groups
   ADD COLUMN IF NOT EXISTS carried_over_from uuid
   REFERENCES public.groups(id) ON DELETE SET NULL;
 
-CREATE INDEX IF NOT EXISTS idx_groups_carried_over_from
-  ON public.groups(carried_over_from);
+-- Unique, not just indexed: a group can be carried into a given festival at most
+-- once. The service checks this before inserting, but that check is a TOCTOU
+-- window, and two concurrent carry-overs slipping through would leave the
+-- findCarryOverTarget lookup permanently broken on multiple rows. Partial so the
+-- NULLs on ordinary groups are not covered; it still serves lookups by
+-- carried_over_from, so no separate plain index is needed.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_groups_carried_over_from_festival
+  ON public.groups(carried_over_from, festival_id)
+  WHERE carried_over_from IS NOT NULL;
 
 COMMENT ON COLUMN public.groups.carried_over_from IS
   'Group in an earlier festival that this group continues. NULL for originals.';
@@ -120,6 +127,21 @@ BEGIN
     -- Insert the creator as a member of the group
     INSERT INTO group_members (group_id, user_id)
     VALUES (v_group_id, p_user_id);
+
+    -- set_group_token stamps every new group with a 7-day token expiry, which
+    -- suits an ad-hoc invite link but not a carry-over: that token is the only
+    -- CTA in the notification last year's crew receives, and they have the whole
+    -- festival to act on it. GREATEST keeps the 7-day floor when the target
+    -- festival is already nearly over, and ignores a NULL if the festival row is
+    -- missing rather than clearing the expiry.
+    IF p_carried_over_from IS NOT NULL THEN
+        UPDATE groups
+        SET token_expiration = GREATEST(
+              token_expiration,
+              (SELECT f.end_date + INTERVAL '1 day' FROM festivals f WHERE f.id = p_festival_id)
+            )
+        WHERE id = v_group_id;
+    END IF;
 
     -- Return the created group details
     RETURN QUERY SELECT

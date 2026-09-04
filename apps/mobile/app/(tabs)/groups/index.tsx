@@ -96,6 +96,13 @@ export default function GroupsScreen() {
     [syncAndRefresh, showDialog, t, currentFestival],
   );
 
+  const handleCarryOverError = useCallback(
+    (message: string) => {
+      showDialog(t("common.status.error"), message);
+    },
+    [showDialog, t],
+  );
+
   const handleJoinSuccess = useCallback(async () => {
     setIsJoinSheetOpen(false);
     showDialog(t("common.status.success"), t("groups.joinSuccess"));
@@ -147,7 +154,7 @@ export default function GroupsScreen() {
             festival where you have no groups yet but last time's crew exists.
             Spacing lives inside the component so nothing is left behind when it
             renders null. */}
-        <CarryOverGroups onSuccess={handleCarryOverSuccess} />
+        <CarryOverGroups onSuccess={handleCarryOverSuccess} onError={handleCarryOverError} />
 
         {hasGroups ? (
           <VStack space="md" className="p-4 pb-20">

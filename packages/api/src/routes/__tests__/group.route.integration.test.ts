@@ -398,6 +398,71 @@ describe("Group Routes Integration (Local DB)", () => {
       ).rejects.toThrow(ErrorCodes.GROUP_NAME_TAKEN);
     });
 
+    // The invite token is the only CTA in the notification the source group's
+    // members receive, and set_group_token stamps every new group with a 7-day
+    // expiry, so without the override the link dies mid-festival.
+    it("keeps the carry-over invite token alive until the festival ends", async () => {
+      const { data: created } = await supabaseAdmin.rpc("create_group_with_member", {
+        p_group_name: `Expiry Crew ${Date.now()}`,
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 2,
+      });
+      const source = created![0];
+      createdGroupIds.push(source.group_id);
+
+      const carried = await repo.carryOver(testUser.id, source.group_id, targetFestival.id);
+      createdGroupIds.push(carried.id);
+
+      const { data: rows } = await supabaseAdmin
+        .from("groups")
+        .select("id, token_expiration")
+        .in("id", [source.group_id, carried.id]);
+
+      const sourceExpiry = rows!.find((row) => row.id === source.group_id)!.token_expiration!;
+      const carriedExpiry = rows!.find((row) => row.id === carried.id)!.token_expiration!;
+
+      // The source is an ordinary group and keeps the 7-day default.
+      expect(sourceExpiry < targetFestival.endDate).toBe(true);
+      expect(carriedExpiry > targetFestival.endDate).toBe(true);
+    });
+
+    it("does not offer groups from festivals that start after the target", async () => {
+      const { data: laterFestival, error: laterError } = await supabaseAdmin
+        .from("festivals")
+        .insert({
+          name: `Carry Over Later ${Date.now()}`,
+          short_name: `carryover-later-${Date.now()}`,
+          festival_type: "oktoberfest",
+          start_date: "2100-09-19",
+          end_date: "2100-10-04",
+          beer_cost: 16.2,
+          location: "Test Location",
+          timezone: "Europe/Berlin",
+          is_active: false,
+          status: "upcoming",
+        })
+        .select()
+        .single();
+
+      if (laterError || !laterFestival) {
+        throw new Error(`Failed to create later festival: ${laterError?.message}`);
+      }
+      createdFestivalIds.push(laterFestival.id);
+
+      const { data: created } = await supabaseAdmin.rpc("create_group_with_member", {
+        p_group_name: `Future Crew ${Date.now()}`,
+        p_user_id: testUser.id,
+        p_festival_id: laterFestival.id,
+        p_winning_criteria_id: 2,
+      });
+      const future = created![0];
+      createdGroupIds.push(future.group_id);
+
+      const candidates = await repo.listCarryOverCandidates(testUser.id, targetFestival.id);
+      expect(candidates.map((candidate) => candidate.groupId)).not.toContain(future.group_id);
+    });
+
     it("returns the festival end date, and null for an unknown festival", async () => {
       expect(await repo.getFestivalEndDate(targetFestival.id)).toBe(targetFestival.endDate);
       expect(

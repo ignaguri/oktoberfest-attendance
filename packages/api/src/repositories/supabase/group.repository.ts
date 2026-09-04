@@ -15,7 +15,7 @@ import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
+import { ConflictError, DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
 import type { IGroupRepository } from "../interfaces";
 
 // Mapping between winning criteria strings and database IDs
@@ -433,7 +433,23 @@ export class SupabaseGroupRepository implements IGroupRepository {
     userId: string,
     targetFestivalId: string,
   ): Promise<CarryOverCandidate[]> {
-    // Groups the caller created in any other festival.
+    // "Past" has to mean earlier than the target, not merely different: .neq
+    // alone also offers groups from festivals that have not started yet.
+    const { data: target, error: targetError } = await this.supabase
+      .from("festivals")
+      .select("start_date")
+      .eq("id", targetFestivalId)
+      .maybeSingle();
+
+    if (targetError) {
+      throw new DatabaseError(`Failed to list carry-over candidates: ${targetError.message}`);
+    }
+
+    if (!target) {
+      return [];
+    }
+
+    // Groups the caller created in an earlier festival.
     const { data: pastGroups, error: pastError } = await this.supabase
       .from("groups")
       .select(
@@ -446,7 +462,8 @@ export class SupabaseGroupRepository implements IGroupRepository {
       `,
       )
       .eq("created_by", userId)
-      .neq("festival_id", targetFestivalId);
+      .neq("festival_id", targetFestivalId)
+      .lt("festivals.start_date", target.start_date);
 
     if (pastError) {
       throw new DatabaseError(`Failed to list carry-over candidates: ${pastError.message}`);
@@ -487,8 +504,21 @@ export class SupabaseGroupRepository implements IGroupRepository {
       (b.festivals?.start_date || "").localeCompare(a.festivals?.start_date || ""),
     );
 
+    // A crew that has run for several festivals leaves one candidate per year,
+    // all with the same name. Only the newest can be carried over: UNIQUE
+    // (name, festival_id) makes every later one a guaranteed GROUP_NAME_TAKEN.
+    // Relies on the sort above having put the newest first.
+    const seenNames = new Set<string>();
+    const newestPerName = remaining.filter((group) => {
+      if (seenNames.has(group.name)) {
+        return false;
+      }
+      seenNames.add(group.name);
+      return true;
+    });
+
     return await Promise.all(
-      remaining.map(async (group) => {
+      newestPerName.map(async (group) => {
         const { count } = await this.supabase
           .from("group_members")
           .select("*", { count: "exact", head: true })
@@ -544,10 +574,23 @@ export class SupabaseGroupRepository implements IGroupRepository {
     });
 
     if (error) {
-      // UNIQUE (name, festival_id): the creator already made a group with this
-      // name in the target festival by hand.
       if (error.code === PgErrorCode.UNIQUE_VIOLATION) {
-        throw new ConflictError(ErrorCodes.GROUP_NAME_TAKEN);
+        // Two unique constraints can fire here. The partial index means another
+        // request won the race to carry this group into this festival, which is
+        // the same answer the service-level check gives; anything else is
+        // UNIQUE (name, festival_id), i.e. the creator already made a group with
+        // this name in the target festival by hand.
+        const violated = `${error.message} ${error.details ?? ""}`;
+        throw new ConflictError(
+          violated.includes("idx_groups_carried_over_from_festival")
+            ? ErrorCodes.GROUP_ALREADY_CARRIED_OVER
+            : ErrorCodes.GROUP_NAME_TAKEN,
+        );
+      }
+      // The function re-checks source ownership itself, so this is reachable
+      // even though the service already ran isCreator.
+      if (error.code === PgErrorCode.INSUFFICIENT_PRIVILEGE) {
+        throw new ForbiddenError(ErrorCodes.NOT_GROUP_CREATOR);
       }
       throw new DatabaseError(`Failed to carry over group: ${error.message}`);
     }
