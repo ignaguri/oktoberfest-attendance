@@ -412,7 +412,8 @@
       "moreOptions": "Más opciones...",
       "whatsappNotInstalled": "WhatsApp no está instalado en este dispositivo",
       "whatsappFailed": "No se pudo abrir WhatsApp",
-      "copyFailed": "No se pudo copiar al portapapeles"
+      "copyFailed": "No se pudo copiar al portapapeles",
+      "alone": "Estás solo en este grupo. Compartí el enlace de invitación para que se sume tu gente."
     },
     "winningCriteria": {
       "days_attended": "Más días asistidos",
