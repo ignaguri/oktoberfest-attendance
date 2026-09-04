@@ -133,6 +133,12 @@ export default function GroupPage() {
         />
       </div>
 
+      {group.memberCount === 1 && (
+        <p className="mb-4 rounded-md bg-yellow-50 p-3 text-center text-sm text-yellow-800">
+          {t("groups.share.alone")}
+        </p>
+      )}
+
       {group.description && <p className="mb-4 text-gray-600">{group.description}</p>}
 
       <p className="mb-4 text-sm font-medium text-gray-500">

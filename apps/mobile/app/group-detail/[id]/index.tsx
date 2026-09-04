@@ -270,6 +270,13 @@ export default function GroupDetailScreen() {
                 <Text className="text-sm text-typography-600">{group.description}</Text>
               )}
 
+              {/* Nudge a creator who has not invited anyone yet */}
+              {group.memberCount === 1 && (
+                <Text className="rounded-md bg-warning-50 p-3 text-sm text-warning-700">
+                  {t("groups.share.alone")}
+                </Text>
+              )}
+
               {/* Action Buttons */}
               <HStack space="sm" className="mt-2 flex-wrap">
                 <Button variant="outline" action="secondary" size="sm" onPress={handleShare}>

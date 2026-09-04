@@ -412,7 +412,8 @@
       "moreOptions": "More Options...",
       "whatsappNotInstalled": "WhatsApp is not installed on this device",
       "whatsappFailed": "Failed to open WhatsApp",
-      "copyFailed": "Failed to copy to clipboard"
+      "copyFailed": "Failed to copy to clipboard",
+      "alone": "You're the only one here. Share the invite link to get your crew in."
     },
     "winningCriteria": {
       "days_attended": "Most Days Attended",

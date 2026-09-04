@@ -45,7 +45,9 @@ export const CreateGroupForm = () => {
         festivalId: currentFestival.id,
       });
       if (groupId) {
-        router.push(`/group-settings/${groupId}`);
+        // Land on the group detail page: it surfaces the working Share/QR invite
+        // buttons, whereas group-settings hides the link behind a regenerate.
+        router.push(`/groups/${groupId}`);
         toast.success(t("notifications.success.groupCreated"));
       }
     } catch {

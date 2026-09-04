@@ -407,7 +407,8 @@
       "moreOptions": "Weitere Optionen...",
       "whatsappNotInstalled": "WhatsApp ist auf diesem Gerät nicht installiert",
       "whatsappFailed": "WhatsApp konnte nicht geöffnet werden",
-      "copyFailed": "In Zwischenablage kopieren fehlgeschlagen"
+      "copyFailed": "In Zwischenablage kopieren fehlgeschlagen",
+      "alone": "Du bist noch allein in dieser Gruppe. Teile den Einladungslink, damit deine Freunde mitmachen können."
     },
     "winningCriteria": {
       "days_attended": "Meiste Tage besucht",

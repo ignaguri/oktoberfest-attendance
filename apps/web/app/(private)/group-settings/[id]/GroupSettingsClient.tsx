@@ -63,7 +63,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
   const { t } = useTranslation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [inviteToken, setInviteToken] = useState<string | null>(group.invite_token);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
 
   // Get current user from session

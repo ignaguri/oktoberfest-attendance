@@ -72,13 +72,13 @@ export default function GroupsScreen() {
   const handleCreateSuccess = useCallback(
     async (groupId: string) => {
       setIsCreateSheetOpen(false);
-      showDialog(t("common.status.success"), t("groups.createSuccess"));
       // Sync to pull the new group into local SQLite, then refresh
       await syncAndRefresh();
-      // Navigate to the new group
+      // Landing on the new group is the confirmation. A success dialog here would
+      // open on top of the group detail screen and block the invite buttons.
       router.push(`/group-detail/${groupId}`);
     },
-    [syncAndRefresh, showDialog, t, router],
+    [syncAndRefresh, router],
   );
 
   const handleCarryOverSuccess = useCallback(
