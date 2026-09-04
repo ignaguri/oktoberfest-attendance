@@ -9,9 +9,12 @@ import { Button } from "@/components/ui/button";
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n/client";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
+// See LandingContent: an `opacity: 0` hidden state is serialized into the SSR
+// markup, blanking the page until hydration. Slide only, and let the
+// .entrance-scope rule in globals.css handle prefers-reduced-motion.
+const entrance = {
+  hidden: { y: 24 },
+  visible: { y: 0 },
 };
 
 const stagger = {
@@ -50,25 +53,25 @@ export function DownloadContent() {
   const { t } = useTranslation();
 
   return (
-    <div className="px-4 py-16 sm:px-6">
+    <div className="entrance-scope px-4 py-16 sm:px-6">
       <motion.div
         className="mx-auto max-w-3xl text-center"
         initial="hidden"
         animate="visible"
         variants={stagger}
       >
-        <motion.div variants={fadeUp} className="mb-6">
+        <motion.div variants={entrance} className="mb-6">
           <Beer className="mx-auto size-16 text-yellow-500" />
         </motion.div>
 
         <motion.h1
-          variants={fadeUp}
+          variants={entrance}
           className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
         >
           {t("marketing.download.title")}
         </motion.h1>
 
-        <motion.p variants={fadeUp} className="mb-12 text-lg text-gray-500">
+        <motion.p variants={entrance} className="mb-12 text-lg text-gray-500">
           {t("marketing.download.subtitle")}
         </motion.p>
 
@@ -77,7 +80,7 @@ export function DownloadContent() {
           {platformKeys.map((platform) => (
             <motion.div
               key={platform.key}
-              variants={fadeUp}
+              variants={entrance}
               className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
             >
               <platform.icon
@@ -112,7 +115,7 @@ export function DownloadContent() {
 
         {/* QR Code */}
         <motion.div
-          variants={fadeUp}
+          variants={entrance}
           className="mx-auto max-w-xs rounded-2xl border border-gray-200 bg-white p-8"
         >
           <p className="mb-4 text-sm font-medium text-gray-600">
@@ -130,7 +133,7 @@ export function DownloadContent() {
 
         {/* Apple Watch Companion */}
         <motion.div
-          variants={fadeUp}
+          variants={entrance}
           className="mx-auto mt-10 max-w-2xl rounded-2xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50 p-6 text-left sm:p-8"
         >
           <div className="flex items-start gap-4 sm:gap-6">

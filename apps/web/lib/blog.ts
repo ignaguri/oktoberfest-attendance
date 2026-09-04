@@ -15,9 +15,6 @@ function parseCategory(value: unknown): BlogCategory {
   }
   return "tips";
 }
-/** Non-English locales that have their own URL prefix (e.g. /de, /es) */
-export const NON_DEFAULT_LOCALES: SupportedLanguage[] = ["de", "es"];
-
 export interface BlogPost {
   slug: string;
   title: string;

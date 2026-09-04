@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 import { DownloadContent } from "@/components/marketing/DownloadContent";
 import { SyncLocale } from "@/components/marketing/SyncLocale";
-import { NON_DEFAULT_LOCALES } from "@/lib/blog";
+import { NON_DEFAULT_LOCALES } from "@/lib/constants";
 
 export const revalidate = 86400;
 

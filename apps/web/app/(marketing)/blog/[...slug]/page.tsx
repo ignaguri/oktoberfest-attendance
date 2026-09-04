@@ -20,9 +20,9 @@ import {
   getPostBySlug,
   getPostsByCategory,
   getPostSlugs,
-  NON_DEFAULT_LOCALES,
   VALID_CATEGORIES,
 } from "@/lib/blog";
+import { NON_DEFAULT_LOCALES } from "@/lib/constants";
 
 export const revalidate = 3600;
 

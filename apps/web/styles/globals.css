@@ -406,3 +406,17 @@
     height: 100%;
   }
 }
+
+/* Entrance animations on the marketing pages.
+ *
+ * framer-motion writes the hidden state as an inline transform, and that inline
+ * style is serialized into the prerendered HTML, so overriding it needs
+ * !important. Doing this in CSS instead of branching on useReducedMotion keeps
+ * the server and client markup identical (no hydration mismatch) and it lands
+ * before the first paint, so a reduced-motion visitor never sees the offset even
+ * for a single frame. */
+@media (prefers-reduced-motion: reduce) {
+  .entrance-scope * {
+    transform: none !important;
+  }
+}

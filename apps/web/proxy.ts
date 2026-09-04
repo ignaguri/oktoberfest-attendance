@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
+import { NON_DEFAULT_LOCALES } from "@/lib/constants";
 import { updateSession } from "@/utils/supabase/middleware";
 
 // The apex domain used to be redirected to www at the Vercel domain level, but
@@ -11,6 +12,14 @@ import { updateSession } from "@/utils/supabase/middleware";
 // redirect here instead lets the apex serve those two files directly.
 const APEX_HOST = "prostcounter.fun";
 const CANONICAL_HOST = "www.prostcounter.fun";
+
+// Both derived from NON_DEFAULT_LOCALES so that adding a locale cannot silently
+// leave its landing page without an OAuth `?code=` handler.
+const LOCALES = NON_DEFAULT_LOCALES.join("|");
+/** The landing pages: /, /de, /es */
+const LANDING_PATH = new RegExp(`^/(${LOCALES})?$`);
+/** Localized marketing pages: /de, /es, /de/download, /es/download */
+const LOCALIZED_MARKETING_PATH = new RegExp(`^/(${LOCALES})(/download)?$`);
 
 export async function proxy(request: NextRequest) {
   const requestHost = (request.headers.get("x-forwarded-host") ?? request.headers.get("host"))
@@ -55,8 +64,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(unescapedUrl, request.url));
   }
 
-  // Handle OAuth code parameter at root level as fallback
-  if (request.nextUrl.pathname === "/" && request.nextUrl.searchParams.has("code")) {
+  // Handle OAuth code parameter on the landing pages. This is the only place that
+  // does it: the landing pages themselves must not read searchParams, because that
+  // opts them out of static prerendering.
+  if (LANDING_PATH.test(request.nextUrl.pathname) && request.nextUrl.searchParams.has("code")) {
     const code = request.nextUrl.searchParams.get("code");
     const redirectParam = request.nextUrl.searchParams.get("redirect");
 
@@ -98,7 +109,7 @@ export async function proxy(request: NextRequest) {
     publicPaths.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/blog") || // Blog pages (marketing)
     request.nextUrl.pathname.startsWith("/download") || // Download page (marketing)
-    /^\/(de|es)(\/(download))?$/.test(request.nextUrl.pathname) || // Localized marketing pages (/de, /es, /de/download, /es/download)
+    LOCALIZED_MARKETING_PATH.test(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/r/") ||
     request.nextUrl.pathname.startsWith("/api/") || // API routes handle their own auth
     request.nextUrl.pathname.startsWith("/serwist/") || // Service worker assets

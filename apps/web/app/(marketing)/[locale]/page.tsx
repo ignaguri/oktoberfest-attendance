@@ -2,14 +2,13 @@ import "server-only";
 
 import { PROD_URL } from "@prostcounter/shared/constants";
 import type { SupportedLanguage } from "@prostcounter/shared/i18n";
-import { getAppUrl } from "@prostcounter/shared/utils";
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { NON_DEFAULT_LOCALES } from "@/lib/blog";
+import { NON_DEFAULT_LOCALES } from "@/lib/constants";
 
 export const revalidate = 86400;
 
@@ -35,28 +34,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   };
 }
 
-export default async function LocalizedLandingPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<Params>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
+// Deliberately takes no searchParams: reading them opts the route out of static
+// prerendering. OAuth `?code=` is redirected to /auth/callback in proxy.ts.
+export default async function LocalizedLandingPage({ params }: { params: Promise<Params> }) {
   const { locale } = await params;
 
   if (!NON_DEFAULT_LOCALES.includes(locale as SupportedLanguage)) {
     notFound();
-  }
-
-  // Handle OAuth callback codes (same as English landing)
-  const sp = await searchParams;
-  if (sp.code) {
-    const code = sp.code as string;
-    const redirectParam = sp.redirect as string;
-    const callbackUrl = new URL("/auth/callback", getAppUrl());
-    callbackUrl.searchParams.set("code", code);
-    if (redirectParam) callbackUrl.searchParams.set("redirect", redirectParam);
-    redirect(callbackUrl.toString());
   }
 
   const jsonLd = {
