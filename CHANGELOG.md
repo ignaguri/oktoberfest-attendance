@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.11.0] - 2026-09-04
+
+### ✨ Features
+
+- carry a group over into a later festival (#284)
+
+### 🐛 Bug Fixes
+
+- move pnpm settings to pnpm-workspace.yaml, bump security pins (#283)
+- unbreak App Links verification on the apex domain (#281)
+
+### 🔧 Maintenance
+
+- reconcile festival migrations with what prod actually ran (#285)
+- add localized 36.txt release notes
+- add the production hCaptcha sitekey to eas.json (#282)
+
 ## [0.10.2] - 2026-08-31
 
 ### ✨ Features
