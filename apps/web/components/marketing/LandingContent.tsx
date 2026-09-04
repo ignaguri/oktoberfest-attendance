@@ -55,7 +55,7 @@ const festivalKeys = [
 export function LandingContent() {
   const { t } = useTranslation();
   const lang = i18n.language;
-  const fadeUp = useReducedMotion() ? noEntrance : slideUp;
+  const entrance = useReducedMotion() ? noEntrance : slideUp;
 
   return (
     <div className="overflow-hidden">
@@ -76,7 +76,7 @@ export function LandingContent() {
           animate="visible"
           variants={stagger}
         >
-          <motion.div variants={fadeUp} className="mb-6">
+          <motion.div variants={entrance} className="mb-6">
             <Image
               src={AppLogo}
               alt="ProstCounter Logo"
@@ -87,7 +87,7 @@ export function LandingContent() {
           </motion.div>
 
           <motion.h1
-            variants={fadeUp}
+            variants={entrance}
             className="mb-6 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-6xl"
           >
             {t("marketing.hero.title1")}
@@ -98,14 +98,14 @@ export function LandingContent() {
           </motion.h1>
 
           <motion.p
-            variants={fadeUp}
+            variants={entrance}
             className="mx-auto mb-10 max-w-2xl text-lg text-gray-500 sm:text-xl"
           >
             {t("marketing.hero.subtitle")}
           </motion.p>
 
           <motion.div
-            variants={fadeUp}
+            variants={entrance}
             className="flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <Button variant="darkYellow" size="lg" asChild className="px-8 text-base">
@@ -120,7 +120,7 @@ export function LandingContent() {
           </motion.div>
 
           {/* Social proof hint */}
-          <motion.p variants={fadeUp} className="mt-6 text-sm text-gray-400">
+          <motion.p variants={entrance} className="mt-6 text-sm text-gray-400">
             {t("marketing.hero.freeForever")}
           </motion.p>
         </motion.div>
@@ -137,12 +137,12 @@ export function LandingContent() {
             variants={stagger}
           >
             <motion.h2
-              variants={fadeUp}
+              variants={entrance}
               className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
             >
               {t("marketing.features.sectionTitle")}
             </motion.h2>
-            <motion.p variants={fadeUp} className="mt-3 text-lg text-gray-500">
+            <motion.p variants={entrance} className="mt-3 text-lg text-gray-500">
               {t("marketing.features.sectionSubtitle")}
             </motion.p>
           </motion.div>
@@ -157,7 +157,7 @@ export function LandingContent() {
             {featureKeys.map((feature) => (
               <motion.div
                 key={feature.key}
-                variants={fadeUp}
+                variants={entrance}
                 className="group rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className={`mb-4 inline-flex rounded-xl p-3 ${feature.color}`}>
@@ -185,7 +185,7 @@ export function LandingContent() {
             viewport={{ once: true, margin: "-100px" }}
             variants={stagger}
           >
-            <motion.div variants={fadeUp} className="flex items-center justify-center">
+            <motion.div variants={entrance} className="flex items-center justify-center">
               <div className="relative">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 opacity-30 blur-3xl" />
                 <div className="relative inline-flex items-center justify-center rounded-[3rem] bg-gradient-to-br from-gray-900 to-gray-700 p-10 shadow-2xl">
@@ -194,7 +194,7 @@ export function LandingContent() {
               </div>
             </motion.div>
 
-            <motion.div variants={fadeUp}>
+            <motion.div variants={entrance}>
               <span className="mb-3 inline-flex items-center rounded-full bg-yellow-500/10 px-3 py-1 text-xs font-semibold tracking-wide text-yellow-700 uppercase">
                 <Watch size={14} className="mr-1.5" />
                 Apple Watch
@@ -246,12 +246,12 @@ export function LandingContent() {
             variants={stagger}
           >
             <motion.h2
-              variants={fadeUp}
+              variants={entrance}
               className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
             >
               {t("marketing.festivals.sectionTitle")}
             </motion.h2>
-            <motion.p variants={fadeUp} className="mt-3 text-lg text-gray-500">
+            <motion.p variants={entrance} className="mt-3 text-lg text-gray-500">
               {t("marketing.festivals.sectionSubtitle")}
             </motion.p>
           </motion.div>
@@ -264,7 +264,7 @@ export function LandingContent() {
             variants={stagger}
           >
             {festivalKeys.map((festival) => (
-              <motion.div key={festival.key} variants={fadeUp}>
+              <motion.div key={festival.key} variants={entrance}>
                 <Link
                   href={marketingUrl(festival.href, lang)}
                   className="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-yellow-300 hover:shadow-md"
@@ -289,7 +289,7 @@ export function LandingContent() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            variants={fadeUp}
+            variants={entrance}
           >
             <Link
               href={marketingUrl("/blog/munich-beer-festivals-calendar", lang)}
@@ -319,17 +319,17 @@ export function LandingContent() {
           variants={stagger}
         >
           <motion.h2
-            variants={fadeUp}
+            variants={entrance}
             className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl"
           >
             {t("marketing.cta.title")}
           </motion.h2>
-          <motion.p variants={fadeUp} className="mb-10 text-lg text-gray-300">
+          <motion.p variants={entrance} className="mb-10 text-lg text-gray-300">
             {t("marketing.cta.subtitle")}
           </motion.p>
 
           <motion.div
-            variants={fadeUp}
+            variants={entrance}
             className="flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
             <a
@@ -360,7 +360,7 @@ export function LandingContent() {
             </Button>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="mt-10">
+          <motion.div variants={entrance} className="mt-10">
             <Image
               src="/images/qrcode.svg"
               alt="Scan to download ProstCounter"

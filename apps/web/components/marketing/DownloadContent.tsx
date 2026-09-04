@@ -55,7 +55,7 @@ const platformKeys = [
 
 export function DownloadContent() {
   const { t } = useTranslation();
-  const fadeUp = useReducedMotion() ? noEntrance : slideUp;
+  const entrance = useReducedMotion() ? noEntrance : slideUp;
 
   return (
     <div className="px-4 py-16 sm:px-6">
@@ -65,18 +65,18 @@ export function DownloadContent() {
         animate="visible"
         variants={stagger}
       >
-        <motion.div variants={fadeUp} className="mb-6">
+        <motion.div variants={entrance} className="mb-6">
           <Beer className="mx-auto size-16 text-yellow-500" />
         </motion.div>
 
         <motion.h1
-          variants={fadeUp}
+          variants={entrance}
           className="mb-4 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"
         >
           {t("marketing.download.title")}
         </motion.h1>
 
-        <motion.p variants={fadeUp} className="mb-12 text-lg text-gray-500">
+        <motion.p variants={entrance} className="mb-12 text-lg text-gray-500">
           {t("marketing.download.subtitle")}
         </motion.p>
 
@@ -85,7 +85,7 @@ export function DownloadContent() {
           {platformKeys.map((platform) => (
             <motion.div
               key={platform.key}
-              variants={fadeUp}
+              variants={entrance}
               className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
             >
               <platform.icon
@@ -120,7 +120,7 @@ export function DownloadContent() {
 
         {/* QR Code */}
         <motion.div
-          variants={fadeUp}
+          variants={entrance}
           className="mx-auto max-w-xs rounded-2xl border border-gray-200 bg-white p-8"
         >
           <p className="mb-4 text-sm font-medium text-gray-600">
@@ -138,7 +138,7 @@ export function DownloadContent() {
 
         {/* Apple Watch Companion */}
         <motion.div
-          variants={fadeUp}
+          variants={entrance}
           className="mx-auto mt-10 max-w-2xl rounded-2xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50 p-6 text-left sm:p-8"
         >
           <div className="flex items-start gap-4 sm:gap-6">
