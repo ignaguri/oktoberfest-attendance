@@ -94,6 +94,52 @@ Update in `apps/mobile/app.config.ts` before each release to generate a new EAS 
 
 See **[VERSION_MANAGEMENT.md](./VERSION_MANAGEMENT.md)** for the automated version bump / changelog / release tag workflow (`pnpm run version:patch`, etc.).
 
+## Play Store Submission
+
+**`eas submit` cannot deliver release notes.** It uploads the AAB and nothing else — there is no release-notes option on the Android submitter — so the `fastlane/metadata/android/<locale>/changelogs/<versionCode>.txt` files never reach Google through it. Use `fastlane supply`, which ships both in one edit. There is no Fastfile, so invoke it directly:
+
+```bash
+# The AAB is not local after a cloud build. Grab artifacts.applicationArchiveUrl:
+eas build:list --platform android --limit 1 --json --non-interactive
+curl -sL -o app.aab "<applicationArchiveUrl>"
+
+fastlane supply \
+  --package_name com.prostcounter.app \
+  --aab app.aab \
+  --track production \
+  --release_status completed \
+  --json_key apps/mobile/keys/play-store-service-account.json \
+  --metadata_path fastlane/metadata/android \
+  --skip_upload_metadata true --skip_upload_images true --skip_upload_screenshots true
+```
+
+Add `--validate_only true` first. It builds and validates the whole edit without committing, and it doubles as a check on whether the versionCode was already consumed by an earlier half-failed run.
+
+### Why the skip flags
+
+`fastlane/metadata/android/<locale>/` also holds `title.txt`, `short_description.txt` and `full_description.txt`. Without `--skip_upload_metadata`, supply pushes those too and **overwrites the live Play listing** with whatever the repo happens to contain.
+
+That flag does not skip changelogs — its own help text reads "changelogs not included". `--skip_upload_changelogs` is a separate flag; leave it off or the release notes are exactly what you lose.
+
+### Everything under `metadata/android/` must be a locale code
+
+A directory there that isn't a locale gets read as one, and Google rejects the **entire edit**:
+
+```
+Preparing uploads for language 'changelogs'...
+[!] changelogs - Invalid request
+```
+
+The fallback changelog belongs at `<locale>/changelogs/default.txt`, not in a shared top-level `changelogs/`. This blocked the 1.7.0 release until it was fixed.
+
+Note that supply commits its edit at the very end, so a failure like that publishes nothing at all, binary included. A failed run is safe to retry once the cause is fixed.
+
+### Rollout
+
+`--track production` with `--release_status completed` goes to 100% of users once Google approves. Use `--rollout 0.2` for a staged release you can halt if crash rates spike.
+
 ## iOS Local Build & App Store Submit
 
 Use `eas build --local` to bypass EAS cloud build credits. See personal memory `eas-local-ios-build.md` for the full fastlane + Xcode submit flow.
+
+`eas submit --platform ios` uploads to App Store Connect and the build lands in TestFlight. It does **not** release to the App Store: that still needs the version created in ASC and submitted for review by hand.
