@@ -420,3 +420,51 @@ export function useGroupGallery(groupId: string) {
     },
   );
 }
+
+/**
+ * Hook to fetch past-festival groups the user can bring to a festival
+ *
+ * Network-only by design: carry-over is an online action, so this deliberately
+ * does not go through the mobile offline SQLite layer.
+ */
+export function useCarryOverCandidates(festivalId?: string) {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.carryOverCandidates(festivalId || ""),
+    async () => {
+      if (!festivalId) return [];
+
+      const { data } = await apiClient.groups.carryOverCandidates(festivalId);
+      return data;
+    },
+    {
+      enabled: !!festivalId,
+      staleTime: 5 * 60 * 1000, // 5 minutes - changes only when a group is carried over
+      gcTime: 15 * 60 * 1000, // 15 minutes cache
+    },
+  );
+}
+
+/**
+ * Hook to carry a group over into another festival
+ */
+export function useCarryOverGroup() {
+  const apiClient = useApiClient();
+  const invalidateQueries = useInvalidateQueries();
+
+  return useMutation(
+    async ({ groupId, targetFestivalId }: { groupId: string; targetFestivalId: string }) => {
+      return await apiClient.groups.carryOver(groupId, targetFestivalId);
+    },
+    {
+      onSuccess: () => {
+        invalidateQueries(["groups", "carry-over-candidates"]);
+        invalidateQueries(["user", "current", "groups"]);
+        invalidateQueries(["groups"]);
+        invalidateQueries(["activity-feed"]);
+        invalidateQueries(QueryKeys.pendingUnlocks());
+      },
+    },
+  );
+}

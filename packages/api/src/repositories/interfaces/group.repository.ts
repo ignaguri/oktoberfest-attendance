@@ -1,4 +1,5 @@
 import type {
+  CarryOverCandidate,
   CreateGroupInput,
   Group,
   GroupGalleryPhoto,
@@ -110,4 +111,42 @@ export interface IGroupRepository {
    * @returns Array of photos with user info
    */
   getGallery(groupId: string): Promise<GroupGalleryPhoto[]>;
+
+  /**
+   * List past-festival groups the user created that are not yet carried over
+   * into the target festival
+   * @param userId - User ID (must be the group creator)
+   * @param targetFestivalId - Festival the groups would be carried into
+   * @returns Candidates, newest source festival first
+   */
+  listCarryOverCandidates(userId: string, targetFestivalId: string): Promise<CarryOverCandidate[]>;
+
+  /**
+   * Find an existing carry-over of a group into a festival
+   * @param sourceGroupId - The original group
+   * @param targetFestivalId - Festival to look in
+   * @returns The existing clone's group ID, or null if not carried over yet
+   */
+  findCarryOverTarget(sourceGroupId: string, targetFestivalId: string): Promise<string | null>;
+
+  /**
+   * Clone a group into another festival, copying name and winning criteria
+   * @param userId - User performing the carry-over (must be the creator)
+   * @param sourceGroupId - Group being carried over
+   * @param targetFestivalId - Destination festival
+   * @returns The newly created group
+   */
+  carryOver(userId: string, sourceGroupId: string, targetFestivalId: string): Promise<Group>;
+
+  /**
+   * Get what is needed to decide whether a festival is over: its end date and
+   * the timezone that date is expressed in. Both travel together because
+   * comparing the end date against "today" in the wrong zone is off by a day at
+   * the boundary.
+   * @param festivalId - Festival ID
+   * @returns end_date as YYYY-MM-DD plus its timezone, or null if no such festival
+   */
+  getFestivalSchedule(
+    festivalId: string,
+  ): Promise<{ endDate: string; timezone: string | null } | null>;
 }

@@ -29,6 +29,8 @@ export { useActiveFestival, useFestivalById, useFestivals } from "./useFestivals
 
 // Group hooks
 export {
+  useCarryOverCandidates,
+  useCarryOverGroup,
   useCreateGroup,
   useGroupGallery,
   useGroupMembers,

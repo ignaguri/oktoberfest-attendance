@@ -1,0 +1,175 @@
+-- Group carry-over: let a creator clone a group into a later festival.
+--
+-- groups.festival_id is NOT NULL with UNIQUE (name, festival_id), and there was
+-- no clone path, so every festival a crew had to recreate their group from
+-- scratch. carried_over_from records the lineage so we can tell which past
+-- groups are already present in a festival, and so a future "vs. last year"
+-- comparison has something to join on.
+
+-- ON DELETE SET NULL: deleting last year's group must not cascade into this
+-- year's, it just loses the lineage link.
+ALTER TABLE public.groups
+  ADD COLUMN IF NOT EXISTS carried_over_from uuid
+  REFERENCES public.groups(id) ON DELETE SET NULL;
+
+-- Unique, not just indexed: a group can be carried into a given festival at most
+-- once. The service checks this before inserting, but that check is a TOCTOU
+-- window, and two concurrent carry-overs slipping through would leave the
+-- findCarryOverTarget lookup permanently broken on multiple rows. Partial so the
+-- NULLs on ordinary groups are not covered; it still serves lookups by
+-- carried_over_from, so no separate plain index is needed.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_groups_carried_over_from_festival
+  ON public.groups(carried_over_from, festival_id)
+  WHERE carried_over_from IS NOT NULL;
+
+COMMENT ON COLUMN public.groups.carried_over_from IS
+  'Group in an earlier festival that this group continues. NULL for originals.';
+
+-- Recreate create_group_with_member with a carry-over source argument.
+-- Dropped first: adding a DEFAULT parameter alongside the existing 6-argument
+-- signature would make every existing call ambiguous.
+DROP FUNCTION IF EXISTS public.create_group_with_member(
+  character varying, uuid, uuid, integer, uuid, character varying
+);
+
+CREATE FUNCTION public.create_group_with_member(
+  p_group_name character varying,
+  p_user_id uuid,
+  p_festival_id uuid,
+  p_winning_criteria_id integer DEFAULT 2,
+  p_invite_token uuid DEFAULT NULL,
+  p_password character varying DEFAULT NULL,
+  p_carried_over_from uuid DEFAULT NULL
+)
+RETURNS TABLE (
+  group_id uuid,
+  group_name character varying,
+  invite_token uuid,
+  winning_criteria_id integer,
+  festival_id uuid,
+  created_by uuid,
+  created_at timestamptz,
+  carried_over_from uuid
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, extensions
+AS $function$
+DECLARE
+    v_group_id UUID;
+    v_invite_token UUID;
+    v_password VARCHAR;
+    v_created_at TIMESTAMPTZ;
+    v_source_creator UUID;
+BEGIN
+    -- Validate user_id is not null (basic sanity check)
+    IF p_user_id IS NULL THEN
+        RAISE EXCEPTION 'User ID cannot be null';
+    END IF;
+
+    -- Carried over verbatim from 20260805150000_harden_security_definer_grants.
+    -- DROP FUNCTION discards the body, so every guard the old signature had has
+    -- to be restored here: without this one, any authenticated caller can hit
+    -- the RPC directly with someone else's p_user_id and create a group owned by
+    -- them. Keep this block in sync if that migration's version ever changes.
+    IF auth.uid() IS NOT NULL
+       AND p_user_id <> auth.uid()
+       AND NOT public.is_super_admin() THEN
+        RAISE EXCEPTION 'Not authorized to create a group for another user'
+            USING ERRCODE = '42501';
+    END IF;
+
+    -- This function is SECURITY DEFINER and reachable directly through PostgREST,
+    -- so ownership of the carry-over source is re-checked here rather than
+    -- trusting the service-layer isCreator check alone.
+    IF p_carried_over_from IS NOT NULL THEN
+        SELECT g.created_by INTO v_source_creator
+        FROM groups g
+        WHERE g.id = p_carried_over_from;
+
+        IF v_source_creator IS NULL THEN
+            RAISE EXCEPTION 'Source group % not found', p_carried_over_from
+                USING ERRCODE = 'P0002';
+        END IF;
+
+        -- 42501 rather than the default P0001: the repository maps it to a 403,
+        -- so a direct PostgREST call gets the same answer as one through the API
+        -- instead of a generic 500.
+        IF v_source_creator <> p_user_id THEN
+            RAISE EXCEPTION 'Only the creator of group % can carry it over', p_carried_over_from
+                USING ERRCODE = '42501';
+        END IF;
+    END IF;
+
+    -- Generate invite token if not provided
+    v_invite_token := COALESCE(p_invite_token, gen_random_uuid());
+
+    -- Generate password if not provided
+    v_password := COALESCE(p_password, encode(gen_random_bytes(32), 'hex'));
+
+    -- Insert the group
+    INSERT INTO groups (
+      name, password, created_by, winning_criteria_id,
+      festival_id, invite_token, carried_over_from
+    )
+    VALUES (
+      p_group_name, v_password, p_user_id, p_winning_criteria_id,
+      p_festival_id, v_invite_token, p_carried_over_from
+    )
+    -- Read invite_token back from the row, not from v_invite_token: the
+    -- set_group_token BEFORE INSERT trigger overwrites it with a fresh uuid,
+    -- so the value passed in above is never what gets stored. Returning the
+    -- pre-trigger value hands callers a token that does not exist, which
+    -- silently breaks every invite link built from this function's result.
+    RETURNING id, groups.created_at, groups.invite_token
+    INTO v_group_id, v_created_at, v_invite_token;
+
+    -- Insert the creator as a member of the group
+    INSERT INTO group_members (group_id, user_id)
+    VALUES (v_group_id, p_user_id);
+
+    -- set_group_token stamps every new group with a 7-day token expiry, which
+    -- suits an ad-hoc invite link but not a carry-over: that token is the only
+    -- CTA in the notification last year's crew receives, and they have the whole
+    -- festival to act on it. GREATEST keeps the 7-day floor when the target
+    -- festival is already nearly over, and ignores a NULL if the festival row is
+    -- missing rather than clearing the expiry.
+    IF p_carried_over_from IS NOT NULL THEN
+        UPDATE groups
+        SET token_expiration = GREATEST(
+              token_expiration,
+              (SELECT f.end_date + INTERVAL '1 day' FROM festivals f WHERE f.id = p_festival_id)
+            )
+        WHERE id = v_group_id;
+    END IF;
+
+    -- Return the created group details
+    RETURN QUERY SELECT
+      v_group_id,
+      p_group_name,
+      v_invite_token,
+      p_winning_criteria_id,
+      p_festival_id,
+      p_user_id,
+      v_created_at,
+      p_carried_over_from;
+END;
+$function$;
+
+-- Restore exactly the grants the dropped function had: authenticated and
+-- service_role, nothing else. The REVOKEs are required, not decorative: a newly
+-- created function picks up EXECUTE for PUBLIC by default (and anon via
+-- Supabase's default privileges), which the old function did not have. This is
+-- SECURITY DEFINER and takes p_user_id, so an anon caller with EXECUTE could
+-- create groups on behalf of arbitrary users.
+REVOKE ALL ON FUNCTION public.create_group_with_member(
+  character varying, uuid, uuid, integer, uuid, character varying, uuid
+) FROM PUBLIC;
+
+REVOKE ALL ON FUNCTION public.create_group_with_member(
+  character varying, uuid, uuid, integer, uuid, character varying, uuid
+) FROM anon;
+
+GRANT EXECUTE ON FUNCTION public.create_group_with_member(
+  character varying, uuid, uuid, integer, uuid, character varying, uuid
+) TO authenticated, service_role;

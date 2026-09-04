@@ -7,6 +7,7 @@ import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
+import { createAdminClient } from "../utils/admin-client";
 
 type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
@@ -284,6 +285,56 @@ export class NotificationService {
   }
 
   /**
+   * Narrow a recipient list to those who have not switched `column` off.
+   *
+   * Always reads through the admin client. The only SELECT policy on
+   * user_notification_preferences is `auth.uid() = user_id`, so the
+   * request-scoped client returns zero rows for anybody but the caller, with no
+   * error, and a fan-out that filters on those rows silently drops every
+   * recipient. Returns null when preferences cannot be read at all, so callers
+   * can skip sending rather than notify people who opted out.
+   *
+   * A recipient with no row counts as opted in: every toggle on the table
+   * defaults to true, and accounts predating the default-preferences trigger
+   * have no row at all.
+   */
+  private async filterByPreference(
+    recipientIds: string[],
+    column: "group_notifications_enabled" | "group_join_enabled" | "checkin_enabled",
+  ): Promise<string[] | null> {
+    if (recipientIds.length === 0) {
+      return [];
+    }
+
+    let prefsClient;
+    try {
+      prefsClient = createAdminClient();
+    } catch (adminError) {
+      logger.error(
+        { error: adminError, column },
+        "Admin client unavailable; skipping notifications rather than ignoring recipient preferences",
+      );
+      return null;
+    }
+
+    const { data, error } = await prefsClient
+      .from("user_notification_preferences")
+      .select("user_id, group_notifications_enabled, group_join_enabled, checkin_enabled")
+      .in("user_id", recipientIds);
+
+    if (error) {
+      logger.error({ error, column }, "Error fetching recipient notification preferences");
+      return null;
+    }
+
+    const disabled = new Set(
+      (data ?? []).filter((row) => row[column] === false).map((row) => row.user_id),
+    );
+
+    return recipientIds.filter((id) => !disabled.has(id));
+  }
+
+  /**
    * Update user's notification preferences
    */
   async updateUserNotificationPreferences(
@@ -417,28 +468,12 @@ export class NotificationService {
     try {
       if (recipientIds.length === 0) return;
 
-      // Filter by group_notifications_enabled
-      const { data: prefsList, error } = await this.supabase
-        .from("user_notification_preferences")
-        .select("user_id, group_notifications_enabled")
-        .in("user_id", recipientIds);
+      const enabledRecipientIds = await this.filterByPreference(
+        recipientIds,
+        "group_notifications_enabled",
+      );
 
-      if (error) {
-        logger.error(
-          {
-            error,
-          },
-          "Error fetching preferences for group achievement",
-        );
-        return;
-      }
-
-      const enabledRecipientIds = (prefsList || [])
-        .filter((p) => p.group_notifications_enabled !== false)
-        .map((p) => p.user_id)
-        .filter(Boolean) as string[];
-
-      if (enabledRecipientIds.length === 0) return;
+      if (!enabledRecipientIds || enabledRecipientIds.length === 0) return;
 
       await Promise.allSettled(
         enabledRecipientIds.map((to) =>
@@ -521,19 +556,11 @@ export class NotificationService {
         return;
       }
 
-      // Get notification preferences for these members (checkin_enabled)
-      const memberIds = [...new Set(groupMembers.map((member) => member.user_id))];
+      const memberIds = [
+        ...new Set(groupMembers.map((member) => member.user_id).filter((id) => id !== null)),
+      ];
 
-      const { data: membersToNotify, error: prefsError } = await this.supabase
-        .from("user_notification_preferences")
-        .select("user_id, checkin_enabled, push_enabled")
-        .in("user_id", memberIds)
-        .eq("checkin_enabled", true);
-
-      if (prefsError) {
-        logger.error({ error: prefsError }, "Error fetching member preferences");
-        return;
-      }
+      const membersToNotify = await this.filterByPreference(memberIds, "checkin_enabled");
 
       if (!membersToNotify || membersToNotify.length === 0) {
         return;
@@ -543,10 +570,10 @@ export class NotificationService {
       const sharerAvatar = user.avatar_url || DEFAULT_AVATAR_URL;
 
       // Send notifications to all eligible members
-      const notificationPromises = membersToNotify.map((member) => {
+      const notificationPromises = membersToNotify.map((memberId) => {
         // Find groups this specific member shares with the sharing user
         const memberGroupsData = groupMembers
-          .filter((gm) => gm.user_id === member.user_id)
+          .filter((gm) => gm.user_id === memberId)
           .map((gm) => ({
             name: (gm.groups as { name: string })?.name,
             id: gm.group_id,
@@ -559,7 +586,7 @@ export class NotificationService {
 
         return this.novu.trigger({
           workflowId: NOTIFICATION_WORKFLOWS.LOCATION_SHARING,
-          to: member.user_id!,
+          to: memberId,
           payload: {
             sharerName,
             groupName: groupNamesText,
@@ -608,11 +635,12 @@ export class NotificationService {
         return;
       }
 
-      // Get admin's notification preferences
-      const prefs = await this.getUserNotificationPreferences(adminId);
-
-      // Skip if admin has disabled group join notifications
-      if (prefs && !prefs.group_join_enabled) {
+      // The admin is not the caller, so their preferences are unreadable through
+      // the request-scoped client that getUserNotificationPreferences uses: it
+      // returned null every time and the `prefs &&` guard read that as "send
+      // anyway", which meant group_join_enabled was never actually honoured.
+      const enabled = await this.filterByPreference([adminId], "group_join_enabled");
+      if (!enabled || enabled.length === 0) {
         return;
       }
 
@@ -635,6 +663,61 @@ export class NotificationService {
       });
     } catch (error) {
       logger.error({ error }, "Error sending group join notification");
+    }
+  }
+
+  /**
+   * Notify the members of a past-festival group that it has been carried over
+   * Fans out to everyone except the creator, who triggered it
+   */
+  async notifyGroupCarryOver(
+    recipientIds: string[],
+    payload: {
+      groupName: string;
+      festivalName: string;
+      inviteToken: string;
+      groupId: string;
+    },
+  ): Promise<void> {
+    try {
+      if (recipientIds.length === 0) {
+        return;
+      }
+
+      const enabledRecipientIds = await this.filterByPreference(
+        recipientIds,
+        "group_notifications_enabled",
+      );
+
+      if (!enabledRecipientIds || enabledRecipientIds.length === 0) {
+        return;
+      }
+
+      const results = await Promise.allSettled(
+        enabledRecipientIds.map((to) =>
+          this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.GROUP_CARRY_OVER,
+            to,
+            payload,
+          }),
+        ),
+      );
+
+      // allSettled hides rejections, so surface them: a trigger that fails here
+      // is otherwise indistinguishable from one that was never sent.
+      const failures = results.filter((r) => r.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((f) => String((f as PromiseRejectedResult).reason)),
+          },
+          "Some group carry-over notifications failed to send",
+        );
+      }
+    } catch (error) {
+      logger.error({ error }, "Error sending group carry-over notification");
     }
   }
 
@@ -732,20 +815,11 @@ export class NotificationService {
         return;
       }
 
-      // Get notification preferences for these members
-      const memberIds = groupMembers.map((member) => member.user_id);
+      const memberIds = [
+        ...new Set(groupMembers.map((member) => member.user_id).filter((id) => id !== null)),
+      ];
 
-      // Query for members with checkin notifications enabled
-      const { data: membersToNotify, error: prefsError } = await this.supabase
-        .from("user_notification_preferences")
-        .select("user_id, checkin_enabled, push_enabled")
-        .in("user_id", memberIds)
-        .eq("checkin_enabled", true);
-
-      if (prefsError) {
-        logger.error({ error: prefsError }, "Error fetching member preferences");
-        return;
-      }
+      const membersToNotify = await this.filterByPreference(memberIds, "checkin_enabled");
 
       if (!membersToNotify || membersToNotify.length === 0) {
         return;
@@ -755,10 +829,10 @@ export class NotificationService {
       const userAvatar = user.avatar_url || DEFAULT_AVATAR_URL;
 
       // Send notifications to all eligible members with their specific group context
-      const notificationPromises = membersToNotify.map((member) => {
+      const notificationPromises = membersToNotify.map((memberId) => {
         // Find groups this specific member shares with the check-in user
         const memberGroups = groupMembers
-          .filter((gm) => gm.user_id === member.user_id)
+          .filter((gm) => gm.user_id === memberId)
 
           .map((gm) => (gm.groups as any)?.name)
           .filter(Boolean);
@@ -767,7 +841,7 @@ export class NotificationService {
 
         return this.novu.trigger({
           workflowId: NOTIFICATION_WORKFLOWS.TENT_CHECKIN,
-          to: member.user_id!,
+          to: memberId,
           payload: {
             userName,
             tentName,

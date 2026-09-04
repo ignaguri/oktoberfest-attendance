@@ -1,5 +1,6 @@
 import type { Database, TablesUpdate } from "@prostcounter/db";
 import type {
+  CarryOverCandidate,
   CreateGroupInput,
   Group,
   GroupGalleryPhoto,
@@ -10,10 +11,11 @@ import type {
   SearchGroupsQuery,
   UpdateGroupInput,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
+import { ConflictError, DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
 import type { IGroupRepository } from "../interfaces";
 
 // Mapping between winning criteria strings and database IDs
@@ -427,6 +429,224 @@ export class SupabaseGroupRepository implements IGroupRepository {
     }));
   }
 
+  async listCarryOverCandidates(
+    userId: string,
+    targetFestivalId: string,
+  ): Promise<CarryOverCandidate[]> {
+    // "Past" has to mean earlier than the target, not merely different: .neq
+    // alone also offers groups from festivals that have not started yet.
+    const { data: target, error: targetError } = await this.supabase
+      .from("festivals")
+      .select("start_date")
+      .eq("id", targetFestivalId)
+      .maybeSingle();
+
+    if (targetError) {
+      throw new DatabaseError(`Failed to list carry-over candidates: ${targetError.message}`);
+    }
+
+    if (!target) {
+      return [];
+    }
+
+    // Groups the caller created in an earlier festival.
+    const { data: pastGroups, error: pastError } = await this.supabase
+      .from("groups")
+      .select(
+        `
+        id,
+        name,
+        winning_criteria_id,
+        festival_id,
+        festivals!groups_festival_id_fkey!inner (id, name, start_date)
+      `,
+      )
+      .eq("created_by", userId)
+      .neq("festival_id", targetFestivalId)
+      .lt("festivals.start_date", target.start_date);
+
+    if (pastError) {
+      throw new DatabaseError(`Failed to list carry-over candidates: ${pastError.message}`);
+    }
+
+    if (!pastGroups || pastGroups.length === 0) {
+      return [];
+    }
+
+    // Groups already in the target festival that continue one of those.
+    // RLS limits this to groups the caller belongs to, which is exactly right:
+    // create_group_with_member always makes the creator a member.
+    const { data: existingGroups, error: existingError } = await this.supabase
+      .from("groups")
+      .select("carried_over_from")
+      .eq("festival_id", targetFestivalId)
+      .not("carried_over_from", "is", null);
+
+    if (existingError) {
+      throw new DatabaseError(`Failed to list carry-over candidates: ${existingError.message}`);
+    }
+
+    const alreadyCarriedOver = new Set(
+      (existingGroups || [])
+        .map((group) => group.carried_over_from)
+        .filter((id): id is string => id !== null),
+    );
+
+    const remaining = (pastGroups as any[]).filter((group) => !alreadyCarriedOver.has(group.id));
+
+    if (remaining.length === 0) {
+      return [];
+    }
+
+    // Newest source festival first. Sorted before mapping so the start date does
+    // not have to travel on the returned CarryOverCandidate shape.
+    remaining.sort((a, b) =>
+      (b.festivals?.start_date || "").localeCompare(a.festivals?.start_date || ""),
+    );
+
+    // A crew that has run for several festivals leaves one candidate per year,
+    // all with the same name. Only the newest can be carried over: UNIQUE
+    // (name, festival_id) makes every later one a guaranteed GROUP_NAME_TAKEN.
+    // Relies on the sort above having put the newest first.
+    const seenNames = new Set<string>();
+    const newestPerName = remaining.filter((group) => {
+      if (seenNames.has(group.name)) {
+        return false;
+      }
+      seenNames.add(group.name);
+      return true;
+    });
+
+    // One query for every candidate's members rather than a head-count per
+    // candidate: this runs on the groups tab, and a per-row count also swallowed
+    // its own error, quietly rendering "0 members" for a query that failed.
+    const { data: memberRows, error: memberError } = await this.supabase
+      .from("group_members")
+      .select("group_id")
+      .in(
+        "group_id",
+        newestPerName.map((group) => group.id),
+      );
+
+    if (memberError) {
+      throw new DatabaseError(`Failed to count carry-over members: ${memberError.message}`);
+    }
+
+    const memberCounts = new Map<string, number>();
+    for (const row of memberRows ?? []) {
+      if (row.group_id) {
+        memberCounts.set(row.group_id, (memberCounts.get(row.group_id) ?? 0) + 1);
+      }
+    }
+
+    return newestPerName.map((group) => ({
+      groupId: group.id,
+      name: group.name,
+      winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
+      memberCount: memberCounts.get(group.id) ?? 0,
+      sourceFestivalId: group.festival_id,
+      sourceFestivalName: group.festivals?.name || "",
+    }));
+  }
+
+  async findCarryOverTarget(
+    sourceGroupId: string,
+    targetFestivalId: string,
+  ): Promise<string | null> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .select("id")
+      .eq("carried_over_from", sourceGroupId)
+      .eq("festival_id", targetFestivalId)
+      .maybeSingle();
+
+    if (error) {
+      throw new DatabaseError(`Failed to check existing carry-over: ${error.message}`);
+    }
+
+    return data?.id ?? null;
+  }
+
+  async carryOver(userId: string, sourceGroupId: string, targetFestivalId: string): Promise<Group> {
+    const source = await this.findById(sourceGroupId);
+    if (!source) {
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
+    }
+
+    const winningCriteriaId = WINNING_CRITERIA_MAP[source.winningCriteria];
+    if (!winningCriteriaId) {
+      throw new DatabaseError(`Invalid winning criteria: ${source.winningCriteria}`);
+    }
+
+    const { data: result, error } = await this.supabase.rpc("create_group_with_member", {
+      p_group_name: source.name,
+      p_user_id: userId,
+      p_festival_id: targetFestivalId,
+      p_winning_criteria_id: winningCriteriaId,
+      p_carried_over_from: sourceGroupId,
+    });
+
+    if (error) {
+      if (error.code === PgErrorCode.UNIQUE_VIOLATION) {
+        // Two unique constraints can fire here. The partial index means another
+        // request won the race to carry this group into this festival, which is
+        // the same answer the service-level check gives; anything else is
+        // UNIQUE (name, festival_id), i.e. the creator already made a group with
+        // this name in the target festival by hand.
+        const violated = `${error.message} ${error.details ?? ""}`;
+        throw new ConflictError(
+          violated.includes("idx_groups_carried_over_from_festival")
+            ? ErrorCodes.GROUP_ALREADY_CARRIED_OVER
+            : ErrorCodes.GROUP_NAME_TAKEN,
+        );
+      }
+      // The function re-checks source ownership itself, so this is reachable
+      // even though the service already ran isCreator.
+      if (error.code === PgErrorCode.INSUFFICIENT_PRIVILEGE) {
+        throw new ForbiddenError(ErrorCodes.NOT_GROUP_CREATOR);
+      }
+      throw new DatabaseError(`Failed to carry over group: ${error.message}`);
+    }
+
+    if (!result || result.length === 0) {
+      throw new DatabaseError("Failed to carry over group: no data returned");
+    }
+
+    const group = result[0];
+
+    return {
+      id: group.group_id,
+      name: group.group_name,
+      festivalId: group.festival_id,
+      winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
+      inviteToken: group.invite_token,
+      createdBy: group.created_by,
+      carriedOverFrom: group.carried_over_from,
+      createdAt: group.created_at,
+      updatedAt: group.created_at, // groups has no updated_at column
+    };
+  }
+
+  async getFestivalSchedule(
+    festivalId: string,
+  ): Promise<{ endDate: string; timezone: string | null } | null> {
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("end_date, timezone")
+      .eq("id", festivalId)
+      .maybeSingle();
+
+    if (error) {
+      throw new DatabaseError(`Failed to fetch festival: ${error.message}`);
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return { endDate: data.end_date, timezone: data.timezone };
+  }
+
   private mapToGroup(data: any): Group {
     // Extract winning criteria name from joined table or use reverse map
     let winningCriteria: "days_attended" | "total_beers" | "avg_beers";
@@ -446,6 +666,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       winningCriteria,
       inviteToken: data.invite_token,
       createdBy: data.created_by,
+      carriedOverFrom: data.carried_over_from ?? null,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };

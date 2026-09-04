@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { CarryOverGroups } from "@/components/groups/carry-over-groups";
 import { CreateGroupSheet } from "@/components/groups/create-group-sheet";
 import { EmptyGroupsState } from "@/components/groups/empty-groups-state";
 import { GroupListItem } from "@/components/groups/group-list-item";
@@ -80,6 +81,28 @@ export default function GroupsScreen() {
     [syncAndRefresh, showDialog, t, router],
   );
 
+  const handleCarryOverSuccess = useCallback(
+    async (groupName: string) => {
+      showDialog(
+        t("common.status.success"),
+        t("groups.carryOver.success", {
+          name: groupName,
+          festival: currentFestival?.name ?? "",
+        }),
+      );
+      // Sync to pull the new group into local SQLite, then refresh
+      await syncAndRefresh();
+    },
+    [syncAndRefresh, showDialog, t, currentFestival],
+  );
+
+  const handleCarryOverError = useCallback(
+    (message: string) => {
+      showDialog(t("common.status.error"), message);
+    },
+    [showDialog, t],
+  );
+
   const handleJoinSuccess = useCallback(async () => {
     setIsJoinSheetOpen(false);
     showDialog(t("common.status.success"), t("groups.joinSuccess"));
@@ -127,6 +150,12 @@ export default function GroupsScreen() {
         className="flex-1 bg-background-50"
         refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
       >
+        {/* Outside the hasGroups branch on purpose: the most valuable case is a
+            festival where you have no groups yet but last time's crew exists.
+            Spacing lives inside the component so nothing is left behind when it
+            renders null. */}
+        <CarryOverGroups onSuccess={handleCarryOverSuccess} onError={handleCarryOverError} />
+
         {hasGroups ? (
           <VStack space="md" className="p-4 pb-20">
             {/* Header with action buttons */}

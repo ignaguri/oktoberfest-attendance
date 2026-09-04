@@ -1,5 +1,8 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  CarryOverCandidatesQuerySchema,
+  CarryOverCandidatesResponseSchema,
+  CarryOverGroupSchema,
   CreateGroupSchema,
   GroupActionResponseSchema,
   GroupGalleryResponseSchema,
@@ -21,9 +24,10 @@ import {
 
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
-import { SupabaseGroupRepository } from "../repositories/supabase";
+import { SupabaseFestivalRepository, SupabaseGroupRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
+import { NotificationService } from "../services/notification.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -174,6 +178,55 @@ app.openapi(listGroupsRoute, async (c) => {
   const groups = await service.listUserGroups(user.id, query);
 
   return c.json({ data: groups }, 200);
+});
+
+// GET /groups/carry-over-candidates - Past groups that can be brought to a festival
+// Registered before /groups/{id} or the literal path gets captured as an id.
+const carryOverCandidatesRoute = createRoute({
+  method: "get",
+  path: "/groups/carry-over-candidates",
+  tags: ["groups"],
+  summary: "List carry-over candidates",
+  description:
+    "Past-festival groups the caller created that are not yet carried over into the given festival",
+  request: {
+    query: CarryOverCandidatesQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Candidates retrieved successfully",
+      content: {
+        "application/json": {
+          schema: CarryOverCandidatesResponseSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(carryOverCandidatesRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { festivalId } = c.req.valid("query");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const data = await service.listCarryOverCandidates(user.id, festivalId);
+
+  return c.json({ data }, 200);
 });
 
 // GET /groups/:id - Get group details
@@ -724,6 +777,133 @@ app.openapi(renewTokenRoute, async (c) => {
   const inviteToken = await service.renewInviteToken(id, user.id);
 
   return c.json({ inviteToken }, 200);
+});
+
+// POST /groups/:id/carry-over - Clone a group into another festival
+const carryOverRoute = createRoute({
+  method: "post",
+  path: "/groups/{id}/carry-over",
+  tags: ["groups"],
+  summary: "Carry a group over to another festival",
+  description:
+    "Clones the group (name and winning criteria) into the target festival and notifies the original members. Only the group creator can do this.",
+  request: {
+    params: GroupIdParamSchema,
+    body: {
+      content: {
+        "application/json": {
+          schema: CarryOverGroupSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Group carried over successfully",
+      content: {
+        "application/json": {
+          schema: GroupSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    403: {
+      description: "Forbidden - Not the group creator",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    404: {
+      description: "Group or festival not found",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    409: {
+      description: "Already carried over, name taken, or festival ended",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(carryOverRoute, async (c) => {
+  const user = c.var.user;
+  const supabase = c.var.supabase;
+  const { id } = c.req.valid("param");
+  const { targetFestivalId } = c.req.valid("json");
+
+  const groupRepo = new SupabaseGroupRepository(supabase);
+  const service = new GroupService(groupRepo);
+
+  const group = await service.carryOverGroup(id, user.id, targetFestivalId);
+
+  // Notify last year's crew once, right after the clone exists. The whole block
+  // is guarded because the clone is already committed by this point: a missed
+  // push must not turn a successful carry-over into an error the client reports
+  // as a failure, whose retry then hits GROUP_ALREADY_CARRIED_OVER. Only
+  // notifyGroupCarryOver swallows its own failures; getMembers throws
+  // NOT_GROUP_MEMBER for a creator who left the source group, and findById
+  // throws on any query error. The constructor throws without an API key, so
+  // guard that like the other routes.
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (novuApiKey) {
+    try {
+      const sourceMembers = await service.getMembers(id, user.id);
+      const recipientIds = sourceMembers
+        .map((member) => member.userId)
+        .filter((memberId) => memberId !== user.id);
+
+      const festivalRepo = new SupabaseFestivalRepository(supabase);
+      const targetFestival = await festivalRepo.findById(targetFestivalId);
+
+      const notificationService = new NotificationService(supabase, novuApiKey);
+      await notificationService.notifyGroupCarryOver(recipientIds, {
+        groupName: group.name,
+        festivalName: targetFestival?.name ?? "",
+        inviteToken: group.inviteToken,
+        groupId: group.id,
+      });
+    } catch (error) {
+      logger.error(
+        { error, sourceGroupId: id, carriedOverGroupId: group.id },
+        "Group carried over, but notifying the source group's members failed",
+      );
+    }
+  }
+
+  // Evaluate-only: the unlock reaches the client through the outbox, not this
+  // response. Awaited so the outbox row exists before the client's next read.
+  await evaluateAfterWrite(supabase, user.id, targetFestivalId, "POST /groups/:id/carry-over");
+
+  return c.json(group, 200);
 });
 
 // GET /groups/:id/gallery - Get group photo gallery

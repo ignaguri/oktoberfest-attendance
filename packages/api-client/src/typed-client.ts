@@ -8,6 +8,7 @@
 // Import shared schema types
 import type {
   AttendanceByDate,
+  CarryOverCandidatesResponse,
   Consumption,
   CreateMessageResponse,
   CrowdLevel,
@@ -577,6 +578,38 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to regenerate invite token");
         }
         return parseJsonResponse<{ inviteToken: string }>(response);
+      },
+
+      async carryOverCandidates(festivalId: string): Promise<CarryOverCandidatesResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/groups/carry-over-candidates?festivalId=${festivalId}`,
+          {
+            headers,
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch carry-over candidates");
+        }
+        return parseJsonResponse<CarryOverCandidatesResponse>(response);
+      },
+
+      async carryOver(groupId: string, targetFestivalId: string): Promise<Group> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/${groupId}/carry-over`,
+          {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ targetFestivalId }),
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to carry group over");
+        }
+        return parseJsonResponse<Group>(response);
       },
 
       async getGallery(groupId: string): Promise<{

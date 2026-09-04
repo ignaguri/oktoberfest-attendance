@@ -1,4 +1,5 @@
 import type {
+  CarryOverCandidate,
   CreateGroupInput,
   Group,
   GroupGalleryPhoto,
@@ -8,8 +9,9 @@ import type {
   UpdateGroupInput,
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
 
-import { ForbiddenError, NotFoundError } from "../middleware/error";
+import { ConflictError, ForbiddenError, NotFoundError } from "../middleware/error";
 import type { IGroupRepository } from "../repositories/interfaces";
 
 /**
@@ -222,5 +224,67 @@ export class GroupService {
     await this.groupRepo.addMember(group.id, userId);
 
     return group;
+  }
+
+  /**
+   * List past-festival groups the caller created that could be carried over
+   * into the target festival
+   */
+  async listCarryOverCandidates(
+    userId: string,
+    targetFestivalId: string,
+  ): Promise<CarryOverCandidate[]> {
+    return await this.groupRepo.listCarryOverCandidates(userId, targetFestivalId);
+  }
+
+  /**
+   * Carry a group over into another festival
+   * Only the group creator can do this, and only into a festival that has not ended
+   */
+  async carryOverGroup(
+    sourceGroupId: string,
+    userId: string,
+    targetFestivalId: string,
+  ): Promise<Group> {
+    const source = await this.groupRepo.findById(sourceGroupId);
+
+    if (!source) {
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
+    }
+
+    const isCreator = await this.groupRepo.isCreator(sourceGroupId, userId);
+    if (!isCreator) {
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_CREATOR);
+    }
+
+    if (source.festivalId === targetFestivalId) {
+      throw new ConflictError(ErrorCodes.GROUP_ALREADY_CARRIED_OVER);
+    }
+
+    const schedule = await this.groupRepo.getFestivalSchedule(targetFestivalId);
+    if (!schedule) {
+      throw new NotFoundError(ErrorCodes.FESTIVAL_NOT_FOUND);
+    }
+
+    // festivals.status and is_active are stale in prod, so the guard compares
+    // end_date directly. Both are YYYY-MM-DD, so string compare is safe.
+    // "Today" is resolved in the festival's own timezone: end_date is a wall-clock
+    // date there, so using the app default would end the festival a day early or
+    // late for anything outside Europe/Berlin. `?? undefined` falls back to that
+    // default, since festivals.timezone is nullable.
+    const today = formatDateForDatabase(new Date(), schedule.timezone ?? undefined);
+    if (schedule.endDate < today) {
+      throw new ConflictError(ErrorCodes.FESTIVAL_ENDED);
+    }
+
+    const existingCarryOver = await this.groupRepo.findCarryOverTarget(
+      sourceGroupId,
+      targetFestivalId,
+    );
+    if (existingCarryOver) {
+      throw new ConflictError(ErrorCodes.GROUP_ALREADY_CARRIED_OVER);
+    }
+
+    return await this.groupRepo.carryOver(userId, sourceGroupId, targetFestivalId);
   }
 }

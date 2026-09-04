@@ -38,6 +38,8 @@ export class QueryKeys {
   static groupSearch = (name: string, festivalId: string) =>
     ["groups", "search", name, festivalId] as const;
   static groupGallery = (groupId: string) => ["group", groupId, "gallery"] as const;
+  static carryOverCandidates = (festivalId: string) =>
+    ["groups", "carry-over-candidates", festivalId] as const;
   static groupMessages = (groupId: string) => ["group-messages", groupId] as const;
   static messageFeed = (festivalId: string) => ["message-feed", festivalId] as const;
 
