@@ -5,7 +5,7 @@ import { getFestivalStatus, groupFestivalsByStatus } from "@prostcounter/shared/
 import { cn } from "@prostcounter/ui";
 import { format, parseISO } from "date-fns";
 import { Check, ChevronDown, ChevronUp } from "lucide-react-native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 
 import {
   Actionsheet,
@@ -55,6 +55,7 @@ export function FestivalSelectorSheet({ isOpen, onClose }: FestivalSelectorSheet
   const { t } = useTranslation();
   const { currentFestival, festivals, setCurrentFestival } = useFestival();
   const [showPast, setShowPast] = useState(false);
+  const [wasOpen, setWasOpen] = useState(isOpen);
 
   const { active, upcoming, past } = useMemo(
     () => groupFestivalsByStatus(festivals),
@@ -71,11 +72,14 @@ export function FestivalSelectorSheet({ isOpen, onClose }: FestivalSelectorSheet
     [past, currentFestival, currentGroup],
   );
 
-  useEffect(() => {
+  // Apply the auto-expand decision only on the closed->open transition, so a
+  // manual toggle made while the sheet is open is never silently overwritten.
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
     if (isOpen) {
       setShowPast(shouldAutoExpand);
     }
-  }, [isOpen, shouldAutoExpand]);
+  }
 
   const handleFestivalSelect = useCallback(
     (festival: Festival) => {
