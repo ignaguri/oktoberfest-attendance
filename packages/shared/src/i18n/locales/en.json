@@ -2424,7 +2424,10 @@
       "title": "Select Festival",
       "description": "Choose which festival you want to view and participate in.",
       "currentFestival": "Current Festival",
-      "noFestival": "No festival selected"
+      "noFestival": "No festival selected",
+      "pastFestivals": "Past festival ({{count}})",
+      "pastFestivals_other": "Past festivals ({{count}})",
+      "pastFestivalsHint": "Shows festivals that have already ended"
     },
     "status": {
       "upcoming": "Upcoming",

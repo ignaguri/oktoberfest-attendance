@@ -1,24 +1,18 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import type { Festival as FestivalType } from "@prostcounter/shared/schemas";
-import { format, parseISO } from "date-fns";
+import { formatLocalized } from "@prostcounter/shared/utils";
+import { parseISO } from "date-fns";
 import { CalendarDays, ChevronDown } from "lucide-react";
 import { Link } from "next-view-transitions";
 import { useMemo, useState } from "react";
 
 import { logout } from "@/components/Auth/actions";
 import Avatar from "@/components/Avatar/Avatar";
+import { FestivalSelectorDialog } from "@/components/FestivalSelectorDialog";
 import { ShareDialog } from "@/components/ShareDialog/ShareDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,10 +28,8 @@ import {
 } from "@/components/UserMenu/menuConfig";
 import { WhatsNew } from "@/components/WhatsNew";
 import { useInstallBanner } from "@/hooks/use-install-banner";
-import { getFestivalStatus } from "@/lib/festivalConstants";
+import { getFestivalDisplayInfo, getFestivalStatusBadgeProps } from "@/lib/festivalConstants";
 import { useTranslation } from "@/lib/i18n/client";
-import type { FestivalStatus } from "@/lib/types";
-import type { ShadcnBadgeVariant } from "@/lib/ui-adapters";
 import { cn } from "@/lib/utils";
 
 interface UserMenuProps {
@@ -50,30 +42,9 @@ interface UserMenuProps {
   className?: string;
 }
 
-const getFestivalDisplayInfo = (festival: FestivalType) => {
-  const firstLetter = festival.name.charAt(0).toUpperCase();
-  const yearMatch = festival.name.match(/(\d{4})/);
-  const lastTwoDigits = yearMatch ? yearMatch[1].slice(-2) : "??";
-  return { firstLetter, lastTwoDigits };
-};
-
-const getFestivalStatusBadgeProps = (
-  festival: FestivalType,
-): { status: FestivalStatus; variant: ShadcnBadgeVariant } => {
-  const status = getFestivalStatus(festival);
-
-  if (status === "upcoming") {
-    return { status, variant: "default" };
-  } else if (status === "active") {
-    return { status, variant: "success" };
-  } else {
-    return { status, variant: "secondary" };
-  }
-};
-
 export function UserMenu({ profileData, className }: UserMenuProps) {
   const { t } = useTranslation();
-  const { currentFestival, festivals, setCurrentFestival, isLoading } = useFestival();
+  const { currentFestival, festivals, isLoading } = useFestival();
   const { canInstall, triggerInstall } = useInstallBanner({ enabled: false });
   const [isOpen, setIsOpen] = useState(false);
   const [isFestivalModalOpen, setIsFestivalModalOpen] = useState(false);
@@ -178,8 +149,8 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
                   {t(`festival.status.${status}`)}
                 </Badge>
                 <div className="text-muted-foreground text-xs">
-                  {format(parseISO(currentFestival.startDate), "MMM d")} -{" "}
-                  {format(parseISO(currentFestival.endDate), "MMM d")}
+                  {formatLocalized(parseISO(currentFestival.startDate), "MMM d")} -{" "}
+                  {formatLocalized(parseISO(currentFestival.endDate), "MMM d")}
                 </div>
               </div>
             </div>
@@ -195,63 +166,10 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
     if (festivals.length <= 1) return null;
 
     return (
-      <Dialog open={isFestivalModalOpen} onOpenChange={setIsFestivalModalOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("festival.selector.title")}</DialogTitle>
-            <DialogDescription>{t("festival.selector.description")}</DialogDescription>
-          </DialogHeader>
-          <div className="grid max-h-96 gap-3 overflow-y-auto">
-            {festivals.map((festival) => {
-              const { firstLetter, lastTwoDigits } = getFestivalDisplayInfo(festival);
-              const { status, variant } = getFestivalStatusBadgeProps(festival);
-              const isSelected = festival.id === currentFestival?.id;
-
-              return (
-                <Button
-                  key={festival.id}
-                  variant={isSelected ? "default" : "outline"}
-                  className={cn(
-                    "h-auto w-full justify-start p-4",
-                    isSelected && "border-yellow-500 bg-yellow-500 hover:bg-yellow-600",
-                  )}
-                  onClick={() => {
-                    setCurrentFestival(festival);
-                    setIsFestivalModalOpen(false);
-                  }}
-                >
-                  <div className="flex w-full items-center gap-3">
-                    <div
-                      className={cn(
-                        "flex size-10 flex-shrink-0 items-center justify-center rounded-md font-semibold",
-                        isSelected ? "bg-white text-yellow-500" : "bg-yellow-500 text-white",
-                      )}
-                    >
-                      <span className="text-base">
-                        {firstLetter}
-                        <sub className="text-sm">{lastTwoDigits}</sub>
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-start text-left">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{festival.name}</span>
-                        <Badge className="capitalize" variant={variant}>
-                          {t(`festival.status.${status}`)}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {format(parseISO(festival.startDate), "MMM d")} -{" "}
-                        {format(parseISO(festival.endDate), "MMM d, yyyy")}
-                      </div>
-                      <span className="text-muted-foreground text-xs">{festival.location}</span>
-                    </div>
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <FestivalSelectorDialog
+        isOpen={isFestivalModalOpen}
+        onOpenChange={setIsFestivalModalOpen}
+      />
     );
   };
 

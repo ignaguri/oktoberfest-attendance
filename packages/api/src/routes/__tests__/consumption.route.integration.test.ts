@@ -126,15 +126,31 @@ describe("Consumption Routes Integration (Local DB)", () => {
   afterAll(async () => {
     // Cleanup: Delete all test data in correct order (respecting foreign keys)
     // Use admin client to bypass RLS policies
+    //
+    // By festival, not by the tracked id arrays: beforeEach resets those, so they
+    // only ever hold what the LAST test registered and every earlier test's rows
+    // survived. attendances_festival_id_fkey is RESTRICT, so the festival delete
+    // below then failed silently and each run left an orphan festival, tent and
+    // visits behind in the local database.
+    if (testFestival?.id) {
+      const { data: festivalAttendances } = await supabaseAdmin
+        .from("attendances")
+        .select("id")
+        .eq("festival_id", testFestival.id);
+      const attendanceIds = (festivalAttendances ?? []).map((row) => row.id);
 
-    // 1. Delete tent visits first
-    await supabaseAdmin.from("tent_visits").delete().in("id", createdTentVisitIds);
+      await supabaseAdmin.from("tent_visits").delete().eq("festival_id", testFestival.id);
 
-    // 2. Delete consumptions (must be before attendances due to FK)
-    await supabaseAdmin.from("consumptions").delete().in("id", createdConsumptionIds);
+      if (attendanceIds.length > 0) {
+        // Must precede attendances: beer_pictures.attendance_id has no cascade.
+        // consumptions.attendance_id does cascade, so this delete is redundant,
+        // but harmless and keeps the teardown order obvious.
+        await supabaseAdmin.from("beer_pictures").delete().in("attendance_id", attendanceIds);
+        await supabaseAdmin.from("consumptions").delete().in("attendance_id", attendanceIds);
+      }
 
-    // 3. Delete attendances
-    await supabaseAdmin.from("attendances").delete().in("id", createdAttendanceIds);
+      await supabaseAdmin.from("attendances").delete().eq("festival_id", testFestival.id);
+    }
 
     // 4. Delete festival-tent association
     if (testFestival?.id && testTent?.id) {
@@ -152,7 +168,11 @@ describe("Consumption Routes Integration (Local DB)", () => {
 
     // 6. Delete festival
     if (testFestival?.id) {
-      await supabaseAdmin.from("festivals").delete().eq("id", testFestival.id);
+      const { error } = await supabaseAdmin.from("festivals").delete().eq("id", testFestival.id);
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.warn(`Teardown left festival ${testFestival.id} behind: ${error.message}`);
+      }
     }
 
     // 7. Delete test users (requires admin API)

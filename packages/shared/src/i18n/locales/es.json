@@ -2484,7 +2484,10 @@
       "title": "Seleccionar festival",
       "description": "Elegí en qué festival querés ver y participar.",
       "currentFestival": "Festival actual",
-      "noFestival": "No hay festival seleccionado"
+      "noFestival": "No hay festival seleccionado",
+      "pastFestivals": "Festival pasado ({{count}})",
+      "pastFestivals_other": "Festivales pasados ({{count}})",
+      "pastFestivalsHint": "Muestra los festivales que ya terminaron"
     },
     "status": {
       "upcoming": "Próximo",
