@@ -72,4 +72,4 @@ overrides:
 # React Native's LogBox toasts render white text on a white background. The
 # patch opts LogBox's button out of the interop.
 patchedDependencies:
-  react-native@0.86.0: patches/react-native@0.86.0.patch
+  react-native@0.86.3: patches/react-native@0.86.3.patch
