@@ -12,7 +12,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "ios:device": "[ -f .env ] && cp .env .env.bak; cp .env.device .env && expo run:ios",
-    "ios:clean": "expo prebuild --clean && expo run:ios",
+    "ios:clean": "rm -rf \"${TMPDIR:-/tmp}\"/metro-cache \"${TMPDIR:-/tmp}\"/metro-file-map-* && expo prebuild --clean && expo run:ios",
     "web": "expo start --web",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
