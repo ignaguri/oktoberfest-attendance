@@ -1,0 +1,16 @@
+diff --git a/Libraries/LogBox/UI/LogBoxButton.js b/Libraries/LogBox/UI/LogBoxButton.js
+index d86a7290c7fc5f965cd5f22c660c5f8239d82960..884409d9720fd4f6db68f1b973bddc9b5043533e 100644
+--- a/Libraries/LogBox/UI/LogBoxButton.js
++++ b/Libraries/LogBox/UI/LogBoxButton.js
+@@ -56,6 +56,11 @@ component LogBoxButton(
+ 
+   return (
+     <Pressable
++      // NativeWind's cssInterop wraps Pressable and drops function `style`
++      // props, which leaves this button (and so every LogBox toast) with no
++      // background and unreadable white-on-white text. Opting this element out
++      // of the interop is NativeWind's own escape hatch.
++      cssInterop={false}
+       id={id}
+       focusable={true}
+       hitSlop={hitSlop}
