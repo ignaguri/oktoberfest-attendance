@@ -45,19 +45,19 @@
     "ios": "pnpm --filter @prostcounter/mobile ios"
   },
   "devDependencies": {
-    "@novu/api": "^3.18.2",
-    "@playwright/test": "^1.62.0",
+    "@novu/api": "^3.19.1",
+    "@playwright/test": "^1.63.0",
     "dotenv": "^17.4.2",
     "expo": "~57.0.8",
     "husky": "^9.1.7",
-    "next": "16.2.12",
-    "oxfmt": "^0.60.0",
-    "oxlint": "^1.75.0",
+    "next": "16.3.4",
+    "oxfmt": "^0.66.0",
+    "oxlint": "^1.81.0",
     "react": "19.2.8",
     "react-native": "0.86.0",
-    "supabase": "2.109.1",
-    "tsx": "^4.23.1",
-    "turbo": "^2.10.7",
+    "supabase": "2.116.0",
+    "tsx": "^4.23.13",
+    "turbo": "^2.10.12",
     "typescript": "5.9.3"
   },
   "engines": {

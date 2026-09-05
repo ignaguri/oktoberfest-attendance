@@ -29,13 +29,13 @@
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
     "date-fns": "^4.4.0",
-    "i18next": "^26.3.6",
-    "react-i18next": "^17.0.11",
-    "zod": "^4.4.3"
+    "i18next": "^26.4.2",
+    "react-i18next": "^17.0.13",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.101.4",
-    "@types/react": "^19.2.17",
+    "@tanstack/react-query": "^5.102.8",
+    "@types/react": "^19.2.18",
     "react": "19.2.8",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"
