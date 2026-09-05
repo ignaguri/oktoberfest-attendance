@@ -38,7 +38,7 @@ export const metadata: Metadata = {
       {
         url: getRandomImage(),
         width: 1200,
-        height: 630,
+        height: 670,
         alt: "ProstCounter",
       },
     ],
