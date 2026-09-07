@@ -86,12 +86,12 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.7",
-    "@types/node": "25.6.0",
+    "@types/node": "26.4.1",
     "@types/qrcode": "^1.5.6",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "@types/sanitize-html": "^2.16.1",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^5.0.0",
     "esbuild-wasm": "^0.28.2",
     "happy-dom": "^20.14.0",
     "postcss": "^8.5.28",
@@ -99,7 +99,7 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.9.3",
     "vite": "7.3.5",
-    "vitest": "^4.1.10"
+    "vitest": "^5.0.0"
   },
   "optionalDependencies": {
     "sharp": "^0.35.4"

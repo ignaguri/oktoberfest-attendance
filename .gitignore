@@ -8,6 +8,8 @@
 
 # testing
 /coverage
+apps/**/coverage/
+packages/**/coverage/
 /test-results/
 /playwright-report/
 
