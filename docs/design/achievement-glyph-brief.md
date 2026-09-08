@@ -1,14 +1,26 @@
 # Achievement Glyph Art Brief
 
-> **Historical.** This brief drove the generated-PNG glyph set, which has been
-> replaced by hand-drawn vectors in
-> `packages/shared/src/achievements/glyph-paths.ts`. It is kept for the per-glyph
-> subject descriptions below, which still describe what each glyph depicts.
+> **Reference.** This brief defines what each glyph depicts. The subject
+> descriptions below are the source for the `subject` column in
+> `scripts/glyphs/prompts.tsv`, which is what actually generates the shipped art.
 >
-> The generated set failed on its own terms: several glyphs came back
-> unrecognisable (`tent-ring` was six disconnected chevrons, `polaroid` an empty
-> frame), and an image model cannot hold stroke weight, optical size, or palette
-> steady across 30 assets. Do not restart this pipeline. Draw new glyphs as paths.
+> Read `scripts/glyphs/README.md` before regenerating anything. It carries the
+> operational detail this brief does not: the 22px legibility constraint, the
+> per-glyph seed record in `chosen.tsv`, and the prompt failures worth avoiding.
+>
+> Two earlier attempts are worth knowing about. A first generated set failed
+> (`tent-ring` came back as six disconnected chevrons, `polaroid` as an empty
+> frame), and the conclusion drawn at the time was that an image model cannot
+> hold stroke weight and palette steady across 30 assets, so the set was redrawn
+> as hand-made SVG paths. Those vectors then failed too, for a reason neither
+> attempt had isolated: at 22px legibility comes from outline contrast and shape
+> simplicity, and no amount of path tuning adds either.
+>
+> The current generated set addresses that directly, with heavy dark-brown
+> outlines fixed in a shared style string and a per-glyph palette column. So the
+> first set's failure was fixable rather than fundamental. Keep the diagnosis in
+> mind rather than the old verdict: if a glyph is unreadable, the shape is
+> probably too busy for 22px, whatever medium it is drawn in.
 
 ## Shared style & context
 

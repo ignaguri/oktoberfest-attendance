@@ -23,11 +23,28 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 
 ### Achievement Glyphs
 
-Glyphs are vector path data in `packages/shared/src/achievements/glyph-paths.ts`,
-drawn on a 24x24 grid in two tones and rendered as SVG by both apps. Adding one
-means adding its id to `GLYPH_IDS` and its paths to `GLYPH_PATHS` — no assets, no
-build step. Keep art clear of the outer 2px, and never give a glyph its own
-enclosing ring; the badge already draws one.
+Glyphs are committed PNGs, one set per app: `apps/mobile/assets/achievements/glyphs/`
+and `apps/web/public/achievements/glyphs/`. They are generated locally by
+`scripts/glyphs/` (see its README) and exported at 256px; the apps build from
+the committed files, so you only need the pipeline to add or redraw a glyph.
+
+The art carries its own colours, so a glyph takes no category colour. The badge
+ring around it supplies the category coding, which is why a gold sun can sit
+inside a green attendance ring.
+
+Adding one means: id in `GLYPH_IDS`, a row in `scripts/glyphs/prompts.tsv`, and
+a static `require()` in `apps/mobile/components/achievements/glyph-images.ts` in
+`GLYPH_IDS` order. Metro cannot resolve a computed require, so that registry is
+mandatory; web builds its `src` from the id instead. Both have tests that fail
+on drift.
+
+Design constraint: the badge renders a glyph at 0.68 of its diameter, so the
+list sizes are 22 and 27px. Outline contrast is what makes a glyph readable
+there, and multi-element or thin-walled art does not survive. Never give a glyph
+its own enclosing ring; the badge already draws one.
+
+`packages/shared/src/achievements/glyph-paths.ts` is a superseded vector set. No
+component reads it.
 
 ### Testing Commands
 

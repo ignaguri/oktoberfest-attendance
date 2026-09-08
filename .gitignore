@@ -104,5 +104,7 @@ apps/mobile/build-*.aab
 # Demo videos
 *.mp4
 
-# Local achievement glyph generation scratch (models, raw renders)
+# Achievement glyph generation: the scripts in scripts/glyphs/ are tracked, but
+# their renders are not. work/ holds 1024px masters and raw output (~100 MB).
+scripts/glyphs/work/
 .glyphgen/
