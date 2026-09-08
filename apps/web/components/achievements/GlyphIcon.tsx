@@ -3,6 +3,7 @@
 import type { GlyphId } from "@prostcounter/shared/achievements";
 import { GLYPH_FALLBACK_ICONS, GLYPH_IDS } from "@prostcounter/shared/achievements";
 import Image from "next/image";
+import { useState } from "react";
 import {
   Award,
   Beaker,
@@ -73,15 +74,25 @@ interface GlyphIconProps {
 
 /**
  * Draws an achievement glyph from its PNG in `public/achievements/glyphs`,
- * falling back to a lucide icon for a glyph id the set does not cover (rows
- * written before an id was added still render something).
+ * falling back to a lucide icon.
+ *
+ * Two ways to reach the fallback, and both are needed. An id the set does not
+ * cover has no art to load at all (a row written before the id was added still
+ * renders something), and that case cannot use the per-glyph mapping, since
+ * GLYPH_FALLBACK_ICONS is keyed by GlyphId. Art for a *known* id can also fail
+ * at runtime, on a rolling deploy where the PNG is not live yet or when the
+ * image optimizer errors; that is the case the mapping is for, and it is why
+ * the failure is tracked per glyph rather than as a bare boolean, so one bad
+ * asset cannot suppress the art of every later glyph this component renders.
  *
  * The art carries its own colours, so unlike the vector set this takes no
  * category colour; the badge ring drawn around it still does the category
  * coding.
  */
 export function GlyphIcon({ glyph, sizePx }: GlyphIconProps) {
-  if (!GLYPHS_WITH_ART.has(glyph)) {
+  const [failedGlyph, setFailedGlyph] = useState<string | null>(null);
+
+  if (!GLYPHS_WITH_ART.has(glyph) || failedGlyph === glyph) {
     const FallbackIcon =
       FALLBACK_ICON_COMPONENTS[
         GLYPH_FALLBACK_ICONS[glyph] as keyof typeof FALLBACK_ICON_COMPONENTS
@@ -96,6 +107,7 @@ export function GlyphIcon({ glyph, sizePx }: GlyphIconProps) {
       width={sizePx}
       height={sizePx}
       aria-hidden="true"
+      onError={() => setFailedGlyph(glyph)}
     />
   );
 }
