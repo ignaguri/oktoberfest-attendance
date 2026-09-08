@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 
+import { getAppVersions } from "./lib/app-version";
 import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
 import { loggerMiddleware } from "./middleware/logger";
@@ -36,6 +37,14 @@ app.use("*", loggerMiddleware);
 // Health check endpoint (public)
 app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Published app versions (public). The apps check this from the sign-in screen,
+// before any session exists, so it must stay outside the authenticated /v1
+// namespace. Kept off the OpenAPI spec for the same reason /health is: the
+// generated client always attaches a bearer token, which callers here lack.
+app.get("/app-version", (c) => {
+  return c.json(getAppVersions());
 });
 
 // Mount API v1 routes with authentication

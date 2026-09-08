@@ -2883,7 +2883,13 @@
     },
     "storeAvailable": {
       "title": "New Version Available",
-      "description": "A new version of ProstCounter is available on the App Store. Update to get the latest features and improvements.",
+      "description": "A new version of ProstCounter is available. Update to get the latest features and improvements.",
+      "updateNow": "Update Now",
+      "later": "Maybe Later"
+    },
+    "storeRequired": {
+      "title": "Update Required",
+      "description": "This version of ProstCounter is no longer supported. Update the app to keep signing in to your account.",
       "updateNow": "Update Now",
       "later": "Maybe Later"
     }

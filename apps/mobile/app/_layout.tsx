@@ -285,12 +285,32 @@ function WatchInstallPromptHandler() {
   );
 }
 
-// Show prompt when a newer version is available on the App Store
+// Spelled out rather than built from a prefix so the keys stay greppable.
+const STORE_UPDATE_COPY = {
+  available: {
+    titleKey: "update.storeAvailable.title",
+    descriptionKey: "update.storeAvailable.description",
+    primaryButtonKey: "update.storeAvailable.updateNow",
+    dismissButtonKey: "update.storeAvailable.later",
+  },
+  required: {
+    titleKey: "update.storeRequired.title",
+    descriptionKey: "update.storeRequired.description",
+    primaryButtonKey: "update.storeRequired.updateNow",
+    dismissButtonKey: "update.storeRequired.later",
+  },
+} as const;
+
+// Show prompt when a newer version has been published to the store
 function StoreUpdatePromptHandler() {
-  const { isStoreUpdateAvailable, openStore } = useStoreUpdate();
+  const { isStoreUpdateAvailable, isBelowMinimum, openStore } = useStoreUpdate();
   const [dismissed, setDismissed] = useState(false);
 
   const showPrompt = isStoreUpdateAvailable && !dismissed;
+
+  // A build below the supported floor cannot authenticate at all, so it gets
+  // the blunter copy. Still dismissible: this warns, it does not lock the app.
+  const copy = isBelowMinimum ? STORE_UPDATE_COPY.required : STORE_UPDATE_COPY.available;
 
   return (
     <UpdatePrompt
@@ -298,10 +318,7 @@ function StoreUpdatePromptHandler() {
       onClose={() => setDismissed(true)}
       onUpdate={openStore}
       icon={ArrowUpCircle}
-      titleKey="update.storeAvailable.title"
-      descriptionKey="update.storeAvailable.description"
-      primaryButtonKey="update.storeAvailable.updateNow"
-      dismissButtonKey="update.storeAvailable.later"
+      {...copy}
     />
   );
 }

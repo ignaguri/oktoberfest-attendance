@@ -4,60 +4,82 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppStateStatus } from "react-native";
 import { AppState, Platform } from "react-native";
 
-import { IOS_APP_STORE_URL } from "@/lib/constants/app-store";
+import { API_BASE_URL } from "@/lib/api-client";
+import { APP_STORE_URL } from "@/lib/constants/app-store";
 import { logger } from "@/lib/logger";
+import { isNewerVersion } from "@/lib/version";
 
-/** Minimum interval between store version checks (1 hour). */
+/** Minimum interval between version checks (1 hour). */
 const CHECK_INTERVAL_MS = 60 * 60 * 1000;
 
-function isNewerVersion(currentVersion: string, storeVersion: string): boolean {
-  const current = currentVersion.split(".").map(Number);
-  const store = storeVersion.split(".").map(Number);
+/** Platforms that have a store to send someone to. */
+type StorePlatform = "ios" | "android";
 
-  for (let i = 0; i < Math.max(current.length, store.length); i++) {
-    const c = current[i] ?? 0;
-    const s = store[i] ?? 0;
-    if (s > c) return true;
-    if (s < c) return false;
-  }
-  return false;
+interface PublishedVersion {
+  latest: string;
+  minSupported: string;
 }
 
-async function fetchAppStoreVersion(): Promise<string | null> {
-  const bundleId = Application.applicationId;
-  if (!bundleId) return null;
+function currentStorePlatform(): StorePlatform | null {
+  return Platform.OS === "ios" || Platform.OS === "android" ? Platform.OS : null;
+}
 
+/**
+ * Reads the published versions from our own API.
+ *
+ * This used to call the iTunes lookup API, which only ever covered iOS because
+ * Google publishes no equivalent. Serving both platforms from one endpoint also
+ * means the supported floor can move without shipping an app build.
+ *
+ * Returns null on any failure, which the caller treats as "no update": a
+ * network blip must not interrupt someone mid-session.
+ */
+async function fetchPublishedVersion(platform: StorePlatform): Promise<PublishedVersion | null> {
   try {
-    const response = await fetch(`https://itunes.apple.com/lookup?bundleId=${bundleId}`);
+    const response = await fetch(`${API_BASE_URL}/app-version`);
     if (!response.ok) {
-      logger.error(`App Store lookup failed: ${response.status}`);
+      logger.error(`App version lookup failed: ${response.status}`);
       return null;
     }
+
     const data = await response.json();
-    if (data.resultCount > 0 && data.results[0]?.version) {
-      return data.results[0].version as string;
+    const entry = data?.[platform];
+
+    // Validated rather than trusted: a malformed payload reaching
+    // isNewerVersion would be rejected there anyway, but bailing here keeps the
+    // reason visible in the logs.
+    if (typeof entry?.latest !== "string" || typeof entry?.minSupported !== "string") {
+      logger.error("App version payload missing fields for platform", { platform });
+      return null;
     }
-    return null;
+
+    return { latest: entry.latest, minSupported: entry.minSupported };
   } catch (error) {
-    logger.error("Failed to fetch App Store version:", error);
+    logger.error("Failed to fetch published app version:", error);
     return null;
   }
 }
 
 /**
- * Checks whether a newer version of the app is available on the App Store.
+ * Checks whether a newer version of the app has been published.
  *
  * Includes a 1-hour throttle between checks and skips entirely in __DEV__ mode
- * or on non-iOS platforms.
+ * or on platforms without a store.
+ *
+ * `isBelowMinimum` marks builds the backend no longer works with, as opposed to
+ * merely out of date. It is currently reported alongside the normal prompt so
+ * the two can be told apart at the call site.
  */
 export function useStoreUpdate() {
   const [isStoreUpdateAvailable, setIsStoreUpdateAvailable] = useState(false);
+  const [isBelowMinimum, setIsBelowMinimum] = useState(false);
 
   const isCheckingRef = useRef(false);
   const lastCheckRef = useRef(0);
 
   const checkForStoreUpdate = useCallback(async () => {
-    if (__DEV__ || Platform.OS !== "ios") return;
+    const platform = currentStorePlatform();
+    if (__DEV__ || !platform) return;
     if (isCheckingRef.current) return;
     if (isStoreUpdateAvailable) return;
 
@@ -71,20 +93,27 @@ export function useStoreUpdate() {
       const currentVersion = Application.nativeApplicationVersion;
       if (!currentVersion) return;
 
-      const storeVersion = await fetchAppStoreVersion();
-      if (storeVersion && isNewerVersion(currentVersion, storeVersion)) {
-        logger.info(`Store update available: ${currentVersion} → ${storeVersion}`);
+      const published = await fetchPublishedVersion(platform);
+      if (!published) return;
+
+      if (isNewerVersion(currentVersion, published.latest)) {
+        logger.info(`Store update available: ${currentVersion} → ${published.latest}`);
         setIsStoreUpdateAvailable(true);
       }
+
+      if (isNewerVersion(currentVersion, published.minSupported)) {
+        logger.info(`Build is below the supported floor: ${currentVersion} < ${published.minSupported}`);
+        setIsBelowMinimum(true);
+      }
     } catch (error) {
-      logger.error("Error checking store version:", error);
+      logger.error("Error checking published version:", error);
     } finally {
       isCheckingRef.current = false;
     }
   }, [isStoreUpdateAvailable]);
 
   useEffect(() => {
-    if (__DEV__ || Platform.OS !== "ios") return;
+    if (__DEV__ || !currentStorePlatform()) return;
 
     checkForStoreUpdate();
 
@@ -99,14 +128,15 @@ export function useStoreUpdate() {
 
   const openStore = useCallback(async () => {
     try {
-      await Linking.openURL(IOS_APP_STORE_URL);
+      await Linking.openURL(APP_STORE_URL);
     } catch (error) {
-      logger.error("Failed to open App Store URL:", error);
+      logger.error("Failed to open store URL:", error);
     }
   }, []);
 
   return {
     isStoreUpdateAvailable,
+    isBelowMinimum,
     openStore,
   };
 }

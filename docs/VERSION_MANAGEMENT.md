@@ -268,6 +268,35 @@ pnpm run version:set 0.3.0
 6. **Use quick release commands** for standard version bumps
 7. **Document breaking changes** thoroughly
 
+## After a Store Release: Bump `APP_VERSIONS`
+
+`scripts/version.ts` updates the root `package.json` and `CHANGELOG.md` only. It
+does not touch the mobile app version in `apps/mobile/app.config.ts`, and it does
+not touch the published versions the apps read to decide whether to prompt for an
+update.
+
+Once a build is live in the App Store or Play Store, update
+`packages/api/src/lib/app-version.ts`:
+
+```ts
+export const APP_VERSIONS: AppVersions = {
+  ios: { latest: "1.6.2", minSupported: "1.6.2" },
+  android: { latest: "1.7.0", minSupported: "1.6.2" },
+};
+```
+
+- **`latest`** — the newest version in that platform's store. Drives the
+  dismissible "new version available" prompt. Forgetting to bump it only means
+  users are not told about an update, so it is a soft failure.
+- **`minSupported`** — the oldest version the backend still works with. Raising
+  it switches those users to the blunter "update required" copy. Only raise it
+  when older builds genuinely cannot function, and never above `latest`, or you
+  strand users on a version they cannot reach. A test enforces that ordering.
+
+The endpoint is served publicly at `GET /api/app-version`, outside the
+authenticated `/v1` namespace, because the apps check it from the sign-in screen
+before any session exists.
+
 ## Migration from Manual Versioning
 
 If you're migrating from manual version management:

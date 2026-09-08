@@ -2861,7 +2861,13 @@
     },
     "storeAvailable": {
       "title": "Neue Version verfügbar",
-      "description": "Eine neue Version von ProstCounter ist im App Store verfügbar. Aktualisiere, um die neuesten Funktionen und Verbesserungen zu erhalten.",
+      "description": "Eine neue Version von ProstCounter ist verfügbar. Aktualisiere, um die neuesten Funktionen und Verbesserungen zu erhalten.",
+      "updateNow": "Jetzt aktualisieren",
+      "later": "Vielleicht später"
+    },
+    "storeRequired": {
+      "title": "Update erforderlich",
+      "description": "Diese Version von ProstCounter wird nicht mehr unterstützt. Aktualisiere die App, um dich weiterhin bei deinem Konto anmelden zu können.",
       "updateNow": "Jetzt aktualisieren",
       "later": "Vielleicht später"
     }
