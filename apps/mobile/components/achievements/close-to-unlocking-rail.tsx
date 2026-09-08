@@ -46,7 +46,7 @@ export function CloseToUnlockingRail({ cards }: CloseToUnlockingRailProps) {
               size="sm"
               className="border-yellow-200 bg-yellow-50/30"
             >
-              <HStack space="sm" className="items-center p-3">
+              <HStack space="md" className="items-center p-3">
                 <AchievementBadge
                   glyph={card.glyph as GlyphId}
                   category={card.category}

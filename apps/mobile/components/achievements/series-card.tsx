@@ -53,7 +53,7 @@ export function SeriesCard({ card }: SeriesCardProps) {
             isUnlocked ? "border-green-200 bg-green-50/30" : "border-gray-200 bg-white",
           )}
         >
-          <HStack space="sm" className="items-center p-3">
+          <HStack space="md" className="items-center p-3">
             <AchievementBadge
               glyph={card.glyph as GlyphId}
               category={card.category}
