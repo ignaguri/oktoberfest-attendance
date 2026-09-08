@@ -103,3 +103,6 @@ apps/mobile/build-*.aab
 
 # Demo videos
 *.mp4
+
+# Local achievement glyph generation scratch (models, raw renders)
+.glyphgen/

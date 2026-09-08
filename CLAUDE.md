@@ -23,11 +23,11 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 
 ### Achievement Glyphs
 
-- `pnpm glyphs:build --src <dir>` - Rebuild the achievement glyph PNGs from raw renders
-- `pnpm glyphs:build --src <dir> --only <glyph-id>` - Rebuild a single glyph
-
-See **[scripts/glyphs/README.md](./scripts/glyphs/README.md)** for the pipeline, how to
-add a new glyph, and the traps in the source renders. Never hand-clean a render.
+Glyphs are vector path data in `packages/shared/src/achievements/glyph-paths.ts`,
+drawn on a 24x24 grid in two tones and rendered as SVG by both apps. Adding one
+means adding its id to `GLYPH_IDS` and its paths to `GLYPH_PATHS` — no assets, no
+build step. Keep art clear of the outer 2px, and never give a glyph its own
+enclosing ring; the badge already draws one.
 
 ### Testing Commands
 
@@ -175,4 +175,3 @@ GestureHandlerRootView → SafeAreaProvider → I18nextProvider → ErrorBoundar
 - **[BLOG.md](./docs/BLOG.md)** - Blog/MDX content authoring guide
 - **[Mobile PRD](./docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md)** - Mobile app plans
 - **[FRIENDSHIP_SYSTEM.md](./docs/FRIENDSHIP_SYSTEM.md)** - Friendship feature documentation
-- **[scripts/glyphs/README.md](./scripts/glyphs/README.md)** - Achievement glyph asset pipeline

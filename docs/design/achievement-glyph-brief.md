@@ -1,16 +1,14 @@
 # Achievement Glyph Art Brief
 
-This document is source material for generating 30 achievement glyph images by hand,
-one at a time, in an external AI image-generation tool. Paste the shared style/context
-section (or a condensed form of it) alongside each individual glyph prompt when
-generating that glyph, since each generation is a separate, independent request with
-no memory of the others.
-
-Once a render exists, **[scripts/glyphs/README.md](../../scripts/glyphs/README.md)**
-covers turning it into a shipped asset: `pnpm glyphs:build` strips the baked-in
-transparency checkerboard, recovers real alpha, and writes the 256px PNG into both
-apps. Do not hand-clean a render; the checkerboard has traps in it that the pipeline
-already knows about.
+> **Historical.** This brief drove the generated-PNG glyph set, which has been
+> replaced by hand-drawn vectors in
+> `packages/shared/src/achievements/glyph-paths.ts`. It is kept for the per-glyph
+> subject descriptions below, which still describe what each glyph depicts.
+>
+> The generated set failed on its own terms: several glyphs came back
+> unrecognisable (`tent-ring` was six disconnected chevrons, `polaroid` an empty
+> frame), and an image model cannot hold stroke weight, optical size, or palette
+> steady across 30 assets. Do not restart this pipeline. Draw new glyphs as paths.
 
 ## Shared style & context
 

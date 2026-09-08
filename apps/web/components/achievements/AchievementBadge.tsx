@@ -6,8 +6,6 @@ import type {
   GlyphId,
 } from "@prostcounter/shared/achievements";
 import { getCategoryColor, TIER_RING_WIDTH } from "@prostcounter/shared/achievements";
-import { useState } from "react";
-
 import { useTranslation } from "@/lib/i18n/client";
 import type { AchievementRarity } from "@/lib/types/achievements";
 import { cn } from "@/lib/utils";
@@ -30,6 +28,13 @@ interface AchievementBadgeProps {
   className?: string;
 }
 
+/**
+ * Glyph size as a share of the badge diameter. The art is exported trimmed to
+ * its own bounding box with a small margin, so it needs the extra room over
+ * the 0.6 the first bitmap set used — at 0.6 it read as a dot inside the ring.
+ */
+const GLYPH_SIZE_RATIO = 0.68;
+
 const SIZE_PX: Record<BadgeSize, number> = {
   sm: 32,
   md: 40,
@@ -49,15 +54,12 @@ export function AchievementBadge({
   className,
 }: AchievementBadgeProps) {
   const { t } = useTranslation();
-  const [failedIcon, setFailedIcon] = useState<string | null>(null);
-  const imageFailed = failedIcon === icon;
 
   const translatedName = t(name);
   const diameter = SIZE_PX[size];
   const strokeWidth = tier !== undefined ? TIER_RING_WIDTH[tier] : TIER_RING_WIDTH[1];
   const ringColor = category !== undefined ? getCategoryColor(category) : getCategoryColor("");
   const glowsForTier = tier !== undefined && tier >= 3;
-  const imagePath = `/achievements/glyphs/${icon}.png`;
 
   return (
     <span className={cn("inline-flex items-center gap-1.5", className)}>
@@ -67,22 +69,11 @@ export function AchievementBadge({
           width: diameter,
           height: diameter,
           border: `${strokeWidth}px solid ${ringColor}`,
-          opacity: isUnlocked ? 1 : 0.4,
+          opacity: isUnlocked ? 1 : 0.6,
           boxShadow: glowsForTier ? `0 0 8px ${ringColor}` : undefined,
         }}
       >
-        {!imageFailed ? (
-          // eslint-disable-next-line nextjs/no-img-element -- dynamic, possibly-missing static asset; next/image requires a known-good src
-          <img
-            src={imagePath}
-            alt=""
-            width={diameter * 0.6}
-            height={diameter * 0.6}
-            onError={() => setFailedIcon(icon)}
-          />
-        ) : (
-          <GlyphIcon glyph={icon as GlyphId} sizePx={diameter * 0.5} />
-        )}
+        <GlyphIcon glyph={icon as GlyphId} sizePx={diameter * GLYPH_SIZE_RATIO} />
       </span>
 
       {name !== "" && <span className="truncate text-sm">{translatedName}</span>}

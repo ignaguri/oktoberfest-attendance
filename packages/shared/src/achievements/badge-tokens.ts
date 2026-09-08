@@ -65,3 +65,27 @@ export function tierToRarity(
       return "common";
   }
 }
+
+/**
+ * Lighter companion to a category colour, used for the `tint` tone of an
+ * achievement glyph (see `GLYPH_PATHS`). Mixing towards white rather than
+ * dropping opacity keeps the hue intact: a translucent fill takes on
+ * whatever sits behind it, which turned orange into brown on a dark ground.
+ *
+ * Both apps currently render light-only, so this is the light-ground ratio.
+ * A dark ground wants a much smaller mix (about 0.35) — the glyph needs to
+ * stay brighter than its background, not paler.
+ */
+const TINT_MIX_TOWARDS_WHITE = 0.62;
+
+export function getCategoryTintColor(category: string): string {
+  const base = getCategoryColor(category);
+  const channels = [1, 3, 5].map((i) => parseInt(base.slice(i, i + 2), 16));
+  return `#${channels
+    .map((channel) =>
+      Math.round(channel + (255 - channel) * TINT_MIX_TOWARDS_WHITE)
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`;
+}
