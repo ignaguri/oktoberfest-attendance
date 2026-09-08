@@ -6,6 +6,7 @@ import type {
 import {
   GLYPH_FALLBACK_ICONS,
   getCategoryColor,
+  GLYPH_SIZE_RATIO,
   TIER_RING_WIDTH,
 } from "@prostcounter/shared/achievements";
 import { cn } from "@prostcounter/ui";
@@ -86,12 +87,6 @@ const SIZE_PX: Record<BadgeSize, number> = {
   xl: 96,
 };
 
-/**
- * Glyph size as a share of the badge diameter. The art is exported trimmed to
- * its own bounding box with a small margin, so it needs the extra room over
- * the 0.6 the first bitmap set used — at 0.6 it read as a dot inside the ring.
- */
-const GLYPH_SIZE_RATIO = 0.68;
 
 const SIZE_CLASSES: Record<BadgeSize, string> = {
   sm: "w-8 h-8",

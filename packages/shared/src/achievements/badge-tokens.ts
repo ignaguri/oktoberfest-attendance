@@ -46,6 +46,21 @@ export const TIER_RING_WIDTH: Record<AchievementTier, number> = {
 };
 
 /**
+ * Glyph diameter as a fraction of the badge's, so the art clears the ring.
+ * The art is exported trimmed to its own bounding box with a small margin, so
+ * it needs the extra room over the 0.6 the first bitmap set used — at 0.6 it
+ * read as a dot inside the ring.
+ *
+ * Shared because it decides what the art has to survive, not just how the
+ * badge looks: against the badge sizes it yields a render ladder of roughly
+ * 22 / 27 / 38 / 65 px, the 22 governs every glyph design decision, and
+ * scripts/glyphs/ sizes its previews and its 256px export from the same
+ * number. Changing it in one app only would leave the other app and the art
+ * pipeline disagreeing about what "legible" has to mean.
+ */
+export const GLYPH_SIZE_RATIO = 0.68;
+
+/**
  * Tier onto the rarity vocabulary the stats breakdown and the web
  * `AchievementBadge` still speak. Takes a plain number because callers read
  * the tier off wire-shaped data (`z.number()`), which cannot be narrowed to
@@ -64,28 +79,4 @@ export function tierToRarity(
     default:
       return "common";
   }
-}
-
-/**
- * Lighter companion to a category colour, used for the `tint` tone of an
- * achievement glyph (see `GLYPH_PATHS`). Mixing towards white rather than
- * dropping opacity keeps the hue intact: a translucent fill takes on
- * whatever sits behind it, which turned orange into brown on a dark ground.
- *
- * Both apps currently render light-only, so this is the light-ground ratio.
- * A dark ground wants a much smaller mix (about 0.35) — the glyph needs to
- * stay brighter than its background, not paler.
- */
-const TINT_MIX_TOWARDS_WHITE = 0.62;
-
-export function getCategoryTintColor(category: string): string {
-  const base = getCategoryColor(category);
-  const channels = [1, 3, 5].map((i) => parseInt(base.slice(i, i + 2), 16));
-  return `#${channels
-    .map((channel) =>
-      Math.round(channel + (255 - channel) * TINT_MIX_TOWARDS_WHITE)
-        .toString(16)
-        .padStart(2, "0"),
-    )
-    .join("")}`;
 }

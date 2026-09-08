@@ -5,7 +5,11 @@ import type {
   AchievementTier,
   GlyphId,
 } from "@prostcounter/shared/achievements";
-import { getCategoryColor, TIER_RING_WIDTH } from "@prostcounter/shared/achievements";
+import {
+  getCategoryColor,
+  GLYPH_SIZE_RATIO,
+  TIER_RING_WIDTH,
+} from "@prostcounter/shared/achievements";
 import { useTranslation } from "@/lib/i18n/client";
 import type { AchievementRarity } from "@/lib/types/achievements";
 import { cn } from "@/lib/utils";
@@ -28,12 +32,6 @@ interface AchievementBadgeProps {
   className?: string;
 }
 
-/**
- * Glyph size as a share of the badge diameter. The art is exported trimmed to
- * its own bounding box with a small margin, so it needs the extra room over
- * the 0.6 the first bitmap set used — at 0.6 it read as a dot inside the ring.
- */
-const GLYPH_SIZE_RATIO = 0.68;
 
 const SIZE_PX: Record<BadgeSize, number> = {
   sm: 32,
