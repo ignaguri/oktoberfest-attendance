@@ -12,11 +12,15 @@ describe("getAppVersions", () => {
     }
   });
 
+  // Asserted against a literal, not against APP_VERSIONS. Comparing the two
+  // reads cannot fail: without the copy, the mutation below lands on the shared
+  // constant and both sides return "99.0.0".
   it("returns a copy, so a caller cannot mutate the shared constant", () => {
     const versions = getAppVersions();
     versions.ios.latest = "99.0.0";
 
-    expect(getAppVersions().ios.latest).toBe(APP_VERSIONS.ios.latest);
+    expect(getAppVersions().ios.latest).toBe("1.6.2");
+    expect(APP_VERSIONS.ios.latest).toBe("1.6.2");
   });
 
   // The floor exists because builds below it ship no hCaptcha sitekey and are

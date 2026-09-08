@@ -43,7 +43,12 @@ app.get("/health", (c) => {
 // before any session exists, so it must stay outside the authenticated /v1
 // namespace. Kept off the OpenAPI spec for the same reason /health is: the
 // generated client always attaches a bearer token, which callers here lack.
+// Cached because the payload is a compile-time constant: without this every
+// install reaches a function once an hour to be told three hard-coded strings.
+// An hour of staleness is harmless, since a late prompt is the failure mode
+// this endpoint is allowed to have.
 app.get("/app-version", (c) => {
+  c.header("Cache-Control", "public, max-age=3600, s-maxage=3600");
   return c.json(getAppVersions());
 });
 

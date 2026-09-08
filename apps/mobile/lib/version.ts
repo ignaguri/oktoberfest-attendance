@@ -7,21 +7,26 @@
 
 /**
  * Splits a dotted version into numeric segments, or returns null when any
- * segment is not a plain non-negative integer.
+ * segment is not a run of digits.
  *
  * Both inputs are remote data (the version endpoint, or a stored build string),
  * so an unparseable value must be rejected outright. Coercing with Number()
  * alone yields NaN, and every comparison against NaN is false, which lets the
  * loop fall through to the next segment and report a bogus "newer" result.
+ *
+ * Tested against the raw segment rather than the coerced number, because
+ * Number() is too permissive to express this: Number("") is 0 and Number(" ")
+ * is 0, so "" and "1..2" would both pass an isInteger check and parse to
+ * something that looks like a valid version.
  */
 function parseVersion(version: string): number[] | null {
-  const segments = version.split(".").map((segment) => Number(segment));
+  const segments = version.split(".");
 
-  if (segments.some((segment) => !Number.isInteger(segment) || segment < 0)) {
+  if (segments.some((segment) => !/^\d+$/.test(segment))) {
     return null;
   }
 
-  return segments;
+  return segments.map(Number);
 }
 
 /**

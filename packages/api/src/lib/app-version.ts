@@ -30,7 +30,15 @@ export interface AppVersions {
  * recovery outright. Existing sessions keep working, so this only bites users
  * who need to re-authenticate.
  *
- * There is no iOS 1.7.0 build; iOS tops out at 1.6.2.
+ * A version number does not by itself imply the sitekey: commit 41d7e3a7 added
+ * it to eas.json without bumping `version` or `runtimeVersion`, so in principle
+ * a 1.6.2 binary could predate it. It does not here. EAS has exactly one 1.6.2
+ * build per platform and both were built from 41d7e3a7 itself (iOS
+ * 2026-08-31T18:20Z, Android 18:53Z, commit authored 18:02Z). Re-check that
+ * before lowering this floor.
+ *
+ * There is no iOS 1.7.0 build; iOS tops out at 1.6.2, which is what the App
+ * Store serves. Play serves Android 1.7.0.
  */
 export const APP_VERSIONS: AppVersions = {
   ios: { latest: "1.6.2", minSupported: "1.6.2" },

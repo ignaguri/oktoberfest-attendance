@@ -49,7 +49,7 @@ async function fetchPublishedVersion(platform: StorePlatform): Promise<Published
     // isNewerVersion would be rejected there anyway, but bailing here keeps the
     // reason visible in the logs.
     if (typeof entry?.latest !== "string" || typeof entry?.minSupported !== "string") {
-      logger.error("App version payload missing fields for platform", { platform });
+      logger.error("App version payload missing fields for platform", undefined, { platform });
       return null;
     }
 

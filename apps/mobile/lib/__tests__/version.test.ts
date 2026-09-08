@@ -38,4 +38,15 @@ describe("isNewerVersion", () => {
     expect(isNewerVersion("not-a-version", "1.6.2")).toBe(false);
     expect(isNewerVersion("1.6.2", "")).toBe(false);
   });
+
+  // Asserted from the other side too: an unparseable *current* version must
+  // also be rejected. Number("") is 0, so "" once parsed to [0] and reported
+  // every real version as newer.
+  it("rejects empty and malformed segments rather than coercing them to zero", () => {
+    expect(isNewerVersion("", "1.6.2")).toBe(false);
+    expect(isNewerVersion(" ", "1.6.2")).toBe(false);
+    expect(isNewerVersion("1..2", "1.6.2")).toBe(false);
+    expect(isNewerVersion("1.6.2", "1..2")).toBe(false);
+    expect(isNewerVersion("1.6.2", "1.7.0-beta")).toBe(false);
+  });
 });
