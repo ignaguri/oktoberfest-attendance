@@ -63,8 +63,14 @@ export function SeriesCardDetailSheet({ card, open, onOpenChange }: SeriesCardDe
           short viewport, and neither DrawerContent (max-h-[80vh], no overflow
           rule) nor DialogContent (no max height at all) would let you reach
           the overflow — the drawer is bottom-anchored, so it paints off-screen.
-          Same pattern as components/ui/datetime-picker.tsx. */}
-      <div className="max-h-[60vh] space-y-4 overflow-y-auto px-4 pb-4 md:px-0 md:pb-0">
+          Same pattern as components/ui/datetime-picker.tsx.
+
+          pt-2 is not chrome padding, so it stays at every breakpoint: setting
+          overflow-y also makes overflow-x a scroll box, which clips on all four
+          sides, and the hero badge's tier-3+ glow (box-shadow blur 8px) is drawn
+          outside its border box. Without the 8px the halo is sliced flat along
+          the top, since the badge is the scroller's first child. */}
+      <div className="max-h-[60vh] space-y-4 overflow-y-auto px-4 pb-4 pt-2 md:px-0 md:pb-0">
         {/* The glyph at a size worth looking at — the card behind this dialog
             only ever shows it at 40px. Below the heading rather than above it,
             because ResponsiveDialog owns the title and description. */}
