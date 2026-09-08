@@ -25,6 +25,7 @@ function seriesCard(
     tiers: [1, 2, 3, 4].map((tier) => ({
       tier,
       name: `achievements.${id}.t${tier}.name`,
+      description: `achievements.${id}.t${tier}.description`,
       points: tier * 10,
       isUnlocked: tier <= currentTier,
       unlockedAt: tier <= currentTier ? "2026-09-20T10:00:00Z" : null,
@@ -44,6 +45,7 @@ function oneOffCard(id: string, difficulty: number, unlocked: boolean): SeriesCa
       {
         tier: difficulty,
         name: `achievements.${id}.name`,
+        description: `achievements.${id}.description`,
         points: 600,
         isUnlocked: unlocked,
         unlockedAt: unlocked ? "2026-09-20T10:00:00Z" : null,

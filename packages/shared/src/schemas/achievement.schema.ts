@@ -111,6 +111,14 @@ export const SeriesTierSchema = z.object({
   tier: z.number().int().min(1).max(4),
   /** i18n key, e.g. "achievements.drinks_total.t2.name". */
   name: z.string(),
+  /**
+   * i18n key for what this rung takes, e.g.
+   * "achievements.drinks_total.t2.description" -> "Have 10 drinks this
+   * festival". Carries the rung's target in prose, which is why no numeric
+   * target is on the wire: the copy is the only place a locked rung's
+   * threshold is stated.
+   */
+  description: z.string(),
   points: z.number().int(),
   isUnlocked: z.boolean(),
   unlockedAt: z.iso.datetime().nullable(),

@@ -52,12 +52,19 @@ export function SeriesCardDetailSheet({ card, open, onOpenChange }: SeriesCardDe
   const isUnlocked = card.currentTier > 0;
   const categoryColor = getCategoryColor(card.category);
 
+  // Scope matters as much as category and was invisible until now: a festival
+  // card resets every festival, a lifetime one is earned once ever, and the
+  // rung descriptions only sometimes say so. The "lifetime" -> scope.allTime
+  // mapping is the same one ScopeToggle uses.
+  const scopeLabel =
+    card.scope === "festival" ? t("achievements.scope.festival") : t("achievements.scope.allTime");
+
   return (
     <ResponsiveDialog
       open={open}
       onOpenChange={onOpenChange}
       title={t(activeTier.name)}
-      description={t(`achievements.categories.${card.category}`)}
+      description={`${t(`achievements.categories.${card.category}`)} · ${scopeLabel}`}
     >
       {/* Scrollable and capped: the hero badge plus four rungs runs past a
           short viewport, and neither DrawerContent (max-h-[80vh], no overflow
@@ -132,11 +139,22 @@ export function SeriesCardDetailSheet({ card, open, onOpenChange }: SeriesCardDe
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1.5">
-                  <p className="text-xs text-gray-600">
-                    {t(`achievements.tiers.${TIER_NAMES[tier.tier as AchievementTier]}`)}
+                {/* What the rung actually takes. The only place a locked rung's
+                    target is stated: the payload carries no numeric target, and
+                    the status column shows one only for the single next rung. */}
+                <p className="text-xs text-gray-700">{t(tier.description)}</p>
+
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs text-gray-600">
+                      {t(`achievements.tiers.${TIER_NAMES[tier.tier as AchievementTier]}`)}
+                    </p>
+                    <TierLevelPips tier={tier} categoryColor={categoryColor} />
+                  </div>
+
+                  <p className="shrink-0 text-xs text-gray-600">
+                    {tier.points} {t("achievements.points")}
                   </p>
-                  <TierLevelPips tier={tier} categoryColor={categoryColor} />
                 </div>
               </div>
             );
