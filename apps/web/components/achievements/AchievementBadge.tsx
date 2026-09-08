@@ -1,13 +1,9 @@
 "use client";
 
-import type {
-  AchievementCategory,
-  AchievementTier,
-  GlyphId,
-} from "@prostcounter/shared/achievements";
+import type { AchievementCategory, AchievementTier } from "@prostcounter/shared/achievements";
 import {
   getCategoryColor,
-  GLYPH_SIZE_RATIO,
+  glyphSizePx,
   TIER_RING_WIDTH,
 } from "@prostcounter/shared/achievements";
 import { useTranslation } from "@/lib/i18n/client";
@@ -71,7 +67,7 @@ export function AchievementBadge({
           boxShadow: glowsForTier ? `0 0 8px ${ringColor}` : undefined,
         }}
       >
-        <GlyphIcon glyph={icon as GlyphId} sizePx={diameter * GLYPH_SIZE_RATIO} />
+        <GlyphIcon glyph={icon} sizePx={glyphSizePx(diameter)} />
       </span>
 
       {name !== "" && <span className="truncate text-sm">{translatedName}</span>}

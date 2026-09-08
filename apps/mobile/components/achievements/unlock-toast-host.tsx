@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useWindowDimensions, View } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 
-import type { GlyphId, PersistedUnlock } from "@prostcounter/shared/achievements";
+import type { PersistedUnlock } from "@prostcounter/shared/achievements";
 import { batchEarnsConfetti, nameKeyFor } from "@prostcounter/shared/achievements";
 import { useUnlockQueue } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -83,7 +83,7 @@ export function UnlockToastHost() {
                 {batch.slice(0, MAX_TOAST_BADGES).map((entry) => (
                   <AchievementBadge
                     key={entry.eventId}
-                    glyph={entry.glyph as GlyphId}
+                    glyph={entry.glyph}
                     category={entry.category}
                     tier={entry.tier}
                     isUnlocked

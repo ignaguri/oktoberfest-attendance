@@ -1,7 +1,6 @@
 "use client";
 
-import type { GlyphId } from "@prostcounter/shared/achievements";
-import { GLYPH_FALLBACK_ICONS, GLYPH_IDS } from "@prostcounter/shared/achievements";
+import { getGlyphFallbackIcon, GLYPH_IDS } from "@prostcounter/shared/achievements";
 import Image from "next/image";
 import { useState } from "react";
 import {
@@ -68,7 +67,12 @@ const FALLBACK_ICON_COMPONENTS = {
 const GLYPHS_WITH_ART = new Set<string>(GLYPH_IDS);
 
 interface GlyphIconProps {
-  glyph: GlyphId;
+  /**
+   * Plain string, not GlyphId: achievement rows store `glyph` as text, so an
+   * unknown id is a real input this component handles rather than something
+   * call sites should cast away.
+   */
+  glyph: string;
   sizePx: number;
 }
 
@@ -95,7 +99,7 @@ export function GlyphIcon({ glyph, sizePx }: GlyphIconProps) {
   if (!GLYPHS_WITH_ART.has(glyph) || failedGlyph === glyph) {
     const FallbackIcon =
       FALLBACK_ICON_COMPONENTS[
-        GLYPH_FALLBACK_ICONS[glyph] as keyof typeof FALLBACK_ICON_COMPONENTS
+        getGlyphFallbackIcon(glyph) as keyof typeof FALLBACK_ICON_COMPONENTS
       ] ?? Trophy;
     return <FallbackIcon size={sizePx} />;
   }

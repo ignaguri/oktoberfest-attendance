@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ALL_DEFINITIONS } from "./definitions";
-import { GLYPH_FALLBACK_ICONS, GLYPH_IDS } from "./glyphs";
+import { getGlyphFallbackIcon, GLYPH_FALLBACK_ICONS, GLYPH_IDS } from "./glyphs";
 
 describe("glyph registry", () => {
   it("GLYPH_IDS matches every distinct glyph used in definitions.ts", () => {
@@ -18,5 +18,13 @@ describe("glyph registry", () => {
 
   it("GLYPH_FALLBACK_ICONS has no entries for unknown glyph ids", () => {
     expect(Object.keys(GLYPH_FALLBACK_ICONS).sort()).toEqual([...GLYPH_IDS].sort());
+  });
+
+  it("getGlyphFallbackIcon resolves a known id and returns undefined otherwise", () => {
+    expect(getGlyphFallbackIcon("wiesn-crown")).toBe(GLYPH_FALLBACK_ICONS["wiesn-crown"]);
+    // Ids arrive as plain strings off the wire, so a legacy or newer-build id
+    // has to be answerable rather than a type error at the call site.
+    expect(getGlyphFallbackIcon("retired-glyph")).toBeUndefined();
+    expect(getGlyphFallbackIcon("")).toBeUndefined();
   });
 });

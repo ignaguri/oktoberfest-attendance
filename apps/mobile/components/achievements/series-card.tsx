@@ -1,4 +1,4 @@
-import type { AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
+import type { AchievementTier } from "@prostcounter/shared/achievements";
 import {
   getActiveTier,
   getCategoryColor,
@@ -55,7 +55,7 @@ export function SeriesCard({ card }: SeriesCardProps) {
         >
           <HStack space="md" className="items-center p-3">
             <AchievementBadge
-              glyph={card.glyph as GlyphId}
+              glyph={card.glyph}
               category={card.category}
               tier={activeTier.tier as AchievementTier}
               isUnlocked={isUnlocked}

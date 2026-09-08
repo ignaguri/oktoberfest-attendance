@@ -1,5 +1,5 @@
 import { Motion } from "@legendapp/motion";
-import type { AchievementCategory, GlyphId } from "@prostcounter/shared/achievements";
+import type { AchievementCategory } from "@prostcounter/shared/achievements";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import {
@@ -64,7 +64,7 @@ export function AchievementsSlide({ data, isActive }: AchievementsSlideProps) {
             >
               <View className="w-9 items-center">
                 <AchievementBadge
-                  glyph={achievement.icon as GlyphId}
+                  glyph={achievement.icon}
                   category={achievement.category as AchievementCategory}
                   tier={achievement.tier as 1 | 2 | 3 | 4}
                   isUnlocked

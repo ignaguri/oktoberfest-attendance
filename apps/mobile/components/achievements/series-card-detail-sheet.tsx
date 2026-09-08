@@ -1,4 +1,4 @@
-import type { AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
+import type { AchievementTier } from "@prostcounter/shared/achievements";
 import {
   getActiveTier,
   getCategoryColor,
@@ -83,7 +83,7 @@ export function SeriesCardDetailSheet({ card, isOpen, onClose }: SeriesCardDetai
                 only ever shows it at 40px. */}
             <VStack space="xs" className="items-center">
               <AchievementBadge
-                glyph={card.glyph as GlyphId}
+                glyph={card.glyph}
                 category={card.category}
                 tier={activeTier.tier as AchievementTier}
                 isUnlocked={isUnlocked}

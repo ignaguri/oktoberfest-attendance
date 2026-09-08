@@ -1,10 +1,10 @@
-import type { GlyphId } from "@prostcounter/shared/achievements";
 import { Image } from "react-native";
 
 import { getGlyphImage } from "./glyph-images";
 
 interface GlyphProps {
-  glyph: GlyphId;
+  /** Plain string: ids arrive from the database, so an unknown one is valid input. */
+  glyph: string;
   size: number;
 }
 

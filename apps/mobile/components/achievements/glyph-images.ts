@@ -43,6 +43,11 @@ export const GLYPH_IMAGES: Partial<Record<GlyphId, ImageSourcePropType>> = {
   "ribbon-scroll": require("@/assets/achievements/glyphs/ribbon-scroll.png"),
 };
 
-export function getGlyphImage(glyphId: GlyphId): ImageSourcePropType | undefined {
-  return GLYPH_IMAGES[glyphId];
+/**
+ * Takes a plain string because a glyph id reaches the UI as one: achievement
+ * rows store it as text, so it can be an id this registry has no line for.
+ * That is the undefined case, and callers substitute a lucide icon for it.
+ */
+export function getGlyphImage(glyphId: string): ImageSourcePropType | undefined {
+  return GLYPH_IMAGES[glyphId as GlyphId];
 }

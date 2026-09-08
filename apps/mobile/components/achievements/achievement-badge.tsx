@@ -1,12 +1,8 @@
-import type {
-  AchievementCategory,
-  AchievementTier,
-  GlyphId,
-} from "@prostcounter/shared/achievements";
+import type { AchievementCategory, AchievementTier } from "@prostcounter/shared/achievements";
 import {
-  GLYPH_FALLBACK_ICONS,
   getCategoryColor,
-  GLYPH_SIZE_RATIO,
+  getGlyphFallbackIcon,
+  glyphSizePx,
   TIER_RING_WIDTH,
 } from "@prostcounter/shared/achievements";
 import { cn } from "@prostcounter/ui";
@@ -96,7 +92,11 @@ const SIZE_CLASSES: Record<BadgeSize, string> = {
 };
 
 interface AchievementBadgeProps {
-  glyph: GlyphId;
+  /**
+   * Plain string, not GlyphId: achievement rows store `glyph` as text, so an
+   * unknown id is a real input this badge handles with a lucide fallback.
+   */
+  glyph: string;
   category: AchievementCategory;
   tier: AchievementTier;
   isUnlocked: boolean;
@@ -117,7 +117,7 @@ export function AchievementBadge({
   const hasGlyph = getGlyphImage(glyph) !== undefined;
   const FallbackIcon =
     FALLBACK_ICON_COMPONENTS[
-      GLYPH_FALLBACK_ICONS[glyph] as keyof typeof FALLBACK_ICON_COMPONENTS
+      getGlyphFallbackIcon(glyph) as keyof typeof FALLBACK_ICON_COMPONENTS
     ] ?? Trophy;
 
   return (
@@ -145,7 +145,7 @@ export function AchievementBadge({
         />
       </Svg>
       {hasGlyph ? (
-        <Glyph glyph={glyph} size={diameter * GLYPH_SIZE_RATIO} />
+        <Glyph glyph={glyph} size={glyphSizePx(diameter)} />
       ) : (
         <FallbackIcon size={diameter * 0.5} color={IconColors.primary} />
       )}

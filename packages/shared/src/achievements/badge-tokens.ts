@@ -61,6 +61,22 @@ export const TIER_RING_WIDTH: Record<AchievementTier, number> = {
 export const GLYPH_SIZE_RATIO = 0.68;
 
 /**
+ * Glyph size a badge of `badgeDiameterPx` draws, in whole pixels.
+ *
+ * The ratio alone yields 21.76 / 27.2 / 38.08 / 65.28 for the four badge
+ * diameters, and every consumer wants the integers those round to. `next/image`
+ * takes width and height as pixel counts, and `scripts/glyphs/preview.sh`
+ * renders the previews a glyph is approved from at exactly 22 / 27 / 38 / 65,
+ * so an unrounded size ships art at a size nobody reviewed it at.
+ *
+ * Shared rather than rounded per app for the same reason the ratio is: the
+ * ladder is a contract between both apps and the art pipeline, not styling.
+ */
+export function glyphSizePx(badgeDiameterPx: number): number {
+  return Math.round(badgeDiameterPx * GLYPH_SIZE_RATIO);
+}
+
+/**
  * Tier onto the rarity vocabulary the stats breakdown and the web
  * `AchievementBadge` still speak. Takes a plain number because callers read
  * the tier off wire-shaped data (`z.number()`), which cannot be narrowed to
