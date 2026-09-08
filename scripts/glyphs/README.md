@@ -120,5 +120,6 @@ does not have. The first *generated* set failed for a different and fixable
 reason, namely low-contrast outlines and no per-glyph palette control, both of
 which the current `gen.sh` addresses.
 
-`packages/shared/src/achievements/glyph-paths.ts` still exists but no component
-reads it.
+The vector set lived at `packages/shared/src/achievements/glyph-paths.ts` and
+was deleted once this set shipped; `git log -- packages/shared/src/achievements/glyph-paths.ts`
+still has it if a path is ever worth recovering.

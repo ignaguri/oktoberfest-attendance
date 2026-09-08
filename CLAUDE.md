@@ -43,8 +43,10 @@ list sizes are 22 and 27px. Outline contrast is what makes a glyph readable
 there, and multi-element or thin-walled art does not survive. Never give a glyph
 its own enclosing ring; the badge already draws one.
 
-`packages/shared/src/achievements/glyph-paths.ts` is a superseded vector set. No
-component reads it.
+The badge's glyph-to-diameter ratio is `GLYPH_SIZE_RATIO` in
+`packages/shared/src/achievements/badge-tokens.ts`, shared by both apps and by
+`scripts/glyphs/`. It is what sets the 22px rung above, so it is not a per-app
+styling knob.
 
 ### Testing Commands
 
