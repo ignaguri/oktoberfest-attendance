@@ -76,3 +76,27 @@ export const GLYPH_FALLBACK_ICONS: Record<GlyphId, string> = {
   "id-card": "IdCard",
   "ribbon-scroll": "ScrollText",
 };
+
+/**
+ * Safe accessor for GLYPH_FALLBACK_ICONS. Same pattern, and same reason, as
+ * getCategoryColor in badge-tokens.ts: a glyph id reaches the UI as a plain
+ * string, because achievement rows store it as text (`glyph: z.string()` in
+ * the schemas) rather than as this module's union. So the id may be one a
+ * newer build added or a legacy one no longer in GLYPH_IDS, and either must
+ * still render something.
+ *
+ * Returns undefined for an id not in the map, which is the caller's cue to
+ * fall back to its own last-resort icon.
+ *
+ * The own-property check is what makes the declared return type true. Indexing
+ * an object literal with an arbitrary string reaches the prototype chain, so
+ * `"constructor"` would hand back a function and `"__proto__"` an object, both
+ * typed as string. Nothing writes those ids today (the column is filled by
+ * sync-achievement-registry.ts from ALL_DEFINITIONS), but the guard costs one
+ * call and TypeScript cannot catch the case.
+ */
+export function getGlyphFallbackIcon(glyph: string): string | undefined {
+  return Object.hasOwn(GLYPH_FALLBACK_ICONS, glyph)
+    ? GLYPH_FALLBACK_ICONS[glyph as GlyphId]
+    : undefined;
+}

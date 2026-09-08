@@ -1,11 +1,8 @@
-import type {
-  AchievementCategory,
-  AchievementTier,
-  GlyphId,
-} from "@prostcounter/shared/achievements";
+import type { AchievementCategory, AchievementTier } from "@prostcounter/shared/achievements";
 import {
-  GLYPH_FALLBACK_ICONS,
   getCategoryColor,
+  getGlyphFallbackIcon,
+  glyphSizePx,
   TIER_RING_WIDTH,
 } from "@prostcounter/shared/achievements";
 import { cn } from "@prostcounter/ui";
@@ -38,12 +35,13 @@ import {
   Users,
   Wallet,
 } from "lucide-react-native";
-import { Image, View } from "react-native";
+import { View } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 
 import { IconColors } from "@/lib/constants/colors";
 
 import { getGlyphImage } from "./glyph-images";
+import { Glyph } from "./glyph";
 
 const FALLBACK_ICON_COMPONENTS = {
   Award,
@@ -85,6 +83,7 @@ const SIZE_PX: Record<BadgeSize, number> = {
   xl: 96,
 };
 
+
 const SIZE_CLASSES: Record<BadgeSize, string> = {
   sm: "w-8 h-8",
   md: "w-10 h-10",
@@ -93,7 +92,11 @@ const SIZE_CLASSES: Record<BadgeSize, string> = {
 };
 
 interface AchievementBadgeProps {
-  glyph: GlyphId;
+  /**
+   * Plain string, not GlyphId: achievement rows store `glyph` as text, so an
+   * unknown id is a real input this badge handles with a lucide fallback.
+   */
+  glyph: string;
   category: AchievementCategory;
   tier: AchievementTier;
   isUnlocked: boolean;
@@ -111,10 +114,10 @@ export function AchievementBadge({
   const strokeWidth = TIER_RING_WIDTH[tier];
   const ringColor = getCategoryColor(category);
   const glowsForTier = tier >= 3;
-  const imageSource = getGlyphImage(glyph);
+  const hasGlyph = getGlyphImage(glyph) !== undefined;
   const FallbackIcon =
     FALLBACK_ICON_COMPONENTS[
-      GLYPH_FALLBACK_ICONS[glyph] as keyof typeof FALLBACK_ICON_COMPONENTS
+      getGlyphFallbackIcon(glyph) as keyof typeof FALLBACK_ICON_COMPONENTS
     ] ?? Trophy;
 
   return (
@@ -122,7 +125,7 @@ export function AchievementBadge({
       className={cn(
         "items-center justify-center",
         SIZE_CLASSES[size],
-        isUnlocked ? "opacity-100" : "opacity-40",
+        isUnlocked ? "opacity-100" : "opacity-60",
       )}
       style={{
         shadowColor: glowsForTier ? ringColor : undefined,
@@ -141,13 +144,8 @@ export function AchievementBadge({
           fill="none"
         />
       </Svg>
-      {imageSource ? (
-        <Image
-          source={imageSource}
-          style={{ width: diameter * 0.6, height: diameter * 0.6 }}
-          resizeMode="contain"
-          alt=""
-        />
+      {hasGlyph ? (
+        <Glyph glyph={glyph} size={glyphSizePx(diameter)} />
       ) : (
         <FallbackIcon size={diameter * 0.5} color={IconColors.primary} />
       )}

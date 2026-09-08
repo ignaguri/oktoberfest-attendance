@@ -1,6 +1,12 @@
 import type { RecentUnlock, SeriesCard, SeriesTier } from "@prostcounter/shared";
 import type { SeriesProgress } from "@prostcounter/shared/achievements";
-import { nameKeyFor, ONE_OFFS, SERIES, slugFor } from "@prostcounter/shared/achievements";
+import {
+  descriptionKeyFor,
+  nameKeyFor,
+  ONE_OFFS,
+  SERIES,
+  slugFor,
+} from "@prostcounter/shared/achievements";
 
 const DEFAULT_RECENT_UNLOCK_LIMIT = 10;
 
@@ -66,6 +72,7 @@ export function buildSeriesCards(
       return {
         tier: tierDef.tier,
         name: nameKeyFor(slugFor(series, tierDef.tier)),
+        description: descriptionKeyFor(slugFor(series, tierDef.tier)),
         points: tierDef.points,
         isUnlocked: unlockedAt !== null,
         unlockedAt,
@@ -105,6 +112,7 @@ export function buildSeriesCards(
         {
           tier: oneOff.tier,
           name: nameKeyFor(slug),
+          description: descriptionKeyFor(slug),
           points: oneOff.points,
           isUnlocked: unlockedAt !== null,
           unlockedAt,

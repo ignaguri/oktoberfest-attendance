@@ -4009,6 +4009,7 @@ export interface paths {
                                 tiers: {
                                     tier: number;
                                     name: string;
+                                    description: string;
                                     points: number;
                                     isUnlocked: boolean;
                                     /** Format: date-time */

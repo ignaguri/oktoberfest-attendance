@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ALL_SLUGS } from "./definitions";
-import { describeUnlock, nameKeyFor } from "./unlock-display";
+import { describeUnlock, descriptionKeyFor, nameKeyFor } from "./unlock-display";
 
 describe("nameKeyFor", () => {
   it("builds the i18n key for a series tier slug", () => {
@@ -10,6 +10,16 @@ describe("nameKeyFor", () => {
 
   it("builds the i18n key for a one-off slug", () => {
     expect(nameKeyFor("first_drink")).toBe("achievements.first_drink.name");
+  });
+});
+
+describe("descriptionKeyFor", () => {
+  it("builds the i18n key for a series tier slug", () => {
+    expect(descriptionKeyFor("drinks_total.t2")).toBe("achievements.drinks_total.t2.description");
+  });
+
+  it("builds the i18n key for a one-off slug", () => {
+    expect(descriptionKeyFor("first_drink")).toBe("achievements.first_drink.description");
   });
 });
 

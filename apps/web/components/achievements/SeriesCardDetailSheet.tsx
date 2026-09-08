@@ -52,19 +52,32 @@ export function SeriesCardDetailSheet({ card, open, onOpenChange }: SeriesCardDe
   const isUnlocked = card.currentTier > 0;
   const categoryColor = getCategoryColor(card.category);
 
+  // Scope matters as much as category and was invisible until now: a festival
+  // card resets every festival, a lifetime one is earned once ever, and the
+  // rung descriptions only sometimes say so. The "lifetime" -> scope.allTime
+  // mapping is the same one ScopeToggle uses.
+  const scopeLabel =
+    card.scope === "festival" ? t("achievements.scope.festival") : t("achievements.scope.allTime");
+
   return (
     <ResponsiveDialog
       open={open}
       onOpenChange={onOpenChange}
       title={t(activeTier.name)}
-      description={t(`achievements.categories.${card.category}`)}
+      description={`${t(`achievements.categories.${card.category}`)} · ${scopeLabel}`}
     >
       {/* Scrollable and capped: the hero badge plus four rungs runs past a
           short viewport, and neither DrawerContent (max-h-[80vh], no overflow
           rule) nor DialogContent (no max height at all) would let you reach
           the overflow — the drawer is bottom-anchored, so it paints off-screen.
-          Same pattern as components/ui/datetime-picker.tsx. */}
-      <div className="max-h-[60vh] space-y-4 overflow-y-auto px-4 pb-4 md:px-0 md:pb-0">
+          Same pattern as components/ui/datetime-picker.tsx.
+
+          pt-2 is not chrome padding, so it stays at every breakpoint: setting
+          overflow-y also makes overflow-x a scroll box, which clips on all four
+          sides, and the hero badge's tier-3+ glow (box-shadow blur 8px) is drawn
+          outside its border box. Without the 8px the halo is sliced flat along
+          the top, since the badge is the scroller's first child. */}
+      <div className="max-h-[60vh] space-y-4 overflow-y-auto px-4 pb-4 pt-2 md:px-0 md:pb-0">
         {/* The glyph at a size worth looking at — the card behind this dialog
             only ever shows it at 40px. Below the heading rather than above it,
             because ResponsiveDialog owns the title and description. */}
@@ -126,11 +139,22 @@ export function SeriesCardDetailSheet({ card, open, onOpenChange }: SeriesCardDe
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1.5">
-                  <p className="text-xs text-gray-600">
-                    {t(`achievements.tiers.${TIER_NAMES[tier.tier as AchievementTier]}`)}
+                {/* What the rung actually takes. The only place a locked rung's
+                    target is stated: the payload carries no numeric target, and
+                    the status column shows one only for the single next rung. */}
+                <p className="text-xs text-gray-700">{t(tier.description)}</p>
+
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs text-gray-600">
+                      {t(`achievements.tiers.${TIER_NAMES[tier.tier as AchievementTier]}`)}
+                    </p>
+                    <TierLevelPips tier={tier} categoryColor={categoryColor} />
+                  </div>
+
+                  <p className="shrink-0 text-xs text-gray-600">
+                    {tier.points} {t("achievements.points")}
                   </p>
-                  <TierLevelPips tier={tier} categoryColor={categoryColor} />
                 </div>
               </div>
             );

@@ -1,4 +1,4 @@
-import type { AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
+import type { AchievementTier } from "@prostcounter/shared/achievements";
 import { getActiveTier, selectCloseToUnlocking } from "@prostcounter/shared/achievements";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SeriesCard as SeriesCardData } from "@prostcounter/shared/schemas";
@@ -46,9 +46,9 @@ export function CloseToUnlockingRail({ cards }: CloseToUnlockingRailProps) {
               size="sm"
               className="border-yellow-200 bg-yellow-50/30"
             >
-              <HStack space="sm" className="items-center p-3">
+              <HStack space="md" className="items-center p-3">
                 <AchievementBadge
-                  glyph={card.glyph as GlyphId}
+                  glyph={card.glyph}
                   category={card.category}
                   tier={activeTier.tier as AchievementTier}
                   isUnlocked={card.currentTier > 0}

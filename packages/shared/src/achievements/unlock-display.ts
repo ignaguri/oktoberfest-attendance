@@ -8,6 +8,16 @@ export function nameKeyFor(slug: string): string {
 }
 
 /**
+ * The i18n key holding a slug's one-line description of what it takes to earn,
+ * e.g. "achievements.drinks_total.t2.description" -> "Have 10 drinks this
+ * festival". Every slug has one in all three locales, enforced by
+ * locale-coverage.test.ts.
+ */
+export function descriptionKeyFor(slug: string): string {
+  return `achievements.${slug}.description`;
+}
+
+/**
  * Every slug the definitions know about, mapped to the data an unlock renders
  * with. Built once at module load rather than searched per call: the toast
  * resolves a slug on every unlock, and the table is a fixed 90 entries.

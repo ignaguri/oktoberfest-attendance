@@ -1,4 +1,4 @@
-import type { AchievementTier, GlyphId } from "@prostcounter/shared/achievements";
+import type { AchievementTier } from "@prostcounter/shared/achievements";
 import {
   getActiveTier,
   getCategoryColor,
@@ -83,7 +83,7 @@ export function SeriesCardDetailSheet({ card, isOpen, onClose }: SeriesCardDetai
                 only ever shows it at 40px. */}
             <VStack space="xs" className="items-center">
               <AchievementBadge
-                glyph={card.glyph as GlyphId}
+                glyph={card.glyph}
                 category={card.category}
                 tier={activeTier.tier as AchievementTier}
                 isUnlocked={isUnlocked}
@@ -92,8 +92,16 @@ export function SeriesCardDetailSheet({ card, isOpen, onClose }: SeriesCardDetai
               <Heading size="lg" className="text-center text-typography-900">
                 {t(activeTier.name)}
               </Heading>
-              <Text className="text-sm text-typography-500">
-                {t(`achievements.categories.${card.category}`)}
+              {/* Scope matters as much as category and was invisible until now:
+                  a festival card resets every festival, a lifetime one is
+                  earned once ever, and the rung descriptions only sometimes
+                  say so. The "lifetime" -> scope.allTime mapping is the same
+                  one ScopeToggle uses. */}
+              <Text className="text-center text-sm text-typography-500">
+                {t(`achievements.categories.${card.category}`)} ·{" "}
+                {card.scope === "festival"
+                  ? t("achievements.scope.festival")
+                  : t("achievements.scope.allTime")}
               </Text>
             </VStack>
 
@@ -147,11 +155,24 @@ export function SeriesCardDetailSheet({ card, isOpen, onClose }: SeriesCardDetai
                       </Text>
                     </HStack>
 
-                    <HStack space="xs" className="items-center">
+                    {/* What the rung actually takes. The only place a locked
+                        rung's target is stated: the payload carries no numeric
+                        target, and the status column shows one only for the
+                        single next rung. Left to wrap, since the German copy
+                        runs long. */}
+                    <Text className="text-xs text-typography-600">{t(tier.description)}</Text>
+
+                    <HStack space="sm" className="items-center justify-between">
+                      <HStack space="xs" className="items-center">
+                        <Text className="text-xs text-typography-500">
+                          {t(`achievements.tiers.${TIER_NAMES[tier.tier as AchievementTier]}`)}
+                        </Text>
+                        <TierLevelPips tier={tier} categoryColor={categoryColor} />
+                      </HStack>
+
                       <Text className="text-xs text-typography-500">
-                        {t(`achievements.tiers.${TIER_NAMES[tier.tier as AchievementTier]}`)}
+                        {tier.points} {t("achievements.points")}
                       </Text>
-                      <TierLevelPips tier={tier} categoryColor={categoryColor} />
                     </HStack>
                   </VStack>
                 );

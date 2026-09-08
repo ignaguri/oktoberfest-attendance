@@ -1,16 +1,26 @@
 # Achievement Glyph Art Brief
 
-This document is source material for generating 30 achievement glyph images by hand,
-one at a time, in an external AI image-generation tool. Paste the shared style/context
-section (or a condensed form of it) alongside each individual glyph prompt when
-generating that glyph, since each generation is a separate, independent request with
-no memory of the others.
-
-Once a render exists, **[scripts/glyphs/README.md](../../scripts/glyphs/README.md)**
-covers turning it into a shipped asset: `pnpm glyphs:build` strips the baked-in
-transparency checkerboard, recovers real alpha, and writes the 256px PNG into both
-apps. Do not hand-clean a render; the checkerboard has traps in it that the pipeline
-already knows about.
+> **Reference.** This brief defines what each glyph depicts. The subject
+> descriptions below are the source for the `subject` column in
+> `scripts/glyphs/prompts.tsv`, which is what actually generates the shipped art.
+>
+> Read `scripts/glyphs/README.md` before regenerating anything. It carries the
+> operational detail this brief does not: the 22px legibility constraint, the
+> per-glyph seed record in `chosen.tsv`, and the prompt failures worth avoiding.
+>
+> Two earlier attempts are worth knowing about. A first generated set failed
+> (`tent-ring` came back as six disconnected chevrons, `polaroid` as an empty
+> frame), and the conclusion drawn at the time was that an image model cannot
+> hold stroke weight and palette steady across 30 assets, so the set was redrawn
+> as hand-made SVG paths. Those vectors then failed too, for a reason neither
+> attempt had isolated: at 22px legibility comes from outline contrast and shape
+> simplicity, and no amount of path tuning adds either.
+>
+> The current generated set addresses that directly, with heavy dark-brown
+> outlines fixed in a shared style string and a per-glyph palette column. So the
+> first set's failure was fixable rather than fundamental. Keep the diagnosis in
+> mind rather than the old verdict: if a glyph is unreadable, the shape is
+> probably too busy for 22px, whatever medium it is drawn in.
 
 ## Shared style & context
 

@@ -7212,6 +7212,9 @@
                                 "name": {
                                   "type": "string"
                                 },
+                                "description": {
+                                  "type": "string"
+                                },
                                 "points": {
                                   "type": "integer"
                                 },
@@ -7227,6 +7230,7 @@
                               "required": [
                                 "tier",
                                 "name",
+                                "description",
                                 "points",
                                 "isUnlocked",
                                 "unlockedAt"

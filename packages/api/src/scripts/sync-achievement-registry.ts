@@ -8,7 +8,13 @@
  *   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... pnpm --filter=@prostcounter/api sync:achievements
  *   add --dry-run to print the plan without writing
  */
-import { ALL_DEFINITIONS, isSeries, slugFor } from "@prostcounter/shared/achievements";
+import {
+  ALL_DEFINITIONS,
+  descriptionKeyFor,
+  isSeries,
+  nameKeyFor,
+  slugFor,
+} from "@prostcounter/shared/achievements";
 import type { AchievementCategory, AchievementScope } from "@prostcounter/shared/achievements";
 import type { Database } from "@prostcounter/db";
 import { createClient } from "@supabase/supabase-js";
@@ -48,8 +54,8 @@ export function buildRegistryRows(): RegistryRow[] {
           category: definition.category,
           points: tierDef.points,
           icon: definition.glyph,
-          name: `achievements.${slug}.name`,
-          description: `achievements.${slug}.description`,
+          name: nameKeyFor(slug),
+          description: descriptionKeyFor(slug),
           is_active: true,
         });
       }
@@ -63,8 +69,8 @@ export function buildRegistryRows(): RegistryRow[] {
         category: definition.category,
         points: definition.points,
         icon: definition.glyph,
-        name: `achievements.${slug}.name`,
-        description: `achievements.${slug}.description`,
+        name: nameKeyFor(slug),
+        description: descriptionKeyFor(slug),
         is_active: true,
       });
     }

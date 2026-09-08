@@ -23,11 +23,30 @@ ProstCounter is a cross-platform app (Next.js PWA + Expo mobile) for tracking Ok
 
 ### Achievement Glyphs
 
-- `pnpm glyphs:build --src <dir>` - Rebuild the achievement glyph PNGs from raw renders
-- `pnpm glyphs:build --src <dir> --only <glyph-id>` - Rebuild a single glyph
+Glyphs are committed PNGs, one set per app: `apps/mobile/assets/achievements/glyphs/`
+and `apps/web/public/achievements/glyphs/`. They are generated locally by
+`scripts/glyphs/` (see its README) and exported at 256px; the apps build from
+the committed files, so you only need the pipeline to add or redraw a glyph.
 
-See **[scripts/glyphs/README.md](./scripts/glyphs/README.md)** for the pipeline, how to
-add a new glyph, and the traps in the source renders. Never hand-clean a render.
+The art carries its own colours, so a glyph takes no category colour. The badge
+ring around it supplies the category coding, which is why a gold sun can sit
+inside a green attendance ring.
+
+Adding one means: id in `GLYPH_IDS`, a row in `scripts/glyphs/prompts.tsv`, and
+a static `require()` in `apps/mobile/components/achievements/glyph-images.ts` in
+`GLYPH_IDS` order. Metro cannot resolve a computed require, so that registry is
+mandatory; web builds its `src` from the id instead. Both have tests that fail
+on drift.
+
+Design constraint: the badge renders a glyph at 0.68 of its diameter, so the
+list sizes are 22 and 27px. Outline contrast is what makes a glyph readable
+there, and multi-element or thin-walled art does not survive. Never give a glyph
+its own enclosing ring; the badge already draws one.
+
+The badge's glyph-to-diameter ratio is `GLYPH_SIZE_RATIO` in
+`packages/shared/src/achievements/badge-tokens.ts`, shared by both apps and by
+`scripts/glyphs/`. It is what sets the 22px rung above, so it is not a per-app
+styling knob.
 
 ### Testing Commands
 
@@ -175,4 +194,3 @@ GestureHandlerRootView → SafeAreaProvider → I18nextProvider → ErrorBoundar
 - **[BLOG.md](./docs/BLOG.md)** - Blog/MDX content authoring guide
 - **[Mobile PRD](./docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md)** - Mobile app plans
 - **[FRIENDSHIP_SYSTEM.md](./docs/FRIENDSHIP_SYSTEM.md)** - Friendship feature documentation
-- **[scripts/glyphs/README.md](./scripts/glyphs/README.md)** - Achievement glyph asset pipeline

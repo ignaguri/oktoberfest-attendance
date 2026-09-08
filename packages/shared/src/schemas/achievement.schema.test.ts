@@ -12,6 +12,7 @@ const validCard = {
     {
       tier: 1,
       name: "achievements.drinks_total.t1.name",
+      description: "achievements.drinks_total.t1.description",
       points: 10,
       isUnlocked: true,
       unlockedAt: "2026-09-20T10:00:00Z",
@@ -19,6 +20,7 @@ const validCard = {
     {
       tier: 2,
       name: "achievements.drinks_total.t2.name",
+      description: "achievements.drinks_total.t2.description",
       points: 50,
       isUnlocked: true,
       unlockedAt: "2026-09-21T10:00:00Z",
@@ -26,6 +28,7 @@ const validCard = {
     {
       tier: 3,
       name: "achievements.drinks_total.t3.name",
+      description: "achievements.drinks_total.t3.description",
       points: 150,
       isUnlocked: false,
       unlockedAt: null,
@@ -33,6 +36,7 @@ const validCard = {
     {
       tier: 4,
       name: "achievements.drinks_total.t4.name",
+      description: "achievements.drinks_total.t4.description",
       points: 400,
       isUnlocked: false,
       unlockedAt: null,
@@ -79,6 +83,7 @@ describe("SeriesCardSchema", () => {
         {
           tier: 1,
           name: "achievements.first_drink.name",
+          description: "achievements.first_drink.description",
           points: 10,
           isUnlocked: true,
           unlockedAt: "2026-09-20T10:00:00Z",
