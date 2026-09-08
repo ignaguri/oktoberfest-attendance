@@ -88,6 +88,20 @@ all take explicit paths, so they compose:
 that white paint exists. A glyph that looks wrong with a clean report is
 probably an alpha problem, not an art problem. Check `diag.sh`'s matte panel.
 
+The reverse trap is the dangerous one, because it looks like success.
+`preview.sh` and `sheet.sh` composite on white and the badge draws no
+background fill, so a foam head that is a *hole* is indistinguishable from one
+that is white paint until the glyph sits on anything else. Check a seed on a
+non-white background before approving it, via `diag.sh`'s grey panel or
+`magick <src> -background magenta -alpha remove -alpha off out.png`.
+
+`verify.py`'s enclosed-hole count is the fast signal, and it swings hard
+between seeds of one prompt: of four `three-glasses` seeds, one reported 19k
+hole pixels and the rest 110k-131k. Only that one had painted foam, and it won
+for that reason. Compare against a glyph known to be right (`masskrug` shows
+magenta through the stein handle and nowhere else) rather than against zero,
+since some holes are correct.
+
 ## Prompt lessons
 
 The style preamble in `gen.sh` is doing real work; the per-glyph `subject`
@@ -110,6 +124,18 @@ column should describe shape and nothing else.
 - Keep art clear of the outer edge. `gen.sh` trims to the alpha bounding box and
   re-centres at 83% of the frame, so a generous model margin does not eat the
   badge's pixel budget.
+- **The palette column carries the art's own colour, not the category's.** The
+  crown was prompted `emerald green` because `full_festival` is an attendance
+  achievement, which drew a green crown sitting inside a green ring and threw
+  away the gold that says "top prize". The ring does the category coding, so
+  repeating it in the art costs a colour and buys nothing.
+- **Name the elements rather than counting them.** `drink_variety` scores
+  *distinct* drink types, so its glyph has to show different vessels, and
+  "two overlapping drinking vessels" quietly contradicted the metric. Naming a
+  wheat glass, a stemmed wine glass and a handled stein put three in all four
+  seeds. A second hue in the palette is what makes them read as different
+  drinks at 22px, and it is worth bending the duotone rule for: in one hue the
+  three shapes are just three containers of the same liquid.
 
 ## History
 
