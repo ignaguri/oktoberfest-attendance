@@ -47,7 +47,12 @@ export const GLYPH_IMAGES: Partial<Record<GlyphId, ImageSourcePropType>> = {
  * Takes a plain string because a glyph id reaches the UI as one: achievement
  * rows store it as text, so it can be an id this registry has no line for.
  * That is the undefined case, and callers substitute a lucide icon for it.
+ *
+ * The own-property check matters more here than for a missing id: indexing
+ * with `"__proto__"` returns Object.prototype, which is not undefined, so
+ * achievement-badge.tsx would take it as proof an asset exists, skip the
+ * lucide fallback, and hand a non-source to <Image />.
  */
 export function getGlyphImage(glyphId: string): ImageSourcePropType | undefined {
-  return GLYPH_IMAGES[glyphId as GlyphId];
+  return Object.hasOwn(GLYPH_IMAGES, glyphId) ? GLYPH_IMAGES[glyphId as GlyphId] : undefined;
 }

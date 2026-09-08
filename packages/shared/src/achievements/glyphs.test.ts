@@ -27,4 +27,13 @@ describe("glyph registry", () => {
     expect(getGlyphFallbackIcon("retired-glyph")).toBeUndefined();
     expect(getGlyphFallbackIcon("")).toBeUndefined();
   });
+
+  // Indexing an object literal with an arbitrary string reaches the prototype
+  // chain, so without an own-property check these return a function or an
+  // object while the signature promises a string.
+  it("getGlyphFallbackIcon does not resolve prototype properties", () => {
+    for (const key of ["__proto__", "constructor", "toString", "hasOwnProperty", "valueOf"]) {
+      expect(getGlyphFallbackIcon(key)).toBeUndefined();
+    }
+  });
 });

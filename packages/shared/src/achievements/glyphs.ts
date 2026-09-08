@@ -87,7 +87,16 @@ export const GLYPH_FALLBACK_ICONS: Record<GlyphId, string> = {
  *
  * Returns undefined for an id not in the map, which is the caller's cue to
  * fall back to its own last-resort icon.
+ *
+ * The own-property check is what makes the declared return type true. Indexing
+ * an object literal with an arbitrary string reaches the prototype chain, so
+ * `"constructor"` would hand back a function and `"__proto__"` an object, both
+ * typed as string. Nothing writes those ids today (the column is filled by
+ * sync-achievement-registry.ts from ALL_DEFINITIONS), but the guard costs one
+ * call and TypeScript cannot catch the case.
  */
 export function getGlyphFallbackIcon(glyph: string): string | undefined {
-  return GLYPH_FALLBACK_ICONS[glyph as GlyphId];
+  return Object.hasOwn(GLYPH_FALLBACK_ICONS, glyph)
+    ? GLYPH_FALLBACK_ICONS[glyph as GlyphId]
+    : undefined;
 }

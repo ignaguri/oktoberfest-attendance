@@ -36,7 +36,6 @@ elif mode == "fill":
         for x in range(w):
             if px[x, y][3] <= 128:
                 fp[x, y] = 255          # candidate transparent
-    d = ImageDraw.Draw(flags)
     for x in range(w):
         for y in (0, h - 1):
             if fp[x, y] == 255:

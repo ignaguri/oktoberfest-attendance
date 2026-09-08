@@ -60,6 +60,11 @@ the per-glyph exceptions that were re-rolled later. **Add a row here when you
 approve a different seed**, rather than renaming the file, or the next full
 `./export.sh` will silently revert that glyph to seed 4's art.
 
+`export.sh` and `diag.sh` both resolve it through `chosen_seed()` in
+`chosen-seed.sh`, so a row moves what ships and what you inspect together.
+`preview.sh` and `sheet.sh` take paths instead, since you use them to compare
+seeds before one is approved.
+
 ## Adding a glyph
 
 1. Add the id to `GLYPH_IDS` in `packages/shared/src/achievements/glyphs.ts`.

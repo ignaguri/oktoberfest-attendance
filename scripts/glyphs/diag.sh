@@ -3,6 +3,9 @@
 #   1. on white  - what the badge actually shows (white art vanishes here)
 #   2. on grey   - reveals which pixels are opaque white vs transparent
 #   3. alpha     - the matte itself, white = kept, black = cut
+#
+# Diagnoses the seed chosen.tsv approves for the glyph, seed 4 otherwise, so
+# that what you inspect is what export.sh ships.
 set -euo pipefail
 cd "$(dirname "$0")"
 # Renders and intermediates are large and machine-local, so they live in an
@@ -10,8 +13,10 @@ cd "$(dirname "$0")"
 WORK="${GLYPH_WORK:-work}"
 mkdir -p "$WORK/raw" "$WORK/cut" "$WORK/review"
 FONT="/System/Library/Fonts/Supplemental/Arial.ttf"
+# shellcheck source=chosen-seed.sh
+source ./chosen-seed.sh
 id="$1"
-src="$WORK/cut/${id}-s4.png"
+src="$WORK/cut/${id}-s$(chosen_seed "$id").png"
 out="$WORK/review/diag-${id}.png"
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
 magick "$src" -resize 300x300 -background white   -alpha remove -alpha off -gravity center -extent 320x320 "$tmp/1.png"

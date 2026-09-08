@@ -17,15 +17,8 @@ mkdir -p "$MOBILE" "$WEB"
 # Seed 4 was the winner for most glyphs, but a few were re-rolled later and their
 # approved art carries a different seed. chosen.tsv records those so a full
 # re-export cannot silently revert them to the original seed's art.
-chosen_seed() {
-  local want="$1" id seed
-  while IFS=$'\t' read -r id seed; do
-    if [ "$id" = "$want" ]; then
-      echo "$seed"; return
-    fi
-  done < chosen.tsv
-  echo 4
-}
+# shellcheck source=chosen-seed.sh
+source ./chosen-seed.sh
 
 n=0
 while IFS=$'\t' read -r id _rest; do
