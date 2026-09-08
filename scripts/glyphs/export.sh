@@ -36,7 +36,9 @@ while IFS=$'\t' read -r id _rest; do
   if [ ! -f "$src" ]; then
     echo "MISSING $src" >&2; exit 1
   fi
-  magick "$src" -resize "${PX}x${PX}" -strip "$MOBILE/${id}.png"
+  magick "$src" -resize "${PX}x${PX}" \
+    -background none -gravity center -extent "${PX}x${PX}" \
+    -strip "$MOBILE/${id}.png"
   cp "$MOBILE/${id}.png" "$WEB/${id}.png"
   n=$((n + 1))
 done < prompts.tsv

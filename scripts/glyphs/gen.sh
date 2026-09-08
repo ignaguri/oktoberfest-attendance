@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Generate achievement glyph art with Z-Image Turbo (MLX), then matte the background out.
 #
-#   ./gen.sh                    # every glyph, seed 42
-#   ./gen.sh masskrug           # one glyph, seed 42
+#   ./gen.sh                    # every glyph, seed 4
+#   ./gen.sh masskrug           # one glyph, seed 4
 #   ./gen.sh masskrug 1 2 3 4   # one glyph, four seeds
 #
 # Raw renders land in $WORK/raw, alpha-cut versions in $WORK/cut. Existing files are skipped,
@@ -26,7 +26,10 @@ target="${1:-all}"
 if [ $# -gt 0 ]; then
   shift
 fi
-seeds="${*:-42}"
+# Seed 4 is the default because export.sh reads seed 4 unless chosen.tsv
+# overrides a glyph. A different default here silently produces files that
+# export.sh will not find.
+seeds="${*:-4}"
 
 while IFS=$'\t' read -r id category color subject; do
   if [ -z "$id" ]; then

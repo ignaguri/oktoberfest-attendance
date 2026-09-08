@@ -35,7 +35,7 @@ memory on a 36 GB machine.
 ## Workflow
 
 ```sh
-./gen.sh                      # every glyph, seed 42
+./gen.sh                      # every glyph, seed 4
 ./gen.sh masskrug             # one glyph
 ./gen.sh masskrug 1 2 3 4     # one glyph, four seeds
 
