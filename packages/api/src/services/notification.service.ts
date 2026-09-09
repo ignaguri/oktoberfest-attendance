@@ -28,8 +28,13 @@ type SubscriberProfile = {
 export function resolveAvatarUrl(avatarUrl: string | null | undefined): string {
   const supabaseUrl = process.env.SUPABASE_PUBLIC_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const getAvatarUrl = createGetAvatarUrl({ strategy: "direct-storage", supabaseUrl });
+  const resolved = getAvatarUrl(avatarUrl);
 
-  return getAvatarUrl(avatarUrl) || DEFAULT_AVATAR_URL;
+  // With neither env var set the builder produces a relative
+  // "/storage/v1/..." path. That is truthy, so a plain falsy check would let
+  // it through to fail inside Novu instead, which is the failure this
+  // function exists to prevent. Only an absolute URL counts as resolved.
+  return resolved?.startsWith("http") ? resolved : DEFAULT_AVATAR_URL;
 }
 
 function isConflictError(error: unknown): boolean {

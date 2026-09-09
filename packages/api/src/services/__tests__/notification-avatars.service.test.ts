@@ -91,6 +91,20 @@ describe("resolveAvatarUrl", () => {
     expect(resolveAvatarUrl(null)).toBe(DEFAULT_AVATAR_URL);
     expect(resolveAvatarUrl("")).toBe(DEFAULT_AVATAR_URL);
   });
+
+  it("falls back rather than building a relative URL when no supabase URL is set", () => {
+    const originalPublicUrl = process.env.SUPABASE_PUBLIC_URL;
+    delete process.env.SUPABASE_PUBLIC_URL;
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+    try {
+      expect(resolveAvatarUrl(AVATAR_FILE)).toBe(DEFAULT_AVATAR_URL);
+    } finally {
+      if (originalPublicUrl !== undefined) {
+        process.env.SUPABASE_PUBLIC_URL = originalPublicUrl;
+      }
+    }
+  });
 });
 
 describe("notification payload avatars", () => {
