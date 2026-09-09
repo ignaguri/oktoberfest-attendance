@@ -2975,7 +2975,6 @@
     },
     "status": {
       "friends": "Freunde",
-      "pendingSent": "Ausstehend",
       "pendingReceived": "Antworten",
       "none": "Freund hinzufügen"
     },

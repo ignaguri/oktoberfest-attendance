@@ -129,6 +129,7 @@ export function UserSearch() {
                   <AddFriendButton
                     userId={user.id}
                     initialStatus={user.friendshipStatus}
+                    initialFriendshipId={user.friendshipId}
                     size="sm"
                   />
                 </div>

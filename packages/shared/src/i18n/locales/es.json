@@ -3057,7 +3057,6 @@
     },
     "status": {
       "friends": "Amigos",
-      "pendingSent": "Pendiente",
       "pendingReceived": "Responder",
       "none": "Agregar amigo"
     },

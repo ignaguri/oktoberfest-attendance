@@ -2997,7 +2997,6 @@
     },
     "status": {
       "friends": "Friends",
-      "pendingSent": "Pending",
       "pendingReceived": "Respond",
       "none": "Add Friend"
     },
