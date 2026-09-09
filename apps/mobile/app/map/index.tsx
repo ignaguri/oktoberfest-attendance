@@ -169,7 +169,9 @@ export default function MapScreen() {
           />
           <Pressable
             onPress={toggleMapExpanded}
-            className="absolute right-2 top-2 rounded-full bg-white/90 p-2 active:opacity-70"
+            // Top-left: react-native-maps draws its own locate and 3D controls in the
+            // top-right corner, and they render above this overlay.
+            className="absolute left-2 top-2 rounded-full bg-white/90 p-2 active:opacity-70"
             hitSlop={8}
             accessibilityRole="button"
             accessibilityLabel={t(isMapExpanded ? "location.map.collapse" : "location.map.expand")}
