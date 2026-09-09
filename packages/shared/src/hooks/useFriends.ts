@@ -139,6 +139,7 @@ export function useDeclineFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestsIncoming());
         invalidateQueries(QueryKeys.friendRequestCount());
         invalidateQueries(QueryKeys.friendSearchAll());
+        invalidateQueries(QueryKeys.friendshipStatusAll());
       },
     },
   );
@@ -160,6 +161,10 @@ export function useCancelFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestsOutgoing());
         invalidateQueries(QueryKeys.friendSuggestions());
         invalidateQueries(QueryKeys.friendSearchAll());
+        // The mutation only knows the friendship id, so the cached status for
+        // the other user has to go by prefix. Left stale it still reads
+        // pending_sent with a friendship id the server has already deleted.
+        invalidateQueries(QueryKeys.friendshipStatusAll());
       },
     },
   );
