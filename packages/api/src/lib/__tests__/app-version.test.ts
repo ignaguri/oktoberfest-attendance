@@ -12,11 +12,8 @@ describe("getAppVersions", () => {
     }
   });
 
-  // The original value is captured before mutating, not read from APP_VERSIONS
-  // afterwards: comparing two post-mutation reads can't fail, since without the
-  // copy the mutation lands on the shared constant and both sides agree on the
-  // mutated value. Capturing first also keeps this independent of whatever
-  // APP_VERSIONS currently holds, so a routine version bump can't break it.
+  // Captured before mutating: comparing two post-mutation reads can't fail,
+  // since without the copy both sides would agree on the mutated value.
   it("returns a copy, so a caller cannot mutate the shared constant", () => {
     const originalLatest = APP_VERSIONS.ios.latest;
 

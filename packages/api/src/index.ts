@@ -39,14 +39,9 @@ app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// Published app versions (public). The apps check this from the sign-in screen,
-// before any session exists, so it must stay outside the authenticated /v1
-// namespace. Kept off the OpenAPI spec for the same reason /health is: the
-// generated client always attaches a bearer token, which callers here lack.
-// Cached because the payload is a compile-time constant: without this every
-// install reaches a function once an hour to be told three hard-coded strings.
-// An hour of staleness is harmless, since a late prompt is the failure mode
-// this endpoint is allowed to have.
+// Public (like /health): checked from the sign-in screen before any session
+// exists. Off the OpenAPI spec too -- the generated client always attaches a
+// bearer token. Cached since the payload is a compile-time constant.
 app.get("/app-version", (c) => {
   c.header("Cache-Control", "public, max-age=3600, s-maxage=3600");
   return c.json(getAppVersions());

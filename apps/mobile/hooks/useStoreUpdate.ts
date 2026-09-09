@@ -25,14 +25,8 @@ function currentStorePlatform(): StorePlatform | null {
 }
 
 /**
- * Reads the published versions from our own API.
- *
- * This used to call the iTunes lookup API, which only ever covered iOS because
- * Google publishes no equivalent. Serving both platforms from one endpoint also
- * means the supported floor can move without shipping an app build.
- *
- * Returns null on any failure, which the caller treats as "no update": a
- * network blip must not interrupt someone mid-session.
+ * Reads published versions from our API (replaces the iOS-only iTunes lookup).
+ * Returns null on any failure, so a network blip reads as "no update".
  */
 async function fetchPublishedVersion(platform: StorePlatform): Promise<PublishedVersion | null> {
   try {
@@ -45,9 +39,7 @@ async function fetchPublishedVersion(platform: StorePlatform): Promise<Published
     const data = await response.json();
     const entry = data?.[platform];
 
-    // Validated rather than trusted: a malformed payload reaching
-    // isNewerVersion would be rejected there anyway, but bailing here keeps the
-    // reason visible in the logs.
+    // Bail here rather than in isNewerVersion, so the reason lands in the logs.
     if (typeof entry?.latest !== "string" || typeof entry?.minSupported !== "string") {
       logger.error("App version payload missing fields for platform", undefined, { platform });
       return null;
@@ -61,14 +53,8 @@ async function fetchPublishedVersion(platform: StorePlatform): Promise<Published
 }
 
 /**
- * Checks whether a newer version of the app has been published.
- *
- * Includes a 1-hour throttle between checks and skips entirely in __DEV__ mode
- * or on platforms without a store.
- *
- * `isBelowMinimum` marks builds the backend no longer works with, as opposed to
- * merely out of date. It is currently reported alongside the normal prompt so
- * the two can be told apart at the call site.
+ * Checks for a published update, throttled to once an hour. `isBelowMinimum`
+ * marks builds the backend rejects outright, as opposed to merely outdated.
  */
 export function useStoreUpdate() {
   const [isStoreUpdateAvailable, setIsStoreUpdateAvailable] = useState(false);
