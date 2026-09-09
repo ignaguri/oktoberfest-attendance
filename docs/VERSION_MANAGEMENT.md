@@ -276,14 +276,18 @@ not touch the published versions the apps read to decide whether to prompt for a
 update.
 
 Once a build is live in the App Store or Play Store, update
-`packages/api/src/lib/app-version.ts`:
+`packages/api/src/lib/app-version.ts`. For example, after shipping iOS 1.7.0:
 
-```ts
-export const APP_VERSIONS: AppVersions = {
-  ios: { latest: "1.6.2", minSupported: "1.6.2" },
-  android: { latest: "1.7.0", minSupported: "1.6.2" },
-};
+```diff
+ export const APP_VERSIONS: AppVersions = {
+-  ios: { latest: "1.6.2", minSupported: "1.6.2" },
++  ios: { latest: "1.7.0", minSupported: "1.6.2" },
+   android: { latest: "1.7.0", minSupported: "1.6.2" },
+ };
 ```
+
+(Illustrative only — check the current file for the values to change, don't
+copy the snippet above.)
 
 - **`latest`** — the newest version in that platform's store. Drives the
   dismissible "new version available" prompt. Forgetting to bump it only means
