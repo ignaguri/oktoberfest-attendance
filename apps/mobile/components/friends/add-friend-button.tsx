@@ -11,6 +11,8 @@ type FriendshipStatus = FriendshipStatusCheck["status"];
 interface AddFriendButtonProps {
   status: FriendshipStatus;
   onPress: () => void;
+  /** Where "Accept" goes. Without it the button renders inert rather than sending. */
+  onRespond?: () => void;
   loading?: boolean;
   size?: "sm" | "md";
 }
@@ -24,6 +26,13 @@ const STATUS_CONFIG: Record<
     action: "primary" | "secondary" | "positive";
     iconColor: string;
     spinnerColor: string;
+    /**
+     * Which callback a press dispatches to, or null when the state is
+     * terminal. Pressing a sent request only re-posts it for a 409, and
+     * "Accept" must never reach onPress: that sends a second request in the
+     * opposite direction instead of accepting the one already there.
+     */
+    press: "send" | "respond" | null;
   }
 > = {
   none: {
@@ -33,6 +42,7 @@ const STATUS_CONFIG: Record<
     action: "primary",
     iconColor: IconColors.white,
     spinnerColor: IconColors.white,
+    press: "send",
   },
   pending_sent: {
     labelKey: "friends.request.sent",
@@ -41,6 +51,7 @@ const STATUS_CONFIG: Record<
     action: "secondary",
     iconColor: IconColors.muted,
     spinnerColor: Colors.gray[500],
+    press: null,
   },
   pending_received: {
     labelKey: "friends.request.accept",
@@ -49,6 +60,7 @@ const STATUS_CONFIG: Record<
     action: "primary",
     iconColor: IconColors.primary,
     spinnerColor: Colors.primary[500],
+    press: "respond",
   },
   friends: {
     labelKey: "friends.status.friends",
@@ -57,12 +69,14 @@ const STATUS_CONFIG: Record<
     action: "positive",
     iconColor: IconColors.success,
     spinnerColor: Colors.success[500],
+    press: null,
   },
 };
 
 export function AddFriendButton({
   status,
   onPress,
+  onRespond,
   loading = false,
   size = "md",
 }: AddFriendButtonProps) {
@@ -73,8 +87,15 @@ export function AddFriendButton({
   const iconSize = size === "sm" ? 14 : 16;
 
   const handlePress = useCallback(() => {
-    onPress();
-  }, [onPress]);
+    if (config.press === "send") {
+      onPress();
+    } else if (config.press === "respond") {
+      onRespond?.();
+    }
+  }, [config.press, onPress, onRespond]);
+
+  const isDisabled =
+    loading || config.press === null || (config.press === "respond" && !onRespond);
 
   const accessibilityLabel = useMemo(() => {
     return t(config.labelKey);
@@ -86,7 +107,7 @@ export function AddFriendButton({
       action={config.action}
       size={size}
       onPress={handlePress}
-      disabled={loading || status === "friends"}
+      disabled={isDisabled}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
     >

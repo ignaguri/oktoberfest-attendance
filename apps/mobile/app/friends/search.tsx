@@ -1,6 +1,7 @@
 import { useSearchUsers, useSendFriendRequest } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SearchUserResult } from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
 import { Search } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList } from "react-native";
@@ -92,11 +93,18 @@ export default function FriendSearchScreen() {
 }
 
 function SearchResultItem({ user }: { user: SearchUserResult }) {
+  const router = useRouter();
   const sendRequest = useSendFriendRequest();
 
   const handleSendRequest = useCallback(() => {
     sendRequest.mutate(user.id);
   }, [sendRequest, user.id]);
+
+  // Accepting needs the friendshipId, which the search result does not carry,
+  // so hand the incoming request over to the requests tab.
+  const handleRespond = useCallback(() => {
+    router.push("/friends?tab=requests");
+  }, [router]);
 
   const displayName = user.fullName || user.username || "";
   const friendshipStatus = user.friendshipStatus;
@@ -124,6 +132,7 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
       <AddFriendButton
         status={friendshipStatus}
         onPress={handleSendRequest}
+        onRespond={handleRespond}
         loading={sendRequest.loading}
         size="sm"
       />
