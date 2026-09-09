@@ -2126,7 +2126,11 @@
       "button": "Karte",
       "openAccessibility": "Festivalplan öffnen",
       "officialMap": "Offizielle Festivalkarte",
-      "officialMapHint": "Öffnet die offizielle Karte im Browser"
+      "officialMapHint": "Öffnet die offizielle Karte im Browser",
+      "expand": "Karte vergrößern",
+      "collapse": "Karte verkleinern",
+      "expandHint": "Vergrößert die Karte",
+      "collapseHint": "Setzt die Karte auf ihre normale Größe zurück"
     },
     "tabs": {
       "friends": "Freunde",

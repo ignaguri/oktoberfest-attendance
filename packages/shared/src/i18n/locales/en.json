@@ -2110,7 +2110,11 @@
       "button": "Map",
       "openAccessibility": "Open festival map",
       "officialMap": "Official festival map",
-      "officialMapHint": "Opens the official map in your browser"
+      "officialMapHint": "Opens the official map in your browser",
+      "expand": "Expand map",
+      "collapse": "Collapse map",
+      "expandHint": "Makes the map taller",
+      "collapseHint": "Returns the map to its normal size"
     },
     "tabs": {
       "friends": "Friends",
