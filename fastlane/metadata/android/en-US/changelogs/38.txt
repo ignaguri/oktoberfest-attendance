@@ -1,0 +1,3 @@
+- New achievement badge artwork, and a detail sheet that explains how to unlock each one.
+- Get notified in-app when a new version is available.
+- Small fixes and polish. Prost!

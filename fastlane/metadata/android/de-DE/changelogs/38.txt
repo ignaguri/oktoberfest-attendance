@@ -1,0 +1,3 @@
+- Neue Abzeichen-Illustrationen für Erfolge, und ein Detailfenster, das erklärt, wie man jedes davon freischaltet.
+- In-App-Hinweis, wenn eine neue Version verfügbar ist.
+- Kleine Korrekturen und Verbesserungen. Prost!

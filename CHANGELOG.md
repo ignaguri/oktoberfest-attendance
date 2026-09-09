@@ -1,5 +1,36 @@
 # Changelog
 
+## [0.12.0] - 2026-09-09
+
+### ✨ Features
+
+- cross-platform store update prompt via API (#298)
+- new glyph art, and a detail sheet that explains itself (#297)
+- send platform and version identification headers (#288)
+
+### 🐛 Bug Fixes
+
+- friend request states, map control, 2026 prices (#300)
+- restore LogBox toast styling swallowed by NativeWind (#293)
+- make the selector scroll and group past festivals (#291)
+- surface the invite link right after group creation (#289)
+- put default changelog inside each locale dir (#287)
+
+### 📚 Documentation
+
+- add the captcha rollout runbook (#299)
+
+### ⚡ Performance Improvements
+
+- paint the landing page before hydration, prerender it (#290)
+
+### 🔧 Maintenance
+
+- bump the small majors (@types/node, vitest) (#296)
+- align Expo SDK 57 packages, RN 0.86.3 (#295)
+- bump JS-only minor and patch versions (#294)
+- replace the 7 OG images with the new set (#292)
+
 ## [0.11.0] - 2026-09-04
 
 ### ✨ Features
