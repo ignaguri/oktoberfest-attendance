@@ -11,7 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslation } from "@/lib/i18n/client";
 
-export function UserSearch() {
+interface UserSearchProps {
+  /** Where a result with an incoming request sends the user. Without it that
+   * row's button renders inert, since the dropdown cannot accept a request. */
+  onRespond?: () => void;
+}
+
+export function UserSearch({ onRespond }: UserSearchProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [query, setQuery] = useState("");
@@ -55,6 +61,19 @@ export function UserSearch() {
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   }, []);
+
+  // The dropdown overlays the tabs, so it has to get out of the way before the
+  // requests tab it just switched to is any use.
+  const handleRespond = useMemo(() => {
+    if (!onRespond) {
+      return undefined;
+    }
+    return () => {
+      setIsExpanded(false);
+      setQuery("");
+      onRespond();
+    };
+  }, [onRespond]);
 
   const showDropdown = isExpanded && debouncedQuery.length >= 1;
 
@@ -130,6 +149,7 @@ export function UserSearch() {
                     userId={user.id}
                     initialStatus={user.friendshipStatus}
                     initialFriendshipId={user.friendshipId}
+                    onRespond={handleRespond}
                     size="sm"
                   />
                 </div>

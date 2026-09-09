@@ -107,9 +107,11 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
   }, [sendRequest, user.id]);
 
   // Accepting takes more than the friendshipId (it needs the request card's
-  // context), so hand the incoming request over to the requests tab.
+  // context), so hand the incoming request over to the requests tab. Search is
+  // only ever reached from that screen, so dismiss back down to it: a push
+  // would stack a second copy and leave Android's back button on this screen.
   const handleRespond = useCallback(() => {
-    router.push("/friends?tab=requests");
+    router.dismissTo("/friends?tab=requests");
   }, [router]);
 
   const handleCancel = useCallback(() => {
