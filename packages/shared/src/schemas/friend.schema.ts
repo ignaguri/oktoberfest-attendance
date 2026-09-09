@@ -102,6 +102,8 @@ export const SearchUserResultSchema = z.object({
   fullName: z.string().nullable(),
   avatarUrl: z.string().nullable(),
   friendshipStatus: z.enum(["friends", "pending_sent", "pending_received", "none"]),
+  /** The friendship row, when one exists. Needed to cancel a request from search. */
+  friendshipId: z.string().uuid().nullable(),
 });
 export type SearchUserResult = z.infer<typeof SearchUserResultSchema>;
 

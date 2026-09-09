@@ -3,7 +3,7 @@ import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import type { Database } from "@prostcounter/db";
 import type { UpdateNotificationPreferencesInput } from "@prostcounter/shared";
 import { DEFAULT_AVATAR_URL, NOTIFICATION_WORKFLOWS } from "@prostcounter/shared/constants";
-import { runNovuWriteTolerantly } from "@prostcounter/shared/utils";
+import { createGetAvatarUrl, runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
@@ -17,6 +17,25 @@ type SubscriberProfile = {
   lastName?: string;
   avatar?: string;
 };
+
+/**
+ * Profiles store only the avatar filename; clients build the URL themselves.
+ * Novu's in-app step validates its avatar control as a URI, so handing it a
+ * bare filename fails the entire step with ExecutionStateOutputInvalidError
+ * and no notification is delivered at all. Resolve it to a public storage URL
+ * before it goes into a trigger payload.
+ */
+export function resolveAvatarUrl(avatarUrl: string | null | undefined): string {
+  const supabaseUrl = process.env.SUPABASE_PUBLIC_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const getAvatarUrl = createGetAvatarUrl({ strategy: "direct-storage", supabaseUrl });
+  const resolved = getAvatarUrl(avatarUrl);
+
+  // With neither env var set the builder produces a relative
+  // "/storage/v1/..." path. That is truthy, so a plain falsy check would let
+  // it through to fail inside Novu instead, which is the failure this
+  // function exists to prevent. Only an absolute URL counts as resolved.
+  return resolved?.startsWith("http") ? resolved : DEFAULT_AVATAR_URL;
+}
 
 function isConflictError(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;
@@ -567,7 +586,7 @@ export class NotificationService {
       }
 
       const sharerName = user.username || user.full_name || "Someone";
-      const sharerAvatar = user.avatar_url || DEFAULT_AVATAR_URL;
+      const sharerAvatar = resolveAvatarUrl(user.avatar_url);
 
       // Send notifications to all eligible members
       const notificationPromises = membersToNotify.map((memberId) => {
@@ -646,7 +665,7 @@ export class NotificationService {
 
       // Prepare notification payload
       const joinerName = newMember.username ?? newMember.full_name ?? "Someone";
-      const joinerAvatar = newMember.avatar_url || DEFAULT_AVATAR_URL;
+      const joinerAvatar = resolveAvatarUrl(newMember.avatar_url);
 
       const payload = {
         joinerName,
@@ -750,7 +769,7 @@ export class NotificationService {
       }
 
       const requesterName = requester.username || requester.full_name || "Someone";
-      const requesterAvatar = requester.avatar_url || DEFAULT_AVATAR_URL;
+      const requesterAvatar = resolveAvatarUrl(requester.avatar_url);
 
       await this.novu.trigger({
         workflowId: NOTIFICATION_WORKFLOWS.FRIEND_REQUEST,
@@ -826,7 +845,7 @@ export class NotificationService {
       }
 
       const userName = user.username || user.full_name || "Someone";
-      const userAvatar = user.avatar_url || DEFAULT_AVATAR_URL;
+      const userAvatar = resolveAvatarUrl(user.avatar_url);
 
       // Send notifications to all eligible members with their specific group context
       const notificationPromises = membersToNotify.map((memberId) => {

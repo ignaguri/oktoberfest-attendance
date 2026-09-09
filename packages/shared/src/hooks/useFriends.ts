@@ -89,6 +89,10 @@ export function useSendFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestsOutgoing());
         invalidateQueries(QueryKeys.friendSuggestions());
         invalidateQueries(QueryKeys.friendshipStatus(addresseeId));
+        // Cached search results carry their own friendshipStatus, and the
+        // Add Friend button renders off it. Without this the button falls
+        // straight back to "Add friend" once the mutation settles.
+        invalidateQueries(QueryKeys.friendSearchAll());
         invalidateQueries(["public-profile", addresseeId] as const);
       },
     },
@@ -134,6 +138,8 @@ export function useDeclineFriendRequest() {
       onSuccess: () => {
         invalidateQueries(QueryKeys.friendRequestsIncoming());
         invalidateQueries(QueryKeys.friendRequestCount());
+        invalidateQueries(QueryKeys.friendSearchAll());
+        invalidateQueries(QueryKeys.friendshipStatusAll());
       },
     },
   );
@@ -154,6 +160,11 @@ export function useCancelFriendRequest() {
       onSuccess: () => {
         invalidateQueries(QueryKeys.friendRequestsOutgoing());
         invalidateQueries(QueryKeys.friendSuggestions());
+        invalidateQueries(QueryKeys.friendSearchAll());
+        // The mutation only knows the friendship id, so the cached status for
+        // the other user has to go by prefix. Left stale it still reads
+        // pending_sent with a friendship id the server has already deleted.
+        invalidateQueries(QueryKeys.friendshipStatusAll());
       },
     },
   );

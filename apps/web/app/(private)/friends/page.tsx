@@ -2,6 +2,7 @@
 
 import { useFriendRequestCount } from "@prostcounter/shared/hooks";
 import { Users } from "lucide-react";
+import { useCallback, useState } from "react";
 
 import { FriendRequests } from "@/components/friends/FriendRequests";
 import { FriendsList } from "@/components/friends/FriendsList";
@@ -14,15 +15,23 @@ import { useTranslation } from "@/lib/i18n/client";
 export default function FriendsPage() {
   const { t } = useTranslation();
   const { data: requestCount } = useFriendRequestCount();
+  const [activeTab, setActiveTab] = useState("friends");
+
+  // Search results can surface someone whose request is already waiting. There
+  // is nowhere to accept it from the dropdown, so send the user to the tab
+  // that holds it.
+  const showRequests = useCallback(() => {
+    setActiveTab("requests");
+  }, []);
 
   return (
     <div className="w-full px-2">
       <div className="mb-4 flex items-center gap-4">
         <h1 className="text-2xl font-bold">{t("friends.title")}</h1>
-        <UserSearch />
+        <UserSearch onRespond={showRequests} />
       </div>
 
-      <Tabs defaultValue="friends">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-4 w-full">
           <TabsTrigger value="friends" className="flex-1 gap-1.5">
             <Users className="size-4" />

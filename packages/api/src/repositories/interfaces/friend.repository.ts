@@ -41,6 +41,7 @@ export interface IFriendRepository {
       fullName: string | null;
       avatarUrl: string | null;
       friendshipStatus: "friends" | "pending_sent" | "pending_received" | "none";
+      friendshipId: string | null;
     }[]
   >;
   getFriendshipStatus(userId: string, otherUserId: string): Promise<FriendshipStatusCheck>;

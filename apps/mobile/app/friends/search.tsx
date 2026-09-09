@@ -1,6 +1,11 @@
-import { useSearchUsers, useSendFriendRequest } from "@prostcounter/shared/hooks";
+import {
+  useCancelFriendRequest,
+  useSearchUsers,
+  useSendFriendRequest,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SearchUserResult } from "@prostcounter/shared/schemas";
+import { useRouter } from "expo-router";
 import { Search } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList } from "react-native";
@@ -92,11 +97,29 @@ export default function FriendSearchScreen() {
 }
 
 function SearchResultItem({ user }: { user: SearchUserResult }) {
+  const router = useRouter();
   const sendRequest = useSendFriendRequest();
+  const cancelRequest = useCancelFriendRequest();
+  const { friendshipId } = user;
 
   const handleSendRequest = useCallback(() => {
     sendRequest.mutate(user.id);
   }, [sendRequest, user.id]);
+
+  // Accepting takes more than the friendshipId (it needs the request card's
+  // context), so hand the incoming request over to the requests tab. Search is
+  // only ever reached from that screen, so dismiss back down to it: a push
+  // would stack a second copy and leave Android's back button on this screen.
+  const handleRespond = useCallback(() => {
+    router.dismissTo("/friends?tab=requests");
+  }, [router]);
+
+  const handleCancel = useCallback(() => {
+    if (!friendshipId) {
+      return;
+    }
+    cancelRequest.mutate(friendshipId);
+  }, [cancelRequest, friendshipId]);
 
   const displayName = user.fullName || user.username || "";
   const friendshipStatus = user.friendshipStatus;
@@ -124,7 +147,9 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
       <AddFriendButton
         status={friendshipStatus}
         onPress={handleSendRequest}
-        loading={sendRequest.loading}
+        onRespond={handleRespond}
+        onCancel={friendshipId ? handleCancel : undefined}
+        loading={sendRequest.loading || cancelRequest.loading}
         size="sm"
       />
     </HStack>

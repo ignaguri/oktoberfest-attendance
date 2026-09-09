@@ -1,7 +1,11 @@
 "use client";
 
-import { useFriendshipStatus, useSendFriendRequest } from "@prostcounter/shared/hooks";
-import { Check, Clock, Loader2, UserPlus } from "lucide-react";
+import {
+  useCancelFriendRequest,
+  useFriendshipStatus,
+  useSendFriendRequest,
+} from "@prostcounter/shared/hooks";
+import { Check, Loader2, UserPlus, X } from "lucide-react";
 import { useCallback } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +16,8 @@ interface AddFriendButtonProps {
   userId: string;
   /** Pre-fetched status to avoid extra API call when parent already has it */
   initialStatus?: "friends" | "pending_sent" | "pending_received" | "none";
+  /** The friendship row behind initialStatus. Cancelling a sent request needs it. */
+  initialFriendshipId?: string | null;
   className?: string;
   size?: "default" | "sm";
   onRespond?: () => void;
@@ -20,6 +26,7 @@ interface AddFriendButtonProps {
 export function AddFriendButton({
   userId,
   initialStatus,
+  initialFriendshipId,
   className,
   size = "default",
   onRespond,
@@ -29,8 +36,12 @@ export function AddFriendButton({
     initialStatus ? undefined : userId,
   );
   const sendRequest = useSendFriendRequest();
+  const cancelRequest = useCancelFriendRequest();
 
   const status = initialStatus ?? statusData?.status ?? "none";
+  const friendshipId = initialStatus
+    ? (initialFriendshipId ?? null)
+    : (statusData?.friendshipId ?? null);
 
   const handleSendRequest = useCallback(async () => {
     try {
@@ -39,6 +50,17 @@ export function AddFriendButton({
       // Error handled by mutation
     }
   }, [sendRequest, userId]);
+
+  const handleCancelRequest = useCallback(async () => {
+    if (!friendshipId) {
+      return;
+    }
+    try {
+      await cancelRequest.mutateAsync(friendshipId);
+    } catch {
+      // Error handled by mutation
+    }
+  }, [cancelRequest, friendshipId]);
 
   if (statusLoading && !initialStatus) {
     return (
@@ -63,21 +85,34 @@ export function AddFriendButton({
       );
 
     case "pending_sent":
+      // Without the friendship id there is nothing to cancel, so the button
+      // stays inert rather than offering an action it cannot carry out.
       return (
         <Button
           variant="outline"
           size={size}
-          disabled
+          onClick={handleCancelRequest}
+          disabled={!friendshipId || cancelRequest.loading}
           className={cn("text-muted-foreground", className)}
         >
-          <Clock className="size-4" />
-          {t("friends.status.pendingSent")}
+          {cancelRequest.loading ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <X className="size-4" />
+          )}
+          {t("friends.request.cancel")}
         </Button>
       );
 
     case "pending_received":
       return (
-        <Button variant="outline" size={size} onClick={onRespond} className={className}>
+        <Button
+          variant="outline"
+          size={size}
+          onClick={onRespond}
+          disabled={!onRespond}
+          className={className}
+        >
           {t("friends.status.pendingReceived")}
         </Button>
       );

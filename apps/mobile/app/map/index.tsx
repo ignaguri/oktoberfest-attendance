@@ -4,7 +4,15 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { Stack, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
-import { Beer, ExternalLink, Map, MapPin, RefreshCw } from "lucide-react-native";
+import {
+  Beer,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  ExternalLink,
+  Map,
+  MapPin,
+  RefreshCw,
+} from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -46,6 +54,7 @@ export default function MapScreen() {
 
   const [selectedTab, setSelectedTab] = useState<"friends" | "tents">("friends");
   const [selectedTent, setSelectedTent] = useState<NearbyTent | null>(null);
+  const [isMapExpanded, setIsMapExpanded] = useState(false);
   const hasInitializedRef = useRef(false);
 
   // refreshNearby must stay in the deps. Its identity changes with the current
@@ -56,6 +65,10 @@ export default function MapScreen() {
       refreshNearby(currentFestival.id);
     }
   }, [currentFestival?.id, refreshNearby]);
+
+  const toggleMapExpanded = useCallback(() => {
+    setIsMapExpanded((expanded) => !expanded);
+  }, []);
 
   // Start local tracking when screen mounts (only if not already sharing)
   useEffect(() => {
@@ -141,7 +154,12 @@ export default function MapScreen() {
         }}
       >
         {/* Map */}
-        <Box className="mx-3 mb-2 mt-3 h-[250px] overflow-hidden rounded-2xl">
+        <Box
+          className={cn(
+            "mx-3 mb-2 mt-3 overflow-hidden rounded-2xl",
+            isMapExpanded ? "h-[65vh]" : "h-[250px]",
+          )}
+        >
           <FriendMap
             showFriends
             showTents
@@ -149,6 +167,24 @@ export default function MapScreen() {
             selectedTentId={selectedTent?.tentId}
             onMarkerPress={handleMarkerPress}
           />
+          <Pressable
+            onPress={toggleMapExpanded}
+            // Top-left: react-native-maps draws its own locate and 3D controls in the
+            // top-right corner, and they render above this overlay.
+            className="absolute left-2 top-2 rounded-full bg-white/90 p-2 active:opacity-70"
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel={t(isMapExpanded ? "location.map.collapse" : "location.map.expand")}
+            accessibilityHint={t(
+              isMapExpanded ? "location.map.collapseHint" : "location.map.expandHint",
+            )}
+          >
+            {isMapExpanded ? (
+              <ChevronsDownUp size={18} color={IconColors.primary} />
+            ) : (
+              <ChevronsUpDown size={18} color={IconColors.primary} />
+            )}
+          </Pressable>
         </Box>
 
         {/* External festival map link */}

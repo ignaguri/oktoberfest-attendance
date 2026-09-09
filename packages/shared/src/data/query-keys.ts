@@ -110,7 +110,11 @@ export class QueryKeys {
   static friendRequestCount = () => ["friends", "requests", "count"] as const;
   static friendSuggestions = () => ["friends", "suggestions"] as const;
   static friendSearch = (query: string) => ["friends", "search", query] as const;
+  /** Prefix covering every cached search query, for invalidation. */
+  static friendSearchAll = () => ["friends", "search"] as const;
   static friendshipStatus = (userId: string) => ["friends", "status", userId] as const;
+  /** Prefix covering every cached status, for mutations that only know a friendship id. */
+  static friendshipStatusAll = () => ["friends", "status"] as const;
 
   // Crowd report queries
   static crowdStatus = (festivalId: string) => ["crowd-status", festivalId] as const;

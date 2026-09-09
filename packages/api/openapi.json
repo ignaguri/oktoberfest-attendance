@@ -3558,6 +3558,11 @@
                               "pending_received",
                               "none"
                             ]
+                          },
+                          "friendshipId": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "uuid"
                           }
                         },
                         "required": [
@@ -3565,7 +3570,8 @@
                           "username",
                           "fullName",
                           "avatarUrl",
-                          "friendshipStatus"
+                          "friendshipStatus",
+                          "friendshipId"
                         ]
                       }
                     }

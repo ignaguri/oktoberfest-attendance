@@ -1961,6 +1961,8 @@ export interface paths {
                                 avatarUrl: string | null;
                                 /** @enum {string} */
                                 friendshipStatus: "friends" | "pending_sent" | "pending_received" | "none";
+                                /** Format: uuid */
+                                friendshipId: string | null;
                             }[];
                         };
                     };
