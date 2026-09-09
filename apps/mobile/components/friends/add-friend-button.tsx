@@ -1,18 +1,27 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { FriendshipStatusCheck } from "@prostcounter/shared/schemas";
-import { Check, Clock, UserCheck, UserPlus } from "lucide-react-native";
-import { useCallback, useMemo } from "react";
+import { Check, UserCheck, UserPlus, X } from "lucide-react-native";
+import { useMemo } from "react";
 
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
 type FriendshipStatus = FriendshipStatusCheck["status"];
 
+/**
+ * Which callback a press dispatches to, or null when the state is terminal.
+ * "Accept" must never reach onPress: that sends a second request in the
+ * opposite direction instead of accepting the one already there.
+ */
+type PressAction = "send" | "respond" | "cancel" | null;
+
 interface AddFriendButtonProps {
   status: FriendshipStatus;
   onPress: () => void;
   /** Where "Accept" goes. Without it the button renders inert rather than sending. */
   onRespond?: () => void;
+  /** Where "Cancel Request" goes. Without it the button renders inert. */
+  onCancel?: () => void;
   loading?: boolean;
   size?: "sm" | "md";
 }
@@ -26,13 +35,7 @@ const STATUS_CONFIG: Record<
     action: "primary" | "secondary" | "positive";
     iconColor: string;
     spinnerColor: string;
-    /**
-     * Which callback a press dispatches to, or null when the state is
-     * terminal. Pressing a sent request only re-posts it for a 409, and
-     * "Accept" must never reach onPress: that sends a second request in the
-     * opposite direction instead of accepting the one already there.
-     */
-    press: "send" | "respond" | null;
+    press: PressAction;
   }
 > = {
   none: {
@@ -45,13 +48,13 @@ const STATUS_CONFIG: Record<
     press: "send",
   },
   pending_sent: {
-    labelKey: "friends.request.sent",
-    icon: Clock,
+    labelKey: "friends.request.cancel",
+    icon: X,
     variant: "outline",
     action: "secondary",
     iconColor: IconColors.muted,
     spinnerColor: Colors.gray[500],
-    press: null,
+    press: "cancel",
   },
   pending_received: {
     labelKey: "friends.request.accept",
@@ -77,6 +80,7 @@ export function AddFriendButton({
   status,
   onPress,
   onRespond,
+  onCancel,
   loading = false,
   size = "md",
 }: AddFriendButtonProps) {
@@ -86,16 +90,22 @@ export function AddFriendButton({
   const Icon = config.icon;
   const iconSize = size === "sm" ? 14 : 16;
 
-  const handlePress = useCallback(() => {
-    if (config.press === "send") {
-      onPress();
-    } else if (config.press === "respond") {
-      onRespond?.();
+  // A screen that does not supply the callback its status needs gets an inert
+  // button rather than a press that silently does the wrong thing.
+  const handlePress = useMemo(() => {
+    switch (config.press) {
+      case "send":
+        return onPress;
+      case "respond":
+        return onRespond;
+      case "cancel":
+        return onCancel;
+      default:
+        return undefined;
     }
-  }, [config.press, onPress, onRespond]);
+  }, [config.press, onPress, onRespond, onCancel]);
 
-  const isDisabled =
-    loading || config.press === null || (config.press === "respond" && !onRespond);
+  const isDisabled = loading || !handlePress;
 
   const accessibilityLabel = useMemo(() => {
     return t(config.labelKey);

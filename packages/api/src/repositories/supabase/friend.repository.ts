@@ -336,6 +336,7 @@ export class SupabaseFriendRepository implements IFriendRepository {
       fullName: string | null;
       avatarUrl: string | null;
       friendshipStatus: "friends" | "pending_sent" | "pending_received" | "none";
+      friendshipId: string | null;
     }[]
   > {
     const { data, error } = await this.supabase
@@ -362,27 +363,34 @@ export class SupabaseFriendRepository implements IFriendRepository {
 
     const friendshipMap = new Map<
       string,
-      "friends" | "pending_sent" | "pending_received" | "none"
+      {
+        status: "friends" | "pending_sent" | "pending_received";
+        friendshipId: string;
+      }
     >();
     for (const f of friendships || []) {
       const otherUserId = f.requester_id === userId ? f.addressee_id : f.requester_id;
       if (f.status === "accepted") {
-        friendshipMap.set(otherUserId, "friends");
+        friendshipMap.set(otherUserId, { status: "friends", friendshipId: f.id });
       } else if (f.status === "pending") {
-        friendshipMap.set(
-          otherUserId,
-          f.requester_id === userId ? "pending_sent" : "pending_received",
-        );
+        friendshipMap.set(otherUserId, {
+          status: f.requester_id === userId ? "pending_sent" : "pending_received",
+          friendshipId: f.id,
+        });
       }
     }
 
-    return data.map((p) => ({
-      id: p.id,
-      username: p.username,
-      fullName: p.full_name,
-      avatarUrl: p.avatar_url,
-      friendshipStatus: friendshipMap.get(p.id) ?? "none",
-    }));
+    return data.map((p) => {
+      const friendship = friendshipMap.get(p.id);
+      return {
+        id: p.id,
+        username: p.username,
+        fullName: p.full_name,
+        avatarUrl: p.avatar_url,
+        friendshipStatus: friendship?.status ?? ("none" as const),
+        friendshipId: friendship?.friendshipId ?? null,
+      };
+    });
   }
 
   async getFriendshipStatus(userId: string, otherUserId: string): Promise<FriendshipStatusCheck> {

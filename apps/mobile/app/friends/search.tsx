@@ -1,4 +1,8 @@
-import { useSearchUsers, useSendFriendRequest } from "@prostcounter/shared/hooks";
+import {
+  useCancelFriendRequest,
+  useSearchUsers,
+  useSendFriendRequest,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SearchUserResult } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
@@ -95,16 +99,25 @@ export default function FriendSearchScreen() {
 function SearchResultItem({ user }: { user: SearchUserResult }) {
   const router = useRouter();
   const sendRequest = useSendFriendRequest();
+  const cancelRequest = useCancelFriendRequest();
+  const { friendshipId } = user;
 
   const handleSendRequest = useCallback(() => {
     sendRequest.mutate(user.id);
   }, [sendRequest, user.id]);
 
-  // Accepting needs the friendshipId, which the search result does not carry,
-  // so hand the incoming request over to the requests tab.
+  // Accepting takes more than the friendshipId (it needs the request card's
+  // context), so hand the incoming request over to the requests tab.
   const handleRespond = useCallback(() => {
     router.push("/friends?tab=requests");
   }, [router]);
+
+  const handleCancel = useCallback(() => {
+    if (!friendshipId) {
+      return;
+    }
+    cancelRequest.mutate(friendshipId);
+  }, [cancelRequest, friendshipId]);
 
   const displayName = user.fullName || user.username || "";
   const friendshipStatus = user.friendshipStatus;
@@ -133,7 +146,8 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
         status={friendshipStatus}
         onPress={handleSendRequest}
         onRespond={handleRespond}
-        loading={sendRequest.loading}
+        onCancel={friendshipId ? handleCancel : undefined}
+        loading={sendRequest.loading || cancelRequest.loading}
         size="sm"
       />
     </HStack>
