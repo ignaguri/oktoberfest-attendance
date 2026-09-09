@@ -191,6 +191,7 @@ GestureHandlerRootView → SafeAreaProvider → I18nextProvider → ErrorBoundar
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - Full system architecture, API routes, testing infrastructure, database schema
 - **[BUILDS.md](./docs/BUILDS.md)** - EAS build profiles, OTA updates, version management, `.env.local` gotcha
 - **[VERSION_MANAGEMENT.md](./docs/VERSION_MANAGEMENT.md)** - npm version bump, changelog, and release tag workflow
+- **[CAPTCHA_ROLLOUT.md](./docs/CAPTCHA_ROLLOUT.md)** - enabling hCaptcha safely, and the auth-log queries for signup/reset abuse
 - **[BLOG.md](./docs/BLOG.md)** - Blog/MDX content authoring guide
 - **[Mobile PRD](./docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md)** - Mobile app plans
 - **[FRIENDSHIP_SYSTEM.md](./docs/FRIENDSHIP_SYSTEM.md)** - Friendship feature documentation
