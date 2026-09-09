@@ -25,7 +25,7 @@ export { ApiError, AuthRequiredError };
  * Base URL for API requests
  * Configured via Expo constants or environment variable
  */
-const API_BASE_URL =
+export const API_BASE_URL =
   Constants.expoConfig?.extra?.apiUrl ||
   (typeof process !== "undefined" ? process.env.EXPO_PUBLIC_API_URL : "") ||
   "http://localhost:3008/api";

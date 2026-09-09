@@ -1,5 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 
+import { getAppVersions } from "./lib/app-version";
 import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
 import { loggerMiddleware } from "./middleware/logger";
@@ -36,6 +37,14 @@ app.use("*", loggerMiddleware);
 // Health check endpoint (public)
 app.get("/health", (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// Public (like /health): checked from the sign-in screen before any session
+// exists. Off the OpenAPI spec too -- the generated client always attaches a
+// bearer token. Cached since the payload is a compile-time constant.
+app.get("/app-version", (c) => {
+  c.header("Cache-Control", "public, max-age=3600, s-maxage=3600");
+  return c.json(getAppVersions());
 });
 
 // Mount API v1 routes with authentication

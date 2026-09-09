@@ -149,9 +149,14 @@ password_requirements = ""
 # The values above are the always-pass test pair, for local and e2e only. In
 # production the sitekeys come from elsewhere: web from the Vercel env, mobile
 # from the `production` / `production-apk` env blocks in apps/mobile/eas.json.
-# Metro inlines the mobile one at bundle time, so changing it takes a new store
-# build, never an OTA. A binary built without it sends no token and is rejected
-# outright once `enabled` is true here.
+# Metro inlines the mobile one at bundle time -- and that includes OTAs:
+# `eas update --environment production` reaches existing installs with a
+# changed sitekey (verified by exporting a bundle with a sentinel value). Same
+# reason `.env.local` must be renamed first (docs/BUILDS.md).
+#
+# The real limit is runtimeVersion: an OTA only reaches a matching one, so
+# builds predating the sitekey still need a store update, and until then they
+# send no token and are rejected outright once `enabled` is true here.
 [auth.captcha]
 enabled = false
 provider = "hcaptcha"
