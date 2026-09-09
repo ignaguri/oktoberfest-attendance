@@ -1,0 +1,3 @@
+- Nuevas ilustraciones para las insignias de logros, y una ficha de detalle que explica cómo desbloquear cada una.
+- Recibe un aviso en la app cuando haya una nueva versión disponible.
+- Correcciones y mejoras menores. ¡Prost!
