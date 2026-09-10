@@ -69,6 +69,7 @@ packages/**/dist/
 WARP.md
 .claude/skills/
 .claude/worktrees/
+.claude/helpers/
 .cursor/skills/
 .impeccable/
 
@@ -110,3 +111,6 @@ apps/mobile/build-*.aab
 # their renders are not. work/ holds 1024px masters and raw output (~100 MB).
 scripts/glyphs/work/
 .glyphgen/
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
