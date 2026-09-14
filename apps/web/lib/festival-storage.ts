@@ -3,6 +3,7 @@ import type { Festival } from "@prostcounter/shared/schemas";
 
 const STORAGE_KEY = "selectedFestivalId";
 const CACHED_FESTIVAL_KEY = "cachedFestival";
+const DISMISSED_SUGGESTION_KEY = "dismissedFestivalSuggestionId";
 
 /**
  * Web-specific festival storage using localStorage
@@ -33,6 +34,16 @@ export const webFestivalStorage: FestivalStorage = {
   setCachedFestival: async (festival: Festival): Promise<void> => {
     if (typeof window !== "undefined") {
       localStorage.setItem(CACHED_FESTIVAL_KEY, JSON.stringify(festival));
+    }
+  },
+
+  getDismissedSuggestionId: async () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(DISMISSED_SUGGESTION_KEY);
+  },
+  setDismissedSuggestionId: async (id: string) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(DISMISSED_SUGGESTION_KEY, id);
     }
   },
 };

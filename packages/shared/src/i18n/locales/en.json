@@ -2437,6 +2437,17 @@
       "upcoming": "Upcoming",
       "active": "Active",
       "ended": "Ended"
+    },
+    "switchPrompt": {
+      "title": "{{festival}} has started",
+      "description": "You are still viewing {{current}}. Switch to {{festival}} to see its groups and rankings?",
+      "switch": "Switch to {{festival}}",
+      "stay": "Stay on {{current}}"
+    },
+    "switchedToast": "Switched to {{festival}} to show this group",
+    "otherFestivalGroups": {
+      "hint": "You have {{count}} group in {{festival}}",
+      "hint_other": "You have {{count}} groups in {{festival}}"
     }
   },
   "install": {

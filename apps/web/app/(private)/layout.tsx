@@ -8,6 +8,7 @@ import { UnlockToastHost } from "@/components/achievements/UnlockToastHost";
 import AppInstallBanner from "@/components/AppInstallBanner";
 import Breadcrumbs from "@/components/Breadcrumbs/Breadcrumbs";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { FestivalSwitchPrompt } from "@/components/FestivalSwitchPrompt";
 import Footer from "@/components/Footer";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Navbar from "@/components/Navbar";
@@ -50,6 +51,7 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
                   <AuthCheck />
                   {children}
                   <WhatsNew />
+                  <FestivalSwitchPrompt />
                   <VersionChecker />
                   <AppInstallBanner />
                 </Suspense>

@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "@prostcounter/selectedFestivalId";
 const CACHED_FESTIVAL_KEY = "@prostcounter/cachedFestival";
+const DISMISSED_SUGGESTION_KEY = "@prostcounter/dismissedFestivalSuggestionId";
 
 export const mobileFestivalStorage: FestivalStorage = {
   getSelectedFestivalId: () => AsyncStorage.getItem(STORAGE_KEY),
@@ -29,4 +30,7 @@ export const mobileFestivalStorage: FestivalStorage = {
   setCachedFestival: async (festival: Festival): Promise<void> => {
     await AsyncStorage.setItem(CACHED_FESTIVAL_KEY, JSON.stringify(festival));
   },
+
+  getDismissedSuggestionId: () => AsyncStorage.getItem(DISMISSED_SUGGESTION_KEY),
+  setDismissedSuggestionId: (id) => AsyncStorage.setItem(DISMISSED_SUGGESTION_KEY, id),
 };

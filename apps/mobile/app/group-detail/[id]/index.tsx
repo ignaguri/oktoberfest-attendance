@@ -51,6 +51,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
+import { useGroupFestivalSync } from "@/hooks/useGroupFestivalSync";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
 import { logger } from "@/lib/logger";
@@ -87,6 +88,9 @@ export default function GroupDetailScreen() {
 
   // The group data is nested inside the response
   const group = groupResponse?.data;
+
+  // Opened from a notification or link, the group can belong to another festival
+  useGroupFestivalSync(group?.festivalId);
 
   // Fetch leaderboard
   const criteriaId = group ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria] : 0;

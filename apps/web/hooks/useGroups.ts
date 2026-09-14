@@ -6,6 +6,7 @@
  */
 
 export {
+  useAllUserGroups,
   useCarryOverCandidates,
   useCarryOverGroup,
   useCreateGroup,

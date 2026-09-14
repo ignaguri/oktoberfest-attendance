@@ -136,6 +136,8 @@ export function OfflineDataProvider({
   const syncManagerRef = useRef<SyncManager | null>(null);
   const dbRef = useRef<SQLite.SQLiteDatabase | null>(null);
   const lastSyncTimeRef = useRef<number>(0);
+  // The festival of the most recent sync that actually started, success or not
+  const attemptedFestivalIdRef = useRef<string | undefined>(undefined);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
   // Initialize database on mount
@@ -239,6 +241,7 @@ export function OfflineDataProvider({
         };
       }
 
+      attemptedFestivalIdRef.current = options.festivalId;
       setSyncTrigger(trigger);
       setSyncStatus("syncing");
       setError(null);
@@ -387,6 +390,22 @@ export function OfflineDataProvider({
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [effectiveIsOnline, isReady, festivalId, userId, disableAutoSync, performSync]);
+
+  // Sync when the festival changes. The throttle above stops re-pulling data the
+  // device already has, but a newly selected festival's rows are not local yet,
+  // so waiting out MIN_SYNC_INTERVAL leaves its screens empty. syncStatus is a
+  // dependency so a switch made during an in-flight sync still gets its pull once
+  // that sync settles; the attempted-festival check keeps a failing pull from
+  // retrying in a loop.
+  useEffect(() => {
+    if (!isReady || !effectiveIsOnline || disableAutoSync) return;
+    if (!festivalId || !userId || syncStatus === "syncing") return;
+    // The session's first sync belongs to the effect above
+    if (attemptedFestivalIdRef.current === undefined) return;
+    if (festivalId === attemptedFestivalIdRef.current) return;
+
+    performSync({ festivalId, userId, direction: "pull" });
+  }, [isReady, effectiveIsOnline, disableAutoSync, festivalId, userId, syncStatus, performSync]);
 
   // Sync on app foreground
   useEffect(() => {

@@ -1,6 +1,7 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Plus, UserPlus, Users } from "lucide-react-native";
 
+import { OtherFestivalGroupsHint } from "@/components/groups/other-festival-groups-hint";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
@@ -29,6 +30,8 @@ export function EmptyGroupsState({ onCreateGroup, onJoinGroup }: EmptyGroupsStat
             </Heading>
             <Text className="text-center text-typography-500">{t("groups.empty.description")}</Text>
           </VStack>
+
+          <OtherFestivalGroupsHint />
 
           <VStack space="md" className="w-full">
             <Button

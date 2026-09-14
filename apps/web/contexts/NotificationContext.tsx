@@ -1,6 +1,7 @@
 "use client";
 
 import type { Tables } from "@prostcounter/db";
+import { useCanShowLaunchPopups } from "@prostcounter/shared/contexts";
 import type { User } from "@supabase/supabase-js";
 import type { ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -94,9 +95,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const supabase = createSupabaseBrowserClient();
 
-  // Only one of WhatsNew / install banner can be visible at a time.
-  const canShowInstallBanner = !isWhatsNewVisible;
-  const canShowWhatsNew = !isInstallBannerVisible;
+  // Only one of WhatsNew / install banner can be visible at a time, and both
+  // wait for the festival switch prompt. Waiting matters here too because the
+  // install banner opens on mount (enabled: false does not close it).
+  const canShowPopups = useCanShowLaunchPopups();
+  const canShowInstallBanner = !isWhatsNewVisible && canShowPopups;
+  const canShowWhatsNew = !isInstallBannerVisible && canShowPopups;
 
   const setWhatsNewVisible = useCallback((visible: boolean) => {
     setIsWhatsNewVisible(visible);

@@ -1,6 +1,10 @@
 import "../global.css";
 
-import { FestivalProvider, useFestival } from "@prostcounter/shared/contexts";
+import {
+  FestivalProvider,
+  useCanShowLaunchPopups,
+  useFestival,
+} from "@prostcounter/shared/contexts";
 import { ApiClientProvider } from "@prostcounter/shared/data";
 import { UnlockQueueProvider } from "@prostcounter/shared/hooks";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
@@ -17,6 +21,7 @@ import { UnlockToastHost } from "@/components/achievements/unlock-toast-host";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { NovuAutoSubscriber } from "@/components/notifications/NovuAutoSubscriber";
+import { FestivalSwitchPrompt } from "@/components/shared/festival-switch-prompt";
 import { SyncStatusBar } from "@/components/sync";
 import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
@@ -165,6 +170,7 @@ function NotificationPromptHandler() {
     registerForPushNotifications,
   } = useNotificationContext();
   const [showPrompt, setShowPrompt] = useState(false);
+  const canShowLaunchPopups = useCanShowLaunchPopups();
 
   useEffect(() => {
     // Show prompt if user is authenticated, hasn't seen prompt, and permission is undetermined
@@ -196,7 +202,7 @@ function NotificationPromptHandler() {
 
   return (
     <NotificationPermissionPrompt
-      isOpen={showPrompt}
+      isOpen={showPrompt && canShowLaunchPopups}
       onClose={() => setShowPrompt(false)}
       onEnable={handleEnable}
       onSkip={handleSkip}
@@ -209,8 +215,9 @@ function UpdatePromptHandler() {
   const { isUpdateReady, applyUpdate } = useAppUpdate();
   const [dismissed, setDismissed] = useState(false);
   const [isRestarting, setIsRestarting] = useState(false);
+  const canShowLaunchPopups = useCanShowLaunchPopups();
 
-  const showPrompt = isUpdateReady && !dismissed;
+  const showPrompt = isUpdateReady && !dismissed && canShowLaunchPopups;
 
   const handleUpdate = async () => {
     setIsRestarting(true);
@@ -240,6 +247,7 @@ function WatchInstallPromptHandler() {
   const { isPaired, isInstalled } = useWatchStatus();
   const [hasBeenShown, setHasBeenShown] = useState<boolean | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const canShowLaunchPopups = useCanShowLaunchPopups();
 
   useEffect(() => {
     if (Platform.OS !== "ios") return;
@@ -277,7 +285,7 @@ function WatchInstallPromptHandler() {
 
   return (
     <WatchInstallPrompt
-      isOpen={showPrompt}
+      isOpen={showPrompt && canShowLaunchPopups}
       onClose={dismiss}
       onInstall={handleInstall}
       onSkip={dismiss}
@@ -305,8 +313,9 @@ const STORE_UPDATE_COPY = {
 function StoreUpdatePromptHandler() {
   const { isStoreUpdateAvailable, isBelowMinimum, openStore } = useStoreUpdate();
   const [dismissed, setDismissed] = useState(false);
+  const canShowLaunchPopups = useCanShowLaunchPopups();
 
-  const showPrompt = isStoreUpdateAvailable && !dismissed;
+  const showPrompt = isStoreUpdateAvailable && !dismissed && canShowLaunchPopups;
 
   // A build below the supported floor cannot authenticate at all, so it gets
   // the blunter copy. Still dismissible: this warns, it does not lock the app.
@@ -400,6 +409,7 @@ export default function RootLayout() {
                                       <UpdatePromptHandler />
                                       <StoreUpdatePromptHandler />
                                       <WatchInstallPromptHandler />
+                                      <FestivalSwitchPrompt />
                                       <TutorialOverlay />
                                       <Stack
                                         screenOptions={{
