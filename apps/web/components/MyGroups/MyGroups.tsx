@@ -44,7 +44,8 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
                 <Link href="/groups">{t("groups.joinOrCreate")}</Link>
               </Button>
             )}
-            <OtherFestivalGroupsHint />
+            {/* A failed request says nothing about this festival having no groups */}
+            {!error && <OtherFestivalGroupsHint />}
           </div>
         )}
         {groups

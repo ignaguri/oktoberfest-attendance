@@ -2,7 +2,6 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useDeleteMessage,
   useGroupMessages,
-  useGroupName,
   useGroupSettings,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -60,12 +59,11 @@ export default function GroupMessagesScreen() {
     refetch,
   } = useGroupMessages(id || "");
 
-  // Fetch group name for header
-  const { data: groupName } = useGroupName(id || "");
-
-  // Message notifications land here, and the group can belong to another festival
+  // One group request serves both the header name and the festival sync.
+  // Message notifications land here, and the group can belong to another festival.
   const { data: groupResponse } = useGroupSettings(id || "");
-  useGroupFestivalSync(groupResponse?.data?.festivalId);
+  const groupName = groupResponse?.data?.name;
+  useGroupFestivalSync(groupResponse?.data?.id, groupResponse?.data?.festivalId);
 
   // Delete mutation
   const deleteMutation = useDeleteMessage();

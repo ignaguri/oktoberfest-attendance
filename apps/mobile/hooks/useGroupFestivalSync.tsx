@@ -11,11 +11,14 @@ import { View } from "@/components/ui/view";
  * would blend into it otherwise; top placement matches every other toast in the
  * app.
  */
-export function useGroupFestivalSync(groupFestivalId: string | undefined) {
+export function useGroupFestivalSync(
+  groupId: string | undefined,
+  groupFestivalId: string | undefined,
+) {
   const { t } = useTranslation();
   const toast = useToast();
 
-  useSyncFestivalWithGroup(groupFestivalId, (festival) => {
+  useSyncFestivalWithGroup(groupId, groupFestivalId, (festival) => {
     toast.show({
       placement: "top",
       render: () => (

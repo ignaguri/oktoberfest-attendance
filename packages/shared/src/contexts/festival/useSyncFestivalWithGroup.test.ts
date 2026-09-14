@@ -28,47 +28,43 @@ const festivals = [oktoberfest, fruehlingsfest];
 
 describe("resolveGroupFestivalSync", () => {
   it("switches to the group's festival when it differs", () => {
-    expect(resolveGroupFestivalSync(oktoberfest.id, fruehlingsfest, festivals, undefined)).toEqual({
-      handled: true,
-      switchTo: oktoberfest,
-    });
+    expect(
+      resolveGroupFestivalSync("group-a", oktoberfest.id, fruehlingsfest, festivals, undefined),
+    ).toEqual({ handled: true, switchTo: oktoberfest });
   });
 
   it("settles without switching when the group matches the current festival", () => {
-    expect(resolveGroupFestivalSync(oktoberfest.id, oktoberfest, festivals, undefined)).toEqual({
-      handled: true,
-      switchTo: null,
-    });
+    expect(
+      resolveGroupFestivalSync("group-a", oktoberfest.id, oktoberfest, festivals, undefined),
+    ).toEqual({ handled: true, switchTo: null });
   });
 
   it("does not switch back after the user picks another festival", () => {
     // The group screen already synced to Oktoberfest, then the user chose Frühlingsfest
     expect(
-      resolveGroupFestivalSync(oktoberfest.id, fruehlingsfest, festivals, oktoberfest.id),
+      resolveGroupFestivalSync("group-a", oktoberfest.id, fruehlingsfest, festivals, "group-a"),
     ).toEqual({ handled: false, switchTo: null });
   });
 
   it("waits while the group or the current festival is still loading", () => {
-    expect(resolveGroupFestivalSync(undefined, fruehlingsfest, festivals, undefined)).toEqual({
-      handled: false,
-      switchTo: null,
-    });
-    expect(resolveGroupFestivalSync(oktoberfest.id, null, festivals, undefined)).toEqual({
-      handled: false,
-      switchTo: null,
-    });
+    expect(
+      resolveGroupFestivalSync(undefined, undefined, fruehlingsfest, festivals, undefined),
+    ).toEqual({ handled: false, switchTo: null });
+    expect(
+      resolveGroupFestivalSync("group-a", oktoberfest.id, null, festivals, undefined),
+    ).toEqual({ handled: false, switchTo: null });
   });
 
   it("retries once festivals load instead of settling early", () => {
-    expect(resolveGroupFestivalSync(oktoberfest.id, fruehlingsfest, [], undefined)).toEqual({
-      handled: false,
-      switchTo: null,
-    });
+    expect(
+      resolveGroupFestivalSync("group-a", oktoberfest.id, fruehlingsfest, [], undefined),
+    ).toEqual({ handled: false, switchTo: null });
   });
 
-  it("acts again for a different group festival", () => {
+  it("acts again for another group of the same festival", () => {
+    // A reused route: group A was synced, the user switched away, then opened group B
     expect(
-      resolveGroupFestivalSync(fruehlingsfest.id, oktoberfest, festivals, oktoberfest.id),
-    ).toEqual({ handled: true, switchTo: fruehlingsfest });
+      resolveGroupFestivalSync("group-b", oktoberfest.id, fruehlingsfest, festivals, "group-a"),
+    ).toEqual({ handled: true, switchTo: oktoberfest });
   });
 });

@@ -30,7 +30,7 @@ export default function MessagesPage({ params }: MessagesPageProps) {
 
   // Message notifications land here, and the group can belong to another festival
   const { data: groupResponse } = useGroupSettings(groupId);
-  useSyncFestivalWithGroup(groupResponse?.data?.festivalId, (festival) => {
+  useSyncFestivalWithGroup(groupResponse?.data?.id, groupResponse?.data?.festivalId, (festival) => {
     toast.info(t("festival.switchedToast", { festival: festival.name }));
   });
 

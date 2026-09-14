@@ -140,6 +140,14 @@ export function OfflineDataProvider({
   const attemptedFestivalIdRef = useRef<string | undefined>(undefined);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
 
+  // The provider outlives sign-out, which clears the local rows, so the next
+  // user's first sync must not be throttled or skipped by the previous user's.
+  // Declared before the sync effects so it runs first in the same commit.
+  useEffect(() => {
+    lastSyncTimeRef.current = 0;
+    attemptedFestivalIdRef.current = undefined;
+  }, [userId]);
+
   // Initialize database on mount
   useEffect(() => {
     let mounted = true;

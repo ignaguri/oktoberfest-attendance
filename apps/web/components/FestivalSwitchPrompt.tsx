@@ -1,6 +1,7 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
+import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +22,13 @@ export function FestivalSwitchPrompt() {
   const { t } = useTranslation();
   const { currentFestival, switchSuggestion, setCurrentFestival, dismissSwitchSuggestion } =
     useFestival();
+  const pathname = usePathname();
 
-  if (!currentFestival || !switchSuggestion) {
+  // A group page picks its own festival once the group loads, so the prompt
+  // must not flash over it while that request is still in flight
+  const isGroupPage = pathname?.startsWith("/groups/");
+
+  if (!currentFestival || !switchSuggestion || isGroupPage) {
     return null;
   }
 

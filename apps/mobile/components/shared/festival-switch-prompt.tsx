@@ -1,5 +1,6 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { useSegments } from "expo-router";
 
 import {
   AlertDialog,
@@ -24,8 +25,13 @@ export function FestivalSwitchPrompt() {
   const { isAuthenticated } = useAuth();
   const { currentFestival, switchSuggestion, setCurrentFestival, dismissSwitchSuggestion } =
     useFestival();
+  const segments = useSegments();
 
-  if (!isAuthenticated || !currentFestival || !switchSuggestion) {
+  // A group screen picks its own festival once the group loads, so the prompt
+  // must not flash over it while that request is still in flight
+  const isGroupScreen = (segments as string[]).includes("group-detail");
+
+  if (!isAuthenticated || !currentFestival || !switchSuggestion || isGroupScreen) {
     return null;
   }
 

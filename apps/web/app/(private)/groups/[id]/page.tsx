@@ -43,7 +43,7 @@ export default function GroupPage() {
   const group = groupResponse?.data;
 
   // Opened from a notification or link, the group can belong to another festival
-  useSyncFestivalWithGroup(group?.festivalId, (festival) => {
+  useSyncFestivalWithGroup(group?.id, group?.festivalId, (festival) => {
     toast.info(t("festival.switchedToast", { festival: festival.name }));
   });
 

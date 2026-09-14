@@ -50,6 +50,9 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
   // The suggestion is judged once per session, against the festival restored on
   // launch. A refetch must not re-offer it after the user has changed festival.
   const suggestionEvaluatedRef = useRef(false);
+  // State twin of the ref, for popups that must wait for the verdict. A festival
+  // restored from the offline cache is not a verdict yet.
+  const [isSwitchSuggestionEvaluated, setIsSwitchSuggestionEvaluated] = useState(false);
 
   // Load stored festival ID, cached festival and dismissed suggestion on mount
   useEffect(() => {
@@ -94,6 +97,7 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
       if (!suggestionEvaluatedRef.current) {
         suggestionEvaluatedRef.current = true;
         setSwitchSuggestion(getSwitchSuggestion(festivalsData, selected, dismissedSuggestionId));
+        setIsSwitchSuggestionEvaluated(true);
       }
     }
   }, [festivalsData, storedFestivalId, dismissedSuggestionId, storageLoaded, storage]);
@@ -152,10 +156,12 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
       switchSuggestion,
       dismissSwitchSuggestion,
       clearSwitchSuggestion,
+      isSwitchSuggestionEvaluated,
       isLoading,
       error,
     }),
     [
+      isSwitchSuggestionEvaluated,
       currentFestival,
       festivals,
       setCurrentFestival,
@@ -196,6 +202,7 @@ export function useFestivalSafe(): FestivalContextType {
       switchSuggestion: null,
       dismissSwitchSuggestion: () => {},
       clearSwitchSuggestion: () => {},
+      isSwitchSuggestionEvaluated: false,
       isLoading: false,
       error: null,
     };
@@ -208,13 +215,15 @@ export function useFestivalSafe(): FestivalContextType {
  * may open. They wait for the festival switch prompt, which changes what the
  * user sees and so goes first instead of stacking with them.
  *
- * They also wait for a festival to be selected, because the suggestion is only
- * known then. currentFestival and switchSuggestion are set in the same effect,
- * so there is no render in between. With no festivals at all they must not wait
- * forever.
+ * They also wait for the suggestion to be evaluated from festival data. A festival
+ * restored from the offline cache does not count: the list can arrive later and
+ * bring a suggestion with it. The verdict and switchSuggestion are set in the
+ * same effect, so there is no render in between. With no festivals at all they
+ * must not wait forever.
  */
 export function useCanShowLaunchPopups(): boolean {
-  const { currentFestival, festivals, isLoading, switchSuggestion } = useFestival();
-  const isFestivalSettled = !!currentFestival || (!isLoading && festivals.length === 0);
+  const { festivals, isLoading, switchSuggestion, isSwitchSuggestionEvaluated } = useFestival();
+  const isFestivalSettled =
+    isSwitchSuggestionEvaluated || (!isLoading && festivals.length === 0);
   return isFestivalSettled && !switchSuggestion;
 }

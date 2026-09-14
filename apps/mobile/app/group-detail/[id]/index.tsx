@@ -90,7 +90,7 @@ export default function GroupDetailScreen() {
   const group = groupResponse?.data;
 
   // Opened from a notification or link, the group can belong to another festival
-  useGroupFestivalSync(group?.festivalId);
+  useGroupFestivalSync(group?.id, group?.festivalId);
 
   // Fetch leaderboard
   const criteriaId = group ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria] : 0;

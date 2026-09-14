@@ -39,6 +39,8 @@ export interface FestivalContextType {
   dismissSwitchSuggestion: () => void;
   /** Drop the switch suggestion for this session only, without remembering it as declined */
   clearSwitchSuggestion: () => void;
+  /** Whether the launch-time switch suggestion has been worked out from festival data */
+  isSwitchSuggestionEvaluated: boolean;
   /** Loading state for initial fetch */
   isLoading: boolean;
   /** Error message if fetch failed */

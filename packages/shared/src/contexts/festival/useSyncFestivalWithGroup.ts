@@ -6,7 +6,7 @@ import type { Festival } from "../../schemas/festival.schema";
 import { useFestival } from "./FestivalContext";
 
 interface GroupFestivalSyncDecision {
-  /** Whether this group festival is settled and must not be acted on again */
+  /** Whether this group is settled and must not be acted on again */
   handled: boolean;
   /** The festival to switch to, if any */
   switchTo: Festival | null;
@@ -15,19 +15,21 @@ interface GroupFestivalSyncDecision {
 /**
  * Decide whether a loaded group should switch the current festival.
  *
- * Acts once per group festival. A group screen stays mounted under other
- * screens (or next to the web festival menu), so re-deciding on every
- * currentFestival change would undo a manual switch the moment the user picks
- * another festival. It only counts as handled once a decision was possible:
+ * Acts once per group. A group screen stays mounted under other screens (or
+ * next to the web festival menu), so re-deciding on every currentFestival change
+ * would undo a manual switch the moment the user picks another festival. It is
+ * keyed by group, not festival, because a reused route can show another group of
+ * the same festival. It only counts as handled once a decision was possible:
  * while festivals are still loading the group festival cannot be found yet.
  */
 export function resolveGroupFestivalSync(
+  groupId: string | undefined,
   groupFestivalId: string | undefined,
   currentFestival: Festival | null,
   festivals: Festival[],
-  handledGroupFestivalId: string | undefined,
+  handledGroupId: string | undefined,
 ): GroupFestivalSyncDecision {
-  if (!groupFestivalId || !currentFestival || handledGroupFestivalId === groupFestivalId) {
+  if (!groupId || !groupFestivalId || !currentFestival || handledGroupId === groupId) {
     return { handled: false, switchTo: null };
   }
 
@@ -50,10 +52,12 @@ export function resolveGroupFestivalSync(
  * festival than the selected one, which would show its leaderboard and messages
  * against the wrong festival.
  *
+ * @param groupId - The loaded group, undefined while loading
  * @param groupFestivalId - The festival of the loaded group, undefined while loading
  * @param onSwitched - Called after a switch, so the platform can tell the user
  */
 export function useSyncFestivalWithGroup(
+  groupId: string | undefined,
   groupFestivalId: string | undefined,
   onSwitched: (festival: Festival) => void,
 ) {
@@ -66,18 +70,19 @@ export function useSyncFestivalWithGroup(
     onSwitchedRef.current = onSwitched;
   });
 
-  const handledGroupFestivalIdRef = useRef<string | undefined>(undefined);
+  const handledGroupIdRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     const { handled, switchTo } = resolveGroupFestivalSync(
+      groupId,
       groupFestivalId,
       currentFestival,
       festivals,
-      handledGroupFestivalIdRef.current,
+      handledGroupIdRef.current,
     );
 
     if (handled) {
-      handledGroupFestivalIdRef.current = groupFestivalId;
+      handledGroupIdRef.current = groupId;
       // The group already decided the festival. Offering the live one on top
       // of it would show this group against a festival it does not belong to.
       clearSwitchSuggestion();
@@ -86,5 +91,5 @@ export function useSyncFestivalWithGroup(
       setCurrentFestival(switchTo);
       onSwitchedRef.current(switchTo);
     }
-  }, [groupFestivalId, currentFestival, festivals, setCurrentFestival, clearSwitchSuggestion]);
+  }, [groupId, groupFestivalId, currentFestival, festivals, setCurrentFestival, clearSwitchSuggestion]);
 }
