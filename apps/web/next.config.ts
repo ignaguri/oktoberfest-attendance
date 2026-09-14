@@ -59,6 +59,27 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Must come after the /.well-known rule above: the last matching
+        // header wins, and security.txt is plain text, not JSON.
+        source: "/.well-known/security.txt",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "text/plain; charset=utf-8",
+          },
+        ],
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        // Scanners only look at /.well-known/security.txt; the file itself is
+        // served by app/api/security.txt/route.ts.
+        source: "/.well-known/security.txt",
+        destination: "/api/security.txt",
+      },
     ];
   },
   experimental: {

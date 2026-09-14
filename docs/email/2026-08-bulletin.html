@@ -27,6 +27,15 @@
 
   Split into two batches because the Resend free plan caps sending at 100
   emails/day and pauses rather than queueing once the cap is hit.
+
+  Next bulletin: send from notify.prostcounter.fun, not account. That domain
+  was added 2026-09-14 (Resend free now allows 3 domains) for bulletins and
+  marketing only, with click tracking ON (open tracking off) through the
+  tracking subdomain links.notify.prostcounter.fun, so per-link clicks show up
+  in the broadcast detail. Resend refuses tracking without a tracking
+  subdomain, and once set it can be renamed but never removed.
+  account.prostcounter.fun stays auth-only with tracking off. The 100/day cap
+  is per account, so batching still applies.
 -->
 <!DOCTYPE html>
 <html lang="en">
