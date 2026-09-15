@@ -1,0 +1,4 @@
+- Countdown to Oktoberfest 2026 on the home screen, and which festival day it is once it opens.
+- Turn on notifications right from home so you don't miss O'zapft is.
+- The app offers the festival that's on now, and a group link takes you straight to that group's festival.
+- Small fixes and polish. Prost!

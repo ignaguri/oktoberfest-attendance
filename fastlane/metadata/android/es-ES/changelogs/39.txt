@@ -1,0 +1,4 @@
+- Cuenta regresiva para el Oktoberfest 2026 en la pantalla de inicio, y el día de fiesta en el que estás cuando empieza.
+- Activa las notificaciones desde el inicio para no perderte el O'zapft is.
+- La app te sugiere la fiesta en curso, y un enlace de grupo te lleva directo a la fiesta de ese grupo.
+- Correcciones y mejoras menores. ¡Prost!
