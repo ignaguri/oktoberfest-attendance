@@ -26,6 +26,7 @@
 
 // Festival hooks
 export { useActiveFestival, useFestivalById, useFestivals } from "./useFestivals";
+export { useFestivalCountdown } from "./useFestivalCountdown";
 
 // Group hooks
 export {

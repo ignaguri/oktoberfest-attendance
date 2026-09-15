@@ -2310,7 +2310,17 @@
       "currentDay": "It's day {{currentDay}} / {{totalDays}}",
       "startsInOneDay": "Starts tomorrow!",
       "startsInDays": "Starts in {{daysUntil}} days",
-      "ended": "Festival has ended"
+      "ended": "Festival has ended",
+      "countdownLabel": "O'zapft is in",
+      "openingToday": "O'zapft is at noon!",
+      "live": "O'zapft is! Day {{currentDay}} of {{totalDays}}",
+      "unitDays": "d",
+      "unitHours": "h",
+      "unitMinutes": "m",
+      "unitSeconds": "s",
+      "countdownAccessibility": "{{days}} days, {{hours}} hours and {{minutes}} minutes until {{festivalName}} opens",
+      "lastTime": "{{festivalName}}: {{beers}} Maß in {{days}} days. Beat it?",
+      "firstTime": "Your first one with ProstCounter. Make it count!"
     },
     "quickAdd": {
       "beer": "Beer",
@@ -2672,7 +2682,21 @@
       "photoVisibilityPublic": "Your photo is now visible to group members.",
       "photoVisibilityPrivate": "Your photo is now private.",
       "newVersionRefresh": "Click to refresh and get the latest features."
+    },
+    "festivalAlert": {
+      "title": "Get the O'zapft is alert",
+      "description": "Turn on notifications so you don't miss a moment of {{festivalName}}.",
+      "enable": "Turn on",
+      "openSettings": "Open settings",
+      "dismiss": "Not now",
+      "enableHint": "Asks for permission to send you notifications",
+      "dismissHint": "Hides this card"
     }
+  },
+  "festivalCountdown": {
+    "opensIn": "{{festivalName}} opens in",
+    "live": "{{festivalName}} is on! Day {{currentDay}} of {{totalDays}}",
+    "cta": "Start tracking your Wiesn"
   },
   "apiErrors": {
     "INTERNAL_ERROR": "An internal error occurred. Please try again.",

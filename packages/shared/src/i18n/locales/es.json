@@ -2370,7 +2370,17 @@
       "currentDay": "Es el día {{currentDay}} / {{totalDays}}",
       "startsInOneDay": "¡Empieza mañana!",
       "startsInDays": "Empieza en {{daysUntil}} días",
-      "ended": "El festival terminó"
+      "ended": "El festival terminó",
+      "countdownLabel": "O'zapft is en",
+      "openingToday": "¡O'zapft is al mediodía!",
+      "live": "¡O'zapft is! Día {{currentDay}} de {{totalDays}}",
+      "unitDays": "d",
+      "unitHours": "h",
+      "unitMinutes": "min",
+      "unitSeconds": "s",
+      "countdownAccessibility": "Faltan {{days}} días, {{hours}} horas y {{minutes}} minutos para que empiece {{festivalName}}",
+      "lastTime": "{{festivalName}}: {{beers}} jarras en {{days}} días. ¿Lo superas?",
+      "firstTime": "Tu primera vez con ProstCounter. ¡Que valga la pena!"
     },
     "quickAdd": {
       "beer": "Cerveza",
@@ -2732,7 +2742,21 @@
       "photoVisibilityPublic": "Tu foto ahora es visible para los miembros del grupo.",
       "photoVisibilityPrivate": "Tu foto ahora es privada.",
       "newVersionRefresh": "Hacé click para actualizar y obtener las últimas funciones."
+    },
+    "festivalAlert": {
+      "title": "Recibe la alerta de O'zapft is",
+      "description": "Activa las notificaciones para no perderte ningún momento de {{festivalName}}.",
+      "enable": "Activar",
+      "openSettings": "Abrir ajustes",
+      "dismiss": "Ahora no",
+      "enableHint": "Pide permiso para enviarte notificaciones",
+      "dismissHint": "Oculta esta tarjeta"
     }
+  },
+  "festivalCountdown": {
+    "opensIn": "{{festivalName}} empieza en",
+    "live": "¡{{festivalName}} está en marcha! Día {{currentDay}} de {{totalDays}}",
+    "cta": "Empieza a registrar tu Wiesn"
   },
   "apiErrors": {
     "INTERNAL_ERROR": "Ocurrió un error interno. Por favor, intentá de nuevo.",
