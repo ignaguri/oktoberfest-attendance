@@ -6,17 +6,12 @@ import { createNotificationService } from "@/lib/services/notifications";
 import { createClient } from "@/utils/supabase/server";
 
 import { processAchievementNotifications } from "./achievements";
+import { processFestivalOpeningNotifications } from "./festival-opening";
 import { processReservationNotifications } from "./reservations";
 
 export const runtime = "nodejs";
 
-export async function POST(req: Request) {
-  const secret = process.env.CRON_SECRET;
-  const header = req.headers.get("x-cron-secret");
-  if (!secret || header !== secret) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
+async function runScheduler() {
   const supabase = await createClient(true);
   const notifications = createNotificationService();
 
@@ -26,6 +21,19 @@ export async function POST(req: Request) {
   await processReservationNotifications(supabase, notifications, baseUrl, nowIso);
 
   await processAchievementNotifications(supabase, notifications);
+
+  let hasFailure = false;
+
+  try {
+    await processFestivalOpeningNotifications(supabase, notifications, new Date());
+  } catch (error) {
+    hasFailure = true;
+    logger.error(
+      "Festival opening notifications failed",
+      logger.apiRoute("cron/scheduler"),
+      error as Error,
+    );
+  }
 
   // Refresh competitive standings for the active festival.
   // Past festivals are immutable and were materialised once at creation time.
@@ -56,9 +64,32 @@ export async function POST(req: Request) {
     }
   }
 
+  if (hasFailure) {
+    return NextResponse.json({ ok: false }, { status: 500 });
+  }
+
   return NextResponse.json({ ok: true });
 }
 
-export async function GET() {
-  return new NextResponse("OK");
+// Vercel Cron calls this route with GET and an `Authorization: Bearer <CRON_SECRET>`
+// header. See https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs
+export async function GET(req: Request) {
+  const secret = process.env.CRON_SECRET;
+  const header = req.headers.get("authorization");
+  if (!secret || header !== `Bearer ${secret}`) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  return runScheduler();
+}
+
+// scripts/trigger-cron.ts (manual/local triggering) still uses this header.
+export async function POST(req: Request) {
+  const secret = process.env.CRON_SECRET;
+  const header = req.headers.get("x-cron-secret");
+  if (!secret || header !== secret) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  return runScheduler();
 }

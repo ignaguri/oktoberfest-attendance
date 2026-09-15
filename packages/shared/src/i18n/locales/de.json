@@ -2337,7 +2337,17 @@
       "currentDay": "Es ist Tag {{currentDay}} / {{totalDays}}",
       "startsInOneDay": "Beginnt morgen!",
       "startsInDays": "Beginnt in {{daysUntil}} Tagen",
-      "ended": "Festival ist beendet"
+      "ended": "Festival ist beendet",
+      "countdownLabel": "O'zapft is in",
+      "openingToday": "O'zapft is um 12 Uhr!",
+      "live": "O'zapft is! Tag {{currentDay}} von {{totalDays}}",
+      "unitDays": "T",
+      "unitHours": "Std",
+      "unitMinutes": "Min",
+      "unitSeconds": "Sek",
+      "countdownAccessibility": "Noch {{days}} Tage, {{hours}} Stunden und {{minutes}} Minuten bis {{festivalName}} beginnt",
+      "lastTime": "{{festivalName}}: {{beers}} Maß an {{days}} Tagen. Schaffst du mehr?",
+      "firstTime": "Dein erstes Mal mit ProstCounter. Lass es krachen!"
     },
     "quickAttendance": {
       "title": "Was trinken du?",
@@ -2699,7 +2709,22 @@
       "photoVisibilityPublic": "dein Foto ist jetzt für Gruppenmitglieder sichtbar.",
       "photoVisibilityPrivate": "dein Foto ist jetzt privat.",
       "newVersionRefresh": "Klicke zum Aktualisieren und um die neuesten Funktionen zu erhalten."
+    },
+    "festivalAlert": {
+      "title": "Hol dir den O'zapft-is-Alarm",
+      "description": "Aktiviere Benachrichtigungen, damit du keinen Moment von {{festivalName}} verpasst.",
+      "enable": "Aktivieren",
+      "openSettings": "Einstellungen öffnen",
+      "dismiss": "Nicht jetzt",
+      "enableHint": "Fragt nach der Erlaubnis, dir Benachrichtigungen zu senden",
+      "openSettingsHint": "Öffnet deine Geräteeinstellungen, damit du Benachrichtigungen erlauben kannst",
+      "dismissHint": "Blendet diese Karte aus"
     }
+  },
+  "festivalCountdown": {
+    "opensIn": "{{festivalName}} beginnt in",
+    "live": "{{festivalName}} läuft! Tag {{currentDay}} von {{totalDays}}",
+    "cta": "Tracke deine Wiesn"
   },
   "apiErrors": {
     "INTERNAL_ERROR": "Ein interner Fehler ist aufgetreten. Bitte versuche es erneut.",

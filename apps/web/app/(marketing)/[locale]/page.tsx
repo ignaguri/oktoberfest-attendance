@@ -5,10 +5,12 @@ import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { FestivalCountdownBanner } from "@/components/marketing/FestivalCountdownBanner";
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { NON_DEFAULT_LOCALES } from "@/lib/constants";
+import { getCountdownFestival } from "@/lib/marketing/getCountdownFestival";
 
 export const revalidate = 86400;
 
@@ -43,6 +45,8 @@ export default async function LocalizedLandingPage({ params }: { params: Promise
     notFound();
   }
 
+  const countdownFestival = await getCountdownFestival();
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -72,6 +76,7 @@ export default async function LocalizedLandingPage({ params }: { params: Promise
     <>
       <SyncLocale locale={locale} />
       <JsonLd data={jsonLd} />
+      {countdownFestival && <FestivalCountdownBanner festival={countdownFestival} />}
       <LandingContent />
     </>
   );
