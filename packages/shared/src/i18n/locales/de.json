@@ -2717,6 +2717,7 @@
       "openSettings": "Einstellungen öffnen",
       "dismiss": "Nicht jetzt",
       "enableHint": "Fragt nach der Erlaubnis, dir Benachrichtigungen zu senden",
+      "openSettingsHint": "Öffnet deine Geräteeinstellungen, damit du Benachrichtigungen erlauben kannst",
       "dismissHint": "Blendet diese Karte aus"
     }
   },

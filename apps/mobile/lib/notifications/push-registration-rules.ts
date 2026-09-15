@@ -6,13 +6,17 @@ export function shouldSyncPushRegistration(input: {
   permissionStatus: PermissionStatus;
   alreadySynced: boolean;
   isWeb: boolean;
+  userId: string | null;
+  lastAttemptedUserId: string | null;
 }): boolean {
   return (
     input.isAuthenticated &&
     !input.isPermissionLoading &&
     input.permissionStatus === "granted" &&
     !input.alreadySynced &&
-    !input.isWeb
+    !input.isWeb &&
+    input.userId !== null &&
+    input.userId !== input.lastAttemptedUserId
   );
 }
 

@@ -2750,6 +2750,7 @@
       "openSettings": "Abrir ajustes",
       "dismiss": "Ahora no",
       "enableHint": "Pide permiso para enviarte notificaciones",
+      "openSettingsHint": "Abre la configuración de tu dispositivo para que puedas permitir las notificaciones",
       "dismissHint": "Oculta esta tarjeta"
     }
   },

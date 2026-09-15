@@ -11,6 +11,8 @@ const syncReady = {
   permissionStatus: "granted" as const,
   alreadySynced: false,
   isWeb: false,
+  userId: "user-1",
+  lastAttemptedUserId: null as string | null,
 };
 
 describe("shouldSyncPushRegistration", () => {
@@ -25,9 +27,25 @@ describe("shouldSyncPushRegistration", () => {
   it("waits for auth and permission state, and skips without permission or on web", () => {
     expect(shouldSyncPushRegistration({ ...syncReady, isAuthenticated: false })).toBe(false);
     expect(shouldSyncPushRegistration({ ...syncReady, isPermissionLoading: true })).toBe(false);
-    expect(shouldSyncPushRegistration({ ...syncReady, permissionStatus: "undetermined" })).toBe(false);
+    expect(shouldSyncPushRegistration({ ...syncReady, permissionStatus: "undetermined" })).toBe(
+      false,
+    );
     expect(shouldSyncPushRegistration({ ...syncReady, permissionStatus: "denied" })).toBe(false);
     expect(shouldSyncPushRegistration({ ...syncReady, isWeb: true })).toBe(false);
+  });
+
+  it("does not attempt when there is no signed-in user", () => {
+    expect(shouldSyncPushRegistration({ ...syncReady, userId: null })).toBe(false);
+  });
+
+  it("does not re-attempt for the same user it already attempted", () => {
+    expect(
+      shouldSyncPushRegistration({ ...syncReady, lastAttemptedUserId: syncReady.userId }),
+    ).toBe(false);
+  });
+
+  it("attempts again for a different user than the last one attempted", () => {
+    expect(shouldSyncPushRegistration({ ...syncReady, lastAttemptedUserId: "user-0" })).toBe(true);
   });
 });
 

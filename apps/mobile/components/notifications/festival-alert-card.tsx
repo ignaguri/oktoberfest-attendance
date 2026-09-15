@@ -106,7 +106,11 @@ export function FestivalAlertCard() {
                 ? t("notifications.festivalAlert.openSettings")
                 : t("notifications.festivalAlert.enable")
             }
-            accessibilityHint={t("notifications.festivalAlert.enableHint")}
+            accessibilityHint={
+              isDenied
+                ? t("notifications.festivalAlert.openSettingsHint")
+                : t("notifications.festivalAlert.enableHint")
+            }
           >
             <ButtonText>
               {isDenied

@@ -59,10 +59,7 @@ export function usePushRegistration() {
           const errorMessage = enableResult.error || "Unknown error";
           logger.error("[Push] enablePush failed: " + errorMessage);
           if (!isSilent) {
-            Alert.alert(
-              t("common.status.error"),
-              `Failed to enable push notifications: ${errorMessage}`,
-            );
+            Alert.alert(t("common.status.error"), t("profile.notifications.enableFailed"));
           }
           return false;
         }
@@ -75,10 +72,7 @@ export function usePushRegistration() {
         const errorMessage = error instanceof Error ? error.message : String(error);
         logger.error("[Push] Exception: " + errorMessage);
         if (!isSilent) {
-          Alert.alert(
-            t("common.status.error"),
-            `Failed to enable push notifications: ${errorMessage}`,
-          );
+          Alert.alert(t("common.status.error"), t("profile.notifications.enableFailed"));
         }
         return false;
       } finally {

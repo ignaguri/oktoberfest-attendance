@@ -215,41 +215,44 @@ function NotificationPromptHandler() {
 }
 
 // One-time catch-up for devices that granted permission before the launch
-// prompt registered with Novu. Runs once per device, silently.
+// prompt registered with Novu. Runs once per signed-in user, silently. Keyed
+// by user id (both the in-memory guard and the persisted flag) so a second
+// user signing in on the same device still gets synced.
 function PushRegistrationSync() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { permissionStatus, isPermissionLoading } = useNotificationContext();
   const { register } = usePushRegistration();
-  const hasAttemptedRef = useRef(false);
+  const lastAttemptedUserIdRef = useRef<string | null>(null);
+  const userId = user?.id ?? null;
 
   useEffect(() => {
-    if (hasAttemptedRef.current) {
-      return;
-    }
     if (
+      !userId ||
       !shouldSyncPushRegistration({
         isAuthenticated,
         isPermissionLoading,
         permissionStatus,
         alreadySynced: false,
         isWeb: Platform.OS === "web",
+        userId,
+        lastAttemptedUserId: lastAttemptedUserIdRef.current,
       })
     ) {
       return;
     }
-    hasAttemptedRef.current = true;
+    lastAttemptedUserIdRef.current = userId;
 
-    const syncOnce = async () => {
-      if (await hasPushRegistrationSynced()) {
+    const syncOnce = async (currentUserId: string) => {
+      if (await hasPushRegistrationSynced(currentUserId)) {
         return;
       }
       const registered = await register({ silent: true });
       if (registered) {
-        await setPushRegistrationSynced();
+        await setPushRegistrationSynced(currentUserId);
       }
     };
-    syncOnce();
-  }, [isAuthenticated, isPermissionLoading, permissionStatus, register]);
+    syncOnce(userId);
+  }, [isAuthenticated, isPermissionLoading, permissionStatus, register, userId]);
 
   return null;
 }

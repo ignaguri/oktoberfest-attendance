@@ -12,7 +12,7 @@ const KEYS = {
   NOTIFICATION_PROMPT_SHOWN: "prostcounter_notification_prompt_shown",
   NOTIFICATION_PERMISSION_STATUS: "prostcounter_notification_permission_status",
   FCM_TOKEN: "prostcounter_fcm_token",
-  PUSH_REGISTRATION_SYNCED: "prostcounter_push_registration_synced_v1",
+  PUSH_REGISTRATION_SYNCED_PREFIX: "prostcounter_push_registration_synced_v1_",
   FESTIVAL_ALERT_DISMISSED_PREFIX: "prostcounter_festival_alert_dismissed_",
   // Location keys
   LOCATION_PROMPT_SHOWN: "prostcounter_location_prompt_shown",
@@ -128,21 +128,25 @@ export async function hasNotificationPromptBeenShown(): Promise<boolean> {
 
 /**
  * Whether this device already ran the one-time push registration catch-up
+ * for the given user. Keyed by user id so a second user signing in on the
+ * same device is not skipped because a previous user already synced.
  */
-export async function hasPushRegistrationSynced(): Promise<boolean> {
-  const value = await SecureStore.getItemAsync(KEYS.PUSH_REGISTRATION_SYNCED);
+export async function hasPushRegistrationSynced(userId: string): Promise<boolean> {
+  const value = await SecureStore.getItemAsync(`${KEYS.PUSH_REGISTRATION_SYNCED_PREFIX}${userId}`);
   return value === "true";
 }
 
-export async function setPushRegistrationSynced(): Promise<void> {
-  await SecureStore.setItemAsync(KEYS.PUSH_REGISTRATION_SYNCED, "true");
+export async function setPushRegistrationSynced(userId: string): Promise<void> {
+  await SecureStore.setItemAsync(`${KEYS.PUSH_REGISTRATION_SYNCED_PREFIX}${userId}`, "true");
 }
 
 /**
  * Whether the festival notification card was dismissed for this festival
  */
 export async function isFestivalAlertDismissed(festivalId: string): Promise<boolean> {
-  const value = await SecureStore.getItemAsync(`${KEYS.FESTIVAL_ALERT_DISMISSED_PREFIX}${festivalId}`);
+  const value = await SecureStore.getItemAsync(
+    `${KEYS.FESTIVAL_ALERT_DISMISSED_PREFIX}${festivalId}`,
+  );
   return value === "true";
 }
 
