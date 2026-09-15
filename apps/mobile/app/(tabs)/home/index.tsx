@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CrowdReportPrompt, CrowdStatusSummary } from "@/components/crowd";
 import { LocationSharingToggle, TentProximityBanner } from "@/components/location";
+import { FestivalAlertCard } from "@/components/notifications/festival-alert-card";
 import { AppHeader } from "@/components/shared/app-header";
 import { FestivalStatus } from "@/components/shared/festival-status";
 import { UnifiedFeed } from "@/components/shared/unified-feed";
@@ -213,6 +214,9 @@ export default function HomeScreen() {
           <TutorialTarget stepId="festival-status">
             <FestivalStatus />
           </TutorialTarget>
+
+          {/* Notification nudge before and during the festival */}
+          <FestivalAlertCard />
 
           {/* Wrapped CTA */}
           <WrappedCTA />
