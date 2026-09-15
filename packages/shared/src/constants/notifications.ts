@@ -24,6 +24,7 @@ export const NOTIFICATION_WORKFLOWS = {
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
   GROUP_CARRY_OVER: "group-carryover-invite",
+  FESTIVAL_OPENING: "festival-opening",
 } as const;
 
 export type NotificationWorkflowId =

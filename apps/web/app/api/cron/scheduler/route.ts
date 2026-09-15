@@ -6,6 +6,7 @@ import { createNotificationService } from "@/lib/services/notifications";
 import { createClient } from "@/utils/supabase/server";
 
 import { processAchievementNotifications } from "./achievements";
+import { processFestivalOpeningNotifications } from "./festival-opening";
 import { processReservationNotifications } from "./reservations";
 
 export const runtime = "nodejs";
@@ -26,6 +27,16 @@ export async function POST(req: Request) {
   await processReservationNotifications(supabase, notifications, baseUrl, nowIso);
 
   await processAchievementNotifications(supabase, notifications);
+
+  try {
+    await processFestivalOpeningNotifications(supabase, notifications, new Date());
+  } catch (error) {
+    logger.error(
+      "Festival opening notifications failed",
+      logger.apiRoute("cron/scheduler"),
+      error as Error,
+    );
+  }
 
   // Refresh competitive standings for the active festival.
   // Past festivals are immutable and were materialised once at creation time.
