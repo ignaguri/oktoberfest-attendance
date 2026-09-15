@@ -2379,7 +2379,7 @@
       "unitMinutes": "min",
       "unitSeconds": "s",
       "countdownAccessibility": "Faltan {{days}} días, {{hours}} horas y {{minutes}} minutos para que empiece {{festivalName}}",
-      "lastTime": "{{festivalName}}: {{beers}} jarras en {{days}} días. ¿Lo superas?",
+      "lastTime": "{{festivalName}}: {{beers}} jarras en {{days}} días. ¿Lo superás?",
       "firstTime": "Tu primera vez con ProstCounter. ¡Que valga la pena!"
     },
     "quickAdd": {
@@ -2744,8 +2744,8 @@
       "newVersionRefresh": "Hacé click para actualizar y obtener las últimas funciones."
     },
     "festivalAlert": {
-      "title": "Recibe la alerta de O'zapft is",
-      "description": "Activa las notificaciones para no perderte ningún momento de {{festivalName}}.",
+      "title": "Recibí la alerta de O'zapft is",
+      "description": "Activá las notificaciones para no perderte ningún momento de {{festivalName}}.",
       "enable": "Activar",
       "openSettings": "Abrir ajustes",
       "dismiss": "Ahora no",
@@ -2756,7 +2756,7 @@
   "festivalCountdown": {
     "opensIn": "{{festivalName}} empieza en",
     "live": "¡{{festivalName}} está en marcha! Día {{currentDay}} de {{totalDays}}",
-    "cta": "Empieza a registrar tu Wiesn"
+    "cta": "Empezá a registrar tu Wiesn"
   },
   "apiErrors": {
     "INTERNAL_ERROR": "Ocurrió un error interno. Por favor, intentá de nuevo.",

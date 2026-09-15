@@ -1,7 +1,8 @@
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import type { ReactNode } from "react";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { AppState } from "react-native";
 
 import {
   clearFCMToken,
@@ -161,6 +162,56 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     loadNotificationState();
   }, [getExpoPushToken]);
+
+  // Kept in sync with permissionStatus so the AppState listener below can
+  // compare against the latest value without resubscribing on every change.
+  const permissionStatusRef = useRef(permissionStatus);
+  useEffect(() => {
+    permissionStatusRef.current = permissionStatus;
+  }, [permissionStatus]);
+
+  /**
+   * Re-check device permission whenever the app returns to the foreground.
+   *
+   * Covers the case where the user denied the prompt, granted notifications
+   * from the OS settings, then came back to the app: without this, the
+   * context would keep reporting the stale "denied" status until the next
+   * cold start.
+   */
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState !== "active") {
+        return;
+      }
+
+      (async () => {
+        try {
+          const { status: deviceStatus } = await Notifications.getPermissionsAsync();
+
+          let actualStatus: NotificationPermissionStatus = "undetermined";
+          if (deviceStatus === "granted") {
+            actualStatus = "granted";
+          } else if (deviceStatus === "denied") {
+            actualStatus = "denied";
+          }
+
+          if (actualStatus !== permissionStatusRef.current) {
+            logger.debug(
+              `Foreground permission re-check: ${permissionStatusRef.current} -> ${actualStatus}`,
+            );
+            setPermissionStatusState(actualStatus);
+            await setNotificationPermissionStatus(actualStatus);
+          }
+        } catch (error) {
+          logger.error("Error re-checking notification permission on foreground:", error);
+        }
+      })();
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   /**
    * Mark the permission prompt as shown

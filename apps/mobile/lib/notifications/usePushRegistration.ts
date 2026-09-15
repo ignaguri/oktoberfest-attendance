@@ -15,9 +15,11 @@ import { useNotificationContextSafe } from "@/lib/notifications/NotificationCont
 /**
  * Registers this device's Expo push token with Novu and marks push as enabled.
  *
- * Does not ask for OS permission: callers request it first. This used to live
- * only in the settings screen, so accepting the launch prompt got a token but
- * never registered it, and almost nobody could receive pushes.
+ * Does not ask for OS permission: callers request it first. Shared so every
+ * entry point that can grant permission — the launch prompt, the
+ * notifications settings screen, the foreground sync in the root layout, and
+ * the festival alert card — registers the device the same way instead of
+ * only obtaining a local token.
  */
 export function usePushRegistration() {
   const { t } = useTranslation();
@@ -83,7 +85,14 @@ export function usePushRegistration() {
         setIsRegistering(false);
       }
     },
-    [enablePush, markAsRegisteredWithNovu, profile, registerForPushNotifications, t, updatePreferences],
+    [
+      enablePush,
+      markAsRegisteredWithNovu,
+      profile,
+      registerForPushNotifications,
+      t,
+      updatePreferences,
+    ],
   );
 
   return { register, isRegistering };
