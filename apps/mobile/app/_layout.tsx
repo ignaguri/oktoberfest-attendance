@@ -12,7 +12,7 @@ import { i18n } from "@prostcounter/shared/i18n";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowUpCircle, Download } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Linking, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -35,7 +35,9 @@ import { GlobalAlertProvider } from "@/lib/alerts";
 import { apiClient } from "@/lib/api-client";
 import { AuthProvider, useAuth } from "@/lib/auth/AuthContext";
 import {
+  hasPushRegistrationSynced,
   hasWatchInstallPromptBeenShown,
+  setPushRegistrationSynced,
   setWatchInstallPromptShown,
 } from "@/lib/auth/secure-storage";
 import { IOS_APP_STORE_URL } from "@/lib/constants/app-store";
@@ -63,6 +65,8 @@ import {
   useNotificationContext,
 } from "@/lib/notifications/NotificationContext";
 import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
+import { shouldSyncPushRegistration } from "@/lib/notifications/push-registration-rules";
+import { usePushRegistration } from "@/lib/notifications/usePushRegistration";
 import { initSentry } from "@/lib/sentry";
 import { TutorialProvider } from "@/lib/tutorial";
 import { useWatchStatus } from "@/lib/watch/useWatchStatus";
@@ -167,8 +171,8 @@ function NotificationPromptHandler() {
     isPermissionLoading,
     requestPermission,
     markPromptAsShown,
-    registerForPushNotifications,
   } = useNotificationContext();
+  const { register } = usePushRegistration();
   const [showPrompt, setShowPrompt] = useState(false);
   const canShowLaunchPopups = useCanShowLaunchPopups();
 
@@ -191,7 +195,7 @@ function NotificationPromptHandler() {
     setShowPrompt(false);
     const granted = await requestPermission();
     if (granted) {
-      await registerForPushNotifications();
+      await register();
     }
   };
 
@@ -208,6 +212,46 @@ function NotificationPromptHandler() {
       onSkip={handleSkip}
     />
   );
+}
+
+// One-time catch-up for devices that granted permission before the launch
+// prompt registered with Novu. Runs once per device, silently.
+function PushRegistrationSync() {
+  const { isAuthenticated } = useAuth();
+  const { permissionStatus, isPermissionLoading } = useNotificationContext();
+  const { register } = usePushRegistration();
+  const hasAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (hasAttemptedRef.current) {
+      return;
+    }
+    if (
+      !shouldSyncPushRegistration({
+        isAuthenticated,
+        isPermissionLoading,
+        permissionStatus,
+        alreadySynced: false,
+        isWeb: Platform.OS === "web",
+      })
+    ) {
+      return;
+    }
+    hasAttemptedRef.current = true;
+
+    const syncOnce = async () => {
+      if (await hasPushRegistrationSynced()) {
+        return;
+      }
+      const registered = await register({ silent: true });
+      if (registered) {
+        await setPushRegistrationSynced();
+      }
+    };
+    syncOnce();
+  }, [isAuthenticated, isPermissionLoading, permissionStatus, register]);
+
+  return null;
 }
 
 // Show update prompt when an OTA update has been downloaded
@@ -406,6 +450,7 @@ export default function RootLayout() {
                                       <WatchBridge />
                                       <NovuAutoSubscriber />
                                       <NotificationPromptHandler />
+                                      <PushRegistrationSync />
                                       <UpdatePromptHandler />
                                       <StoreUpdatePromptHandler />
                                       <WatchInstallPromptHandler />

@@ -1,11 +1,8 @@
 import {
-  useCurrentProfile,
-  useEnablePushNotifications,
   useNotificationPreferences,
   useUpdateNotificationPreferences,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { splitFullName } from "@prostcounter/shared/utils";
 import { Bell, Clock, ExternalLink, Trophy, Users } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import {
@@ -22,9 +19,8 @@ import { NotificationPermissionPrompt } from "@/components/notifications/Notific
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
-import { getAvatarUrl } from "@/lib/image-urls";
-import { logger } from "@/lib/logger";
 import { useNotificationContextSafe } from "@/lib/notifications/NotificationContext";
+import { usePushRegistration } from "@/lib/notifications/usePushRegistration";
 
 export default function NotificationSettingsScreen() {
   const { t } = useTranslation();
@@ -34,8 +30,6 @@ export default function NotificationSettingsScreen() {
     permissionStatus,
     isPermissionLoading,
     requestPermission,
-    registerForPushNotifications,
-    markAsRegisteredWithNovu,
     expoPushToken: _expoPushToken,
   } = useNotificationContextSafe();
 
@@ -49,17 +43,11 @@ export default function NotificationSettingsScreen() {
 
   const updatePreferences = useUpdateNotificationPreferences();
 
-  // Atomic subscribe + token registration
-  const enablePush = useEnablePushNotifications();
-
-  // Get current user profile
-  const { data: profile } = useCurrentProfile();
+  // Token registration + Novu subscribe, shared with the launch prompt
+  const { register, isRegistering: isEnabling } = usePushRegistration();
 
   // Local state for permission prompt
   const [showPermissionPrompt, setShowPermissionPrompt] = useState(false);
-
-  // Track if registration is in progress
-  const [isEnabling, setIsEnabling] = useState(false);
 
   const isLoading = isLoadingPreferences || isPermissionLoading;
 
@@ -141,52 +129,11 @@ export default function NotificationSettingsScreen() {
   };
 
   const enablePushNotifications = async () => {
-    setIsEnabling(true);
-
-    try {
-      const granted = await requestPermission();
-      if (!granted) {
-        setIsEnabling(false);
-        return;
-      }
-
-      const token = await registerForPushNotifications();
-      if (!token) {
-        logger.error("[Push] No token returned from registerForPushNotifications");
-        Alert.alert(t("common.status.error"), t("profile.notifications.noToken"));
-        setIsEnabling(false);
-        return;
-      }
-
-      const fullAvatarUrl = getAvatarUrl(profile?.avatar_url);
-      const { firstName, lastName } = splitFullName(profile?.full_name);
-
-      const enableResult = await enablePush.mutateAsync({
-        token,
-        ...(profile?.email && { email: profile.email }),
-        ...(firstName && { firstName }),
-        ...(lastName && { lastName }),
-        ...(fullAvatarUrl && { avatar: fullAvatarUrl }),
-      });
-
-      if (!enableResult.success) {
-        const errorMsg = enableResult.error || "Unknown error";
-        logger.error("[Push] enablePush failed: " + errorMsg);
-        Alert.alert(t("common.status.error"), `Failed to enable push notifications: ${errorMsg}`);
-        setIsEnabling(false);
-        return;
-      }
-
-      markAsRegisteredWithNovu();
-      await updatePreferences.mutateAsync({ pushEnabled: true });
-      logger.info("[Push] Push notifications enabled");
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error("[Push] Exception: " + errorMessage);
-      Alert.alert(t("common.status.error"), `Failed to enable push notifications: ${errorMessage}`);
-    } finally {
-      setIsEnabling(false);
+    const granted = await requestPermission();
+    if (!granted) {
+      return;
     }
+    await register();
   };
 
   if (isLoading) {
