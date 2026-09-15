@@ -23,11 +23,11 @@ export interface AppVersions {
  * shows exactly one 1.6.2 build per platform, both from 41d7e3a7 -- re-verify
  * before lowering it.
  *
- * iOS tops out at 1.6.2 in the App Store; Play serves Android 1.7.0.
+ * Both stores serve 1.8.0. Bump to 1.8.1 once each store has approved it.
  */
 export const APP_VERSIONS: AppVersions = {
-  ios: { latest: "1.6.2", minSupported: "1.6.2" },
-  android: { latest: "1.7.0", minSupported: "1.6.2" },
+  ios: { latest: "1.8.0", minSupported: "1.6.2" },
+  android: { latest: "1.8.0", minSupported: "1.6.2" },
 };
 
 /** Returns a defensive copy so a handler cannot mutate the shared constant. */
