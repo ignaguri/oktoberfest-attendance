@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { SkeletonGroups } from "@/components/ui/skeleton-cards";
 import { useUserGroups } from "@/lib/data";
 
+import { OtherFestivalGroupsHint } from "./OtherFestivalGroupsHint";
+
 interface MyGroupsProps {
   showGroupsLink?: boolean;
 }
@@ -42,6 +44,8 @@ export default function MyGroups({ showGroupsLink = true }: MyGroupsProps) {
                 <Link href="/groups">{t("groups.joinOrCreate")}</Link>
               </Button>
             )}
+            {/* A failed request says nothing about this festival having no groups */}
+            {!error && <OtherFestivalGroupsHint />}
           </div>
         )}
         {groups

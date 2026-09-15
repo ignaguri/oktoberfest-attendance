@@ -2,6 +2,7 @@
 
 import { useFestival } from "@prostcounter/shared/contexts";
 import { formatLocalized } from "@prostcounter/shared/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { parseISO } from "date-fns";
 import { CalendarDays, ChevronDown } from "lucide-react";
 import { Link } from "next-view-transitions";
@@ -50,8 +51,13 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   const [isFestivalModalOpen, setIsFestivalModalOpen] = useState(false);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSignOut = async () => {
+    // The logout redirect is a client navigation that keeps the query cache, and
+    // its queries are keyed "current" user, so the next user would see this one's
+    // data. Cleared first because code after the redirect does not run.
+    queryClient.clear();
     await logout();
   };
 

@@ -1,9 +1,10 @@
 "use client";
 
-import { useFestival } from "@prostcounter/shared/contexts";
+import { useFestival, useSyncFestivalWithGroup } from "@prostcounter/shared/contexts";
 import { CalendarDays, Images, MessageSquare } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Link } from "next-view-transitions";
+import { toast } from "sonner";
 
 import { Leaderboard } from "@/components/Leaderboard";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -40,6 +41,12 @@ export default function GroupPage() {
 
   // The group data is nested inside the response
   const group = groupResponse?.data;
+
+  // Opened from a notification or link, the group can belong to another festival
+  useSyncFestivalWithGroup(group?.id, group?.festivalId, (festival) => {
+    toast.info(t("festival.switchedToast", { festival: festival.name }));
+  });
+
   const isCreator = !!group && !!currentUser && group.createdBy === currentUser.id;
   const inviteToken = group?.inviteToken ?? null;
 

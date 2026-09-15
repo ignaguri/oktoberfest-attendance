@@ -18,6 +18,9 @@ export interface FestivalStorage {
   getCachedFestival: () => Promise<Festival | null>;
   /** Cache the full festival object for offline fallback */
   setCachedFestival: (festival: Festival) => Promise<void>;
+  /** The live festival the user declined to switch to */
+  getDismissedSuggestionId: () => Promise<string | null>;
+  setDismissedSuggestionId: (id: string) => Promise<void>;
 }
 
 /**
@@ -30,6 +33,14 @@ export interface FestivalContextType {
   festivals: Festival[];
   /** Function to change the current festival */
   setCurrentFestival: (festival: Festival) => void;
+  /** A live festival to offer when the current one is not live */
+  switchSuggestion: Festival | null;
+  /** Decline the switch suggestion; it is not offered again for that festival */
+  dismissSwitchSuggestion: () => void;
+  /** Drop the switch suggestion for this session only, without remembering it as declined */
+  clearSwitchSuggestion: () => void;
+  /** Whether the launch-time switch suggestion has been worked out from festival data */
+  isSwitchSuggestionEvaluated: boolean;
   /** Loading state for initial fetch */
   isLoading: boolean;
   /** Error message if fetch failed */

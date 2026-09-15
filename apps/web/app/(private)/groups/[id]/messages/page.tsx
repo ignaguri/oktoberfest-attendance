@@ -1,7 +1,7 @@
 "use client";
 
-import { useFestival } from "@prostcounter/shared/contexts";
-import { useDeleteMessage, useGroupMessages } from "@prostcounter/shared/hooks";
+import { useFestival, useSyncFestivalWithGroup } from "@prostcounter/shared/contexts";
+import { useDeleteMessage, useGroupMessages, useGroupSettings } from "@prostcounter/shared/hooks";
 import type { GroupMessageItem } from "@prostcounter/shared/schemas";
 import { MessageSquare, Plus } from "lucide-react";
 import { use, useCallback, useMemo, useState } from "react";
@@ -27,6 +27,12 @@ export default function MessagesPage({ params }: MessagesPageProps) {
   const { messages, loading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useGroupMessages(groupId);
   const { mutateAsync: deleteMessage } = useDeleteMessage();
+
+  // Message notifications land here, and the group can belong to another festival
+  const { data: groupResponse } = useGroupSettings(groupId);
+  useSyncFestivalWithGroup(groupResponse?.data?.id, groupResponse?.data?.festivalId, (festival) => {
+    toast.info(t("festival.switchedToast", { festival: festival.name }));
+  });
 
   const [composeOpen, setComposeOpen] = useState(false);
 

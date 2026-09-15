@@ -1,5 +1,9 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useDeleteMessage, useGroupMessages, useGroupName } from "@prostcounter/shared/hooks";
+import {
+  useDeleteMessage,
+  useGroupMessages,
+  useGroupSettings,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -28,6 +32,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
+import { useGroupFestivalSync } from "@/hooks/useGroupFestivalSync";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
@@ -54,8 +59,11 @@ export default function GroupMessagesScreen() {
     refetch,
   } = useGroupMessages(id || "");
 
-  // Fetch group name for header
-  const { data: groupName } = useGroupName(id || "");
+  // One group request serves both the header name and the festival sync.
+  // Message notifications land here, and the group can belong to another festival.
+  const { data: groupResponse } = useGroupSettings(id || "");
+  const groupName = groupResponse?.data?.name;
+  useGroupFestivalSync(groupResponse?.data?.id, groupResponse?.data?.festivalId);
 
   // Delete mutation
   const deleteMutation = useDeleteMessage();

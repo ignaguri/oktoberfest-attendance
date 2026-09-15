@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/react-native";
 import type { Session, User } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   type ReactNode,
@@ -89,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const userInitiatedSignOutRef = useRef(false);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Get initial session
@@ -126,6 +128,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       if (event === "SIGNED_OUT") {
         userInitiatedSignOutRef.current = false;
+        // Cached queries are keyed "current" user, not by id, so the next user
+        // would otherwise see this user's groups until a refetch
+        queryClient.clear();
       }
 
       setSession(session);
@@ -155,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [queryClient]);
 
   const signIn = useCallback(async (email: string, password: string, captchaToken?: string) => {
     const { error } = await supabase.auth.signInWithPassword({

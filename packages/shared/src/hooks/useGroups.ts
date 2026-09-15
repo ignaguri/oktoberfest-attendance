@@ -39,6 +39,27 @@ export function useUserGroups(festivalId?: string) {
 }
 
 /**
+ * Hook to fetch user's groups across every festival
+ *
+ * Keyed under userGroups, so the join/create/leave invalidations cover it.
+ */
+export function useAllUserGroups() {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.userGroups("current", "all"),
+    async () => {
+      const { data } = await apiClient.groups.list();
+      return data;
+    },
+    {
+      staleTime: 2 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    },
+  );
+}
+
+/**
  * Hook to fetch group settings/details
  */
 export function useGroupSettings(groupId: string) {

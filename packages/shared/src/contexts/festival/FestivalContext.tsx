@@ -24,7 +24,7 @@ import {
 
 import { useFestivals } from "../../hooks/useFestivals";
 import type { Festival } from "../../schemas/festival.schema";
-import { selectFestival } from "./selection-logic";
+import { getSwitchSuggestion, selectFestival } from "./selection-logic";
 import type { FestivalContextType, FestivalStorage } from "./types";
 
 const FestivalContext = createContext<FestivalContextType | undefined>(undefined);
@@ -39,25 +39,37 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
   const [currentFestival, setCurrentFestivalState] = useState<Festival | null>(null);
   const [storedFestivalId, setStoredFestivalId] = useState<string | null>(null);
   const [cachedFestival, setCachedFestivalState] = useState<Festival | null>(null);
+  const [dismissedSuggestionId, setDismissedSuggestionId] = useState<string | null>(null);
+  const [switchSuggestion, setSwitchSuggestion] = useState<Festival | null>(null);
   const [storageLoaded, setStorageLoaded] = useState(false);
 
   // Track whether we have already applied the cache fallback to avoid
   // re-applying it if the API later succeeds
   const cacheAppliedRef = useRef(false);
 
-  // Load stored festival ID and cached festival on mount
+  // The suggestion is judged once per session, against the festival restored on
+  // launch. A refetch must not re-offer it after the user has changed festival.
+  const suggestionEvaluatedRef = useRef(false);
+  // State twin of the ref, for popups that must wait for the verdict. A festival
+  // restored from the offline cache is not a verdict yet.
+  const [isSwitchSuggestionEvaluated, setIsSwitchSuggestionEvaluated] = useState(false);
+
+  // Load stored festival ID, cached festival and dismissed suggestion on mount
   useEffect(() => {
     let mounted = true;
 
-    Promise.all([storage.getSelectedFestivalId(), storage.getCachedFestival()]).then(
-      ([id, cached]) => {
-        if (mounted) {
-          setStoredFestivalId(id);
-          setCachedFestivalState(cached);
-          setStorageLoaded(true);
-        }
-      },
-    );
+    Promise.all([
+      storage.getSelectedFestivalId(),
+      storage.getCachedFestival(),
+      storage.getDismissedSuggestionId(),
+    ]).then(([id, cached, dismissedId]) => {
+      if (mounted) {
+        setStoredFestivalId(id);
+        setCachedFestivalState(cached);
+        setDismissedSuggestionId(dismissedId);
+        setStorageLoaded(true);
+      }
+    });
 
     return () => {
       mounted = false;
@@ -81,8 +93,14 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
       // Update the cache whenever we select a festival from fresh API data
       storage.setCachedFestival(selected);
       cacheAppliedRef.current = false; // Reset since we have live data
+
+      if (!suggestionEvaluatedRef.current) {
+        suggestionEvaluatedRef.current = true;
+        setSwitchSuggestion(getSwitchSuggestion(festivalsData, selected, dismissedSuggestionId));
+        setIsSwitchSuggestionEvaluated(true);
+      }
     }
-  }, [festivalsData, storedFestivalId, storageLoaded, storage]);
+  }, [festivalsData, storedFestivalId, dismissedSuggestionId, storageLoaded, storage]);
 
   // Fallback: use cached festival when API returns no data (offline cold start)
   useEffect(() => {
@@ -102,12 +120,30 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
   const setCurrentFestival = useCallback(
     async (festival: Festival) => {
       setCurrentFestivalState(festival);
+      // Keep the selection effect in step, or a festivals refetch would restore
+      // the id read on launch and undo this change
+      setStoredFestivalId(festival.id);
+      // Any explicit change supersedes the launch-time suggestion
+      setSwitchSuggestion(null);
       await storage.setSelectedFestivalId(festival.id);
       // Also cache the full festival object for offline fallback
       await storage.setCachedFestival(festival);
     },
     [storage],
   );
+
+  const dismissSwitchSuggestion = useCallback(() => {
+    setSwitchSuggestion((suggestion) => {
+      if (suggestion) {
+        storage.setDismissedSuggestionId(suggestion.id);
+      }
+      return null;
+    });
+  }, [storage]);
+
+  const clearSwitchSuggestion = useCallback(() => {
+    setSwitchSuggestion(null);
+  }, []);
 
   const error = queryError?.message || null;
   const isLoading = isLoadingFestivals || !storageLoaded;
@@ -117,10 +153,24 @@ export function FestivalProvider({ children, storage }: FestivalProviderProps) {
       currentFestival,
       festivals,
       setCurrentFestival,
+      switchSuggestion,
+      dismissSwitchSuggestion,
+      clearSwitchSuggestion,
+      isSwitchSuggestionEvaluated,
       isLoading,
       error,
     }),
-    [currentFestival, festivals, setCurrentFestival, isLoading, error],
+    [
+      isSwitchSuggestionEvaluated,
+      currentFestival,
+      festivals,
+      setCurrentFestival,
+      switchSuggestion,
+      dismissSwitchSuggestion,
+      clearSwitchSuggestion,
+      isLoading,
+      error,
+    ],
   );
 
   return <FestivalContext.Provider value={value}>{children}</FestivalContext.Provider>;
@@ -149,9 +199,31 @@ export function useFestivalSafe(): FestivalContextType {
       currentFestival: null,
       festivals: [],
       setCurrentFestival: () => {},
+      switchSuggestion: null,
+      dismissSwitchSuggestion: () => {},
+      clearSwitchSuggestion: () => {},
+      isSwitchSuggestionEvaluated: false,
       isLoading: false,
       error: null,
     };
   }
   return context;
+}
+
+/**
+ * Whether other launch popups (install banner, update and permission prompts)
+ * may open. They wait for the festival switch prompt, which changes what the
+ * user sees and so goes first instead of stacking with them.
+ *
+ * They also wait for the suggestion to be evaluated from festival data. A festival
+ * restored from the offline cache does not count: the list can arrive later and
+ * bring a suggestion with it. The verdict and switchSuggestion are set in the
+ * same effect, so there is no render in between. With no festivals at all they
+ * must not wait forever.
+ */
+export function useCanShowLaunchPopups(): boolean {
+  const { festivals, isLoading, switchSuggestion, isSwitchSuggestionEvaluated } = useFestival();
+  const isFestivalSettled =
+    isSwitchSuggestionEvaluated || (!isLoading && festivals.length === 0);
+  return isFestivalSettled && !switchSuggestion;
 }

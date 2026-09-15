@@ -2464,6 +2464,17 @@
       "upcoming": "Demnächst",
       "active": "Aktiv",
       "ended": "Beendet"
+    },
+    "switchPrompt": {
+      "title": "{{festival}} hat begonnen",
+      "description": "Du siehst noch {{current}}. Zu {{festival}} wechseln, um die Gruppen und Ranglisten dort zu sehen?",
+      "switch": "Zu {{festival}} wechseln",
+      "stay": "Bei {{current}} bleiben"
+    },
+    "switchedToast": "Zu {{festival}} gewechselt, um diese Gruppe anzuzeigen",
+    "otherFestivalGroups": {
+      "hint": "Du hast {{count}} Gruppe für {{festival}}",
+      "hint_other": "Du hast {{count}} Gruppen für {{festival}}"
     }
   },
   "install": {

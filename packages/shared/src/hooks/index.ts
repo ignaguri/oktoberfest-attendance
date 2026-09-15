@@ -43,6 +43,7 @@ export {
   useRemoveMember,
   useRenewInviteToken,
   useUpdateGroup,
+  useAllUserGroups,
   useUserGroups,
 } from "./useGroups";
 
