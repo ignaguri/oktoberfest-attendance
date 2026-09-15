@@ -15,5 +15,6 @@ export {
   selectFestival,
 } from "./selection-logic";
 export { getOtherFestivalGroups, type OtherFestivalGroups } from "./other-festival-groups";
+export { useCurrentDate } from "./useCurrentDate";
 export { useSyncFestivalWithGroup } from "./useSyncFestivalWithGroup";
 export type { FestivalContextType, FestivalStorage } from "./types";

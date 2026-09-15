@@ -1,4 +1,8 @@
-import { getOtherFestivalGroups, useFestival } from "@prostcounter/shared/contexts";
+import {
+  getOtherFestivalGroups,
+  useCurrentDate,
+  useFestival,
+} from "@prostcounter/shared/contexts";
 import { useAllUserGroups } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupWithMembers } from "@prostcounter/shared/schemas";
@@ -17,6 +21,8 @@ export function OtherFestivalGroupsHint() {
   const { t } = useTranslation();
   const { currentFestival, festivals, setCurrentFestival } = useFestival();
   const { data } = useAllUserGroups();
+  // Refreshing, so a festival that ends while this stays open drops out
+  const now = useCurrentDate();
 
   const otherFestivalGroups = useMemo(
     () =>
@@ -24,8 +30,9 @@ export function OtherFestivalGroupsHint() {
         (data as GroupWithMembers[] | null) ?? [],
         festivals,
         currentFestival?.id,
+        now,
       ),
-    [data, festivals, currentFestival?.id],
+    [data, festivals, currentFestival?.id, now],
   );
 
   if (otherFestivalGroups.length === 0) {

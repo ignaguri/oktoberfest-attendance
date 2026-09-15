@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { logout } from "./actions";
 
 export default function SignOut() {
+  const queryClient = useQueryClient();
+
   async function handleSignOut() {
+    // The logout redirect is a client navigation that keeps the query cache, and
+    // its queries are keyed "current" user, so the next user would see this one's
+    // data. Cleared first because code after the redirect does not run.
+    queryClient.clear();
     await logout();
   }
 

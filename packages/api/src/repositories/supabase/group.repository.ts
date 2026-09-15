@@ -97,22 +97,35 @@ export class SupabaseGroupRepository implements IGroupRepository {
       throw new DatabaseError(`Failed to list groups: ${error.message}`);
     }
 
-    // Get member counts for each group
-    const groupsWithCounts = await Promise.all(
-      data.map(async (group) => {
-        const { count } = await this.supabase
-          .from("group_members")
-          .select("*", { count: "exact", head: true })
-          .eq("group_id", group.id);
+    if (data.length === 0) {
+      return [];
+    }
 
-        return {
-          ...this.mapToGroup(group),
-          memberCount: count || 0,
-        };
-      }),
-    );
+    // One query for every group's members rather than a head-count per group:
+    // without a festival filter this covers every group the user ever joined.
+    const { data: memberRows, error: memberError } = await this.supabase
+      .from("group_members")
+      .select("group_id")
+      .in(
+        "group_id",
+        data.map((group) => group.id),
+      );
 
-    return groupsWithCounts;
+    if (memberError) {
+      throw new DatabaseError(`Failed to count group members: ${memberError.message}`);
+    }
+
+    const memberCounts = new Map<string, number>();
+    for (const row of memberRows ?? []) {
+      if (row.group_id) {
+        memberCounts.set(row.group_id, (memberCounts.get(row.group_id) ?? 0) + 1);
+      }
+    }
+
+    return data.map((group) => ({
+      ...this.mapToGroup(group),
+      memberCount: memberCounts.get(group.id) ?? 0,
+    }));
   }
 
   async findById(id: string): Promise<GroupWithMembers | null> {

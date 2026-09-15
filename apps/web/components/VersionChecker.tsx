@@ -1,5 +1,6 @@
 "use client";
 
+import { useCanShowLaunchPopups } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { RefreshCw, X } from "lucide-react";
 import { useEffect } from "react";
@@ -11,9 +12,11 @@ import { useAppUpdate } from "@/hooks/use-app-update";
 export function VersionChecker() {
   const { t } = useTranslation();
   const { hasUpdate, applyUpdate, skipUpdate } = useAppUpdate();
+  // Waits for the festival switch prompt like the other launch popups
+  const canShowLaunchPopups = useCanShowLaunchPopups();
 
   useEffect(() => {
-    if (hasUpdate) {
+    if (hasUpdate && canShowLaunchPopups) {
       toast.info(t("common.updates.available"), {
         description: (
           <div className="space-y-2">
@@ -34,7 +37,7 @@ export function VersionChecker() {
         duration: Infinity, // Persistent until user acts
       });
     }
-  }, [hasUpdate, applyUpdate, skipUpdate, t]);
+  }, [hasUpdate, canShowLaunchPopups, applyUpdate, skipUpdate, t]);
 
   return null;
 }
