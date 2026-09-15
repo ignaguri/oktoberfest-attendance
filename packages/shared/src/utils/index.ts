@@ -45,5 +45,17 @@ export { groupFestivalsByStatus, type GroupedFestivals } from "./festival-groupi
 // Festival day model
 export { buildFestivalWeeks, type FestivalDayCell } from "./festival-days";
 
+// Festival countdown
+export {
+  FESTIVAL_OPENING_HOUR,
+  getFestivalCountdown,
+  getFestivalSeriesKey,
+  getPreviousFestivalInSeries,
+  type CountdownRemaining,
+  type FestivalCountdown,
+  type FestivalCountdownPhase,
+  type FestivalDates,
+} from "./festival-countdown";
+
 // Tent visit helpers
 export { getCurrentTentId } from "./tent-visits";
