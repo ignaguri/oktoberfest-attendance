@@ -11,13 +11,7 @@ import { processReservationNotifications } from "./reservations";
 
 export const runtime = "nodejs";
 
-export async function POST(req: Request) {
-  const secret = process.env.CRON_SECRET;
-  const header = req.headers.get("x-cron-secret");
-  if (!secret || header !== secret) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-
+async function runScheduler() {
   const supabase = await createClient(true);
   const notifications = createNotificationService();
 
@@ -70,6 +64,25 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true });
 }
 
-export async function GET() {
-  return new NextResponse("OK");
+// Vercel Cron calls this route with GET and an `Authorization: Bearer <CRON_SECRET>`
+// header. See https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs
+export async function GET(req: Request) {
+  const secret = process.env.CRON_SECRET;
+  const header = req.headers.get("authorization");
+  if (!secret || header !== `Bearer ${secret}`) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  return runScheduler();
+}
+
+// scripts/trigger-cron.ts (manual/local triggering) still uses this header.
+export async function POST(req: Request) {
+  const secret = process.env.CRON_SECRET;
+  const header = req.headers.get("x-cron-secret");
+  if (!secret || header !== secret) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
+  return runScheduler();
 }
