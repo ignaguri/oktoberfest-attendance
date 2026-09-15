@@ -66,6 +66,25 @@ describe("cron scheduler route", () => {
       expect(processFestivalOpeningNotifications).not.toHaveBeenCalled();
     });
 
+    it("returns 500 and still runs the standings refresh when the opening job throws", async () => {
+      vi.stubEnv("CRON_SECRET", "test-secret");
+      processFestivalOpeningNotifications.mockRejectedValueOnce(new Error("chunks failed"));
+      maybeSingle.mockResolvedValueOnce({ data: { id: "fest-1" }, error: null });
+      const { GET } = await import("./route");
+
+      const res = await GET(
+        new Request("http://localhost/api/cron/scheduler", {
+          headers: { authorization: "Bearer test-secret" },
+        }),
+      );
+
+      expect(res.status).toBe(500);
+      expect(await res.json()).toEqual({ ok: false });
+      expect(rpc).toHaveBeenCalledWith("refresh_festival_group_standings", {
+        p_festival_id: "fest-1",
+      });
+    });
+
     it("returns 401 when the Bearer token is wrong", async () => {
       vi.stubEnv("CRON_SECRET", "test-secret");
       const { GET } = await import("./route");
@@ -125,6 +144,26 @@ describe("cron scheduler route", () => {
       expect(processReservationNotifications).toHaveBeenCalledTimes(1);
       expect(processAchievementNotifications).toHaveBeenCalledTimes(1);
       expect(processFestivalOpeningNotifications).toHaveBeenCalledTimes(1);
+    });
+
+    it("returns 500 and still runs the standings refresh when the opening job throws", async () => {
+      vi.stubEnv("CRON_SECRET", "test-secret");
+      processFestivalOpeningNotifications.mockRejectedValueOnce(new Error("chunks failed"));
+      maybeSingle.mockResolvedValueOnce({ data: { id: "fest-1" }, error: null });
+      const { POST } = await import("./route");
+
+      const res = await POST(
+        new Request("http://localhost/api/cron/scheduler", {
+          method: "POST",
+          headers: { "x-cron-secret": "test-secret" },
+        }),
+      );
+
+      expect(res.status).toBe(500);
+      expect(await res.json()).toEqual({ ok: false });
+      expect(rpc).toHaveBeenCalledWith("refresh_festival_group_standings", {
+        p_festival_id: "fest-1",
+      });
     });
 
     it("returns 401 when x-cron-secret is wrong", async () => {

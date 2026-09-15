@@ -209,13 +209,20 @@ export class NotificationService {
    *
    * Each event carries festival-opening:<festivalId>:<userId> as its
    * transactionId, and Novu ignores a transactionId it has already seen, so a
-   * second cron run or a retry cannot notify anyone twice.
+   * second cron run or a retry cannot notify anyone twice — that's what makes
+   * it safe to throw below and let the caller retry the whole batch.
+   *
+   * Every chunk is attempted even if an earlier one fails, so one bad chunk
+   * doesn't stop the rest of the recipients from being notified. If any chunk
+   * failed, throws after the loop so the caller knows the run was incomplete.
    */
   async notifyFestivalOpening(
     recipientIds: string[],
     festival: { id: string; name: string },
   ): Promise<void> {
     const BULK_TRIGGER_LIMIT = 100;
+    const totalChunks = Math.ceil(recipientIds.length / BULK_TRIGGER_LIMIT);
+    let failedChunkCount = 0;
 
     for (let chunkStart = 0; chunkStart < recipientIds.length; chunkStart += BULK_TRIGGER_LIMIT) {
       const chunk = recipientIds.slice(chunkStart, chunkStart + BULK_TRIGGER_LIMIT);
@@ -236,7 +243,14 @@ export class NotificationService {
         });
       } catch (error) {
         reportNotificationException("notifyFestivalOpening", error as Error);
+        failedChunkCount += 1;
       }
+    }
+
+    if (failedChunkCount > 0) {
+      throw new Error(
+        `Festival opening push failed for ${failedChunkCount} of ${totalChunks} chunk(s)`,
+      );
     }
   }
 

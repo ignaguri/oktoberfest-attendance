@@ -22,9 +22,12 @@ async function runScheduler() {
 
   await processAchievementNotifications(supabase, notifications);
 
+  let hasFailure = false;
+
   try {
     await processFestivalOpeningNotifications(supabase, notifications, new Date());
   } catch (error) {
+    hasFailure = true;
     logger.error(
       "Festival opening notifications failed",
       logger.apiRoute("cron/scheduler"),
@@ -59,6 +62,10 @@ async function runScheduler() {
         standingsError,
       );
     }
+  }
+
+  if (hasFailure) {
+    return NextResponse.json({ ok: false }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

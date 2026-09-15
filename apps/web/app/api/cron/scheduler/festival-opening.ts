@@ -6,6 +6,41 @@ import { logger } from "@/lib/logger";
 import type { NotificationService } from "@/lib/services/notifications";
 
 const USERS_PAGE_SIZE = 1000;
+// Supabase caps a single response at max_rows=1000, so opted-out preferences
+// have to be paged the same way.
+const PREFERENCES_PAGE_SIZE = 1000;
+
+async function listOptedOutUserIds(supabase: SupabaseClient<Database>): Promise<string[] | null> {
+  const optedOutUserIds: string[] = [];
+
+  for (let from = 0; ; from += PREFERENCES_PAGE_SIZE) {
+    const { data, error } = await supabase
+      .from("user_notification_preferences")
+      .select("user_id")
+      .eq("reminders_enabled", false)
+      .order("user_id")
+      .range(from, from + PREFERENCES_PAGE_SIZE - 1);
+
+    if (error) {
+      logger.error(
+        "Failed to load reminder preferences for opening push",
+        logger.apiRoute("cron/scheduler"),
+        error,
+      );
+      return null;
+    }
+
+    const rows = data ?? [];
+    for (const row of rows) {
+      if (row.user_id) {
+        optedOutUserIds.push(row.user_id);
+      }
+    }
+    if (rows.length < PREFERENCES_PAGE_SIZE) {
+      return optedOutUserIds;
+    }
+  }
+}
 
 async function listConfirmedUserIds(supabase: SupabaseClient<Database>): Promise<string[] | null> {
   const confirmedUserIds: string[] = [];
@@ -69,22 +104,13 @@ export async function processFestivalOpeningNotifications(
   }
 
   // Preferences can't be read: skip rather than notify people who opted out.
-  const { data: optedOutRows, error: preferencesError } = await supabase
-    .from("user_notification_preferences")
-    .select("user_id")
-    .eq("reminders_enabled", false);
-
-  if (preferencesError) {
-    logger.error(
-      "Failed to load reminder preferences for opening push",
-      logger.apiRoute("cron/scheduler"),
-      preferencesError,
-    );
+  const optedOutUserIds = await listOptedOutUserIds(supabase);
+  if (!optedOutUserIds) {
     return;
   }
 
-  const optedOutUserIds = new Set((optedOutRows ?? []).map((row) => row.user_id));
-  const recipientIds = confirmedUserIds.filter((userId) => !optedOutUserIds.has(userId));
+  const optedOutUserIdSet = new Set(optedOutUserIds);
+  const recipientIds = confirmedUserIds.filter((userId) => !optedOutUserIdSet.has(userId));
 
   for (const festival of openingToday) {
     await notifications.notifyFestivalOpening(recipientIds, {
