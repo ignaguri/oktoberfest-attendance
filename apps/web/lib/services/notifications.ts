@@ -230,7 +230,7 @@ export class NotificationService {
               festivalName: festival.name,
               kind: "opening",
               title: "O'zapft is today! 🍺",
-              body: `Today's the day. First keg at noon, see you at ${festival.name}.`,
+              body: `First keg at noon. Open ProstCounter and log your first Maß at ${festival.name}.`,
             },
           })),
         });
