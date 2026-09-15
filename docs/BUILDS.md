@@ -13,7 +13,7 @@ The `production-apk` profile produces an APK (not AAB) using production env valu
 
 ## Critical: Rename `.env.local` Before Any EAS Artifact
 
-**Always rename `apps/mobile/.env.local` before running `eas build --local` or `eas update`.** Metro loads `.env.local` during the bundle phase and it wins over EAS-injected env vars, silently baking local values (e.g. `EXPO_PUBLIC_API_URL=http://localhost:3001`) into production artifacts.
+**Always rename `apps/mobile/.env.local` (and `.env`, which also points at localhost) before running `eas build --local` or a local `expo export`.** Metro loads them during the bundle phase and they win over EAS-injected env vars, silently baking local values (e.g. `EXPO_PUBLIC_API_URL=http://localhost:3001`) into production artifacts. `eas update --environment` does not load them, but it has its own env trap: see [OTA Updates](#ota-updates-eas-update).
 
 ```bash
 mv apps/mobile/.env.local apps/mobile/.env.local.bkp
@@ -53,12 +53,43 @@ vitest run is the only thing that needs it.
 
 ## OTA Updates (`eas update`)
 
-For production OTAs, do **both**:
+An OTA bundle only gets the env values `eas update` can see, and that is a different set from what a store build gets:
 
-1. Rename `.env.local` aside (see above)
-2. Run with both flags: `eas update --channel production --environment production --message "<msg>"`
+- **Store builds** (`eas build`) use the `env` block of the profile in `eas.json`, plus EAS server-side variables.
+- **`eas update --environment <env>`** ignores `eas.json` entirely. It sets `EXPO_NO_DOTENV=1`, so no `.env*` file is loaded either, and bundles with the EAS server-side variables for that environment only. Variables with **secret** visibility are not included: secret values can only be read on the EAS builder.
 
-`--environment production` alone is not enough — `.env.local` overrides it if present.
+So every `EXPO_PUBLIC_*` the JS reads must exist on EAS for the environment, with **plaintext** or **sensitive** visibility. `EXPO_PUBLIC_*` values are compiled into the bundle anyway, so secret visibility protects nothing and silently empties them in OTAs. Keep those values in sync with `build.production.env` in `eas.json`. EAS refuses to change a secret variable to plaintext or sensitive, so a variable created as secret has to be created again.
+
+This broke production once: the Novu app id, Sentry DSN and Vexo key were secret and the hCaptcha sitekey wasn't on EAS at all, so the OTA shipped with all four empty, `NovuProviderWrapper` rendered no provider, and the header bell threw `useNovu must be used within a <NovuProvider />` on every launch. The API and Supabase values were public, so the app still reached the right backend and the bundle looked fine at a glance.
+
+### Publishing a production OTA
+
+1. Work from an up-to-date `main`, and move `.env.local` and `.env` aside (see above). They are not loaded by `eas update`, but `expo export` in step 2 does load them.
+2. Verify the bundle before publishing. `--clear` matters: Metro's transform cache keeps env values inlined by earlier runs, which can hide a missing variable.
+
+   ```bash
+   cd apps/mobile
+   npx eas-cli env:exec production 'EXPO_NO_DOTENV=1 npx expo export --clear --platform ios --no-bytecode --output-dir /tmp/ota-check'
+   grep -c '<a value you expect, e.g. the Novu app id>' /tmp/ota-check/_expo/static/js/ios/*.js
+   ```
+
+   Check the Novu app id, hCaptcha sitekey, Sentry DSN, Vexo key, API URL and Supabase URL. Grep the `--no-bytecode` export: short strings don't reliably show up when grepping a Hermes `.hbc` file.
+
+3. Publish with the cache cleared:
+
+   ```bash
+   eas update --channel production --environment production --clear-cache --message "<msg>"
+   ```
+
+4. Restart the app twice on a real device (the first launch downloads the update, the second runs it) before walking away.
+
+If an OTA breaks launch, roll phones back to the bundle embedded in their binary:
+
+```bash
+eas update:roll-back-to-embedded --branch production --runtime-version <runtimeVersion> --platform all --message "<why>"
+```
+
+An error caught by the root `ErrorBoundary` shows only "An unexpected error occurred" in release builds, and Sentry is empty too if the DSN is what went missing. To read the real error from a connected iPhone, stream its log with `idevicesyslog -n -u <udid>` (from `libimobiledevice`; find the udid with `idevice_id -n`), tap "Try Again" on the error screen, and grep for `ProstCounter(React)`.
 
 ### Native dependencies can't ship as an OTA
 
