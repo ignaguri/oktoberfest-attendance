@@ -1,0 +1,4 @@
+- Countdown zum Oktoberfest 2026 auf dem Startbildschirm, und ab dem Anstich siehst du, welcher Festtag ist.
+- Benachrichtigungen direkt auf dem Startbildschirm aktivieren, damit du O'zapft is nicht verpasst.
+- Die App schlägt das laufende Fest vor, und ein Gruppenlink bringt dich direkt zum Fest der Gruppe.
+- Kleine Korrekturen und Verbesserungen. Prost!

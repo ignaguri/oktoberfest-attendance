@@ -1,4 +1,5 @@
 export const changelog: Record<string, string[]> = {
+  "1.8.1": ["Countdown to Oktoberfest 2026 on the home screen"],
   "1.8.0": [
     "New achievement badge artwork, and a detail sheet that explains how to unlock each one",
     "Get notified in-app when a new version is available",
