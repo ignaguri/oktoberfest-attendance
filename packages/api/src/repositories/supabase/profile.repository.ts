@@ -174,7 +174,7 @@ export class SupabaseProfileRepository {
 
     await this.supabase.from("group_members").delete().eq("user_id", userId);
 
-    await this.supabase.from("reservations").delete().eq("user_id", userId);
+    await this.supabase.from("day_plans").delete().eq("user_id", userId);
 
     await this.supabase.from("user_achievements").delete().eq("user_id", userId);
 

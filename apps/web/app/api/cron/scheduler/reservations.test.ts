@@ -26,7 +26,7 @@ function createMockSupabase(reminders: any[] = [], prompts: any[] = []) {
           }),
         } as any;
       }
-      if (table === "reservations") {
+      if (table === "day_plans") {
         return {
           update: vi.fn((payload) => ({
             in: vi.fn((_, ids: string[]) => {

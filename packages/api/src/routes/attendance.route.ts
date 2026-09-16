@@ -591,7 +591,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
 
   // Get the reservation details
   const { data: reservation, error: reservationError } = await supabase
-    .from("reservations")
+    .from("day_plans")
     .select(
       `
       id,
@@ -603,6 +603,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     )
     .eq("id", reservationId)
     .eq("user_id", user.id)
+    .eq("kind", "reservation")
     .in("status", ["pending", "confirmed"])
     .single();
 
@@ -698,7 +699,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
 
   // Mark reservation as completed
   const { error: updateError } = await supabase
-    .from("reservations")
+    .from("day_plans")
     .update({
       status: "completed",
       processed_at: new Date().toISOString(),
