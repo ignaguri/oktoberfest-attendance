@@ -311,6 +311,158 @@ export type Database = {
           },
         ]
       }
+      day_plan_overlap_notifications: {
+        Row: {
+          actor_id: string
+          created_at: string
+          date: string
+          festival_id: string
+          recipient_id: string
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          date: string
+          festival_id: string
+          recipient_id: string
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          date?: string
+          festival_id?: string
+          recipient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_plan_overlap_notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "day_plan_overlap_notifications_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "day_plan_overlap_notifications_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "day_plan_overlap_notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "day_plan_overlap_notifications_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      day_plans: {
+        Row: {
+          auto_checkin: boolean | null
+          created_at: string | null
+          date: string
+          end_at: string | null
+          festival_id: string
+          id: string
+          kind: string
+          note: string | null
+          processed_at: string | null
+          prompt_sent_at: string | null
+          reminder_offset_minutes: number | null
+          reminder_sent_at: string | null
+          start_at: string | null
+          status: string | null
+          tent_id: string | null
+          updated_at: string | null
+          user_id: string
+          visible_to_groups: boolean
+        }
+        Insert: {
+          auto_checkin?: boolean | null
+          created_at?: string | null
+          date: string
+          end_at?: string | null
+          festival_id: string
+          id?: string
+          kind: string
+          note?: string | null
+          processed_at?: string | null
+          prompt_sent_at?: string | null
+          reminder_offset_minutes?: number | null
+          reminder_sent_at?: string | null
+          start_at?: string | null
+          status?: string | null
+          tent_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          visible_to_groups?: boolean
+        }
+        Update: {
+          auto_checkin?: boolean | null
+          created_at?: string | null
+          date?: string
+          end_at?: string | null
+          festival_id?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          processed_at?: string | null
+          prompt_sent_at?: string | null
+          reminder_offset_minutes?: number | null
+          reminder_sent_at?: string | null
+          start_at?: string | null
+          status?: string | null
+          tent_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          visible_to_groups?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_plans_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "day_plans_tent_id_fkey"
+            columns: ["tent_id"]
+            isOneToOne: false
+            referencedRelation: "tents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "day_plans_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "day_plans_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drink_type_prices: {
         Row: {
           created_at: string
@@ -1489,6 +1641,7 @@ export type Database = {
           checkin_enabled: boolean | null
           created_at: string | null
           daily_reminder_enabled: boolean
+          friend_plans_enabled: boolean | null
           group_join_enabled: boolean | null
           group_notifications_enabled: boolean | null
           id: string
@@ -1502,6 +1655,7 @@ export type Database = {
           checkin_enabled?: boolean | null
           created_at?: string | null
           daily_reminder_enabled?: boolean
+          friend_plans_enabled?: boolean | null
           group_join_enabled?: boolean | null
           group_notifications_enabled?: boolean | null
           id?: string
@@ -1515,6 +1669,7 @@ export type Database = {
           checkin_enabled?: boolean | null
           created_at?: string | null
           daily_reminder_enabled?: boolean
+          friend_plans_enabled?: boolean | null
           group_join_enabled?: boolean | null
           group_notifications_enabled?: boolean | null
           id?: string
@@ -1770,13 +1925,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "fk_user_id"
             columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "leaderboard"
@@ -1785,13 +1933,20 @@ export type Database = {
           {
             foreignKeyName: "fk_user_id"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_user_id"
+            columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fk_user_id"
-            columns: ["viewer_id"]
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1911,6 +2066,10 @@ export type Database = {
       get_achievement_metrics: {
         Args: { p_festival_id: string; p_user_id: string }
         Returns: Json
+      }
+      get_day_plan_overlap_recipients: {
+        Args: { p_actor_id: string; p_date: string; p_festival_id: string }
+        Returns: string[]
       }
       get_drink_price_cents: {
         Args: {
