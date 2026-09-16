@@ -90,6 +90,10 @@ export class QueryKeys {
   static reservations = (festivalId: string) => ["reservations", festivalId] as const;
   static reservation = (id: string) => ["reservation", id] as const;
 
+  // Day plan queries
+  static dayPlans = (festivalId: string) => ["day-plans", festivalId] as const;
+  static friendsGoing = (festivalId: string) => ["friends-going", festivalId] as const;
+
   // Profile queries
   static tutorialStatus = () => ["tutorial-status"] as const;
   static missingProfileFields = () => ["missing-profile-fields"] as const;

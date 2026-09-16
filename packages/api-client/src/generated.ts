@@ -5695,6 +5695,378 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/festivals/{festivalId}/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the user's day plans
+         * @description Returns the user's active mark (plan to go or reservation) for every day of the festival that has one.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Day plans retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            plans: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                userId: string;
+                                /** Format: uuid */
+                                festivalId: string;
+                                /** Format: date */
+                                date: string;
+                                /** @enum {string} */
+                                kind: "plan" | "reservation";
+                                /** Format: uuid */
+                                tentId: string | null;
+                                tentName: string | null;
+                                note: string | null;
+                                visibleToGroups: boolean;
+                                /** Format: date-time */
+                                startAt: string | null;
+                                /** Format: date-time */
+                                endAt: string | null;
+                                /** @enum {string|null} */
+                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired" | null;
+                                reminderOffsetMinutes: number | null;
+                                autoCheckin: boolean | null;
+                                /** Format: date-time */
+                                reminderSentAt: string | null;
+                                /** Format: date-time */
+                                promptSentAt: string | null;
+                                /** Format: date-time */
+                                processedAt: string | null;
+                                /** Format: date-time */
+                                createdAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/festivals/{festivalId}/days/{date}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set the user's plan for a day
+         * @description Creates or replaces the day's single mark. Switching between plan and reservation updates the same row.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                    date: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        kind: "plan";
+                        /** Format: uuid */
+                        tentId?: string | null;
+                        note?: string | null;
+                        visibleToGroups: boolean;
+                    } | {
+                        /** @enum {string} */
+                        kind: "reservation";
+                        /** Format: uuid */
+                        tentId: string;
+                        /** Format: date-time */
+                        startAt: string;
+                        note?: string | null;
+                        visibleToGroups: boolean;
+                        reminderOffsetMinutes?: number;
+                        autoCheckin?: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description Day plan saved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            plan: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                userId: string;
+                                /** Format: uuid */
+                                festivalId: string;
+                                /** Format: date */
+                                date: string;
+                                /** @enum {string} */
+                                kind: "plan" | "reservation";
+                                /** Format: uuid */
+                                tentId: string | null;
+                                tentName: string | null;
+                                note: string | null;
+                                visibleToGroups: boolean;
+                                /** Format: date-time */
+                                startAt: string | null;
+                                /** Format: date-time */
+                                endAt: string | null;
+                                /** @enum {string|null} */
+                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired" | null;
+                                reminderOffsetMinutes: number | null;
+                                autoCheckin: boolean | null;
+                                /** Format: date-time */
+                                reminderSentAt: string | null;
+                                /** Format: date-time */
+                                promptSentAt: string | null;
+                                /** Format: date-time */
+                                processedAt: string | null;
+                                /** Format: date-time */
+                                createdAt: string | null;
+                                /** Format: date-time */
+                                updatedAt: string | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Validation error */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Festival not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description The day's reservation can no longer be changed */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * Clear the user's plan for a day
+         * @description Deletes a plan, or cancels a reservation.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                    date: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Day plan cleared */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description The day has no plan */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/festivals/{festivalId}/friends-going": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List friends going on upcoming days
+         * @description Friends' and group-mates' visible plans and reservations from today on, grouped by day.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Friends going retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            days: {
+                                /** Format: date */
+                                date: string;
+                                users: {
+                                    /** Format: uuid */
+                                    userId: string;
+                                    username: string | null;
+                                    fullName: string | null;
+                                    avatarUrl: string | null;
+                                    /** @enum {string} */
+                                    kind: "plan" | "reservation";
+                                    tentName: string | null;
+                                    /** Format: date-time */
+                                    startAt: string | null;
+                                    note: string | null;
+                                }[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Festival not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/location/sessions": {
         parameters: {
             query?: never;
