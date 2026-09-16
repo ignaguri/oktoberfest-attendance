@@ -679,7 +679,6 @@
       "a11yPhotos_other": "{{count}} Fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserviert",
-      "reservationsUnavailable": "Reservierungen konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einer Reservierung.",
       "plansUnavailable": "Pläne konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einem Plan oder einer Reservierung.",
       "planning": "Geplant",
       "friendsCount": "{{count}} Freund",

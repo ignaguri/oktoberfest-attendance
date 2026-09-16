@@ -1,9 +1,9 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals, DayPlan } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { isSameDay, parseISO } from "date-fns";
-import { CalendarClock, Image as ImageIcon } from "lucide-react-native";
+import { format, isSameDay, parseISO } from "date-fns";
+import { CalendarClock, Footprints, Image as ImageIcon, Users } from "lucide-react-native";
 import { Fragment, useMemo } from "react";
 
 import { Divider } from "@/components/ui/divider";
@@ -12,32 +12,37 @@ import { Pressable } from "@/components/ui/pressable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { IconColors } from "@/lib/constants/colors";
-import type { DaySummaries } from "@/lib/database/adapted-hooks";
 import {
-  buildActiveReservationsByDate,
   buildDayListEntries,
   type DayListEntry,
   formatEuros,
 } from "@/lib/attendance/day-list-entries";
+import { buildDayPlansByDate } from "@/lib/attendance/day-plans";
+import { IconColors } from "@/lib/constants/colors";
+import type { DaySummaries } from "@/lib/database/adapted-hooks";
 
 import { DrinkCountSummary } from "./drink-count-summary";
 
 /** Names shown inline before the row collapses the rest into "+N". */
 const MAX_VISIBLE_TENTS = 2;
 
+const NO_FRIENDS = new Map<string, number>();
+
 interface AttendanceDayListProps {
   attendances: AttendanceWithTotals[];
   summaries: DaySummaries | null;
-  reservations?: Reservation[];
+  /** The user's own marks, both kinds. */
+  plans?: DayPlan[];
   /**
-   * Reservations could not be loaded, so reservation-only rows are missing.
+   * Plans could not be loaded, so plan-only and reservation-only rows are missing.
    *
    * Worth saying out loud: this list is the one view whose row *set* depends on
-   * reservation data, and reservations are API-only, so offline it is simply
-   * shorter with no explanation. Silence reads as days having been lost.
+   * plan data, and plans are API-only, so offline it is simply shorter with no
+   * explanation. Silence reads as days having been lost.
    */
-  reservationsUnavailable?: boolean;
+  plansUnavailable?: boolean;
+  /** How many friends have a visible plan or reservation, per YYYY-MM-DD. */
+  friendsCountByDate?: Map<string, number>;
   /**
    * Day summaries are still being read from SQLite.
    *
@@ -51,36 +56,50 @@ interface AttendanceDayListProps {
   onDateSelect: (date: Date) => void;
 }
 
+function FriendsChip({ count }: { count: number }) {
+  const { t } = useTranslation();
+
+  return (
+    <HStack space="xs" className="items-center rounded-full bg-sky-100 px-2 py-0.5">
+      <Users size={12} color={IconColors.friends} />
+      <Text className="text-xs font-medium text-sky-700">
+        {t("attendance.list.friendsCount", { count })}
+      </Text>
+    </HStack>
+  );
+}
+
 /**
- * List of days that have an attendance record or an active reservation, most
- * recent first.
+ * List of days that have an attendance record, a plan or an active reservation,
+ * most recent first.
  *
  * Complements the strip: the strip shows which days exist and is where you plan
  * and log, the list shows what each logged day actually cost and where it
- * happened — detail a 48pt cell cannot carry. Reservation-only days (an active
- * reservation with no attendance yet) render as a lightweight row so this view
- * doesn't hide reservations the way the calendar strip does not.
+ * happened. Plan-only and reservation-only days render as lightweight rows, and
+ * upcoming rows say how many friends are going.
  */
 export function AttendanceDayList({
   attendances,
   summaries,
-  reservations = [],
-  reservationsUnavailable = false,
+  plans = [],
+  plansUnavailable = false,
+  friendsCountByDate = NO_FRIENDS,
   summariesLoading = false,
   selectedDate,
   onDateSelect,
 }: AttendanceDayListProps) {
   const { t } = useTranslation();
+  const todayKey = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
 
   function handlePress(dateStr: string) {
     onDateSelect(parseISO(dateStr));
   }
 
-  const reservationMap = useMemo(() => buildActiveReservationsByDate(reservations), [reservations]);
+  const planMap = useMemo(() => buildDayPlansByDate(plans), [plans]);
 
   const entries = useMemo(
-    () => buildDayListEntries(attendances, reservationMap),
-    [attendances, reservationMap],
+    () => buildDayListEntries(attendances, planMap, todayKey),
+    [attendances, planMap, todayKey],
   );
 
   // A refetch keeps the previous summaries, and showing placeholders over data
@@ -89,13 +108,11 @@ export function AttendanceDayList({
 
   // Sits above the rows and inside the empty state, because a list that is merely
   // shorter than usual is the case that misleads: the user cannot tell a day they
-  // never logged from a reservation row that failed to load.
-  const reservationNotice = reservationsUnavailable ? (
+  // never logged from a plan row that failed to load.
+  const plansNotice = plansUnavailable ? (
     <HStack space="xs" className="items-center justify-center px-3 py-2">
       <CalendarClock size={14} color={IconColors.muted} />
-      <Text className="text-xs text-typography-500">
-        {t("attendance.list.reservationsUnavailable")}
-      </Text>
+      <Text className="text-xs text-typography-500">{t("attendance.list.plansUnavailable")}</Text>
     </HStack>
   ) : null;
 
@@ -108,15 +125,76 @@ export function AttendanceDayList({
         <Text className="text-center text-sm text-typography-500">
           {t("attendance.noAttendancesDescription")}
         </Text>
-        {reservationNotice}
+        {plansNotice}
       </VStack>
     );
   }
 
+  /** Friends only matter for days still ahead. */
+  function upcomingFriendsCount(dateStr: string): number {
+    return dateStr >= todayKey ? (friendsCountByDate.get(dateStr) ?? 0) : 0;
+  }
+
   function renderEntry(entry: DayListEntry) {
+    const date = parseISO(entry.date);
+    const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
+    const friendsCount = upcomingFriendsCount(entry.date);
+
+    if (entry.kind === "planOnly") {
+      const { plan } = entry;
+
+      const accessibilityLabelParts = [
+        formatLocalized(date, "EEEE, MMMM d"),
+        t("attendance.list.planning"),
+      ];
+      if (plan.tentName) {
+        accessibilityLabelParts.push(plan.tentName);
+      }
+      if (plan.note) {
+        accessibilityLabelParts.push(plan.note);
+      }
+      if (friendsCount > 0) {
+        accessibilityLabelParts.push(t("attendance.list.friendsCount", { count: friendsCount }));
+      }
+
+      return (
+        <Pressable
+          onPress={() => handlePress(entry.date)}
+          className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabelParts.join(", ")}
+          accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+          accessibilityState={{ selected: isSelected }}
+        >
+          <VStack space="xs">
+            <HStack className="items-center justify-between">
+              <Text className="font-medium text-typography-900">
+                {formatLocalized(date, "EEE, MMM d")}
+              </Text>
+              <HStack space="xs" className="items-center">
+                <Footprints size={14} color={IconColors.plan} />
+                <Text className="text-sm text-teal-700">{t("attendance.list.planning")}</Text>
+                {plan.tentName && (
+                  <Text className="text-sm text-typography-500" numberOfLines={1}>
+                    {plan.tentName}
+                  </Text>
+                )}
+              </HStack>
+            </HStack>
+            {(plan.note || friendsCount > 0) && (
+              <HStack space="sm" className="items-center justify-between">
+                <Text className="flex-1 text-xs italic text-typography-500" numberOfLines={1}>
+                  {plan.note ?? ""}
+                </Text>
+                {friendsCount > 0 && <FriendsChip count={friendsCount} />}
+              </HStack>
+            )}
+          </VStack>
+        </Pressable>
+      );
+    }
+
     if (entry.kind === "reservationOnly") {
-      const date = parseISO(entry.date);
-      const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
       const { reservation } = entry;
 
       const accessibilityLabelParts = [
@@ -126,42 +204,52 @@ export function AttendanceDayList({
       if (reservation.tentName) {
         accessibilityLabelParts.push(reservation.tentName);
       }
+      if (friendsCount > 0) {
+        accessibilityLabelParts.push(t("attendance.list.friendsCount", { count: friendsCount }));
+      }
 
       return (
         <Pressable
           onPress={() => handlePress(entry.date)}
           className={cn("rounded-lg p-3", isSelected ? "bg-primary-100" : "bg-transparent")}
+          accessibilityRole="button"
           accessibilityLabel={accessibilityLabelParts.join(", ")}
           accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
+          accessibilityState={{ selected: isSelected }}
         >
-          <HStack className="items-center justify-between">
-            <Text className="font-medium text-typography-900">
-              {formatLocalized(date, "EEE, MMM d")}
-            </Text>
-            <HStack space="xs" className="items-center">
-              <CalendarClock size={14} color={IconColors.reservation} />
-              <Text className="text-sm text-teal-700">{t("attendance.list.reserved")}</Text>
-              {reservation.tentName && (
-                <Text className="text-sm text-typography-500">{reservation.tentName}</Text>
-              )}
+          <VStack space="xs">
+            <HStack className="items-center justify-between">
+              <Text className="font-medium text-typography-900">
+                {formatLocalized(date, "EEE, MMM d")}
+              </Text>
+              <HStack space="xs" className="items-center">
+                <CalendarClock size={14} color={IconColors.reservation} />
+                <Text className="text-sm text-teal-700">{t("attendance.list.reserved")}</Text>
+                {reservation.tentName && (
+                  <Text className="text-sm text-typography-500">{reservation.tentName}</Text>
+                )}
+              </HStack>
             </HStack>
-          </HStack>
+            {friendsCount > 0 && (
+              <HStack className="justify-end">
+                <FriendsChip count={friendsCount} />
+              </HStack>
+            )}
+          </VStack>
         </Pressable>
       );
     }
 
     const { attendance } = entry;
-    const date = parseISO(attendance.date);
-    const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
     const tentNames = summaries?.tentNames.get(attendance.date) ?? [];
     const drinkCounts = summaries?.drinkCounts.get(attendance.date);
     const photoCount = summaries?.photoCounts.get(attendance.date) ?? 0;
-    const hasReservation = reservationMap.has(attendance.date);
+    const hasReservation = planMap.get(attendance.date)?.kind === "reservation";
 
     const visibleTents = tentNames.slice(0, MAX_VISIBLE_TENTS);
     const hiddenTentCount = tentNames.length - visibleTents.length;
 
-    // Everything the row shows, including the two bare icons: a reservation and a
+    // Everything the row shows, including the bare icons: a reservation and a
     // photo are rendered as glyphs with no text anywhere near them, so leaving
     // them out made them invisible to a screen reader.
     // drinkCount rather than a dedicated string, because it is already pluralized
@@ -184,6 +272,9 @@ export function AttendanceDayList({
     }
     if (tentNames.length > 0) {
       accessibilityLabelParts.push(tentNames.join(", "));
+    }
+    if (friendsCount > 0) {
+      accessibilityLabelParts.push(t("attendance.list.friendsCount", { count: friendsCount }));
     }
 
     return (
@@ -248,6 +339,12 @@ export function AttendanceDayList({
               )}
             </HStack>
           )}
+
+          {friendsCount > 0 && (
+            <HStack className="justify-end">
+              <FriendsChip count={friendsCount} />
+            </HStack>
+          )}
         </VStack>
       </Pressable>
     );
@@ -255,7 +352,7 @@ export function AttendanceDayList({
 
   return (
     <VStack space="xs" className="rounded-xl bg-background-0 p-2">
-      {reservationNotice}
+      {plansNotice}
       {entries.map((entry, index) => (
         <Fragment key={entry.date}>
           {index > 0 && <Divider />}
@@ -265,5 +362,3 @@ export function AttendanceDayList({
     </VStack>
   );
 }
-
-AttendanceDayList.displayName = "AttendanceDayList";

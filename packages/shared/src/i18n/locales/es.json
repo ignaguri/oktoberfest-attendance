@@ -694,7 +694,6 @@
       "a11yPhotos_other": "{{count}} fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reservado",
-      "reservationsUnavailable": "No se pudieron cargar las reservas, así que faltan los días que solo tienen una reserva.",
       "plansUnavailable": "No se pudieron cargar los planes, así que faltan los días que solo tienen un plan o una reserva.",
       "planning": "Planeando",
       "friendsCount": "{{count}} amigo",

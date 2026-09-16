@@ -335,8 +335,9 @@ export default function AttendanceScreen() {
                 attendances={(attendances ?? []) as AttendanceWithTotals[]}
                 summaries={daySummaries}
                 summariesLoading={daySummariesLoading}
-                reservations={reservations}
-                reservationsUnavailable={plansUnavailable}
+                plans={plans}
+                plansUnavailable={plansUnavailable}
+                friendsCountByDate={friendsCountByDate}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />
