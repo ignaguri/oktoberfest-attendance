@@ -5979,6 +5979,18 @@ export interface paths {
                         };
                     };
                 };
+                /** @description The day's reservation already happened and can't be cancelled */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
             };
         };
         options?: never;

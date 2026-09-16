@@ -133,6 +133,7 @@ const deleteDayPlanRoute = createRoute({
     },
     401: errorResponse("Unauthorized"),
     404: errorResponse("The day has no plan"),
+    409: errorResponse("The day's reservation already happened and can't be cancelled"),
   },
   security: [{ bearerAuth: [] }],
 });

@@ -20,6 +20,15 @@ export interface UpsertDayPlanResult {
 }
 
 /**
+ * A reservation that was checked in, completed or expired records a day that
+ * happened; rewriting it, turning it into a plan or cancelling it would falsify
+ * that.
+ */
+function isFinishedReservation(plan: DayPlan): boolean {
+  return plan.kind === "reservation" && plan.status !== "pending" && plan.status !== "confirmed";
+}
+
+/**
  * The columns a save writes, given what the day held before.
  *
  * Editing a reservation keeps what the form does not send (status, end time,
@@ -99,13 +108,7 @@ export class DayPlanService {
 
     const existing = await this.repo.findActiveByDate(userId, festivalId, date);
 
-    // A reservation that was checked in, completed or expired records a day that
-    // happened; turning it into a plan or rewriting it would falsify that.
-    if (
-      existing?.kind === "reservation" &&
-      existing.status !== "pending" &&
-      existing.status !== "confirmed"
-    ) {
+    if (existing && isFinishedReservation(existing)) {
       throw new ConflictError(ErrorCodes.DAY_PLAN_CONFLICT);
     }
 
@@ -126,6 +129,9 @@ export class DayPlanService {
 
     if (!existing) {
       throw new NotFoundError(ErrorCodes.DAY_PLAN_NOT_FOUND);
+    }
+    if (isFinishedReservation(existing)) {
+      throw new ConflictError(ErrorCodes.DAY_PLAN_CONFLICT);
     }
 
     // A plan leaves no trace; a reservation is cancelled, as it always was.

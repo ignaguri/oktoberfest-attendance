@@ -266,6 +266,15 @@ describe("DayPlanService.removePlan", () => {
     expect(repo.deleteById).not.toHaveBeenCalled();
   });
 
+  it("refuses to cancel a reservation that already happened", async () => {
+    const repo = createRepo(dayPlan({ kind: "reservation", status: "checked_in", tentId: TENT_ID }));
+
+    await expect(
+      createService(repo).removePlan(USER_ID, FESTIVAL_ID, "2026-09-26"),
+    ).rejects.toMatchObject({ code: ErrorCodes.DAY_PLAN_CONFLICT });
+    expect(repo.cancel).not.toHaveBeenCalled();
+  });
+
   it("fails when the day has no mark", async () => {
     await expect(
       createService(createRepo()).removePlan(USER_ID, FESTIVAL_ID, "2026-09-26"),
