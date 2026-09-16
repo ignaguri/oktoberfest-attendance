@@ -651,10 +651,36 @@
       "invalidDate": "Por favor, seleccioná una fecha válida",
       "dateOutsideFestival": "La fecha debe estar dentro de las fechas del festival"
     },
+    "planner": {
+      "whosGoing": "Quién va",
+      "moreFriends": "+{{count}} más",
+      "unknownFriend": "Alguien",
+      "you": "Vos",
+      "status": {
+        "none": "No voy",
+        "plan": "Planeando",
+        "reservation": "Reservado"
+      },
+      "tentOptional": "Carpa (opcional)",
+      "clearTent": "Quitar carpa",
+      "notePlaceholder": "¿Con quién vas?",
+      "visibility": "Visible para amigos y grupos",
+      "visibilityDescription": "Van a ver que vas ese día",
+      "reservationHint": "¿Tenés mesa? Cambiá a Reservado para agregar horario y recordatorio.",
+      "summaryPlan": "Planeás ir",
+      "summaryReservation": "Tenés una reserva",
+      "editHint": "Abre tu plan de este día para editarlo",
+      "saveFailed": "No se pudo guardar tu plan. Probá de nuevo."
+    },
     "calendar": {
       "tapToAddOrEdit": "Tocá un día para agregar o editar tu asistencia",
       "hasAttendance": "Tiene asistencia",
       "hasReservation": "Reserva",
+      "hasPlan": "Planeando",
+      "friendsGoing": "Amigos que van",
+      "a11yPlanning": "planea ir",
+      "a11yFriendsGoing": "{{count}} amigo va",
+      "a11yFriendsGoing_other": "{{count}} amigos van",
       "selected": "Seleccionado"
     },
     "view": {
@@ -669,11 +695,16 @@
       "moreTents": "+{{amount}}",
       "reserved": "Reservado",
       "reservationsUnavailable": "No se pudieron cargar las reservas, así que faltan los días que solo tienen una reserva.",
+      "plansUnavailable": "No se pudieron cargar los planes, así que faltan los días que solo tienen un plan o una reserva.",
+      "planning": "Planeando",
+      "friendsCount": "{{count}} amigo",
+      "friendsCount_other": "{{count}} amigos",
       "tip": "+{{amount}} propina"
     },
     "tabs": {
       "attendance": "Asistencia",
-      "reservation": "Reserva"
+      "reservation": "Reserva",
+      "plan": "Plan"
     },
     "saveSuccess": "Cambios guardados exitosamente",
     "summary": {
@@ -1354,6 +1385,8 @@
       "achievementsDescription": "Recibí notificaciones cuando desbloquees logros",
       "groups": "Notificaciones de grupos",
       "groupsDescription": "Recibí notificaciones de tus grupos (check-ins, logros, etc.)",
+      "friendPlans": "Planes de amigos",
+      "friendPlansDescription": "Cuando un amigo va un día que marcaste",
       "groupActivity": "Actividad del grupo",
       "reminders": "Recordatorios",
       "remindersDescription": "Recordatorios de reservas y avisos de check-in",

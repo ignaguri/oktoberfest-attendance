@@ -636,10 +636,36 @@
       "invalidDate": "Bitte wähle ein gültiges Datum",
       "dateOutsideFestival": "Das Datum muss innerhalb der Festivaldaten liegen"
     },
+    "planner": {
+      "whosGoing": "Wer geht hin",
+      "moreFriends": "+{{count}} weitere",
+      "unknownFriend": "Jemand",
+      "you": "Du",
+      "status": {
+        "none": "Gehe nicht",
+        "plan": "Geplant",
+        "reservation": "Reserviert"
+      },
+      "tentOptional": "Zelt (optional)",
+      "clearTent": "Zelt entfernen",
+      "notePlaceholder": "Mit wem gehst du hin?",
+      "visibility": "Sichtbar für Freunde & Gruppen",
+      "visibilityDescription": "Sie sehen, dass du an diesem Tag hingehst",
+      "reservationHint": "Du hast einen Tisch? Wechsle zu Reserviert, um Uhrzeit und Erinnerung hinzuzufügen.",
+      "summaryPlan": "Du planst hinzugehen",
+      "summaryReservation": "Du hast eine Reservierung",
+      "editHint": "Öffnet deinen Plan für diesen Tag zum Bearbeiten",
+      "saveFailed": "Dein Plan konnte nicht gespeichert werden. Versuch es noch einmal."
+    },
     "calendar": {
       "tapToAddOrEdit": "Tippe auf einen Tag, um deinen Besuch hinzuzufügen oder zu bearbeiten",
       "hasAttendance": "Hat Besuch",
       "hasReservation": "Reservierung",
+      "hasPlan": "Geplant",
+      "friendsGoing": "Freunde gehen hin",
+      "a11yPlanning": "plant hinzugehen",
+      "a11yFriendsGoing": "{{count}} Freund geht hin",
+      "a11yFriendsGoing_other": "{{count}} Freunde gehen hin",
       "selected": "Ausgewählt"
     },
     "view": {
@@ -654,11 +680,16 @@
       "moreTents": "+{{amount}}",
       "reserved": "Reserviert",
       "reservationsUnavailable": "Reservierungen konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einer Reservierung.",
+      "plansUnavailable": "Pläne konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einem Plan oder einer Reservierung.",
+      "planning": "Geplant",
+      "friendsCount": "{{count}} Freund",
+      "friendsCount_other": "{{count}} Freunde",
       "tip": "+{{amount}} Trinkgeld"
     },
     "tabs": {
       "attendance": "Besuche",
-      "reservation": "Reservierung"
+      "reservation": "Reservierung",
+      "plan": "Plan"
     },
     "saveSuccess": "Änderungen erfolgreich gespeichert",
     "summary": {
@@ -1516,6 +1547,8 @@
       "achievementsDescription": "Benachrichtigung erhalten, wenn du Erfolge freischaltest",
       "groups": "Gruppen-Benachrichtigungen",
       "groupsDescription": "Benachrichtigungen von deinen Gruppen erhalten (Check-ins, Erfolge, etc.)",
+      "friendPlans": "Pläne von Freunden",
+      "friendPlansDescription": "Wenn Freunde an einem Tag hingehen, den du markiert hast",
       "groupActivity": "Gruppen-Aktivität",
       "reminders": "Erinnerungen",
       "remindersDescription": "Reservierungserinnerungen und Check-in-Aufforderungen",

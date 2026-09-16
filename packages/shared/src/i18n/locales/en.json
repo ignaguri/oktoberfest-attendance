@@ -651,10 +651,36 @@
       "invalidDate": "Please select a valid date",
       "dateOutsideFestival": "Date must be within the festival dates"
     },
+    "planner": {
+      "whosGoing": "Who's going",
+      "moreFriends": "+{{count}} more",
+      "unknownFriend": "Someone",
+      "you": "You",
+      "status": {
+        "none": "Not going",
+        "plan": "Planning",
+        "reservation": "Reserved"
+      },
+      "tentOptional": "Tent (optional)",
+      "clearTent": "Clear tent",
+      "notePlaceholder": "Who are you going with?",
+      "visibility": "Visible to friends & groups",
+      "visibilityDescription": "They'll see you're going this day",
+      "reservationHint": "Got a table? Switch to Reserved to add a time and a reminder.",
+      "summaryPlan": "You're planning to go",
+      "summaryReservation": "You have a reservation",
+      "editHint": "Opens your plan for this day to edit",
+      "saveFailed": "Couldn't save your plan. Try again."
+    },
     "calendar": {
       "tapToAddOrEdit": "Tap a day to add or edit your attendance",
       "hasAttendance": "Has attendance",
       "hasReservation": "Reservation",
+      "hasPlan": "Planning",
+      "friendsGoing": "Friends going",
+      "a11yPlanning": "planning to go",
+      "a11yFriendsGoing": "{{count}} friend going",
+      "a11yFriendsGoing_other": "{{count}} friends going",
       "selected": "Selected"
     },
     "view": {
@@ -669,11 +695,16 @@
       "moreTents": "+{{amount}}",
       "reserved": "Reserved",
       "reservationsUnavailable": "Reservations couldn't be loaded, so days with only a reservation are missing.",
+      "plansUnavailable": "Plans couldn't be loaded, so days with only a plan or reservation are missing.",
+      "planning": "Planning",
+      "friendsCount": "{{count}} friend",
+      "friendsCount_other": "{{count}} friends",
       "tip": "+{{amount}} tip"
     },
     "tabs": {
       "attendance": "Attendance",
-      "reservation": "Reservation"
+      "reservation": "Reservation",
+      "plan": "Plan"
     },
     "saveSuccess": "Changes saved successfully",
     "summary": {
@@ -1294,6 +1325,8 @@
       "achievementsDescription": "Get notified when you unlock achievements",
       "groups": "Group Notifications",
       "groupsDescription": "Get notifications from your groups (check-ins, achievements, etc.)",
+      "friendPlans": "Friends' plans",
+      "friendPlansDescription": "When a friend is going on a day you've marked",
       "groupActivity": "Group Activity",
       "reminders": "Reminders",
       "remindersDescription": "Reservation reminders and check-in prompts",
