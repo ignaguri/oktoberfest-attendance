@@ -1,7 +1,12 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
+import type {
+  AttendanceWithTotals,
+  DayPlan,
+  FriendGoing,
+  Reservation,
+} from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
-import { endOfDay, isAfter, isBefore, startOfDay } from "date-fns";
+import { endOfDay, format, isAfter, isBefore, startOfDay } from "date-fns";
 import { X } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -20,10 +25,11 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
+import { DayPlanner } from "../day-planner";
 import { type AttendanceSuccessData, AttendanceTabContent } from "./attendance-tab-content";
 import { ReservationTabContent } from "./reservation-tab-content";
 
-export type TabKey = "attendance" | "reservation";
+export type TabKey = "attendance" | "reservation" | "plan";
 
 export interface CalendarActionSheetProps {
   isOpen: boolean;
@@ -33,30 +39,29 @@ export interface CalendarActionSheetProps {
   festivalEndDate: Date;
   selectedDate: Date;
   existingAttendance?: AttendanceWithTotals | null;
+  /** The day's active reservation, shown read-only on a past day. */
   existingReservation?: Reservation | null;
+  /** The user's plan or reservation for the day, edited in the planner. */
+  existingPlan?: DayPlan | null;
+  /** Friends with a visible plan or reservation on the day. */
+  friends?: FriendGoing[];
   onSuccess?: (data: AttendanceSuccessData) => void;
   // Check-in mode: pre-fill tent from reservation
   checkInMode?: boolean;
   prefillTentId?: string;
 }
 
+const NO_FRIENDS: FriendGoing[] = [];
+
 /**
- * Calendar action sheet with tabs for attendance and reservations
+ * Calendar action sheet for one day.
  *
- * Tab availability is determined by the selected date and the data that exists:
- * - Past dates: attendance, plus a read-only reservation tab if one exists
- * - Today: Both tabs available
- * - Future dates: Only reservation tab
+ * - Past: attendance, plus a read-only reservation tab if one exists
+ * - Today: attendance and the day planner
+ * - Future: the day planner alone, with no segmented control
  *
- * Whether you can *create* a reservation is a date question; whether you can
- * *read* the one already there is not. A past reservation stays viewable so
- * reservation history isn't write-only.
- *
- * Features:
- * - Smart default tab based on date and existing data
- * - Shared date header
- * - Seamless tab switching
- * - Check-in mode for reservation flow
+ * The planner holds the day's single status (not going, planning, reserved)
+ * and who else is going.
  */
 export function CalendarActionSheet({
   isOpen,
@@ -67,6 +72,8 @@ export function CalendarActionSheet({
   selectedDate,
   existingAttendance,
   existingReservation,
+  existingPlan = null,
+  friends = NO_FRIENDS,
   onSuccess,
   checkInMode = false,
   prefillTentId,
@@ -79,45 +86,58 @@ export function CalendarActionSheet({
   const isPastDate = isBefore(selectedDate, startOfDay(today));
   const isFutureDate = isAfter(selectedDate, endOfDay(today));
 
-  // Determine available tabs based on date
   const availableTabs = useMemo((): Tab[] => {
-    const attendanceTab: Tab = {
-      key: "attendance",
-      label: t("attendance.tabs.attendance"),
-      disabled: isFutureDate,
-    };
+    if (isFutureDate) {
+      return [];
+    }
 
-    const reservationTab: Tab = {
-      key: "reservation",
-      label: t("attendance.tabs.reservation"),
+    const attendanceTab: Tab = { key: "attendance", label: t("attendance.tabs.attendance") };
+
+    if (isPastDate) {
       // Past dates can't take a new reservation, but an existing one stays
-      // readable (the tab renders read-only below).
-      disabled: isPastDate && !existingReservation,
-    };
+      // readable so reservation history isn't write-only.
+      return [
+        attendanceTab,
+        {
+          key: "reservation",
+          label: t("attendance.tabs.reservation"),
+          disabled: !existingReservation,
+        },
+      ];
+    }
 
-    return [attendanceTab, reservationTab];
+    return [attendanceTab, { key: "plan", label: t("attendance.tabs.plan") }];
   }, [t, isPastDate, isFutureDate, existingReservation]);
 
-  // Determine default tab when sheet opens
   const determineDefaultTab = useCallback((): TabKey => {
     // Check-in mode always opens to attendance
-    if (checkInMode) return "attendance";
-
-    // Future date - reservation only
-    if (isFutureDate) return "reservation";
-
+    if (checkInMode) {
+      return "attendance";
+    }
+    if (isFutureDate) {
+      return "plan";
+    }
     // Past date - attendance, unless the only thing logged that day was a
     // reservation, in which case an empty attendance form is the wrong landing.
     if (isPastDate) {
       return !existingAttendance && existingReservation ? "reservation" : "attendance";
     }
-
-    // Today - prefer attendance if exists, else reservation if exists, else attendance
-    if (existingAttendance) return "attendance";
-    if (existingReservation) return "reservation";
-
+    // Today - attendance if logged, else the plan if one exists, else attendance
+    if (existingAttendance) {
+      return "attendance";
+    }
+    if (existingPlan) {
+      return "plan";
+    }
     return "attendance";
-  }, [checkInMode, isFutureDate, isPastDate, existingAttendance, existingReservation]);
+  }, [
+    checkInMode,
+    isFutureDate,
+    isPastDate,
+    existingAttendance,
+    existingReservation,
+    existingPlan,
+  ]);
 
   // Reset active tab when sheet opens
   useEffect(() => {
@@ -129,13 +149,12 @@ export function CalendarActionSheet({
     }
   }, [isOpen, determineDefaultTab]);
 
-  // Handle tab change
   const handleTabChange = useCallback((key: string) => {
     setActiveTab(key as TabKey);
   }, []);
 
-  // Wrapper for reservation success (doesn't pass tent data)
-  const handleReservationSuccess = useCallback(() => {
+  // The planner doesn't report tents, so its success carries none
+  const handlePlanSuccess = useCallback(() => {
     onSuccess?.({ date: selectedDate, tentIds: [] });
   }, [onSuccess, selectedDate]);
 
@@ -144,6 +163,8 @@ export function CalendarActionSheet({
     selectedDate && !isNaN(selectedDate.getTime())
       ? formatLocalized(selectedDate, "EEEE, MMMM d, yyyy")
       : t("common.labels.selectDate");
+
+  const plannerKey = `${format(selectedDate, "yyyy-MM-dd")}-${existingPlan?.id ?? "new"}`;
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -161,16 +182,16 @@ export function CalendarActionSheet({
           </Pressable>
         </HStack>
 
-        {/* Tab Bar */}
-        <VStack className="mb-4 w-full px-2">
-          <SegmentedControl
-            tabs={availableTabs}
-            activeTab={activeTab}
-            onTabChange={handleTabChange}
-          />
-        </VStack>
+        {availableTabs.length > 0 && (
+          <VStack className="mb-4 w-full px-2">
+            <SegmentedControl
+              tabs={availableTabs}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
+          </VStack>
+        )}
 
-        {/* Tab Content */}
         <ActionsheetScrollView className="w-full">
           {activeTab === "attendance" && !isFutureDate && (
             <AttendanceTabContent
@@ -185,13 +206,18 @@ export function CalendarActionSheet({
             />
           )}
 
-          {activeTab === "reservation" && (!isPastDate || Boolean(existingReservation)) && (
-            <ReservationTabContent
+          {activeTab === "reservation" && isPastDate && existingReservation && (
+            <ReservationTabContent existingReservation={existingReservation} onClose={onClose} />
+          )}
+
+          {activeTab === "plan" && !isPastDate && (
+            <DayPlanner
+              key={plannerKey}
               festivalId={festivalId}
               selectedDate={selectedDate}
-              existingReservation={existingReservation}
-              readOnly={isPastDate}
-              onSuccess={onSuccess ? handleReservationSuccess : undefined}
+              existingPlan={existingPlan}
+              friends={friends}
+              onSuccess={onSuccess ? handlePlanSuccess : undefined}
               onClose={onClose}
             />
           )}

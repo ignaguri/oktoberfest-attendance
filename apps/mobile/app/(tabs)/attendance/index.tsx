@@ -49,8 +49,9 @@ export default function AttendanceScreen() {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const router = useRouter();
-  const { checkInReservationId } = useLocalSearchParams<{
+  const { checkInReservationId, date: dateParam } = useLocalSearchParams<{
     checkInReservationId?: string;
+    date?: string;
   }>();
 
   // Dialog state
@@ -151,6 +152,18 @@ export default function AttendanceScreen() {
     }
   }, [checkInReservationId, reservations, router]);
 
+  // Open a day from a deep link, e.g. a friend's overlap push (?date=YYYY-MM-DD)
+  useEffect(() => {
+    if (!dateParam || !/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+      return;
+    }
+    queueMicrotask(() => {
+      setSelectedDate(parseISO(dateParam));
+      setIsFormOpen(true);
+      router.setParams({ date: undefined });
+    });
+  }, [dateParam, router]);
+
   // Parse festival dates using parseISO to avoid UTC timezone issues
   // new Date("2024-12-31") parses as UTC midnight, but parseISO treats it as local
   const festivalStartDate = useMemo(
@@ -180,6 +193,11 @@ export default function AttendanceScreen() {
     () => (existingPlan ? dayPlanToReservation(existingPlan) : null),
     [existingPlan],
   );
+
+  const selectedDayFriends = useMemo(() => {
+    if (!selectedDate) return [];
+    return friendsByDate.get(format(selectedDate, "yyyy-MM-dd")) ?? [];
+  }, [selectedDate, friendsByDate]);
 
   // Transform attendances for calendar
   const calendarAttendances = useMemo(() => {
@@ -428,6 +446,8 @@ export default function AttendanceScreen() {
           selectedDate={selectedDate}
           existingAttendance={existingAttendance}
           existingReservation={existingReservation}
+          existingPlan={existingPlan}
+          friends={selectedDayFriends}
           onSuccess={handleFormSuccess}
           checkInMode={checkInMode}
           prefillTentId={prefillTentId}
