@@ -1,9 +1,9 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { Reservation } from "@prostcounter/shared/schemas";
+import type { DayPlan } from "@prostcounter/shared/schemas";
 import { buildFestivalWeeks, formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { addDays, format, isSameDay } from "date-fns";
-import { Beer, CalendarClock } from "lucide-react-native";
+import { Beer, CalendarClock, Footprints } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
 import { View } from "react-native";
 
@@ -11,8 +11,12 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import {
+  buildDayPlansByDate,
+  formatFriendsBadge,
+  resolveCellTopSlot,
+} from "@/lib/attendance/day-plans";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { buildActiveReservationsByDate } from "@/lib/attendance/day-list-entries";
 
 interface AttendanceData {
   date: string;
@@ -23,7 +27,10 @@ interface AttendanceStripProps {
   festivalStartDate: Date;
   festivalEndDate: Date;
   attendances: AttendanceData[];
-  reservations?: Reservation[];
+  /** The user's own marks, both kinds. Inactive reservations are ignored. */
+  plans?: DayPlan[];
+  /** How many friends have a visible plan or reservation, per YYYY-MM-DD. */
+  friendsCountByDate?: Map<string, number>;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
 }
@@ -31,14 +38,10 @@ interface AttendanceStripProps {
 // Week starts on Monday (ISO standard, used in Europe)
 const WEEK_STARTS_ON = 1 as const;
 
-/**
- * One size for both day indicators.
- *
- * The reservation glyph used to be 12 against the beer's 10, which cost the
- * indicator row two points it does not have on a first-of-month cell and left
- * the two icons visibly mismatched sitting side by side.
- */
+/** One size for every day indicator, so icons sitting side by side match. */
 const INDICATOR_ICON_SIZE = 10;
+
+const NO_FRIENDS = new Map<string, number>();
 
 /**
  * Weekday headers, generated from a known Monday so they always match the grid.
@@ -54,20 +57,23 @@ function getWeekdayHeaders(): string[] {
 /**
  * Strip of every day in the festival window, weekday-aligned.
  *
- * Replaces the previous month grid, which could open on a month containing zero
- * festival days and which split every month-straddling festival (5 of 6 in
- * production) across two screens.
+ * Cells are 56pt tall with three fixed rows: a top slot (TODAY or the month on
+ * the 1st), the day number, and the indicators. The old 48pt cell stacked the
+ * same content with an absolutely positioned today bar that landed on the
+ * number. Festivals span at most three or four weeks, so the height is cheap.
  */
 export function AttendanceStrip({
   festivalStartDate,
   festivalEndDate,
   attendances,
-  reservations = [],
+  plans = [],
+  friendsCountByDate = NO_FRIENDS,
   selectedDate,
   onDateSelect,
 }: AttendanceStripProps) {
   const { t } = useTranslation();
   const today = useMemo(() => new Date(), []);
+  const todayKey = useMemo(() => format(today, "yyyy-MM-dd"), [today]);
   const weekdayHeaders = useMemo(() => getWeekdayHeaders(), []);
 
   const weeks = useMemo(
@@ -88,9 +94,7 @@ export function AttendanceStrip({
     return map;
   }, [attendances]);
 
-  // Shared with the day list: both views need the same one-reservation-per-day
-  // map, and two copies of it would drift.
-  const reservationMap = useMemo(() => buildActiveReservationsByDate(reservations), [reservations]);
+  const planMap = useMemo(() => buildDayPlansByDate(plans), [plans]);
 
   const rangeLabel = useMemo(
     () =>
@@ -105,25 +109,37 @@ export function AttendanceStrip({
     (date: Date, isFirstOfMonth: boolean) => {
       const dateStr = format(date, "yyyy-MM-dd");
       const isToday = isSameDay(date, today);
+      // A plan and who else is going only mean something ahead of time. A past
+      // day shows what happened: attendance, and a reservation if one was made.
+      const isUpcoming = dateStr >= todayKey;
       const isSelected = selectedDate !== null && isSameDay(date, selectedDate);
       const drinkCount = attendanceMap.get(dateStr);
       const hasAttendance = drinkCount !== undefined;
-      const hasReservation = reservationMap.has(dateStr);
+      const plan = planMap.get(dateStr);
+      const hasReservation = plan?.kind === "reservation";
+      const hasPlan = plan?.kind === "plan" && isUpcoming;
+      const friendsCount = isUpcoming ? (friendsCountByDate.get(dateStr) ?? 0) : 0;
+      const topSlot = resolveCellTopSlot({ isToday, isFirstOfMonth });
 
       const cellClassName = cn(
-        "h-12 w-12 items-center justify-center rounded-lg",
+        "h-14 flex-1 items-center justify-center rounded-lg",
         isSelected && "bg-primary-500",
-        !isSelected && hasAttendance && "bg-primary-100 border border-primary-300",
-        !isSelected && !hasAttendance && hasReservation && "bg-teal-100 border border-teal-300",
-        !isSelected && !hasAttendance && !hasReservation && "bg-background-100",
+        !isSelected && hasAttendance && "border border-primary-300 bg-primary-100",
+        !isSelected && !hasAttendance && hasReservation && "border border-teal-300 bg-teal-100",
+        !isSelected &&
+          !hasAttendance &&
+          !hasReservation &&
+          hasPlan &&
+          "border-2 border-dashed border-teal-400 bg-background-0",
+        !isSelected && !hasAttendance && !hasReservation && !hasPlan && "bg-background-100",
       );
 
-      const textClassName = cn(
-        "text-sm font-medium",
+      const numberClassName = cn(
+        "text-base font-semibold leading-tight",
         isSelected && "text-white",
         !isSelected && hasAttendance && "text-primary-700",
-        !isSelected && !hasAttendance && hasReservation && "text-teal-700",
-        !isSelected && !hasAttendance && !hasReservation && "text-typography-900",
+        !isSelected && !hasAttendance && (hasReservation || hasPlan) && "text-teal-700",
+        !isSelected && !hasAttendance && !hasReservation && !hasPlan && "text-typography-900",
       );
 
       const indicatorColor = isSelected ? Colors.white : Colors.primary[600];
@@ -133,6 +149,10 @@ export function AttendanceStrip({
         isToday ? t("attendance.list.today") : null,
         hasAttendance ? t("attendance.drinkCount", { count: drinkCount }) : null,
         hasReservation ? t("attendance.list.reserved") : null,
+        hasPlan ? t("attendance.calendar.a11yPlanning") : null,
+        friendsCount > 0
+          ? t("attendance.calendar.a11yFriendsGoing", { count: friendsCount })
+          : null,
       ]
         .filter(Boolean)
         .join(", ");
@@ -143,68 +163,78 @@ export function AttendanceStrip({
           onPress={() => onDateSelect(date)}
           className={cellClassName}
           accessibilityRole="button"
-          // Everything the cell conveys visually goes in the label. Colour and a
-          // badge carry the drink count, the reservation and today, and a label of
-          // only the date left a screen-reader user swiping past sixteen
-          // indistinguishable days with no way to tell which ones they had logged
-          // - on the view that opens by default.
+          // Everything the cell conveys visually goes in the label: colour and
+          // badges carry the drinks, the marks, today and the friends count.
           accessibilityLabel={cellAccessibilityLabel}
           accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
           accessibilityState={{ selected: isSelected }}
         >
-          <VStack className="items-center">
-            {isToday && <View className="absolute -top-0.5 h-1 w-3 rounded-full bg-primary-800" />}
-
-            {/* leading-none on both rows, here and on the day number below.
-                The cell is a fixed 42pt and a first-of-month day stacks three
-                rows into it - month label, day, indicators - which at the
-                default line height comes to roughly 47pt. The overflow is
-                centred, so the month label rode up onto the top border while
-                the indicators crossed the bottom one. Oct 1 falls inside every
-                Oktoberfest, so this was the flagship festival's own strip. */}
-            {isFirstOfMonth && (
-              <Text
-                className={cn(
-                  "text-[9px] font-semibold uppercase leading-none",
-                  isSelected ? "text-white" : "text-typography-500",
-                )}
-              >
-                {formatLocalized(date, "MMM")}
+          {friendsCount > 0 && (
+            <View className="absolute -right-1 -top-1.5 z-10 h-4 min-w-4 items-center justify-center rounded-full border border-background-0 bg-sky-500 px-1">
+              <Text className="text-[9px] font-bold leading-none text-white">
+                {formatFriendsBadge(friendsCount)}
               </Text>
-            )}
+            </View>
+          )}
 
-            <Text className={cn(textClassName, "leading-none")}>{format(date, "d")}</Text>
+          <VStack className="items-center">
+            <View className="h-2 justify-center">
+              {topSlot === "today" && (
+                <Text
+                  className={cn(
+                    "text-[7px] font-extrabold uppercase leading-none",
+                    isSelected ? "text-white" : "text-typography-900",
+                  )}
+                >
+                  {t("attendance.list.today")}
+                </Text>
+              )}
+              {topSlot === "month" && (
+                <Text
+                  className={cn(
+                    "text-[8px] font-semibold uppercase leading-none",
+                    isSelected ? "text-white" : "text-typography-500",
+                  )}
+                >
+                  {formatLocalized(date, "MMM")}
+                </Text>
+              )}
+            </View>
 
-            {/* Both indicators render when both exist; the previous calendar
-                suppressed the reservation whenever the day also had attendance. */}
-            {(hasAttendance || hasReservation) && (
-              <HStack className="mt-0.5 items-center gap-1">
-                {drinkCount !== undefined && drinkCount > 0 && (
-                  <HStack className="items-center gap-0.5">
-                    <Beer size={INDICATOR_ICON_SIZE} color={indicatorColor} />
-                    <Text
-                      className={cn(
-                        "text-[9px] font-semibold leading-none",
-                        isSelected ? "text-white" : "text-primary-600",
-                      )}
-                    >
-                      {drinkCount}
-                    </Text>
-                  </HStack>
-                )}
-                {hasReservation && (
-                  <CalendarClock
-                    size={INDICATOR_ICON_SIZE}
-                    color={isSelected ? Colors.white : IconColors.reservation}
-                  />
-                )}
-              </HStack>
-            )}
+            <Text className={numberClassName}>{format(date, "d")}</Text>
+
+            <HStack className="h-3 items-center gap-1">
+              {drinkCount !== undefined && drinkCount > 0 && (
+                <HStack className="items-center gap-0.5">
+                  <Beer size={INDICATOR_ICON_SIZE} color={indicatorColor} />
+                  <Text
+                    className={cn(
+                      "text-[9px] font-semibold leading-none",
+                      isSelected ? "text-white" : "text-primary-600",
+                    )}
+                  >
+                    {drinkCount}
+                  </Text>
+                </HStack>
+              )}
+              {hasReservation && (
+                <CalendarClock
+                  size={INDICATOR_ICON_SIZE}
+                  color={isSelected ? Colors.white : IconColors.reservation}
+                />
+              )}
+              {hasPlan && (
+                <Footprints
+                  size={INDICATOR_ICON_SIZE}
+                  color={isSelected ? Colors.white : IconColors.plan}
+                />
+              )}
+            </HStack>
           </VStack>
         </Pressable>
       );
     },
-    [today, selectedDate, attendanceMap, reservationMap, onDateSelect, t],
+    [today, todayKey, selectedDate, attendanceMap, planMap, friendsCountByDate, onDateSelect, t],
   );
 
   return (
@@ -213,22 +243,24 @@ export function AttendanceStrip({
         {rangeLabel}
       </Text>
 
-      <HStack className="mb-2 justify-around">
+      <HStack className="mb-2 gap-1">
         {weekdayHeaders.map((weekday) => (
-          <View key={weekday} className="w-12 items-center">
+          <View key={weekday} className="flex-1 items-center">
             <Text className="text-xs font-medium text-typography-500">{weekday}</Text>
           </View>
         ))}
       </HStack>
 
-      <VStack space="xs">
+      {/* space="sm" rather than xs: the friends badge sticks out above its cell
+          and needs the gap to stay clear of the week above. */}
+      <VStack space="sm">
         {weeks.map((week, weekIndex) => (
-          <HStack key={weekIndex} className="justify-around">
+          <HStack key={weekIndex} className="gap-1">
             {week.map((cell, dayIndex) =>
               cell ? (
                 renderDay(cell.date, cell.isFirstOfMonth)
               ) : (
-                <View key={`blank-${weekIndex}-${dayIndex}`} className="h-12 w-12" />
+                <View key={`blank-${weekIndex}-${dayIndex}`} className="h-14 flex-1" />
               ),
             )}
           </HStack>
@@ -249,6 +281,16 @@ export function AttendanceStrip({
           <View className="h-3 w-3 rounded border border-teal-300 bg-teal-100" />
           <Text className="text-xs text-typography-500">
             {t("attendance.calendar.hasReservation")}
+          </Text>
+        </HStack>
+        <HStack space="sm" className="items-center">
+          <View className="h-3 w-3 rounded border border-dashed border-teal-400 bg-background-0" />
+          <Text className="text-xs text-typography-500">{t("attendance.calendar.hasPlan")}</Text>
+        </HStack>
+        <HStack space="sm" className="items-center">
+          <View className="h-3 w-3 rounded-full bg-sky-500" />
+          <Text className="text-xs text-typography-500">
+            {t("attendance.calendar.friendsGoing")}
           </Text>
         </HStack>
         <HStack space="sm" className="items-center">
