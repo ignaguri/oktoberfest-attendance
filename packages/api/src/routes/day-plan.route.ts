@@ -9,9 +9,11 @@ import {
   UpsertDayPlanSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseDayPlanRepository } from "../repositories/supabase";
 import { DayPlanService } from "../services/day-plan.service";
+import { NotificationService } from "../services/notification.service";
 
 const app = new OpenAPIHono<AuthContext>();
 
@@ -92,6 +94,24 @@ app.openapi(upsertDayPlanRoute, async (c) => {
 
   const service = new DayPlanService(new SupabaseDayPlanRepository(supabase));
   const result = await service.upsertPlan(user.id, festivalId, date, input);
+
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (result.becameVisible && novuApiKey) {
+    // Never fail the save over a notification.
+    try {
+      const notificationService = new NotificationService(supabase, novuApiKey);
+      await notificationService.notifyPlanOverlap({
+        actorId: user.id,
+        festivalId,
+        date,
+        today: result.today,
+        kind: result.plan.kind,
+        tentName: result.plan.tentName,
+      });
+    } catch (notificationError) {
+      logger.error({ error: notificationError }, "Failed to send plan overlap notification");
+    }
+  }
 
   return c.json({ plan: result.plan }, 200);
 });

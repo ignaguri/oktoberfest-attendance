@@ -8365,6 +8365,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "friendPlansEnabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "createdAt": {
                       "type": "string",
                       "nullable": true,
@@ -8385,6 +8389,7 @@
                     "achievementNotificationsEnabled",
                     "groupNotificationsEnabled",
                     "dailyReminderEnabled",
+                    "friendPlansEnabled",
                     "createdAt",
                     "updatedAt"
                   ]
@@ -8452,6 +8457,9 @@
                     "type": "boolean"
                   },
                   "dailyReminderEnabled": {
+                    "type": "boolean"
+                  },
+                  "friendPlansEnabled": {
                     "type": "boolean"
                   }
                 }

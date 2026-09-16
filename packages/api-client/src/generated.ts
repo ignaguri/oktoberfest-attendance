@@ -4598,6 +4598,7 @@ export interface paths {
                             achievementNotificationsEnabled: boolean | null;
                             groupNotificationsEnabled: boolean | null;
                             dailyReminderEnabled: boolean | null;
+                            friendPlansEnabled: boolean | null;
                             /** Format: date-time */
                             createdAt: string | null;
                             /** Format: date-time */
@@ -4640,6 +4641,7 @@ export interface paths {
                         achievementNotificationsEnabled?: boolean;
                         groupNotificationsEnabled?: boolean;
                         dailyReminderEnabled?: boolean;
+                        friendPlansEnabled?: boolean;
                     };
                 };
             };

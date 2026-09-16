@@ -15,6 +15,14 @@ vi.mock("../../services/day-plan.service", () => ({
   }),
 }));
 
+const { notifyPlanOverlapMock } = vi.hoisted(() => ({ notifyPlanOverlapMock: vi.fn() }));
+
+vi.mock("../../services/notification.service", () => ({
+  NotificationService: vi.fn().mockImplementation(function () {
+    return { notifyPlanOverlap: notifyPlanOverlapMock };
+  }),
+}));
+
 const FESTIVAL_ID = "22222222-2222-4222-8222-222222222222";
 const DATE = "2026-09-26";
 
@@ -109,6 +117,72 @@ describe("Day plan routes - unit", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ plan: PLAN });
     expect(service.upsertPlan).toHaveBeenCalledWith(mockUser.id, FESTIVAL_ID, DATE, body);
+  });
+
+  describe("overlap push", () => {
+    const originalNovuKey = process.env.NOVU_API_KEY;
+
+    beforeEach(() => {
+      process.env.NOVU_API_KEY = "test-novu-key";
+    });
+
+    afterEach(() => {
+      process.env.NOVU_API_KEY = originalNovuKey;
+    });
+
+    function putPlan() {
+      return app.request(
+        createAuthRequest(`/festivals/${FESTIVAL_ID}/days/${DATE}/plan`, {
+          method: "PUT",
+          body: JSON.stringify({ kind: "plan", visibleToGroups: true }),
+        }),
+      );
+    }
+
+    it("notifies overlapping friends when the day became visible", async () => {
+      service.upsertPlan.mockResolvedValueOnce({
+        plan: PLAN,
+        becameVisible: true,
+        today: "2026-09-20",
+      });
+
+      const res = await putPlan();
+
+      expect(res.status).toBe(200);
+      expect(notifyPlanOverlapMock).toHaveBeenCalledWith({
+        actorId: mockUser.id,
+        festivalId: FESTIVAL_ID,
+        date: DATE,
+        today: "2026-09-20",
+        kind: "plan",
+        tentName: null,
+      });
+    });
+
+    it("stays quiet when the save did not change visibility", async () => {
+      service.upsertPlan.mockResolvedValueOnce({
+        plan: PLAN,
+        becameVisible: false,
+        today: "2026-09-20",
+      });
+
+      await putPlan();
+
+      expect(notifyPlanOverlapMock).not.toHaveBeenCalled();
+    });
+
+    it("still saves when the notification throws", async () => {
+      service.upsertPlan.mockResolvedValueOnce({
+        plan: PLAN,
+        becameVisible: true,
+        today: "2026-09-20",
+      });
+      notifyPlanOverlapMock.mockRejectedValueOnce(new Error("novu down"));
+
+      const res = await putPlan();
+
+      expect(res.status).toBe(200);
+    });
   });
 
   it("rejects a reservation without a tent", async () => {
