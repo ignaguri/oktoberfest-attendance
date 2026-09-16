@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { DAY_PLAN_NOTE_MAX_LENGTH, DayPlanPathParamsSchema, UpsertDayPlanSchema } from "./day-plan.schema";
+import {
+  DAY_PLAN_NOTE_MAX_LENGTH,
+  DayPlanPathParamsSchema,
+  UpsertDayPlanSchema,
+} from "./day-plan.schema";
 
 const TENT_ID = "33333333-3333-4333-8333-333333333333";
 
 describe("UpsertDayPlanSchema", () => {
   it("accepts a plan with only its visibility", () => {
-    expect(UpsertDayPlanSchema.safeParse({ kind: "plan", visibleToGroups: true }).success).toBe(true);
+    expect(UpsertDayPlanSchema.safeParse({ kind: "plan", visibleToGroups: true }).success).toBe(
+      true,
+    );
   });
 
   it("accepts a plan with a tent and a note", () => {
@@ -49,7 +55,9 @@ describe("UpsertDayPlanSchema", () => {
   });
 
   it("rejects an unknown kind", () => {
-    expect(UpsertDayPlanSchema.safeParse({ kind: "maybe", visibleToGroups: true }).success).toBe(false);
+    expect(UpsertDayPlanSchema.safeParse({ kind: "maybe", visibleToGroups: true }).success).toBe(
+      false,
+    );
   });
 });
 
@@ -57,7 +65,11 @@ describe("DayPlanPathParamsSchema", () => {
   it("requires an ISO date", () => {
     const festivalId = "22222222-2222-4222-8222-222222222222";
 
-    expect(DayPlanPathParamsSchema.safeParse({ festivalId, date: "2026-09-26" }).success).toBe(true);
-    expect(DayPlanPathParamsSchema.safeParse({ festivalId, date: "26-09-2026" }).success).toBe(false);
+    expect(DayPlanPathParamsSchema.safeParse({ festivalId, date: "2026-09-26" }).success).toBe(
+      true,
+    );
+    expect(DayPlanPathParamsSchema.safeParse({ festivalId, date: "26-09-2026" }).success).toBe(
+      false,
+    );
   });
 });

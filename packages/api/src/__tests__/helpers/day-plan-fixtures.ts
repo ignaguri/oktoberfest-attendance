@@ -133,7 +133,11 @@ export async function createSharedGroup(
 
 export async function cleanupDayPlanFixtures(
   admin: SupabaseClient<Database>,
-  { festivalIds, tentIds, userIds }: { festivalIds: string[]; tentIds: string[]; userIds: string[] },
+  {
+    festivalIds,
+    tentIds,
+    userIds,
+  }: { festivalIds: string[]; tentIds: string[]; userIds: string[] },
 ): Promise<void> {
   if (festivalIds.length > 0) {
     await admin.from("day_plan_overlap_notifications").delete().in("festival_id", festivalIds);
