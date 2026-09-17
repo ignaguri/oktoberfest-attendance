@@ -88,6 +88,7 @@ export {
 
 // Day plan hooks
 export { useDayPlans, useDeleteDayPlan, useFriendsGoing, useUpsertDayPlan } from "./useDayPlans";
+export { useFriendsWent } from "./useFriendsWent";
 
 // Reservation hooks
 export {
