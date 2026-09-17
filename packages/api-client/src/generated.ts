@@ -6081,6 +6081,107 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/attendance/friends-went": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List friends who went on a past day
+         * @description Friends' and group-mates' attendance on a past festival day: drinks by type, tents and public photos. Empty for today and later.
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                    date: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Friends who went retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            friends: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                totalDrinks: number;
+                                drinks: {
+                                    /** @enum {string} */
+                                    type: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
+                                    count: number;
+                                }[];
+                                tents: string[];
+                                photoCount: number;
+                                photos: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    pictureUrl: string;
+                                }[];
+                                /** Format: uuid */
+                                sharedGroupId: string | null;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid query */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Festival not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/location/sessions": {
         parameters: {
             query?: never;
