@@ -4,7 +4,7 @@ import type { DayPlan } from "@prostcounter/shared/schemas";
 import { buildFestivalWeeks, formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { addDays, format, isSameDay } from "date-fns";
-import { Beer, CalendarClock, Footprints } from "lucide-react-native";
+import { Beer, CalendarClock, Footprints, Users } from "lucide-react-native";
 import { useCallback, useMemo } from "react";
 import { View } from "react-native";
 
@@ -123,6 +123,9 @@ export function AttendanceStrip({
       const plan = planMap.get(dateStr);
       const hasReservation = plan?.kind === "reservation";
       const hasPlan = plan?.kind === "plan" && isUpcoming;
+      // A day already logged doesn't need the plan's footprints, and today can
+      // carry drinks and friends at once: three groups don't fit a 48pt cell.
+      const showPlanIndicator = hasPlan && !hasAttendance;
       const friendsCount = isUpcoming ? (friendsCountByDate.get(dateStr) ?? 0) : 0;
       const topSlot = resolveCellTopSlot({ isToday, isFirstOfMonth });
 
@@ -174,14 +177,6 @@ export function AttendanceStrip({
           accessibilityHint={t("attendance.calendar.tapToAddOrEdit")}
           accessibilityState={{ selected: isSelected }}
         >
-          {friendsCount > 0 && (
-            <View className="absolute -right-1 -top-1.5 z-10 h-4 min-w-4 items-center justify-center rounded-full border border-background-0 bg-sky-500 px-1">
-              <Text className="text-[9px] font-bold leading-none text-white">
-                {formatFriendsBadge(friendsCount)}
-              </Text>
-            </View>
-          )}
-
           <VStack className="items-center">
             <View className="h-2 justify-center">
               {topSlot === "today" && (
@@ -228,11 +223,27 @@ export function AttendanceStrip({
                   color={isSelected ? Colors.white : IconColors.reservation}
                 />
               )}
-              {hasPlan && (
+              {showPlanIndicator && (
                 <Footprints
                   size={INDICATOR_ICON_SIZE}
                   color={isSelected ? Colors.white : IconColors.plan}
                 />
+              )}
+              {friendsCount > 0 && (
+                <HStack className="items-center gap-0.5">
+                  <Users
+                    size={INDICATOR_ICON_SIZE}
+                    color={isSelected ? Colors.white : IconColors.friends}
+                  />
+                  <Text
+                    className={cn(
+                      "text-[9px] font-semibold leading-none",
+                      isSelected ? "text-white" : "text-sky-700",
+                    )}
+                  >
+                    {formatFriendsBadge(friendsCount)}
+                  </Text>
+                </HStack>
               )}
             </HStack>
           </VStack>
@@ -256,9 +267,7 @@ export function AttendanceStrip({
         ))}
       </HStack>
 
-      {/* space="sm" rather than xs: the friends badge sticks out above its cell
-          and needs the gap to stay clear of the week above. */}
-      <VStack space="sm">
+      <VStack space="xs">
         {weeks.map((week, weekIndex) => (
           <HStack key={weekIndex} className="gap-1">
             {week.map((cell, dayIndex) =>
@@ -293,7 +302,7 @@ export function AttendanceStrip({
           <Text className="text-xs text-typography-500">{t("attendance.calendar.hasPlan")}</Text>
         </HStack>
         <HStack space="sm" className="items-center">
-          <View className="h-3 w-3 rounded-full bg-sky-500" />
+          <Users size={12} color={IconColors.friends} />
           <Text className="text-xs text-typography-500">
             {t("attendance.calendar.friendsGoing")}
           </Text>

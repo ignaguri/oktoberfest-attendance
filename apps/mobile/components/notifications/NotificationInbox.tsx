@@ -4,7 +4,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { Archive, Bell, CheckCheck } from "lucide-react-native";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, RefreshControl, View } from "react-native";
 import Swipeable, { type SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, { interpolate, useAnimatedStyle, type SharedValue } from "react-native-reanimated";
@@ -137,8 +137,17 @@ export function NotificationInbox({ onNotificationPress }: NotificationInboxProp
   });
   const unreadCount = counts?.[0]?.count ?? 0;
 
-  const handleRefresh = useCallback(() => {
-    refetch();
+  // Novu's refetch flips isLoading back to true, which would swap the list for
+  // the full-screen spinner mid-pull. Track the pull here instead.
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [refetch]);
 
   const handleLoadMore = useCallback(() => {
@@ -186,7 +195,8 @@ export function NotificationInbox({ onNotificationPress }: NotificationInboxProp
     );
   }, [isFetching, isLoading]);
 
-  if (isLoading) {
+  // Only the first load, before there is a list to keep on screen
+  if (isLoading && !notifications) {
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" color={Colors.primary[500]} />
@@ -226,7 +236,7 @@ export function NotificationInbox({ onNotificationPress }: NotificationInboxProp
         ListFooterComponent={renderFooter}
         refreshControl={
           <RefreshControl
-            refreshing={isFetching && !isLoading}
+            refreshing={isRefreshing}
             onRefresh={handleRefresh}
             tintColor={Colors.primary[500]}
           />
