@@ -143,7 +143,9 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
               disabled={isDisabled}
               // min-h-11 is 44pt, the smallest comfortable touch target. py-2
               // around 14px text landed near 36.
-              className="min-h-11 flex-1 items-center justify-center py-2"
+              // The label's colour marks a disabled tab. Pressable's own disabled
+              // opacity-40 on top of that left the name unreadable.
+              className="min-h-11 flex-1 items-center justify-center py-2 data-[disabled=true]:opacity-100"
               accessibilityRole="tab"
               accessibilityState={{ selected: isActive, disabled: isDisabled }}
               accessibilityLabel={tab.label}
@@ -154,8 +156,7 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
                   "text-sm",
                   isActive && "font-semibold text-typography-900",
                   !isActive && "font-medium",
-                  // 300 on the track's background-200 all but vanished
-                  !isActive && isDisabled && "text-typography-500",
+                  !isActive && isDisabled && "text-typography-400",
                   !isActive && !isDisabled && "text-typography-600",
                 )}
               >
