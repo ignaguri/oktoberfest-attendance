@@ -7,6 +7,8 @@ export const ReservationStatusSchema = z.enum([
   "pending",
   "confirmed",
   "checked_in",
+  // Written by POST /attendance/check-in/{reservationId}
+  "completed",
   "cancelled",
   "expired",
 ]);

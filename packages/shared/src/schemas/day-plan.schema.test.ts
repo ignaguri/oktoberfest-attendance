@@ -5,6 +5,7 @@ import {
   DayPlanPathParamsSchema,
   UpsertDayPlanSchema,
 } from "./day-plan.schema";
+import { ReservationStatusSchema } from "./reservation.schema";
 
 const TENT_ID = "33333333-3333-4333-8333-333333333333";
 
@@ -71,5 +72,11 @@ describe("DayPlanPathParamsSchema", () => {
     expect(DayPlanPathParamsSchema.safeParse({ festivalId, date: "26-09-2026" }).success).toBe(
       false,
     );
+  });
+});
+
+describe("ReservationStatusSchema", () => {
+  it("accepts completed, which attendance check-in writes", () => {
+    expect(ReservationStatusSchema.safeParse("completed").success).toBe(true);
   });
 });

@@ -9420,6 +9420,7 @@
                             "pending",
                             "confirmed",
                             "checked_in",
+                            "completed",
                             "cancelled",
                             "expired"
                           ]
@@ -9563,6 +9564,7 @@
                 "pending",
                 "confirmed",
                 "checked_in",
+                "completed",
                 "cancelled",
                 "expired"
               ]
@@ -9650,6 +9652,7 @@
                               "pending",
                               "confirmed",
                               "checked_in",
+                              "completed",
                               "cancelled",
                               "expired"
                             ]
@@ -9825,6 +9828,7 @@
                             "pending",
                             "confirmed",
                             "checked_in",
+                            "completed",
                             "cancelled",
                             "expired"
                           ]
@@ -10048,6 +10052,7 @@
                             "pending",
                             "confirmed",
                             "checked_in",
+                            "completed",
                             "cancelled",
                             "expired"
                           ]
@@ -10230,6 +10235,7 @@
                             "pending",
                             "confirmed",
                             "checked_in",
+                            "completed",
                             "cancelled",
                             "expired"
                           ]
@@ -10448,6 +10454,7 @@
                             "pending",
                             "confirmed",
                             "checked_in",
+                            "completed",
                             "cancelled",
                             "expired"
                           ]
@@ -10678,6 +10685,7 @@
                               "pending",
                               "confirmed",
                               "checked_in",
+                              "completed",
                               "cancelled",
                               "expired",
                               null
@@ -10951,6 +10959,7 @@
                             "pending",
                             "confirmed",
                             "checked_in",
+                            "completed",
                             "cancelled",
                             "expired",
                             null

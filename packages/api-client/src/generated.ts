@@ -5122,7 +5122,7 @@ export interface paths {
             parameters: {
                 query?: {
                     festivalId?: string;
-                    status?: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+                    status?: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired";
                     upcoming?: boolean | null;
                     limit?: number;
                     offset?: number | null;
@@ -5155,7 +5155,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired";
                                 note: string | null;
                                 visibleToGroups: boolean;
                                 autoCheckin: boolean;
@@ -5247,7 +5247,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired";
                                 note: string | null;
                                 visibleToGroups: boolean;
                                 autoCheckin: boolean;
@@ -5344,7 +5344,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired";
                                 note: string | null;
                                 visibleToGroups: boolean;
                                 autoCheckin: boolean;
@@ -5457,7 +5457,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired";
                                 note: string | null;
                                 visibleToGroups: boolean;
                                 autoCheckin: boolean;
@@ -5552,7 +5552,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired";
                                 note: string | null;
                                 visibleToGroups: boolean;
                                 autoCheckin: boolean;
@@ -5647,7 +5647,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired";
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired";
                                 note: string | null;
                                 visibleToGroups: boolean;
                                 autoCheckin: boolean;
@@ -5747,7 +5747,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string|null} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired" | null;
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired" | null;
                                 reminderOffsetMinutes: number | null;
                                 autoCheckin: boolean | null;
                                 /** Format: date-time */
@@ -5860,7 +5860,7 @@ export interface paths {
                                 /** Format: date-time */
                                 endAt: string | null;
                                 /** @enum {string|null} */
-                                status: "pending" | "confirmed" | "checked_in" | "cancelled" | "expired" | null;
+                                status: "pending" | "confirmed" | "checked_in" | "completed" | "cancelled" | "expired" | null;
                                 reminderOffsetMinutes: number | null;
                                 autoCheckin: boolean | null;
                                 /** Format: date-time */
