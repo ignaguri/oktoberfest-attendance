@@ -154,7 +154,8 @@ export function SegmentedControl({ tabs, activeTab, onTabChange }: SegmentedCont
                   "text-sm",
                   isActive && "font-semibold text-typography-900",
                   !isActive && "font-medium",
-                  !isActive && isDisabled && "text-typography-300",
+                  // 300 on the track's background-200 all but vanished
+                  !isActive && isDisabled && "text-typography-500",
                   !isActive && !isDisabled && "text-typography-600",
                 )}
               >
