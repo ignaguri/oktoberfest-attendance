@@ -1,0 +1,4 @@
+- Planea qué días vas a ir al festival, con carpa, nota y con quién vas.
+- Mira en el calendario qué amigos y miembros de tus grupos van, y recibe un aviso cuando un amigo marque el mismo día.
+- En los días pasados, mira qué amigos fueron, qué tomaron y sus fotos.
+- Correcciones y mejoras menores. ¡Prost!
