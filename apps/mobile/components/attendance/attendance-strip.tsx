@@ -1,3 +1,4 @@
+import { TIMEZONE } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DayPlan } from "@prostcounter/shared/schemas";
 import { buildFestivalWeeks, formatLocalized } from "@prostcounter/shared/utils";
@@ -13,6 +14,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import {
   buildDayPlansByDate,
+  festivalTodayKey,
   formatFriendsBadge,
   resolveCellTopSlot,
 } from "@/lib/attendance/day-plans";
@@ -31,6 +33,8 @@ interface AttendanceStripProps {
   plans?: DayPlan[];
   /** How many friends have a visible plan or reservation, per YYYY-MM-DD. */
   friendsCountByDate?: Map<string, number>;
+  /** Today is the festival's today, as the day sheet and the API decide it. */
+  festivalTimezone?: string | null;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
 }
@@ -68,12 +72,13 @@ export function AttendanceStrip({
   attendances,
   plans = [],
   friendsCountByDate = NO_FRIENDS,
+  festivalTimezone,
   selectedDate,
   onDateSelect,
 }: AttendanceStripProps) {
   const { t } = useTranslation();
-  const today = useMemo(() => new Date(), []);
-  const todayKey = useMemo(() => format(today, "yyyy-MM-dd"), [today]);
+  // Worked out on every render, so it moves on past midnight with the next update.
+  const todayKey = festivalTodayKey(new Date(), festivalTimezone ?? TIMEZONE);
   const weekdayHeaders = useMemo(() => getWeekdayHeaders(), []);
 
   const weeks = useMemo(
@@ -108,7 +113,7 @@ export function AttendanceStrip({
   const renderDay = useCallback(
     (date: Date, isFirstOfMonth: boolean) => {
       const dateStr = format(date, "yyyy-MM-dd");
-      const isToday = isSameDay(date, today);
+      const isToday = dateStr === todayKey;
       // A plan and who else is going only mean something ahead of time. A past
       // day shows what happened: attendance, and a reservation if one was made.
       const isUpcoming = dateStr >= todayKey;
@@ -234,7 +239,7 @@ export function AttendanceStrip({
         </Pressable>
       );
     },
-    [today, todayKey, selectedDate, attendanceMap, planMap, friendsCountByDate, onDateSelect, t],
+    [todayKey, selectedDate, attendanceMap, planMap, friendsCountByDate, onDateSelect, t],
   );
 
   return (

@@ -1,8 +1,9 @@
+import { TIMEZONE } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AttendanceWithTotals, DayPlan } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { format, isSameDay, parseISO } from "date-fns";
+import { isSameDay, parseISO } from "date-fns";
 import { CalendarClock, Footprints, Image as ImageIcon, Users } from "lucide-react-native";
 import { Fragment, useMemo } from "react";
 
@@ -17,7 +18,7 @@ import {
   type DayListEntry,
   formatEuros,
 } from "@/lib/attendance/day-list-entries";
-import { buildDayPlansByDate } from "@/lib/attendance/day-plans";
+import { buildDayPlansByDate, festivalTodayKey } from "@/lib/attendance/day-plans";
 import { IconColors } from "@/lib/constants/colors";
 import type { DaySummaries } from "@/lib/database/adapted-hooks";
 
@@ -43,6 +44,8 @@ interface AttendanceDayListProps {
   plansUnavailable?: boolean;
   /** How many friends have a visible plan or reservation, per YYYY-MM-DD. */
   friendsCountByDate?: Map<string, number>;
+  /** Upcoming rows start at the festival's today, as the API decides it. */
+  festivalTimezone?: string | null;
   /**
    * Day summaries are still being read from SQLite.
    *
@@ -84,12 +87,14 @@ export function AttendanceDayList({
   plans = [],
   plansUnavailable = false,
   friendsCountByDate = NO_FRIENDS,
+  festivalTimezone,
   summariesLoading = false,
   selectedDate,
   onDateSelect,
 }: AttendanceDayListProps) {
   const { t } = useTranslation();
-  const todayKey = useMemo(() => format(new Date(), "yyyy-MM-dd"), []);
+  // Worked out on every render, so it moves on past midnight with the next update.
+  const todayKey = festivalTodayKey(new Date(), festivalTimezone ?? TIMEZONE);
 
   function handlePress(dateStr: string) {
     onDateSelect(parseISO(dateStr));

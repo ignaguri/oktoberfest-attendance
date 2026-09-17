@@ -399,6 +399,7 @@ export default function AttendanceScreen() {
                 attendances={calendarAttendances}
                 plans={plans}
                 friendsCountByDate={friendsCountByDate}
+                festivalTimezone={currentFestival.timezone}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />
@@ -410,6 +411,7 @@ export default function AttendanceScreen() {
                 plans={plans}
                 plansUnavailable={plansUnavailable}
                 friendsCountByDate={friendsCountByDate}
+                festivalTimezone={currentFestival.timezone}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />

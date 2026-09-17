@@ -8,6 +8,7 @@ import {
   buildFriendsGoingByDate,
   classifyFestivalDay,
   countFriendsByDate,
+  festivalTodayKey,
   dayPlanToReservation,
   formatFriendsBadge,
   resolveCellTopSlot,
@@ -164,5 +165,14 @@ describe("classifyFestivalDay", () => {
 
   it("treats later days as future", () => {
     expect(classifyFestivalDay(new Date(2026, 8, 22), NOW, FESTIVAL_TIMEZONE)).toBe("future");
+  });
+});
+
+describe("festivalTodayKey", () => {
+  it("is today's date on the festival's clock, not the phone's", () => {
+    // 11:00 UTC on Sep 20 is already Sep 21 at UTC+14.
+    expect(festivalTodayKey(new Date("2026-09-20T11:00:00Z"), "Pacific/Kiritimati")).toBe(
+      "2026-09-21",
+    );
   });
 });

@@ -16,6 +16,11 @@ import { format } from "date-fns";
 
 export type FestivalDayRelation = "past" | "today" | "future";
 
+/** Today's YYYY-MM-DD on the festival's clock, the key every day map uses. */
+export function festivalTodayKey(now: Date, timezone: string): string {
+  return formatDateForDatabase(now, timezone);
+}
+
 /**
  * Where a calendar day sits relative to today on the festival's clock, which
  * is how the API decides whether a day can still be planned. The phone's own
@@ -23,7 +28,7 @@ export type FestivalDayRelation = "past" | "today" | "future";
  */
 export function classifyFestivalDay(day: Date, now: Date, timezone: string): FestivalDayRelation {
   const dayKey = format(day, "yyyy-MM-dd");
-  const todayKey = formatDateForDatabase(now, timezone);
+  const todayKey = festivalTodayKey(now, timezone);
 
   if (dayKey < todayKey) {
     return "past";
