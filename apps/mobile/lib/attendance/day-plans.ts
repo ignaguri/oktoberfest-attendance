@@ -20,6 +20,22 @@ export function isActiveDayPlan(plan: DayPlan): boolean {
   return plan.status === "pending" || plan.status === "confirmed";
 }
 
+/**
+ * Days whose reservation was checked in or expired. The API still counts that
+ * row as the day's mark and refuses to change it, so these days cannot take a
+ * plan.
+ */
+export function buildFinishedReservationDates(plans: DayPlan[]): Set<string> {
+  return new Set(
+    plans
+      .filter(
+        (plan) =>
+          plan.kind === "reservation" && plan.status !== "cancelled" && !isActiveDayPlan(plan),
+      )
+      .map((plan) => plan.date),
+  );
+}
+
 /** Active marks by YYYY-MM-DD. The API guarantees at most one per day. */
 export function buildDayPlansByDate(plans: DayPlan[]): Map<string, DayPlan> {
   const map = new Map<string, DayPlan>();

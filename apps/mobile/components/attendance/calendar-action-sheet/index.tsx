@@ -43,6 +43,11 @@ export interface CalendarActionSheetProps {
   existingReservation?: Reservation | null;
   /** The user's plan or reservation for the day, edited in the planner. */
   existingPlan?: DayPlan | null;
+  /**
+   * False when the day's reservation was already checked in or expired: the
+   * API refuses to replace it, so the planner would only ever fail to save.
+   */
+  canPlan?: boolean;
   /** Friends with a visible plan or reservation on the day. */
   friends?: FriendGoing[];
   onSuccess?: (data: AttendanceSuccessData) => void;
@@ -73,6 +78,7 @@ export function CalendarActionSheet({
   existingAttendance,
   existingReservation,
   existingPlan = null,
+  canPlan = true,
   friends = NO_FRIENDS,
   onSuccess,
   checkInMode = false,
@@ -106,8 +112,8 @@ export function CalendarActionSheet({
       ];
     }
 
-    return [attendanceTab, { key: "plan", label: t("attendance.tabs.plan") }];
-  }, [t, isPastDate, isFutureDate, existingReservation]);
+    return [attendanceTab, { key: "plan", label: t("attendance.tabs.plan"), disabled: !canPlan }];
+  }, [t, isPastDate, isFutureDate, existingReservation, canPlan]);
 
   const determineDefaultTab = useCallback((): TabKey => {
     // Check-in mode always opens to attendance
@@ -126,7 +132,7 @@ export function CalendarActionSheet({
     if (existingAttendance) {
       return "attendance";
     }
-    if (existingPlan) {
+    if (existingPlan && canPlan) {
       return "plan";
     }
     return "attendance";
@@ -137,6 +143,7 @@ export function CalendarActionSheet({
     existingAttendance,
     existingReservation,
     existingPlan,
+    canPlan,
   ]);
 
   // Reset active tab when sheet opens
@@ -210,7 +217,7 @@ export function CalendarActionSheet({
             <ReservationTabContent existingReservation={existingReservation} onClose={onClose} />
           )}
 
-          {activeTab === "plan" && !isPastDate && (
+          {activeTab === "plan" && !isPastDate && canPlan && (
             <DayPlanner
               key={plannerKey}
               festivalId={festivalId}

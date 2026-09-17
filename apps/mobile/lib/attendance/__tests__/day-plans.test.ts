@@ -4,6 +4,7 @@ import type { DayPlan, FriendGoing } from "@prostcounter/shared/schemas";
 
 import {
   buildDayPlansByDate,
+  buildFinishedReservationDates,
   buildFriendsGoingByDate,
   countFriendsByDate,
   dayPlanToReservation,
@@ -80,6 +81,20 @@ describe("buildDayPlansByDate", () => {
     ]);
 
     expect(map.size).toBe(0);
+  });
+});
+
+describe("buildFinishedReservationDates", () => {
+  it("collects the days whose reservation already happened", () => {
+    const dates = buildFinishedReservationDates([
+      dayPlan("p1", "2026-09-20"),
+      reservation("pending", "2026-09-21"),
+      reservation("cancelled", "2026-09-22", "cancelled"),
+      reservation("checked-in", "2026-09-23", "checked_in"),
+      reservation("expired", "2026-09-24", "expired"),
+    ]);
+
+    expect([...dates].sort()).toEqual(["2026-09-23", "2026-09-24"]);
   });
 });
 

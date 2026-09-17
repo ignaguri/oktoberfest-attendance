@@ -39,6 +39,7 @@ import {
 } from "@/lib/database/adapted-hooks";
 import {
   buildDayPlansByDate,
+  buildFinishedReservationDates,
   buildFriendsGoingByDate,
   countFriendsByDate,
   dayPlanToReservation,
@@ -76,6 +77,7 @@ export default function AttendanceScreen() {
 
   const plans = useMemo(() => dayPlansData?.plans ?? [], [dayPlansData?.plans]);
   const planMap = useMemo(() => buildDayPlansByDate(plans), [plans]);
+  const finishedReservationDates = useMemo(() => buildFinishedReservationDates(plans), [plans]);
 
   // The check-in deep link and the past-day summary still speak reservations.
   const reservations = useMemo(
@@ -447,6 +449,7 @@ export default function AttendanceScreen() {
           existingAttendance={existingAttendance}
           existingReservation={existingReservation}
           existingPlan={existingPlan}
+          canPlan={!finishedReservationDates.has(format(selectedDate, "yyyy-MM-dd"))}
           friends={selectedDayFriends}
           onSuccess={handleFormSuccess}
           checkInMode={checkInMode}
