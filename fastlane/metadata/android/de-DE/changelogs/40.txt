@@ -1,0 +1,4 @@
+- Plane, an welchen Tagen du aufs Volksfest gehst, mit Zelt, Notiz und mit wem du gehst.
+- Sieh im Kalender, welche Freunde und Gruppenmitglieder dabei sind, und erhalte einen Hinweis, wenn ein Freund denselben Tag auswählt.
+- Sieh an vergangenen Tagen, welche Freunde da waren, was sie getrunken haben und ihre Fotos.
+- Kleine Korrekturen und Verbesserungen. Prost!

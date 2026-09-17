@@ -1,4 +1,9 @@
 export const changelog: Record<string, string[]> = {
+  "1.8.2": [
+    "Plan the festival days you're going, and who you're going with",
+    "See which friends are going each day, and get notified when a friend picks the same day",
+    "On past days, see which friends went, what they drank and their photos",
+  ],
   "1.8.1": ["Countdown to Oktoberfest 2026 on the home screen"],
   "1.8.0": [
     "New achievement badge artwork, and a detail sheet that explains how to unlock each one",
