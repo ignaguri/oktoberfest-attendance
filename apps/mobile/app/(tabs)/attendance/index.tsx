@@ -443,6 +443,7 @@ export default function AttendanceScreen() {
           isOpen={isFormOpen}
           onClose={handleFormClose}
           festivalId={currentFestival.id}
+          festivalTimezone={currentFestival.timezone}
           festivalStartDate={festivalStartDate}
           festivalEndDate={festivalEndDate}
           selectedDate={selectedDate}

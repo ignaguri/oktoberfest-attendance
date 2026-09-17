@@ -1,7 +1,8 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { FriendGoing } from "@prostcounter/shared/schemas";
+import { formatTimeInTimezone } from "@prostcounter/shared/utils";
 import { cn, getInitials } from "@prostcounter/ui";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { CalendarClock, Footprints, MapPin } from "lucide-react-native";
 import { useState } from "react";
 
@@ -16,12 +17,12 @@ import { getAvatarUrl } from "@/lib/utils";
 /** Rows shown before "+N more". Enough to see who has a table without scrolling past the form. */
 const COLLAPSED_COUNT = 3;
 
-function FriendRow({ friend }: { friend: FriendGoing }) {
+function FriendRow({ friend, timezone }: { friend: FriendGoing; timezone: string }) {
   const { t } = useTranslation();
   const displayName = friend.username || friend.fullName || t("attendance.planner.unknownFriend");
   const isReserved = friend.kind === "reservation";
   const statusLabel = isReserved ? t("attendance.list.reserved") : t("attendance.list.planning");
-  const arrival = friend.startAt ? format(parseISO(friend.startAt), "HH:mm") : null;
+  const arrival = friend.startAt ? formatTimeInTimezone(parseISO(friend.startAt), timezone) : null;
   const details = [friend.tentName, arrival].filter(Boolean).join(" · ");
 
   return (
@@ -82,7 +83,14 @@ function FriendRow({ friend }: { friend: FriendGoing }) {
  * Friends and group-mates with a visible plan or reservation on the day.
  * Renders nothing when nobody is going.
  */
-export function WhosGoingSection({ friends }: { friends: FriendGoing[] }) {
+export function WhosGoingSection({
+  friends,
+  timezone,
+}: {
+  friends: FriendGoing[];
+  /** The festival's timezone, so arrival times read as they were booked. */
+  timezone: string;
+}) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -105,7 +113,7 @@ export function WhosGoingSection({ friends }: { friends: FriendGoing[] }) {
       </HStack>
       <VStack space="md">
         {visibleFriends.map((friend) => (
-          <FriendRow key={friend.userId} friend={friend} />
+          <FriendRow key={friend.userId} friend={friend} timezone={timezone} />
         ))}
       </VStack>
       {hiddenCount > 0 && (

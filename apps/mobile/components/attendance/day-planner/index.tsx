@@ -49,6 +49,8 @@ import { WhosGoingSection } from "./whos-going-section";
 
 interface DayPlannerProps {
   festivalId: string;
+  /** The festival's timezone: arrival times are picked and shown on its clock. */
+  timezone: string;
   selectedDate: Date;
   /** The user's saved plan or reservation for the day, if any. */
   existingPlan: DayPlan | null;
@@ -68,6 +70,7 @@ interface DayPlannerProps {
  */
 export function DayPlanner({
   festivalId,
+  timezone,
   selectedDate,
   existingPlan,
   friends,
@@ -84,8 +87,8 @@ export function DayPlanner({
 
   const dateKey = format(selectedDate, "yyyy-MM-dd");
   const defaults = useMemo(
-    () => buildPlannerDefaults(existingPlan, selectedDate),
-    [existingPlan, selectedDate],
+    () => buildPlannerDefaults(existingPlan, selectedDate, timezone),
+    [existingPlan, selectedDate, timezone],
   );
 
   const {
@@ -146,7 +149,7 @@ export function DayPlanner({
 
   const onSubmit = useCallback(
     async (values: PlannerFormValues) => {
-      const input = toUpsertInput(values, selectedDate);
+      const input = toUpsertInput(values, selectedDate, timezone);
 
       if (!input) {
         if (!existingPlan) {
@@ -178,6 +181,7 @@ export function DayPlanner({
     },
     [
       selectedDate,
+      timezone,
       existingPlan,
       onClose,
       showDialog,
@@ -203,7 +207,7 @@ export function DayPlanner({
   return (
     <>
       <VStack space="xl" className="px-2 pb-4">
-        <WhosGoingSection friends={friends} />
+        <WhosGoingSection friends={friends} timezone={timezone} />
 
         <VStack space="md">
           <Text className="text-base font-semibold text-typography-900">
@@ -211,7 +215,11 @@ export function DayPlanner({
           </Text>
 
           {!isEditing && existingPlan ? (
-            <PlanSummaryCard plan={existingPlan} onEdit={() => setIsEditing(true)} />
+            <PlanSummaryCard
+              plan={existingPlan}
+              timezone={timezone}
+              onEdit={() => setIsEditing(true)}
+            />
           ) : (
             <VStack space="lg">
               <Controller

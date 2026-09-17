@@ -1,3 +1,4 @@
+import { TIMEZONE } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
   AttendanceWithTotals,
@@ -35,6 +36,8 @@ export interface CalendarActionSheetProps {
   isOpen: boolean;
   onClose: () => void;
   festivalId: string;
+  /** The festival's timezone, for reservation times in the planner. */
+  festivalTimezone?: string | null;
   festivalStartDate: Date;
   festivalEndDate: Date;
   selectedDate: Date;
@@ -72,6 +75,7 @@ export function CalendarActionSheet({
   isOpen,
   onClose,
   festivalId,
+  festivalTimezone,
   festivalStartDate,
   festivalEndDate,
   selectedDate,
@@ -221,6 +225,7 @@ export function CalendarActionSheet({
             <DayPlanner
               key={plannerKey}
               festivalId={festivalId}
+              timezone={festivalTimezone ?? TIMEZONE}
               selectedDate={selectedDate}
               existingPlan={existingPlan}
               friends={friends}

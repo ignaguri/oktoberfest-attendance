@@ -6,11 +6,14 @@ export { buildGroupInviteUrl, getAppUrl, replaceLocalhostInUrl, safeHost } from 
 
 // Date utilities
 export {
+  atZonedTime,
   formatDateForDatabase,
   formatLocalized,
   formatRelativeTime,
+  formatTimeInTimezone,
   formatTimestampForDatabase,
   getDateLocale,
+  zonedTimeOnDay,
 } from "./date-utils";
 
 // Pricing utilities

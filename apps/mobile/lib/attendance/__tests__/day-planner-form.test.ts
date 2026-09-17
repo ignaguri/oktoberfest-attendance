@@ -5,6 +5,11 @@ import type { DayPlan } from "@prostcounter/shared/schemas";
 import { buildPlannerDefaults, plannerFormSchema, toUpsertInput } from "../day-planner-form";
 
 const SELECTED_DATE = new Date(2026, 8, 26);
+/**
+ * The festival's timezone. UTC+14 all year, so it never matches the machine
+ * running the tests: a result built on the device's clock would fail.
+ */
+const FESTIVAL_TIMEZONE = "Pacific/Kiritimati";
 
 function dayPlan(overrides: Partial<DayPlan> = {}): DayPlan {
   return {
@@ -33,7 +38,7 @@ function dayPlan(overrides: Partial<DayPlan> = {}): DayPlan {
 
 describe("buildPlannerDefaults", () => {
   it("starts an empty day as a visible plan at noon", () => {
-    expect(buildPlannerDefaults(null, SELECTED_DATE)).toEqual({
+    expect(buildPlannerDefaults(null, SELECTED_DATE, FESTIVAL_TIMEZONE)).toEqual({
       status: "plan",
       tentId: "",
       startTime: new Date(2026, 8, 26, 12, 0),
@@ -47,6 +52,7 @@ describe("buildPlannerDefaults", () => {
     const values = buildPlannerDefaults(
       dayPlan({ tentId: "t1", note: "with the crew", visibleToGroups: false }),
       SELECTED_DATE,
+      FESTIVAL_TIMEZONE,
     );
 
     expect(values).toMatchObject({
@@ -57,17 +63,18 @@ describe("buildPlannerDefaults", () => {
     });
   });
 
-  it("loads a reservation's local arrival time and reminder", () => {
-    const arrival = new Date(2026, 8, 26, 16, 30);
+  it("loads a reservation's arrival time on the festival's clock, and its reminder", () => {
     const values = buildPlannerDefaults(
       dayPlan({
         kind: "reservation",
         tentId: "t1",
-        startAt: arrival.toISOString(),
+        // 16:30 in Kiritimati
+        startAt: "2026-09-26T02:30:00.000Z",
         status: "pending",
         reminderOffsetMinutes: 60,
       }),
       SELECTED_DATE,
+      FESTIVAL_TIMEZONE,
     );
 
     expect(values.status).toBe("reservation");
@@ -78,14 +85,16 @@ describe("buildPlannerDefaults", () => {
 });
 
 describe("toUpsertInput", () => {
-  const base = buildPlannerDefaults(null, SELECTED_DATE);
+  const base = buildPlannerDefaults(null, SELECTED_DATE, FESTIVAL_TIMEZONE);
 
   it("returns null for not going", () => {
-    expect(toUpsertInput({ ...base, status: "none" }, SELECTED_DATE)).toBeNull();
+    expect(toUpsertInput({ ...base, status: "none" }, SELECTED_DATE, FESTIVAL_TIMEZONE)).toBeNull();
   });
 
   it("sends a plan with no tent as null and trims the note", () => {
-    expect(toUpsertInput({ ...base, note: "  with the crew  " }, SELECTED_DATE)).toEqual({
+    expect(
+      toUpsertInput({ ...base, note: "  with the crew  " }, SELECTED_DATE, FESTIVAL_TIMEZONE),
+    ).toEqual({
       kind: "plan",
       tentId: null,
       note: "with the crew",
@@ -94,10 +103,12 @@ describe("toUpsertInput", () => {
   });
 
   it("sends a blank note as null", () => {
-    expect(toUpsertInput({ ...base, note: "   " }, SELECTED_DATE)).toMatchObject({ note: null });
+    expect(toUpsertInput({ ...base, note: "   " }, SELECTED_DATE, FESTIVAL_TIMEZONE)).toMatchObject(
+      { note: null },
+    );
   });
 
-  it("puts a reservation's time on the selected day", () => {
+  it("books a reservation's time on the festival's clock, on the selected day", () => {
     const input = toUpsertInput(
       {
         ...base,
@@ -107,12 +118,14 @@ describe("toUpsertInput", () => {
         reminderOffsetMinutes: 60,
       },
       SELECTED_DATE,
+      FESTIVAL_TIMEZONE,
     );
 
     expect(input).toEqual({
       kind: "reservation",
       tentId: "t1",
-      startAt: new Date(2026, 8, 26, 16, 30).toISOString(),
+      // 16:30 in Kiritimati, whatever the device's own timezone
+      startAt: "2026-09-26T02:30:00.000Z",
       note: null,
       visibleToGroups: true,
       reminderOffsetMinutes: 60,
@@ -121,7 +134,7 @@ describe("toUpsertInput", () => {
 });
 
 describe("plannerFormSchema", () => {
-  const base = buildPlannerDefaults(null, SELECTED_DATE);
+  const base = buildPlannerDefaults(null, SELECTED_DATE, FESTIVAL_TIMEZONE);
 
   it("requires a tent only for a reservation", () => {
     expect(plannerFormSchema.safeParse({ ...base, status: "plan" }).success).toBe(true);

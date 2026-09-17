@@ -1,7 +1,8 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DayPlan } from "@prostcounter/shared/schemas";
+import { formatTimeInTimezone } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
-import { format, parseISO } from "date-fns";
+import { parseISO } from "date-fns";
 import { CalendarClock, ChevronRight, Footprints } from "lucide-react-native";
 
 import { HStack } from "@/components/ui/hstack";
@@ -12,17 +13,19 @@ import { IconColors } from "@/lib/constants/colors";
 
 interface PlanSummaryCardProps {
   plan: DayPlan;
+  /** The festival's timezone, so the arrival time reads as it was booked. */
+  timezone: string;
   onEdit: () => void;
 }
 
 /** The saved plan or reservation, compact. Tapping it opens the editor. */
-export function PlanSummaryCard({ plan, onEdit }: PlanSummaryCardProps) {
+export function PlanSummaryCard({ plan, timezone, onEdit }: PlanSummaryCardProps) {
   const { t } = useTranslation();
   const isReservation = plan.kind === "reservation";
   const title = isReservation
     ? t("attendance.planner.summaryReservation")
     : t("attendance.planner.summaryPlan");
-  const arrival = plan.startAt ? format(parseISO(plan.startAt), "HH:mm") : null;
+  const arrival = plan.startAt ? formatTimeInTimezone(parseISO(plan.startAt), timezone) : null;
   const details = [plan.tentName, arrival, plan.note ? `"${plan.note}"` : null]
     .filter(Boolean)
     .join(" · ");

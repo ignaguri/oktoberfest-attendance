@@ -8,6 +8,7 @@ import {
   type DayPlan,
   type UpsertDayPlanInput,
 } from "@prostcounter/shared/schemas";
+import { atZonedTime, zonedTimeOnDay } from "@prostcounter/shared/utils";
 import { setHours, setMinutes } from "date-fns";
 import { z } from "zod";
 
@@ -31,17 +32,17 @@ export const plannerFormSchema = z
 
 export type PlannerFormValues = z.infer<typeof plannerFormSchema>;
 
-function atTimeOn(day: Date, time: Date): Date {
-  return setMinutes(setHours(day, time.getHours()), time.getMinutes());
-}
-
 /**
  * Form values for a day. With nothing saved, tapping a future day most likely
  * means "I'm going", so the form opens on Planning rather than Not going.
+ *
+ * The arrival time is shown on the festival's clock (`timezone`), which is
+ * also how the API files a reservation under its day.
  */
 export function buildPlannerDefaults(
   existingPlan: DayPlan | null,
   selectedDate: Date,
+  timezone: string,
 ): PlannerFormValues {
   const noon = setMinutes(setHours(selectedDate, 12), 0);
 
@@ -59,7 +60,9 @@ export function buildPlannerDefaults(
   return {
     status: existingPlan.kind,
     tentId: existingPlan.tentId ?? "",
-    startTime: existingPlan.startAt ? atTimeOn(selectedDate, new Date(existingPlan.startAt)) : noon,
+    startTime: existingPlan.startAt
+      ? zonedTimeOnDay(new Date(existingPlan.startAt), selectedDate, timezone)
+      : noon,
     note: existingPlan.note ?? "",
     visibleToGroups: existingPlan.visibleToGroups,
     reminderOffsetMinutes:
@@ -71,6 +74,7 @@ export function buildPlannerDefaults(
 export function toUpsertInput(
   values: PlannerFormValues,
   selectedDate: Date,
+  timezone: string,
 ): UpsertDayPlanInput | null {
   const trimmedNote = values.note.trim();
   const note = trimmedNote.length > 0 ? trimmedNote : null;
@@ -91,7 +95,9 @@ export function toUpsertInput(
   return {
     kind: "reservation",
     tentId: values.tentId,
-    startAt: atTimeOn(selectedDate, values.startTime).toISOString(),
+    // On the festival's clock: the API rejects a time that lands on another
+    // festival-local day, which a phone set to a far timezone would otherwise send.
+    startAt: atZonedTime(selectedDate, values.startTime, timezone).toISOString(),
     note,
     visibleToGroups: values.visibleToGroups,
     reminderOffsetMinutes: values.reminderOffsetMinutes,
