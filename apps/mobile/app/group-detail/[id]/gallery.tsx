@@ -6,8 +6,8 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { getInitials } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Camera } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
-import { Dimensions, Image, Pressable, RefreshControl, ScrollView } from "react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Dimensions, Image, type LayoutChangeEvent, Pressable, RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { PhotoDetailModal } from "@/components/gallery/photo-detail-modal";
@@ -87,11 +87,26 @@ function groupGalleryData(photos: GalleryPhoto[]): GroupedGallery[] {
 
 export default function GroupGalleryScreen() {
   const { t } = useTranslation();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, date } = useLocalSearchParams<{ id: string; date?: string }>();
   const [selectedPhoto, setSelectedPhoto] = useState<{
     id: string;
     url: string;
   } | null>(null);
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const hasScrolledToDateRef = useRef(false);
+
+  // Opened from a past day's recap: jump to that day once its section is laid out
+  const handleDaySectionLayout = useCallback(
+    (dayDate: string, event: LayoutChangeEvent) => {
+      if (dayDate !== date || hasScrolledToDateRef.current) {
+        return;
+      }
+      hasScrolledToDateRef.current = true;
+      scrollViewRef.current?.scrollTo({ y: event.nativeEvent.layout.y, animated: false });
+    },
+    [date],
+  );
 
   // Fetch gallery data
   const {
@@ -162,6 +177,7 @@ export default function GroupGalleryScreen() {
       />
 
       <ScrollView
+        ref={scrollViewRef}
         className="flex-1 bg-background-50"
         refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={refetch} />}
       >
@@ -181,7 +197,11 @@ export default function GroupGalleryScreen() {
 
           {/* Photo Grid by Date */}
           {groupedGallery.map((dayGroup) => (
-            <VStack key={dayGroup.date} space="md">
+            <VStack
+              key={dayGroup.date}
+              space="md"
+              onLayout={(event) => handleDaySectionLayout(dayGroup.date, event)}
+            >
               {/* Date Header */}
               <Text className="text-lg font-semibold text-typography-900">
                 {dayGroup.formattedDate}
