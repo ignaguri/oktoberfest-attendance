@@ -47,18 +47,24 @@ function mockAdmin({
     .mockResolvedValue({ data: inserted.map((id) => ({ recipient_id: id })), error: null });
   const upsert = vi.fn().mockReturnValue({ select: ledgerSelect });
   const prefsIn = vi.fn().mockResolvedValue({ data: prefs, error: null });
+  const ledgerDeleteIn = vi.fn().mockResolvedValue({ error: null });
+  const ledgerDeleteQuery = {
+    eq: vi.fn(() => ledgerDeleteQuery),
+    in: ledgerDeleteIn,
+  };
+  const ledgerDelete = vi.fn().mockReturnValue(ledgerDeleteQuery);
 
   const client = {
     rpc,
     from: vi.fn((table: string) =>
       table === "user_notification_preferences"
         ? { select: vi.fn().mockReturnValue({ in: prefsIn }) }
-        : { upsert },
+        : { upsert, delete: ledgerDelete },
     ),
   };
   vi.mocked(createAdminClient).mockReturnValue(client as never);
 
-  return { rpc, upsert };
+  return { rpc, upsert, ledgerDelete, ledgerDeleteQuery, ledgerDeleteIn };
 }
 
 function mockRequestScopedSupabase() {
@@ -133,6 +139,35 @@ describe("NotificationService.notifyPlanOverlap", () => {
     await service.notifyPlanOverlap(OVERLAP);
 
     expect(triggerMock).not.toHaveBeenCalled();
+  });
+
+  it("forgets a failed send so a later save can notify that recipient", async () => {
+    const { ledgerDelete, ledgerDeleteQuery, ledgerDeleteIn } = mockAdmin({
+      recipients: [FRIEND_ID, MUTED_ID],
+      inserted: [FRIEND_ID, MUTED_ID],
+    });
+    triggerMock.mockImplementation(async ({ to }: { to: string }) => {
+      if (to === MUTED_ID) {
+        throw new Error("workflow not found");
+      }
+      return { result: {} };
+    });
+
+    await service.notifyPlanOverlap(OVERLAP);
+
+    expect(ledgerDelete).toHaveBeenCalledTimes(1);
+    expect(ledgerDeleteQuery.eq).toHaveBeenCalledWith("actor_id", ACTOR_ID);
+    expect(ledgerDeleteQuery.eq).toHaveBeenCalledWith("festival_id", FESTIVAL_ID);
+    expect(ledgerDeleteQuery.eq).toHaveBeenCalledWith("date", "2026-09-26");
+    expect(ledgerDeleteIn).toHaveBeenCalledWith("recipient_id", [MUTED_ID]);
+  });
+
+  it("keeps the ledger when every send succeeds", async () => {
+    const { ledgerDelete } = mockAdmin({ recipients: [FRIEND_ID], inserted: [FRIEND_ID] });
+
+    await service.notifyPlanOverlap(OVERLAP);
+
+    expect(ledgerDelete).not.toHaveBeenCalled();
   });
 
   it("sends nothing when nobody else marked the day", async () => {

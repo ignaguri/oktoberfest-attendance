@@ -891,7 +891,7 @@ export class NotificationService {
         }),
       };
 
-      await Promise.allSettled(
+      const results = await Promise.allSettled(
         newRecipientIds.map((to) =>
           this.novu.trigger({
             workflowId: NOTIFICATION_WORKFLOWS.FRIEND_PLAN_OVERLAP,
@@ -900,6 +900,35 @@ export class NotificationService {
           }),
         ),
       );
+
+      const failedRecipientIds = newRecipientIds.filter(
+        (_recipientId, index) => results[index].status === "rejected",
+      );
+      if (failedRecipientIds.length === 0) {
+        return;
+      }
+
+      logger.error(
+        {
+          failedCount: failedRecipientIds.length,
+          reason: results.find((result) => result.status === "rejected")?.reason,
+        },
+        "Error sending plan overlap notifications",
+      );
+
+      // A failed send must not count as notified, or that recipient never hears
+      // about this actor and day again.
+      const { error: forgetError } = await adminClient
+        .from("day_plan_overlap_notifications")
+        .delete()
+        .eq("actor_id", input.actorId)
+        .eq("festival_id", input.festivalId)
+        .eq("date", input.date)
+        .in("recipient_id", failedRecipientIds);
+
+      if (forgetError) {
+        logger.error({ error: forgetError }, "Error clearing failed plan overlap notifications");
+      }
     } catch (error) {
       logger.error({ error }, "Error sending plan overlap notifications");
     }
