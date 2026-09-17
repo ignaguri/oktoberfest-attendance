@@ -94,19 +94,31 @@ export default function GroupGalleryScreen() {
   } | null>(null);
 
   const scrollViewRef = useRef<ScrollView>(null);
-  const hasScrolledToDateRef = useRef(false);
+  const dateTargetYRef = useRef<number | null>(null);
+  const isFollowingDateRef = useRef(true);
 
-  // Opened from a past day's recap: jump to that day once its section is laid out
+  // Opened from a past day's recap: keep re-scrolling to the target day's latest known y until the user drags
+  const scrollToDateTarget = useCallback(() => {
+    if (!isFollowingDateRef.current || dateTargetYRef.current === null) {
+      return;
+    }
+    scrollViewRef.current?.scrollTo({ y: dateTargetYRef.current, animated: false });
+  }, []);
+
   const handleDaySectionLayout = useCallback(
     (dayDate: string, event: LayoutChangeEvent) => {
-      if (dayDate !== date || hasScrolledToDateRef.current) {
+      if (dayDate !== date) {
         return;
       }
-      hasScrolledToDateRef.current = true;
-      scrollViewRef.current?.scrollTo({ y: event.nativeEvent.layout.y, animated: false });
+      dateTargetYRef.current = event.nativeEvent.layout.y;
+      scrollToDateTarget();
     },
-    [date],
+    [date, scrollToDateTarget],
   );
+
+  const handleScrollBeginDrag = useCallback(() => {
+    isFollowingDateRef.current = false;
+  }, []);
 
   // Fetch gallery data
   const {
@@ -180,6 +192,8 @@ export default function GroupGalleryScreen() {
         ref={scrollViewRef}
         className="flex-1 bg-background-50"
         refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={refetch} />}
+        onContentSizeChange={scrollToDateTarget}
+        onScrollBeginDrag={handleScrollBeginDrag}
       >
         <VStack space="lg" className="p-4 pb-8">
           {/* Empty State */}
