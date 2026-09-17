@@ -25,6 +25,7 @@ export const NOTIFICATION_WORKFLOWS = {
   FRIEND_REQUEST: "friend-request",
   GROUP_CARRY_OVER: "group-carryover-invite",
   FESTIVAL_OPENING: "festival-opening",
+  FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
 } as const;
 
 export type NotificationWorkflowId =
@@ -44,6 +45,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   GROUP_ACHIEVEMENT_UNLOCKED: "group-achievement-unlocked",
   FRIEND_REQUEST: "friend-request",
   GROUP_CARRY_OVER: "group-carry-over",
+  FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
 } as const;
 
 export type NotificationPushType =
@@ -61,7 +63,20 @@ interface NotificationPayload {
   senderName?: string;
   inviteToken?: string;
   url?: string;
+  actorName?: string;
+  date?: string;
+  festivalId?: string;
   [key: string]: unknown;
+}
+
+/**
+ * The attendance day a plan overlap points at. The festival rides along because
+ * festivals can share dates, and the day must open in the one it was planned for.
+ */
+function buildDayRoute(date: string, festivalId: string | undefined): string {
+  return festivalId
+    ? `/attendance?date=${date}&festivalId=${festivalId}`
+    : `/attendance?date=${date}`;
 }
 
 /**
@@ -106,11 +121,16 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
         return payload.reservationId
           ? `/attendance?checkInReservationId=${payload.reservationId}`
           : "/attendance";
+
+      case NOTIFICATION_PUSH_TYPES.FRIEND_PLAN_OVERLAP:
+        return payload.date ? buildDayRoute(payload.date, payload.festivalId) : "/attendance";
     }
   }
 
   // Fallback: infer route from payload shape (for in-app notifications)
   if (payload.achievementName) return "/achievements";
+  // An in-app overlap notification carries its trigger payload, not a type.
+  if (payload.actorName && payload.date) return buildDayRoute(payload.date, payload.festivalId);
   if (payload.senderName && !payload.groupId) return "/friends?tab=requests";
   // Before the groupId fallback: a push step's schema is {skip, subject, body},
   // so it cannot carry data.type and the raw trigger payload arrives instead.

@@ -38,6 +38,8 @@ const mapApiToDbPreferences = (api: ApiPreferences): NotificationPreferences => 
   achievement_notifications_enabled: api.achievementNotificationsEnabled,
   group_notifications_enabled: api.groupNotificationsEnabled,
   daily_reminder_enabled: api.dailyReminderEnabled ?? true,
+  // Mobile-only toggle, web never reads it
+  friend_plans_enabled: null,
   created_at: api.createdAt,
   updated_at: api.updatedAt,
 });

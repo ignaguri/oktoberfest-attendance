@@ -28,6 +28,7 @@ export type NotificationPreferencesResponse = {
   achievementNotificationsEnabled: boolean | null;
   groupNotificationsEnabled: boolean | null;
   dailyReminderEnabled: boolean | null;
+  friendPlansEnabled: boolean | null;
   createdAt: string;
   updatedAt: string | null;
 } | null;
@@ -43,6 +44,7 @@ export type UpdateNotificationPreferencesInput = {
   achievementNotificationsEnabled?: boolean;
   groupNotificationsEnabled?: boolean;
   dailyReminderEnabled?: boolean;
+  friendPlansEnabled?: boolean;
 };
 
 /**
@@ -117,6 +119,9 @@ export function useUpdateNotificationPreferences(userId?: string) {
             }),
             ...(newData.dailyReminderEnabled !== undefined && {
               dailyReminderEnabled: newData.dailyReminderEnabled,
+            }),
+            ...(newData.friendPlansEnabled !== undefined && {
+              friendPlansEnabled: newData.friendPlansEnabled,
             }),
             updatedAt: new Date().toISOString(),
           });

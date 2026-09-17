@@ -12,7 +12,9 @@ import type {
   Consumption,
   CreateMessageResponse,
   CrowdLevel,
+  DayPlanResponse,
   DeleteAttendanceResponse,
+  DeleteDayPlanResponse,
   DeleteGroupMessageResponse,
   FestivalTent,
   FriendActionResponse,
@@ -23,6 +25,7 @@ import type {
   GetCalendarEventsResponse,
   GetCrowdStatusResponse,
   GetFestivalResponse,
+  GetFriendsGoingResponse,
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
   GetPendingUnlocksResponse,
@@ -36,6 +39,7 @@ import type {
   ListAchievementsResponse,
   ListAttendancesResponse,
   ListAvailableAchievementsResponse,
+  ListDayPlansResponse,
   ListFestivalsResponse,
   ListFriendRequestsResponse,
   ListFriendsResponse,
@@ -53,6 +57,7 @@ import type {
   TutorialStatus,
   UpdateGroupMessageResponse,
   UpdatePersonalAttendanceResponse,
+  UpsertDayPlanInput,
   WinningCriteriaListResponse,
 } from "@prostcounter/shared/schemas";
 
@@ -1167,6 +1172,74 @@ export function createTypedApiClient(config: ApiClientConfig) {
     },
 
     /**
+     * Day plans API: one mark per festival day, a plan to go or a reservation
+     */
+    dayPlans: {
+      async list(festivalId: string): Promise<ListDayPlansResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/festivals/${festivalId}/plans`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch day plans");
+        }
+        return parseJsonResponse<ListDayPlansResponse>(response);
+      },
+
+      async upsert(
+        festivalId: string,
+        date: string,
+        data: UpsertDayPlanInput,
+      ): Promise<DayPlanResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "PUT",
+          `${baseUrl}/v1/festivals/${festivalId}/days/${date}/plan`,
+          {
+            method: "PUT",
+            headers,
+            body: JSON.stringify(data),
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to save day plan");
+        }
+        return parseJsonResponse<DayPlanResponse>(response);
+      },
+
+      async remove(festivalId: string, date: string): Promise<DeleteDayPlanResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/festivals/${festivalId}/days/${date}/plan`,
+          {
+            method: "DELETE",
+            headers,
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to remove day plan");
+        }
+        return parseJsonResponse<DeleteDayPlanResponse>(response);
+      },
+
+      async friendsGoing(festivalId: string): Promise<GetFriendsGoingResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/festivals/${festivalId}/friends-going`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch friends going");
+        }
+        return parseJsonResponse<GetFriendsGoingResponse>(response);
+      },
+    },
+
+    /**
      * Reservations API
      */
     reservations: {
@@ -1483,6 +1556,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         achievementNotificationsEnabled: boolean | null;
         groupNotificationsEnabled: boolean | null;
         dailyReminderEnabled: boolean | null;
+        friendPlansEnabled: boolean | null;
         createdAt: string;
         updatedAt: string | null;
       } | null> {
@@ -1504,6 +1578,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         achievementNotificationsEnabled?: boolean;
         groupNotificationsEnabled?: boolean;
         dailyReminderEnabled?: boolean;
+        friendPlansEnabled?: boolean;
       }): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("PUT", `${baseUrl}/v1/notifications/preferences`, {

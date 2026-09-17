@@ -32,7 +32,7 @@ export async function processReservationNotifications(
     );
 
     await supabase
-      .from("reservations")
+      .from("day_plans")
       .update({ reminder_sent_at: new Date().toISOString() })
       .in(
         "id",
@@ -63,7 +63,7 @@ export async function processReservationNotifications(
     );
 
     await supabase
-      .from("reservations")
+      .from("day_plans")
       .update({ prompt_sent_at: new Date().toISOString() })
       .in(
         "id",

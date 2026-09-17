@@ -6,11 +6,14 @@ export { buildGroupInviteUrl, getAppUrl, replaceLocalhostInUrl, safeHost } from 
 
 // Date utilities
 export {
+  atZonedTime,
   formatDateForDatabase,
   formatLocalized,
   formatRelativeTime,
+  formatTimeInTimezone,
   formatTimestampForDatabase,
   getDateLocale,
+  zonedTimeOnDay,
 } from "./date-utils";
 
 // Pricing utilities
@@ -44,6 +47,7 @@ export { groupFestivalsByStatus, type GroupedFestivals } from "./festival-groupi
 
 // Festival day model
 export { buildFestivalWeeks, type FestivalDayCell } from "./festival-days";
+export { type FriendGoingRow, groupFriendsGoing } from "./friends-going";
 
 // Festival countdown
 export {

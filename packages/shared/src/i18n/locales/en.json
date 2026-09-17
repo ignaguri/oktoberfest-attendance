@@ -651,10 +651,36 @@
       "invalidDate": "Please select a valid date",
       "dateOutsideFestival": "Date must be within the festival dates"
     },
+    "planner": {
+      "whosGoing": "Who's going",
+      "moreFriends": "+{{count}} more",
+      "unknownFriend": "Someone",
+      "you": "You",
+      "status": {
+        "none": "Not going",
+        "plan": "Planning",
+        "reservation": "Reserved"
+      },
+      "tentOptional": "Tent (optional)",
+      "clearTent": "Clear tent",
+      "notePlaceholder": "Who are you going with?",
+      "visibility": "Visible to friends & groups",
+      "visibilityDescription": "They'll see you're going this day",
+      "reservationHint": "Got a table? Switch to Reserved to add a time and a reminder.",
+      "summaryPlan": "You're planning to go",
+      "summaryReservation": "You have a reservation",
+      "editHint": "Opens your plan for this day to edit",
+      "saveFailed": "Couldn't save your plan. Try again."
+    },
     "calendar": {
       "tapToAddOrEdit": "Tap a day to add or edit your attendance",
       "hasAttendance": "Has attendance",
       "hasReservation": "Reservation",
+      "hasPlan": "Planning",
+      "friendsGoing": "Friends going",
+      "a11yPlanning": "planning to go",
+      "a11yFriendsGoing": "{{count}} friend going",
+      "a11yFriendsGoing_other": "{{count}} friends going",
       "selected": "Selected"
     },
     "view": {
@@ -668,12 +694,16 @@
       "a11yPhotos_other": "{{count}} photos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserved",
-      "reservationsUnavailable": "Reservations couldn't be loaded, so days with only a reservation are missing.",
+      "plansUnavailable": "Plans couldn't be loaded, so days with only a plan or reservation are missing.",
+      "planning": "Planning",
+      "friendsCount": "{{count}} friend",
+      "friendsCount_other": "{{count}} friends",
       "tip": "+{{amount}} tip"
     },
     "tabs": {
       "attendance": "Attendance",
-      "reservation": "Reservation"
+      "reservation": "Reservation",
+      "plan": "Plan"
     },
     "saveSuccess": "Changes saved successfully",
     "summary": {
@@ -1294,6 +1324,8 @@
       "achievementsDescription": "Get notified when you unlock achievements",
       "groups": "Group Notifications",
       "groupsDescription": "Get notifications from your groups (check-ins, achievements, etc.)",
+      "friendPlans": "Friends' plans",
+      "friendPlansDescription": "When a friend is going on a day you've marked",
       "groupActivity": "Group Activity",
       "reminders": "Reminders",
       "remindersDescription": "Reservation reminders and check-in prompts",
@@ -2455,6 +2487,7 @@
       "stay": "Stay on {{current}}"
     },
     "switchedToast": "Switched to {{festival}} to show this group",
+    "switchedToDayToast": "Switched to {{festival}} to show this day",
     "otherFestivalGroups": {
       "hint": "You have {{count}} group in {{festival}}",
       "hint_other": "You have {{count}} groups in {{festival}}"
@@ -2736,6 +2769,10 @@
     "RESERVATION_CANCELLED": "This reservation has been cancelled.",
     "RESERVATION_START_IN_PAST": "Reservation start time must be in the future.",
     "RESERVATION_END_BEFORE_START": "End time must be after start time.",
+    "DAY_PLAN_NOT_FOUND": "You haven't marked this day.",
+    "DAY_PLAN_CONFLICT": "This day already has a reservation.",
+    "DAY_PLAN_DATE_IN_PAST": "You can only plan today or later.",
+    "DAY_PLAN_DATE_MISMATCH": "The reservation time has to be on the selected day.",
     "PHOTO_NOT_FOUND": "Photo not found.",
     "PHOTO_UPLOAD_FAILED": "Failed to upload photo.",
     "INVALID_FILE_TYPE": "Invalid file type.",

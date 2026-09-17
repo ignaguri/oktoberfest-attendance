@@ -1,6 +1,6 @@
 import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useCheckInReservation, useReservations } from "@prostcounter/shared/hooks";
+import { useCheckInReservation, useDayPlans, useFriendsGoing } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
 import { format, parseISO } from "date-fns";
@@ -28,6 +28,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Text } from "@/components/ui/text";
+import { useToast } from "@/components/ui/toast";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAttendanceViewMode } from "@/hooks/useAttendanceViewMode";
@@ -37,15 +38,34 @@ import {
   useAdaptedDaySummaries,
   useSyncRefresh,
 } from "@/lib/database/adapted-hooks";
+import {
+  buildDayPlansByDate,
+  buildFinishedReservationDates,
+  buildFriendsGoingByDate,
+  countFriendsByDate,
+  dayPlanToReservation,
+} from "@/lib/attendance/day-plans";
+import { resolveDayLink } from "@/lib/attendance/day-link";
 import { logger } from "@/lib/logger";
-import { isActiveReservation } from "@/lib/utils/reservation";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
-  const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const {
+    currentFestival,
+    festivals,
+    setCurrentFestival,
+    isLoading: festivalLoading,
+  } = useFestival();
   const router = useRouter();
-  const { checkInReservationId } = useLocalSearchParams<{
+  const toast = useToast();
+  const {
+    checkInReservationId,
+    date: dateParam,
+    festivalId: festivalIdParam,
+  } = useLocalSearchParams<{
     checkInReservationId?: string;
+    date?: string;
+    festivalId?: string;
   }>();
 
   // Dialog state
@@ -62,28 +82,49 @@ export default function AttendanceScreen() {
   const { isOnline } = useOffline();
 
   const {
-    data: reservationsData,
-    loading: reservationsLoading,
-    error: reservationsError,
-    refetch: refetchReservations,
-  } = useReservations(currentFestival?.id);
+    data: dayPlansData,
+    loading: plansLoading,
+    error: plansError,
+    refetch: refetchDayPlans,
+  } = useDayPlans(currentFestival?.id);
 
+  const plans = useMemo(() => dayPlansData?.plans ?? [], [dayPlansData?.plans]);
+  const planMap = useMemo(() => buildDayPlansByDate(plans), [plans]);
+  const finishedReservationDates = useMemo(() => buildFinishedReservationDates(plans), [plans]);
+
+  // The check-in deep link and the past-day summary still speak reservations.
   const reservations = useMemo(
-    () => reservationsData?.reservations ?? [],
-    [reservationsData?.reservations],
+    () =>
+      plans
+        .map(dayPlanToReservation)
+        .filter((reservation): reservation is Reservation => reservation !== null),
+    [plans],
   );
 
   /*
-   * Whether reservations could not be loaded at all.
+   * Whether plans could not be loaded at all.
    *
-   * The day list renders reservation-only rows, and reservations are API-only:
-   * there is no local table and no persisted query cache, so after a cold start
-   * without a connection there are none. Without saying so the list would simply
-   * be shorter offline than online, which reads as data having been lost rather
-   * than as data being unavailable.
+   * The day list renders plan-only and reservation-only rows, and plans are
+   * API-only: there is no local table and no persisted query cache, so after a
+   * cold start without a connection there are none. Without saying so the list
+   * would simply be shorter offline than online, which reads as data having
+   * been lost rather than as data being unavailable.
    */
-  const reservationsUnavailable =
-    !!reservationsError || (!isOnline && !reservationsLoading && !reservationsData);
+  const plansUnavailable = !!plansError || (!isOnline && !plansLoading && !dayPlansData);
+
+  const { data: friendsGoingData, refetch: refetchFriendsGoing } = useFriendsGoing(
+    currentFestival?.id,
+  );
+  const friendsByDate = useMemo(
+    () => buildFriendsGoingByDate(friendsGoingData?.days ?? []),
+    [friendsGoingData?.days],
+  );
+  const friendsCountByDate = useMemo(() => countFriendsByDate(friendsByDate), [friendsByDate]);
+
+  const refetchPlanData = useCallback(() => {
+    refetchDayPlans();
+    refetchFriendsGoing();
+  }, [refetchDayPlans, refetchFriendsGoing]);
 
   // Check-in mutation
   const checkInReservation = useCheckInReservation();
@@ -126,6 +167,57 @@ export default function AttendanceScreen() {
     }
   }, [checkInReservationId, reservations, router]);
 
+  // Open a day from a deep link, e.g. a friend's overlap push
+  // (?date=YYYY-MM-DD&festivalId=...), switching to its festival first
+  useEffect(() => {
+    const link = resolveDayLink({
+      date: dateParam,
+      festivalId: festivalIdParam,
+      currentFestivalId: currentFestival?.id,
+      festivals,
+      festivalsLoading: festivalLoading,
+    });
+
+    if (link.action === "switch") {
+      // Runs again once the switch lands, and then opens the day.
+      setCurrentFestival(link.festival);
+      toast.show({
+        placement: "top",
+        render: () => (
+          <View className="rounded-lg bg-background-800 px-4 py-3">
+            <Text className="font-medium text-typography-0">
+              {t("festival.switchedToDayToast", { festival: link.festival.name })}
+            </Text>
+          </View>
+        ),
+      });
+      return;
+    }
+    if (link.action === "drop") {
+      router.setParams({ date: undefined, festivalId: undefined });
+      return;
+    }
+    if (link.action !== "open") {
+      return;
+    }
+
+    queueMicrotask(() => {
+      setSelectedDate(parseISO(link.date));
+      setIsFormOpen(true);
+      router.setParams({ date: undefined, festivalId: undefined });
+    });
+  }, [
+    dateParam,
+    festivalIdParam,
+    currentFestival?.id,
+    festivals,
+    festivalLoading,
+    setCurrentFestival,
+    toast,
+    t,
+    router,
+  ]);
+
   // Parse festival dates using parseISO to avoid UTC timezone issues
   // new Date("2024-12-31") parses as UTC midnight, but parseISO treats it as local
   const festivalStartDate = useMemo(
@@ -145,17 +237,21 @@ export default function AttendanceScreen() {
     return (attendances as AttendanceWithTotals[]).find((a) => a.date === dateStr) ?? null;
   }, [selectedDate, attendances]);
 
-  // Find existing reservation for selected date
-  const existingReservation = useMemo((): Reservation | null => {
-    if (!selectedDate || !reservations.length) return null;
-    const dateStr = format(selectedDate, "yyyy-MM-dd");
-    return (
-      reservations.find((r: Reservation) => {
-        const reservationDate = format(new Date(r.startAt), "yyyy-MM-dd");
-        return reservationDate === dateStr && isActiveReservation(r);
-      }) ?? null
-    );
-  }, [selectedDate, reservations]);
+  // The day's plan or reservation, and the reservation shape of it if it is one
+  const existingPlan = useMemo(() => {
+    if (!selectedDate) return null;
+    return planMap.get(format(selectedDate, "yyyy-MM-dd")) ?? null;
+  }, [selectedDate, planMap]);
+
+  const existingReservation = useMemo(
+    () => (existingPlan ? dayPlanToReservation(existingPlan) : null),
+    [existingPlan],
+  );
+
+  const selectedDayFriends = useMemo(() => {
+    if (!selectedDate) return [];
+    return friendsByDate.get(format(selectedDate, "yyyy-MM-dd")) ?? [];
+  }, [selectedDate, friendsByDate]);
 
   // Transform attendances for calendar
   const calendarAttendances = useMemo(() => {
@@ -195,13 +291,13 @@ export default function AttendanceScreen() {
   const handleFormSuccess = useCallback(async () => {
     showDialog(t("common.status.success"), t("attendance.saveSuccess"));
     await syncAndRefresh();
-    refetchReservations();
-  }, [syncAndRefresh, refetchReservations, showDialog, t]);
+    refetchPlanData();
+  }, [syncAndRefresh, refetchPlanData, showDialog, t]);
 
   const onRefresh = useCallback(async () => {
     await syncAndRefresh();
-    refetchReservations();
-  }, [syncAndRefresh, refetchReservations]);
+    refetchPlanData();
+  }, [syncAndRefresh, refetchPlanData]);
 
   // Handle check-in dialog close
   const handleCheckInDialogClose = useCallback(() => {
@@ -236,7 +332,7 @@ export default function AttendanceScreen() {
 
       // Refresh data — sync from API then invalidate local caches
       await syncAndRefresh();
-      refetchReservations();
+      refetchPlanData();
     } catch (error) {
       logger.error("Failed to check in:", error);
       showDialog(t("common.status.error"), t("reservation.checkIn.failedDescription"));
@@ -246,17 +342,13 @@ export default function AttendanceScreen() {
     currentFestival,
     checkInReservation,
     syncAndRefresh,
-    refetchReservations,
+    refetchPlanData,
     showDialog,
     t,
   ]);
 
   // Loading state - festival or initial data load
-  if (
-    viewMode === null ||
-    festivalLoading ||
-    ((isLoading || reservationsLoading) && !attendances)
-  ) {
+  if (viewMode === null || festivalLoading || ((isLoading || plansLoading) && !attendances)) {
     return (
       <View className="flex-1 bg-background-50">
         <AttendanceSkeleton />
@@ -305,7 +397,9 @@ export default function AttendanceScreen() {
                 festivalStartDate={festivalStartDate}
                 festivalEndDate={festivalEndDate}
                 attendances={calendarAttendances}
-                reservations={reservations}
+                plans={plans}
+                friendsCountByDate={friendsCountByDate}
+                festivalTimezone={currentFestival.timezone}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />
@@ -314,8 +408,10 @@ export default function AttendanceScreen() {
                 attendances={(attendances ?? []) as AttendanceWithTotals[]}
                 summaries={daySummaries}
                 summariesLoading={daySummariesLoading}
-                reservations={reservations}
-                reservationsUnavailable={reservationsUnavailable}
+                plans={plans}
+                plansUnavailable={plansUnavailable}
+                friendsCountByDate={friendsCountByDate}
+                festivalTimezone={currentFestival.timezone}
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
               />
@@ -401,11 +497,15 @@ export default function AttendanceScreen() {
           isOpen={isFormOpen}
           onClose={handleFormClose}
           festivalId={currentFestival.id}
+          festivalTimezone={currentFestival.timezone}
           festivalStartDate={festivalStartDate}
           festivalEndDate={festivalEndDate}
           selectedDate={selectedDate}
           existingAttendance={existingAttendance}
           existingReservation={existingReservation}
+          existingPlan={existingPlan}
+          canPlan={!finishedReservationDates.has(format(selectedDate, "yyyy-MM-dd"))}
+          friends={selectedDayFriends}
           onSuccess={handleFormSuccess}
           checkInMode={checkInMode}
           prefillTentId={prefillTentId}

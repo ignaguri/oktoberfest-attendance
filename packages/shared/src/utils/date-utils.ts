@@ -104,6 +104,52 @@ export function formatTimestampForDatabase(date: Date, timezone: string = TIMEZO
 }
 
 /**
+ * The instant at which a clock in `timezone` shows `time` on `day`.
+ *
+ * Pickers hand back device-local dates, so the calendar fields of `day` and the
+ * hours and minutes of `time` are read in device-local time and reinterpreted
+ * as festival wall-clock time. A phone set to another timezone then still
+ * books the time the user picked, on the festival's own clock.
+ */
+export function atZonedTime(day: Date, time: Date, timezone: string = TIMEZONE): Date {
+  return new Date(
+    new TZDate(
+      day.getFullYear(),
+      day.getMonth(),
+      day.getDate(),
+      time.getHours(),
+      time.getMinutes(),
+      timezone,
+    ).getTime(),
+  );
+}
+
+/**
+ * The inverse of atZonedTime: a device-local date on `day` whose hours and
+ * minutes are what a clock in `timezone` shows at `instant`. This is the value
+ * a time picker should display.
+ */
+export function zonedTimeOnDay(instant: Date, day: Date, timezone: string = TIMEZONE): Date {
+  const zoned = new TZDate(instant, timezone);
+  return new Date(
+    day.getFullYear(),
+    day.getMonth(),
+    day.getDate(),
+    zoned.getHours(),
+    zoned.getMinutes(),
+  );
+}
+
+/** A time as a clock in `timezone` shows it, "HH:mm" by default. */
+export function formatTimeInTimezone(
+  date: Date,
+  timezone: string = TIMEZONE,
+  formatStr: string = "HH:mm",
+): string {
+  return format(new TZDate(date, timezone), formatStr);
+}
+
+/**
  * Formats a date for relative time using Intl.RelativeTimeFormat
  * Uses the current i18n language for localized output (e.g., "vor 2 Stunden" in German)
  *

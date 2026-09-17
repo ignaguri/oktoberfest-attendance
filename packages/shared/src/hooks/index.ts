@@ -86,6 +86,9 @@ export {
   useTentsByCategory,
 } from "./useTents";
 
+// Day plan hooks
+export { useDayPlans, useDeleteDayPlan, useFriendsGoing, useUpsertDayPlan } from "./useDayPlans";
+
 // Reservation hooks
 export {
   useCancelReservation,

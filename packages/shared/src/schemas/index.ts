@@ -12,6 +12,7 @@ export * from "./achievement.schema";
 export * from "./notification.schema";
 export * from "./wrapped.schema";
 export * from "./reservation.schema";
+export * from "./day-plan.schema";
 export * from "./location.schema";
 export * from "./photo.schema";
 export * from "./photo-social.schema";

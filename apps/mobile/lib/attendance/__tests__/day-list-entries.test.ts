@@ -1,12 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
+import type { AttendanceWithTotals, DayPlan } from "@prostcounter/shared/schemas";
 
-import {
-  buildActiveReservationsByDate,
-  buildDayListEntries,
-  formatEuros,
-} from "../day-list-entries";
+import { buildDayListEntries, formatEuros } from "../day-list-entries";
+import { buildDayPlansByDate } from "../day-plans";
+
+const TODAY = "2026-09-23";
 
 function attendance(date: string, overrides: Partial<AttendanceWithTotals> = {}) {
   return {
@@ -26,55 +25,20 @@ function attendance(date: string, overrides: Partial<AttendanceWithTotals> = {})
   } as AttendanceWithTotals;
 }
 
-function reservation(
-  id: string,
-  startAt: string,
-  status: Reservation["status"] = "confirmed",
-): Reservation {
-  return { id, startAt, status } as Reservation;
+function plan(id: string, date: string): DayPlan {
+  return { id, date, kind: "plan", status: null } as DayPlan;
 }
 
-describe("buildActiveReservationsByDate", () => {
-  it("keys active reservations by their local day", () => {
-    const map = buildActiveReservationsByDate([
-      reservation("r1", "2026-09-21T19:00:00Z"),
-      reservation("r2", "2026-09-23T12:00:00Z", "pending"),
-    ]);
-
-    expect([...map.keys()].sort()).toEqual(["2026-09-21", "2026-09-23"]);
-  });
-
-  it("drops reservations that are not active", () => {
-    const map = buildActiveReservationsByDate([
-      reservation("cancelled", "2026-09-21T19:00:00Z", "cancelled"),
-      reservation("expired", "2026-09-22T19:00:00Z", "expired"),
-      reservation("checked-in", "2026-09-23T19:00:00Z", "checked_in"),
-    ]);
-
-    expect(map.size).toBe(0);
-  });
-
-  it("collapses two reservations on one day to a single entry", () => {
-    // Both views render one marker per day, so there is nothing to show for a
-    // second reservation.
-    const map = buildActiveReservationsByDate([
-      reservation("early", "2026-09-21T12:00:00Z"),
-      reservation("late", "2026-09-21T19:00:00Z"),
-    ]);
-
-    expect(map.size).toBe(1);
-    expect(map.get("2026-09-21")?.id).toBe("late");
-  });
-});
+function reservation(id: string, date: string, status: DayPlan["status"] = "confirmed"): DayPlan {
+  return { id, date, kind: "reservation", status } as DayPlan;
+}
 
 describe("buildDayListEntries", () => {
-  it("orders every row by date, newest first, across both kinds", () => {
+  it("orders every row by date, newest first, across all kinds", () => {
     const entries = buildDayListEntries(
       [attendance("2026-09-20"), attendance("2026-09-24")],
-      buildActiveReservationsByDate([
-        reservation("r1", "2026-09-22T19:00:00Z"),
-        reservation("r2", "2026-09-26T19:00:00Z"),
-      ]),
+      buildDayPlansByDate([reservation("r1", "2026-09-22"), plan("p1", "2026-09-26")]),
+      TODAY,
     );
 
     expect(entries.map((entry) => entry.date)).toEqual([
@@ -85,21 +49,22 @@ describe("buildDayListEntries", () => {
     ]);
   });
 
-  it("does not add a reservation row to a day that already has an attendance", () => {
+  it("does not add a plan or reservation row to a day that already has an attendance", () => {
     // Two rows for one date would read as two separate outings.
     const entries = buildDayListEntries(
-      [attendance("2026-09-21")],
-      buildActiveReservationsByDate([reservation("r1", "2026-09-21T19:00:00Z")]),
+      [attendance("2026-09-21"), attendance("2026-09-25")],
+      buildDayPlansByDate([reservation("r1", "2026-09-21"), plan("p1", "2026-09-25")]),
+      TODAY,
     );
 
-    expect(entries).toHaveLength(1);
-    expect(entries[0].kind).toBe("attendance");
+    expect(entries.map((entry) => entry.kind)).toEqual(["attendance", "attendance"]);
   });
 
-  it("keeps a reservation-only day", () => {
+  it("keeps a reservation-only day, including one that has passed", () => {
     const entries = buildDayListEntries(
       [],
-      buildActiveReservationsByDate([reservation("r1", "2026-09-21T19:00:00Z")]),
+      buildDayPlansByDate([reservation("r1", "2026-09-21")]),
+      TODAY,
     );
 
     expect(entries).toEqual([
@@ -111,17 +76,37 @@ describe("buildDayListEntries", () => {
     ]);
   });
 
+  it("keeps a plan-only day from today on", () => {
+    const entries = buildDayListEntries(
+      [],
+      buildDayPlansByDate([plan("today", TODAY), plan("later", "2026-09-25")]),
+      TODAY,
+    );
+
+    expect(entries).toEqual([
+      { kind: "planOnly", date: "2026-09-25", plan: expect.objectContaining({ id: "later" }) },
+      { kind: "planOnly", date: TODAY, plan: expect.objectContaining({ id: "today" }) },
+    ]);
+  });
+
+  it("drops a plan on a day that has passed", () => {
+    expect(buildDayListEntries([], buildDayPlansByDate([plan("p1", "2026-09-22")]), TODAY)).toEqual(
+      [],
+    );
+  });
+
   it("gives every row a distinct date, so date is a usable React key", () => {
     const entries = buildDayListEntries(
       [attendance("2026-09-21"), attendance("2026-09-22")],
-      buildActiveReservationsByDate([reservation("r1", "2026-09-22T19:00:00Z")]),
+      buildDayPlansByDate([reservation("r1", "2026-09-22"), plan("p1", "2026-09-24")]),
+      TODAY,
     );
 
     expect(new Set(entries.map((entry) => entry.date)).size).toBe(entries.length);
   });
 
   it("returns nothing when there is nothing to show", () => {
-    expect(buildDayListEntries([], new Map())).toEqual([]);
+    expect(buildDayListEntries([], new Map(), TODAY)).toEqual([]);
   });
 });
 

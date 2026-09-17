@@ -1,13 +1,18 @@
 import { Novu } from "@novu/api";
 import { ChatOrPushProviderEnum } from "@novu/api/models/components";
 import type { Database } from "@prostcounter/db";
-import type { UpdateNotificationPreferencesInput } from "@prostcounter/shared";
-import { DEFAULT_AVATAR_URL, NOTIFICATION_WORKFLOWS } from "@prostcounter/shared/constants";
+import type { DayPlanKind, UpdateNotificationPreferencesInput } from "@prostcounter/shared";
+import {
+  DEFAULT_AVATAR_URL,
+  NOTIFICATION_PUSH_TYPES,
+  NOTIFICATION_WORKFLOWS,
+} from "@prostcounter/shared/constants";
 import { createGetAvatarUrl, runNovuWriteTolerantly } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
 import { createAdminClient } from "../utils/admin-client";
+import { buildOverlapBody, formatOverlapDayLabel } from "./plan-overlap-copy";
 
 type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
@@ -319,7 +324,11 @@ export class NotificationService {
    */
   private async filterByPreference(
     recipientIds: string[],
-    column: "group_notifications_enabled" | "group_join_enabled" | "checkin_enabled",
+    column:
+      | "group_notifications_enabled"
+      | "group_join_enabled"
+      | "checkin_enabled"
+      | "friend_plans_enabled",
   ): Promise<string[] | null> {
     if (recipientIds.length === 0) {
       return [];
@@ -338,7 +347,9 @@ export class NotificationService {
 
     const { data, error } = await prefsClient
       .from("user_notification_preferences")
-      .select("user_id, group_notifications_enabled, group_join_enabled, checkin_enabled")
+      .select(
+        "user_id, group_notifications_enabled, group_join_enabled, checkin_enabled, friend_plans_enabled",
+      )
       .in("user_id", recipientIds);
 
     if (error) {
@@ -370,6 +381,7 @@ export class NotificationService {
         achievement_notifications_enabled: preferences.achievementNotificationsEnabled,
         group_notifications_enabled: preferences.groupNotificationsEnabled,
         daily_reminder_enabled: preferences.dailyReminderEnabled,
+        friend_plans_enabled: preferences.friendPlansEnabled,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" },
@@ -782,6 +794,144 @@ export class NotificationService {
       });
     } catch (error) {
       logger.error({ error }, "Error sending friend request notification");
+    }
+  }
+
+  /**
+   * Tell friends and group-mates who marked the same day that the actor is
+   * going too.
+   *
+   * Only people who can already see the actor's plans are asked, and each
+   * (recipient, actor, day) is notified at most once: the ledger insert is the
+   * dedupe, so switching to "Not going" and back cannot notify anyone twice.
+   */
+  async notifyPlanOverlap(input: {
+    actorId: string;
+    festivalId: string;
+    date: string;
+    today: string;
+    kind: DayPlanKind;
+    tentName: string | null;
+  }): Promise<void> {
+    try {
+      let adminClient;
+      try {
+        adminClient = createAdminClient();
+      } catch (adminError) {
+        logger.error(
+          { error: adminError },
+          "Admin client unavailable; skipping plan overlap notifications",
+        );
+        return;
+      }
+
+      const { data: recipientIds, error: recipientsError } = await adminClient.rpc(
+        "get_day_plan_overlap_recipients",
+        { p_actor_id: input.actorId, p_festival_id: input.festivalId, p_date: input.date },
+      );
+
+      if (recipientsError) {
+        logger.error({ error: recipientsError }, "Error fetching plan overlap recipients");
+        return;
+      }
+      if (!recipientIds || recipientIds.length === 0) {
+        return;
+      }
+
+      const enabledRecipientIds = await this.filterByPreference(
+        recipientIds,
+        "friend_plans_enabled",
+      );
+      if (!enabledRecipientIds || enabledRecipientIds.length === 0) {
+        return;
+      }
+
+      const { data: ledgerRows, error: ledgerError } = await adminClient
+        .from("day_plan_overlap_notifications")
+        .upsert(
+          enabledRecipientIds.map((recipientId) => ({
+            recipient_id: recipientId,
+            actor_id: input.actorId,
+            festival_id: input.festivalId,
+            date: input.date,
+          })),
+          { onConflict: "recipient_id,actor_id,festival_id,date", ignoreDuplicates: true },
+        )
+        .select("recipient_id");
+
+      if (ledgerError) {
+        logger.error({ error: ledgerError }, "Error recording plan overlap notifications");
+        return;
+      }
+
+      const newRecipientIds = (ledgerRows ?? []).map((row) => row.recipient_id);
+      if (newRecipientIds.length === 0) {
+        return;
+      }
+
+      const { data: actor } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.actorId)
+        .single();
+
+      const actorName = actor?.username || actor?.full_name || "Someone";
+      const payload = {
+        type: NOTIFICATION_PUSH_TYPES.FRIEND_PLAN_OVERLAP,
+        actorName,
+        actorAvatar: resolveAvatarUrl(actor?.avatar_url),
+        date: input.date,
+        festivalId: input.festivalId,
+        kind: input.kind,
+        tentName: input.tentName ?? "",
+        body: buildOverlapBody({
+          actorName,
+          kind: input.kind,
+          tentName: input.tentName,
+          dayLabel: formatOverlapDayLabel(input.date, input.today),
+        }),
+      };
+
+      const results = await Promise.allSettled(
+        newRecipientIds.map((to) =>
+          this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.FRIEND_PLAN_OVERLAP,
+            to,
+            payload,
+          }),
+        ),
+      );
+
+      const failedRecipientIds = newRecipientIds.filter(
+        (_recipientId, index) => results[index].status === "rejected",
+      );
+      if (failedRecipientIds.length === 0) {
+        return;
+      }
+
+      logger.error(
+        {
+          failedCount: failedRecipientIds.length,
+          reason: results.find((result) => result.status === "rejected")?.reason,
+        },
+        "Error sending plan overlap notifications",
+      );
+
+      // A failed send must not count as notified, or that recipient never hears
+      // about this actor and day again.
+      const { error: forgetError } = await adminClient
+        .from("day_plan_overlap_notifications")
+        .delete()
+        .eq("actor_id", input.actorId)
+        .eq("festival_id", input.festivalId)
+        .eq("date", input.date)
+        .in("recipient_id", failedRecipientIds);
+
+      if (forgetError) {
+        logger.error({ error: forgetError }, "Error clearing failed plan overlap notifications");
+      }
+    } catch (error) {
+      logger.error({ error }, "Error sending plan overlap notifications");
     }
   }
 

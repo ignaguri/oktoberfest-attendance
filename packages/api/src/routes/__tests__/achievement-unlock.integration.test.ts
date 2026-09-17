@@ -356,13 +356,17 @@ describe("inline unlock wiring on the write-path routes", () => {
     }
 
     const { data: reservation1, error: reservation1Error } = await supabaseAdmin
-      .from("reservations")
+      .from("day_plans")
       .insert({
         user_id: user.id,
         festival_id: festival.id,
+        date: "2024-09-21",
+        kind: "reservation",
         tent_id: tent1.id,
         start_at: "2024-09-21T14:00:00Z",
         status: "pending",
+        reminder_offset_minutes: 30,
+        auto_checkin: false,
       })
       .select()
       .single();
@@ -388,14 +392,21 @@ describe("inline unlock wiring on the write-path routes", () => {
     // existing-attendance branch of the handler rather than reusing the same
     // (now-completed) reservation, but exercises the same evaluate-after-write
     // call. days_attended.t1 is already held, so this must be a no-op.
+    // A day holds one active mark, so the first reservation is cancelled to
+    // make room for the second.
+    await supabaseAdmin.from("day_plans").update({ status: "cancelled" }).eq("id", reservation1.id);
     const { data: reservation2, error: reservation2Error } = await supabaseAdmin
-      .from("reservations")
+      .from("day_plans")
       .insert({
         user_id: user.id,
         festival_id: festival.id,
+        date: "2024-09-21",
+        kind: "reservation",
         tent_id: tent2.id,
         start_at: "2024-09-21T18:00:00Z",
         status: "pending",
+        reminder_offset_minutes: 30,
+        auto_checkin: false,
       })
       .select()
       .single();
@@ -416,7 +427,7 @@ describe("inline unlock wiring on the write-path routes", () => {
       .delete()
       .eq("user_id", user.id)
       .eq("festival_id", festival.id);
-    await supabaseAdmin.from("reservations").delete().in("id", [reservation1.id, reservation2.id]);
+    await supabaseAdmin.from("day_plans").delete().in("id", [reservation1.id, reservation2.id]);
     await supabaseAdmin
       .from("attendances")
       .delete()

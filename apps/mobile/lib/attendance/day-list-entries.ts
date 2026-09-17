@@ -9,47 +9,31 @@
  * pinning. Same reasoning as ./tent-visit-rows.
  */
 
-import type { AttendanceWithTotals, Reservation } from "@prostcounter/shared/schemas";
-import { format } from "date-fns";
-
-import { isActiveReservation } from "@/lib/utils/reservation";
+import type { AttendanceWithTotals, DayPlan } from "@prostcounter/shared/schemas";
 
 /** One row in the merged, date-descending list. */
 export type DayListEntry =
   | { kind: "attendance"; date: string; attendance: AttendanceWithTotals }
-  | { kind: "reservationOnly"; date: string; reservation: Reservation };
+  | { kind: "reservationOnly"; date: string; reservation: DayPlan }
+  | { kind: "planOnly"; date: string; plan: DayPlan };
 
 /**
- * Active reservations by day key, one per day.
+ * Merge logged days with days that only carry a plan or a reservation into one
+ * date-descending list.
  *
- * Shared by the strip and the list, which each built this independently and
- * would have drifted. A day holding two reservations keeps the last one seen:
- * both views show a single marker per day, so there is nothing to render for a
- * second, and picking one arbitrarily is honest about that.
- */
-export function buildActiveReservationsByDate(
-  reservations: Reservation[],
-): Map<string, Reservation> {
-  const map = new Map<string, Reservation>();
-  for (const reservation of reservations) {
-    if (!isActiveReservation(reservation)) {
-      continue;
-    }
-    map.set(format(new Date(reservation.startAt), "yyyy-MM-dd"), reservation);
-  }
-  return map;
-}
-
-/**
- * Merge logged days and reservation-only days into one date-descending list.
- *
- * A day with an attendance never also produces a reservation row: the
+ * A day with an attendance never also produces a plan or reservation row: the
  * attendance row already carries the day, and two rows for one date would read
- * as two separate outings.
+ * as two separate outings. A plan on a day that has passed is dropped, since a
+ * plan only says something about the future; a past reservation stays, as it
+ * did before plans existed.
+ *
+ * @param plansByDate active marks keyed by YYYY-MM-DD (see buildDayPlansByDate)
+ * @param today the device's current day, YYYY-MM-DD
  */
 export function buildDayListEntries(
   attendances: AttendanceWithTotals[],
-  reservationsByDate: Map<string, Reservation>,
+  plansByDate: Map<string, DayPlan>,
+  today: string,
 ): DayListEntry[] {
   const attendanceDates = new Set(attendances.map((attendance) => attendance.date));
 
@@ -59,9 +43,16 @@ export function buildDayListEntries(
     attendance,
   }));
 
-  for (const [date, reservation] of reservationsByDate) {
-    if (!attendanceDates.has(date)) {
-      entries.push({ kind: "reservationOnly", date, reservation });
+  for (const [date, plan] of plansByDate) {
+    if (attendanceDates.has(date)) {
+      continue;
+    }
+    if (plan.kind === "reservation") {
+      entries.push({ kind: "reservationOnly", date, reservation: plan });
+      continue;
+    }
+    if (date >= today) {
+      entries.push({ kind: "planOnly", date, plan });
     }
   }
 

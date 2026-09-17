@@ -59,6 +59,11 @@ export const Colors = {
     500: "#14B8A6", // teal-500
     600: "#0D9488", // teal-600 - reservation indicator
   },
+
+  // Sky colors (for friends going)
+  sky: {
+    600: "#0284C7", // sky-600 - friends chip icon
+  },
 } as const;
 
 // Convenience exports for common use cases
@@ -71,6 +76,8 @@ export const IconColors = {
   primary: Colors.primary[500],
   disabled: Colors.gray[300],
   reservation: Colors.teal[600],
+  plan: Colors.teal[600],
+  friends: Colors.sky[600],
 } as const;
 
 export const SwitchColors = {

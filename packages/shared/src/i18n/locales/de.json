@@ -636,10 +636,36 @@
       "invalidDate": "Bitte wähle ein gültiges Datum",
       "dateOutsideFestival": "Das Datum muss innerhalb der Festivaldaten liegen"
     },
+    "planner": {
+      "whosGoing": "Wer geht hin",
+      "moreFriends": "+{{count}} weitere",
+      "unknownFriend": "Jemand",
+      "you": "Du",
+      "status": {
+        "none": "Gehe nicht",
+        "plan": "Geplant",
+        "reservation": "Reserviert"
+      },
+      "tentOptional": "Zelt (optional)",
+      "clearTent": "Zelt entfernen",
+      "notePlaceholder": "Mit wem gehst du hin?",
+      "visibility": "Sichtbar für Freunde & Gruppen",
+      "visibilityDescription": "Sie sehen, dass du an diesem Tag hingehst",
+      "reservationHint": "Du hast einen Tisch? Wechsle zu Reserviert, um Uhrzeit und Erinnerung hinzuzufügen.",
+      "summaryPlan": "Du planst hinzugehen",
+      "summaryReservation": "Du hast eine Reservierung",
+      "editHint": "Öffnet deinen Plan für diesen Tag zum Bearbeiten",
+      "saveFailed": "Dein Plan konnte nicht gespeichert werden. Versuch es noch einmal."
+    },
     "calendar": {
       "tapToAddOrEdit": "Tippe auf einen Tag, um deinen Besuch hinzuzufügen oder zu bearbeiten",
       "hasAttendance": "Hat Besuch",
       "hasReservation": "Reservierung",
+      "hasPlan": "Geplant",
+      "friendsGoing": "Freunde gehen hin",
+      "a11yPlanning": "plant hinzugehen",
+      "a11yFriendsGoing": "{{count}} Freund geht hin",
+      "a11yFriendsGoing_other": "{{count}} Freunde gehen hin",
       "selected": "Ausgewählt"
     },
     "view": {
@@ -653,12 +679,16 @@
       "a11yPhotos_other": "{{count}} Fotos",
       "moreTents": "+{{amount}}",
       "reserved": "Reserviert",
-      "reservationsUnavailable": "Reservierungen konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einer Reservierung.",
+      "plansUnavailable": "Pläne konnten nicht geladen werden, daher fehlen Tage mit ausschließlich einem Plan oder einer Reservierung.",
+      "planning": "Geplant",
+      "friendsCount": "{{count}} Freund",
+      "friendsCount_other": "{{count}} Freunde",
       "tip": "+{{amount}} Trinkgeld"
     },
     "tabs": {
       "attendance": "Besuche",
-      "reservation": "Reservierung"
+      "reservation": "Reservierung",
+      "plan": "Plan"
     },
     "saveSuccess": "Änderungen erfolgreich gespeichert",
     "summary": {
@@ -1516,6 +1546,8 @@
       "achievementsDescription": "Benachrichtigung erhalten, wenn du Erfolge freischaltest",
       "groups": "Gruppen-Benachrichtigungen",
       "groupsDescription": "Benachrichtigungen von deinen Gruppen erhalten (Check-ins, Erfolge, etc.)",
+      "friendPlans": "Pläne von Freunden",
+      "friendPlansDescription": "Wenn Freunde an einem Tag hingehen, den du markiert hast",
       "groupActivity": "Gruppen-Aktivität",
       "reminders": "Erinnerungen",
       "remindersDescription": "Reservierungserinnerungen und Check-in-Aufforderungen",
@@ -2482,6 +2514,7 @@
       "stay": "Bei {{current}} bleiben"
     },
     "switchedToast": "Zu {{festival}} gewechselt, um diese Gruppe anzuzeigen",
+    "switchedToDayToast": "Zu {{festival}} gewechselt, um diesen Tag anzuzeigen",
     "otherFestivalGroups": {
       "hint": "Du hast {{count}} Gruppe für {{festival}}",
       "hint_other": "Du hast {{count}} Gruppen für {{festival}}"
@@ -2763,6 +2796,10 @@
     "RESERVATION_CANCELLED": "Diese Reservierung wurde storniert.",
     "RESERVATION_START_IN_PAST": "Reservierungsstart muss in der Zukunft liegen.",
     "RESERVATION_END_BEFORE_START": "Endzeit muss nach der Startzeit liegen.",
+    "DAY_PLAN_NOT_FOUND": "Du hast diesen Tag nicht markiert.",
+    "DAY_PLAN_CONFLICT": "Für diesen Tag gibt es schon eine Reservierung.",
+    "DAY_PLAN_DATE_IN_PAST": "Du kannst nur ab heute planen.",
+    "DAY_PLAN_DATE_MISMATCH": "Die Reservierungszeit muss am ausgewählten Tag liegen.",
     "PHOTO_NOT_FOUND": "Foto nicht gefunden.",
     "PHOTO_UPLOAD_FAILED": "Hochladen des Fotos fehlgeschlagen.",
     "INVALID_FILE_TYPE": "Ungültiger Dateityp.",

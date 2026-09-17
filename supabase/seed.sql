@@ -363,33 +363,36 @@ BEGIN
   SELECT id INTO v_user2 FROM auth.users ORDER BY email LIMIT 1 OFFSET 2;
 
   -- Due reminder soon: start_at in 55 minutes with a 60-minute offset => reminder due now
-  INSERT INTO reservations (
-    id, user_id, festival_id, tent_id, start_at, end_at, status,
-    reminder_offset_minutes, visible_to_groups, note
+  INSERT INTO day_plans (
+    id, user_id, festival_id, date, kind, tent_id, start_at, end_at, status,
+    reminder_offset_minutes, auto_checkin, visible_to_groups, note
   ) VALUES (
-    gen_random_uuid(), v_user0, v_festival_id, v_tent_id,
+    gen_random_uuid(), v_user0, v_festival_id,
+    ((now() + interval '55 minutes') AT TIME ZONE 'Europe/Berlin')::date, 'reservation', v_tent_id,
     now() + interval '55 minutes', NULL, 'pending',
-    60, true, 'QA: reminder-due'
+    60, false, true, 'QA: reminder-due'
   );
 
   -- Due prompt: start_at in the past by 1 minute => prompt due now
-  INSERT INTO reservations (
-    id, user_id, festival_id, tent_id, start_at, end_at, status,
-    reminder_offset_minutes, visible_to_groups, note
+  INSERT INTO day_plans (
+    id, user_id, festival_id, date, kind, tent_id, start_at, end_at, status,
+    reminder_offset_minutes, auto_checkin, visible_to_groups, note
   ) VALUES (
-    gen_random_uuid(), v_user1, v_festival_id, v_tent_id,
+    gen_random_uuid(), v_user1, v_festival_id,
+    ((now() - interval '1 minute') AT TIME ZONE 'Europe/Berlin')::date, 'reservation', v_tent_id,
     now() - interval '1 minute', NULL, 'pending',
-    1440, true, 'QA: prompt-due'
+    1440, false, true, 'QA: prompt-due'
   );
 
   -- Early check-in reservation
-  INSERT INTO reservations (
-    id, user_id, festival_id, tent_id, start_at, end_at, status,
-    reminder_offset_minutes, visible_to_groups, note
+  INSERT INTO day_plans (
+    id, user_id, festival_id, date, kind, tent_id, start_at, end_at, status,
+    reminder_offset_minutes, auto_checkin, visible_to_groups, note
   ) VALUES (
-    gen_random_uuid(), v_user2, v_festival_id, v_tent_id,
+    gen_random_uuid(), v_user2, v_festival_id,
+    ((now() - interval '1 minute') AT TIME ZONE 'Europe/Berlin')::date, 'reservation', v_tent_id,
     now() - interval '1 minute', NULL, 'pending',
-    1440, true, 'QA: early-checkin-reservation'
+    1440, false, true, 'QA: early-checkin-reservation'
   );
 END $$;
 

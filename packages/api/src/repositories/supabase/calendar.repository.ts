@@ -64,8 +64,9 @@ export class SupabaseCalendarRepository {
 
     // Get reservations (pending or confirmed)
     const { data: reservations, error: resError } = await this.supabase
-      .from("reservations")
+      .from("day_plans")
       .select("id, start_at, end_at, status, tent:tents(id, name)")
+      .eq("kind", "reservation")
       .eq("festival_id", festivalId)
       .eq("user_id", userId)
       .in("status", ["pending", "confirmed"]);
@@ -119,16 +120,18 @@ export class SupabaseCalendarRepository {
       });
 
     // Create reservation events
-    (reservations ?? []).forEach((r) => {
-      const tentName = (r.tent as any)?.name;
-      events.push({
-        id: r.id,
-        title: `Reservation${tentName ? ` · ${tentName}` : ""}`,
-        from: r.start_at,
-        to: r.end_at,
-        type: "reservation" as CalendarEventType,
+    (reservations ?? [])
+      .filter((r) => r.start_at !== null)
+      .forEach((r) => {
+        const tentName = (r.tent as any)?.name;
+        events.push({
+          id: r.id,
+          title: `Reservation${tentName ? ` · ${tentName}` : ""}`,
+          from: r.start_at!,
+          to: r.end_at,
+          type: "reservation" as CalendarEventType,
+        });
       });
-    });
 
     return {
       events,
@@ -213,8 +216,9 @@ export class SupabaseCalendarRepository {
 
     // Get group-visible reservations
     const { data: reservations, error: resError } = await this.supabase
-      .from("reservations")
+      .from("day_plans")
       .select("id, user_id, start_at, end_at, status, visible_to_groups, tent:tents(id, name)")
+      .eq("kind", "reservation")
       .eq("festival_id", festivalId)
       .eq("visible_to_groups", true)
       .in("user_id", memberIds);
@@ -279,17 +283,19 @@ export class SupabaseCalendarRepository {
       });
 
     // Create reservation events
-    (reservations ?? []).forEach((r) => {
-      const memberName = idToName.get(r.user_id ?? "") ?? "Member";
-      const tentName = (r.tent as any)?.name;
-      events.push({
-        id: r.id,
-        title: `${memberName}: Reservation${tentName ? ` · ${tentName}` : ""}`,
-        from: r.start_at,
-        to: r.end_at,
-        type: "reservation" as CalendarEventType,
+    (reservations ?? [])
+      .filter((r) => r.start_at !== null)
+      .forEach((r) => {
+        const memberName = idToName.get(r.user_id ?? "") ?? "Member";
+        const tentName = (r.tent as any)?.name;
+        events.push({
+          id: r.id,
+          title: `${memberName}: Reservation${tentName ? ` · ${tentName}` : ""}`,
+          from: r.start_at!,
+          to: r.end_at,
+          type: "reservation" as CalendarEventType,
+        });
       });
-    });
 
     return {
       events,
