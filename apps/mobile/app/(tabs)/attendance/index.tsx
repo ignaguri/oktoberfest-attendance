@@ -28,6 +28,7 @@ import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Text } from "@/components/ui/text";
+import { useToast } from "@/components/ui/toast";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAttendanceViewMode } from "@/hooks/useAttendanceViewMode";
@@ -44,15 +45,27 @@ import {
   countFriendsByDate,
   dayPlanToReservation,
 } from "@/lib/attendance/day-plans";
+import { resolveDayLink } from "@/lib/attendance/day-link";
 import { logger } from "@/lib/logger";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
-  const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const {
+    currentFestival,
+    festivals,
+    setCurrentFestival,
+    isLoading: festivalLoading,
+  } = useFestival();
   const router = useRouter();
-  const { checkInReservationId, date: dateParam } = useLocalSearchParams<{
+  const toast = useToast();
+  const {
+    checkInReservationId,
+    date: dateParam,
+    festivalId: festivalIdParam,
+  } = useLocalSearchParams<{
     checkInReservationId?: string;
     date?: string;
+    festivalId?: string;
   }>();
 
   // Dialog state
@@ -154,17 +167,56 @@ export default function AttendanceScreen() {
     }
   }, [checkInReservationId, reservations, router]);
 
-  // Open a day from a deep link, e.g. a friend's overlap push (?date=YYYY-MM-DD)
+  // Open a day from a deep link, e.g. a friend's overlap push
+  // (?date=YYYY-MM-DD&festivalId=...), switching to its festival first
   useEffect(() => {
-    if (!dateParam || !/^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    const link = resolveDayLink({
+      date: dateParam,
+      festivalId: festivalIdParam,
+      currentFestivalId: currentFestival?.id,
+      festivals,
+      festivalsLoading: festivalLoading,
+    });
+
+    if (link.action === "switch") {
+      // Runs again once the switch lands, and then opens the day.
+      setCurrentFestival(link.festival);
+      toast.show({
+        placement: "top",
+        render: () => (
+          <View className="rounded-lg bg-background-800 px-4 py-3">
+            <Text className="font-medium text-typography-0">
+              {t("festival.switchedToast", { festival: link.festival.name })}
+            </Text>
+          </View>
+        ),
+      });
       return;
     }
+    if (link.action === "drop") {
+      router.setParams({ date: undefined, festivalId: undefined });
+      return;
+    }
+    if (link.action !== "open") {
+      return;
+    }
+
     queueMicrotask(() => {
-      setSelectedDate(parseISO(dateParam));
+      setSelectedDate(parseISO(link.date));
       setIsFormOpen(true);
-      router.setParams({ date: undefined });
+      router.setParams({ date: undefined, festivalId: undefined });
     });
-  }, [dateParam, router]);
+  }, [
+    dateParam,
+    festivalIdParam,
+    currentFestival?.id,
+    festivals,
+    festivalLoading,
+    setCurrentFestival,
+    toast,
+    t,
+    router,
+  ]);
 
   // Parse festival dates using parseISO to avoid UTC timezone issues
   // new Date("2024-12-31") parses as UTC midnight, but parseISO treats it as local

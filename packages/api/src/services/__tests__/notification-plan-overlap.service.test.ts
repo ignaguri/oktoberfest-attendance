@@ -109,6 +109,7 @@ describe("NotificationService.notifyPlanOverlap", () => {
         payload: expect.objectContaining({
           type: "friend-plan-overlap",
           date: "2026-09-26",
+          festivalId: FESTIVAL_ID,
           kind: "plan",
           actorName: "ana",
           body: "ana is going on Saturday too",

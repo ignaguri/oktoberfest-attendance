@@ -881,6 +881,7 @@ export class NotificationService {
         actorName,
         actorAvatar: resolveAvatarUrl(actor?.avatar_url),
         date: input.date,
+        festivalId: input.festivalId,
         kind: input.kind,
         tentName: input.tentName ?? "",
         body: buildOverlapBody({

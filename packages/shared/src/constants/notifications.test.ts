@@ -18,6 +18,19 @@ describe("getNotificationRoute for friend plan overlaps", () => {
     );
   });
 
+  it("keeps the festival so the day opens in the right one", () => {
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.FRIEND_PLAN_OVERLAP,
+        date: "2026-09-26",
+        festivalId: "festival-1",
+      }),
+    ).toBe("/attendance?date=2026-09-26&festivalId=festival-1");
+    expect(
+      getNotificationRoute({ actorName: "ana", date: "2026-09-26", festivalId: "festival-1" }),
+    ).toBe("/attendance?date=2026-09-26&festivalId=festival-1");
+  });
+
   it("falls back to the attendance screen without a date", () => {
     expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.FRIEND_PLAN_OVERLAP })).toBe(
       "/attendance",
