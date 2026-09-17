@@ -3,7 +3,7 @@ import type { FriendGoing } from "@prostcounter/shared/schemas";
 import { formatTimeInTimezone } from "@prostcounter/shared/utils";
 import { cn, getInitials } from "@prostcounter/ui";
 import { parseISO } from "date-fns";
-import { CalendarClock, Footprints, MapPin } from "lucide-react-native";
+import { CalendarClock, Footprints, MapPin, Users } from "lucide-react-native";
 import { useState } from "react";
 
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
@@ -11,26 +11,44 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { formatCompanionNames } from "@/lib/attendance/day-plans";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
 
 /** Rows shown before "+N more". Enough to see who has a table without scrolling past the form. */
 const COLLAPSED_COUNT = 3;
 
-function FriendRow({ friend, timezone }: { friend: FriendGoing; timezone: string }) {
+function FriendRow({
+  friend,
+  timezone,
+  viewerId,
+}: {
+  friend: FriendGoing;
+  timezone: string;
+  viewerId: string | null;
+}) {
   const { t } = useTranslation();
   const displayName = friend.username || friend.fullName || t("attendance.planner.unknownFriend");
   const isReserved = friend.kind === "reservation";
   const statusLabel = isReserved ? t("attendance.list.reserved") : t("attendance.list.planning");
   const arrival = friend.startAt ? formatTimeInTimezone(parseISO(friend.startAt), timezone) : null;
   const details = [friend.tentName, arrival].filter(Boolean).join(" · ");
+  const companionNames = formatCompanionNames(friend.companions, {
+    viewerId,
+    you: t("attendance.planner.companionYou"),
+    unknown: t("attendance.planner.unknownFriend"),
+  });
+  const companionsLine = companionNames
+    ? t("attendance.planner.withCompanions", { names: companionNames })
+    : null;
 
   return (
     <HStack
       space="md"
       className="items-start"
       accessible
-      accessibilityLabel={[displayName, statusLabel, details, friend.note]
+      accessibilityLabel={[displayName, statusLabel, details, companionsLine, friend.note]
         .filter(Boolean)
         .join(", ")}
     >
@@ -71,6 +89,14 @@ function FriendRow({ friend, timezone }: { friend: FriendGoing; timezone: string
             </Text>
           </HStack>
         )}
+        {companionsLine && (
+          <HStack space="xs" className="items-center">
+            <Users size={12} color={IconColors.muted} />
+            <Text className="flex-1 text-xs text-typography-600" numberOfLines={2}>
+              {companionsLine}
+            </Text>
+          </HStack>
+        )}
         {friend.note && (
           <Text className="text-xs italic text-typography-500">{`"${friend.note}"`}</Text>
         )}
@@ -92,6 +118,7 @@ export function WhosGoingSection({
   timezone: string;
 }) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (friends.length === 0) {
@@ -113,7 +140,12 @@ export function WhosGoingSection({
       </HStack>
       <VStack space="md">
         {visibleFriends.map((friend) => (
-          <FriendRow key={friend.userId} friend={friend} timezone={timezone} />
+          <FriendRow
+            key={friend.userId}
+            friend={friend}
+            timezone={timezone}
+            viewerId={user?.id ?? null}
+          />
         ))}
       </VStack>
       {hiddenCount > 0 && (

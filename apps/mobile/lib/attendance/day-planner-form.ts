@@ -6,6 +6,7 @@
 import {
   DAY_PLAN_NOTE_MAX_LENGTH,
   type DayPlan,
+  type GetCompanionOptionsResponse,
   type UpsertDayPlanInput,
 } from "@prostcounter/shared/schemas";
 import { atZonedTime, zonedTimeOnDay } from "@prostcounter/shared/utils";
@@ -24,6 +25,8 @@ export const plannerFormSchema = z
     note: z.string().max(DAY_PLAN_NOTE_MAX_LENGTH),
     visibleToGroups: z.boolean(),
     reminderOffsetMinutes: z.number().int().min(0).max(1440),
+    companionUserIds: z.array(z.string()),
+    companionGroupIds: z.array(z.string()),
   })
   .refine((values) => values.status !== "reservation" || values.tentId.length > 0, {
     path: ["tentId"],
@@ -54,6 +57,8 @@ export function buildPlannerDefaults(
       note: "",
       visibleToGroups: true,
       reminderOffsetMinutes: DEFAULT_RESERVATION_REMINDER_MINUTES,
+      companionUserIds: [],
+      companionGroupIds: [],
     };
   }
 
@@ -67,6 +72,8 @@ export function buildPlannerDefaults(
     visibleToGroups: existingPlan.visibleToGroups,
     reminderOffsetMinutes:
       existingPlan.reminderOffsetMinutes ?? DEFAULT_RESERVATION_REMINDER_MINUTES,
+    companionUserIds: existingPlan.companions.users.map((user) => user.userId),
+    companionGroupIds: existingPlan.companions.groups.map((group) => group.groupId),
   };
 }
 
@@ -75,6 +82,7 @@ export function toUpsertInput(
   values: PlannerFormValues,
   selectedDate: Date,
   timezone: string,
+  companions?: UpsertDayPlanInput["companions"],
 ): UpsertDayPlanInput | null {
   const trimmedNote = values.note.trim();
   const note = trimmedNote.length > 0 ? trimmedNote : null;
@@ -89,6 +97,7 @@ export function toUpsertInput(
       tentId: values.tentId.length > 0 ? values.tentId : null,
       note,
       visibleToGroups: values.visibleToGroups,
+      companions,
     };
   }
 
@@ -100,6 +109,36 @@ export function toUpsertInput(
     startAt: atZonedTime(selectedDate, values.startTime, timezone).toISOString(),
     note,
     visibleToGroups: values.visibleToGroups,
+    companions,
     reminderOffsetMinutes: values.reminderOffsetMinutes,
+  };
+}
+
+/**
+ * The companions to send with a save, or undefined to leave the saved tags as
+ * they are.
+ *
+ * Only sent when the user changed them, so a tag that went stale (an unfriended
+ * person, a group they left) can't fail an unrelated edit. When they did change
+ * them, anyone no longer on offer is dropped for the same reason.
+ */
+export function resolveCompanionsInput(
+  values: Pick<PlannerFormValues, "companionUserIds" | "companionGroupIds">,
+  changed: boolean,
+  options: GetCompanionOptionsResponse | null,
+): UpsertDayPlanInput["companions"] {
+  if (!changed) {
+    return undefined;
+  }
+  if (!options) {
+    return { userIds: values.companionUserIds, groupIds: values.companionGroupIds };
+  }
+
+  const offeredUserIds = new Set(options.users.map((user) => user.userId));
+  const offeredGroupIds = new Set(options.groups.map((group) => group.groupId));
+
+  return {
+    userIds: values.companionUserIds.filter((userId) => offeredUserIds.has(userId)),
+    groupIds: values.companionGroupIds.filter((groupId) => offeredGroupIds.has(groupId)),
   };
 }

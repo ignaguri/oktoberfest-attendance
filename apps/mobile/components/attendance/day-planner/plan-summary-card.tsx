@@ -9,6 +9,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { formatCompanionNames } from "@/lib/attendance/day-plans";
 import { IconColors } from "@/lib/constants/colors";
 
 interface PlanSummaryCardProps {
@@ -29,6 +30,14 @@ export function PlanSummaryCard({ plan, timezone, onEdit }: PlanSummaryCardProps
   const details = [plan.tentName, arrival, plan.note ? `"${plan.note}"` : null]
     .filter(Boolean)
     .join(" · ");
+  const companionNames = formatCompanionNames(plan.companions, {
+    viewerId: null,
+    you: t("attendance.planner.companionYou"),
+    unknown: t("attendance.planner.unknownFriend"),
+  });
+  const companionsLine = companionNames
+    ? t("attendance.planner.withCompanions", { names: companionNames })
+    : null;
 
   return (
     <Pressable
@@ -40,7 +49,7 @@ export function PlanSummaryCard({ plan, timezone, onEdit }: PlanSummaryCardProps
           : "border-2 border-dashed border-teal-400 bg-background-0",
       )}
       accessibilityRole="button"
-      accessibilityLabel={[title, details].filter(Boolean).join(", ")}
+      accessibilityLabel={[title, details, companionsLine].filter(Boolean).join(", ")}
       accessibilityHint={t("attendance.planner.editHint")}
     >
       <HStack space="md" className="items-center">
@@ -54,6 +63,11 @@ export function PlanSummaryCard({ plan, timezone, onEdit }: PlanSummaryCardProps
           {details.length > 0 && (
             <Text className="text-xs text-typography-600" numberOfLines={2}>
               {details}
+            </Text>
+          )}
+          {companionsLine && (
+            <Text className="text-xs text-typography-600" numberOfLines={2}>
+              {companionsLine}
             </Text>
           )}
         </VStack>

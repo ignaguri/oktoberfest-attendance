@@ -1,14 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDeleteDayPlan, useUpsertDayPlan } from "@prostcounter/shared/hooks";
+import {
+  useDeleteDayPlan,
+  usePlanCompanionOptions,
+  useUpsertDayPlan,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   DAY_PLAN_NOTE_MAX_LENGTH,
   type DayPlan,
+  type DayPlanCompanions,
   type FriendGoing,
 } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import { format } from "date-fns";
-import { ChevronDown, MapPin, X } from "lucide-react-native";
+import { ChevronDown, MapPin, Users, X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -35,8 +40,10 @@ import {
   plannerFormSchema,
   type PlannerFormValues,
   type PlannerStatus,
+  resolveCompanionsInput,
   toUpsertInput,
 } from "@/lib/attendance/day-planner-form";
+import { formatCompanionNames } from "@/lib/attendance/day-plans";
 import { IconColors, SwitchColors } from "@/lib/constants/colors";
 import { useAdaptedTents } from "@/lib/database/adapted-hooks";
 import { logger } from "@/lib/logger";
@@ -44,6 +51,7 @@ import { logger } from "@/lib/logger";
 import { TentSelectorSheet } from "../../tent-selector/tent-selector-sheet";
 import { ReminderOffsetSelect } from "../reservation-form/reminder-offset-select";
 import { TimePickerField } from "../reservation-form/time-picker-field";
+import { CompanionPickerSheet } from "./companion-picker-sheet";
 import { PlanSummaryCard } from "./plan-summary-card";
 import { WhosGoingSection } from "./whos-going-section";
 
@@ -80,10 +88,18 @@ export function DayPlanner({
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(existingPlan === null);
   const [showTentSelector, setShowTentSelector] = useState(false);
+  const [showCompanionPicker, setShowCompanionPicker] = useState(false);
+  // Saves send companions only once the user touched them; see resolveCompanionsInput
+  const [companionsChanged, setCompanionsChanged] = useState(false);
   const { dialog, showDialog, closeDialog } = useAlertDialog();
   const { tents } = useAdaptedTents(festivalId);
   const upsertDayPlan = useUpsertDayPlan();
   const deleteDayPlan = useDeleteDayPlan();
+  const {
+    data: companionOptions,
+    loading: companionOptionsLoading,
+    error: companionOptionsError,
+  } = usePlanCompanionOptions(festivalId, { enabled: isEditing });
 
   const dateKey = format(selectedDate, "yyyy-MM-dd");
   const defaults = useMemo(
@@ -105,6 +121,8 @@ export function DayPlanner({
 
   const status = watch("status");
   const selectedTentId = watch("tentId");
+  const companionUserIds = watch("companionUserIds");
+  const companionGroupIds = watch("companionGroupIds");
   const isProcessing = upsertDayPlan.loading || deleteDayPlan.loading;
   // The existing rule for reservations: the tent is fixed once booked.
   const isTentLocked = existingPlan?.kind === "reservation" && status === "reservation";
@@ -118,6 +136,40 @@ export function DayPlanner({
       .find((opt) => opt.value === selectedTentId);
     return option?.label ?? null;
   }, [selectedTentId, tents]);
+
+  // Names for the picked ids: the options once loaded, the saved plan until then
+  const companionsLabel = useMemo(() => {
+    const users = [...(existingPlan?.companions.users ?? []), ...(companionOptions?.users ?? [])];
+    const groups = [
+      ...(existingPlan?.companions.groups ?? []),
+      ...(companionOptions?.groups ?? []),
+    ];
+    const selected: DayPlanCompanions = {
+      users: companionUserIds.flatMap((userId) => {
+        const user = users.find((candidate) => candidate.userId === userId);
+        return user ? [user] : [];
+      }),
+      groups: companionGroupIds.flatMap((groupId) => {
+        const group = groups.find((candidate) => candidate.groupId === groupId);
+        return group ? [group] : [];
+      }),
+    };
+
+    return formatCompanionNames(selected, {
+      viewerId: null,
+      you: t("attendance.planner.companionYou"),
+      unknown: t("attendance.planner.unknownFriend"),
+    });
+  }, [existingPlan, companionOptions, companionUserIds, companionGroupIds, t]);
+
+  const handleCompanionsChange = useCallback(
+    ({ userIds, groupIds }: { userIds: string[]; groupIds: string[] }) => {
+      setValue("companionUserIds", userIds);
+      setValue("companionGroupIds", groupIds);
+      setCompanionsChanged(true);
+    },
+    [setValue],
+  );
 
   const statusTabs = useMemo(
     (): Tab[] => [
@@ -149,7 +201,12 @@ export function DayPlanner({
 
   const onSubmit = useCallback(
     async (values: PlannerFormValues) => {
-      const input = toUpsertInput(values, selectedDate, timezone);
+      const companions = resolveCompanionsInput(
+        values,
+        companionsChanged,
+        companionOptions ?? null,
+      );
+      const input = toUpsertInput(values, selectedDate, timezone, companions);
 
       if (!input) {
         if (!existingPlan) {
@@ -180,6 +237,8 @@ export function DayPlanner({
       }
     },
     [
+      companionsChanged,
+      companionOptions,
       selectedDate,
       timezone,
       existingPlan,
@@ -201,6 +260,7 @@ export function DayPlanner({
       return;
     }
     reset(defaults);
+    setCompanionsChanged(false);
     setIsEditing(false);
   }, [existingPlan, onClose, reset, defaults]);
 
@@ -288,6 +348,47 @@ export function DayPlanner({
                         {t("reservation.form.tentCannotBeChanged")}
                       </Text>
                     )}
+                  </VStack>
+
+                  <VStack space="sm">
+                    <Text className="text-sm font-medium text-typography-700">
+                      {t("attendance.planner.goingWith")}
+                    </Text>
+                    <Pressable
+                      onPress={() => setShowCompanionPicker(true)}
+                      disabled={isProcessing}
+                      className="w-full rounded-lg border border-background-300 bg-background-0 px-4 py-3"
+                      accessibilityRole="button"
+                      accessibilityLabel={t("attendance.planner.goingWith")}
+                      accessibilityValue={{ text: companionsLabel || undefined }}
+                    >
+                      <HStack className="items-center justify-between">
+                        <HStack space="sm" className="flex-1 items-center">
+                          <Users size={18} color={IconColors.muted} />
+                          <Text
+                            className={cn(
+                              "flex-1 text-base",
+                              companionsLabel ? "text-typography-900" : "text-typography-400",
+                            )}
+                            numberOfLines={1}
+                          >
+                            {companionsLabel || t("attendance.planner.companionsPlaceholder")}
+                          </Text>
+                        </HStack>
+                        {companionsLabel ? (
+                          <Pressable
+                            onPress={() => handleCompanionsChange({ userIds: [], groupIds: [] })}
+                            hitSlop={8}
+                            accessibilityRole="button"
+                            accessibilityLabel={t("attendance.planner.clearCompanions")}
+                          >
+                            <X size={18} color={IconColors.muted} />
+                          </Pressable>
+                        ) : (
+                          <ChevronDown size={18} color={IconColors.muted} />
+                        )}
+                      </HStack>
+                    </Pressable>
                   </VStack>
 
                   {status === "reservation" && (
@@ -414,6 +515,17 @@ export function DayPlanner({
         mode="single"
         selectedTent={selectedTentId}
         onSelectTent={(tentId) => setValue("tentId", tentId, { shouldValidate: true })}
+      />
+
+      <CompanionPickerSheet
+        isOpen={showCompanionPicker}
+        onClose={() => setShowCompanionPicker(false)}
+        options={companionOptions ?? null}
+        isLoading={companionOptionsLoading}
+        hasError={!!companionOptionsError}
+        selectedUserIds={companionUserIds}
+        selectedGroupIds={companionGroupIds}
+        onChange={handleCompanionsChange}
       />
 
       <AlertDialog isOpen={dialog.isOpen} onClose={closeDialog} size="md">

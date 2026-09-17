@@ -672,14 +672,28 @@
       },
       "tentOptional": "Carpa (opcional)",
       "clearTent": "Quitar carpa",
-      "notePlaceholder": "¿Con quién vas?",
+      "notePlaceholder": "Punto de encuentro, planes, lo que sea",
       "visibility": "Visible para amigos y grupos",
       "visibilityDescription": "Van a ver que vas ese día",
       "reservationHint": "¿Tenés mesa? Cambiá a Reservado para agregar horario y recordatorio.",
       "summaryPlan": "Planeás ir",
       "summaryReservation": "Tenés una reserva",
       "editHint": "Abre tu plan de este día para editarlo",
-      "saveFailed": "No se pudo guardar tu plan. Probá de nuevo."
+      "saveFailed": "No se pudo guardar tu plan. Probá de nuevo.",
+      "goingWith": "Vas con (opcional)",
+      "companionsPlaceholder": "Amigos o grupos",
+      "clearCompanions": "Quitar con quién vas",
+      "withCompanions": "Con {{names}}",
+      "companionYou": "vos",
+      "companionPicker": {
+        "title": "¿Con quién vas?",
+        "groups": "Grupos",
+        "people": "Amigos y compañeros de grupo",
+        "empty": "Agregá amigos o unite a un grupo para elegir con quién vas.",
+        "error": "No se pudieron cargar tus amigos y grupos.",
+        "clear": "Limpiar",
+        "doneCount": "Listo ({{count}})"
+      }
     },
     "calendar": {
       "tapToAddOrEdit": "Tocá un día para agregar o editar tu asistencia",
@@ -2843,6 +2857,7 @@
     "DAY_PLAN_CONFLICT": "Este día ya tiene una reserva.",
     "DAY_PLAN_DATE_IN_PAST": "Solo podés planear desde hoy en adelante.",
     "DAY_PLAN_DATE_MISMATCH": "La hora de la reserva tiene que ser en el día seleccionado.",
+    "DAY_PLAN_INVALID_COMPANION": "Solo podés ir con tus amigos, compañeros de grupo y tus grupos.",
     "PHOTO_NOT_FOUND": "Foto no encontrada.",
     "PHOTO_UPLOAD_FAILED": "Error al subir la foto.",
     "INVALID_FILE_TYPE": "Tipo de archivo inválido.",

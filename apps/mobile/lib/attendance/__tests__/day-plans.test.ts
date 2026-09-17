@@ -9,6 +9,7 @@ import {
   classifyFestivalDay,
   countFriendsByDate,
   festivalTodayKey,
+  formatCompanionNames,
   dayPlanToReservation,
   formatFriendsBadge,
   resolveCellTopSlot,
@@ -25,6 +26,7 @@ function dayPlan(id: string, date: string, overrides: Partial<DayPlan> = {}): Da
     tentName: null,
     note: null,
     visibleToGroups: true,
+    companions: { users: [], groups: [] },
     startAt: null,
     endAt: null,
     status: null,
@@ -61,6 +63,7 @@ function friend(userId: string): FriendGoing {
     tentName: null,
     startAt: null,
     note: null,
+    companions: { users: [], groups: [] },
   };
 }
 
@@ -174,5 +177,30 @@ describe("festivalTodayKey", () => {
     expect(festivalTodayKey(new Date("2026-09-20T11:00:00Z"), "Pacific/Kiritimati")).toBe(
       "2026-09-21",
     );
+  });
+});
+
+describe("formatCompanionNames", () => {
+  const labels = { viewerId: "me", you: "you", unknown: "Someone" };
+
+  it("lists the reader first, then groups, then people", () => {
+    expect(
+      formatCompanionNames(
+        {
+          users: [
+            { userId: "u2", username: "ana", fullName: null, avatarUrl: null },
+            { userId: "me", username: "ignacio", fullName: null, avatarUrl: null },
+            { userId: "u3", username: null, fullName: "Tom Weber", avatarUrl: null },
+            { userId: "u4", username: null, fullName: null, avatarUrl: null },
+          ],
+          groups: [{ groupId: "g1", name: "Office" }],
+        },
+        labels,
+      ),
+    ).toBe("you, Office, ana, Tom Weber, Someone");
+  });
+
+  it("is empty when nobody is tagged", () => {
+    expect(formatCompanionNames({ users: [], groups: [] }, labels)).toBe("");
   });
 });
