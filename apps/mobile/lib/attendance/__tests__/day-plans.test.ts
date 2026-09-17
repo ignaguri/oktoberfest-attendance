@@ -6,6 +6,7 @@ import {
   buildDayPlansByDate,
   buildFinishedReservationDates,
   buildFriendsGoingByDate,
+  classifyFestivalDay,
   countFriendsByDate,
   dayPlanToReservation,
   formatFriendsBadge,
@@ -144,5 +145,24 @@ describe("resolveCellTopSlot", () => {
     expect(resolveCellTopSlot({ isToday: true, isFirstOfMonth: true })).toBe("today");
     expect(resolveCellTopSlot({ isToday: false, isFirstOfMonth: true })).toBe("month");
     expect(resolveCellTopSlot({ isToday: false, isFirstOfMonth: false })).toBe("none");
+  });
+});
+
+describe("classifyFestivalDay", () => {
+  // UTC+14 all year, so the test machine's own clock can't make these pass.
+  const FESTIVAL_TIMEZONE = "Pacific/Kiritimati";
+  // 11:00 UTC on Sep 20 is already 01:00 on Sep 21 in the festival's timezone.
+  const NOW = new Date("2026-09-20T11:00:00Z");
+
+  it("uses the festival's date for today", () => {
+    expect(classifyFestivalDay(new Date(2026, 8, 21), NOW, FESTIVAL_TIMEZONE)).toBe("today");
+  });
+
+  it("treats the phone's today as past once the festival's day moved on", () => {
+    expect(classifyFestivalDay(new Date(2026, 8, 20), NOW, FESTIVAL_TIMEZONE)).toBe("past");
+  });
+
+  it("treats later days as future", () => {
+    expect(classifyFestivalDay(new Date(2026, 8, 22), NOW, FESTIVAL_TIMEZONE)).toBe("future");
   });
 });

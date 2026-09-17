@@ -7,7 +7,7 @@ import type {
   Reservation,
 } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
-import { endOfDay, format, isAfter, isBefore, startOfDay } from "date-fns";
+import { format } from "date-fns";
 import { X } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -24,6 +24,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { SegmentedControl, type Tab } from "@/components/ui/segmented-control";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { classifyFestivalDay } from "@/lib/attendance/day-plans";
 import { IconColors } from "@/lib/constants/colors";
 
 import { DayPlanner } from "../day-planner";
@@ -36,7 +37,7 @@ export interface CalendarActionSheetProps {
   isOpen: boolean;
   onClose: () => void;
   festivalId: string;
-  /** The festival's timezone, for reservation times in the planner. */
+  /** The festival's timezone, for today's date and reservation times. */
   festivalTimezone?: string | null;
   festivalStartDate: Date;
   festivalEndDate: Date;
@@ -91,10 +92,12 @@ export function CalendarActionSheet({
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabKey>("attendance");
 
-  // Determine date category
-  const today = new Date();
-  const isPastDate = isBefore(selectedDate, startOfDay(today));
-  const isFutureDate = isAfter(selectedDate, endOfDay(today));
+  const timezone = festivalTimezone ?? TIMEZONE;
+
+  // Past, today or future on the festival's clock, as the API decides it
+  const dayRelation = classifyFestivalDay(selectedDate, new Date(), timezone);
+  const isPastDate = dayRelation === "past";
+  const isFutureDate = dayRelation === "future";
 
   const availableTabs = useMemo((): Tab[] => {
     if (isFutureDate) {
@@ -225,7 +228,7 @@ export function CalendarActionSheet({
             <DayPlanner
               key={plannerKey}
               festivalId={festivalId}
-              timezone={festivalTimezone ?? TIMEZONE}
+              timezone={timezone}
               selectedDate={selectedDate}
               existingPlan={existingPlan}
               friends={friends}

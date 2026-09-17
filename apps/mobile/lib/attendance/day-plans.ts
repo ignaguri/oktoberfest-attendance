@@ -11,6 +11,28 @@ import type {
   FriendsGoingDay,
   Reservation,
 } from "@prostcounter/shared/schemas";
+import { formatDateForDatabase } from "@prostcounter/shared/utils";
+import { format } from "date-fns";
+
+export type FestivalDayRelation = "past" | "today" | "future";
+
+/**
+ * Where a calendar day sits relative to today on the festival's clock, which
+ * is how the API decides whether a day can still be planned. The phone's own
+ * clock can be a day off from a far timezone.
+ */
+export function classifyFestivalDay(day: Date, now: Date, timezone: string): FestivalDayRelation {
+  const dayKey = format(day, "yyyy-MM-dd");
+  const todayKey = formatDateForDatabase(now, timezone);
+
+  if (dayKey < todayKey) {
+    return "past";
+  }
+  if (dayKey > todayKey) {
+    return "future";
+  }
+  return "today";
+}
 
 /** A plan always counts; a reservation only while it can still happen. */
 export function isActiveDayPlan(plan: DayPlan): boolean {
