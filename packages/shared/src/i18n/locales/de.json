@@ -657,14 +657,28 @@
       },
       "tentOptional": "Zelt (optional)",
       "clearTent": "Zelt entfernen",
-      "notePlaceholder": "Mit wem gehst du hin?",
+      "notePlaceholder": "Treffpunkt, Pläne, sonst noch was",
       "visibility": "Sichtbar für Freunde & Gruppen",
       "visibilityDescription": "Sie sehen, dass du an diesem Tag hingehst",
       "reservationHint": "Du hast einen Tisch? Wechsle zu Reserviert, um Uhrzeit und Erinnerung hinzuzufügen.",
       "summaryPlan": "Du planst hinzugehen",
       "summaryReservation": "Du hast eine Reservierung",
       "editHint": "Öffnet deinen Plan für diesen Tag zum Bearbeiten",
-      "saveFailed": "Dein Plan konnte nicht gespeichert werden. Versuch es noch einmal."
+      "saveFailed": "Dein Plan konnte nicht gespeichert werden. Versuch es noch einmal.",
+      "goingWith": "Unterwegs mit (optional)",
+      "companionsPlaceholder": "Freunde oder Gruppen",
+      "clearCompanions": "Auswahl entfernen, mit wem du gehst",
+      "withCompanions": "Mit {{names}}",
+      "companionYou": "dir",
+      "companionPicker": {
+        "title": "Mit wem gehst du hin?",
+        "groups": "Gruppen",
+        "people": "Freunde & Gruppenmitglieder",
+        "empty": "Füge Freunde hinzu oder tritt einer Gruppe bei, um auszuwählen, mit wem du gehst.",
+        "error": "Deine Freunde und Gruppen konnten nicht geladen werden.",
+        "clear": "Zurücksetzen",
+        "doneCount": "Fertig ({{count}})"
+      }
     },
     "calendar": {
       "tapToAddOrEdit": "Tippe auf einen Tag, um deinen Besuch hinzuzufügen oder zu bearbeiten",
@@ -2810,6 +2824,7 @@
     "DAY_PLAN_CONFLICT": "Für diesen Tag gibt es schon eine Reservierung.",
     "DAY_PLAN_DATE_IN_PAST": "Du kannst nur ab heute planen.",
     "DAY_PLAN_DATE_MISMATCH": "Die Reservierungszeit muss am ausgewählten Tag liegen.",
+    "DAY_PLAN_INVALID_COMPANION": "Du kannst nur Freunde, Gruppenmitglieder und deine Gruppen mitnehmen.",
     "PHOTO_NOT_FOUND": "Foto nicht gefunden.",
     "PHOTO_UPLOAD_FAILED": "Hochladen des Fotos fehlgeschlagen.",
     "INVALID_FILE_TYPE": "Ungültiger Dateityp.",

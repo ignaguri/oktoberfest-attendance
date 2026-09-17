@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import type { DayPlan } from "@prostcounter/shared/schemas";
 
-import { buildPlannerDefaults, plannerFormSchema, toUpsertInput } from "../day-planner-form";
+import {
+  buildPlannerDefaults,
+  plannerFormSchema,
+  resolveCompanionsInput,
+  toUpsertInput,
+} from "../day-planner-form";
 
 const SELECTED_DATE = new Date(2026, 8, 26);
 /**
@@ -22,6 +27,7 @@ function dayPlan(overrides: Partial<DayPlan> = {}): DayPlan {
     tentName: null,
     note: null,
     visibleToGroups: true,
+    companions: { users: [], groups: [] },
     startAt: null,
     endAt: null,
     status: null,
@@ -45,6 +51,8 @@ describe("buildPlannerDefaults", () => {
       note: "",
       visibleToGroups: true,
       reminderOffsetMinutes: 30,
+      companionUserIds: [],
+      companionGroupIds: [],
     });
   });
 
@@ -61,6 +69,22 @@ describe("buildPlannerDefaults", () => {
       note: "with the crew",
       visibleToGroups: false,
     });
+  });
+
+  it("loads who a saved plan is going with", () => {
+    const values = buildPlannerDefaults(
+      dayPlan({
+        companions: {
+          users: [{ userId: "u2", username: "ana", fullName: null, avatarUrl: null }],
+          groups: [{ groupId: "g1", name: "Office" }],
+        },
+      }),
+      SELECTED_DATE,
+      FESTIVAL_TIMEZONE,
+    );
+
+    expect(values.companionUserIds).toEqual(["u2"]);
+    expect(values.companionGroupIds).toEqual(["g1"]);
   });
 
   it("loads a reservation's arrival time on the festival's clock, and its reminder", () => {
@@ -130,6 +154,58 @@ describe("toUpsertInput", () => {
       visibleToGroups: true,
       reminderOffsetMinutes: 60,
     });
+  });
+});
+
+describe("toUpsertInput companions", () => {
+  const base = buildPlannerDefaults(null, SELECTED_DATE, FESTIVAL_TIMEZONE);
+  const companions = { userIds: ["u2"], groupIds: ["g1"] };
+
+  it("carries companions on a plan and a reservation", () => {
+    expect(toUpsertInput(base, SELECTED_DATE, FESTIVAL_TIMEZONE, companions)).toMatchObject({
+      kind: "plan",
+      companions,
+    });
+    expect(
+      toUpsertInput(
+        { ...base, status: "reservation", tentId: "t1" },
+        SELECTED_DATE,
+        FESTIVAL_TIMEZONE,
+        companions,
+      ),
+    ).toMatchObject({ kind: "reservation", companions });
+  });
+});
+
+describe("resolveCompanionsInput", () => {
+  const values = { companionUserIds: ["u2", "gone"], companionGroupIds: ["g1", "left"] };
+  const options = {
+    users: [{ userId: "u2", username: "ana", fullName: null, avatarUrl: null }],
+    groups: [{ groupId: "g1", name: "Office" }],
+  };
+
+  it("leaves the saved tags alone when the user didn't touch them", () => {
+    expect(resolveCompanionsInput(values, false, options)).toBeUndefined();
+  });
+
+  it("drops anyone no longer on offer", () => {
+    expect(resolveCompanionsInput(values, true, options)).toEqual({
+      userIds: ["u2"],
+      groupIds: ["g1"],
+    });
+  });
+
+  it("sends the picks as they are when the options never loaded", () => {
+    expect(resolveCompanionsInput(values, true, null)).toEqual({
+      userIds: ["u2", "gone"],
+      groupIds: ["g1", "left"],
+    });
+  });
+
+  it("sends empty lists when the user cleared everyone", () => {
+    expect(
+      resolveCompanionsInput({ companionUserIds: [], companionGroupIds: [] }, true, options),
+    ).toEqual({ userIds: [], groupIds: [] });
   });
 });
 

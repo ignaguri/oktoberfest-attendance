@@ -7,6 +7,7 @@
 
 import type {
   DayPlan,
+  DayPlanCompanions,
   FriendGoing,
   FriendsGoingDay,
   Reservation,
@@ -137,4 +138,24 @@ export function resolveCellTopSlot({
     return "month";
   }
   return "none";
+}
+
+/**
+ * Who a plan is going with, as one readable list: the reader first as "you",
+ * then groups, then people. Empty when nobody is tagged.
+ */
+export function formatCompanionNames(
+  companions: DayPlanCompanions,
+  { viewerId, you, unknown }: { viewerId: string | null; you: string; unknown: string },
+): string {
+  const includesViewer = companions.users.some((user) => user.userId === viewerId);
+  const people = companions.users
+    .filter((user) => user.userId !== viewerId)
+    .map((user) => user.username || user.fullName || unknown);
+
+  return [
+    ...(includesViewer ? [you] : []),
+    ...companions.groups.map((group) => group.name),
+    ...people,
+  ].join(", ");
 }

@@ -8,6 +8,7 @@
 import { QueryKeys, useApiClient, useInvalidateQueries, useMutation, useQuery } from "../data";
 import type {
   DayPlan,
+  GetCompanionOptionsResponse,
   GetFriendsGoingResponse,
   ListDayPlansResponse,
   UpsertDayPlanInput,
@@ -101,6 +102,26 @@ export function useFriendsGoing(festivalId?: string) {
     {
       enabled: !!festivalId,
       staleTime: 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+    },
+  );
+}
+
+/** Friends, group-mates and groups the user can say they're going with. */
+export function usePlanCompanionOptions(festivalId?: string, options?: { enabled?: boolean }) {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.planCompanionOptions(festivalId || ""),
+    async (): Promise<GetCompanionOptionsResponse> => {
+      if (!festivalId) {
+        return { users: [], groups: [] };
+      }
+      return apiClient.dayPlans.companionOptions(festivalId);
+    },
+    {
+      enabled: !!festivalId && (options?.enabled ?? true),
+      staleTime: 2 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
     },
   );

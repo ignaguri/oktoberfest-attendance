@@ -4,6 +4,7 @@ import {
   DayPlanPathParamsSchema,
   DayPlanResponseSchema,
   DeleteDayPlanResponseSchema,
+  GetCompanionOptionsResponseSchema,
   GetFriendsGoingResponseSchema,
   ListDayPlansResponseSchema,
   UpsertDayPlanSchema,
@@ -178,6 +179,38 @@ app.openapi(friendsGoingRoute, async (c) => {
   const days = await service.getFriendsGoing(user.id, festivalId);
 
   return c.json({ days }, 200);
+});
+
+// GET /festivals/:festivalId/plan-companions - Who the user can tag on a plan
+const companionOptionsRoute = createRoute({
+  method: "get",
+  path: "/festivals/{festivalId}/plan-companions",
+  tags: ["day-plans"],
+  summary: "List who can be tagged on a plan",
+  description:
+    "Friends and group-mates for the festival, and the user's groups in it: everyone a plan can say the user is going with.",
+  request: {
+    params: DayPlanFestivalParamSchema,
+  },
+  responses: {
+    200: {
+      description: "Companion options retrieved successfully",
+      content: { "application/json": { schema: GetCompanionOptionsResponseSchema } },
+    },
+    401: errorResponse("Unauthorized"),
+    404: errorResponse("Festival not found"),
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(companionOptionsRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+
+  const service = new DayPlanService(new SupabaseDayPlanRepository(supabase));
+  const options = await service.getCompanionOptions(user.id, festivalId);
+
+  return c.json(options, 200);
 });
 
 export default app;

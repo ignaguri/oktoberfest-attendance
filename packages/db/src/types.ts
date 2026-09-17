@@ -311,6 +311,66 @@ export type Database = {
           },
         ]
       }
+      day_plan_companions: {
+        Row: {
+          created_at: string | null
+          group_id: string | null
+          id: string
+          plan_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          plan_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          plan_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_plan_companions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "day_plan_companions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["group_id"]
+          },
+          {
+            foreignKeyName: "day_plan_companions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "day_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "day_plan_companions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "day_plan_companions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       day_plan_overlap_notifications: {
         Row: {
           actor_id: string
@@ -2291,6 +2351,10 @@ export type Database = {
       send_friend_request: {
         Args: { p_addressee_id: string; p_requester_id: string }
         Returns: Json
+      }
+      set_day_plan_companions: {
+        Args: { p_group_ids: string[]; p_plan_id: string; p_user_ids: string[] }
+        Returns: undefined
       }
       tier_to_rarity: {
         Args: { p_tier: number }

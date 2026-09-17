@@ -5742,6 +5742,20 @@ export interface paths {
                                 tentName: string | null;
                                 note: string | null;
                                 visibleToGroups: boolean;
+                                companions: {
+                                    users: {
+                                        /** Format: uuid */
+                                        userId: string;
+                                        username: string | null;
+                                        fullName: string | null;
+                                        avatarUrl: string | null;
+                                    }[];
+                                    groups: {
+                                        /** Format: uuid */
+                                        groupId: string;
+                                        name: string;
+                                    }[];
+                                };
                                 /** Format: date-time */
                                 startAt: string | null;
                                 /** Format: date-time */
@@ -5817,6 +5831,10 @@ export interface paths {
                         tentId?: string | null;
                         note?: string | null;
                         visibleToGroups: boolean;
+                        companions?: {
+                            userIds: string[];
+                            groupIds: string[];
+                        };
                     } | {
                         /** @enum {string} */
                         kind: "reservation";
@@ -5826,6 +5844,10 @@ export interface paths {
                         startAt: string;
                         note?: string | null;
                         visibleToGroups: boolean;
+                        companions?: {
+                            userIds: string[];
+                            groupIds: string[];
+                        };
                         reminderOffsetMinutes?: number;
                         autoCheckin?: boolean;
                     };
@@ -5855,6 +5877,20 @@ export interface paths {
                                 tentName: string | null;
                                 note: string | null;
                                 visibleToGroups: boolean;
+                                companions: {
+                                    users: {
+                                        /** Format: uuid */
+                                        userId: string;
+                                        username: string | null;
+                                        fullName: string | null;
+                                        avatarUrl: string | null;
+                                    }[];
+                                    groups: {
+                                        /** Format: uuid */
+                                        groupId: string;
+                                        name: string;
+                                    }[];
+                                };
                                 /** Format: date-time */
                                 startAt: string | null;
                                 /** Format: date-time */
@@ -6042,7 +6078,99 @@ export interface paths {
                                     /** Format: date-time */
                                     startAt: string | null;
                                     note: string | null;
+                                    companions: {
+                                        users: {
+                                            /** Format: uuid */
+                                            userId: string;
+                                            username: string | null;
+                                            fullName: string | null;
+                                            avatarUrl: string | null;
+                                        }[];
+                                        groups: {
+                                            /** Format: uuid */
+                                            groupId: string;
+                                            name: string;
+                                        }[];
+                                    };
                                 }[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Festival not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/festivals/{festivalId}/plan-companions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List who can be tagged on a plan
+         * @description Friends and group-mates for the festival, and the user's groups in it: everyone a plan can say the user is going with.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Companion options retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            users: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            }[];
+                            groups: {
+                                /** Format: uuid */
+                                groupId: string;
+                                name: string;
                             }[];
                         };
                     };

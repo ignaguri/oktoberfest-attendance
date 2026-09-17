@@ -10668,6 +10668,64 @@
                           "visibleToGroups": {
                             "type": "boolean"
                           },
+                          "companions": {
+                            "type": "object",
+                            "properties": {
+                              "users": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "userId": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "username": {
+                                      "type": "string",
+                                      "nullable": true
+                                    },
+                                    "fullName": {
+                                      "type": "string",
+                                      "nullable": true
+                                    },
+                                    "avatarUrl": {
+                                      "type": "string",
+                                      "nullable": true
+                                    }
+                                  },
+                                  "required": [
+                                    "userId",
+                                    "username",
+                                    "fullName",
+                                    "avatarUrl"
+                                  ]
+                                }
+                              },
+                              "groups": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "groupId": {
+                                      "type": "string",
+                                      "format": "uuid"
+                                    },
+                                    "name": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "groupId",
+                                    "name"
+                                  ]
+                                }
+                              }
+                            },
+                            "required": [
+                              "users",
+                              "groups"
+                            ]
+                          },
                           "startAt": {
                             "type": "string",
                             "nullable": true,
@@ -10735,6 +10793,7 @@
                           "tentName",
                           "note",
                           "visibleToGroups",
+                          "companions",
                           "startAt",
                           "endAt",
                           "status",
@@ -10839,6 +10898,31 @@
                       },
                       "visibleToGroups": {
                         "type": "boolean"
+                      },
+                      "companions": {
+                        "type": "object",
+                        "properties": {
+                          "userIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "maxItems": 50
+                          },
+                          "groupIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "maxItems": 20
+                          }
+                        },
+                        "required": [
+                          "userIds",
+                          "groupIds"
+                        ]
                       }
                     },
                     "required": [
@@ -10870,6 +10954,31 @@
                       },
                       "visibleToGroups": {
                         "type": "boolean"
+                      },
+                      "companions": {
+                        "type": "object",
+                        "properties": {
+                          "userIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "maxItems": 50
+                          },
+                          "groupIds": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid"
+                            },
+                            "maxItems": 20
+                          }
+                        },
+                        "required": [
+                          "userIds",
+                          "groupIds"
+                        ]
                       },
                       "reminderOffsetMinutes": {
                         "type": "integer",
@@ -10942,6 +11051,64 @@
                         "visibleToGroups": {
                           "type": "boolean"
                         },
+                        "companions": {
+                          "type": "object",
+                          "properties": {
+                            "users": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "userId": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  },
+                                  "username": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "fullName": {
+                                    "type": "string",
+                                    "nullable": true
+                                  },
+                                  "avatarUrl": {
+                                    "type": "string",
+                                    "nullable": true
+                                  }
+                                },
+                                "required": [
+                                  "userId",
+                                  "username",
+                                  "fullName",
+                                  "avatarUrl"
+                                ]
+                              }
+                            },
+                            "groups": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "groupId": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "groupId",
+                                  "name"
+                                ]
+                              }
+                            }
+                          },
+                          "required": [
+                            "users",
+                            "groups"
+                          ]
+                        },
                         "startAt": {
                           "type": "string",
                           "nullable": true,
@@ -11009,6 +11176,7 @@
                         "tentName",
                         "note",
                         "visibleToGroups",
+                        "companions",
                         "startAt",
                         "endAt",
                         "status",
@@ -11318,6 +11486,64 @@
                                 "note": {
                                   "type": "string",
                                   "nullable": true
+                                },
+                                "companions": {
+                                  "type": "object",
+                                  "properties": {
+                                    "users": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "userId": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                          },
+                                          "username": {
+                                            "type": "string",
+                                            "nullable": true
+                                          },
+                                          "fullName": {
+                                            "type": "string",
+                                            "nullable": true
+                                          },
+                                          "avatarUrl": {
+                                            "type": "string",
+                                            "nullable": true
+                                          }
+                                        },
+                                        "required": [
+                                          "userId",
+                                          "username",
+                                          "fullName",
+                                          "avatarUrl"
+                                        ]
+                                      }
+                                    },
+                                    "groups": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "groupId": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                          },
+                                          "name": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": [
+                                          "groupId",
+                                          "name"
+                                        ]
+                                      }
+                                    }
+                                  },
+                                  "required": [
+                                    "users",
+                                    "groups"
+                                  ]
                                 }
                               },
                               "required": [
@@ -11328,7 +11554,8 @@
                                 "kind",
                                 "tentName",
                                 "startAt",
-                                "note"
+                                "note",
+                                "companions"
                               ]
                             }
                           }
@@ -11342,6 +11569,142 @@
                   },
                   "required": [
                     "days"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Festival not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/festivals/{festivalId}/plan-companions": {
+      "get": {
+        "tags": [
+          "day-plans"
+        ],
+        "summary": "List who can be tagged on a plan",
+        "description": "Friends and group-mates for the festival, and the user's groups in it: everyone a plan can say the user is going with.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Companion options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "username": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "fullName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "avatarUrl": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "userId",
+                          "username",
+                          "fullName",
+                          "avatarUrl"
+                        ]
+                      }
+                    },
+                    "groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "groupId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "groupId",
+                          "name"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "users",
+                    "groups"
                   ]
                 }
               }
