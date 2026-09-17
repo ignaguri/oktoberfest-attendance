@@ -2487,6 +2487,7 @@
       "stay": "Stay on {{current}}"
     },
     "switchedToast": "Switched to {{festival}} to show this group",
+    "switchedToDayToast": "Switched to {{festival}} to show this day",
     "otherFestivalGroups": {
       "hint": "You have {{count}} group in {{festival}}",
       "hint_other": "You have {{count}} groups in {{festival}}"

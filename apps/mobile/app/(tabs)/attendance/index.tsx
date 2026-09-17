@@ -186,7 +186,7 @@ export default function AttendanceScreen() {
         render: () => (
           <View className="rounded-lg bg-background-800 px-4 py-3">
             <Text className="font-medium text-typography-0">
-              {t("festival.switchedToast", { festival: link.festival.name })}
+              {t("festival.switchedToDayToast", { festival: link.festival.name })}
             </Text>
           </View>
         ),

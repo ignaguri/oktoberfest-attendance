@@ -2514,6 +2514,7 @@
       "stay": "Bei {{current}} bleiben"
     },
     "switchedToast": "Zu {{festival}} gewechselt, um diese Gruppe anzuzeigen",
+    "switchedToDayToast": "Zu {{festival}} gewechselt, um diesen Tag anzuzeigen",
     "otherFestivalGroups": {
       "hint": "Du hast {{count}} Gruppe für {{festival}}",
       "hint_other": "Du hast {{count}} Gruppen für {{festival}}"
