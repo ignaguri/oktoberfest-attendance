@@ -117,6 +117,11 @@ export class DayPlanService {
       throw new ConflictError(ErrorCodes.DAY_PLAN_CONFLICT);
     }
 
+    // Checked before the plan is written, so a rejected tag saves nothing
+    if (input.companions) {
+      await this.assertCompanionsAllowed(userId, festivalId, input.companions);
+    }
+
     const write = buildWrite(input, existing);
     let plan = existing
       ? await this.repo.update(existing.id, userId, write)
@@ -167,7 +172,29 @@ export class DayPlanService {
     userId: string,
     festivalId: string,
   ): Promise<GetCompanionOptionsResponse> {
+    await this.requireFestival(festivalId);
     return this.repo.listCompanionOptions(userId, festivalId);
+  }
+
+  private async assertCompanionsAllowed(
+    userId: string,
+    festivalId: string,
+    companions: { userIds: string[]; groupIds: string[] },
+  ): Promise<void> {
+    if (companions.userIds.length === 0 && companions.groupIds.length === 0) {
+      return;
+    }
+
+    const options = await this.repo.listCompanionOptions(userId, festivalId);
+    const allowedUserIds = new Set(options.users.map((user) => user.userId));
+    const allowedGroupIds = new Set(options.groups.map((group) => group.groupId));
+
+    if (
+      companions.userIds.some((id) => !allowedUserIds.has(id)) ||
+      companions.groupIds.some((id) => !allowedGroupIds.has(id))
+    ) {
+      throw new ValidationError(ErrorCodes.DAY_PLAN_INVALID_COMPANION);
+    }
   }
 
   private todayIn(festival: FestivalDayContext): string {

@@ -222,6 +222,7 @@ describe("DayPlanService.upsertPlan companions", () => {
       },
     });
     repo.findActiveByDate.mockResolvedValueOnce(null).mockResolvedValueOnce(tagged);
+    repo.listCompanionOptions.mockResolvedValueOnce(tagged.companions);
 
     const result = await createService(repo).upsertPlan(USER_ID, FESTIVAL_ID, "2026-09-26", {
       ...PLAN_INPUT,
@@ -249,6 +250,26 @@ describe("DayPlanService.upsertPlan companions", () => {
     });
 
     expect(repo.setCompanions).toHaveBeenCalledWith(PLAN_ID, [], []);
+    expect(repo.listCompanionOptions).not.toHaveBeenCalled();
+  });
+
+  it("rejects a tag the user can't pick before writing the plan", async () => {
+    const repo = createRepo();
+    repo.listCompanionOptions.mockResolvedValueOnce({
+      users: [{ userId: FRIEND_ID, username: "ana", fullName: null, avatarUrl: null }],
+      groups: [],
+    });
+
+    await expect(
+      createService(repo).upsertPlan(USER_ID, FESTIVAL_ID, "2026-09-26", {
+        ...PLAN_INPUT,
+        companions: { userIds: [FRIEND_ID], groupIds: [GROUP_ID] },
+      }),
+    ).rejects.toMatchObject({ code: ErrorCodes.DAY_PLAN_INVALID_COMPANION });
+
+    expect(repo.insert).not.toHaveBeenCalled();
+    expect(repo.update).not.toHaveBeenCalled();
+    expect(repo.setCompanions).not.toHaveBeenCalled();
   });
 });
 
@@ -337,5 +358,18 @@ describe("DayPlanService.getFriendsGoing", () => {
     await createService(repo, lateNight).getFriendsGoing(USER_ID, FESTIVAL_ID);
 
     expect(repo.listFriendsGoing).toHaveBeenCalledWith(USER_ID, FESTIVAL_ID, "2026-09-21");
+  });
+});
+
+describe("DayPlanService.getCompanionOptions", () => {
+  it("rejects an unknown festival", async () => {
+    const repo = createRepo();
+    repo.getFestivalContext.mockResolvedValueOnce(null);
+
+    await expect(
+      createService(repo).getCompanionOptions(USER_ID, FESTIVAL_ID),
+    ).rejects.toMatchObject({ code: ErrorCodes.FESTIVAL_NOT_FOUND });
+
+    expect(repo.listCompanionOptions).not.toHaveBeenCalled();
   });
 });

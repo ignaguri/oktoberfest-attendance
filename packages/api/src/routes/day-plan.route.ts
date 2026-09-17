@@ -198,6 +198,7 @@ const companionOptionsRoute = createRoute({
       content: { "application/json": { schema: GetCompanionOptionsResponseSchema } },
     },
     401: errorResponse("Unauthorized"),
+    404: errorResponse("Festival not found"),
   },
   security: [{ bearerAuth: [] }],
 });

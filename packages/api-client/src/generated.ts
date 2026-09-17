@@ -6187,6 +6187,18 @@ export interface paths {
                         };
                     };
                 };
+                /** @description Festival not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
             };
         };
         put?: never;

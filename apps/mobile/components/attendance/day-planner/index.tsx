@@ -1,9 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ApiError } from "@prostcounter/api-client";
 import {
   useDeleteDayPlan,
   usePlanCompanionOptions,
   useUpsertDayPlan,
 } from "@prostcounter/shared/hooks";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   DAY_PLAN_NOTE_MAX_LENGTH,
@@ -99,6 +101,7 @@ export function DayPlanner({
     data: companionOptions,
     loading: companionOptionsLoading,
     error: companionOptionsError,
+    refetch: refetchCompanionOptions,
   } = usePlanCompanionOptions(festivalId, { enabled: isEditing });
 
   const dateKey = format(selectedDate, "yyyy-MM-dd");
@@ -232,6 +235,16 @@ export function DayPlanner({
         await upsertDayPlan.mutateAsync({ festivalId, date: dateKey, input });
         finish();
       } catch (error) {
+        // Someone picked was unfriended or left the group since the list loaded:
+        // reload it, so the next save drops them
+        if (error instanceof ApiError && error.code === ErrorCodes.DAY_PLAN_INVALID_COMPANION) {
+          refetchCompanionOptions();
+          showDialog(
+            t("common.status.error"),
+            t(`apiErrors.${ErrorCodes.DAY_PLAN_INVALID_COMPANION}`),
+          );
+          return;
+        }
         logger.error("Failed to save day plan:", error);
         showSaveFailed();
       }
@@ -251,6 +264,7 @@ export function DayPlanner({
       dateKey,
       finish,
       showSaveFailed,
+      refetchCompanionOptions,
     ],
   );
 
