@@ -47,12 +47,49 @@ export class SupabaseFriendsWentRepository implements IFriendsWentRepository {
   }
 
   async listDayRows(viewerId: string, festivalId: string, date: string): Promise<FriendsWentRows> {
+    const [friendshipsResult, sharedGroupMembersResult] = await Promise.all([
+      this.supabase
+        .from("friendships")
+        .select("requester_id, addressee_id")
+        .eq("status", "accepted")
+        .or(`requester_id.eq.${viewerId},addressee_id.eq.${viewerId}`),
+      this.supabase
+        .from("v_user_shared_group_members")
+        .select("owner_id")
+        .eq("viewer_id", viewerId)
+        .eq("festival_id", festivalId),
+    ]);
+
+    if (friendshipsResult.error) {
+      throw new DatabaseError(`Failed to list friendships: ${friendshipsResult.error.message}`);
+    }
+    if (sharedGroupMembersResult.error) {
+      throw new DatabaseError(
+        `Failed to list shared group members: ${sharedGroupMembersResult.error.message}`,
+      );
+    }
+
+    const friendIds = (friendshipsResult.data ?? []).map((row) =>
+      row.requester_id === viewerId ? row.addressee_id : row.requester_id,
+    );
+    const sharedGroupOwnerIds = (sharedGroupMembersResult.data ?? []).flatMap((row) =>
+      row.owner_id ? [row.owner_id] : [],
+    );
+
+    const allowedUserIds = new Set([...friendIds, ...sharedGroupOwnerIds]);
+    allowedUserIds.delete(viewerId);
+
+    if (allowedUserIds.size === 0) {
+      return emptyRows();
+    }
+
     const { data: attendanceData, error: attendanceError } = await this.supabase
       .from("attendances")
       .select("id, user_id")
       .eq("festival_id", festivalId)
       .eq("date", date)
-      .neq("user_id", viewerId);
+      .neq("user_id", viewerId)
+      .in("user_id", [...allowedUserIds]);
 
     if (attendanceError) {
       throw new DatabaseError(`Failed to list friends' attendance: ${attendanceError.message}`);

@@ -38,6 +38,7 @@ describe("SupabaseFriendsWentRepository (Local DB)", () => {
   let friend: TestUser;
   let groupMate: TestUser;
   let stranger: TestUser;
+  let superAdmin: TestUser;
   let festival: TestFestival;
   let tent: TestTent;
   let olderGroupId: string;
@@ -46,6 +47,7 @@ describe("SupabaseFriendsWentRepository (Local DB)", () => {
   let publicPhotoId: string;
   let viewerRepo: SupabaseFriendsWentRepository;
   let strangerRepo: SupabaseFriendsWentRepository;
+  let superAdminRepo: SupabaseFriendsWentRepository;
 
   beforeAll(async () => {
     admin = createTestSupabaseAdmin();
@@ -53,8 +55,18 @@ describe("SupabaseFriendsWentRepository (Local DB)", () => {
     friend = await createTestUser("fw-friend");
     groupMate = await createTestUser("fw-mate");
     stranger = await createTestUser("fw-stranger");
+    superAdmin = await createTestUser("fw-admin");
     festival = await createLiveFestival(admin);
     tent = await createTestTent(admin);
+
+    const { error: superAdminError } = await admin
+      .from("profiles")
+      .update({ is_super_admin: true })
+      .eq("id", superAdmin.id);
+
+    if (superAdminError) {
+      throw new Error(`Failed to mark super admin: ${superAdminError.message}`);
+    }
 
     await makeFriends(admin, viewer.id, friend.id);
     olderGroupId = await createSharedGroup(admin, festival.id, [viewer.id, groupMate.id]);
@@ -98,6 +110,7 @@ describe("SupabaseFriendsWentRepository (Local DB)", () => {
 
     viewerRepo = new SupabaseFriendsWentRepository(createTestSupabaseWithAuth(viewer.token));
     strangerRepo = new SupabaseFriendsWentRepository(createTestSupabaseWithAuth(stranger.token));
+    superAdminRepo = new SupabaseFriendsWentRepository(createTestSupabaseWithAuth(superAdmin.token));
   });
 
   afterAll(async () => {
@@ -105,7 +118,7 @@ describe("SupabaseFriendsWentRepository (Local DB)", () => {
     await cleanupDayPlanFixtures(admin, {
       festivalIds: [festival.id],
       tentIds: [tent.id],
-      userIds: [viewer.id, friend.id, groupMate.id, stranger.id],
+      userIds: [viewer.id, friend.id, groupMate.id, stranger.id, superAdmin.id],
     });
   });
 
@@ -185,6 +198,12 @@ describe("SupabaseFriendsWentRepository (Local DB)", () => {
 
   it("shows a stranger nobody", async () => {
     const rows = await strangerRepo.listDayRows(stranger.id, festival.id, pastDate);
+
+    expect(rows.attendances).toEqual([]);
+  });
+
+  it("lists nobody for a super admin with no friends or groups", async () => {
+    const rows = await superAdminRepo.listDayRows(superAdmin.id, festival.id, pastDate);
 
     expect(rows.attendances).toEqual([]);
   });
