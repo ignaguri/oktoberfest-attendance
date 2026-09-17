@@ -1,8 +1,10 @@
 import type { Database, Tables, TablesUpdate } from "@prostcounter/db";
 import type {
   DayPlan,
+  DayPlanCompanions,
   DayPlanKind,
   FriendsGoingDay,
+  GetCompanionOptionsResponse,
   ReservationStatus,
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
@@ -10,15 +12,61 @@ import { groupFriendsGoing } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
+import {
+  ConflictError,
+  DatabaseError,
+  NotFoundError,
+  ValidationError,
+} from "../../middleware/error";
 import type { DayPlanWrite, FestivalDayContext, IDayPlanRepository } from "../interfaces";
 
 /** PostgREST filter for rows that still count as the day's mark. */
 export const ACTIVE_DAY_PLAN_FILTER = "status.is.null,status.neq.cancelled";
 
-const DAY_PLAN_SELECT = "*, tents(name)";
+const COMPANIONS_SELECT =
+  "day_plan_companions(user_id, group_id, profiles(username, full_name, avatar_url), groups(name))";
 
-type DayPlanRowWithTent = Tables<"day_plans"> & { tents: { name: string } | null };
+const DAY_PLAN_SELECT = `*, tents(name), ${COMPANIONS_SELECT}`;
+
+interface CompanionRow {
+  user_id: string | null;
+  group_id: string | null;
+  profiles: { username: string | null; full_name: string | null; avatar_url: string | null } | null;
+  groups: { name: string } | null;
+}
+
+type DayPlanRowWithTent = Tables<"day_plans"> & {
+  tents: { name: string } | null;
+  day_plan_companions: CompanionRow[] | null;
+};
+
+function byName(a: string | null, b: string | null): number {
+  return (a ?? "").localeCompare(b ?? "", undefined, { sensitivity: "base" });
+}
+
+/** A group the reader can't see comes back without a name and is left out. */
+export function mapCompanions(rows: CompanionRow[] | null): DayPlanCompanions {
+  const users: DayPlanCompanions["users"] = [];
+  const groups: DayPlanCompanions["groups"] = [];
+
+  for (const row of rows ?? []) {
+    if (row.user_id) {
+      users.push({
+        userId: row.user_id,
+        username: row.profiles?.username ?? null,
+        fullName: row.profiles?.full_name ?? null,
+        avatarUrl: row.profiles?.avatar_url ?? null,
+      });
+    } else if (row.group_id && row.groups) {
+      groups.push({ groupId: row.group_id, name: row.groups.name });
+    }
+  }
+
+  users.sort((a, b) => byName(a.username ?? a.fullName, b.username ?? b.fullName));
+  groups.sort((a, b) => byName(a.name, b.name));
+
+  return { users, groups };
+}
 
 export function mapDayPlan(row: DayPlanRowWithTent): DayPlan {
   return {
@@ -31,6 +79,7 @@ export function mapDayPlan(row: DayPlanRowWithTent): DayPlan {
     tentName: row.tents?.name ?? null,
     note: row.note,
     visibleToGroups: row.visible_to_groups,
+    companions: mapCompanions(row.day_plan_companions),
     startAt: row.start_at,
     endAt: row.end_at,
     status: row.status as ReservationStatus | null,
@@ -205,6 +254,93 @@ export class SupabaseDayPlanRepository implements IDayPlanRepository {
     return mapDayPlan(data as DayPlanRowWithTent);
   }
 
+  async setCompanions(planId: string, userIds: string[], groupIds: string[]): Promise<void> {
+    const { error } = await this.supabase.rpc("set_day_plan_companions", {
+      p_plan_id: planId,
+      p_user_ids: userIds,
+      p_group_ids: groupIds,
+    });
+
+    // RLS refuses a tag that isn't a friend, a group-mate or one of the user's groups
+    if (error?.code === PgErrorCode.INSUFFICIENT_PRIVILEGE) {
+      throw new ValidationError(ErrorCodes.DAY_PLAN_INVALID_COMPANION);
+    }
+    if (error) {
+      throw new DatabaseError(`Failed to save plan companions: ${error.message}`);
+    }
+  }
+
+  async listCompanionOptions(
+    userId: string,
+    festivalId: string,
+  ): Promise<GetCompanionOptionsResponse> {
+    const [friendshipsResult, sharedGroupMembersResult, groupsResult] = await Promise.all([
+      this.supabase
+        .from("friendships")
+        .select("requester_id, addressee_id")
+        .eq("status", "accepted")
+        .or(`requester_id.eq.${userId},addressee_id.eq.${userId}`),
+      this.supabase
+        .from("v_user_shared_group_members")
+        .select("owner_id")
+        .eq("viewer_id", userId)
+        .eq("festival_id", festivalId),
+      this.supabase
+        .from("group_members")
+        .select("groups!inner(id, name, festival_id)")
+        .eq("user_id", userId)
+        .eq("groups.festival_id", festivalId),
+    ]);
+
+    if (friendshipsResult.error) {
+      throw new DatabaseError(`Failed to list friendships: ${friendshipsResult.error.message}`);
+    }
+    if (sharedGroupMembersResult.error) {
+      throw new DatabaseError(
+        `Failed to list shared group members: ${sharedGroupMembersResult.error.message}`,
+      );
+    }
+    if (groupsResult.error) {
+      throw new DatabaseError(`Failed to list groups: ${groupsResult.error.message}`);
+    }
+
+    const userIds = new Set([
+      ...friendshipsResult.data.map((row) =>
+        row.requester_id === userId ? row.addressee_id : row.requester_id,
+      ),
+      ...sharedGroupMembersResult.data.flatMap((row) => (row.owner_id ? [row.owner_id] : [])),
+    ]);
+    userIds.delete(userId);
+
+    let users: GetCompanionOptionsResponse["users"] = [];
+
+    if (userIds.size > 0) {
+      const { data: profiles, error: profilesError } = await this.supabase
+        .from("profiles")
+        .select("id, username, full_name, avatar_url")
+        .in("id", [...userIds]);
+
+      if (profilesError) {
+        throw new DatabaseError(`Failed to fetch profiles: ${profilesError.message}`);
+      }
+
+      users = profiles
+        .map((row) => ({
+          userId: row.id,
+          username: row.username,
+          fullName: row.full_name,
+          avatarUrl: row.avatar_url,
+        }))
+        .sort((a, b) => byName(a.username ?? a.fullName, b.username ?? b.fullName));
+    }
+
+    const groups = groupsResult.data
+      .map((row) => ({ groupId: row.groups.id, name: row.groups.name }))
+      .sort((a, b) => byName(a.name, b.name));
+
+    return { users, groups };
+  }
+
   async listFriendsGoing(
     userId: string,
     festivalId: string,
@@ -213,7 +349,7 @@ export class SupabaseDayPlanRepository implements IDayPlanRepository {
     const { data, error } = await this.supabase
       .from("day_plans")
       .select(
-        "user_id, date, kind, start_at, note, tents(name), profiles!day_plans_user_id_fkey(username, full_name, avatar_url)",
+        `user_id, date, kind, start_at, note, tents(name), profiles!day_plans_user_id_fkey(username, full_name, avatar_url), ${COMPANIONS_SELECT}`,
       )
       .eq("festival_id", festivalId)
       .neq("user_id", userId)
@@ -235,6 +371,7 @@ export class SupabaseDayPlanRepository implements IDayPlanRepository {
         tentName: row.tents?.name ?? null,
         startAt: row.start_at,
         note: row.note,
+        companions: mapCompanions(row.day_plan_companions as CompanionRow[] | null),
       })),
     );
   }

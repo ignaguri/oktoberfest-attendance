@@ -2,6 +2,7 @@ import type {
   DayPlan,
   DayPlanKind,
   FriendsGoingDay,
+  GetCompanionOptionsResponse,
   ReservationStatus,
 } from "@prostcounter/shared";
 
@@ -47,6 +48,15 @@ export interface IDayPlanRepository {
 
   /** Marks a reservation cancelled, which frees its day. */
   cancel(id: string, userId: string): Promise<DayPlan>;
+
+  /**
+   * Replaces who the plan is tagged with, all or nothing.
+   * @throws ValidationError(DAY_PLAN_INVALID_COMPANION) for anyone the owner can't tag
+   */
+  setCompanions(planId: string, userIds: string[], groupIds: string[]): Promise<void>;
+
+  /** Friends and group-mates for the festival, and the user's groups in it. */
+  listCompanionOptions(userId: string, festivalId: string): Promise<GetCompanionOptionsResponse>;
 
   /**
    * Other users' visible plans and reservations from `fromDate` on. Visibility

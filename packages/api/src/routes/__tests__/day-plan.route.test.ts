@@ -36,6 +36,7 @@ const PLAN = {
   tentName: null,
   note: "with the crew",
   visibleToGroups: true,
+  companions: { users: [], groups: [] },
   startAt: null,
   endAt: null,
   status: null,
@@ -56,6 +57,7 @@ describe("Day plan routes - unit", () => {
     upsertPlan: ReturnType<typeof vi.fn>;
     removePlan: ReturnType<typeof vi.fn>;
     getFriendsGoing: ReturnType<typeof vi.fn>;
+    getCompanionOptions: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -68,6 +70,7 @@ describe("Day plan routes - unit", () => {
       upsertPlan: vi.fn(),
       removePlan: vi.fn(),
       getFriendsGoing: vi.fn(),
+      getCompanionOptions: vi.fn(),
     };
     vi.mocked(DayPlanService).mockImplementation(function () {
       return service as any;
@@ -239,6 +242,7 @@ describe("Day plan routes - unit", () => {
             tentName: "Augustiner-Festhalle",
             startAt: "2026-09-26T09:00:00.000Z",
             note: null,
+            companions: { users: [], groups: [] },
           },
         ],
       },
@@ -250,6 +254,27 @@ describe("Day plan routes - unit", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ days });
     expect(service.getFriendsGoing).toHaveBeenCalledWith(mockUser.id, FESTIVAL_ID);
+  });
+
+  it("returns who the user can tag on a plan", async () => {
+    const options = {
+      users: [
+        {
+          userId: "55555555-5555-4555-8555-555555555555",
+          username: "ana",
+          fullName: null,
+          avatarUrl: null,
+        },
+      ],
+      groups: [{ groupId: "66666666-6666-4666-8666-666666666666", name: "Office" }],
+    };
+    service.getCompanionOptions.mockResolvedValueOnce(options);
+
+    const res = await app.request(createAuthRequest(`/festivals/${FESTIVAL_ID}/plan-companions`));
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(options);
+    expect(service.getCompanionOptions).toHaveBeenCalledWith(mockUser.id, FESTIVAL_ID);
   });
 
   it("requires authentication", async () => {

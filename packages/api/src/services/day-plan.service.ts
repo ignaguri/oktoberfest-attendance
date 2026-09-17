@@ -1,4 +1,9 @@
-import type { DayPlan, FriendsGoingDay, UpsertDayPlanInput } from "@prostcounter/shared";
+import type {
+  DayPlan,
+  FriendsGoingDay,
+  GetCompanionOptionsResponse,
+  UpsertDayPlanInput,
+} from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import { formatDateForDatabase } from "@prostcounter/shared/utils";
 
@@ -113,9 +118,19 @@ export class DayPlanService {
     }
 
     const write = buildWrite(input, existing);
-    const plan = existing
+    let plan = existing
       ? await this.repo.update(existing.id, userId, write)
       : await this.repo.insert(userId, festivalId, date, write);
+
+    if (input.companions) {
+      await this.repo.setCompanions(
+        plan.id,
+        input.companions.userIds,
+        input.companions.groupIds,
+      );
+      // Read back, so the response carries the tags' names
+      plan = (await this.repo.findActiveByDate(userId, festivalId, date)) ?? plan;
+    }
 
     return {
       plan,
@@ -146,6 +161,13 @@ export class DayPlanService {
   async getFriendsGoing(userId: string, festivalId: string): Promise<FriendsGoingDay[]> {
     const festival = await this.requireFestival(festivalId);
     return this.repo.listFriendsGoing(userId, festivalId, this.todayIn(festival));
+  }
+
+  async getCompanionOptions(
+    userId: string,
+    festivalId: string,
+  ): Promise<GetCompanionOptionsResponse> {
+    return this.repo.listCompanionOptions(userId, festivalId);
   }
 
   private todayIn(festival: FestivalDayContext): string {

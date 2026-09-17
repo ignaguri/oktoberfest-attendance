@@ -9,6 +9,39 @@ export type DayPlanKind = z.infer<typeof DayPlanKindSchema>;
 
 export const DAY_PLAN_NOTE_MAX_LENGTH = 200;
 
+/** Caps on how many people and groups one plan can tag. */
+export const DAY_PLAN_MAX_COMPANION_USERS = 50;
+export const DAY_PLAN_MAX_COMPANION_GROUPS = 20;
+
+/** A person a plan is tagged with, or who can be tagged. */
+export const DayPlanCompanionUserSchema = z.object({
+  userId: z.uuid(),
+  username: z.string().nullable(),
+  fullName: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
+});
+
+export type DayPlanCompanionUser = z.infer<typeof DayPlanCompanionUserSchema>;
+
+/** A group a plan is tagged with, or that can be tagged. */
+export const DayPlanCompanionGroupSchema = z.object({
+  groupId: z.uuid(),
+  name: z.string(),
+});
+
+export type DayPlanCompanionGroup = z.infer<typeof DayPlanCompanionGroupSchema>;
+
+/**
+ * Who a plan's owner is going with. Display only. A group the reader can't see
+ * is left out.
+ */
+export const DayPlanCompanionsSchema = z.object({
+  users: z.array(DayPlanCompanionUserSchema),
+  groups: z.array(DayPlanCompanionGroupSchema),
+});
+
+export type DayPlanCompanions = z.infer<typeof DayPlanCompanionsSchema>;
+
 /**
  * A user's mark on one festival day.
  *
@@ -24,6 +57,7 @@ export const DayPlanSchema = z.object({
   tentName: z.string().nullable(),
   note: z.string().nullable(),
   visibleToGroups: z.boolean(),
+  companions: DayPlanCompanionsSchema,
   startAt: z.iso.datetime().nullable(),
   endAt: z.iso.datetime().nullable(),
   status: ReservationStatusSchema.nullable(),
@@ -56,6 +90,14 @@ export const DayPlanPathParamsSchema = z.object({
 
 const noteSchema = z.string().max(DAY_PLAN_NOTE_MAX_LENGTH).nullable().optional();
 
+/** Omitted keeps the plan's current tags; sent replaces them. */
+const companionsInputSchema = z
+  .object({
+    userIds: z.array(z.uuid()).max(DAY_PLAN_MAX_COMPANION_USERS),
+    groupIds: z.array(z.uuid()).max(DAY_PLAN_MAX_COMPANION_GROUPS),
+  })
+  .optional();
+
 /**
  * PUT /api/v1/festivals/:festivalId/days/:date/plan
  *
@@ -67,6 +109,7 @@ export const UpsertDayPlanSchema = z.discriminatedUnion("kind", [
     tentId: z.uuid({ error: "Invalid tent ID" }).nullable().optional(),
     note: noteSchema,
     visibleToGroups: z.boolean(),
+    companions: companionsInputSchema,
   }),
   z.object({
     kind: z.literal("reservation"),
@@ -74,6 +117,7 @@ export const UpsertDayPlanSchema = z.discriminatedUnion("kind", [
     startAt: z.iso.datetime({ error: "Invalid start time" }),
     note: noteSchema,
     visibleToGroups: z.boolean(),
+    companions: companionsInputSchema,
     reminderOffsetMinutes: z.number().int().min(0).max(1440).optional(),
     autoCheckin: z.boolean().optional(),
   }),
@@ -109,6 +153,7 @@ export const FriendGoingSchema = z.object({
   tentName: z.string().nullable(),
   startAt: z.iso.datetime().nullable(),
   note: z.string().nullable(),
+  companions: DayPlanCompanionsSchema,
 });
 
 export type FriendGoing = z.infer<typeof FriendGoingSchema>;
@@ -125,3 +170,16 @@ export const GetFriendsGoingResponseSchema = z.object({
 });
 
 export type GetFriendsGoingResponse = z.infer<typeof GetFriendsGoingResponseSchema>;
+
+/**
+ * GET /api/v1/festivals/:festivalId/plan-companions
+ *
+ * Who the user can tag on a plan: friends and group-mates for the festival, and
+ * the user's groups in it.
+ */
+export const GetCompanionOptionsResponseSchema = z.object({
+  users: z.array(DayPlanCompanionUserSchema),
+  groups: z.array(DayPlanCompanionGroupSchema),
+});
+
+export type GetCompanionOptionsResponse = z.infer<typeof GetCompanionOptionsResponseSchema>;

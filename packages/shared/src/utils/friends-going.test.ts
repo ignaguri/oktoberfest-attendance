@@ -13,6 +13,7 @@ function row(overrides: Partial<FriendGoingRow>): FriendGoingRow {
     tentName: null,
     startAt: null,
     note: null,
+    companions: { users: [], groups: [] },
     ...overrides,
   };
 }

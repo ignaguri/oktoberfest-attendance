@@ -25,6 +25,7 @@ import type {
   GetCalendarEventsResponse,
   GetCrowdStatusResponse,
   GetFestivalResponse,
+  GetCompanionOptionsResponse,
   GetFriendsGoingResponse,
   GetFriendsWentResponse,
   GetGroupMessagesResponse,
@@ -1251,6 +1252,19 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to fetch friends going");
         }
         return parseJsonResponse<GetFriendsGoingResponse>(response);
+      },
+
+      async companionOptions(festivalId: string): Promise<GetCompanionOptionsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/festivals/${festivalId}/plan-companions`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch plan companions");
+        }
+        return parseJsonResponse<GetCompanionOptionsResponse>(response);
       },
     },
 

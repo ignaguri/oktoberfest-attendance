@@ -87,7 +87,13 @@ export {
 } from "./useTents";
 
 // Day plan hooks
-export { useDayPlans, useDeleteDayPlan, useFriendsGoing, useUpsertDayPlan } from "./useDayPlans";
+export {
+  useDayPlans,
+  useDeleteDayPlan,
+  useFriendsGoing,
+  usePlanCompanionOptions,
+  useUpsertDayPlan,
+} from "./useDayPlans";
 export { useFriendsWent } from "./useFriendsWent";
 
 // Reservation hooks
