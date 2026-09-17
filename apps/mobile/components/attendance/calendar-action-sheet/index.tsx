@@ -1,4 +1,5 @@
 import { TIMEZONE } from "@prostcounter/shared/constants";
+import { useFriendsWent } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type {
   AttendanceWithTotals,
@@ -8,8 +9,9 @@ import type {
 } from "@prostcounter/shared/schemas";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { format } from "date-fns";
+import { useRouter } from "expo-router";
 import { X } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Actionsheet,
@@ -25,13 +27,15 @@ import { SegmentedControl, type Tab } from "@/components/ui/segmented-control";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { classifyFestivalDay } from "@/lib/attendance/day-plans";
+import { pickPastDayLandingTab, shouldLeaveEmptyFriendsTab } from "@/lib/attendance/past-day-tab";
 import { IconColors } from "@/lib/constants/colors";
 
 import { DayPlanner } from "../day-planner";
 import { type AttendanceSuccessData, AttendanceTabContent } from "./attendance-tab-content";
+import { FriendsWentTabContent } from "./friends-went-tab-content";
 import { ReservationTabContent } from "./reservation-tab-content";
 
-export type TabKey = "attendance" | "reservation" | "plan";
+export type TabKey = "attendance" | "reservation" | "plan" | "friends";
 
 export interface CalendarActionSheetProps {
   isOpen: boolean;
@@ -65,7 +69,7 @@ const NO_FRIENDS: FriendGoing[] = [];
 /**
  * Calendar action sheet for one day.
  *
- * - Past: attendance, plus a read-only reservation tab if one exists
+ * - Past: attendance, a read-only reservation tab, and friends who went
  * - Today: attendance and the day planner
  * - Future: the day planner alone, with no segmented control
  *
@@ -99,6 +103,20 @@ export function CalendarActionSheet({
   const isPastDate = dayRelation === "past";
   const isFutureDate = dayRelation === "future";
 
+  const dateKey = format(selectedDate, "yyyy-MM-dd");
+  const router = useRouter();
+  // Set when the user taps a tab, so loading friends never moves them
+  const userChoseTabRef = useRef(false);
+
+  // Friends who went, only for a past day's sheet
+  const {
+    data: friendsWentData,
+    loading: friendsWentLoading,
+    error: friendsWentError,
+    refetch: refetchFriendsWent,
+  } = useFriendsWent(festivalId, dateKey, { enabled: isOpen && isPastDate });
+  const friendsWent = friendsWentData?.friends ?? null;
+
   const availableTabs = useMemo((): Tab[] => {
     if (isFutureDate) {
       return [];
@@ -108,7 +126,8 @@ export function CalendarActionSheet({
 
     if (isPastDate) {
       // Past dates can't take a new reservation, but an existing one stays
-      // readable so reservation history isn't write-only.
+      // readable so reservation history isn't write-only. Empty tabs stay
+      // visible but disabled, so the control keeps the same shape every day.
       return [
         attendanceTab,
         {
@@ -116,11 +135,16 @@ export function CalendarActionSheet({
           label: t("attendance.tabs.reservation"),
           disabled: !existingReservation,
         },
+        {
+          key: "friends",
+          label: t("attendance.tabs.friends"),
+          disabled: friendsWent !== null && friendsWent.length === 0,
+        },
       ];
     }
 
     return [attendanceTab, { key: "plan", label: t("attendance.tabs.plan"), disabled: !canPlan }];
-  }, [t, isPastDate, isFutureDate, existingReservation, canPlan]);
+  }, [t, isPastDate, isFutureDate, existingReservation, canPlan, friendsWent]);
 
   const determineDefaultTab = useCallback((): TabKey => {
     // Check-in mode always opens to attendance
@@ -130,10 +154,12 @@ export function CalendarActionSheet({
     if (isFutureDate) {
       return "plan";
     }
-    // Past date - attendance, unless the only thing logged that day was a
-    // reservation, in which case an empty attendance form is the wrong landing.
+    // Past date - your own record first; friends who went when you have none
     if (isPastDate) {
-      return !existingAttendance && existingReservation ? "reservation" : "attendance";
+      return pickPastDayLandingTab({
+        hasAttendance: !!existingAttendance,
+        hasReservation: !!existingReservation,
+      });
     }
     // Today - attendance if logged, else the plan if one exists, else attendance
     if (existingAttendance) {
@@ -156,6 +182,7 @@ export function CalendarActionSheet({
   // Reset active tab when sheet opens
   useEffect(() => {
     if (isOpen) {
+      userChoseTabRef.current = false;
       // Use queueMicrotask to defer state update and avoid lint warning
       queueMicrotask(() => {
         setActiveTab(determineDefaultTab());
@@ -163,9 +190,34 @@ export function CalendarActionSheet({
     }
   }, [isOpen, determineDefaultTab]);
 
+  // Landed on Friends for a day nobody went: fall back to the attendance form
+  useEffect(() => {
+    if (
+      shouldLeaveEmptyFriendsTab({
+        activeTab,
+        landingTab: determineDefaultTab(),
+        userChoseTab: userChoseTabRef.current,
+        friendsCount: friendsWent === null ? null : friendsWent.length,
+      })
+    ) {
+      queueMicrotask(() => {
+        setActiveTab("attendance");
+      });
+    }
+  }, [activeTab, determineDefaultTab, friendsWent]);
+
   const handleTabChange = useCallback((key: string) => {
+    userChoseTabRef.current = true;
     setActiveTab(key as TabKey);
   }, []);
+
+  const handleOpenGallery = useCallback(
+    (groupId: string) => {
+      onClose();
+      router.push(`/group-detail/${groupId}/gallery?date=${dateKey}`);
+    },
+    [onClose, router, dateKey],
+  );
 
   // The planner doesn't report tents, so its success carries none
   const handlePlanSuccess = useCallback(() => {
@@ -178,7 +230,7 @@ export function CalendarActionSheet({
       ? formatLocalized(selectedDate, "EEEE, MMMM d, yyyy")
       : t("common.labels.selectDate");
 
-  const plannerKey = `${format(selectedDate, "yyyy-MM-dd")}-${existingPlan?.id ?? "new"}`;
+  const plannerKey = `${dateKey}-${existingPlan?.id ?? "new"}`;
 
   return (
     <Actionsheet isOpen={isOpen} onClose={onClose}>
@@ -222,6 +274,17 @@ export function CalendarActionSheet({
 
           {activeTab === "reservation" && isPastDate && existingReservation && (
             <ReservationTabContent existingReservation={existingReservation} onClose={onClose} />
+          )}
+
+          {activeTab === "friends" && isPastDate && (
+            <FriendsWentTabContent
+              key={dateKey}
+              friends={friendsWent}
+              isLoading={friendsWentLoading}
+              error={friendsWentError}
+              onRetry={refetchFriendsWent}
+              onOpenGallery={handleOpenGallery}
+            />
           )}
 
           {activeTab === "plan" && !isPastDate && canPlan && (

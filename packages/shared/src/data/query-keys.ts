@@ -93,6 +93,8 @@ export class QueryKeys {
   // Day plan queries
   static dayPlans = (festivalId: string) => ["day-plans", festivalId] as const;
   static friendsGoing = (festivalId: string) => ["friends-going", festivalId] as const;
+  static friendsWent = (festivalId: string, date: string) =>
+    ["friends-went", festivalId, date] as const;
 
   // Profile queries
   static tutorialStatus = () => ["tutorial-status"] as const;

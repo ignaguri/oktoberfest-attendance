@@ -26,6 +26,7 @@ import type {
   GetCrowdStatusResponse,
   GetFestivalResponse,
   GetFriendsGoingResponse,
+  GetFriendsWentResponse,
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
   GetPendingUnlocksResponse,
@@ -393,6 +394,20 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to fetch attendance");
         }
         return parseJsonResponse<{ attendance: AttendanceByDate | null }>(response);
+      },
+
+      async friendsWent(festivalId: string, date: string): Promise<GetFriendsWentResponse> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams({ festivalId, date });
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/attendance/friends-went?${params}`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch friends who went");
+        }
+        return parseJsonResponse<GetFriendsWentResponse>(response);
       },
     },
 

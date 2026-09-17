@@ -11394,6 +11394,225 @@
         }
       }
     },
+    "/v1/attendance/friends-went": {
+      "get": {
+        "tags": [
+          "attendance"
+        ],
+        "summary": "List friends who went on a past day",
+        "description": "Friends' and group-mates' attendance on a past festival day: drinks by type, tents and public photos. Empty for today and later.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "required": true,
+            "name": "date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Friends who went retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "friends": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "username": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "fullName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "avatarUrl": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "totalDrinks": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "drinks": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "enum": [
+                                    "beer",
+                                    "radler",
+                                    "alcohol_free",
+                                    "wine",
+                                    "soft_drink",
+                                    "other"
+                                  ]
+                                },
+                                "count": {
+                                  "type": "integer",
+                                  "minimum": 0,
+                                  "exclusiveMinimum": true
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "count"
+                              ]
+                            }
+                          },
+                          "tents": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "photoCount": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "photos": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "pictureUrl": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "pictureUrl"
+                              ]
+                            }
+                          },
+                          "sharedGroupId": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "uuid"
+                          }
+                        },
+                        "required": [
+                          "userId",
+                          "username",
+                          "fullName",
+                          "avatarUrl",
+                          "totalDrinks",
+                          "drinks",
+                          "tents",
+                          "photoCount",
+                          "photos",
+                          "sharedGroupId"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "friends"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Festival not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/location/sessions": {
       "post": {
         "tags": [

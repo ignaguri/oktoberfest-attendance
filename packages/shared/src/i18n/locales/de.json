@@ -636,6 +636,15 @@
       "invalidDate": "Bitte wähle ein gültiges Datum",
       "dateOutsideFestival": "Das Datum muss innerhalb der Festivaldaten liegen"
     },
+    "friendsWent": {
+      "count": "{{count}} Freund war da",
+      "count_other": "{{count}} Freunde waren da",
+      "noDrinks": "Keine Getränke eingetragen",
+      "photos": "{{count}} Foto",
+      "photos_other": "{{count}} Fotos",
+      "openGalleryHint": "Öffnet die Gruppengalerie an diesem Tag",
+      "empty": "Keiner deiner Freunde hat diesen Tag eingetragen"
+    },
     "planner": {
       "whosGoing": "Wer geht hin",
       "moreFriends": "+{{count}} weitere",
@@ -688,7 +697,8 @@
     "tabs": {
       "attendance": "Besuche",
       "reservation": "Reservierung",
-      "plan": "Plan"
+      "plan": "Plan",
+      "friends": "Freunde"
     },
     "saveSuccess": "Änderungen erfolgreich gespeichert",
     "summary": {

@@ -6,8 +6,8 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { getInitials } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Camera } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
-import { Dimensions, Image, Pressable, RefreshControl, ScrollView } from "react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Dimensions, Image, type LayoutChangeEvent, Pressable, RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { PhotoDetailModal } from "@/components/gallery/photo-detail-modal";
@@ -87,11 +87,38 @@ function groupGalleryData(photos: GalleryPhoto[]): GroupedGallery[] {
 
 export default function GroupGalleryScreen() {
   const { t } = useTranslation();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, date } = useLocalSearchParams<{ id: string; date?: string }>();
   const [selectedPhoto, setSelectedPhoto] = useState<{
     id: string;
     url: string;
   } | null>(null);
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const dateTargetYRef = useRef<number | null>(null);
+  const isFollowingDateRef = useRef(true);
+
+  // Opened from a past day's recap: keep re-scrolling to the target day's latest known y until the user drags
+  const scrollToDateTarget = useCallback(() => {
+    if (!isFollowingDateRef.current || dateTargetYRef.current === null) {
+      return;
+    }
+    scrollViewRef.current?.scrollTo({ y: dateTargetYRef.current, animated: false });
+  }, []);
+
+  const handleDaySectionLayout = useCallback(
+    (dayDate: string, event: LayoutChangeEvent) => {
+      if (dayDate !== date) {
+        return;
+      }
+      dateTargetYRef.current = event.nativeEvent.layout.y;
+      scrollToDateTarget();
+    },
+    [date, scrollToDateTarget],
+  );
+
+  const handleScrollBeginDrag = useCallback(() => {
+    isFollowingDateRef.current = false;
+  }, []);
 
   // Fetch gallery data
   const {
@@ -162,8 +189,11 @@ export default function GroupGalleryScreen() {
       />
 
       <ScrollView
+        ref={scrollViewRef}
         className="flex-1 bg-background-50"
         refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={refetch} />}
+        onContentSizeChange={scrollToDateTarget}
+        onScrollBeginDrag={handleScrollBeginDrag}
       >
         <VStack space="lg" className="p-4 pb-8">
           {/* Empty State */}
@@ -181,7 +211,11 @@ export default function GroupGalleryScreen() {
 
           {/* Photo Grid by Date */}
           {groupedGallery.map((dayGroup) => (
-            <VStack key={dayGroup.date} space="md">
+            <VStack
+              key={dayGroup.date}
+              space="md"
+              onLayout={(event) => handleDaySectionLayout(dayGroup.date, event)}
+            >
               {/* Date Header */}
               <Text className="text-lg font-semibold text-typography-900">
                 {dayGroup.formattedDate}

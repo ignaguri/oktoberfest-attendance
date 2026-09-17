@@ -48,6 +48,12 @@ export { groupFestivalsByStatus, type GroupedFestivals } from "./festival-groupi
 // Festival day model
 export { buildFestivalWeeks, type FestivalDayCell } from "./festival-days";
 export { type FriendGoingRow, groupFriendsGoing } from "./friends-going";
+export {
+  FRIENDS_WENT_PHOTO_LIMIT,
+  type FriendsWentInput,
+  type FriendsWentRows,
+  groupFriendsWent,
+} from "./friends-went";
 
 // Festival countdown
 export {
