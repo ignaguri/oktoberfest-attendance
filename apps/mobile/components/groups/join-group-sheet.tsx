@@ -1,4 +1,10 @@
-import { useGroupSearch, useJoinGroup, useJoinGroupByToken } from "@prostcounter/shared/hooks";
+import {
+  useCancelJoinRequest,
+  useGroupSearch,
+  useJoinGroup,
+  useJoinGroupByToken,
+  useRequestToJoinGroup,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SearchGroupResult } from "@prostcounter/shared/schemas";
 import { ChevronRight, Link, Search, Users, X } from "lucide-react-native";
@@ -36,6 +42,8 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
   const { t } = useTranslation();
   const joinGroup = useJoinGroup();
   const joinGroupByToken = useJoinGroupByToken();
+  const requestToJoin = useRequestToJoinGroup();
+  const cancelJoinRequest = useCancelJoinRequest();
 
   // UI State
   const [mode, setMode] = useState<JoinMode>("search");
@@ -43,6 +51,9 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
   const [selectedGroup, setSelectedGroup] = useState<SearchGroupResult | null>(null);
   const [inviteToken, setInviteToken] = useState("");
   const [error, setError] = useState<string | null>(null);
+  // Search mode shows "Request to join" first; the invite-link field is opt-in
+  const [showLinkInput, setShowLinkInput] = useState(false);
+  const [requestSent, setRequestSent] = useState(false);
 
   // Search query - debounced via React Query
   const { data: searchResults, loading: isSearching } = useGroupSearch(searchQuery, festivalId);
@@ -55,6 +66,8 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
       setSelectedGroup(null);
       setInviteToken("");
       setError(null);
+      setShowLinkInput(false);
+      setRequestSent(false);
     }
   }, [isOpen]);
 
@@ -101,11 +114,50 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
     setSelectedGroup(null);
     setInviteToken("");
     setError(null);
+    setShowLinkInput(false);
+    setRequestSent(false);
   }, []);
 
   const handleClose = useCallback(() => {
     onClose();
   }, [onClose]);
+
+  const isRequestPending = requestSent || selectedGroup?.joinRequestPending === true;
+
+  const handleRequestToJoin = useCallback(async () => {
+    if (!selectedGroup) {
+      return;
+    }
+    setError(null);
+    try {
+      await requestToJoin.mutateAsync(selectedGroup.id);
+      setRequestSent(true);
+    } catch (err: any) {
+      logger.error("Failed to request to join group:", err);
+      if (err?.code === "JOIN_REQUEST_PENDING") {
+        setRequestSent(true);
+      } else if (err?.code === "ALREADY_GROUP_MEMBER") {
+        setError(t("apiErrors.ALREADY_GROUP_MEMBER"));
+      } else {
+        setError(t("groups.joinRequests.requestFailed"));
+      }
+    }
+  }, [selectedGroup, requestToJoin, t]);
+
+  const handleCancelRequest = useCallback(async () => {
+    if (!selectedGroup) {
+      return;
+    }
+    setError(null);
+    try {
+      await cancelJoinRequest.mutateAsync(selectedGroup.id);
+      setRequestSent(false);
+      setSelectedGroup({ ...selectedGroup, joinRequestPending: false });
+    } catch (err: any) {
+      logger.error("Failed to cancel join request:", err);
+      setError(t("common.errors.generic"));
+    }
+  }, [selectedGroup, cancelJoinRequest, t]);
 
   const isJoining = joinGroup.loading || joinGroupByToken.loading;
   const canJoin =
@@ -170,26 +222,94 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
     );
   };
 
+  const renderSelectedGroupCard = () => {
+    if (!selectedGroup) {
+      return null;
+    }
+    return (
+      <Card variant="elevated" size="md" className="bg-background-0">
+        <VStack space="sm">
+          <Text className="font-semibold text-typography-900">{selectedGroup.name}</Text>
+          <HStack space="xs" className="items-center">
+            <Users size={14} color={IconColors.muted} />
+            <Text className="text-sm text-typography-500">
+              {t("groups.memberCount", {
+                count: selectedGroup.memberCount,
+              })}
+            </Text>
+          </HStack>
+        </VStack>
+      </Card>
+    );
+  };
+
+  // A group found by search: ask its creator, or switch to pasting a link
+  const renderRequestToJoin = () => {
+    return (
+      <VStack space="lg">
+        {renderSelectedGroupCard()}
+
+        {isRequestPending ? (
+          <VStack space="sm">
+            <Button variant="outline" action="secondary" isDisabled>
+              <ButtonText>{t("groups.joinRequests.requested")}</ButtonText>
+            </Button>
+            <Text className="text-center text-xs text-typography-500">
+              {t("groups.joinRequests.requestedHelp")}
+            </Text>
+            <Button
+              variant="link"
+              size="sm"
+              onPress={handleCancelRequest}
+              isDisabled={cancelJoinRequest.loading}
+              accessibilityLabel={t("groups.joinRequests.cancelRequest")}
+              accessibilityHint={t("groups.joinRequests.cancelRequestHint")}
+            >
+              <ButtonText>{t("groups.joinRequests.cancelRequest")}</ButtonText>
+            </Button>
+          </VStack>
+        ) : (
+          <Button
+            variant="solid"
+            action="primary"
+            onPress={handleRequestToJoin}
+            isDisabled={requestToJoin.loading}
+            accessibilityLabel={t("groups.joinRequests.requestToJoin")}
+            accessibilityHint={t("groups.joinRequests.requestToJoinHint")}
+          >
+            {requestToJoin.loading && <ButtonSpinner color={Colors.white} />}
+            <ButtonText>{t("groups.joinRequests.requestToJoin")}</ButtonText>
+          </Button>
+        )}
+
+        {error && <Text className="text-sm text-error-600">{error}</Text>}
+
+        <HStack className="w-full gap-3">
+          <Button variant="outline" action="secondary" className="flex-1" onPress={handleBack}>
+            <ButtonText>{t("common.buttons.back")}</ButtonText>
+          </Button>
+          <Button
+            variant="link"
+            className="flex-1"
+            onPress={() => {
+              setError(null);
+              setShowLinkInput(true);
+            }}
+          >
+            <Link size={16} color={IconColors.default} />
+            <ButtonText className="ml-1">{t("groups.joinRequests.haveInviteLink")}</ButtonText>
+          </Button>
+        </HStack>
+      </VStack>
+    );
+  };
+
   // Invite link input (for selected group or link-only mode). Both modes need
   // the link: it is what authorizes the join, and the API accepts a full link.
   const renderTokenInput = () => {
     return (
       <VStack space="lg">
-        {selectedGroup && (
-          <Card variant="elevated" size="md" className="bg-background-0">
-            <VStack space="sm">
-              <Text className="font-semibold text-typography-900">{selectedGroup.name}</Text>
-              <HStack space="xs" className="items-center">
-                <Users size={14} color={IconColors.muted} />
-                <Text className="text-sm text-typography-500">
-                  {t("groups.memberCount", {
-                    count: selectedGroup.memberCount,
-                  })}
-                </Text>
-              </HStack>
-            </VStack>
-          </Card>
-        )}
+        {renderSelectedGroupCard()}
 
         <VStack space="sm">
           <Text className="text-sm font-medium text-typography-700">
@@ -317,6 +437,8 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
                 {/* Search Results */}
                 {renderSearchResults()}
               </>
+            ) : mode === "search" && selectedGroup && !showLinkInput ? (
+              renderRequestToJoin()
             ) : (
               renderTokenInput()
             )}
