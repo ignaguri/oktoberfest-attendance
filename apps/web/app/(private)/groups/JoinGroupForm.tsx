@@ -99,19 +99,22 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
     }
 
     try {
+      const typedName = getValues("groupName").trim().toLowerCase();
       const searchResult = await apiClient.groups.search({
         name: getValues("groupName"),
         festivalId: currentFestival.id,
-        limit: 1,
+        limit: 10,
       });
-      const match = searchResult.data?.[0];
+      // The search matches substrings, so only an exact name counts as the target
+      const match = searchResult.data?.find(
+        (group) => group.name.trim().toLowerCase() === typedName,
+      );
       if (!match) {
         toast.error(t("notifications.error.groupNotFound"));
         return;
       }
 
       await requestToJoin(match.id);
-      // Names the matched group, since the search takes the first hit
       toast.success(t("groups.joinRequests.requestSent", { groupName: match.name }));
     } catch (error) {
       const code = (error as { code?: string })?.code;
