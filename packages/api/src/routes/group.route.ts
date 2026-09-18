@@ -135,14 +135,21 @@ app.openapi(searchGroupsRoute, async (c) => {
   const groupRepo = new SupabaseGroupRepository(supabase);
   const groups = await groupRepo.search(query);
 
-  // Lets the join sheet show "Requested" instead of the request button
-  const joinRequestRepo = new SupabaseGroupJoinRequestRepository(supabase);
-  const blocking = new Set(
-    await joinRequestRepo.listBlockingGroupIds(
-      user.id,
-      groups.map((group) => group.id),
-    ),
-  );
+  // Lets the join sheet show "Requested" instead of the request button.
+  // Search must never fail because of this flag: on error, degrade to false
+  // for every result rather than turning a working search into a 500.
+  let blocking = new Set<string>();
+  try {
+    const joinRequestRepo = new SupabaseGroupJoinRequestRepository(supabase);
+    blocking = new Set(
+      await joinRequestRepo.listBlockingGroupIds(
+        user.id,
+        groups.map((group) => group.id),
+      ),
+    );
+  } catch (err) {
+    logger.error({ err }, "[group.route] failed to load join request state for search results");
+  }
 
   return c.json(
     { data: groups.map((group) => ({ ...group, joinRequestPending: blocking.has(group.id) })) },
