@@ -89,6 +89,8 @@ export const SearchGroupResultSchema = z.object({
   name: z.string(),
   festivalId: z.uuid(),
   memberCount: z.number().int(),
+  /** The caller already asked to join (or was declined within the cooldown) */
+  joinRequestPending: z.boolean().optional(),
 });
 
 export type SearchGroupResult = z.infer<typeof SearchGroupResultSchema>;
@@ -268,3 +270,33 @@ export const CarryOverCandidatesResponseSchema = z.object({
 });
 
 export type CarryOverCandidatesResponse = z.infer<typeof CarryOverCandidatesResponseSchema>;
+
+/**
+ * A pending request to join a group, as seen by the group's creator
+ */
+export const GroupJoinRequestSchema = z.object({
+  id: z.uuid(),
+  groupId: z.uuid(),
+  groupName: z.string(),
+  createdAt: z.string(),
+  requester: z.object({
+    id: z.uuid(),
+    username: z.string().nullable(),
+    fullName: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
+  }),
+});
+
+export type GroupJoinRequest = z.infer<typeof GroupJoinRequestSchema>;
+
+export const ListGroupJoinRequestsResponseSchema = z.object({
+  data: z.array(GroupJoinRequestSchema),
+});
+
+export type ListGroupJoinRequestsResponse = z.infer<typeof ListGroupJoinRequestsResponseSchema>;
+
+export const GroupJoinRequestIdParamSchema = z.object({
+  requestId: z.uuid({ error: "Invalid request ID" }),
+});
+
+export type GroupJoinRequestIdParam = z.infer<typeof GroupJoinRequestIdParamSchema>;

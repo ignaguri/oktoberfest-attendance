@@ -333,6 +333,27 @@
         "invalidToken": "Token de invitación inválido"
       }
     },
+    "joinRequests": {
+      "sectionTitle": "Solicitudes para unirse",
+      "requestToJoin": "Pedir unirme",
+      "requestToJoinHint": "Le manda una solicitud a quien creó el grupo",
+      "requested": "Solicitado",
+      "requestedHelp": "Quien creó el grupo va a ver tu solicitud. Te avisamos cuando estés adentro.",
+      "cancelRequest": "Cancelar solicitud",
+      "cancelRequestHint": "Retira tu solicitud para unirte",
+      "haveInviteLink": "¿Tenés un enlace de invitación?",
+      "requestFailed": "No se pudo enviar la solicitud. Intentá de nuevo.",
+      "requestSent": "Solicitud enviada a {{groupName}}",
+      "accept": "Aceptar",
+      "acceptHint": "Agrega a {{name}} al grupo",
+      "decline": "Rechazar",
+      "declineHint": "Rechaza la solicitud de {{name}}",
+      "declineTitle": "¿Rechazar solicitud?",
+      "declineMessage": "{{name}} no va a recibir ningún aviso y puede volver a pedirlo en una semana.",
+      "acceptFailed": "No se pudo aceptar la solicitud. Intentá de nuevo.",
+      "declineFailed": "No se pudo rechazar la solicitud. Intentá de nuevo.",
+      "pendingBadge": "{{count}} solicitudes pendientes"
+    },
     "settings": {
       "title": "Configuración del grupo",
       "loading": "Cargando configuración del grupo...",
@@ -2825,6 +2846,8 @@
     "NOT_GROUP_MEMBER": "No sos miembro de este grupo.",
     "NOT_GROUP_CREATOR": "Solo el creador del grupo puede hacer esto.",
     "ALREADY_GROUP_MEMBER": "Ya sos miembro de este grupo.",
+    "JOIN_REQUEST_PENDING": "Ya pediste unirte a este grupo.",
+    "JOIN_REQUEST_NOT_FOUND": "Esta solicitud ya no existe.",
     "INVALID_INVITE_TOKEN": "Token de invitación inválido.",
     "CANNOT_REMOVE_SELF": "No podés eliminarte a vos mismo. Usá abandonar grupo en su lugar.",
     "USER_NOT_GROUP_MEMBER": "El usuario no es miembro de este grupo.",

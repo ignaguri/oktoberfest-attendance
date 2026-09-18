@@ -333,6 +333,27 @@
         "invalidToken": "Invalid invite token"
       }
     },
+    "joinRequests": {
+      "sectionTitle": "Join requests",
+      "requestToJoin": "Request to join",
+      "requestToJoinHint": "Sends a request to the group's creator",
+      "requested": "Requested",
+      "requestedHelp": "The group's creator will see your request. You'll get a notification when you're in.",
+      "cancelRequest": "Cancel request",
+      "cancelRequestHint": "Withdraws your request to join",
+      "haveInviteLink": "Have an invite link?",
+      "requestFailed": "Couldn't send the request. Please try again.",
+      "requestSent": "Request sent to {{groupName}}",
+      "accept": "Accept",
+      "acceptHint": "Adds {{name}} to the group",
+      "decline": "Decline",
+      "declineHint": "Declines {{name}}'s request",
+      "declineTitle": "Decline request?",
+      "declineMessage": "{{name}} won't be notified. They can ask again in a week.",
+      "acceptFailed": "Couldn't accept the request. Please try again.",
+      "declineFailed": "Couldn't decline the request. Please try again.",
+      "pendingBadge": "{{count}} pending join requests"
+    },
     "settings": {
       "title": "Group Settings",
       "loading": "Loading group settings...",
@@ -2765,6 +2786,8 @@
     "NOT_GROUP_MEMBER": "You are not a member of this group.",
     "NOT_GROUP_CREATOR": "Only the group creator can do this.",
     "ALREADY_GROUP_MEMBER": "You are already a member of this group.",
+    "JOIN_REQUEST_PENDING": "You already asked to join this group.",
+    "JOIN_REQUEST_NOT_FOUND": "This request no longer exists.",
     "INVALID_INVITE_TOKEN": "Invalid invite token.",
     "CANNOT_REMOVE_SELF": "You cannot remove yourself. Use leave group instead.",
     "USER_NOT_GROUP_MEMBER": "User is not a member of this group.",

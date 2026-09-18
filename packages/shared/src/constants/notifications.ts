@@ -26,6 +26,8 @@ export const NOTIFICATION_WORKFLOWS = {
   GROUP_CARRY_OVER: "group-carryover-invite",
   FESTIVAL_OPENING: "festival-opening",
   FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
+  GROUP_JOIN_REQUEST: "group-join-request",
+  GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
 } as const;
 
 export type NotificationWorkflowId =
@@ -46,6 +48,8 @@ export const NOTIFICATION_PUSH_TYPES = {
   FRIEND_REQUEST: "friend-request",
   GROUP_CARRY_OVER: "group-carry-over",
   FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
+  GROUP_JOIN_REQUEST: "group-join-request",
+  GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
 } as const;
 
 export type NotificationPushType =
@@ -124,6 +128,13 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
 
       case NOTIFICATION_PUSH_TYPES.FRIEND_PLAN_OVERLAP:
         return payload.date ? buildDayRoute(payload.date, payload.festivalId) : "/attendance";
+
+      // The creator reviews requests in the group's settings
+      case NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST:
+        return payload.groupId ? `/group-detail/${payload.groupId}/settings` : "/groups";
+
+      case NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST_ACCEPTED:
+        return payload.groupId ? `/group-detail/${payload.groupId}` : "/groups";
     }
   }
 
@@ -132,6 +143,8 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
   // An in-app overlap notification carries its trigger payload, not a type.
   if (payload.actorName && payload.date) return buildDayRoute(payload.date, payload.festivalId);
   if (payload.senderName && !payload.groupId) return "/friends?tab=requests";
+  // A join request names its requester and group; the creator reviews it in settings
+  if (payload.requesterName && payload.groupId) return `/group-detail/${payload.groupId}/settings`;
   // Before the groupId fallback: a push step's schema is {skip, subject, body},
   // so it cannot carry data.type and the raw trigger payload arrives instead.
   // A carry-over payload has both, and the recipient is not a member yet, so
