@@ -28,8 +28,8 @@ interface JoinRequestsSectionProps {
   showDialog: ShowDialog;
 }
 
-function displayNameOf(request: GroupJoinRequest): string {
-  return request.requester.fullName || request.requester.username || "User";
+function displayNameOf(request: GroupJoinRequest, fallback: string): string {
+  return request.requester.fullName || request.requester.username || fallback;
 }
 
 /**
@@ -60,7 +60,7 @@ export function JoinRequestsSection({ groupId, showDialog }: JoinRequestsSection
 
   const handleDecline = useCallback(
     (request: GroupJoinRequest) => {
-      const name = displayNameOf(request);
+      const name = displayNameOf(request, t("common.unknownUser"));
       showDialog(
         t("groups.joinRequests.declineTitle"),
         t("groups.joinRequests.declineMessage", { name }),
@@ -99,7 +99,7 @@ export function JoinRequestsSection({ groupId, showDialog }: JoinRequestsSection
         </HStack>
 
         {requests.map((request) => {
-          const name = displayNameOf(request);
+          const name = displayNameOf(request, t("common.unknownUser"));
           const { requester } = request;
           return (
             <VStack key={request.id} space="sm">

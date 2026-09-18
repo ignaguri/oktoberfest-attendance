@@ -20,13 +20,13 @@ export class GroupsPage extends BasePage {
   // Join Group form
   readonly joinFormHeading: Locator;
   readonly joinGroupNameInput: Locator;
-  readonly joinPasswordInput: Locator;
+  readonly joinInviteLinkInput: Locator;
   readonly joinButton: Locator;
+  readonly requestToJoinButton: Locator;
 
   // Create Group form
   readonly createFormHeading: Locator;
   readonly createGroupNameInput: Locator;
-  readonly createPasswordInput: Locator;
   readonly createButton: Locator;
 
   constructor(page: Page) {
@@ -39,20 +39,24 @@ export class GroupsPage extends BasePage {
     this.myGroupsSection = page.getByText(/my groups/i);
 
     // Join Group form - use heading to locate the form section
-    // Placeholder translations: groups.join.namePlaceholder: "Group Name", groups.join.passwordPlaceholder: "Group Password"
+    // Placeholder translations: groups.join.namePlaceholder: "Group Name", groups.join.inviteLinkPlaceholder: "Paste the invite link"
+    // The DOM holds a second, hidden copy of the forms, so inputs are scoped to the visible form
     this.joinFormHeading = page.getByRole("heading", { name: "Join a Group" });
-    this.joinGroupNameInput = page.getByPlaceholder(/^group name$/i);
-    this.joinPasswordInput = page.getByPlaceholder(/^group password$/i);
-    this.joinButton = page.getByRole("button", { name: /^join group$/i });
+    const joinForm = page.locator("form").filter({ visible: true, has: this.joinFormHeading });
+    this.joinGroupNameInput = joinForm.getByPlaceholder(/^group name$/i);
+    this.joinInviteLinkInput = joinForm.getByPlaceholder(/^paste the invite link$/i);
+    this.joinButton = joinForm.getByRole("button", { name: /^join group$/i });
+    this.requestToJoinButton = joinForm.getByRole("button", { name: /^request to join$/i });
 
     // Create Group form - heading text from groups.create.title: "Create Group"
-    // Placeholder translations: groups.create.namePlaceholder: "Enter group name", groups.create.passwordPlaceholder: "Enter password"
+    // Placeholder translation: groups.create.namePlaceholder: "Enter group name"
     this.createFormHeading = page.getByRole("heading", {
       name: /create group/i,
     });
-    this.createGroupNameInput = page.getByPlaceholder(/enter group name/i);
-    this.createPasswordInput = page.getByPlaceholder(/enter password/i);
-    this.createButton = page.getByRole("button", { name: /^create group$/i });
+    this.createGroupNameInput = page.getByPlaceholder(/enter group name/i).filter({ visible: true });
+    this.createButton = page
+      .getByRole("button", { name: /^create group$/i })
+      .filter({ visible: true });
   }
 
   /**
@@ -75,9 +79,9 @@ export class GroupsPage extends BasePage {
   /**
    * Fill the join group form
    */
-  async fillJoinForm(groupName: string, password: string): Promise<void> {
+  async fillJoinForm(groupName: string, inviteLink: string): Promise<void> {
     await this.joinGroupNameInput.fill(groupName);
-    await this.joinPasswordInput.fill(password);
+    await this.joinInviteLinkInput.fill(inviteLink);
   }
 
   /**
@@ -88,19 +92,26 @@ export class GroupsPage extends BasePage {
   }
 
   /**
-   * Join a group with name and password
+   * Join a group with name and invite link
    */
-  async joinGroup(groupName: string, password: string): Promise<void> {
-    await this.fillJoinForm(groupName, password);
+  async joinGroup(groupName: string, inviteLink: string): Promise<void> {
+    await this.fillJoinForm(groupName, inviteLink);
     await this.submitJoinForm();
+  }
+
+  /**
+   * Ask a group's creator to join, by name only
+   */
+  async requestToJoin(groupName: string): Promise<void> {
+    await this.joinGroupNameInput.fill(groupName);
+    await this.requestToJoinButton.click();
   }
 
   /**
    * Fill the create group form
    */
-  async fillCreateForm(groupName: string, password: string): Promise<void> {
+  async fillCreateForm(groupName: string): Promise<void> {
     await this.createGroupNameInput.fill(groupName);
-    await this.createPasswordInput.fill(password);
   }
 
   /**
@@ -111,10 +122,10 @@ export class GroupsPage extends BasePage {
   }
 
   /**
-   * Create a new group with name and password
+   * Create a new group with a name
    */
-  async createGroup(groupName: string, password: string): Promise<void> {
-    await this.fillCreateForm(groupName, password);
+  async createGroup(groupName: string): Promise<void> {
+    await this.fillCreateForm(groupName);
     await this.submitCreateForm();
   }
 
@@ -150,6 +161,6 @@ export class GroupsPage extends BasePage {
    * Assert error toast for join failure
    */
   async expectJoinError(): Promise<void> {
-    await this.expectErrorToast(/incorrect password|unable to join/i);
+    await this.expectErrorToast(/invalid invite|unable to join/i);
   }
 }

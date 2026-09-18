@@ -99,9 +99,10 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
     }
 
     try {
-      const typedName = getValues("groupName").trim().toLowerCase();
+      const trimmedName = getValues("groupName").trim();
+      const typedName = trimmedName.toLowerCase();
       const searchResult = await apiClient.groups.search({
-        name: getValues("groupName"),
+        name: trimmedName,
         festivalId: currentFestival.id,
         limit: 10,
       });

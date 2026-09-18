@@ -80,14 +80,14 @@ async function handleJoinGroupRequest(request: NextRequest) {
     }
     logger.error(
       "Failed to join group with token",
-      logger.apiRoute("join-group", { token, status: response.status }),
+      logger.apiRoute("join-group", { status: response.status }),
       joinError,
     );
     return NextResponse.redirect(new URL("/join-group/error", request.nextUrl.origin));
   } catch (error) {
     const err = error as Error;
     reportApiException("join-group", err);
-    logger.error("Failed to join group with token", logger.apiRoute("join-group", { token }), err);
+    logger.error("Failed to join group with token", logger.apiRoute("join-group"), err);
 
     return NextResponse.redirect(new URL("/join-group/error", request.nextUrl.origin));
   }
