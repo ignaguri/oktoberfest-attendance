@@ -1,8 +1,16 @@
 import { buildGroupInviteUrl } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useGroupLeaderboard, useGroupSettings } from "@prostcounter/shared/hooks";
+import {
+  useGroupLeaderboard,
+  useGroupSettings,
+  useIncomingJoinRequests,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { LeaderboardEntry, WinningCriteria } from "@prostcounter/shared/schemas";
+import type {
+  GroupJoinRequest,
+  LeaderboardEntry,
+  WinningCriteria,
+} from "@prostcounter/shared/schemas";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -102,6 +110,10 @@ export default function GroupDetailScreen() {
   } = useGroupLeaderboard(id || "", criteriaId, currentFestival?.id || "");
 
   const isCreator = user?.id === group?.createdBy;
+  const { data: incomingJoinRequests } = useIncomingJoinRequests(isCreator);
+  const pendingJoinRequestCount = (
+    (incomingJoinRequests as GroupJoinRequest[] | null) ?? []
+  ).filter((request) => request.groupId === id).length;
   const isLoading = isLoadingGroup || isLoadingLeaderboard;
   const isRefetching = isRefetchingGroup || isRefetchingLeaderboard;
 
@@ -305,9 +317,27 @@ export default function GroupDetailScreen() {
                   <ButtonText className="ml-1">{t("groups.actions.messages")}</ButtonText>
                 </Button>
                 {isCreator && (
-                  <Button variant="solid" action="primary" size="sm" onPress={handleSettings}>
+                  <Button
+                    variant="solid"
+                    action="primary"
+                    size="sm"
+                    onPress={handleSettings}
+                    accessibilityLabel={t("groups.actions.settings")}
+                    accessibilityHint={
+                      pendingJoinRequestCount > 0
+                        ? t("groups.joinRequests.pendingBadge", { count: pendingJoinRequestCount })
+                        : undefined
+                    }
+                  >
                     <Settings size={16} color={IconColors.white} />
                     <ButtonText className="ml-1">{t("groups.actions.settings")}</ButtonText>
+                    {pendingJoinRequestCount > 0 && (
+                      <View className="ml-1 min-w-5 items-center rounded-full bg-white px-1.5">
+                        <Text className="text-xs font-semibold text-primary-600">
+                          {pendingJoinRequestCount}
+                        </Text>
+                      </View>
+                    )}
                   </Button>
                 )}
               </HStack>

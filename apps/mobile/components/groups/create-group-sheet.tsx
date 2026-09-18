@@ -98,7 +98,6 @@ export function CreateGroupSheet({
       try {
         const groupId = await createGroup.mutateAsync({
           groupName: data.name,
-          password: "", // Not used by API, but required by current hook signature
           festivalId,
           winningCriteria: data.winningCriteria,
         });

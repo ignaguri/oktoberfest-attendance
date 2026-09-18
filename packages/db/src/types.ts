@@ -784,6 +784,62 @@ export type Database = {
           },
         ]
       }
+      group_join_requests: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          requester_id: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["group_join_request_status"]
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          requester_id: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["group_join_request_status"]
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          requester_id?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["group_join_request_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_join_requests_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_join_requests_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["group_id"]
+          },
+          {
+            foreignKeyName: "group_join_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "group_join_requests_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           group_id: string | null
@@ -2030,6 +2086,7 @@ export type Database = {
         Args: { p_friendship_id: string; p_user_id: string }
         Returns: Json
       }
+      accept_join_request: { Args: { p_request_id: string }; Returns: Json }
       add_beer_picture: {
         Args: {
           p_attendance_id: string
@@ -2056,6 +2113,7 @@ export type Database = {
         Args: { p_attendance_id: string }
         Returns: number
       }
+      cancel_join_request: { Args: { p_group_id: string }; Returns: Json }
       check_notification_rate_limit: {
         Args: {
           p_group_id: string
@@ -2092,6 +2150,7 @@ export type Database = {
         Args: { p_friendship_id: string; p_user_id: string }
         Returns: Json
       }
+      decline_join_request: { Args: { p_request_id: string }; Returns: Json }
       delete_attendance: {
         Args: { p_attendance_id: string }
         Returns: undefined
@@ -2327,6 +2386,7 @@ export type Database = {
         Returns: number
       }
       renew_group_token: { Args: { p_group_id: string }; Returns: string }
+      request_to_join_group: { Args: { p_group_id: string }; Returns: Json }
       rpc_due_reservation_prompts: {
         Args: { p_now: string }
         Returns: {
@@ -2432,6 +2492,11 @@ export type Database = {
         | "fruehlingsfest"
         | "other"
       friendship_status: "pending" | "accepted" | "declined"
+      group_join_request_status:
+        | "pending"
+        | "accepted"
+        | "declined"
+        | "cancelled"
       group_message_type: "message" | "alert"
       location_sharing_status_enum: "active" | "paused" | "expired"
       message_visibility: "groups" | "public"
@@ -2601,6 +2666,12 @@ export const Constants = {
         "other",
       ],
       friendship_status: ["pending", "accepted", "declined"],
+      group_join_request_status: [
+        "pending",
+        "accepted",
+        "declined",
+        "cancelled",
+      ],
       group_message_type: ["message", "alert"],
       location_sharing_status_enum: ["active", "paused", "expired"],
       message_visibility: ["groups", "public"],

@@ -72,14 +72,24 @@ async function handleJoinGroupRequest(request: NextRequest) {
       return NextResponse.redirect(errorUrl);
     }
 
-    // Generic error
-    return NextResponse.json({ error: errorMessage }, { status: response.status });
+    // Generic error: this route is opened by a browser navigation, so raw JSON
+    // would be the whole page. The error page's default case covers it.
+    const joinError = new Error(errorMessage);
+    if (response.status >= 500) {
+      reportApiException("join-group", joinError);
+    }
+    logger.error(
+      "Failed to join group with token",
+      logger.apiRoute("join-group", { status: response.status }),
+      joinError,
+    );
+    return NextResponse.redirect(new URL("/join-group/error", request.nextUrl.origin));
   } catch (error) {
     const err = error as Error;
     reportApiException("join-group", err);
-    logger.error("Failed to join group with token", logger.apiRoute("join-group", { token }), err);
+    logger.error("Failed to join group with token", logger.apiRoute("join-group"), err);
 
-    return NextResponse.json({ error: "Failed to join the group." }, { status: 500 });
+    return NextResponse.redirect(new URL("/join-group/error", request.nextUrl.origin));
   }
 }
 

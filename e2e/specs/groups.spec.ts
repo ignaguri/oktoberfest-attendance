@@ -48,36 +48,32 @@ test.describe("Groups Flows", () => {
 
       // Verify join form inputs
       await expect(groupsPage.joinGroupNameInput).toBeVisible();
-      await expect(groupsPage.joinPasswordInput).toBeVisible();
+      await expect(groupsPage.joinInviteLinkInput).toBeVisible();
       await expect(groupsPage.joinButton).toBeVisible();
+      await expect(groupsPage.requestToJoinButton).toBeVisible();
 
       // Verify create form inputs
       await expect(groupsPage.createGroupNameInput).toBeVisible();
-      await expect(groupsPage.createPasswordInput).toBeVisible();
       await expect(groupsPage.createButton).toBeVisible();
     });
   });
 
-  test.describe("FLOW_GRP_002: Join a Group", () => {
-    test("should join a group with valid credentials", async ({ page }) => {
+  test.describe("FLOW_GRP_002: Request to Join a Group", () => {
+    test("should send a join request by group name", async ({ page }) => {
       const groupsPage = new GroupsPage(page);
 
       await groupsPage.goto();
       await groupsPage.expectGroupsPageLoaded();
 
-      // Join Group B (since user might already be in Group A from seed)
-      await groupsPage.joinGroup(TEST_GROUPS.groupB.name, TEST_GROUPS.groupB.password);
+      // The request button does nothing until the form hydrates
+      await page.waitForLoadState("networkidle");
 
-      // Wait for navigation or success
-      await page.waitForTimeout(2000);
+      // user2 is not in Group C. A rerun finds the request from the last run still pending
+      await groupsPage.requestToJoin(TEST_GROUPS.groupC.name);
 
-      // Should either redirect to group page or show success toast
-      const currentUrl = page.url();
-      const isOnGroupPage = currentUrl.includes("/groups/") && !currentUrl.endsWith("/groups");
-      if (!isOnGroupPage) {
-        // If still on groups page, check for success toast or error
-        await expect(page).toHaveURL(/\/groups/);
-      }
+      const toast = page.locator("[data-sonner-toast]");
+      await expect(toast).toContainText(/request sent|already asked/i);
+      await expect(page).toHaveURL(/\/groups$/);
     });
   });
 
@@ -90,7 +86,7 @@ test.describe("Groups Flows", () => {
 
       // Create a unique group
       const uniqueGroupName = generateUniqueGroupName();
-      await groupsPage.createGroup(uniqueGroupName, "testpassword123");
+      await groupsPage.createGroup(uniqueGroupName);
 
       // Wait for navigation to settings page
       await page.waitForTimeout(2000);
@@ -113,22 +109,14 @@ test.describe("Groups Flows", () => {
     test("should display group detail page when member", async ({ page }) => {
       const groupsPage = new GroupsPage(page);
 
+      // user2 is a seeded member of Group B
       await groupsPage.goto();
       await groupsPage.expectGroupsPageLoaded();
-
-      // First join a group to ensure we're a member
-      await groupsPage.joinGroup(TEST_GROUPS.groupC.name, TEST_GROUPS.groupC.password);
-
-      // Wait for potential navigation
-      await page.waitForTimeout(2000);
-
-      // Navigate to the group detail page
-      await page.goto("/groups");
       await page.waitForLoadState("networkidle");
 
       // Try to click on the group in My Groups
       const groupLink = page.getByRole("link", {
-        name: TEST_GROUPS.groupC.name,
+        name: TEST_GROUPS.groupB.name,
       });
       const isGroupVisible = await groupLink.isVisible().catch(() => false);
 
@@ -146,16 +134,9 @@ test.describe("Groups Flows", () => {
     test("should navigate to group settings from detail page", async ({ page }) => {
       const groupsPage = new GroupsPage(page);
 
+      // user2 is a seeded member of Group A
       await groupsPage.goto();
       await groupsPage.expectGroupsPageLoaded();
-
-      // Join a group first
-      await groupsPage.joinGroup(TEST_GROUPS.groupA.name, TEST_GROUPS.groupA.password);
-
-      await page.waitForTimeout(2000);
-
-      // Navigate back to groups and find the group
-      await page.goto("/groups");
       await page.waitForLoadState("networkidle");
 
       const groupLink = page.getByRole("link", {
@@ -181,15 +162,15 @@ test.describe("Groups Flows", () => {
     });
   });
 
-  test.describe("FLOW_GRP_006: Join Group Error - Wrong Password", () => {
-    test("should show error for wrong group password", async ({ page }) => {
+  test.describe("FLOW_GRP_006: Join Group Error - Invalid Invite Link", () => {
+    test("should show error for an invalid invite link", async ({ page }) => {
       const groupsPage = new GroupsPage(page);
 
       await groupsPage.goto();
       await groupsPage.expectGroupsPageLoaded();
 
-      // Try to join with wrong password
-      await groupsPage.joinGroup(TEST_GROUPS.groupA.name, "wrongpassword");
+      // Try to join with a link that isn't an invite
+      await groupsPage.joinGroup(TEST_GROUPS.groupC.name, "not-an-invite-link");
 
       // Wait for error toast
       await page.waitForTimeout(1500);
@@ -199,8 +180,8 @@ test.describe("Groups Flows", () => {
       const hasToast = await toast.isVisible().catch(() => false);
 
       if (hasToast) {
-        // Verify it's an error toast - could be password error or festival selection error
-        await expect(toast).toContainText(/incorrect|error|unable|festival|password/i);
+        // Verify it's an error toast - could be the invite link error or festival selection error
+        await expect(toast).toContainText(/invalid|error|unable|festival/i);
       }
 
       // Should still be on groups page
@@ -212,16 +193,9 @@ test.describe("Groups Flows", () => {
     test("should display group members list in settings", async ({ page }) => {
       const groupsPage = new GroupsPage(page);
 
+      // user2 is a seeded member of Group A
       await groupsPage.goto();
       await groupsPage.expectGroupsPageLoaded();
-
-      // First join a group to ensure we're a member
-      await groupsPage.joinGroup(TEST_GROUPS.groupA.name, TEST_GROUPS.groupA.password);
-
-      await page.waitForTimeout(2000);
-
-      // Navigate back to groups page
-      await page.goto("/groups");
       await page.waitForLoadState("networkidle");
 
       // Try to find the specific group link (not breadcrumb)

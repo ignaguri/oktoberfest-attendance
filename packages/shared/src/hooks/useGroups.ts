@@ -89,7 +89,6 @@ export function useCreateGroup() {
   return useMutation(
     async (formData: {
       groupName: string;
-      password: string;
       festivalId: string;
       winningCriteria?: "days_attended" | "total_beers" | "avg_beers";
     }) => {
@@ -153,7 +152,7 @@ export function useJoinGroup() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async (formData: { groupId: string; inviteToken?: string }) => {
+    async (formData: { groupId: string; inviteToken: string }) => {
       const { groupId, inviteToken } = formData;
       return await apiClient.groups.join(groupId, inviteToken);
     },

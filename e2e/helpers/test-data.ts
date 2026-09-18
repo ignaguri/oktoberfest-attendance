@@ -27,14 +27,13 @@ export const TEST_USERS = {
 export const DEFAULT_TEST_USER = TEST_USERS.user9;
 
 /**
- * Seeded test groups with their passwords
- * Group names are "Group A", "Group B", "Group C"
- * Passwords are "passwordA", "passwordB", "passwordC"
+ * Seeded test groups (supabase/seed.sql)
+ * Group A: users 1 and 2, Group B: users 2 and 3, Group C: users 4, 5 and 6
  */
 export const TEST_GROUPS = {
-  groupA: { name: "Group A", password: "passwordA" },
-  groupB: { name: "Group B", password: "passwordB" },
-  groupC: { name: "Group C", password: "passwordC" },
+  groupA: { name: "Test Group A" },
+  groupB: { name: "Test Group B" },
+  groupC: { name: "Test Group C" },
 } as const;
 
 /**

@@ -660,12 +660,27 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     }
     const groupId = groupRows[0].group_id;
 
+    // The set_group_token BEFORE INSERT trigger (see generate_group_token in
+    // supabase/migrations/20260103025746_cleanup_deprecated_objects.sql)
+    // overwrites invite_token on every insert, so the value
+    // create_group_with_member's RETURN QUERY reports is stale. Read the
+    // token that actually persisted instead of trusting the RPC's return.
+    const { data: persistedGroup, error: persistedGroupError } = await supabaseAdmin
+      .from("groups")
+      .select("invite_token")
+      .eq("id", groupId)
+      .single();
+    if (persistedGroupError || !persistedGroup?.invite_token) {
+      throw new Error(`Failed to read persisted invite token: ${persistedGroupError?.message}`);
+    }
+    const inviteToken = persistedGroup.invite_token;
+
     // groups_joined tier 1 unlocks at 1 group (see SERIES in
     // packages/shared/src/achievements/definitions.ts).
     const response = await app.request(`/groups/${groupId}/join`, {
       method: "POST",
       headers: { Authorization: `Bearer ${joiner.token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ inviteToken }),
     });
     expect(response.status).toBe(200);
     const json = await response.json();

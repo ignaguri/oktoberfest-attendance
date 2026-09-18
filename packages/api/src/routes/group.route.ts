@@ -24,7 +24,11 @@ import {
 
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
-import { SupabaseFestivalRepository, SupabaseGroupRepository } from "../repositories/supabase";
+import {
+  SupabaseFestivalRepository,
+  SupabaseGroupJoinRequestRepository,
+  SupabaseGroupRepository,
+} from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
 import { NotificationService } from "../services/notification.service";
@@ -124,13 +128,33 @@ const searchGroupsRoute = createRoute({
 });
 
 app.openapi(searchGroupsRoute, async (c) => {
+  const user = c.var.user;
   const supabase = c.var.supabase;
   const query = c.req.valid("query");
 
   const groupRepo = new SupabaseGroupRepository(supabase);
   const groups = await groupRepo.search(query);
 
-  return c.json({ data: groups }, 200);
+  // Lets the join sheet show "Requested" instead of the request button.
+  // Search must never fail because of this flag: on error, degrade to false
+  // for every result rather than turning a working search into a 500.
+  let blocking = new Set<string>();
+  try {
+    const joinRequestRepo = new SupabaseGroupJoinRequestRepository(supabase);
+    blocking = new Set(
+      await joinRequestRepo.listBlockingGroupIds(
+        user.id,
+        groups.map((group) => group.id),
+      ),
+    );
+  } catch (err) {
+    logger.error({ err }, "[group.route] failed to load join request state for search results");
+  }
+
+  return c.json(
+    { data: groups.map((group) => ({ ...group, joinRequestPending: blocking.has(group.id) })) },
+    200,
+  );
 });
 
 // GET /groups - List user's groups
@@ -383,7 +407,7 @@ const joinGroupRoute = createRoute({
   path: "/groups/{id}/join",
   tags: ["groups"],
   summary: "Join a group",
-  description: "Join a group using an optional invite token",
+  description: "Join a group using its invite token (or an invite link containing it)",
   request: {
     params: GroupIdParamSchema,
     body: {

@@ -298,8 +298,6 @@
       "title": "Create Group",
       "nameLabel": "Group Name",
       "namePlaceholder": "Enter group name",
-      "passwordLabel": "Group Password (optional)",
-      "passwordPlaceholder": "Enter password",
       "winningCriteria": "Winning Criteria",
       "criteriaLabel": "Competition Type",
       "criteriaPlaceholder": "Select competition type",
@@ -312,34 +310,51 @@
     },
     "join": {
       "title": "Join a Group",
-      "tokenLabel": "Invite Token",
-      "tokenPlaceholder": "Paste invite token",
       "namePlaceholder": "Group Name",
-      "passwordLabel": "Group Password",
-      "passwordPlaceholder": "Group Password",
-      "tokenPasswordPlaceholder": "Enter group password",
+      "inviteLinkLabel": "Invite link",
+      "inviteLinkPlaceholder": "Paste the invite link",
+      "inviteLinkHelp": "Ask a group member to send you the group's invite link",
       "linkTokenPlaceholder": "Paste invite link or token",
-      "clickToJoin": "Click below to join <strong>{{groupName}}</strong>",
       "joining": "Joining...",
       "searching": "Searching groups...",
       "submit": "Join Group",
       "success": "Successfully joined group!",
       "noResults": "No groups found",
       "searchMode": "Search by name",
-      "tokenMode": "Join by token",
+      "tokenMode": "Paste link",
       "emptyDescription": "Search for a group by name to join",
       "membersCount": "{{count}} members",
-      "passwordHint": "Ask a group member for the password",
       "tokenHint": "Paste the invite link shared with you",
-      "passwordHelp": "Ask a group member for the password",
-      "tokenHelp": "Paste the invite link shared with you",
       "searchPlaceholder": "Search by group name",
       "searchPrompt": "Enter a group name to search",
-      "error": "Failed to join group. Please check the password and try again.",
+      "error": "Failed to join group. Please check the invite link and try again.",
       "errors": {
         "failed": "Failed to join group",
         "invalidToken": "Invalid invite token"
       }
+    },
+    "joinRequests": {
+      "sectionTitle": "Join requests",
+      "requestToJoin": "Request to join",
+      "requestToJoinHint": "Sends a request to the group's creator",
+      "requested": "Requested",
+      "requestedHelp": "The group's creator will see your request. You'll get a notification when you're in.",
+      "cancelRequest": "Cancel request",
+      "cancelRequestHint": "Withdraws your request to join",
+      "haveInviteLink": "Have an invite link?",
+      "haveInviteLinkHint": "Switches to entering an invite link instead",
+      "requestFailed": "Couldn't send the request. Please try again.",
+      "requestSent": "Request sent to {{groupName}}",
+      "accept": "Accept",
+      "acceptHint": "Adds {{name}} to the group",
+      "decline": "Decline",
+      "declineHint": "Declines {{name}}'s request",
+      "declineTitle": "Decline request?",
+      "declineMessage": "{{name}} won't be notified. They can ask again in a week.",
+      "acceptFailed": "Couldn't accept the request. Please try again.",
+      "declineFailed": "Couldn't decline the request. Please try again.",
+      "pendingBadge_one": "{{count}} pending join request",
+      "pendingBadge_other": "{{count}} pending join requests"
     },
     "settings": {
       "title": "Group Settings",
@@ -2138,6 +2153,8 @@
     "sharingInactive": "Share your location with group members",
     "noFriendsNearby": "No friends sharing their location nearby",
     "noTentsNearby": "No tents within range",
+    "membersWithinRadius": "Members within {{radius}} will appear here.",
+    "showingMembersWithinRadius": "Showing members within {{radius}}",
     "checkIn": "Check In",
     "checkInAt": "Check in at {{tent}}",
     "benefits": {
@@ -2567,8 +2584,8 @@
       "required": "Group name is required",
       "maxLength": "Group name must be {{max}} characters or less"
     },
-    "groupPassword": {
-      "required": "Password is required"
+    "inviteLink": {
+      "required": "Invite link is required"
     },
     "winningCriteria": {
       "required": "Winning criteria is required"
@@ -2771,6 +2788,8 @@
     "NOT_GROUP_MEMBER": "You are not a member of this group.",
     "NOT_GROUP_CREATOR": "Only the group creator can do this.",
     "ALREADY_GROUP_MEMBER": "You are already a member of this group.",
+    "JOIN_REQUEST_PENDING": "You already asked to join this group.",
+    "JOIN_REQUEST_NOT_FOUND": "This request no longer exists.",
     "INVALID_INVITE_TOKEN": "Invalid invite token.",
     "CANNOT_REMOVE_SELF": "You cannot remove yourself. Use leave group instead.",
     "USER_NOT_GROUP_MEMBER": "User is not a member of this group.",

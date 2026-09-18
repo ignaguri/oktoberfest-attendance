@@ -14,6 +14,17 @@ import { formatDateForDatabase } from "@prostcounter/shared/utils";
 import { ConflictError, ForbiddenError, NotFoundError } from "../middleware/error";
 import type { IGroupRepository } from "../repositories/interfaces";
 
+const INVITE_TOKEN_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+/**
+ * Pull the invite token (a UUID) out of whatever the user supplied: the bare
+ * token, a pasted invite link, or a link a share target mangled (Instagram DMs
+ * delivered "<uuid> https://…?token=<uuid>"). Undefined when there is none.
+ */
+function extractInviteToken(input: string): string | undefined {
+  return input.match(INVITE_TOKEN_PATTERN)?.[0].toLowerCase();
+}
+
 /**
  * Group Service
  * Handles business logic for group management
@@ -58,18 +69,18 @@ export class GroupService {
   }
 
   /**
-   * Join a group
-   * Can join by group ID (if already member) or by invite token
+   * Join a group by ID. The invite token is what authorizes the join: RLS on
+   * group_members only checks the row is the caller's own, so this check is the
+   * only thing keeping people out of groups they found by search.
    */
-  async joinGroup(groupId: string, userId: string, inviteToken?: string): Promise<void> {
+  async joinGroup(groupId: string, userId: string, inviteToken: string): Promise<void> {
     const group = await this.groupRepo.findById(groupId);
 
     if (!group) {
       throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
-    // If invite token provided, verify it matches
-    if (inviteToken && group.inviteToken !== inviteToken) {
+    if (extractInviteToken(inviteToken) !== group.inviteToken.toLowerCase()) {
       throw new ForbiddenError(ErrorCodes.INVALID_INVITE_TOKEN);
     }
 
@@ -214,7 +225,14 @@ export class GroupService {
    * Finds group by token and adds user as member
    */
   async joinByToken(inviteToken: string, userId: string): Promise<Group> {
-    const group = await this.groupRepo.findByInviteToken(inviteToken);
+    // invite_token is a uuid column, so anything else makes Postgres throw and
+    // surfaces as a 500.
+    const token = extractInviteToken(inviteToken);
+    if (!token) {
+      throw new NotFoundError(ErrorCodes.INVALID_INVITE_TOKEN);
+    }
+
+    const group = await this.groupRepo.findByInviteToken(token);
 
     if (!group) {
       throw new NotFoundError(ErrorCodes.INVALID_INVITE_TOKEN);

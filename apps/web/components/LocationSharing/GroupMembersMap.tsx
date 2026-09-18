@@ -133,9 +133,7 @@ export const GroupMembersMap = ({ className, radiusMeters = 500 }: GroupMembersM
                     defaultValue: "Enable location sharing to see nearby group members.",
                   })}
               <br />
-              {t("groups.join.passwordHelp", {
-                defaultValue: "Members within {{radius}} will appear here.",
-              }).replace("{{radius}}", formatDistance(radiusMeters))}
+              {t("location.membersWithinRadius", { radius: formatDistance(radiusMeters) })}
             </p>
           </div>
         </CardContent>
@@ -213,9 +211,7 @@ export const GroupMembersMap = ({ className, radiusMeters = 500 }: GroupMembersM
 
           <div className="pt-2 text-center">
             <p className="text-muted-foreground text-xs">
-              {t("groups.join.passwordHelp", {
-                defaultValue: "Showing members within {{radius}}",
-              }).replace("{{radius}}", formatDistance(radiusMeters))}
+              {t("location.showingMembersWithinRadius", { radius: formatDistance(radiusMeters) })}
             </p>
           </div>
         </div>

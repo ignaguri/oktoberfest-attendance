@@ -37,3 +37,35 @@ describe("getNotificationRoute for friend plan overlaps", () => {
     );
   });
 });
+
+describe("getNotificationRoute for group join requests", () => {
+  it("opens the group's settings for the creator from a push", () => {
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST,
+        groupId: "group-1",
+      }),
+    ).toBe("/group-detail/group-1/settings");
+  });
+
+  it("opens the group's settings from an in-app payload without a type", () => {
+    expect(getNotificationRoute({ requesterName: "ana", groupId: "group-1" })).toBe(
+      "/group-detail/group-1/settings",
+    );
+  });
+
+  it("opens the group for the accepted requester", () => {
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST_ACCEPTED,
+        groupId: "group-1",
+      }),
+    ).toBe("/group-detail/group-1");
+  });
+
+  it("falls back to the groups list without a group id", () => {
+    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST })).toBe(
+      "/groups",
+    );
+  });
+});

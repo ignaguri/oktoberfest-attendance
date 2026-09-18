@@ -3,7 +3,7 @@ import { useRenewInviteToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Check, Copy, Link, RefreshCw, Share2 } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { Platform, Share } from "react-native";
+import { Share } from "react-native";
 
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -39,10 +39,9 @@ export function InviteLinkSection({
 
     try {
       // Use Share API which allows copying on iOS
-      await Share.share({
-        message: inviteUrl,
-        url: Platform.OS === "ios" ? inviteUrl : undefined,
-      });
+      // URL goes in `message` only: passing it as `url` too hands iOS share
+      // targets two copies, and some (Instagram DMs) merge them into one link.
+      await Share.share({ message: inviteUrl });
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
@@ -59,10 +58,7 @@ export function InviteLinkSection({
     });
 
     try {
-      await Share.share({
-        message: `${message}\n\n${inviteUrl}`,
-        url: inviteUrl,
-      });
+      await Share.share({ message: `${message}\n\n${inviteUrl}` });
     } catch (error) {
       logger.error("Failed to share:", error);
     }

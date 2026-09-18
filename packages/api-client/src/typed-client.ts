@@ -46,6 +46,7 @@ import type {
   ListFriendRequestsResponse,
   ListFriendsResponse,
   ListFriendSuggestionsResponse,
+  ListGroupJoinRequestsResponse,
   ListGroupsResponse,
   LogConsumptionInput,
   LogConsumptionResponse,
@@ -487,6 +488,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           name: string;
           festivalId: string;
           memberCount: number;
+          joinRequestPending?: boolean;
         }>;
       }> {
         const headers = await getAuthHeaders();
@@ -531,7 +533,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return { data: group };
       },
 
-      async join(groupId: string, inviteToken?: string): Promise<GroupActionResponse> {
+      async join(groupId: string, inviteToken: string): Promise<GroupActionResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/groups/${groupId}/join`, {
           method: "POST",
@@ -540,6 +542,71 @@ export function createTypedApiClient(config: ApiClientConfig) {
         });
         if (!response.ok) {
           await extractApiError(response, "Failed to join group");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async requestToJoin(groupId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/${groupId}/join-requests`,
+          { method: "POST", headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to request to join group");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async cancelJoinRequest(groupId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/groups/${groupId}/join-requests/mine`,
+          { method: "DELETE", headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to cancel join request");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async getIncomingJoinRequests(): Promise<ListGroupJoinRequestsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/groups/join-requests/incoming`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch join requests");
+        }
+        return parseJsonResponse<ListGroupJoinRequestsResponse>(response);
+      },
+
+      async acceptJoinRequest(requestId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/join-requests/${requestId}/accept`,
+          { method: "POST", headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to accept join request");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async declineJoinRequest(requestId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/join-requests/${requestId}/decline`,
+          { method: "POST", headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to decline join request");
         }
         return parseJsonResponse<GroupActionResponse>(response);
       },

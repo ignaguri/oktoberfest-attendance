@@ -32,6 +32,8 @@ import { useWinningCriterias } from "@/hooks/useLeaderboard";
 import { useCurrentUser } from "@/lib/data";
 import { useTranslation } from "@/lib/i18n/client";
 
+import { JoinRequests } from "./JoinRequests";
+
 // Winning criteria as string literals (matching API response)
 type WinningCriteriaString = "days_attended" | "total_beers" | "avg_beers";
 
@@ -246,6 +248,9 @@ export default function GroupSettingsClient({ group, members }: Props) {
           </form>
         </div>
       </div>
+
+      {/* Join requests (creator only; renders nothing when there are none) */}
+      {isCreator && <JoinRequests groupId={group.id} />}
 
       {/* Invite Token Section */}
       {isCreator && (

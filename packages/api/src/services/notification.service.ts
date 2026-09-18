@@ -798,6 +798,88 @@ export class NotificationService {
   }
 
   /**
+   * Tell a group's creator that someone asked to join
+   * (respects group_join_enabled; a missing preference row counts as opted in)
+   */
+  async notifyJoinRequest(input: { requesterId: string; groupId: string }): Promise<void> {
+    try {
+      // The caller is not a member yet, so read the group with the admin client
+      const adminClient = createAdminClient();
+      const { data: group, error: groupError } = await adminClient
+        .from("groups")
+        .select("name, created_by")
+        .eq("id", input.groupId)
+        .single();
+
+      if (groupError || !group?.created_by) {
+        logger.error({ error: groupError }, "Error fetching group for join request notification");
+        return;
+      }
+
+      const recipients = await this.filterByPreference([group.created_by], "group_join_enabled");
+      if (!recipients || recipients.length === 0) {
+        return;
+      }
+
+      const { data: requester } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.requesterId)
+        .single();
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.GROUP_JOIN_REQUEST,
+        to: group.created_by,
+        payload: {
+          type: NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST,
+          requesterName: requester?.username || requester?.full_name || "Someone",
+          requesterAvatar: resolveAvatarUrl(requester?.avatar_url),
+          groupId: input.groupId,
+          groupName: group.name,
+        },
+      });
+    } catch (error) {
+      logger.error({ error }, "Error sending group join request notification");
+    }
+  }
+
+  /**
+   * Tell a requester that the creator let them into the group
+   * (respects group_join_enabled; a missing preference row counts as opted in)
+   */
+  async notifyJoinRequestAccepted(input: { requesterId: string; groupId: string }): Promise<void> {
+    try {
+      const recipients = await this.filterByPreference([input.requesterId], "group_join_enabled");
+      if (!recipients || recipients.length === 0) {
+        return;
+      }
+
+      const { data: group, error: groupError } = await this.supabase
+        .from("groups")
+        .select("name")
+        .eq("id", input.groupId)
+        .single();
+
+      if (groupError || !group) {
+        logger.error({ error: groupError }, "Error fetching group for join accepted notification");
+        return;
+      }
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.GROUP_JOIN_REQUEST_ACCEPTED,
+        to: input.requesterId,
+        payload: {
+          type: NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST_ACCEPTED,
+          groupId: input.groupId,
+          groupName: group.name,
+        },
+      });
+    } catch (error) {
+      logger.error({ error }, "Error sending group join accepted notification");
+    }
+  }
+
+  /**
    * Tell friends and group-mates who marked the same day that the actor is
    * going too.
    *

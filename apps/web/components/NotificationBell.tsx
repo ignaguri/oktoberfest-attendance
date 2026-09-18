@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
 import { useNotifications } from "@/contexts/NotificationContext";
+import { toWebRoute } from "@/lib/notification-route";
 
 const INBOX_APPEARANCE = {
   elements: {
@@ -29,7 +30,7 @@ export function NotificationBell() {
       if (!notification.data) return;
       const route = getNotificationRoute(notification.data);
       if (route) {
-        router.push(route);
+        router.push(toWebRoute(route));
       }
     },
     [router],

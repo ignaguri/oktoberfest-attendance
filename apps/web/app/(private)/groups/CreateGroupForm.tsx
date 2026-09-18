@@ -7,9 +7,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFestival } from "@prostcounter/shared/contexts";
 import type { CreateGroupForm as CreateGroupFormData } from "@prostcounter/shared/schemas";
 import { CreateGroupFormSchema } from "@prostcounter/shared/schemas";
-import { Eye, EyeOff } from "lucide-react";
 import { useTransitionRouter } from "next-view-transitions";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -22,7 +20,6 @@ export const CreateGroupForm = () => {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const router = useTransitionRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const { mutate: createGroupMutation, loading: isCreating } = useCreateGroup();
 
   const {
@@ -64,24 +61,6 @@ export const CreateGroupForm = () => {
         errorMsg={errors.groupName?.message}
         autoComplete="new-password"
         {...register("groupName")}
-      />
-
-      <Input
-        type={showPassword ? "text" : "password"}
-        placeholder={t("groups.create.passwordPlaceholder")}
-        errorMsg={errors.password?.message}
-        autoComplete="new-password"
-        rightElement={
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setShowPassword(!showPassword)}
-            className="h-auto cursor-pointer p-0 text-gray-400 hover:bg-transparent"
-          >
-            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </Button>
-        }
-        {...register("password")}
       />
 
       <Button type="submit" variant="yellow" className="w-fit self-center" disabled={isCreating}>
