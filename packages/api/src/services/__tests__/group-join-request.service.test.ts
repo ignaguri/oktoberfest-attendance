@@ -31,9 +31,18 @@ describe("GroupJoinRequestService", () => {
     service = new GroupJoinRequestService(repo);
   });
 
-  it("sends a request", async () => {
-    await expect(service.request(GROUP_ID)).resolves.toBeUndefined();
+  it("sends a request and notifies the creator by default", async () => {
+    await expect(service.request(GROUP_ID)).resolves.toEqual({ notifyCreator: true });
     expect(repo.request).toHaveBeenCalledWith(GROUP_ID);
+  });
+
+  it("skips the creator notification when the request function says so", async () => {
+    vi.mocked(repo.request).mockResolvedValue({
+      success: true,
+      requestId: REQUEST_ID,
+      notifyCreator: false,
+    });
+    await expect(service.request(GROUP_ID)).resolves.toEqual({ notifyCreator: false });
   });
 
   it.each([

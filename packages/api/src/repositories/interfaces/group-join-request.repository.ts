@@ -8,6 +8,8 @@ export interface JoinRequestRpcResult {
   groupId?: string;
   requesterId?: string;
   festivalId?: string | null;
+  /** From request_to_join_group: false when the requester recently withdrew a request to this group */
+  notifyCreator?: boolean;
 }
 
 export interface IGroupJoinRequestRepository {

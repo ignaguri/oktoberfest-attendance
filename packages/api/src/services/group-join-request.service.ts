@@ -35,11 +35,13 @@ function throwForFailure(result: JoinRequestRpcResult): never {
 export class GroupJoinRequestService {
   constructor(private repo: IGroupJoinRequestRepository) {}
 
-  async request(groupId: string): Promise<void> {
+  /** `notifyCreator` is false when the requester recently withdrew a request to this group */
+  async request(groupId: string): Promise<{ notifyCreator: boolean }> {
     const result = await this.repo.request(groupId);
     if (!result.success) {
       throwForFailure(result);
     }
+    return { notifyCreator: result.notifyCreator !== false };
   }
 
   async accept(

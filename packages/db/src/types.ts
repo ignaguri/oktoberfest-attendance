@@ -2492,7 +2492,11 @@ export type Database = {
         | "fruehlingsfest"
         | "other"
       friendship_status: "pending" | "accepted" | "declined"
-      group_join_request_status: "pending" | "accepted" | "declined"
+      group_join_request_status:
+        | "pending"
+        | "accepted"
+        | "declined"
+        | "cancelled"
       group_message_type: "message" | "alert"
       location_sharing_status_enum: "active" | "paused" | "expired"
       message_visibility: "groups" | "public"
@@ -2662,7 +2666,12 @@ export const Constants = {
         "other",
       ],
       friendship_status: ["pending", "accepted", "declined"],
-      group_join_request_status: ["pending", "accepted", "declined"],
+      group_join_request_status: [
+        "pending",
+        "accepted",
+        "declined",
+        "cancelled",
+      ],
       group_message_type: ["message", "alert"],
       location_sharing_status_enum: ["active", "paused", "expired"],
       message_visibility: ["groups", "public"],

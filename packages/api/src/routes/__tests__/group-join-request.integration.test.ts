@@ -118,6 +118,9 @@ describe("group join requests (integration)", () => {
   });
 
   afterAll(async () => {
+    if (createdUserIds.length > 0) {
+      await admin.from("group_join_requests").delete().in("requester_id", createdUserIds);
+    }
     for (const festivalId of createdFestivalIds) {
       await admin.from("groups").delete().eq("festival_id", festivalId);
       await admin.from("festivals").delete().eq("id", festivalId);
@@ -273,5 +276,40 @@ describe("group join requests (integration)", () => {
     const after = await call(app, requester, "GET", searchPath);
     const afterBody = (await after.json()) as { data: Array<{ id: string; joinRequestPending?: boolean }> };
     expect(afterBody.data.find((g) => g.id === groupId)?.joinRequestPending).toBe(false);
+  });
+
+  it("keeps a cancelled request and lets the requester ask again", async () => {
+    const { app, requester, groupId } = await setup();
+    await call(app, requester, "POST", `/groups/${groupId}/join-requests`);
+
+    const cancel = await call(app, requester, "DELETE", `/groups/${groupId}/join-requests/mine`);
+    expect(cancel.status).toBe(200);
+
+    const again = await call(app, requester, "POST", `/groups/${groupId}/join-requests`);
+    expect(again.status).toBe(200);
+
+    const { data: rows } = await admin
+      .from("group_join_requests")
+      .select("status, responded_at")
+      .eq("group_id", groupId)
+      .eq("requester_id", requester.id)
+      .order("created_at", { ascending: true });
+    expect(rows?.map((row) => row.status)).toEqual(["cancelled", "pending"]);
+    expect(rows?.[0]?.responded_at).not.toBeNull();
+  });
+
+  it("only asks to notify the creator when there is no recent cancelled request", async () => {
+    const { app, requester, groupId } = await setup();
+    const requesterClient = createTestSupabaseWithAuth(requester.token);
+
+    const first = await requesterClient.rpc("request_to_join_group", { p_group_id: groupId });
+    expect(first.error).toBeNull();
+    expect(first.data).toMatchObject({ success: true, notify_creator: true });
+
+    await call(app, requester, "DELETE", `/groups/${groupId}/join-requests/mine`);
+
+    const second = await requesterClient.rpc("request_to_join_group", { p_group_id: groupId });
+    expect(second.error).toBeNull();
+    expect(second.data).toMatchObject({ success: true, notify_creator: false });
   });
 });

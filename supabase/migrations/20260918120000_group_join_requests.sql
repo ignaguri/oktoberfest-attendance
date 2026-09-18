@@ -3,12 +3,14 @@
 -- People who find a group by name can ask to join; the group's creator accepts
 -- (the requester becomes a member) or declines (silently; the requester can ask
 -- again after 7 days). Invite links keep joining instantly and do not use this.
+-- A withdrawn request is kept as 'cancelled' so asking again within a day does
+-- not notify the creator a second time.
 --
 -- The table is read through RLS and written only through the SECURITY DEFINER
 -- functions below, which return jsonb {success, error_code} like the friendship
 -- functions do.
 
-CREATE TYPE public.group_join_request_status AS ENUM ('pending', 'accepted', 'declined');
+CREATE TYPE public.group_join_request_status AS ENUM ('pending', 'accepted', 'declined', 'cancelled');
 
 CREATE TABLE public.group_join_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -19,7 +21,7 @@ CREATE TABLE public.group_join_requests (
   responded_at timestamptz
 );
 
--- One live request per person per group; accepted/declined rows are kept
+-- One live request per person per group; answered and cancelled rows are kept
 CREATE UNIQUE INDEX group_join_requests_one_pending
   ON public.group_join_requests (group_id, requester_id)
   WHERE status = 'pending';
@@ -109,7 +111,19 @@ BEGIN
   VALUES (p_group_id, v_user_id)
   RETURNING id INTO v_request_id;
 
-  RETURN jsonb_build_object('success', true, 'request_id', v_request_id);
+  -- Asking again soon after withdrawing does not notify the creator again
+  RETURN jsonb_build_object(
+    'success', true,
+    'request_id', v_request_id,
+    'notify_creator', NOT EXISTS (
+      SELECT 1
+      FROM public.group_join_requests
+      WHERE group_id = p_group_id
+        AND requester_id = v_user_id
+        AND status = 'cancelled'
+        AND responded_at > now() - interval '24 hours'
+    )
+  );
 EXCEPTION
   WHEN unique_violation THEN
     -- Two concurrent requests: the partial unique index let only one through
@@ -224,7 +238,8 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error_code', 'UNAUTHORIZED');
   END IF;
 
-  DELETE FROM public.group_join_requests
+  UPDATE public.group_join_requests
+  SET status = 'cancelled', responded_at = now()
   WHERE group_id = p_group_id
     AND requester_id = v_user_id
     AND status = 'pending';

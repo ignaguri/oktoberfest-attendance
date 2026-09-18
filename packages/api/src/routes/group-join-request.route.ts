@@ -71,13 +71,15 @@ app.openapi(requestRoute, async (c) => {
   const { id } = c.req.valid("param");
 
   const service = new GroupJoinRequestService(new SupabaseGroupJoinRequestRepository(supabase));
-  await service.request(id);
+  const result = await service.request(id);
 
-  notificationService(supabase)
-    ?.notifyJoinRequest({ requesterId: user.id, groupId: id })
-    .catch((err) => {
-      logger.error({ err }, "[group-join-request] notification failed");
-    });
+  if (result.notifyCreator) {
+    notificationService(supabase)
+      ?.notifyJoinRequest({ requesterId: user.id, groupId: id })
+      .catch((err) => {
+        logger.error({ err }, "[group-join-request] notification failed");
+      });
+  }
 
   return c.json({ success: true, message: "Join request sent" }, 200);
 });

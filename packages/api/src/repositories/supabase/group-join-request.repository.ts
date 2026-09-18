@@ -15,6 +15,7 @@ type RpcPayload = {
   group_id?: string;
   requester_id?: string;
   festival_id?: string | null;
+  notify_creator?: boolean;
 };
 
 type IncomingRow = {
@@ -40,6 +41,7 @@ function toResult(data: unknown): JoinRequestRpcResult {
     groupId: payload.group_id,
     requesterId: payload.requester_id,
     festivalId: payload.festival_id,
+    notifyCreator: payload.notify_creator,
   };
 }
 
