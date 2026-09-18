@@ -298,8 +298,6 @@
       "title": "Create Group",
       "nameLabel": "Group Name",
       "namePlaceholder": "Enter group name",
-      "passwordLabel": "Group Password (optional)",
-      "passwordPlaceholder": "Enter password",
       "winningCriteria": "Winning Criteria",
       "criteriaLabel": "Competition Type",
       "criteriaPlaceholder": "Select competition type",
@@ -312,30 +310,24 @@
     },
     "join": {
       "title": "Join a Group",
-      "tokenLabel": "Invite Token",
-      "tokenPlaceholder": "Paste invite token",
       "namePlaceholder": "Group Name",
-      "passwordLabel": "Group Password",
-      "passwordPlaceholder": "Group Password",
-      "tokenPasswordPlaceholder": "Enter group password",
+      "inviteLinkLabel": "Invite link",
+      "inviteLinkPlaceholder": "Paste the invite link",
+      "inviteLinkHelp": "Ask a group member to send you the group's invite link",
       "linkTokenPlaceholder": "Paste invite link or token",
-      "clickToJoin": "Click below to join <strong>{{groupName}}</strong>",
       "joining": "Joining...",
       "searching": "Searching groups...",
       "submit": "Join Group",
       "success": "Successfully joined group!",
       "noResults": "No groups found",
       "searchMode": "Search by name",
-      "tokenMode": "Join by token",
+      "tokenMode": "Paste link",
       "emptyDescription": "Search for a group by name to join",
       "membersCount": "{{count}} members",
-      "passwordHint": "Ask a group member for the password",
       "tokenHint": "Paste the invite link shared with you",
-      "passwordHelp": "Ask a group member for the password",
-      "tokenHelp": "Paste the invite link shared with you",
       "searchPlaceholder": "Search by group name",
       "searchPrompt": "Enter a group name to search",
-      "error": "Failed to join group. Please check the password and try again.",
+      "error": "Failed to join group. Please check the invite link and try again.",
       "errors": {
         "failed": "Failed to join group",
         "invalidToken": "Invalid invite token"
@@ -2138,6 +2130,8 @@
     "sharingInactive": "Share your location with group members",
     "noFriendsNearby": "No friends sharing their location nearby",
     "noTentsNearby": "No tents within range",
+    "membersWithinRadius": "Members within {{radius}} will appear here.",
+    "showingMembersWithinRadius": "Showing members within {{radius}}",
     "checkIn": "Check In",
     "checkInAt": "Check in at {{tent}}",
     "benefits": {
@@ -2567,8 +2561,8 @@
       "required": "Group name is required",
       "maxLength": "Group name must be {{max}} characters or less"
     },
-    "groupPassword": {
-      "required": "Password is required"
+    "inviteLink": {
+      "required": "Invite link is required"
     },
     "winningCriteria": {
       "required": "Winning criteria is required"

@@ -531,7 +531,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return { data: group };
       },
 
-      async join(groupId: string, inviteToken?: string): Promise<GroupActionResponse> {
+      async join(groupId: string, inviteToken: string): Promise<GroupActionResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/groups/${groupId}/join`, {
           method: "POST",

@@ -298,8 +298,6 @@
       "title": "Crear grupo",
       "nameLabel": "Nombre del grupo",
       "namePlaceholder": "Ingresá el nombre del grupo",
-      "passwordLabel": "Contraseña del grupo (opcional)",
-      "passwordPlaceholder": "Ingresá una contraseña",
       "winningCriteria": "Criterio de victoria",
       "criteriaLabel": "Tipo de competencia",
       "criteriaPlaceholder": "Seleccioná el tipo de competencia",
@@ -312,30 +310,24 @@
     },
     "join": {
       "title": "Unirse a un grupo",
-      "tokenLabel": "Token de invitación",
-      "tokenPlaceholder": "Pegá el token de invitación",
       "namePlaceholder": "Nombre del grupo",
-      "passwordLabel": "Contraseña del grupo",
-      "passwordPlaceholder": "Contraseña del grupo",
-      "tokenPasswordPlaceholder": "Ingresá la contraseña del grupo",
+      "inviteLinkLabel": "Enlace de invitación",
+      "inviteLinkPlaceholder": "Pegá el enlace de invitación",
+      "inviteLinkHelp": "Pedile a un miembro del grupo que te mande el enlace de invitación",
       "linkTokenPlaceholder": "Pegá el enlace o token de invitación",
-      "clickToJoin": "Hacé click abajo para unirte a <strong>{{groupName}}</strong>",
       "joining": "Uniéndose...",
       "searching": "Buscando grupos...",
       "submit": "Unirse al grupo",
       "success": "¡Te uniste al grupo exitosamente!",
       "noResults": "No se encontraron grupos",
       "searchMode": "Buscar por nombre",
-      "tokenMode": "Unirse por token",
+      "tokenMode": "Pegar enlace",
       "emptyDescription": "Buscá un grupo por nombre para unirte",
       "membersCount": "{{count}} miembros",
-      "passwordHint": "Pedile la contraseña a un miembro del grupo",
       "tokenHint": "Pegá el enlace de invitación que te compartieron",
-      "passwordHelp": "Pedile la contraseña a un miembro del grupo",
-      "tokenHelp": "Pegá el enlace de invitación que te compartieron",
       "searchPlaceholder": "Buscar por nombre de grupo",
       "searchPrompt": "Ingresá un nombre de grupo para buscar",
-      "error": "Error al unirse al grupo. Por favor, verificá la contraseña e intentá de nuevo.",
+      "error": "Error al unirse al grupo. Por favor, verificá el enlace de invitación e intentá de nuevo.",
       "errors": {
         "failed": "Error al unirse al grupo",
         "invalidToken": "Token de invitación inválido"
@@ -2198,6 +2190,8 @@
     "sharingInactive": "Compartí tu ubicación con los miembros del grupo",
     "noFriendsNearby": "No hay amigos compartiendo su ubicación cerca",
     "noTentsNearby": "No hay carpas dentro del rango",
+    "membersWithinRadius": "Los miembros a menos de {{radius}} van a aparecer acá.",
+    "showingMembersWithinRadius": "Mostrando miembros a menos de {{radius}}",
     "checkIn": "Hacer check-in",
     "checkInAt": "Hacer check-in en {{tent}}",
     "callout": {
@@ -2627,8 +2621,8 @@
       "required": "El nombre del grupo es requerido",
       "maxLength": "El nombre del grupo debe tener {{max}} caracteres o menos"
     },
-    "groupPassword": {
-      "required": "La contraseña es requerida"
+    "inviteLink": {
+      "required": "El enlace de invitación es requerido"
     },
     "winningCriteria": {
       "required": "El criterio de victoria es requerido"

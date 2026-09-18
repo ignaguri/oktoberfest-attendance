@@ -51,3 +51,34 @@ describe("GroupService.joinByToken", () => {
     expect(repo.findByInviteToken).not.toHaveBeenCalled();
   });
 });
+
+describe("GroupService.joinGroup", () => {
+  let repo: IGroupRepository;
+  let service: GroupService;
+
+  beforeEach(() => {
+    repo = {
+      findById: vi.fn().mockResolvedValue(group),
+      addMember: vi.fn().mockResolvedValue(undefined),
+    } as unknown as IGroupRepository;
+    service = new GroupService(repo);
+  });
+
+  it("joins with the group's token or a pasted invite link", async () => {
+    await service.joinGroup(group.id, USER_ID, TOKEN);
+    await service.joinGroup(group.id, USER_ID, `https://prostcounter.fun/join-group?token=${TOKEN}`);
+
+    expect(repo.addMember).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    ["an empty token", ""],
+    ["another group's token", "22222222-2222-4222-8222-222222222222"],
+    ["something that is not a token", "hunter2"],
+  ])("rejects %s", async (_label, inviteToken) => {
+    await expect(service.joinGroup(group.id, USER_ID, inviteToken)).rejects.toMatchObject({
+      code: ErrorCodes.INVALID_INVITE_TOKEN,
+    });
+    expect(repo.addMember).not.toHaveBeenCalled();
+  });
+});

@@ -293,8 +293,6 @@
       "title": "Gruppe erstellen",
       "nameLabel": "Gruppenname",
       "namePlaceholder": "Gruppennamen eingeben",
-      "passwordLabel": "Gruppenpasswort (optional)",
-      "passwordPlaceholder": "Passwort eingeben",
       "winningCriteria": "Gewinnkriterium",
       "criteriaLabel": "Wettbewerbstyp",
       "criteriaPlaceholder": "Wettbewerbstyp auswählen",
@@ -307,30 +305,24 @@
     },
     "join": {
       "title": "Gruppe beitreten",
-      "tokenLabel": "Einladungs-Token",
-      "tokenPlaceholder": "Einladungs-Token einfügen",
       "namePlaceholder": "Gruppenname",
-      "passwordLabel": "Gruppenpasswort",
-      "passwordPlaceholder": "Gruppenpasswort",
-      "tokenPasswordPlaceholder": "Gruppenpasswort eingeben",
+      "inviteLinkLabel": "Einladungslink",
+      "inviteLinkPlaceholder": "Einladungslink einfügen",
+      "inviteLinkHelp": "Bitte ein Gruppenmitglied, dir den Einladungslink der Gruppe zu schicken",
       "linkTokenPlaceholder": "Einladungslink oder Token einfügen",
-      "clickToJoin": "Klicke unten, um <strong>{{groupName}}</strong> beizutreten",
       "joining": "Trete bei...",
       "searching": "Suche Gruppen...",
       "submit": "Gruppe beitreten",
       "success": "Gruppe erfolgreich beigetreten!",
       "noResults": "Keine Gruppen gefunden",
       "searchMode": "Nach Name suchen",
-      "tokenMode": "Mit Token beitreten",
+      "tokenMode": "Link einfügen",
       "emptyDescription": "Suche eine Gruppe nach Namen",
       "membersCount": "{{count}} Mitglieder",
-      "passwordHint": "Frage ein Gruppenmitglied nach dem Passwort",
       "tokenHint": "Füge den mit dir geteilten Einladungslink ein",
-      "passwordHelp": "Frage ein Gruppenmitglied nach dem Passwort",
-      "tokenHelp": "Füge den mit dir geteilten Einladungslink ein",
       "searchPlaceholder": "Nach Gruppenname suchen",
       "searchPrompt": "Gib einen Gruppennamen ein",
-      "error": "Beitritt zur Gruppe fehlgeschlagen. Bitte überprüfe das Passwort und versuche es erneut.",
+      "error": "Beitritt zur Gruppe fehlgeschlagen. Bitte überprüfe den Einladungslink und versuche es erneut.",
       "errors": {
         "failed": "Beitritt zur Gruppe fehlgeschlagen",
         "invalidToken": "Ungültiges Einladungs-Token"
@@ -2165,6 +2157,8 @@
     "sharingInactive": "Standort mit Gruppenmitgliedern teilen",
     "noFriendsNearby": "Keine Freunde in der Nähe teilen ihren Standort",
     "noTentsNearby": "Keine Zelte in Reichweite",
+    "membersWithinRadius": "Mitglieder im Umkreis von {{radius}} erscheinen hier.",
+    "showingMembersWithinRadius": "Mitglieder im Umkreis von {{radius}}",
     "checkIn": "Einchecken",
     "checkInAt": "Einchecken im {{tent}}",
     "callout": {
@@ -2594,8 +2588,8 @@
       "required": "Gruppenname ist erforderlich",
       "maxLength": "Gruppenname darf maximal {{max}} Zeichen haben"
     },
-    "groupPassword": {
-      "required": "Passwort ist erforderlich"
+    "inviteLink": {
+      "required": "Einladungslink ist erforderlich"
     },
     "winningCriteria": {
       "required": "Gewinnkriterium ist erforderlich"

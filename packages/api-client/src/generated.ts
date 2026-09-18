@@ -2509,7 +2509,7 @@ export interface paths {
         put?: never;
         /**
          * Join a group
-         * @description Join a group using an optional invite token
+         * @description Join a group using its invite token (or an invite link containing it)
          */
         post: {
             parameters: {
@@ -2523,7 +2523,7 @@ export interface paths {
             requestBody?: {
                 content: {
                     "application/json": {
-                        inviteToken?: string;
+                        inviteToken: string;
                     };
                 };
             };

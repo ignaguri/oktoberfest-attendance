@@ -383,7 +383,7 @@ const joinGroupRoute = createRoute({
   path: "/groups/{id}/join",
   tags: ["groups"],
   summary: "Join a group",
-  description: "Join a group using an optional invite token",
+  description: "Join a group using its invite token (or an invite link containing it)",
   request: {
     params: GroupIdParamSchema,
     body: {

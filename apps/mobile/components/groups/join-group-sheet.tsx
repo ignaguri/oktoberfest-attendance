@@ -1,7 +1,7 @@
 import { useGroupSearch, useJoinGroup, useJoinGroupByToken } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SearchGroupResult } from "@prostcounter/shared/schemas";
-import { ChevronRight, Key, Link, Search, Users, X } from "lucide-react-native";
+import { ChevronRight, Link, Search, Users, X } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 
@@ -84,8 +84,11 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
       onSuccess();
     } catch (err: any) {
       logger.error("Failed to join group:", err);
-      // Extract error message from API response
-      const message = err?.response?.data?.message || err?.message || t("groups.join.error");
+      // A wrong link is the common failure; its message is the raw error code
+      const message =
+        err?.code === "INVALID_INVITE_TOKEN"
+          ? t("apiErrors.INVALID_INVITE_TOKEN")
+          : err?.response?.data?.message || err?.message || t("groups.join.error");
       setError(message);
     }
   }, [mode, selectedGroup, inviteToken, joinGroup, joinGroupByToken, onSuccess, t]);
@@ -167,12 +170,9 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
     );
   };
 
-  // Token Input View (for selected group or token-only mode)
-  // In search mode: show "Group Password" (what members share verbally)
-  // In token mode: show "Invite Link" (for pasting shared links)
+  // Invite link input (for selected group or link-only mode). Both modes need
+  // the link: it is what authorizes the join, and the API accepts a full link.
   const renderTokenInput = () => {
-    const isPasswordMode = mode === "search" && selectedGroup;
-
     return (
       <VStack space="lg">
         {selectedGroup && (
@@ -193,18 +193,14 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
 
         <VStack space="sm">
           <Text className="text-sm font-medium text-typography-700">
-            {isPasswordMode ? t("groups.join.passwordLabel") : t("groups.join.tokenLabel")}
+            {t("groups.join.inviteLinkLabel")}
           </Text>
           <Input size="md">
             <InputSlot className="pl-3">
-              <InputIcon as={isPasswordMode ? Key : Link} color={IconColors.muted} />
+              <InputIcon as={Link} color={IconColors.muted} />
             </InputSlot>
             <InputField
-              placeholder={
-                isPasswordMode
-                  ? t("groups.join.passwordPlaceholder")
-                  : t("groups.join.tokenPlaceholder")
-              }
+              placeholder={t("groups.join.inviteLinkPlaceholder")}
               value={inviteToken}
               onChangeText={setInviteToken}
               autoCapitalize="none"
@@ -212,7 +208,7 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
             />
           </Input>
           <Text className="text-xs text-typography-400">
-            {isPasswordMode ? t("groups.join.passwordHelp") : t("groups.join.tokenHelp")}
+            {t("groups.join.inviteLinkHelp")}
           </Text>
           {error && <Text className="text-sm text-error-600">{error}</Text>}
         </VStack>

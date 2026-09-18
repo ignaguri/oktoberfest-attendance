@@ -267,7 +267,7 @@ describe("Group Routes", () => {
         name: "Test Group",
         festival_id: "223e4567-e89b-12d3-a456-426614174000",
         winning_criteria_id: 2,
-        invite_token: "valid-token",
+        invite_token: "b0d2a1b9-7b1e-41cd-be6e-48418d0c6f11",
         created_by: "023e4567-e89b-12d3-a456-426614174001",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -290,7 +290,7 @@ describe("Group Routes", () => {
 
       const req = createAuthRequest("/groups/923e4567-e89b-12d3-a456-426614174000/join", {
         method: "POST",
-        body: JSON.stringify({ inviteToken: "valid-token" }),
+        body: JSON.stringify({ inviteToken: "b0d2a1b9-7b1e-41cd-be6e-48418d0c6f11" }),
       });
 
       const res = await app.request(req as Request);

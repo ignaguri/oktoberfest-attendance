@@ -38,13 +38,12 @@ export const ProfileFormSchema = z.object({
 export type CreateGroupForm = z.infer<typeof CreateGroupFormSchema>;
 export const CreateGroupFormSchema = z.object({
   groupName: z.string().min(1, { error: "validation.groupName.required" }).trim(),
-  password: z.string().min(1, { error: "validation.groupPassword.required" }).trim(),
 });
 
 export type JoinGroupForm = z.infer<typeof JoinGroupFormSchema>;
 export const JoinGroupFormSchema = z.object({
   groupName: z.string().min(1, { error: "validation.groupName.required" }).trim(),
-  password: z.string().min(1, { error: "validation.groupPassword.required" }).trim(),
+  inviteLink: z.string().min(1, { error: "validation.inviteLink.required" }).trim(),
 });
 
 export type GroupSettingsForm = z.infer<typeof GroupSettingsFormSchema>;

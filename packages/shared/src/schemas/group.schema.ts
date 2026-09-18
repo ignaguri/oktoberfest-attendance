@@ -113,7 +113,7 @@ export type ListGroupsResponse = z.infer<typeof ListGroupsResponseSchema>;
  * POST /api/v1/groups/:id/join
  */
 export const JoinGroupSchema = z.object({
-  inviteToken: z.string().optional(),
+  inviteToken: z.string().min(1, "Invite token is required"),
 });
 
 export type JoinGroupInput = z.infer<typeof JoinGroupSchema>;
