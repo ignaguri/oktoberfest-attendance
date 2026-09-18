@@ -24,7 +24,11 @@ import {
 
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
-import { SupabaseFestivalRepository, SupabaseGroupRepository } from "../repositories/supabase";
+import {
+  SupabaseFestivalRepository,
+  SupabaseGroupJoinRequestRepository,
+  SupabaseGroupRepository,
+} from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
 import { NotificationService } from "../services/notification.service";
@@ -124,13 +128,26 @@ const searchGroupsRoute = createRoute({
 });
 
 app.openapi(searchGroupsRoute, async (c) => {
+  const user = c.var.user;
   const supabase = c.var.supabase;
   const query = c.req.valid("query");
 
   const groupRepo = new SupabaseGroupRepository(supabase);
   const groups = await groupRepo.search(query);
 
-  return c.json({ data: groups }, 200);
+  // Lets the join sheet show "Requested" instead of the request button
+  const joinRequestRepo = new SupabaseGroupJoinRequestRepository(supabase);
+  const blocking = new Set(
+    await joinRequestRepo.listBlockingGroupIds(
+      user.id,
+      groups.map((group) => group.id),
+    ),
+  );
+
+  return c.json(
+    { data: groups.map((group) => ({ ...group, joinRequestPending: blocking.has(group.id) })) },
+    200,
+  );
 });
 
 // GET /groups - List user's groups
