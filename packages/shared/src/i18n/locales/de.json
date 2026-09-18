@@ -348,7 +348,8 @@
       "declineMessage": "{{name}} wird nicht benachrichtigt und kann in einer Woche erneut anfragen.",
       "acceptFailed": "Die Anfrage konnte nicht angenommen werden. Bitte versuche es erneut.",
       "declineFailed": "Die Anfrage konnte nicht abgelehnt werden. Bitte versuche es erneut.",
-      "pendingBadge": "{{count}} offene Beitrittsanfragen"
+      "pendingBadge_one": "{{count}} offene Beitrittsanfrage",
+      "pendingBadge_other": "{{count}} offene Beitrittsanfragen"
     },
     "settings": {
       "title": "Gruppeneinstellungen",

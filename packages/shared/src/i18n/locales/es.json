@@ -353,7 +353,8 @@
       "declineMessage": "{{name}} no va a recibir ningún aviso y puede volver a pedirlo en una semana.",
       "acceptFailed": "No se pudo aceptar la solicitud. Intentá de nuevo.",
       "declineFailed": "No se pudo rechazar la solicitud. Intentá de nuevo.",
-      "pendingBadge": "{{count}} solicitudes pendientes"
+      "pendingBadge_one": "{{count}} solicitud pendiente",
+      "pendingBadge_other": "{{count}} solicitudes pendientes"
     },
     "settings": {
       "title": "Configuración del grupo",

@@ -353,7 +353,8 @@
       "declineMessage": "{{name}} won't be notified. They can ask again in a week.",
       "acceptFailed": "Couldn't accept the request. Please try again.",
       "declineFailed": "Couldn't decline the request. Please try again.",
-      "pendingBadge": "{{count}} pending join requests"
+      "pendingBadge_one": "{{count}} pending join request",
+      "pendingBadge_other": "{{count}} pending join requests"
     },
     "settings": {
       "title": "Group Settings",
