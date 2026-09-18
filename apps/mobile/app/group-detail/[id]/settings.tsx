@@ -18,6 +18,7 @@ import { z } from "zod";
 
 import { GroupMembersList } from "@/components/groups/group-members-list";
 import { InviteLinkSection } from "@/components/groups/invite-link-section";
+import { JoinRequestsSection } from "@/components/groups/join-requests-section";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -385,6 +386,9 @@ export default function GroupSettingsScreen() {
               </VStack>
             </Card>
           )}
+
+          {/* Join Requests (Creator only; renders nothing when there are none) */}
+          {isCreator && <JoinRequestsSection groupId={id!} showDialog={showDialog} />}
 
           {/* Invite Link Section (Creator only) */}
           {isCreator && (
