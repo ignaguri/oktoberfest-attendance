@@ -37,6 +37,9 @@ export class QueryKeys {
     ["user", userId, "groups", festivalId] as const;
   static groupSearch = (name: string, festivalId: string) =>
     ["groups", "search", name, festivalId] as const;
+  /** Prefix covering every cached group search, for invalidation. */
+  static groupSearchAll = () => ["groups", "search"] as const;
+  static groupJoinRequestsIncoming = () => ["groups", "join-requests", "incoming"] as const;
   static groupGallery = (groupId: string) => ["group", groupId, "gallery"] as const;
   static carryOverCandidates = (festivalId: string) =>
     ["groups", "carry-over-candidates", festivalId] as const;

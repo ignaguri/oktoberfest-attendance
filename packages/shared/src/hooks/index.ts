@@ -48,6 +48,14 @@ export {
   useUserGroups,
 } from "./useGroups";
 
+export {
+  useAcceptJoinRequest,
+  useCancelJoinRequest,
+  useDeclineJoinRequest,
+  useIncomingJoinRequests,
+  useRequestToJoinGroup,
+} from "./useGroupJoinRequests";
+
 // Leaderboard hooks
 export { useGlobalLeaderboard, useGroupLeaderboard, useWinningCriterias } from "./useLeaderboard";
 
