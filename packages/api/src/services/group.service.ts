@@ -14,6 +14,8 @@ import { formatDateForDatabase } from "@prostcounter/shared/utils";
 import { ConflictError, ForbiddenError, NotFoundError } from "../middleware/error";
 import type { IGroupRepository } from "../repositories/interfaces";
 
+const INVITE_TOKEN_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
 /**
  * Group Service
  * Handles business logic for group management
@@ -214,7 +216,15 @@ export class GroupService {
    * Finds group by token and adds user as member
    */
   async joinByToken(inviteToken: string, userId: string): Promise<Group> {
-    const group = await this.groupRepo.findByInviteToken(inviteToken);
+    // invite_token is a uuid column, so anything else makes Postgres throw and
+    // surfaces as a 500. Share targets can also mangle the link (Instagram DMs
+    // delivered "<uuid> https://…?token=<uuid>"), so take the first UUID found.
+    const token = inviteToken.match(INVITE_TOKEN_PATTERN)?.[0];
+    if (!token) {
+      throw new NotFoundError(ErrorCodes.INVALID_INVITE_TOKEN);
+    }
+
+    const group = await this.groupRepo.findByInviteToken(token.toLowerCase());
 
     if (!group) {
       throw new NotFoundError(ErrorCodes.INVALID_INVITE_TOKEN);
