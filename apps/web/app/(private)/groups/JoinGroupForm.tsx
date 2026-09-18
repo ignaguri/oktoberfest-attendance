@@ -5,6 +5,7 @@
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useRequestToJoinGroup } from "@prostcounter/shared/hooks";
 import type { JoinGroupForm as JoinGroupFormData } from "@prostcounter/shared/schemas";
 import { JoinGroupFormSchema } from "@prostcounter/shared/schemas";
 import { useTransitionRouter } from "next-view-transitions";
@@ -29,10 +30,13 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
 
   // Use mutation hook for joining groups
   const { mutateAsync: joinGroup, loading: isJoining } = useJoinGroup();
+  const { mutateAsync: requestToJoin, loading: isRequesting } = useRequestToJoinGroup();
 
   const {
     register,
     handleSubmit,
+    getValues,
+    trigger,
     formState: { errors, isSubmitting: formSubmitting },
   } = useForm<JoinGroupFormData>({
     resolver: standardSchemaResolver(JoinGroupFormSchema),
@@ -83,6 +87,42 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
     }
   };
 
+  // No invite link: ask the group's creator instead. Only the name is needed.
+  const onRequestToJoin = async () => {
+    const isNameValid = await trigger("groupName");
+    if (!isNameValid) {
+      return;
+    }
+    if (!currentFestival) {
+      toast.error(t("notifications.error.noFestivalSelected"));
+      return;
+    }
+
+    try {
+      const searchResult = await apiClient.groups.search({
+        name: getValues("groupName"),
+        festivalId: currentFestival.id,
+        limit: 1,
+      });
+      const match = searchResult.data?.[0];
+      if (!match) {
+        toast.error(t("notifications.error.groupNotFound"));
+        return;
+      }
+
+      await requestToJoin(match.id);
+      // Names the matched group, since the search takes the first hit
+      toast.success(t("groups.joinRequests.requestSent", { groupName: match.name }));
+    } catch (error) {
+      const code = (error as { code?: string })?.code;
+      if (code === "JOIN_REQUEST_PENDING" || code === "ALREADY_GROUP_MEMBER") {
+        toast.error(translateError(t, code));
+      } else {
+        toast.error(t("groups.joinRequests.requestFailed"));
+      }
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 space-y-2">
       {!groupId && <h3 className="text-xl font-semibold">{t("groups.join.title")}</h3>}
@@ -107,14 +147,27 @@ export const JoinGroupForm = ({ groupName, groupId }: JoinGroupFormProps) => {
       />
       <p className="text-sm text-gray-500">{t("groups.join.inviteLinkHelp")}</p>
 
-      <Button
-        type="submit"
-        variant="yellow"
-        className="w-fit self-center"
-        disabled={formSubmitting || isJoining}
-      >
-        {formSubmitting || isJoining ? t("groups.join.joining") : t("groups.join.submit")}
-      </Button>
+      <div className="flex flex-wrap justify-center gap-2">
+        <Button
+          type="submit"
+          variant="yellow"
+          className="w-fit"
+          disabled={formSubmitting || isJoining || isRequesting}
+        >
+          {formSubmitting || isJoining ? t("groups.join.joining") : t("groups.join.submit")}
+        </Button>
+        {!groupId && (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-fit"
+            onClick={onRequestToJoin}
+            disabled={formSubmitting || isJoining || isRequesting}
+          >
+            {t("groups.joinRequests.requestToJoin")}
+          </Button>
+        )}
+      </div>
     </form>
   );
 };
