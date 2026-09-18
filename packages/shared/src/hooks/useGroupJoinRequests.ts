@@ -82,6 +82,9 @@ export function useAcceptJoinRequest() {
         // Member lists and counts of the group changed
         invalidateQueries(["group"]);
         invalidateQueries(["groups"]);
+        // A new member changes the group leaderboard and the member counts in the groups list
+        invalidateQueries(["leaderboard", "group"]);
+        invalidateQueries(["user", "current", "groups"]);
       },
     },
   );
