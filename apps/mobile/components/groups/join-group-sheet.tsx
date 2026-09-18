@@ -108,6 +108,8 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
 
   const handleGroupSelect = useCallback((group: SearchGroupResult) => {
     setSelectedGroup(group);
+    setShowLinkInput(false);
+    setRequestSent(false);
   }, []);
 
   const handleBack = useCallback(() => {
@@ -295,6 +297,8 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
               setError(null);
               setShowLinkInput(true);
             }}
+            accessibilityLabel={t("groups.joinRequests.haveInviteLink")}
+            accessibilityHint={t("groups.joinRequests.haveInviteLinkHint")}
           >
             <Link size={16} color={IconColors.default} />
             <ButtonText className="ml-1">{t("groups.joinRequests.haveInviteLink")}</ButtonText>
@@ -395,6 +399,8 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
                   setSelectedGroup(null);
                   setInviteToken("");
                   setError(null);
+                  setShowLinkInput(false);
+                  setRequestSent(false);
                 }}
               >
                 <Search
@@ -413,6 +419,8 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
                   setSearchQuery("");
                   setSelectedGroup(null);
                   setError(null);
+                  setShowLinkInput(false);
+                  setRequestSent(false);
                 }}
               >
                 <Link size={16} color={mode === "token" ? IconColors.white : IconColors.default} />

@@ -342,6 +342,7 @@
       "cancelRequest": "Cancelar solicitud",
       "cancelRequestHint": "Retira tu solicitud para unirte",
       "haveInviteLink": "¿Tenés un enlace de invitación?",
+      "haveInviteLinkHint": "Cambia a ingresar un enlace de invitación en su lugar",
       "requestFailed": "No se pudo enviar la solicitud. Intentá de nuevo.",
       "requestSent": "Solicitud enviada a {{groupName}}",
       "accept": "Aceptar",

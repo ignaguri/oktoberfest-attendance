@@ -337,6 +337,7 @@
       "cancelRequest": "Anfrage zurückziehen",
       "cancelRequestHint": "Zieht deine Beitrittsanfrage zurück",
       "haveInviteLink": "Hast du einen Einladungslink?",
+      "haveInviteLinkHint": "Wechselt stattdessen zur Eingabe eines Einladungslinks",
       "requestFailed": "Die Anfrage konnte nicht gesendet werden. Bitte versuche es erneut.",
       "requestSent": "Anfrage an {{groupName}} gesendet",
       "accept": "Annehmen",

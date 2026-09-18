@@ -342,6 +342,7 @@
       "cancelRequest": "Cancel request",
       "cancelRequestHint": "Withdraws your request to join",
       "haveInviteLink": "Have an invite link?",
+      "haveInviteLinkHint": "Switches to entering an invite link instead",
       "requestFailed": "Couldn't send the request. Please try again.",
       "requestSent": "Request sent to {{groupName}}",
       "accept": "Accept",
