@@ -38,7 +38,9 @@ function recordActiveDay(
       p_user_id: userId,
       p_platform: platform ?? null,
       p_app_version: appVersion ?? null,
-      p_push_permission: pushPermission ?? null,
+      // Omitted rather than null when absent, so web and older mobile clients
+      // still hit the pre-migration 3-arg function if the API deploys first.
+      ...(pushPermission !== undefined ? { p_push_permission: pushPermission } : {}),
     })
     .then(({ data: isNewDay, error }) => {
       if (error) {
