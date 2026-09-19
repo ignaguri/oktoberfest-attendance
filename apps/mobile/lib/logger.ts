@@ -121,8 +121,15 @@ type SentryLike = {
 
 function loadSentry(): SentryLike | null {
   try {
+    // The SDK directly, not ./sentry. That wrapper imports this module for
+    // flushPendingSentryEvents, and requiring it back would close a cycle in
+    // the one path that has to work during a cold start. It only re-exports
+    // this same namespace, and capture reaches the client through the SDK's
+    // own global registry, so nothing is lost by skipping it - beforeSend and
+    // the rest of the init config still apply.
+    //
     // Loaded lazily so this module stays usable if Sentry isn't bundled.
-    return require("./sentry").Sentry as SentryLike;
+    return require("@sentry/react-native") as SentryLike;
   } catch {
     return null;
   }
