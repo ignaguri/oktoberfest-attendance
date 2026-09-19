@@ -291,6 +291,12 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
        */
       p_tent_ids: (input.tents ?? null) as unknown as string[],
       p_festival_id: input.festivalId,
+      /*
+       * Only honoured when the call creates the day. An offline client sends
+       * the id it already queued operations against, so a later DELETE carries
+       * an id the server recognises instead of one it never minted.
+       */
+      p_attendance_id: input.attendanceId,
     });
 
     if (error) {

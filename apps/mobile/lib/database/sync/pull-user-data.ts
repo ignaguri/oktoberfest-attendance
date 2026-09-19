@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger";
 import { apiClient } from "../../api-client";
 import { clearDeletedConsumptions } from "../consumptions";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
-import { updateLastSyncAt } from "../sync-queue";
+import { hasPendingDelete, updateLastSyncAt } from "../sync-queue";
 import {
   clearDeletedTentVisits,
   clearSupersededTentVisits,
@@ -193,6 +193,19 @@ async function processAttendances(
     );
 
     if (existing) {
+      // The server still has this day, so a local tombstone with nothing queued
+      // behind it is stale - the reconcile below, or a delete on another
+      // device, marked it and nothing ever clears it. Undelete before the
+      // last-write-wins check, which would otherwise leave the row invisible
+      // whenever the server copy is older. A row whose DELETE has not pushed
+      // yet is left alone: reviving it would undo the user.
+      if (existing._deleted === 1 && !(await hasPendingDelete(db, "attendances", att.id))) {
+        await db.runAsync(`UPDATE attendances SET _deleted = 0, _synced_at = ? WHERE id = ?`, [
+          now,
+          att.id,
+        ]);
+      }
+
       // Use last-write-wins conflict resolution
       const serverUpdatedAt = att.updatedAt ?? att.createdAt;
       if (shouldUpdate(existing, serverUpdatedAt)) {
@@ -217,13 +230,34 @@ async function processAttendances(
       // different (client-generated) ID for the same natural key.
       // This happens when attendance was created offline with a local UUID
       // and synced via updatePersonal (which uses natural key, not ID).
+      // Soft-deleted rows are deliberately included: they still hold the
+      // UNIQUE(user_id, festival_id, date) slot, so filtering them out here
+      // sent a stale tombstone down the INSERT path below, where it failed the
+      // constraint and took the whole attendance pull down with it.
       const byNaturalKey = await db.getFirstAsync<LocalAttendance>(
         `SELECT * FROM attendances
-         WHERE user_id = ? AND festival_id = ? AND date = ? AND _deleted = 0`,
+         WHERE user_id = ? AND festival_id = ? AND date = ?`,
         [att.userId, att.festivalId, att.date],
       );
 
-      if (byNaturalKey && byNaturalKey.id !== att.id) {
+      const deleteStillQueued =
+        byNaturalKey !== null &&
+        byNaturalKey._deleted === 1 &&
+        (await hasPendingDelete(db, "attendances", byNaturalKey.id));
+
+      if (byNaturalKey && deleteStillQueued) {
+        // A local delete for this day is still queued. Leave the row as it is:
+        // the pending DELETE will reach the server and the next pull will stop
+        // returning it. Reviving it below would silently undo the user, and
+        // inserting alongside it would hit the UNIQUE constraint.
+        logConflict(
+          "attendances",
+          byNaturalKey.id,
+          byNaturalKey.updated_at,
+          att.updatedAt ?? att.createdAt,
+          "local",
+        );
+      } else if (byNaturalKey && byNaturalKey.id !== att.id) {
         // Local record exists with a different ID — update ID to match server
         // so future API calls (delete, etc.) use the correct server ID.
         // Wrap in a transaction to avoid partial reconciliation.
@@ -248,10 +282,12 @@ async function processAttendances(
             [att.id, oldId],
           );
 
-          // Update the attendance ID itself
+          // Update the attendance ID itself. `_deleted` clears for the same
+          // reason as in the by-id branch above: the server returned this day,
+          // so any local tombstone on it is stale.
           await db.runAsync(
             `UPDATE attendances SET
-              id = ?, beer_count = ?, updated_at = ?, _synced_at = ?, _dirty = 0
+              id = ?, beer_count = ?, updated_at = ?, _synced_at = ?, _dirty = 0, _deleted = 0
             WHERE id = ?`,
             [att.id, att.beerCount, serverUpdatedAt, now, oldId],
           );

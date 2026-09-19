@@ -647,6 +647,91 @@ describe("Attendance Routes Integration (Local DB)", () => {
     });
   });
 
+  // The server used to mint the attendance id, so a device that created a day
+  // offline kept a local uuid the server had never seen. A DELETE queued before
+  // the next pull reconciled the two carried that local id, and the delete route
+  // reads an unknown id as idempotent success - it answered 200, removed
+  // nothing, and the day returned on the following pull.
+  describe("update_personal_attendance_with_tents client-supplied id", () => {
+    const createCaseDate = "2024-09-28T14:00:00Z";
+    const conflictCaseDate = "2024-09-29T14:00:00Z";
+
+    it("stores the day under a client-supplied attendance id", async () => {
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+      const clientId = randomUUID();
+
+      const { data, error } = await userSupabase.rpc("update_personal_attendance_with_tents", {
+        p_user_id: testUser.id,
+        p_date: createCaseDate,
+        p_beer_count: 0,
+        p_tent_ids: null as unknown as string[],
+        p_festival_id: testFestival.id,
+        p_attendance_id: clientId,
+      });
+
+      expect(error).toBeNull();
+      createdAttendanceIds.push(data![0].attendance_id);
+
+      // The whole point: the id the device already queued operations against is
+      // the id the row now has, so a later delete by that id finds it.
+      expect(data![0].attendance_id).toBe(clientId);
+    });
+
+    it("keeps the stored id when the day already exists", async () => {
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+
+      const { data: first, error: firstError } = await userSupabase.rpc(
+        "update_personal_attendance_with_tents",
+        {
+          p_user_id: testUser.id,
+          p_date: conflictCaseDate,
+          p_beer_count: 0,
+          p_tent_ids: null as unknown as string[],
+          p_festival_id: testFestival.id,
+        },
+      );
+      expect(firstError).toBeNull();
+      const storedId = first![0].attendance_id;
+      createdAttendanceIds.push(storedId);
+
+      // A second device arrives with its own id for the same day. The stored row
+      // is authoritative; the caller reconciles to what comes back rather than
+      // the server rewriting a primary key other rows already reference.
+      const { data: second, error: secondError } = await userSupabase.rpc(
+        "update_personal_attendance_with_tents",
+        {
+          p_user_id: testUser.id,
+          p_date: conflictCaseDate,
+          p_beer_count: 0,
+          p_tent_ids: null as unknown as string[],
+          p_festival_id: testFestival.id,
+          p_attendance_id: randomUUID(),
+        },
+      );
+
+      expect(secondError).toBeNull();
+      expect(second![0].attendance_id).toBe(storedId);
+    });
+
+    // The defaulted parameter exists so the currently deployed API, which sends
+    // five arguments, keeps working while the migration is ahead of the deploy.
+    it("still accepts a call that omits the id", async () => {
+      const userSupabase = createTestSupabaseWithAuth(testUser.token);
+
+      const { data, error } = await userSupabase.rpc("update_personal_attendance_with_tents", {
+        p_user_id: testUser.id,
+        p_date: createCaseDate,
+        p_beer_count: 0,
+        p_tent_ids: null as unknown as string[],
+        p_festival_id: testFestival.id,
+      });
+
+      expect(error).toBeNull();
+      expect(data![0].attendance_id).toBeTruthy();
+      createdAttendanceIds.push(data![0].attendance_id);
+    });
+  });
+
   // A day is a sequence of visits, not just a set of tents: leaving a tent and
   // coming back later is two visits. logTentVisit is the only writer that can
   // say so. update_personal_attendance_with_tents reconciles the day to a set,

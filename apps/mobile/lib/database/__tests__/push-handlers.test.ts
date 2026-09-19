@@ -101,18 +101,24 @@ describe("pushInsert", () => {
     });
   });
 
-  it("still routes attendances to updatePersonal", async () => {
+  it("still routes attendances to updatePersonal, carrying the local id", async () => {
     await pushInsert("attendances", "local-att-id", {
       festival_id: "festival-1",
       date: "2026-09-23",
       tents: ["tent-1"],
     });
 
+    // attendanceId travels for the same reason consumptionId does above: the
+    // server used to mint its own, so a DELETE queued before the next pull
+    // reconciled the ids carried one the server had never seen. The delete
+    // route reads an unknown id as idempotent success, so the day survived and
+    // came back on the next pull.
     expect(updatePersonal).toHaveBeenCalledWith({
       festivalId: "festival-1",
       date: "2026-09-23",
       amount: 0,
       tents: ["tent-1"],
+      attendanceId: "local-att-id",
     });
     expect(logTentVisit).not.toHaveBeenCalled();
   });

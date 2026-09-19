@@ -13,6 +13,7 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
 import { CONSUMPTION_WRITE_PREFIXES, invalidateLocalQueries } from "@/lib/database/query-keys";
 import {
+  createOrResurrectLocalAttendance,
   enqueueOperation,
   generateUUID,
   getRecentConsumption,
@@ -82,18 +83,18 @@ export function useOfflineLogConsumption() {
         attendanceId = existing.id;
       } else {
         // Auto-create attendance if it doesn't exist yet (e.g. quick-attendance flow)
-        attendanceId = generateUUID();
         const userId = user?.id;
         if (!userId) {
           throw new Error("User not authenticated");
         }
-        await db.runAsync(
-          `INSERT INTO attendances (
-            id, user_id, festival_id, date, beer_count,
-            created_at, updated_at, _synced_at, _dirty, _deleted
-          ) VALUES (?, ?, ?, ?, 0, ?, ?, NULL, 1, 0)`,
-          [attendanceId, userId, input.festivalId, input.date, now, now],
-        );
+
+        attendanceId = await createOrResurrectLocalAttendance(db, {
+          userId,
+          festivalId: input.festivalId,
+          date: input.date,
+          now,
+        });
+
         // No `tents` key on purpose. This path only wants the day to have an
         // attendance row to hang the drink off; it has no opinion about tents.
         // Sending [] would state one: the update RPC reads an empty array as

@@ -13,7 +13,11 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext } from "@/lib/database/offline-provider";
 import { invalidateLocalQueries } from "@/lib/database/query-keys";
 import type { LocalAttendance } from "@/lib/database/schema";
-import { enqueueOperation, generateUUID } from "@/lib/database/sync-queue";
+import {
+  createOrResurrectLocalAttendance,
+  enqueueOperation,
+  generateUUID,
+} from "@/lib/database/sync-queue";
 import { reconcileTentVisits } from "@/lib/database/tent-visits";
 import { logger } from "@/lib/logger";
 
@@ -85,14 +89,16 @@ export function useOfflineUpdateAttendance() {
           attendanceId,
         });
       } else {
-        attendanceId = generateUUID();
-        await db.runAsync(
-          `INSERT INTO attendances (
-            id, user_id, festival_id, date, beer_count,
-            created_at, updated_at, _synced_at, _dirty, _deleted
-          ) VALUES (?, ?, ?, ?, 0, ?, ?, NULL, 1, 0)`,
-          [attendanceId, userId, input.festivalId, input.date, now, now],
-        );
+        // Resurrects a soft-deleted day rather than inserting over it: the row
+        // still holds the UNIQUE(user_id, festival_id, date) slot that the
+        // lookup above cannot see, and a bare insert fails the constraint and
+        // takes the whole save down with it.
+        attendanceId = await createOrResurrectLocalAttendance(db, {
+          userId,
+          festivalId: input.festivalId,
+          date: input.date,
+          now,
+        });
 
         attendanceQueueOpId = await enqueueOperation(db, "INSERT", "attendances", attendanceId, {
           festival_id: input.festivalId,

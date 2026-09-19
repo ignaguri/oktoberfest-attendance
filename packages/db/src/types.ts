@@ -2430,6 +2430,7 @@ export type Database = {
       }
       update_personal_attendance_with_tents: {
         Args: {
+          p_attendance_id?: string
           p_beer_count: number
           p_date: string
           p_festival_id: string

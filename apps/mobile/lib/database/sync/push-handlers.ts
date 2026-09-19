@@ -19,12 +19,18 @@ export async function pushInsert(
   idempotencyKey?: string | null,
 ): Promise<void> {
   switch (tableName) {
+    // Passing the local row's id for the same reason as consumptions and
+    // tent_visits below: the server used to mint its own, so a DELETE queued
+    // before the next pull reconciled the two carried an id the server had
+    // never seen - and the delete route reads an unknown id as idempotent
+    // success, so the day was never removed and came back on the next pull.
     case "attendances":
       await apiClient.attendance.updatePersonal({
         festivalId: payload.festival_id as string,
         date: payload.date as string,
         amount: 0,
         tents: payload.tents as string[] | undefined,
+        attendanceId: recordId,
       });
       break;
     // Passing the local row's id, for the same reason tent_visits does below:
@@ -83,6 +89,9 @@ export async function pushUpdate(
         date: payload.date as string,
         amount: 0,
         tents: payload.tents as string[] | undefined,
+        // Carried here too: an UPDATE can be the first operation to reach the
+        // server for a day created offline, in which case it creates the row.
+        attendanceId: recordId,
       });
       break;
     case "consumptions": {

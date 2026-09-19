@@ -643,6 +643,8 @@ export interface paths {
                         tents?: string[];
                         /** @default 0 */
                         amount?: number;
+                        /** Format: uuid */
+                        attendanceId?: string;
                     };
                 };
             };
