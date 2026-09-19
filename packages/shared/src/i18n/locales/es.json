@@ -2826,6 +2826,27 @@
       "enableHint": "Pide permiso para enviarte notificaciones",
       "openSettingsHint": "Abre la configuración de tu dispositivo para que puedas permitir las notificaciones",
       "dismissHint": "Oculta esta tarjeta"
+    },
+    "ask": {
+      "friendRequest": {
+        "title": "No te pierdas a tus amigos",
+        "body": "Activá las notificaciones para enterarte cuando tus amigos acepten tus solicitudes y cuando entren a una carpa."
+      },
+      "dayPlan": {
+        "title": "Mirá quién se suma",
+        "body": "Activá las notificaciones para enterarte cuando tus amigos planeen el mismo día que vos."
+      },
+      "groupJoin": {
+        "title": "Seguí de cerca a tu grupo",
+        "body": "Activá las notificaciones para enterarte cuando tu grupo entre a una carpa o desbloquee logros."
+      },
+      "enable": "Activar",
+      "openSettings": "Abrir ajustes",
+      "notNow": "Ahora no",
+      "enableHint": "Pide permiso para enviarte notificaciones",
+      "openSettingsHint": "Abre la configuración de tu dispositivo para que puedas permitir las notificaciones",
+      "notNowHint": "Cierra este mensaje",
+      "deniedNote": "Las notificaciones de ProstCounter están desactivadas. Podés permitirlas en la configuración de tu dispositivo."
     }
   },
   "festivalCountdown": {

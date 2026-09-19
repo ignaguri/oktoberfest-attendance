@@ -2766,6 +2766,27 @@
       "enableHint": "Asks for permission to send you notifications",
       "openSettingsHint": "Opens your device settings so you can allow notifications",
       "dismissHint": "Hides this card"
+    },
+    "ask": {
+      "friendRequest": {
+        "title": "Don't miss your friends",
+        "body": "Turn on notifications to know when friends accept your requests and when they check into a tent."
+      },
+      "dayPlan": {
+        "title": "See who's joining you",
+        "body": "Turn on notifications to hear when friends plan the same day as you."
+      },
+      "groupJoin": {
+        "title": "Stay in the loop with your group",
+        "body": "Turn on notifications to know when your group checks into a tent or unlocks achievements."
+      },
+      "enable": "Turn on",
+      "openSettings": "Open settings",
+      "notNow": "Not now",
+      "enableHint": "Asks for permission to send you notifications",
+      "openSettingsHint": "Opens your device settings so you can allow notifications",
+      "notNowHint": "Closes this message",
+      "deniedNote": "Notifications are turned off for ProstCounter. You can allow them in your device settings."
     }
   },
   "festivalCountdown": {
