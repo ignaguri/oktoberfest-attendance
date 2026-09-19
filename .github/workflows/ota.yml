@@ -3,6 +3,12 @@ name: OTA Update
 # Manual only, on purpose. An OTA reaches every phone on the matching
 # runtimeVersion within a launch or two, so it should be a deliberate act
 # rather than something that rides every push to main.
+#
+# Production only, also on purpose. `production-apk` is a channel that carries
+# production env values, not an EAS environment of its own, and the preview
+# profile declares no EXPO_PUBLIC_* at all - so a channel picker would either
+# pass an environment EAS does not have or verify a bundle against the wrong
+# reference. dry_run covers rehearsing this without touching a phone.
 on:
   workflow_dispatch:
     inputs:
@@ -10,26 +16,33 @@ on:
         description: "Update message shown in the EAS dashboard"
         required: true
         type: string
-      channel:
-        description: "Channel to publish to"
-        required: true
-        default: production
-        type: choice
-        options:
-          - production
-          - preview
-          - production-apk
       dry_run:
         description: "Build and verify the bundle, but do not publish"
         required: false
         default: false
         type: boolean
 
+# Two publishes racing would leave it ambiguous which bundle phones settle on.
+concurrency:
+  group: ota-production
+  cancel-in-progress: false
+
 jobs:
   ota:
     name: Publish OTA
     runs-on: ubuntu-latest
     steps:
+      # workflow_dispatch runs against whichever ref was selected, and the
+      # checkout follows it. docs/BUILDS.md requires publishing from an
+      # up-to-date main, so anything else is refused rather than quietly
+      # shipping unreviewed code to every phone.
+      - name: Refuse to publish from a branch other than main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "This workflow publishes to the production channel and must run from main."
+          echo "Selected ref: ${GITHUB_REF}"
+          exit 1
+
       - name: Check for EXPO_TOKEN
         run: |
           if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
@@ -80,24 +93,30 @@ jobs:
       # cache keeps env values inlined by an earlier run, which can hide a
       # variable that is now missing. --no-bytecode matters too: short strings
       # do not reliably show up when grepping a Hermes .hbc file.
-      - name: Export and verify the bundle
+      - name: Export the production bundle
         working-directory: apps/mobile
         run: |
-          npx eas-cli env:exec "${{ inputs.channel }}" \
+          npx eas-cli env:exec production \
             'EXPO_NO_DOTENV=1 npx expo export --clear --platform ios --no-bytecode --output-dir /tmp/ota-check'
 
       - name: Assert every EXPO_PUBLIC_* value reached the bundle
         run: node scripts/verify-ota-bundle.mjs /tmp/ota-check ios
 
+      # The message goes through the environment rather than into the script
+      # text. A `${{ }}` interpolation is substituted before the shell runs, so
+      # a quote in the input would end the argument and let the rest execute as
+      # commands - with EXPO_TOKEN in reach.
       - name: Publish
         if: ${{ !inputs.dry_run }}
         working-directory: apps/mobile
+        env:
+          OTA_MESSAGE: ${{ inputs.message }}
         run: |
           eas update \
-            --channel "${{ inputs.channel }}" \
-            --environment "${{ inputs.channel }}" \
+            --channel production \
+            --environment production \
             --clear-cache \
-            --message "${{ inputs.message }}"
+            --message "$OTA_MESSAGE"
 
       - name: Dry run summary
         if: ${{ inputs.dry_run }}
@@ -109,6 +128,6 @@ jobs:
       - name: Next steps
         if: ${{ !inputs.dry_run && success() }}
         run: |
-          echo "Published to the ${{ inputs.channel }} channel."
+          echo "Published to the production channel."
           echo "Restart the app twice on a real device: the first launch downloads the update, the second runs it."
-          echo "To roll back: eas update:roll-back-to-embedded --branch ${{ inputs.channel }} --runtime-version <runtimeVersion> --platform all --message '<why>'"
+          echo "To roll back: eas update:roll-back-to-embedded --branch production --runtime-version <runtimeVersion> --platform all --message '<why>'"
