@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList } from "react-native";
 
 import { AddFriendButton } from "@/components/friends/add-friend-button";
+import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
@@ -100,11 +101,17 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
   const router = useRouter();
   const sendRequest = useSendFriendRequest();
   const cancelRequest = useCancelFriendRequest();
+  const { ask } = useNotificationAsk();
   const { friendshipId } = user;
 
   const handleSendRequest = useCallback(() => {
-    sendRequest.mutate(user.id);
-  }, [sendRequest, user.id]);
+    // No error UI here (as before the ask); the catch only keeps a failed
+    // request from becoming an unhandled rejection.
+    sendRequest
+      .mutate(user.id)
+      .then(() => ask("friend_request"))
+      .catch(() => {});
+  }, [sendRequest, user.id, ask]);
 
   // Accepting takes more than the friendshipId (it needs the request card's
   // context), so hand the incoming request over to the requests tab. Search is

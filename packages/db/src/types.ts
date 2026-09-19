@@ -1686,6 +1686,7 @@ export type Database = {
           first_seen_at: string
           last_seen_at: string
           platform: string | null
+          push_permission: string | null
           request_count: number
           user_id: string
         }
@@ -1695,6 +1696,7 @@ export type Database = {
           first_seen_at?: string
           last_seen_at?: string
           platform?: string | null
+          push_permission?: string | null
           request_count?: number
           user_id: string
         }
@@ -1704,6 +1706,7 @@ export type Database = {
           first_seen_at?: string
           last_seen_at?: string
           platform?: string | null
+          push_permission?: string | null
           request_count?: number
           user_id?: string
         }
@@ -2370,7 +2373,12 @@ export type Database = {
         Returns: undefined
       }
       record_user_active_day: {
-        Args: { p_app_version?: string; p_platform?: string; p_user_id: string }
+        Args: {
+          p_app_version?: string
+          p_platform?: string
+          p_push_permission?: string
+          p_user_id: string
+        }
         Returns: boolean
       }
       refresh_festival_group_standings: {

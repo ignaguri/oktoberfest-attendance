@@ -11,6 +11,7 @@ import { ChevronRight, Link, Search, Users, X } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 
+import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import {
   Actionsheet,
   ActionsheetBackdrop,
@@ -44,6 +45,7 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
   const joinGroupByToken = useJoinGroupByToken();
   const requestToJoin = useRequestToJoinGroup();
   const cancelJoinRequest = useCancelJoinRequest();
+  const { ask } = useNotificationAsk();
 
   // UI State
   const [mode, setMode] = useState<JoinMode>("search");
@@ -94,6 +96,7 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
         await joinGroupByToken.mutateAsync(inviteToken);
       }
 
+      ask("group_join");
       onSuccess();
     } catch (err: any) {
       logger.error("Failed to join group:", err);
@@ -104,7 +107,7 @@ export function JoinGroupSheet({ isOpen, onClose, festivalId, onSuccess }: JoinG
           : err?.response?.data?.message || err?.message || t("groups.join.error");
       setError(message);
     }
-  }, [mode, selectedGroup, inviteToken, joinGroup, joinGroupByToken, onSuccess, t]);
+  }, [mode, selectedGroup, inviteToken, joinGroup, joinGroupByToken, onSuccess, t, ask]);
 
   const handleGroupSelect = useCallback((group: SearchGroupResult) => {
     setSelectedGroup(group);

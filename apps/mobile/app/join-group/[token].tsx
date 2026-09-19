@@ -5,6 +5,7 @@ import { CheckCircle, Users, XCircle } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 
+import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -29,6 +30,7 @@ export default function JoinGroupByTokenScreen() {
   const router = useRouter();
   const { token } = useLocalSearchParams<{ token: string }>();
   const joinGroupByToken = useJoinGroupByToken();
+  const { ask } = useNotificationAsk();
 
   const [status, setStatus] = useState<JoinStatus>("loading");
   const [result, setResult] = useState<JoinResult>({});
@@ -66,6 +68,7 @@ export default function JoinGroupByTokenScreen() {
       try {
         const response = await joinGroupByToken.mutateAsync(token);
         setStatus("success");
+        ask("group_join");
         setResult({
           groupId: response.group.id,
           groupName: response.group.name,

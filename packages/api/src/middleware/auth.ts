@@ -4,6 +4,7 @@ import { createMiddleware } from "hono/factory";
 
 import { logger } from "../lib/logger";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { parsePushPermissionHeader, type PushPermission } from "./client-headers";
 import { UnauthorizedError } from "./error";
 
 // Extend Hono context to include user
@@ -30,12 +31,16 @@ function recordActiveDay(
   userId: string,
   platform?: string,
   appVersion?: string,
+  pushPermission?: PushPermission,
 ): void {
   void supabase
     .rpc("record_user_active_day", {
       p_user_id: userId,
       p_platform: platform ?? null,
       p_app_version: appVersion ?? null,
+      // Omitted rather than null when absent, so web and older mobile clients
+      // still hit the pre-migration 3-arg function if the API deploys first.
+      ...(pushPermission !== undefined ? { p_push_permission: pushPermission } : {}),
     })
     .then(({ data: isNewDay, error }) => {
       if (error) {
@@ -111,6 +116,7 @@ export const authMiddleware = createMiddleware<AuthContext>(async (c, next) => {
     user.id,
     c.req.header("X-Client-Platform"),
     c.req.header("X-Client-Version"),
+    parsePushPermissionHeader(c.req.header("X-Client-Push-Permission")),
   );
 
   await next();

@@ -2793,6 +2793,27 @@
       "enableHint": "Fragt nach der Erlaubnis, dir Benachrichtigungen zu senden",
       "openSettingsHint": "Öffnet deine Geräteeinstellungen, damit du Benachrichtigungen erlauben kannst",
       "dismissHint": "Blendet diese Karte aus"
+    },
+    "ask": {
+      "friendRequest": {
+        "title": "Verpass deine Freunde nicht",
+        "body": "Aktiviere Benachrichtigungen, damit du erfährst, wenn Freunde deine Anfragen annehmen und wenn sie in ein Zelt einchecken."
+      },
+      "dayPlan": {
+        "title": "Sieh, wer mitkommt",
+        "body": "Aktiviere Benachrichtigungen, damit du erfährst, wenn Freunde denselben Tag planen wie du."
+      },
+      "groupJoin": {
+        "title": "Bleib bei deiner Gruppe auf dem Laufenden",
+        "body": "Aktiviere Benachrichtigungen, damit du erfährst, wenn deine Gruppe in ein Zelt eincheckt oder Erfolge freischaltet."
+      },
+      "enable": "Aktivieren",
+      "openSettings": "Einstellungen öffnen",
+      "notNow": "Nicht jetzt",
+      "enableHint": "Fragt nach der Erlaubnis, dir Benachrichtigungen zu senden",
+      "openSettingsHint": "Öffnet deine Geräteeinstellungen, damit du Benachrichtigungen erlauben kannst",
+      "notNowHint": "Schließt diese Nachricht",
+      "deniedNote": "Benachrichtigungen sind für ProstCounter ausgeschaltet. Du kannst sie in deinen Geräteeinstellungen erlauben."
     }
   },
   "festivalCountdown": {

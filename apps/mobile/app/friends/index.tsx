@@ -22,6 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { FriendCard } from "@/components/friends/friend-card";
 import { FriendRequestCard } from "@/components/friends/friend-request-card";
+import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -88,6 +89,7 @@ export default function FriendsScreen() {
   const declineRequest = useDeclineFriendRequest();
   const cancelRequest = useCancelFriendRequest();
   const unfriendMutation = useUnfriend();
+  const { ask } = useNotificationAsk();
 
   // Refresh state
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -109,16 +111,26 @@ export default function FriendsScreen() {
   // Handlers
   const handleSendRequest = useCallback(
     (userId: string) => {
-      sendRequest.mutate(userId);
+      // No error UI here (as before the ask); the catch only keeps a failed
+      // request from becoming an unhandled rejection.
+      sendRequest
+        .mutate(userId)
+        .then(() => ask("friend_request"))
+        .catch(() => {});
     },
-    [sendRequest],
+    [sendRequest, ask],
   );
 
   const handleAcceptRequest = useCallback(
     (requestId: string) => {
-      acceptRequest.mutate(requestId);
+      // No error UI here (as before the ask); the catch only keeps a failed
+      // request from becoming an unhandled rejection.
+      acceptRequest
+        .mutate(requestId)
+        .then(() => ask("friend_request"))
+        .catch(() => {});
     },
-    [acceptRequest],
+    [acceptRequest, ask],
   );
 
   const handleDeclineRequest = useCallback(

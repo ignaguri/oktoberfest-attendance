@@ -9,6 +9,7 @@ import { Beer, Calendar, Check, Clock, TrendingUp, UserPlus, Users, X } from "lu
 import type { ReactNode } from "react";
 import { useCallback } from "react";
 
+import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -211,17 +212,28 @@ function MobileFriendshipBadge({
     status === "pending_received" ? userId : undefined,
   );
   const acceptRequest = useAcceptFriendRequest();
+  const { ask } = useNotificationAsk();
   const friendshipId = statusData?.friendshipId;
 
   const handleSendRequest = useCallback(() => {
     if (!userId) return;
-    sendRequest.mutate(userId);
-  }, [sendRequest, userId]);
+    // No error UI here (as before the ask); the catch only keeps a failed
+    // request from becoming an unhandled rejection.
+    sendRequest
+      .mutate(userId)
+      .then(() => ask("friend_request"))
+      .catch(() => {});
+  }, [sendRequest, userId, ask]);
 
   const handleAcceptRequest = useCallback(() => {
     if (!friendshipId) return;
-    acceptRequest.mutate(friendshipId);
-  }, [acceptRequest, friendshipId]);
+    // No error UI here (as before the ask); the catch only keeps a failed
+    // request from becoming an unhandled rejection.
+    acceptRequest
+      .mutate(friendshipId)
+      .then(() => ask("friend_request"))
+      .catch(() => {});
+  }, [acceptRequest, friendshipId, ask]);
 
   switch (status) {
     case "friends":

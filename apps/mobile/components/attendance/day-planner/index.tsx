@@ -19,6 +19,7 @@ import { ChevronDown, MapPin, Users, X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
+import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -97,6 +98,7 @@ export function DayPlanner({
   const { tents } = useAdaptedTents(festivalId);
   const upsertDayPlan = useUpsertDayPlan();
   const deleteDayPlan = useDeleteDayPlan();
+  const { ask } = useNotificationAsk();
   const {
     data: companionOptions,
     loading: companionOptionsLoading,
@@ -234,6 +236,7 @@ export function DayPlanner({
       try {
         await upsertDayPlan.mutateAsync({ festivalId, date: dateKey, input });
         finish();
+        ask("day_plan");
       } catch (error) {
         // Someone picked was unfriended or left the group since the list loaded:
         // reload it, so the next save drops them
@@ -265,6 +268,7 @@ export function DayPlanner({
       finish,
       showSaveFailed,
       refetchCompanionOptions,
+      ask,
     ],
   );
 
