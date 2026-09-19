@@ -1,0 +1,114 @@
+name: OTA Update
+
+# Manual only, on purpose. An OTA reaches every phone on the matching
+# runtimeVersion within a launch or two, so it should be a deliberate act
+# rather than something that rides every push to main.
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Update message shown in the EAS dashboard"
+        required: true
+        type: string
+      channel:
+        description: "Channel to publish to"
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - preview
+          - production-apk
+      dry_run:
+        description: "Build and verify the bundle, but do not publish"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  ota:
+    name: Publish OTA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for EXPO_TOKEN
+        run: |
+          if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+            echo "EXPO_TOKEN is not set. Add it under Settings > Secrets and variables > Actions."
+            echo "Create the token at https://expo.dev > Account settings > Access tokens."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The documented footgun: Metro loads .env.local and .env during the
+      # export and they beat the EAS-injected values, so a stray file bakes
+      # localhost into a production bundle. Both are gitignored and should
+      # never reach a runner - fail loudly rather than ship one silently.
+      - name: Refuse to build over a committed .env
+        run: |
+          for f in apps/mobile/.env apps/mobile/.env.local; do
+            if [ -f "$f" ]; then
+              echo "$f exists in the checkout. It would override the EAS environment and bake local values into the bundle."
+              exit 1
+            fi
+          done
+          echo "No .env or .env.local in the checkout."
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.14.0
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # Step 2 of docs/BUILDS.md, automated. --clear matters: Metro's transform
+      # cache keeps env values inlined by an earlier run, which can hide a
+      # variable that is now missing. --no-bytecode matters too: short strings
+      # do not reliably show up when grepping a Hermes .hbc file.
+      - name: Export and verify the bundle
+        working-directory: apps/mobile
+        run: |
+          npx eas-cli env:exec "${{ inputs.channel }}" \
+            'EXPO_NO_DOTENV=1 npx expo export --clear --platform ios --no-bytecode --output-dir /tmp/ota-check'
+
+      - name: Assert every EXPO_PUBLIC_* value reached the bundle
+        run: node scripts/verify-ota-bundle.mjs /tmp/ota-check ios
+
+      - name: Publish
+        if: ${{ !inputs.dry_run }}
+        working-directory: apps/mobile
+        run: |
+          eas update \
+            --channel "${{ inputs.channel }}" \
+            --environment "${{ inputs.channel }}" \
+            --clear-cache \
+            --message "${{ inputs.message }}"
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "Dry run: bundle exported and verified, nothing published."
+
+      # An OTA is only really confirmed on a device, so leave the reminder
+      # where whoever triggered the run will see it.
+      - name: Next steps
+        if: ${{ !inputs.dry_run && success() }}
+        run: |
+          echo "Published to the ${{ inputs.channel }} channel."
+          echo "Restart the app twice on a real device: the first launch downloads the update, the second runs it."
+          echo "To roll back: eas update:roll-back-to-embedded --branch ${{ inputs.channel }} --runtime-version <runtimeVersion> --platform all --message '<why>'"
