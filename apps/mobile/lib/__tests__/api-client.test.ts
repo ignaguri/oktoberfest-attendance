@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type * as ApiClientModule from "../api-client";
+
 const getSession = vi.fn();
 
 vi.mock("../supabase", () => ({
@@ -127,5 +129,84 @@ describe("client identification headers", () => {
     const headers = fetchMock.mock.calls[0]![1]!.headers as Record<string, string>;
     expect(headers.Authorization).toBe("Bearer tok-123");
     expect(headers["Content-Type"]).toBe("application/json");
+  });
+});
+
+describe("push permission header", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    getSession.mockReset();
+    getSession.mockResolvedValue({
+      data: {
+        session: { access_token: "tok-123", expires_at: Math.floor(Date.now() / 1000) + 3600 },
+      },
+    });
+    platformOS.current = "ios";
+  });
+
+  async function callFestivalsWith(
+    configure: (module: typeof ApiClientModule) => void,
+    calls = 1,
+  ) {
+    const fetchMock = vi.fn(
+      async (_url: string, _init?: RequestInit) =>
+        ({
+          ok: true,
+          status: 200,
+          headers: new Headers({ "content-type": "application/json" }),
+          clone() {
+            return this;
+          },
+          async json() {
+            return { festivals: [] };
+          },
+        }) as unknown as Response,
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const apiClientModule = await import("../api-client");
+    configure(apiClientModule);
+    for (let callIndex = 0; callIndex < calls; callIndex += 1) {
+      await apiClientModule.apiClient.festivals.list().catch(() => {});
+    }
+    return { fetchMock, apiClientModule };
+  }
+
+  function headersOf(
+    fetchMock: { mock: { calls: Array<[string, RequestInit?]> } },
+    callIndex: number,
+  ) {
+    return fetchMock.mock.calls[callIndex]![1]!.headers as Record<string, string>;
+  }
+
+  it("omits the header until the permission is known", async () => {
+    const { fetchMock } = await callFestivalsWith(() => {});
+    expect(headersOf(fetchMock, 0)).not.toHaveProperty("X-Client-Push-Permission");
+  });
+
+  it("sends the permission once it is set", async () => {
+    const { fetchMock } = await callFestivalsWith((module) => {
+      module.setClientPushPermission("denied");
+    });
+    expect(headersOf(fetchMock, 0)["X-Client-Push-Permission"]).toBe("denied");
+    expect(headersOf(fetchMock, 0).Authorization).toBe("Bearer tok-123");
+  });
+
+  it("reads the latest value on every request", async () => {
+    const { fetchMock, apiClientModule } = await callFestivalsWith((module) => {
+      module.setClientPushPermission("undetermined");
+    });
+    apiClientModule.setClientPushPermission("granted");
+    await apiClientModule.apiClient.festivals.list().catch(() => {});
+    expect(headersOf(fetchMock, 0)["X-Client-Push-Permission"]).toBe("undetermined");
+    expect(headersOf(fetchMock, 1)["X-Client-Push-Permission"]).toBe("granted");
+  });
+
+  it("drops the header again when set back to undefined", async () => {
+    const { fetchMock, apiClientModule } = await callFestivalsWith((module) => {
+      module.setClientPushPermission("granted");
+    });
+    apiClientModule.setClientPushPermission(undefined);
+    await apiClientModule.apiClient.festivals.list().catch(() => {});
+    expect(headersOf(fetchMock, 1)).not.toHaveProperty("X-Client-Push-Permission");
   });
 });

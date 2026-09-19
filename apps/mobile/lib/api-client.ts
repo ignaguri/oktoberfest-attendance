@@ -17,6 +17,7 @@ import { Platform } from "react-native";
 
 import { logger } from "./logger";
 import { supabase } from "./supabase";
+import type { NotificationPermissionStatus } from "./auth/secure-storage";
 
 // Re-export ApiError for convenience
 export { ApiError, AuthRequiredError };
@@ -44,6 +45,26 @@ function withAuth(token: string): ApiHeaders {
 }
 
 /**
+ * The device's notification permission, sent as X-Client-Push-Permission so the
+ * API can record it on user_active_days. NotificationProvider keeps it current;
+ * it is undefined until the permission has been read, and the header is then
+ * omitted rather than guessed. It changes while the app runs, so it is read per
+ * request instead of being fixed when the client is created.
+ */
+let clientPushPermission: NotificationPermissionStatus | undefined;
+
+export function setClientPushPermission(status: NotificationPermissionStatus | undefined): void {
+  clientPushPermission = status;
+}
+
+function withClientState(headers: ApiHeaders): ApiHeaders {
+  if (!clientPushPermission) {
+    return headers;
+  }
+  return { ...headers, "X-Client-Push-Permission": clientPushPermission };
+}
+
+/**
  * Get auth headers for API requests using the Supabase mobile client.
  *
  * supabase-js owns token refresh: getSession() refreshes an expired token
@@ -57,7 +78,7 @@ async function getAuthHeaders(): Promise<ApiHeaders> {
   } = await supabase.auth.getSession();
 
   if (session?.access_token) {
-    return withAuth(session.access_token);
+    return withClientState(withAuth(session.access_token));
   }
 
   throw new AuthRequiredError();

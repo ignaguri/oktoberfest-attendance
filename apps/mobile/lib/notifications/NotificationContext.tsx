@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 
+import { setClientPushPermission } from "@/lib/api-client";
 import {
   clearFCMToken,
   getNotificationPermissionStatus,
@@ -74,6 +75,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   // Registration state
   const [isRegistered, setIsRegistered] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+
+  // Reported to the API on every request (X-Client-Push-Permission) so
+  // user_active_days shows which app users have notifications off. Unknown while
+  // the permission is still being read, so nothing is sent then.
+  useEffect(() => {
+    setClientPushPermission(isPermissionLoading ? undefined : permissionStatus);
+  }, [isPermissionLoading, permissionStatus]);
 
   /**
    * Get Expo push token
