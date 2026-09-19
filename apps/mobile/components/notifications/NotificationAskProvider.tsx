@@ -58,8 +58,7 @@ async function openDeviceSettings(): Promise<void> {
 export function NotificationAskProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
-  const { permissionStatus, isPermissionLoading, hasPromptBeenShown, requestPermission } =
-    useNotificationContextSafe();
+  const { permissionStatus, isPermissionLoading, requestPermission } = useNotificationContextSafe();
   const { register } = usePushRegistration();
   const canShowLaunchPopups = useCanShowLaunchPopups();
 
@@ -79,7 +78,6 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
     userId,
     permissionStatus,
     isPermissionLoading,
-    hasPromptBeenShown,
     canShowLaunchPopups,
   });
   useEffect(() => {
@@ -87,7 +85,6 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
       userId,
       permissionStatus,
       isPermissionLoading,
-      hasPromptBeenShown,
       canShowLaunchPopups,
     };
   });
@@ -125,7 +122,7 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
         openTimerIdRef.current = setTimeout(() => {
           openTimerIdRef.current = null;
           const current = latestRef.current;
-          // Another popup is showing or pending, the user changed, or permission
+          // Another popup is showing, the user changed, or permission
           // moved: drop this ask without counting it, the next trigger can try again.
           const shouldOpen = shouldOpenPendingContextualAsk({
             hasAskedThisSession: hasAskedThisSessionRef.current,
@@ -134,7 +131,6 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
             currentUserId: current.userId,
             permissionStatus: current.permissionStatus,
             isPermissionLoading: current.isPermissionLoading,
-            hasLaunchPromptBeenShown: current.hasPromptBeenShown,
           });
           if (!shouldOpen) {
             return;

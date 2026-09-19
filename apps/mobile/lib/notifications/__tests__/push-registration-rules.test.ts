@@ -144,7 +144,6 @@ const pendingAskReady = {
   currentUserId: "user-1" as string | null,
   permissionStatus: "undetermined" as "undetermined" | "granted" | "denied",
   isPermissionLoading: false,
-  hasLaunchPromptBeenShown: true,
 };
 
 describe("shouldOpenPendingContextualAsk", () => {
@@ -184,21 +183,5 @@ describe("shouldOpenPendingContextualAsk", () => {
     expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, isPermissionLoading: true })).toBe(
       false,
     );
-  });
-
-  it("drops the ask while the launch prompt is still pending", () => {
-    expect(
-      shouldOpenPendingContextualAsk({ ...pendingAskReady, hasLaunchPromptBeenShown: false }),
-    ).toBe(false);
-  });
-
-  it("opens with an unseen launch prompt when permission is already denied", () => {
-    expect(
-      shouldOpenPendingContextualAsk({
-        ...pendingAskReady,
-        hasLaunchPromptBeenShown: false,
-        permissionStatus: "denied",
-      }),
-    ).toBe(true);
   });
 });
