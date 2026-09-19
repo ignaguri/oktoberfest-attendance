@@ -32,6 +32,7 @@ vi.mock("../../utils/admin-client", () => ({
 const ADMIN_ID = "11111111-1111-4111-8111-111111111111";
 const OTHER_ID = "22222222-2222-4222-8222-222222222222";
 const ATTENDANCE_ID = "33333333-3333-4333-8333-333333333333";
+const GROUP_ID = "88888888-8888-4888-8888-888888888888";
 
 describe("Admin Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;
@@ -260,6 +261,141 @@ describe("Admin Routes - Unit Tests", () => {
       // Only the visit on 2026-09-20 belongs to this attendance, even though it
       // was logged at 21:00 -- the timestamp is matched on its day part.
       expect(body.attendances[0].tent_ids).toEqual(["55555555-5555-4555-8555-555555555555"]);
+    });
+  });
+
+  describe("GET /admin/groups", () => {
+    it("returns groups with their member counts and no password", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              id: GROUP_ID,
+              name: "Test Group",
+              description: "A group",
+              winning_criteria_id: 1,
+              festival_id: "44444444-4444-4444-8444-444444444444",
+              created_at: "2026-01-01T00:00:00Z",
+              created_by: OTHER_ID,
+              group_members: [{ count: 4 }],
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest("/admin/groups"));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.groups[0].member_count).toBe(4);
+      // group_members is an implementation detail of the count query, and
+      // password must never reach a client even for an admin.
+      expect(body.groups[0]).not.toHaveProperty("group_members");
+      expect(body.groups[0]).not.toHaveProperty("password");
+      expect(body.groups[0]).not.toHaveProperty("invite_token");
+    });
+
+    it("reports zero members when the count comes back empty", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              id: GROUP_ID,
+              name: "Empty Group",
+              description: null,
+              winning_criteria_id: 1,
+              festival_id: "44444444-4444-4444-8444-444444444444",
+              created_at: null,
+              created_by: null,
+              group_members: [],
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest("/admin/groups"));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.groups[0].member_count).toBe(0);
+    });
+  });
+
+  describe("GET /admin/groups/:groupId/members", () => {
+    it("flattens the joined profile onto each member", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              id: "77777777-7777-4777-8777-777777777777",
+              user_id: OTHER_ID,
+              joined_at: "2026-02-01T00:00:00Z",
+              profiles: { username: "someone", full_name: "Some One", avatar_url: null },
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/groups/${GROUP_ID}/members`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.members[0].username).toBe("someone");
+      expect(body.members[0].full_name).toBe("Some One");
+    });
+
+    it("handles the join arriving as an array", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              id: "77777777-7777-4777-8777-777777777777",
+              user_id: OTHER_ID,
+              joined_at: null,
+              profiles: [{ username: "arrayform", full_name: null, avatar_url: null }],
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/groups/${GROUP_ID}/members`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.members[0].username).toBe("arrayform");
+    });
+  });
+
+  describe("DELETE /admin/groups/:groupId", () => {
+    it("deletes the group", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/groups/${GROUP_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(200);
+      expect(mockSupabase.from).toHaveBeenCalledWith("groups");
+    });
+  });
+
+  describe("PATCH /admin/groups/:groupId", () => {
+    it("rejects an empty group name", async () => {
+      const res = await app.request(
+        createAuthRequest(`/admin/groups/${GROUP_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name: "" }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
     });
   });
 

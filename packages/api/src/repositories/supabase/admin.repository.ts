@@ -1,11 +1,15 @@
 import type { Database } from "@prostcounter/db";
 import type {
   AdminAttendance,
+  AdminGroup,
+  AdminGroupMember,
   AdminUser,
   ListAdminUsersResponse,
   UpdateAdminAttendanceInput,
+  UpdateAdminGroupInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
+  WinningCriterion,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -361,6 +365,108 @@ export class SupabaseAdminRepository {
     if (insertError) {
       throw new Error(`Error adding tent visits: ${insertError.message}`);
     }
+  }
+
+  /**
+   * Lists every group with its member count.
+   *
+   * Columns are named explicitly rather than selected with "*": `groups` also
+   * holds `password` and `invite_token`, and neither belongs in an API
+   * response just because the caller is an admin.
+   */
+  async listGroups(): Promise<AdminGroup[]> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .select(
+        "id, name, description, winning_criteria_id, festival_id, created_at, created_by, group_members(count)",
+      )
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching groups: ${error.message}`);
+    }
+
+    return (data ?? []).map((group) => {
+      const { group_members, ...rest } = group;
+      return {
+        ...rest,
+        member_count: group_members?.[0]?.count ?? 0,
+      };
+    });
+  }
+
+  /** Fetches one group, so the detail screen survives a reload or deep link. */
+  async getGroup(groupId: string): Promise<AdminGroup | null> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .select(
+        "id, name, description, winning_criteria_id, festival_id, created_at, created_by, group_members(count)",
+      )
+      .eq("id", groupId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const { group_members, ...rest } = data;
+    return { ...rest, member_count: group_members?.[0]?.count ?? 0 };
+  }
+
+  async updateGroup(groupId: string, input: UpdateAdminGroupInput): Promise<void> {
+    const { error } = await this.supabase.from("groups").update(input).eq("id", groupId);
+
+    if (error) {
+      throw new Error(`Error updating group: ${error.message}`);
+    }
+  }
+
+  async deleteGroup(groupId: string): Promise<void> {
+    const { error } = await this.supabase.from("groups").delete().eq("id", groupId);
+
+    if (error) {
+      throw new Error(`Error deleting group: ${error.message}`);
+    }
+  }
+
+  /** Lists a group's members, flattened from the joined profile. */
+  async listGroupMembers(groupId: string): Promise<AdminGroupMember[]> {
+    const { data, error } = await this.supabase
+      .from("group_members")
+      .select("id, user_id, joined_at, profiles!inner(username, full_name, avatar_url)")
+      .eq("group_id", groupId)
+      .order("joined_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching group members: ${error.message}`);
+    }
+
+    return (data ?? []).map((member) => {
+      // The !inner join yields an object, but the generated types model the
+      // relationship as possibly-array; normalize before reading it.
+      const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
+      return {
+        id: member.id,
+        user_id: member.user_id,
+        joined_at: member.joined_at,
+        username: profile?.username ?? null,
+        full_name: profile?.full_name ?? null,
+        avatar_url: profile?.avatar_url ?? null,
+      };
+    });
+  }
+
+  async listWinningCriteria(): Promise<WinningCriterion[]> {
+    const { data, error } = await this.supabase
+      .from("winning_criteria")
+      .select("id, name")
+      .order("id");
+
+    if (error) {
+      throw new Error(`Error fetching winning criteria: ${error.message}`);
+    }
+
+    return data ?? [];
   }
 
   async deleteAttendance(attendanceId: string): Promise<void> {

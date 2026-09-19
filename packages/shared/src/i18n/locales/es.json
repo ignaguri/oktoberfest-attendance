@@ -1547,6 +1547,28 @@
   },
   "admin": {
     "mobile": {
+      "groups": {
+        "loading": "Cargando grupos...",
+        "empty": "No se encontraron grupos",
+        "memberCount": "{{count}} miembro(s)",
+        "openHint": "Abre los detalles de este grupo"
+      },
+      "groupDetail": {
+        "title": "Grupo",
+        "loading": "Cargando...",
+        "name": "Nombre",
+        "description": "Descripción",
+        "noDescription": "Sin descripción",
+        "edit": "Editar detalles",
+        "winningCriteria": "Criterio de victoria",
+        "noMembers": "Aún no hay miembros",
+        "dangerZone": "Zona de peligro",
+        "deleteGroup": "Eliminar grupo",
+        "deleteGroupHint": "Elimina permanentemente este grupo y sus membresías",
+        "deleteGroupConfirm": "Esto elimina permanentemente el grupo y a todos sus miembros. ¿Continuar?",
+        "updateError": "No se pudo guardar el cambio",
+        "deleteError": "No se pudo eliminar"
+      },
       "users": {
         "searchPlaceholder": "Buscar por nombre, usuario o correo",
         "loading": "Cargando usuarios...",
@@ -1589,6 +1611,7 @@
       "openAdminHint": "Abre el área de administración",
       "hubDescription": "Herramientas de administración. Los cambios aquí afectan a todos los usuarios.",
       "sections": {
+        "groups": "Editar y eliminar grupos",
         "users": "Buscar y gestionar cuentas de usuario",
         "location": "Sesiones activas de ubicación compartida"
       },

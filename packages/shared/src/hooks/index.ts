@@ -212,6 +212,14 @@ export {
   useForceStopLocationSession,
 } from "./useAdminLocation";
 export {
+  useAdminGroup,
+  useAdminGroupMembers,
+  useAdminGroups,
+  useAdminWinningCriteria,
+  useDeleteAdminGroup,
+  useUpdateAdminGroup,
+} from "./useAdminGroups";
+export {
   useAdminUser,
   useAdminUserAttendances,
   useAdminUsers,

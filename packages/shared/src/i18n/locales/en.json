@@ -1487,6 +1487,28 @@
   },
   "admin": {
     "mobile": {
+      "groups": {
+        "loading": "Loading groups...",
+        "empty": "No groups found",
+        "memberCount": "{{count}} member(s)",
+        "openHint": "Opens this group's details"
+      },
+      "groupDetail": {
+        "title": "Group",
+        "loading": "Loading...",
+        "name": "Name",
+        "description": "Description",
+        "noDescription": "No description",
+        "edit": "Edit details",
+        "winningCriteria": "Winning criteria",
+        "noMembers": "No members yet",
+        "dangerZone": "Danger zone",
+        "deleteGroup": "Delete group",
+        "deleteGroupHint": "Permanently removes this group and its memberships",
+        "deleteGroupConfirm": "This permanently deletes the group and removes all its members. Continue?",
+        "updateError": "Could not save the change",
+        "deleteError": "Could not delete"
+      },
       "users": {
         "searchPlaceholder": "Search by name, username or email",
         "loading": "Loading users...",
@@ -1529,6 +1551,7 @@
       "openAdminHint": "Opens the administration area",
       "hubDescription": "Administration tools. Changes here affect all users.",
       "sections": {
+        "groups": "Edit and remove groups",
         "users": "Find and manage user accounts",
         "location": "Active location sharing sessions"
       },

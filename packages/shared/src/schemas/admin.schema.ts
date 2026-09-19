@@ -125,3 +125,55 @@ export const UpdateAdminAttendanceSchema = z.object({
 });
 
 export type UpdateAdminAttendanceInput = z.infer<typeof UpdateAdminAttendanceSchema>;
+
+// =============================================================================
+// Groups
+// =============================================================================
+
+/**
+ * Admin view of a group.
+ *
+ * Deliberately omits `password` and `invite_token`. The web panel selects "*",
+ * which ships both to the browser; neither is needed to administer a group, and
+ * a group password has no business leaving the server.
+ */
+export const AdminGroupSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  description: z.string().nullable(),
+  winning_criteria_id: z.number(),
+  festival_id: z.string().uuid(),
+  created_at: z.string().nullable(),
+  created_by: z.string().uuid().nullable(),
+  member_count: z.number(),
+});
+
+export type AdminGroup = z.infer<typeof AdminGroupSchema>;
+
+export const UpdateAdminGroupSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  description: z.string().nullable().optional(),
+  winning_criteria_id: z.number().int().positive().optional(),
+});
+
+export type UpdateAdminGroupInput = z.infer<typeof UpdateAdminGroupSchema>;
+
+export const AdminGroupMemberSchema = z.object({
+  id: z.string().uuid(),
+  // Nullable in the database, like attendances.user_id: group_members.user_id
+  // carries no NOT NULL constraint.
+  user_id: z.string().uuid().nullable(),
+  joined_at: z.string().nullable(),
+  username: z.string().nullable(),
+  full_name: z.string().nullable(),
+  avatar_url: z.string().nullable(),
+});
+
+export type AdminGroupMember = z.infer<typeof AdminGroupMemberSchema>;
+
+export const WinningCriterionSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
+export type WinningCriterion = z.infer<typeof WinningCriterionSchema>;
