@@ -308,6 +308,12 @@ export function createTypedApiClient(config: ApiClientConfig) {
         date: string;
         tents?: string[];
         amount?: number;
+        /**
+         * Id to store the day under when this call creates it, so an offline
+         * client keeps the id it already queued operations against. An existing
+         * day keeps its own, which is what comes back in `attendanceId`.
+         */
+        attendanceId?: string;
       }): Promise<UpdatePersonalAttendanceResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/attendance/personal`, {

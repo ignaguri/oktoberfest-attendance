@@ -1327,6 +1327,10 @@
                     "type": "integer",
                     "minimum": 0,
                     "default": 0
+                  },
+                  "attendanceId": {
+                    "type": "string",
+                    "format": "uuid"
                   }
                 },
                 "required": [

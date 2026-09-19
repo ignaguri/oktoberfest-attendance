@@ -99,6 +99,20 @@ export const UpdatePersonalAttendanceSchema = z.object({
    */
   tents: z.array(z.uuid()).optional(),
   amount: z.number().int().min(0).default(0),
+  /**
+   * Id to store the day under, supplied by an offline client.
+   *
+   * Without it the server minted its own, so the device went on holding a local
+   * uuid the server had never seen. A DELETE queued before the next pull
+   * reconciled the two travelled with that local id, and the delete route reads
+   * an unknown id as idempotent success - it answered 200, removed nothing, and
+   * the day came back on the following pull. `consumptionId` and `tentVisitId`
+   * already exist for the same reason.
+   *
+   * Only used when the call creates the day; an existing row keeps its own id,
+   * which is what comes back in `attendanceId`.
+   */
+  attendanceId: z.uuid({ error: "Invalid attendance ID" }).optional(),
 });
 
 export type UpdatePersonalAttendanceInput = z.infer<typeof UpdatePersonalAttendanceSchema>;
