@@ -8557,6 +8557,8 @@ export interface paths {
                                 tip_mode: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
                                 /** @default null */
                                 tip_fixed_amount: number | null;
+                                /** @default false */
+                                is_super_admin: boolean | null;
                             };
                         };
                     };
@@ -8622,6 +8624,8 @@ export interface paths {
                                 tip_mode: "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
                                 /** @default null */
                                 tip_fixed_amount: number | null;
+                                /** @default false */
+                                is_super_admin: boolean | null;
                             };
                         };
                     };

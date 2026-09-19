@@ -16,6 +16,7 @@ import { RefreshControl } from "react-native";
 
 import { ImageSourcePicker } from "@/components/image-source-picker";
 import { AboutSection } from "@/components/profile/about-section";
+import { AdminSection } from "@/components/profile/admin-section";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
@@ -342,6 +343,9 @@ export default function ProfileScreen() {
             </VStack>
           </Card>
         )}
+
+        {/* Admin area - super admins only */}
+        {profile?.is_super_admin && <AdminSection />}
 
         {/* About & Support */}
         <AboutSection />

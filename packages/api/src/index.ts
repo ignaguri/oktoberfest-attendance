@@ -4,6 +4,7 @@ import { getAppVersions } from "./lib/app-version";
 import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
 import { loggerMiddleware } from "./middleware/logger";
+import { requireAdmin } from "./middleware/require-admin";
 // Import routes
 import achievementRoute from "./routes/achievement.route";
 import activityFeedRoute from "./routes/activity-feed.route";
@@ -55,6 +56,10 @@ const apiV1 = new OpenAPIHono();
 
 // Apply authentication middleware to all v1 routes
 apiV1.use("*", authMiddleware);
+
+// Every /admin/* path is admin-only. Guarding by prefix rather than per handler
+// means a newly added admin route is protected by default instead of by memory.
+apiV1.use("/admin/*", requireAdmin);
 
 // Mount route handlers
 apiV1.route("/", consumptionRoute);

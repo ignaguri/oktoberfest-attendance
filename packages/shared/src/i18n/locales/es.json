@@ -1546,6 +1546,20 @@
     }
   },
   "admin": {
+    "mobile": {
+      "subtitle": "Gestiona usuarios, grupos y datos del festival",
+      "openAdmin": "Abrir panel de administración",
+      "openAdminHint": "Abre el área de administración",
+      "hubDescription": "Herramientas de administración. Los cambios aquí afectan a todos los usuarios.",
+      "sections": {
+        "location": "Sesiones activas de ubicación compartida"
+      },
+      "location": {
+        "cleanupHint": "Marca como inactivas todas las sesiones caducadas",
+        "forceStopHint": "Detiene esta sesión sin importar quién la haya iniciado",
+        "forceStopConfirm": "Esto detendrá la sesión de ese usuario inmediatamente. ¿Continuar?"
+      }
+    },
     "pageTitle": "Panel de administración",
     "dashboard": "Panel de administración",
     "tabs": {

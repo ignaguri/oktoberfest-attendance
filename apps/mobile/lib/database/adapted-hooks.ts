@@ -375,6 +375,7 @@ interface ProfileCacheData {
   updated_at: string | null;
   tip_mode: TipMode;
   tip_fixed_amount: number | null;
+  is_super_admin: boolean | null;
 }
 
 /**
@@ -391,6 +392,7 @@ function adaptLocalProfile(local: LocalProfile): ProfileCacheData {
     updated_at: local.updated_at,
     tip_mode: (local.tip_mode as TipMode) ?? "ceiling_plus_1",
     tip_fixed_amount: local.tip_fixed_amount ?? null,
+    is_super_admin: sqliteBoolToJs(local.is_super_admin),
   };
 }
 

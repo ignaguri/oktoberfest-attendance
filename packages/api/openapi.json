@@ -15812,6 +15812,11 @@
                           "type": "number",
                           "nullable": true,
                           "default": null
+                        },
+                        "is_super_admin": {
+                          "type": "boolean",
+                          "nullable": true,
+                          "default": false
                         }
                       },
                       "required": [
@@ -15959,6 +15964,11 @@
                           "type": "number",
                           "nullable": true,
                           "default": null
+                        },
+                        "is_super_admin": {
+                          "type": "boolean",
+                          "nullable": true,
+                          "default": false
                         }
                       },
                       "required": [

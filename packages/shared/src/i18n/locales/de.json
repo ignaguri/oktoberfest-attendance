@@ -1705,6 +1705,20 @@
     }
   },
   "admin": {
+    "mobile": {
+      "subtitle": "Benutzer, Gruppen und Festivaldaten verwalten",
+      "openAdmin": "Adminbereich öffnen",
+      "openAdminHint": "Öffnet den Verwaltungsbereich",
+      "hubDescription": "Verwaltungswerkzeuge. Änderungen hier betreffen alle Benutzer.",
+      "sections": {
+        "location": "Aktive Standortfreigaben"
+      },
+      "location": {
+        "cleanupHint": "Markiert alle abgelaufenen Sitzungen als inaktiv",
+        "forceStopHint": "Beendet diese Sitzung unabhängig davon, wer sie gestartet hat",
+        "forceStopConfirm": "Damit wird die Sitzung für diesen Benutzer sofort beendet. Fortfahren?"
+      }
+    },
     "pageTitle": "Admin-Panel",
     "dashboard": "Admin-Dashboard",
     "tabs": {
