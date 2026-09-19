@@ -1,5 +1,11 @@
 import * as SecureStore from "expo-secure-store";
 
+import {
+  type ContextualAskState,
+  parseContextualAskState,
+  withDecline,
+} from "@/lib/notifications/contextual-ask";
+
 /**
  * Storage keys for auth data
  */
@@ -14,6 +20,7 @@ const KEYS = {
   FCM_TOKEN: "prostcounter_fcm_token",
   PUSH_REGISTRATION_SYNCED_PREFIX: "prostcounter_push_registration_synced_v1_",
   FESTIVAL_ALERT_DISMISSED_PREFIX: "prostcounter_festival_alert_dismissed_",
+  CONTEXTUAL_NOTIFICATION_ASK_PREFIX: "prostcounter_contextual_notification_ask_v1_",
   // Location keys
   LOCATION_PROMPT_SHOWN: "prostcounter_location_prompt_shown",
   LOCATION_PERMISSION_STATUS: "prostcounter_location_permission_status",
@@ -152,6 +159,22 @@ export async function isFestivalAlertDismissed(festivalId: string): Promise<bool
 
 export async function setFestivalAlertDismissed(festivalId: string): Promise<void> {
   await SecureStore.setItemAsync(`${KEYS.FESTIVAL_ALERT_DISMISSED_PREFIX}${festivalId}`, "true");
+}
+
+/**
+ * Declines of the contextual notification ask, per user on this device
+ */
+export async function getContextualAskState(userId: string): Promise<ContextualAskState> {
+  const raw = await SecureStore.getItemAsync(`${KEYS.CONTEXTUAL_NOTIFICATION_ASK_PREFIX}${userId}`);
+  return parseContextualAskState(raw);
+}
+
+export async function recordContextualAskDecline(userId: string, now: Date): Promise<void> {
+  const current = await getContextualAskState(userId);
+  await SecureStore.setItemAsync(
+    `${KEYS.CONTEXTUAL_NOTIFICATION_ASK_PREFIX}${userId}`,
+    JSON.stringify(withDecline(current, now)),
+  );
 }
 
 /**
