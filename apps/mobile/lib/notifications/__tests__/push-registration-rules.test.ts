@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  CONTEXTUAL_ASK_COOLDOWN_MS,
+  shouldShowContextualAsk,
   shouldShowFestivalAlertCard,
   shouldSyncPushRegistration,
 } from "../push-registration-rules";
@@ -71,5 +73,65 @@ describe("shouldShowFestivalAlertCard", () => {
     expect(shouldShowFestivalAlertCard({ ...cardReady, phase: "ended" })).toBe(false);
     expect(shouldShowFestivalAlertCard({ ...cardReady, phase: null })).toBe(false);
     expect(shouldShowFestivalAlertCard({ ...cardReady, isWeb: true })).toBe(false);
+  });
+});
+
+const NOW = new Date("2026-09-20T12:00:00.000Z");
+
+const askReady = {
+  permissionStatus: "undetermined" as const,
+  isPermissionLoading: false,
+  isWeb: false,
+  declineCount: 0,
+  lastDeclinedAt: null as Date | null,
+  hasAskedThisSession: false,
+  now: NOW,
+};
+
+describe("shouldShowContextualAsk", () => {
+  it("asks a native user who never declined", () => {
+    expect(shouldShowContextualAsk(askReady)).toBe(true);
+  });
+
+  it("also asks when the OS permission is denied, since the dialog can open settings", () => {
+    expect(shouldShowContextualAsk({ ...askReady, permissionStatus: "denied" })).toBe(true);
+  });
+
+  it("never asks once permission is granted", () => {
+    expect(shouldShowContextualAsk({ ...askReady, permissionStatus: "granted" })).toBe(false);
+  });
+
+  it("waits for the permission to load and never asks on web", () => {
+    expect(shouldShowContextualAsk({ ...askReady, isPermissionLoading: true })).toBe(false);
+    expect(shouldShowContextualAsk({ ...askReady, isWeb: true })).toBe(false);
+  });
+
+  it("asks at most once per session", () => {
+    expect(shouldShowContextualAsk({ ...askReady, hasAskedThisSession: true })).toBe(false);
+  });
+
+  it("stops for good after three declines", () => {
+    const longAgo = new Date(NOW.getTime() - 30 * CONTEXTUAL_ASK_COOLDOWN_MS);
+    expect(
+      shouldShowContextualAsk({ ...askReady, declineCount: 2, lastDeclinedAt: longAgo }),
+    ).toBe(true);
+    expect(
+      shouldShowContextualAsk({ ...askReady, declineCount: 3, lastDeclinedAt: longAgo }),
+    ).toBe(false);
+  });
+
+  it("waits a full seven days after a decline", () => {
+    const justUnderSevenDays = new Date(NOW.getTime() - CONTEXTUAL_ASK_COOLDOWN_MS + 60_000);
+    const exactlySevenDays = new Date(NOW.getTime() - CONTEXTUAL_ASK_COOLDOWN_MS);
+    expect(
+      shouldShowContextualAsk({ ...askReady, declineCount: 1, lastDeclinedAt: justUnderSevenDays }),
+    ).toBe(false);
+    expect(
+      shouldShowContextualAsk({ ...askReady, declineCount: 1, lastDeclinedAt: exactlySevenDays }),
+    ).toBe(true);
+  });
+
+  it("uses a seven-day cooldown", () => {
+    expect(CONTEXTUAL_ASK_COOLDOWN_MS).toBe(604_800_000);
   });
 });
