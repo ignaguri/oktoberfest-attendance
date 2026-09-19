@@ -15,7 +15,7 @@ import type * as SQLite from "expo-sqlite";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CREATE_TABLES_SQL } from "../schema";
-import { createOrResurrectLocalAttendance } from "../sync-queue";
+import { createOrResurrectLocalAttendance, hasPendingDelete } from "../sync-queue";
 
 vi.mock("@/lib/logger", () => ({
   logger: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -177,9 +177,35 @@ describe("createOrResurrectLocalAttendance", () => {
 
     expect(id).not.toBe("att-yesterday");
     expect(allAttendances(database)).toHaveLength(2);
-    expect(
-      allAttendances(database).find((row) => row.id === "att-yesterday")?._deleted,
-    ).toBe(1);
+    expect(allAttendances(database).find((row) => row.id === "att-yesterday")?._deleted).toBe(1);
+  });
+
+  it("reports a queued delete that _dirty alone would miss", async () => {
+    insertAttendance(database, { id: "att-dead", deleted: 1 });
+    // markRecordClean zeroes _dirty after any successful op on the record, so
+    // the row can look clean while its DELETE is still waiting to push.
+    database
+      .prepare(
+        `INSERT INTO _sync_queue
+          (id, operation, table_name, record_id, payload, status, retry_count, created_at)
+         VALUES (?, 'DELETE', 'attendances', ?, '{}', ?, 0, ?)`,
+      )
+      .run("q-1", "att-dead", "pending", NOW);
+
+    await expect(hasPendingDelete(db, "attendances", "att-dead")).resolves.toBe(true);
+  });
+
+  it("does not report a delete that already reached the server", async () => {
+    insertAttendance(database, { id: "att-dead", deleted: 1 });
+    database
+      .prepare(
+        `INSERT INTO _sync_queue
+          (id, operation, table_name, record_id, payload, status, retry_count, created_at)
+         VALUES (?, 'DELETE', 'attendances', ?, '{}', ?, 0, ?)`,
+      )
+      .run("q-1", "att-dead", "completed", NOW);
+
+    await expect(hasPendingDelete(db, "attendances", "att-dead")).resolves.toBe(false);
   });
 
   it("reproduces the original failure: a bare insert over a tombstone throws", async () => {
@@ -187,8 +213,8 @@ describe("createOrResurrectLocalAttendance", () => {
 
     // This is what the code did before: the `_deleted = 0` lookup misses the
     // tombstone, so a fresh id goes straight into the occupied slot.
-    expect(() =>
-      insertAttendance(database, { id: "att-new", deleted: 0 }),
-    ).toThrow(/UNIQUE constraint failed/);
+    expect(() => insertAttendance(database, { id: "att-new", deleted: 0 })).toThrow(
+      /UNIQUE constraint failed/,
+    );
   });
 });

@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger";
 import { apiClient } from "../../api-client";
 import { clearDeletedConsumptions } from "../consumptions";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
-import { updateLastSyncAt } from "../sync-queue";
+import { hasPendingDelete, updateLastSyncAt } from "../sync-queue";
 import {
   clearDeletedTentVisits,
   clearSupersededTentVisits,
@@ -193,13 +193,13 @@ async function processAttendances(
     );
 
     if (existing) {
-      // The server still has this day, so a clean local tombstone is stale -
-      // the reconcile below, or a delete on another device, marked it and
-      // nothing ever clears it. Undelete before the last-write-wins check,
-      // which would otherwise leave the row invisible whenever the server copy
-      // is older. A _dirty tombstone is excluded on purpose: that is a local
-      // delete still waiting to push, and reviving it would undo the user.
-      if (existing._deleted === 1 && existing._dirty === 0) {
+      // The server still has this day, so a local tombstone with nothing queued
+      // behind it is stale - the reconcile below, or a delete on another
+      // device, marked it and nothing ever clears it. Undelete before the
+      // last-write-wins check, which would otherwise leave the row invisible
+      // whenever the server copy is older. A row whose DELETE has not pushed
+      // yet is left alone: reviving it would undo the user.
+      if (existing._deleted === 1 && !(await hasPendingDelete(db, "attendances", att.id))) {
         await db.runAsync(`UPDATE attendances SET _deleted = 0, _synced_at = ? WHERE id = ?`, [
           now,
           att.id,
@@ -240,7 +240,12 @@ async function processAttendances(
         [att.userId, att.festivalId, att.date],
       );
 
-      if (byNaturalKey && byNaturalKey._deleted === 1 && byNaturalKey._dirty === 1) {
+      const deleteStillQueued =
+        byNaturalKey !== null &&
+        byNaturalKey._deleted === 1 &&
+        (await hasPendingDelete(db, "attendances", byNaturalKey.id));
+
+      if (byNaturalKey && deleteStillQueued) {
         // A local delete for this day is still queued. Leave the row as it is:
         // the pending DELETE will reach the server and the next pull will stop
         // returning it. Reviving it below would silently undo the user, and

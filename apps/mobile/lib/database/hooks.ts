@@ -41,6 +41,7 @@ import type {
   SyncableTable,
 } from "./schema";
 import {
+  createOrResurrectLocalAttendance,
   enqueueOperation,
   generateConsumptionIdempotencyKey,
   generateUUID,
@@ -345,28 +346,26 @@ export function useLocalSaveAttendance() {
           beer_count: 0,
         });
       } else {
-        // Insert new
-        const id = generateUUID();
-        await db.runAsync(
-          `INSERT INTO attendances (
-            id, user_id, festival_id, date, beer_count,
-            created_at, updated_at, _synced_at, _dirty, _deleted
-          ) VALUES (?, ?, ?, ?, 0, ?, ?, NULL, 1, 0)`,
-          [id, userId, festivalId, date, now, now],
-        );
-
-        attendance = {
-          id,
-          user_id: userId,
-          festival_id: festivalId,
+        // Insert new, resurrecting a soft-deleted day rather than inserting
+        // over it: it still holds the UNIQUE(user_id, festival_id, date) slot
+        // the lookup above cannot see, so a bare insert fails the constraint.
+        const id = await createOrResurrectLocalAttendance(db, {
+          userId,
+          festivalId,
           date,
-          beer_count: 0,
-          created_at: now,
-          updated_at: now,
-          _synced_at: null,
-          _dirty: 1,
-          _deleted: 0,
-        };
+          now,
+        });
+
+        // Read back rather than assuming the shape: a resurrected row keeps its
+        // original created_at and id, which a literal here would misreport.
+        const saved = await db.getFirstAsync<LocalAttendance>(
+          "SELECT * FROM attendances WHERE id = ?",
+          [id],
+        );
+        if (!saved) {
+          throw new Error("Failed to read back saved attendance");
+        }
+        attendance = saved;
 
         // Enqueue insert operation
         await enqueueOperation(db, "INSERT", "attendances", id, {

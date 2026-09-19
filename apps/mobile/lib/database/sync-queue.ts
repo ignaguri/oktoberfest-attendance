@@ -192,6 +192,28 @@ export async function getFailedOperations(
 }
 
 /**
+ * Whether a delete for this record is still waiting to reach the server.
+ *
+ * `_dirty` cannot answer this. markRecordClean clears it after any successful
+ * op on the record id, so a queued DELETE can sit behind a completed UPDATE
+ * with the row already looking clean - and a caller trusting `_dirty` would
+ * revive a day the user deleted.
+ */
+export async function hasPendingDelete(
+  db: SQLite.SQLiteDatabase,
+  tableName: SyncableTable,
+  recordId: string,
+): Promise<boolean> {
+  const row = await db.getFirstAsync<{ count: number }>(
+    `SELECT COUNT(*) as count FROM _sync_queue
+     WHERE table_name = ? AND record_id = ? AND operation = 'DELETE'
+       AND status IN ('pending', 'processing', 'failed')`,
+    [tableName, recordId],
+  );
+  return (row?.count ?? 0) > 0;
+}
+
+/**
  * Updates the status of an operation.
  */
 export async function updateOperationStatus(
