@@ -67,7 +67,7 @@ async function waitForActiveDayRow(
   while (Date.now() < deadline) {
     const { data } = await supabaseAdmin
       .from("user_active_days")
-      .select("platform, app_version, request_count")
+      .select("platform, app_version, push_permission, request_count")
       .eq("user_id", userId)
       .maybeSingle();
     if (data && data.request_count >= minRequestCount) {
@@ -186,5 +186,45 @@ describe("client identification headers reach user_active_days", () => {
     const row = await waitForActiveDayRow(user.id, { minRequestCount: 2 });
     expect(row.platform).toBe("web");
     expect(row.app_version).toBe("1.3.0");
+  });
+
+  it("records the push permission the client sent", async () => {
+    const user = await createTestUser();
+
+    const response = await ping(user.token, {
+      "X-Client-Platform": "ios",
+      "X-Client-Push-Permission": "denied",
+    });
+    expect(response.status).toBe(200);
+
+    const row = await waitForActiveDayRow(user.id);
+    expect(row.push_permission).toBe("denied");
+  });
+
+  it("stores NULL for an unknown push permission value instead of failing the upsert", async () => {
+    const user = await createTestUser();
+
+    const response = await ping(user.token, {
+      "X-Client-Platform": "ios",
+      "X-Client-Push-Permission": "provisional",
+    });
+    expect(response.status).toBe(200);
+
+    // The row still lands (platform recorded) even though the value was rejected.
+    const row = await waitForActiveDayRow(user.id);
+    expect(row.platform).toBe("ios");
+    expect(row.push_permission).toBeNull();
+  });
+
+  it("keeps the day's push permission when a later request omits it", async () => {
+    const user = await createTestUser();
+
+    await ping(user.token, { "X-Client-Push-Permission": "granted" });
+    await waitForActiveDayRow(user.id);
+
+    await ping(user.token);
+
+    const row = await waitForActiveDayRow(user.id, { minRequestCount: 2 });
+    expect(row.push_permission).toBe("granted");
   });
 });
