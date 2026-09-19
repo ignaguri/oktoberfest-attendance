@@ -22,8 +22,9 @@ import {
 } from "@/lib/notifications/contextual-ask";
 
 interface NotificationAskDialogProps {
-  /** The action that prompted the ask; null keeps the dialog closed. */
-  trigger: NotificationAskTrigger | null;
+  isOpen: boolean;
+  /** The action that prompted the ask; picks the copy. */
+  trigger: NotificationAskTrigger;
   permissionStatus: NotificationPermissionStatus;
   onPrimary: () => Promise<void>;
   onNotNow: () => Promise<void>;
@@ -35,13 +36,14 @@ interface NotificationAskDialogProps {
  * button opens device settings instead of the OS prompt.
  */
 export function NotificationAskDialog({
+  isOpen,
   trigger,
   permissionStatus,
   onPrimary,
   onNotNow,
 }: NotificationAskDialogProps) {
   const { t } = useTranslation();
-  const copyKey = CONTEXTUAL_ASK_COPY_KEY[trigger ?? "friend_request"];
+  const copyKey = CONTEXTUAL_ASK_COPY_KEY[trigger];
   const isDenied = permissionStatus === "denied";
   const primaryLabel = isDenied
     ? t("notifications.ask.openSettings")
@@ -52,7 +54,7 @@ export function NotificationAskDialog({
 
   return (
     <AlertDialog
-      isOpen={trigger !== null}
+      isOpen={isOpen}
       onClose={() => {
         void onNotNow();
       }}

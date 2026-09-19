@@ -67,3 +67,34 @@ export function shouldShowContextualAsk(input: {
   }
   return input.now.getTime() - input.lastDeclinedAt.getTime() >= CONTEXTUAL_ASK_COOLDOWN_MS;
 }
+
+/**
+ * Re-checked when the open delay ends, since state can move during it. Any
+ * false here drops the ask silently: no decline recorded, session not marked.
+ * An undetermined permission with the launch prompt not yet shown means that
+ * prompt is about to open (often at cold start via a deep link), so the
+ * contextual ask yields to it instead of stacking a second dialog.
+ */
+export function shouldOpenPendingContextualAsk(input: {
+  hasAskedThisSession: boolean;
+  canShowLaunchPopups: boolean;
+  requestingUserId: string;
+  currentUserId: string | null;
+  permissionStatus: PermissionStatus;
+  isPermissionLoading: boolean;
+  hasLaunchPromptBeenShown: boolean;
+}): boolean {
+  if (input.hasAskedThisSession || !input.canShowLaunchPopups) {
+    return false;
+  }
+  if (input.currentUserId !== input.requestingUserId) {
+    return false;
+  }
+  if (input.isPermissionLoading || input.permissionStatus === "granted") {
+    return false;
+  }
+  if (!input.hasLaunchPromptBeenShown && input.permissionStatus === "undetermined") {
+    return false;
+  }
+  return true;
+}

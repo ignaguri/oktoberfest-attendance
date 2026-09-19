@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   CONTEXTUAL_ASK_COOLDOWN_MS,
+  shouldOpenPendingContextualAsk,
   shouldShowContextualAsk,
   shouldShowFestivalAlertCard,
   shouldSyncPushRegistration,
@@ -112,12 +113,12 @@ describe("shouldShowContextualAsk", () => {
 
   it("stops for good after three declines", () => {
     const longAgo = new Date(NOW.getTime() - 30 * CONTEXTUAL_ASK_COOLDOWN_MS);
-    expect(
-      shouldShowContextualAsk({ ...askReady, declineCount: 2, lastDeclinedAt: longAgo }),
-    ).toBe(true);
-    expect(
-      shouldShowContextualAsk({ ...askReady, declineCount: 3, lastDeclinedAt: longAgo }),
-    ).toBe(false);
+    expect(shouldShowContextualAsk({ ...askReady, declineCount: 2, lastDeclinedAt: longAgo })).toBe(
+      true,
+    );
+    expect(shouldShowContextualAsk({ ...askReady, declineCount: 3, lastDeclinedAt: longAgo })).toBe(
+      false,
+    );
   });
 
   it("waits a full seven days after a decline", () => {
@@ -133,5 +134,71 @@ describe("shouldShowContextualAsk", () => {
 
   it("uses a seven-day cooldown", () => {
     expect(CONTEXTUAL_ASK_COOLDOWN_MS).toBe(604_800_000);
+  });
+});
+
+const pendingAskReady = {
+  hasAskedThisSession: false,
+  canShowLaunchPopups: true,
+  requestingUserId: "user-1",
+  currentUserId: "user-1" as string | null,
+  permissionStatus: "undetermined" as "undetermined" | "granted" | "denied",
+  isPermissionLoading: false,
+  hasLaunchPromptBeenShown: true,
+};
+
+describe("shouldOpenPendingContextualAsk", () => {
+  it("opens when nothing changed during the delay", () => {
+    expect(shouldOpenPendingContextualAsk(pendingAskReady)).toBe(true);
+  });
+
+  it("opens for denied permission, since the dialog can open settings", () => {
+    expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, permissionStatus: "denied" })).toBe(
+      true,
+    );
+  });
+
+  it("drops the ask once this session already asked", () => {
+    expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, hasAskedThisSession: true })).toBe(
+      false,
+    );
+  });
+
+  it("drops the ask while another launch popup is showing", () => {
+    expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, canShowLaunchPopups: false })).toBe(
+      false,
+    );
+  });
+
+  it("drops the ask when the user changed or signed out", () => {
+    expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, currentUserId: "user-2" })).toBe(
+      false,
+    );
+    expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, currentUserId: null })).toBe(false);
+  });
+
+  it("drops the ask when permission was granted or is reloading", () => {
+    expect(
+      shouldOpenPendingContextualAsk({ ...pendingAskReady, permissionStatus: "granted" }),
+    ).toBe(false);
+    expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, isPermissionLoading: true })).toBe(
+      false,
+    );
+  });
+
+  it("drops the ask while the launch prompt is still pending", () => {
+    expect(
+      shouldOpenPendingContextualAsk({ ...pendingAskReady, hasLaunchPromptBeenShown: false }),
+    ).toBe(false);
+  });
+
+  it("opens with an unseen launch prompt when permission is already denied", () => {
+    expect(
+      shouldOpenPendingContextualAsk({
+        ...pendingAskReady,
+        hasLaunchPromptBeenShown: false,
+        permissionStatus: "denied",
+      }),
+    ).toBe(true);
   });
 });

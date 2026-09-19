@@ -105,7 +105,12 @@ function SearchResultItem({ user }: { user: SearchUserResult }) {
   const { friendshipId } = user;
 
   const handleSendRequest = useCallback(() => {
-    sendRequest.mutate(user.id).then(() => ask("friend_request"));
+    // No error UI here (as before the ask); the catch only keeps a failed
+    // request from becoming an unhandled rejection.
+    sendRequest
+      .mutate(user.id)
+      .then(() => ask("friend_request"))
+      .catch(() => {});
   }, [sendRequest, user.id, ask]);
 
   // Accepting takes more than the friendshipId (it needs the request card's

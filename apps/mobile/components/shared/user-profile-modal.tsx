@@ -217,12 +217,22 @@ function MobileFriendshipBadge({
 
   const handleSendRequest = useCallback(() => {
     if (!userId) return;
-    sendRequest.mutate(userId).then(() => ask("friend_request"));
+    // No error UI here (as before the ask); the catch only keeps a failed
+    // request from becoming an unhandled rejection.
+    sendRequest
+      .mutate(userId)
+      .then(() => ask("friend_request"))
+      .catch(() => {});
   }, [sendRequest, userId, ask]);
 
   const handleAcceptRequest = useCallback(() => {
     if (!friendshipId) return;
-    acceptRequest.mutate(friendshipId).then(() => ask("friend_request"));
+    // No error UI here (as before the ask); the catch only keeps a failed
+    // request from becoming an unhandled rejection.
+    acceptRequest
+      .mutate(friendshipId)
+      .then(() => ask("friend_request"))
+      .catch(() => {});
   }, [acceptRequest, friendshipId, ask]);
 
   switch (status) {

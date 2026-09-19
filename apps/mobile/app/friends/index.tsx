@@ -111,14 +111,24 @@ export default function FriendsScreen() {
   // Handlers
   const handleSendRequest = useCallback(
     (userId: string) => {
-      sendRequest.mutate(userId).then(() => ask("friend_request"));
+      // No error UI here (as before the ask); the catch only keeps a failed
+      // request from becoming an unhandled rejection.
+      sendRequest
+        .mutate(userId)
+        .then(() => ask("friend_request"))
+        .catch(() => {});
     },
     [sendRequest, ask],
   );
 
   const handleAcceptRequest = useCallback(
     (requestId: string) => {
-      acceptRequest.mutate(requestId).then(() => ask("friend_request"));
+      // No error UI here (as before the ask); the catch only keeps a failed
+      // request from becoming an unhandled rejection.
+      acceptRequest
+        .mutate(requestId)
+        .then(() => ask("friend_request"))
+        .catch(() => {});
     },
     [acceptRequest, ask],
   );

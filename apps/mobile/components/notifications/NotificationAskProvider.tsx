@@ -21,7 +21,10 @@ import {
   runContextualAskPrimary,
 } from "@/lib/notifications/contextual-ask";
 import { useNotificationContextSafe } from "@/lib/notifications/NotificationContext";
-import { shouldShowContextualAsk } from "@/lib/notifications/push-registration-rules";
+import {
+  shouldOpenPendingContextualAsk,
+  shouldShowContextualAsk,
+} from "@/lib/notifications/push-registration-rules";
 import { usePushRegistration } from "@/lib/notifications/usePushRegistration";
 
 interface NotificationAskContextValue {
@@ -55,19 +58,38 @@ async function openDeviceSettings(): Promise<void> {
 export function NotificationAskProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
-  const { permissionStatus, isPermissionLoading, requestPermission } = useNotificationContextSafe();
+  const { permissionStatus, isPermissionLoading, hasPromptBeenShown, requestPermission } =
+    useNotificationContextSafe();
   const { register } = usePushRegistration();
   const canShowLaunchPopups = useCanShowLaunchPopups();
 
-  const [openTrigger, setOpenTrigger] = useState<NotificationAskTrigger | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  // Kept after close so the copy does not flip during the exit animation.
+  const [displayedTrigger, setDisplayedTrigger] =
+    useState<NotificationAskTrigger>("friend_request");
+  // gluestack calls onClose on every backdrop tap / Android back, even while the
+  // dialog is already fading out, so only the first close action may count.
+  const isDialogOpenRef = useRef(false);
   const hasAskedThisSessionRef = useRef(false);
   const openTimerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ask() runs from mutation callbacks and a timer, after renders it did not see,
   // so it reads current values from this ref instead of closing over stale ones.
-  const latestRef = useRef({ userId, permissionStatus, isPermissionLoading, canShowLaunchPopups });
+  const latestRef = useRef({
+    userId,
+    permissionStatus,
+    isPermissionLoading,
+    hasPromptBeenShown,
+    canShowLaunchPopups,
+  });
   useEffect(() => {
-    latestRef.current = { userId, permissionStatus, isPermissionLoading, canShowLaunchPopups };
+    latestRef.current = {
+      userId,
+      permissionStatus,
+      isPermissionLoading,
+      hasPromptBeenShown,
+      canShowLaunchPopups,
+    };
   });
 
   useEffect(() => {
@@ -103,17 +125,24 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
         openTimerIdRef.current = setTimeout(() => {
           openTimerIdRef.current = null;
           const current = latestRef.current;
-          // Another popup (update, What's New) is showing, or the user changed:
-          // drop this ask without counting it, the next trigger can try again.
-          if (
-            hasAskedThisSessionRef.current ||
-            !current.canShowLaunchPopups ||
-            current.userId !== requestingUserId
-          ) {
+          // Another popup is showing or pending, the user changed, or permission
+          // moved: drop this ask without counting it, the next trigger can try again.
+          const shouldOpen = shouldOpenPendingContextualAsk({
+            hasAskedThisSession: hasAskedThisSessionRef.current,
+            canShowLaunchPopups: current.canShowLaunchPopups,
+            requestingUserId,
+            currentUserId: current.userId,
+            permissionStatus: current.permissionStatus,
+            isPermissionLoading: current.isPermissionLoading,
+            hasLaunchPromptBeenShown: current.hasPromptBeenShown,
+          });
+          if (!shouldOpen) {
             return;
           }
           hasAskedThisSessionRef.current = true;
-          setOpenTrigger(trigger);
+          isDialogOpenRef.current = true;
+          setDisplayedTrigger(trigger);
+          setIsOpen(true);
         }, CONTEXTUAL_ASK_OPEN_DELAY_MS);
       })
       .catch((error) => {
@@ -129,7 +158,11 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
   }, [userId]);
 
   const handleNotNow = useCallback(async () => {
-    setOpenTrigger(null);
+    if (!isDialogOpenRef.current) {
+      return;
+    }
+    isDialogOpenRef.current = false;
+    setIsOpen(false);
     try {
       await recordDecline();
     } catch (error) {
@@ -138,7 +171,11 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
   }, [recordDecline]);
 
   const handlePrimary = useCallback(async () => {
-    setOpenTrigger(null);
+    if (!isDialogOpenRef.current) {
+      return;
+    }
+    isDialogOpenRef.current = false;
+    setIsOpen(false);
     try {
       await runContextualAskPrimary({
         permissionStatus,
@@ -158,7 +195,8 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
     <NotificationAskContext.Provider value={value}>
       {children}
       <NotificationAskDialog
-        trigger={openTrigger}
+        isOpen={isOpen}
+        trigger={displayedTrigger}
         permissionStatus={permissionStatus}
         onPrimary={handlePrimary}
         onNotNow={handleNotNow}
