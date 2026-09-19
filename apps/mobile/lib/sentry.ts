@@ -5,6 +5,8 @@
 import * as Sentry from "@sentry/react-native";
 import Constants from "expo-constants";
 
+import { flushPendingSentryEvents } from "./logger";
+
 const SENTRY_DSN =
   Constants.expoConfig?.extra?.sentryDsn ||
   (typeof process !== "undefined" ? process.env.EXPO_PUBLIC_SENTRY_DSN : "") ||
@@ -93,6 +95,10 @@ export function initSentry() {
       return event;
     },
   });
+
+  // Errors logged before this point were held back rather than dropped, so a
+  // failure during startup still reaches Sentry. Send them now.
+  flushPendingSentryEvents();
 
   if (__DEV__) {
     // eslint-disable-next-line no-console

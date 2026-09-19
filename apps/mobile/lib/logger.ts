@@ -89,6 +89,85 @@ function stringifyContextValues(ctx?: LogContext): LogContext | undefined {
   );
 }
 
+/**
+ * An error raised before Sentry.init has run used to be dropped outright, and
+ * that is exactly the window cold-start failures live in: a device that could
+ * not save a drink for two hours reported nothing for the first of them. Hold
+ * those events here and send them once a client exists.
+ */
+interface PendingSentryEvent {
+  message: string;
+  error?: Error | unknown;
+  context?: LogContext;
+  errorContext: LogContext;
+  /**
+   * When the error actually happened. Sentry stamps a held event at flush time,
+   * which on these cold starts can be half a minute late, so the real time
+   * rides along in the context.
+   */
+  loggedAt: string;
+}
+
+/** Bound keeps a boot loop from growing the queue without limit. */
+const MAX_PENDING_SENTRY_EVENTS = 50;
+
+const pendingSentryEvents: PendingSentryEvent[] = [];
+
+type SentryLike = {
+  getClient?: () => unknown;
+  captureException: (error: unknown, hint?: unknown) => void;
+  captureMessage: (message: string, hint?: unknown) => void;
+};
+
+function loadSentry(): SentryLike | null {
+  try {
+    // Loaded lazily so this module stays usable if Sentry isn't bundled.
+    return require("./sentry").Sentry as SentryLike;
+  } catch {
+    return null;
+  }
+}
+
+function captureWithSentry(sentry: SentryLike, event: PendingSentryEvent) {
+  if (event.error instanceof Error) {
+    sentry.captureException(event.error, {
+      contexts: {
+        custom: { ...stringifyContextValues(event.context), loggedAt: event.loggedAt },
+      },
+      tags: {
+        source: "logger",
+      },
+    });
+  } else {
+    sentry.captureMessage(event.message, {
+      level: "error",
+      contexts: {
+        custom: { ...stringifyContextValues(event.errorContext), loggedAt: event.loggedAt },
+      },
+    });
+  }
+}
+
+/**
+ * Send everything logged before Sentry came up. Safe to call repeatedly;
+ * initSentry calls it as soon as a client exists.
+ */
+export function flushPendingSentryEvents() {
+  if (pendingSentryEvents.length === 0) return;
+
+  const sentry = loadSentry();
+  if (!sentry?.getClient?.()) return;
+
+  const queued = pendingSentryEvents.splice(0, pendingSentryEvents.length);
+  for (const event of queued) {
+    try {
+      captureWithSentry(sentry, event);
+    } catch {
+      // One rejected event must not stop the rest of the queue draining.
+    }
+  }
+}
+
 class Logger {
   private isDev = typeof __DEV__ !== "undefined" ? __DEV__ : process.env.NODE_ENV !== "production";
 
@@ -133,36 +212,25 @@ class Logger {
 
     // Send to Sentry in production
     if (!this.isDev) {
-      try {
-        // Dynamic import to avoid issues if Sentry isn't loaded
-        const Sentry = require("./sentry").Sentry;
+      const event: PendingSentryEvent = {
+        message,
+        error,
+        context,
+        errorContext,
+        loggedAt: new Date().toISOString(),
+      };
+      const sentry = loadSentry();
 
-        // Check if Sentry is initialized (has a client)
-        const client = Sentry.getClient?.();
-        if (!client) {
-          // Sentry not initialized yet, skip sending
-          return;
+      if (sentry?.getClient?.()) {
+        // Drain anything held from before init so it keeps its ordering.
+        flushPendingSentryEvents();
+        try {
+          captureWithSentry(sentry, event);
+        } catch {
+          // Fail silently if Sentry rejects the event.
         }
-
-        if (error instanceof Error) {
-          Sentry.captureException(error, {
-            contexts: {
-              custom: stringifyContextValues(context),
-            },
-            tags: {
-              source: "logger",
-            },
-          });
-        } else {
-          Sentry.captureMessage(message, {
-            level: "error",
-            contexts: {
-              custom: stringifyContextValues(errorContext),
-            },
-          });
-        }
-      } catch {
-        // Fail silently if Sentry isn't available or not initialized
+      } else if (pendingSentryEvents.length < MAX_PENDING_SENTRY_EVENTS) {
+        pendingSentryEvents.push(event);
       }
     }
   }

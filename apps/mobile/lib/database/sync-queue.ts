@@ -598,6 +598,66 @@ export async function getRecentConsumption<T>(
 }
 
 // =============================================================================
+// Attendance Write Helpers
+// =============================================================================
+
+export interface CreateAttendanceParams {
+  userId: string;
+  festivalId: string;
+  date: string;
+  now: string;
+}
+
+/**
+ * Create the local attendance row for a day that has none, and return its id.
+ *
+ * The subtlety is `_deleted`. A soft-deleted row still occupies the
+ * UNIQUE(user_id, festival_id, date) slot while being invisible to the
+ * `_deleted = 0` lookups callers use to decide the day is missing, so inserting
+ * over one fails with SQLite error 19 and the caller's write is lost - for
+ * good, since nothing purges tombstones. Such a row is resurrected rather than
+ * replaced, which is what processTentVisits already does on pull.
+ *
+ * The tombstone lookup is keyed exactly like the constraint, user id included,
+ * so it matches the row that would actually collide.
+ */
+export async function createOrResurrectLocalAttendance(
+  db: SQLite.SQLiteDatabase,
+  params: CreateAttendanceParams,
+): Promise<string> {
+  const { userId, festivalId, date, now } = params;
+
+  const tombstone = await db.getFirstAsync<{ id: string }>(
+    `SELECT id FROM attendances
+     WHERE user_id = ? AND festival_id = ? AND date = ? AND _deleted = 1`,
+    [userId, festivalId, date],
+  );
+
+  if (tombstone) {
+    // beer_count resets because the day is starting over: the drinks it counted
+    // were soft-deleted with it and stay that way.
+    await db.runAsync(
+      `UPDATE attendances
+       SET _deleted = 0, _dirty = 1, beer_count = 0, updated_at = ?
+       WHERE id = ?`,
+      [now, tombstone.id],
+    );
+    return tombstone.id;
+  }
+
+  const attendanceId = generateUUID();
+  await db.runAsync(
+    `INSERT INTO attendances (
+      id, user_id, festival_id, date, beer_count,
+      created_at, updated_at, _synced_at, _dirty, _deleted
+    ) VALUES (?, ?, ?, ?, 0, ?, ?, NULL, 1, 0)`,
+    [attendanceId, userId, festivalId, date, now, now],
+  );
+
+  return attendanceId;
+}
+
+// =============================================================================
 // Consumption Write Helpers
 // =============================================================================
 
