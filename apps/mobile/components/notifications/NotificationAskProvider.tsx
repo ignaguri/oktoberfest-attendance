@@ -65,6 +65,9 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
   // gluestack calls onClose on every backdrop tap / Android back, even while the
   // dialog is already fading out, so only the first close action may count.
   const isDialogOpenRef = useRef(false);
+  // The user the open dialog was shown to. Declines are stored under this id,
+  // not the current one, in case auth changed while the dialog was up.
+  const askedUserIdRef = useRef<string | null>(null);
   const hasAskedThisSessionRef = useRef(false);
   const openTimerIdRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -133,6 +136,7 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
           }
           hasAskedThisSessionRef.current = true;
           isDialogOpenRef.current = true;
+          askedUserIdRef.current = requestingUserId;
           setDisplayedTrigger(trigger);
           setIsOpen(true);
         }, CONTEXTUAL_ASK_OPEN_DELAY_MS);
@@ -142,12 +146,22 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
+  // The provider sits outside NavigationGuard, so a sign-out or account switch
+  // does not unmount it. Drop a dialog that belongs to another user, uncounted.
+  useEffect(() => {
+    if (isDialogOpenRef.current && askedUserIdRef.current !== userId) {
+      isDialogOpenRef.current = false;
+      setIsOpen(false);
+    }
+  }, [userId]);
+
   const recordDecline = useCallback(async () => {
-    if (!userId) {
+    const askedUserId = askedUserIdRef.current;
+    if (!askedUserId) {
       return;
     }
-    await recordContextualAskDecline(userId, new Date());
-  }, [userId]);
+    await recordContextualAskDecline(askedUserId, new Date());
+  }, []);
 
   const handleNotNow = useCallback(async () => {
     if (!isDialogOpenRef.current) {
