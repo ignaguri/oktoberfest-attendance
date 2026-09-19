@@ -33,6 +33,7 @@ const ADMIN_ID = "11111111-1111-4111-8111-111111111111";
 const OTHER_ID = "22222222-2222-4222-8222-222222222222";
 const ATTENDANCE_ID = "33333333-3333-4333-8333-333333333333";
 const GROUP_ID = "88888888-8888-4888-8888-888888888888";
+const FESTIVAL_ID = "99999999-9999-4999-8999-999999999999";
 
 describe("Admin Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;
@@ -396,6 +397,140 @@ describe("Admin Routes - Unit Tests", () => {
 
       expect(res.status).toBe(400);
       expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("DELETE /admin/festivals/:festivalId", () => {
+    it("refuses with 409 when attendances still reference the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [{ id: ATTENDANCE_ID }], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.message).toMatch(/attendance/i);
+    });
+
+    it("refuses with 409 when groups still reference the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [{ id: GROUP_ID }], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.message).toMatch(/group/i);
+    });
+
+    it("deletes when nothing references the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe("POST /admin/festivals", () => {
+    it("rejects an end_date before start_date", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Backwards Fest",
+            short_name: "BF",
+            festival_type: "other",
+            location: "Nowhere",
+            start_date: "2026-09-20",
+            end_date: "2026-09-19",
+            status: "upcoming",
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    it("rejects a non-positive beer_cost, matching the database CHECK", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Free Fest",
+            short_name: "FF",
+            festival_type: "other",
+            location: "Somewhere",
+            start_date: "2026-09-19",
+            end_date: "2026-09-20",
+            status: "upcoming",
+            beer_cost: 0,
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    it("clears the current active festival before inserting an active one", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: null, error: null }))
+        .mockReturnValueOnce(
+          createMockChain({
+            data: {
+              id: FESTIVAL_ID,
+              name: "New Fest",
+              short_name: "NF",
+              festival_type: "other",
+              location: "Munich",
+              start_date: "2026-09-19",
+              end_date: "2026-09-20",
+              map_url: null,
+              timezone: "Europe/Berlin",
+              is_active: true,
+              status: "upcoming",
+              description: null,
+              beer_cost: null,
+              created_at: "2026-09-19T00:00:00Z",
+              updated_at: "2026-09-19T00:00:00Z",
+            },
+            error: null,
+          }),
+        );
+
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "New Fest",
+            short_name: "NF",
+            festival_type: "other",
+            location: "Munich",
+            start_date: "2026-09-19",
+            end_date: "2026-09-20",
+            status: "upcoming",
+            is_active: true,
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(201);
+      // Two calls: the deactivate sweep, then the insert. Without the sweep the
+      // unique partial index on is_active rejects the insert.
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(2);
     });
   });
 

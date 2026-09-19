@@ -1547,6 +1547,34 @@
   },
   "admin": {
     "mobile": {
+      "festivals": {
+        "loading": "Cargando festivales...",
+        "empty": "No se encontraron festivales",
+        "openHint": "Abre los detalles de este festival",
+        "activeBadge": "Activo",
+        "status": {
+          "upcoming": "Próximo",
+          "active": "Activo",
+          "ended": "Finalizado"
+        }
+      },
+      "festivalDetail": {
+        "title": "Festival",
+        "loading": "Cargando...",
+        "name": "Nombre",
+        "location": "Ubicación",
+        "edit": "Editar detalles",
+        "isActive": "Festival activo",
+        "isActiveHint": "Solo un festival puede estar activo; al activarlo se desactiva el otro.",
+        "status": "Estado",
+        "dangerZone": "Zona de peligro",
+        "deleteFestival": "Eliminar festival",
+        "deleteFestivalHint": "Elimina permanentemente este festival",
+        "deleteFestivalConfirm": "Esto elimina permanentemente el festival. ¿Continuar?",
+        "deleteBlockedHint": "Un festival con asistencias o grupos no se puede eliminar. Márcalo como Finalizado.",
+        "updateError": "No se pudo guardar el cambio",
+        "deleteError": "No se pudo eliminar"
+      },
       "groups": {
         "loading": "Cargando grupos...",
         "empty": "No se encontraron grupos",
@@ -1611,6 +1639,7 @@
       "openAdminHint": "Abre el área de administración",
       "hubDescription": "Herramientas de administración. Los cambios aquí afectan a todos los usuarios.",
       "sections": {
+        "festivals": "Crear y editar festivales",
         "groups": "Editar y eliminar grupos",
         "users": "Buscar y gestionar cuentas de usuario",
         "location": "Sesiones activas de ubicación compartida"

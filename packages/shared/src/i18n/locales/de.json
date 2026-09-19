@@ -1706,6 +1706,34 @@
   },
   "admin": {
     "mobile": {
+      "festivals": {
+        "loading": "Festivals werden geladen...",
+        "empty": "Keine Festivals gefunden",
+        "openHint": "Öffnet die Details dieses Festivals",
+        "activeBadge": "Aktiv",
+        "status": {
+          "upcoming": "Bevorstehend",
+          "active": "Aktiv",
+          "ended": "Beendet"
+        }
+      },
+      "festivalDetail": {
+        "title": "Festival",
+        "loading": "Wird geladen...",
+        "name": "Name",
+        "location": "Ort",
+        "edit": "Details bearbeiten",
+        "isActive": "Aktives Festival",
+        "isActiveHint": "Nur ein Festival kann aktiv sein; das Einschalten deaktiviert das andere.",
+        "status": "Status",
+        "dangerZone": "Gefahrenbereich",
+        "deleteFestival": "Festival löschen",
+        "deleteFestivalHint": "Entfernt dieses Festival dauerhaft",
+        "deleteFestivalConfirm": "Damit wird das Festival dauerhaft gelöscht. Fortfahren?",
+        "deleteBlockedHint": "Ein Festival mit Besuchen oder Gruppen kann nicht gelöscht werden. Setze es stattdessen auf Beendet.",
+        "updateError": "Änderung konnte nicht gespeichert werden",
+        "deleteError": "Löschen fehlgeschlagen"
+      },
       "groups": {
         "loading": "Gruppen werden geladen...",
         "empty": "Keine Gruppen gefunden",
@@ -1770,6 +1798,7 @@
       "openAdminHint": "Öffnet den Verwaltungsbereich",
       "hubDescription": "Verwaltungswerkzeuge. Änderungen hier betreffen alle Benutzer.",
       "sections": {
+        "festivals": "Festivals erstellen und bearbeiten",
         "groups": "Gruppen bearbeiten und entfernen",
         "users": "Benutzerkonten suchen und verwalten",
         "location": "Aktive Standortfreigaben"

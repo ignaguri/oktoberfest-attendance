@@ -1,11 +1,14 @@
 import type { Database } from "@prostcounter/db";
 import type {
   AdminAttendance,
+  AdminFestival,
   AdminGroup,
   AdminGroupMember,
   AdminUser,
   ListAdminUsersResponse,
+  CreateAdminFestivalInput,
   UpdateAdminAttendanceInput,
+  UpdateAdminFestivalInput,
   UpdateAdminGroupInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
@@ -454,6 +457,131 @@ export class SupabaseAdminRepository {
         avatar_url: profile?.avatar_url ?? null,
       };
     });
+  }
+
+  // ===========================================================================
+  // Festivals
+  // ===========================================================================
+
+  async listFestivals(): Promise<AdminFestival[]> {
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("*")
+      .order("start_date", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching festivals: ${error.message}`);
+    }
+
+    return (data ?? []) as AdminFestival[];
+  }
+
+  async getFestival(festivalId: string): Promise<AdminFestival | null> {
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("*")
+      .eq("id", festivalId)
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data as AdminFestival;
+  }
+
+  /**
+   * Clears is_active on every other festival.
+   *
+   * `idx_festivals_single_active` is a unique partial index over
+   * `is_active WHERE is_active = true`, so marking a second festival active
+   * fails with a constraint violation unless the previous one is cleared first.
+   * The web panel does not do this, so activating a festival there errors.
+   */
+  private async deactivateOtherFestivals(exceptFestivalId?: string): Promise<void> {
+    let query = this.supabase.from("festivals").update({ is_active: false }).eq("is_active", true);
+
+    if (exceptFestivalId) {
+      query = query.neq("id", exceptFestivalId);
+    }
+
+    const { error } = await query;
+
+    if (error) {
+      throw new Error(`Error deactivating current festival: ${error.message}`);
+    }
+  }
+
+  async createFestival(input: CreateAdminFestivalInput): Promise<AdminFestival> {
+    if (input.is_active) {
+      await this.deactivateOtherFestivals();
+    }
+
+    const { data, error } = await this.supabase.from("festivals").insert(input).select().single();
+
+    if (error || !data) {
+      throw new Error(`Error creating festival: ${error?.message}`);
+    }
+
+    return data as AdminFestival;
+  }
+
+  async updateFestival(
+    festivalId: string,
+    input: UpdateAdminFestivalInput,
+  ): Promise<AdminFestival> {
+    if (input.is_active) {
+      await this.deactivateOtherFestivals(festivalId);
+    }
+
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .update({ ...input, updated_at: new Date().toISOString() })
+      .eq("id", festivalId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error updating festival: ${error?.message}`);
+    }
+
+    return data as AdminFestival;
+  }
+
+  /**
+   * Deletes a festival, refusing when dependent data exists.
+   *
+   * Ported from the web panel: attendances and groups reference the festival,
+   * and losing a season's attendance to a stray tap is not recoverable.
+   * Returns a reason string instead of throwing so the route can answer 409.
+   */
+  async deleteFestival(festivalId: string): Promise<{ deleted: true } | { blockedBy: string }> {
+    const [attendances, groups] = await Promise.all([
+      this.supabase.from("attendances").select("id").eq("festival_id", festivalId).limit(1),
+      this.supabase.from("groups").select("id").eq("festival_id", festivalId).limit(1),
+    ]);
+
+    if (attendances.error) {
+      throw new Error(`Error checking festival attendances: ${attendances.error.message}`);
+    }
+    if (groups.error) {
+      throw new Error(`Error checking festival groups: ${groups.error.message}`);
+    }
+
+    if (attendances.data && attendances.data.length > 0) {
+      return { blockedBy: "attendances" };
+    }
+    if (groups.data && groups.data.length > 0) {
+      return { blockedBy: "groups" };
+    }
+
+    const { error } = await this.supabase.from("festivals").delete().eq("id", festivalId);
+
+    if (error) {
+      throw new Error(`Error deleting festival: ${error.message}`);
+    }
+
+    return { deleted: true };
   }
 
   async listWinningCriteria(): Promise<WinningCriterion[]> {

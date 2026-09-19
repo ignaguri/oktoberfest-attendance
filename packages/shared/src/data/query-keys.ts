@@ -141,6 +141,8 @@ export class QueryKeys {
   static adminUserAttendances = (userId: string) => ["admin", "user-attendances", userId] as const;
   /** Prefix covering every cached attendance list. */
   static adminUserAttendancesAll = () => ["admin", "user-attendances"] as const;
+  static adminFestivals = () => ["admin", "festivals"] as const;
+  static adminFestival = (festivalId: string) => ["admin", "festival", festivalId] as const;
   static adminGroups = () => ["admin", "groups"] as const;
   static adminGroup = (groupId: string) => ["admin", "group", groupId] as const;
   static adminGroupMembers = (groupId: string) => ["admin", "group", groupId, "members"] as const;

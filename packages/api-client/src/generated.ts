@@ -10487,6 +10487,421 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/festivals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List festivals (admin) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Festivals retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            festivals: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                short_name: string;
+                                /** @enum {string} */
+                                festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
+                                location: string;
+                                start_date: string;
+                                end_date: string;
+                                map_url: string | null;
+                                timezone: string;
+                                is_active: boolean;
+                                /** @enum {string} */
+                                status: "upcoming" | "active" | "ended";
+                                description: string | null;
+                                beer_cost: number | null;
+                                created_at: string;
+                                updated_at: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Create a festival (admin)
+         * @description Creates a festival. Marking it active clears is_active on the current one, which a unique partial index otherwise rejects.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name: string;
+                        short_name: string;
+                        /** @enum {string} */
+                        festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
+                        location: string;
+                        start_date: string;
+                        end_date: string;
+                        /** Format: uri */
+                        map_url?: string | null;
+                        timezone?: string;
+                        is_active?: boolean;
+                        /** @enum {string} */
+                        status: "upcoming" | "active" | "ended";
+                        description?: string | null;
+                        beer_cost?: number | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Festival created successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            festival: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                short_name: string;
+                                /** @enum {string} */
+                                festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
+                                location: string;
+                                start_date: string;
+                                end_date: string;
+                                map_url: string | null;
+                                timezone: string;
+                                is_active: boolean;
+                                /** @enum {string} */
+                                status: "upcoming" | "active" | "ended";
+                                description: string | null;
+                                beer_cost: number | null;
+                                created_at: string;
+                                updated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/festivals/{festivalId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a festival (admin) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Festival retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            festival: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                short_name: string;
+                                /** @enum {string} */
+                                festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
+                                location: string;
+                                start_date: string;
+                                end_date: string;
+                                map_url: string | null;
+                                timezone: string;
+                                is_active: boolean;
+                                /** @enum {string} */
+                                status: "upcoming" | "active" | "ended";
+                                description: string | null;
+                                beer_cost: number | null;
+                                created_at: string;
+                                updated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Festival not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Delete a festival (admin)
+         * @description Refuses with 409 when attendances or groups still reference the festival; archive it instead.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Festival deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Festival still has dependent data */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                            blockedBy?: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update a festival (admin) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name?: string;
+                        short_name?: string;
+                        /** @enum {string} */
+                        festival_type?: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
+                        location?: string;
+                        start_date?: string;
+                        end_date?: string;
+                        /** Format: uri */
+                        map_url?: string | null;
+                        timezone?: string;
+                        is_active?: boolean;
+                        /** @enum {string} */
+                        status?: "upcoming" | "active" | "ended";
+                        description?: string | null;
+                        beer_cost?: number | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Festival updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            festival: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                short_name: string;
+                                /** @enum {string} */
+                                festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
+                                location: string;
+                                start_date: string;
+                                end_date: string;
+                                map_url: string | null;
+                                timezone: string;
+                                is_active: boolean;
+                                /** @enum {string} */
+                                status: "upcoming" | "active" | "ended";
+                                description: string | null;
+                                beer_cost: number | null;
+                                created_at: string;
+                                updated_at: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {

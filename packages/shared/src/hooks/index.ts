@@ -212,6 +212,13 @@ export {
   useForceStopLocationSession,
 } from "./useAdminLocation";
 export {
+  useAdminFestival,
+  useAdminFestivals,
+  useCreateAdminFestival,
+  useDeleteAdminFestival,
+  useUpdateAdminFestival,
+} from "./useAdminFestivals";
+export {
   useAdminGroup,
   useAdminGroupMembers,
   useAdminGroups,

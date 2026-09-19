@@ -177,3 +177,97 @@ export const WinningCriterionSchema = z.object({
 });
 
 export type WinningCriterion = z.infer<typeof WinningCriterionSchema>;
+
+// =============================================================================
+// Festivals
+// =============================================================================
+
+export const FestivalTypeSchema = z.enum([
+  "oktoberfest",
+  "starkbierfest",
+  "fruehlingsfest",
+  "other",
+]);
+
+export type FestivalType = z.infer<typeof FestivalTypeSchema>;
+
+export const AdminFestivalStatusSchema = z.enum(["upcoming", "active", "ended"]);
+
+/**
+ * Admin view of a festival, in the database's own snake_case.
+ *
+ * Distinct from the public `FestivalSchema`, which is camelCase and omits the
+ * columns only an admin edits (short_name, festival_type, description).
+ */
+export const AdminFestivalSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  short_name: z.string(),
+  festival_type: FestivalTypeSchema,
+  location: z.string(),
+  start_date: z.string(),
+  end_date: z.string(),
+  map_url: z.string().nullable(),
+  timezone: z.string(),
+  is_active: z.boolean(),
+  status: AdminFestivalStatusSchema,
+  description: z.string().nullable(),
+  beer_cost: z.number().nullable(),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export type AdminFestival = z.infer<typeof AdminFestivalSchema>;
+
+const festivalDateRange = {
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Expected YYYY-MM-DD" }),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Expected YYYY-MM-DD" }),
+};
+
+export const CreateAdminFestivalSchema = z
+  .object({
+    name: z.string().min(1).max(255),
+    short_name: z.string().min(1).max(100),
+    festival_type: FestivalTypeSchema,
+    location: z.string().min(1).max(255),
+    ...festivalDateRange,
+    map_url: z.string().url().nullable().optional(),
+    timezone: z.string().min(1).max(100).optional(),
+    is_active: z.boolean().optional(),
+    status: AdminFestivalStatusSchema,
+    description: z.string().nullable().optional(),
+    // The database enforces beer_cost > 0 via a CHECK constraint; mirror it here
+    // so a bad value fails validation instead of surfacing as a 500.
+    beer_cost: z.number().positive().nullable().optional(),
+  })
+  .refine((data) => data.end_date >= data.start_date, {
+    error: "end_date must not be before start_date",
+    path: ["end_date"],
+  });
+
+export type CreateAdminFestivalInput = z.infer<typeof CreateAdminFestivalSchema>;
+
+export const UpdateAdminFestivalSchema = z
+  .object({
+    name: z.string().min(1).max(255).optional(),
+    short_name: z.string().min(1).max(100).optional(),
+    festival_type: FestivalTypeSchema.optional(),
+    location: z.string().min(1).max(255).optional(),
+    start_date: festivalDateRange.start_date.optional(),
+    end_date: festivalDateRange.end_date.optional(),
+    map_url: z.string().url().nullable().optional(),
+    timezone: z.string().min(1).max(100).optional(),
+    is_active: z.boolean().optional(),
+    status: AdminFestivalStatusSchema.optional(),
+    description: z.string().nullable().optional(),
+    beer_cost: z.number().positive().nullable().optional(),
+  })
+  .refine(
+    (data) =>
+      data.start_date === undefined ||
+      data.end_date === undefined ||
+      data.end_date >= data.start_date,
+    { error: "end_date must not be before start_date", path: ["end_date"] },
+  );
+
+export type UpdateAdminFestivalInput = z.infer<typeof UpdateAdminFestivalSchema>;
