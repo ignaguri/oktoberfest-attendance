@@ -1,14 +1,6 @@
 import { useCanShowLaunchPopups } from "@prostcounter/shared/contexts";
 import type { ReactNode } from "react";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Linking, Platform } from "react-native";
 
 import { NotificationAskDialog } from "@/components/notifications/NotificationAskDialog";
@@ -27,19 +19,23 @@ import {
 } from "@/lib/notifications/push-registration-rules";
 import { usePushRegistration } from "@/lib/notifications/usePushRegistration";
 
-interface NotificationAskContextValue {
-  ask: (trigger: NotificationAskTrigger) => void;
-}
+type AskFunction = (trigger: NotificationAskTrigger) => void;
 
-const NotificationAskContext = createContext<NotificationAskContextValue | null>(null);
+// Not React context on purpose: gluestack renders sheets and modals through its
+// OverlayProvider, which sits above this provider, so context never reaches the
+// day planner, the join-group sheet or the profile modal. The mounted provider
+// registers its ask here instead.
+let registeredAsk: AskFunction | null = null;
 
-const NOOP_ASK: NotificationAskContextValue = {
-  ask: () => {},
+const NOTIFICATION_ASK: { ask: AskFunction } = {
+  ask: (trigger) => {
+    registeredAsk?.(trigger);
+  },
 };
 
-/** Outside the provider (tests, isolated screens) asking is a no-op. */
-export function useNotificationAsk(): NotificationAskContextValue {
-  return useContext(NotificationAskContext) ?? NOOP_ASK;
+/** Works from any component, portals included. A no-op while no provider is mounted. */
+export function useNotificationAsk(): { ask: AskFunction } {
+  return NOTIFICATION_ASK;
 }
 
 async function openDeviceSettings(): Promise<void> {
@@ -185,10 +181,17 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
     }
   }, [permissionStatus, requestPermission, register, recordDecline]);
 
-  const value = useMemo(() => ({ ask }), [ask]);
+  useEffect(() => {
+    registeredAsk = ask;
+    return () => {
+      if (registeredAsk === ask) {
+        registeredAsk = null;
+      }
+    };
+  }, [ask]);
 
   return (
-    <NotificationAskContext.Provider value={value}>
+    <>
       {children}
       <NotificationAskDialog
         isOpen={isOpen}
@@ -197,6 +200,6 @@ export function NotificationAskProvider({ children }: { children: ReactNode }) {
         onPrimary={handlePrimary}
         onNotNow={handleNotNow}
       />
-    </NotificationAskContext.Provider>
+    </>
   );
 }
