@@ -7,6 +7,7 @@ import { loggerMiddleware } from "./middleware/logger";
 import { requireAdmin } from "./middleware/require-admin";
 // Import routes
 import achievementRoute from "./routes/achievement.route";
+import adminRoute from "./routes/admin.route";
 import activityFeedRoute from "./routes/activity-feed.route";
 import attendanceRoute from "./routes/attendance.route";
 import calendarRoute from "./routes/calendar.route";
@@ -85,6 +86,7 @@ apiV1.route("/", photoSocialRoute);
 apiV1.route("/", profileRoute);
 apiV1.route("/", activityFeedRoute);
 apiV1.route("/", crowdReportRoute);
+apiV1.route("/", adminRoute);
 
 // Mount v1 routes under /v1 prefix
 app.route("/v1", apiV1);

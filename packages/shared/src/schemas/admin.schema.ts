@@ -41,3 +41,87 @@ export const ListAdminLocationSessionsQuerySchema = z.object({
 });
 
 export type ListAdminLocationSessionsQuery = z.infer<typeof ListAdminLocationSessionsQuerySchema>;
+
+// =============================================================================
+// Users
+// =============================================================================
+
+export const AdminUserProfileSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string().nullable(),
+  full_name: z.string().nullable(),
+  avatar_url: z.string().nullable(),
+  is_super_admin: z.boolean().nullable(),
+});
+
+export const AdminUserSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().nullable(),
+  created_at: z.string().nullable(),
+  last_sign_in_at: z.string().nullable(),
+  profile: AdminUserProfileSchema.nullable(),
+});
+
+export type AdminUser = z.infer<typeof AdminUserSchema>;
+
+export const ListAdminUsersResponseSchema = z.object({
+  users: z.array(AdminUserSchema),
+  totalCount: z.number(),
+  totalPages: z.number(),
+  currentPage: z.number(),
+  /**
+   * True when the auth directory was larger than the scan ceiling, so the
+   * result may be incomplete. Surfaced rather than hidden -- silently
+   * truncating an admin search is worse than saying so.
+   */
+  truncated: z.boolean(),
+});
+
+export type ListAdminUsersResponse = z.infer<typeof ListAdminUsersResponseSchema>;
+
+/** Profile fields an admin may change on another user. */
+export const UpdateAdminUserProfileSchema = z.object({
+  username: z.string().min(3).max(30).nullable().optional(),
+  full_name: z.string().min(1).max(100).nullable().optional(),
+  is_super_admin: z.boolean().optional(),
+});
+
+export type UpdateAdminUserProfileInput = z.infer<typeof UpdateAdminUserProfileSchema>;
+
+/** Auth fields an admin may change. Requires the service role. */
+export const UpdateAdminUserAuthSchema = z
+  .object({
+    email: z.string().email().optional(),
+    password: z.string().min(8).optional(),
+  })
+  .refine((data) => data.email !== undefined || data.password !== undefined, {
+    error: "Provide an email or a password to change",
+  });
+
+export type UpdateAdminUserAuthInput = z.infer<typeof UpdateAdminUserAuthSchema>;
+
+// =============================================================================
+// Attendances
+// =============================================================================
+
+export const AdminAttendanceSchema = z.object({
+  id: z.string().uuid(),
+  // Nullable in the database: attendances.user_id carries no NOT NULL
+  // constraint, so an orphaned row is representable even if RLS makes one
+  // unlikely in practice.
+  user_id: z.string().uuid().nullable(),
+  festival_id: z.string().uuid(),
+  date: z.string(),
+  beer_count: z.number(),
+  tent_ids: z.array(z.string().uuid()),
+});
+
+export type AdminAttendance = z.infer<typeof AdminAttendanceSchema>;
+
+export const UpdateAdminAttendanceSchema = z.object({
+  date: z.string().optional(),
+  beer_count: z.number().int().min(0).optional(),
+  tent_ids: z.array(z.string().uuid()).optional(),
+});
+
+export type UpdateAdminAttendanceInput = z.infer<typeof UpdateAdminAttendanceSchema>;

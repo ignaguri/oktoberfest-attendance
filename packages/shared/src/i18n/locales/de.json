@@ -1706,11 +1706,49 @@
   },
   "admin": {
     "mobile": {
+      "users": {
+        "searchPlaceholder": "Nach Name, Benutzername oder E-Mail suchen",
+        "loading": "Benutzer werden geladen...",
+        "empty": "Keine Benutzer gefunden",
+        "noName": "Benutzer ohne Namen",
+        "adminBadge": "Admin",
+        "resultCount": "{{count}} Benutzer",
+        "openHint": "Öffnet die Details dieses Benutzers",
+        "previousPage": "Zurück",
+        "nextPage": "Weiter",
+        "pageOf": "Seite {{page}} von {{totalPages}}",
+        "truncated": "Es gibt mehr Konten, als auf einmal durchsucht werden können. Grenze die Suche ein, um sicherzugehen."
+      },
+      "userDetail": {
+        "title": "Benutzer",
+        "loading": "Wird geladen...",
+        "adminHint": "Gewährt vollen Zugriff auf diesen Adminbereich",
+        "cannotDemoteSelf": "Du kannst deinen eigenen Adminzugang nicht ändern",
+        "setPassword": "Neues Passwort setzen",
+        "setPasswordHint": "Ersetzt das Passwort dieses Benutzers sofort",
+        "setPasswordConfirm": "Das Passwort des Benutzers wird sofort ersetzt. Fortfahren?",
+        "newPasswordPlaceholder": "Neues Passwort (mind. 8 Zeichen)",
+        "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+        "passwordChanged": "Passwort aktualisiert",
+        "attendances": "Besuche",
+        "noAttendances": "Keine Besuche erfasst",
+        "attendanceSummary": "{{beers}} Bier, {{tents}} Zelt(e)",
+        "deleteAttendance": "Besuch löschen",
+        "deleteAttendanceHint": "Entfernt den Besuchseintrag dieses Tages",
+        "deleteAttendanceConfirm": "Damit werden der Besuch und seine Zeltbesuche entfernt. Fortfahren?",
+        "dangerZone": "Gefahrenbereich",
+        "deleteUser": "Konto löschen",
+        "deleteUserHint": "Entfernt dieses Benutzerkonto dauerhaft",
+        "deleteUserConfirm": "Damit werden das Konto und alle Daten dauerhaft gelöscht. Fortfahren?",
+        "updateError": "Änderung konnte nicht gespeichert werden",
+        "deleteError": "Löschen fehlgeschlagen"
+      },
       "subtitle": "Benutzer, Gruppen und Festivaldaten verwalten",
       "openAdmin": "Adminbereich öffnen",
       "openAdminHint": "Öffnet den Verwaltungsbereich",
       "hubDescription": "Verwaltungswerkzeuge. Änderungen hier betreffen alle Benutzer.",
       "sections": {
+        "users": "Benutzerkonten suchen und verwalten",
         "location": "Aktive Standortfreigaben"
       },
       "location": {

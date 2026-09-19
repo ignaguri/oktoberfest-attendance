@@ -133,6 +133,14 @@ export class QueryKeys {
     ["crowd-reports", tentId, festivalId] as const;
 
   // Admin queries
+  static adminUsers = (search?: string, page?: number) =>
+    ["admin", "users", search ?? "", page ?? 1] as const;
+  /** Prefix covering every cached user page, for invalidation after a mutation. */
+  static adminUsersAll = () => ["admin", "users"] as const;
+  static adminUser = (userId: string) => ["admin", "user", userId] as const;
+  static adminUserAttendances = (userId: string) => ["admin", "user-attendances", userId] as const;
+  /** Prefix covering every cached attendance list. */
+  static adminUserAttendancesAll = () => ["admin", "user-attendances"] as const;
   static adminLocationSessions = (filters?: {
     festivalId?: string;
     userId?: string;

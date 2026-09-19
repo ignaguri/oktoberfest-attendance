@@ -1487,11 +1487,49 @@
   },
   "admin": {
     "mobile": {
+      "users": {
+        "searchPlaceholder": "Search by name, username or email",
+        "loading": "Loading users...",
+        "empty": "No users found",
+        "noName": "Unnamed user",
+        "adminBadge": "Admin",
+        "resultCount": "{{count}} user(s)",
+        "openHint": "Opens this user's details",
+        "previousPage": "Previous",
+        "nextPage": "Next",
+        "pageOf": "Page {{page}} of {{totalPages}}",
+        "truncated": "There are more accounts than can be scanned at once. Narrow your search to be sure a user appears."
+      },
+      "userDetail": {
+        "title": "User",
+        "loading": "Loading...",
+        "adminHint": "Grants full access to this admin area",
+        "cannotDemoteSelf": "You cannot change your own admin access",
+        "setPassword": "Set a new password",
+        "setPasswordHint": "Replaces this user's password immediately",
+        "setPasswordConfirm": "This replaces the user's password immediately. Continue?",
+        "newPasswordPlaceholder": "New password (min. 8 characters)",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "passwordChanged": "Password updated",
+        "attendances": "Attendances",
+        "noAttendances": "No attendances recorded",
+        "attendanceSummary": "{{beers}} beer(s), {{tents}} tent(s)",
+        "deleteAttendance": "Delete attendance",
+        "deleteAttendanceHint": "Removes this day's attendance record",
+        "deleteAttendanceConfirm": "This removes the attendance and its tent visits. Continue?",
+        "dangerZone": "Danger zone",
+        "deleteUser": "Delete account",
+        "deleteUserHint": "Permanently removes this user account",
+        "deleteUserConfirm": "This permanently deletes the account and all its data. Continue?",
+        "updateError": "Could not save the change",
+        "deleteError": "Could not delete"
+      },
       "subtitle": "Manage users, groups and festival data",
       "openAdmin": "Open admin panel",
       "openAdminHint": "Opens the administration area",
       "hubDescription": "Administration tools. Changes here affect all users.",
       "sections": {
+        "users": "Find and manage user accounts",
         "location": "Active location sharing sessions"
       },
       "location": {

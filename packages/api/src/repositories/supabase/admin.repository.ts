@@ -1,0 +1,373 @@
+import type { Database } from "@prostcounter/db";
+import type {
+  AdminAttendance,
+  AdminUser,
+  ListAdminUsersResponse,
+  UpdateAdminAttendanceInput,
+  UpdateAdminUserAuthInput,
+  UpdateAdminUserProfileInput,
+} from "@prostcounter/shared";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { logger } from "../../lib/logger";
+import { createAdminClient } from "../../utils/admin-client";
+
+/**
+ * How many auth users to request per page when building the email map.
+ * GoTrue's own default is 50, which is what silently caps the web admin panel
+ * at the first 50 accounts.
+ */
+const AUTH_PAGE_SIZE = 200;
+
+/**
+ * Hard ceiling on auth pages scanned in one request. Emails live in
+ * `auth.users`, which PostgREST does not expose, so they cannot be joined or
+ * filtered in SQL -- the directory has to be walked. At this size the response
+ * reports `truncated: true` rather than pretending the result is complete.
+ */
+const MAX_AUTH_PAGES = 25;
+
+/** Strips PostgREST/SQL wildcards so a search term cannot alter the filter. */
+function sanitizeSearchTerm(search: string, maxLength = 100): string {
+  return search
+    .trim()
+    .replace(/[%_\\,().*]/g, "")
+    .slice(0, maxLength);
+}
+
+interface AuthUserRow {
+  id: string;
+  email: string | null;
+  created_at: string | null;
+  last_sign_in_at: string | null;
+}
+
+export class SupabaseAdminRepository {
+  /**
+   * @param supabase - the caller's own client. Used for everything RLS can
+   *   authorize, so admin writes go through the "Super admins can do anything"
+   *   policies rather than bypassing them.
+   */
+  constructor(private supabase: SupabaseClient<Database>) {}
+
+  /**
+   * Walks the auth directory. Separate from the caller's client because
+   * `auth.admin` requires the service role.
+   *
+   * Returns the rows plus whether the ceiling cut the scan short.
+   */
+  private async listAuthUsers(): Promise<{ users: AuthUserRow[]; truncated: boolean }> {
+    const adminClient = createAdminClient();
+    const users: AuthUserRow[] = [];
+
+    for (let page = 1; page <= MAX_AUTH_PAGES; page++) {
+      const { data, error } = await adminClient.auth.admin.listUsers({
+        page,
+        perPage: AUTH_PAGE_SIZE,
+      });
+
+      if (error) {
+        throw new Error(`Error fetching users: ${error.message}`);
+      }
+
+      for (const user of data.users) {
+        users.push({
+          id: user.id,
+          email: user.email ?? null,
+          created_at: user.created_at ?? null,
+          last_sign_in_at: user.last_sign_in_at ?? null,
+        });
+      }
+
+      // A short page means the directory is exhausted.
+      if (data.users.length < AUTH_PAGE_SIZE) {
+        return { users, truncated: false };
+      }
+    }
+
+    logger.warn(
+      { scanned: users.length, maxPages: MAX_AUTH_PAGES },
+      "Auth directory exceeded the admin scan ceiling; user list is truncated",
+    );
+    return { users, truncated: true };
+  }
+
+  /**
+   * Lists users with their profiles, optionally filtered by a search term that
+   * matches email, username or full name.
+   *
+   * Pagination happens in memory because the two halves of a user live in
+   * different places: `auth.users` (email, sign-in dates) cannot be joined to
+   * `public.profiles` in a single query.
+   */
+  async listUsers(
+    search: string | undefined,
+    page: number,
+    limit: number,
+  ): Promise<ListAdminUsersResponse> {
+    const { users: authUsers, truncated } = await this.listAuthUsers();
+
+    let matchingIds: string[];
+
+    if (search) {
+      const term = sanitizeSearchTerm(search);
+      const lowered = term.toLowerCase();
+      const pattern = `%${term}%`;
+
+      // Two separate ilike queries rather than one .or() filter: the search
+      // term would otherwise be interpolated into PostgREST filter syntax.
+      const [nameResults, usernameResults] = await Promise.all([
+        this.supabase.from("profiles").select("id").ilike("full_name", pattern),
+        this.supabase.from("profiles").select("id").ilike("username", pattern),
+      ]);
+
+      if (nameResults.error) {
+        throw new Error(`Error fetching profiles: ${nameResults.error.message}`);
+      }
+      if (usernameResults.error) {
+        throw new Error(`Error fetching profiles: ${usernameResults.error.message}`);
+      }
+
+      const profileMatches = new Set([
+        ...(nameResults.data ?? []).map((row) => row.id),
+        ...(usernameResults.data ?? []).map((row) => row.id),
+      ]);
+
+      matchingIds = authUsers
+        .filter(
+          (user) =>
+            profileMatches.has(user.id) || user.email?.toLowerCase().includes(lowered) === true,
+        )
+        .map((user) => user.id);
+    } else {
+      matchingIds = authUsers.map((user) => user.id);
+    }
+
+    const totalCount = matchingIds.length;
+    const totalPages = limit > 0 ? Math.ceil(totalCount / limit) : 0;
+    const startIndex = (page - 1) * limit;
+    const pageIds = matchingIds.slice(startIndex, startIndex + limit);
+
+    // Profiles only for the page being returned.
+    const { data: profiles, error: profileError } = await this.supabase
+      .from("profiles")
+      .select("id, username, full_name, avatar_url, is_super_admin")
+      .in("id", pageIds);
+
+    if (profileError) {
+      throw new Error(`Error fetching user profiles: ${profileError.message}`);
+    }
+
+    const profileById = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+    const authById = new Map(authUsers.map((user) => [user.id, user]));
+
+    const users: AdminUser[] = pageIds.map((id) => {
+      const authUser = authById.get(id);
+      return {
+        id,
+        email: authUser?.email ?? null,
+        created_at: authUser?.created_at ?? null,
+        last_sign_in_at: authUser?.last_sign_in_at ?? null,
+        profile: profileById.get(id) ?? null,
+      };
+    });
+
+    return { users, totalCount, totalPages, currentPage: page, truncated };
+  }
+
+  /**
+   * Fetches one user. Uses getUserById rather than the directory walk in
+   * listUsers, so the detail screen costs a single auth lookup.
+   */
+  async getUser(userId: string): Promise<AdminUser | null> {
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient.auth.admin.getUserById(userId);
+
+    if (error || !data?.user) {
+      return null;
+    }
+
+    const { data: profile } = await this.supabase
+      .from("profiles")
+      .select("id, username, full_name, avatar_url, is_super_admin")
+      .eq("id", userId)
+      .single();
+
+    return {
+      id: data.user.id,
+      email: data.user.email ?? null,
+      created_at: data.user.created_at ?? null,
+      last_sign_in_at: data.user.last_sign_in_at ?? null,
+      profile: profile ?? null,
+    };
+  }
+
+  /**
+   * Updates another user's profile. Runs on the caller's client: the
+   * "Super admins can do anything" policy on `profiles` authorizes it, so a
+   * caller who somehow reached here without the flag still writes nothing.
+   */
+  async updateUserProfile(userId: string, input: UpdateAdminUserProfileInput): Promise<void> {
+    const { error } = await this.supabase.from("profiles").update(input).eq("id", userId);
+
+    if (error) {
+      throw new Error(`Error updating user profile: ${error.message}`);
+    }
+  }
+
+  /** Changes a user's email or password. Requires the service role. */
+  async updateUserAuth(userId: string, input: UpdateAdminUserAuthInput): Promise<void> {
+    const adminClient = createAdminClient();
+    const { error } = await adminClient.auth.admin.updateUserById(userId, input);
+
+    if (error) {
+      throw new Error(`Error updating user auth: ${error.message}`);
+    }
+  }
+
+  /** Deletes a user from auth; the profile row cascades. Service role only. */
+  async deleteUser(userId: string): Promise<void> {
+    const adminClient = createAdminClient();
+    const { error } = await adminClient.auth.admin.deleteUser(userId);
+
+    if (error) {
+      throw new Error(`Error deleting user: ${error.message}`);
+    }
+  }
+
+  /**
+   * Lists a user's attendances with the tents visited on each day.
+   *
+   * Tent visits are fetched in one query for the whole set and grouped in
+   * memory; the web panel issues one query per attendance instead.
+   */
+  async listUserAttendances(userId: string): Promise<AdminAttendance[]> {
+    const { data: attendances, error } = await this.supabase
+      .from("attendances")
+      .select("id, user_id, festival_id, date, beer_count")
+      .eq("user_id", userId)
+      .order("date", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching attendances: ${error.message}`);
+    }
+
+    if (!attendances || attendances.length === 0) {
+      return [];
+    }
+
+    const { data: tentVisits, error: tentError } = await this.supabase
+      .from("tent_visits")
+      .select("tent_id, visit_date")
+      .eq("user_id", userId);
+
+    if (tentError) {
+      throw new Error(`Error fetching tent visits: ${tentError.message}`);
+    }
+
+    // visit_date is a timestamp; attendances.date is a calendar day. Group by
+    // the day part so a visit logged at 21:00 lands on the right attendance.
+    const tentsByDay = new Map<string, string[]>();
+    for (const visit of tentVisits ?? []) {
+      if (!visit.visit_date || !visit.tent_id) continue;
+      const day = visit.visit_date.slice(0, 10);
+      const existing = tentsByDay.get(day);
+      if (existing) {
+        existing.push(visit.tent_id);
+      } else {
+        tentsByDay.set(day, [visit.tent_id]);
+      }
+    }
+
+    return attendances.map((attendance) => ({
+      ...attendance,
+      tent_ids: tentsByDay.get(attendance.date.slice(0, 10)) ?? [],
+    }));
+  }
+
+  /**
+   * Updates an attendance and, when tent_ids is supplied, replaces that day's
+   * tent visits.
+   *
+   * The attendance is read first so the tent visits can be rewritten against
+   * the row's real user/festival/date rather than values supplied by the
+   * caller -- the web version trusts the client for all three, which lets a
+   * malformed payload write visits onto the wrong day.
+   */
+  async updateAttendance(attendanceId: string, input: UpdateAdminAttendanceInput): Promise<void> {
+    const { tent_ids, ...attendanceFields } = input;
+
+    const { data: existing, error: fetchError } = await this.supabase
+      .from("attendances")
+      .select("id, user_id, festival_id, date")
+      .eq("id", attendanceId)
+      .single();
+
+    if (fetchError || !existing) {
+      throw new Error(`Attendance not found: ${fetchError?.message ?? attendanceId}`);
+    }
+
+    if (Object.keys(attendanceFields).length > 0) {
+      const { error } = await this.supabase
+        .from("attendances")
+        .update(attendanceFields)
+        .eq("id", attendanceId);
+
+      if (error) {
+        throw new Error(`Error updating attendance: ${error.message}`);
+      }
+    }
+
+    if (!tent_ids) {
+      return;
+    }
+
+    // Tent visits are keyed by user, so an attendance with no owner has no
+    // day to rewrite. Refuse rather than writing visits with a null user_id.
+    // Captured to a local because the narrowing does not survive the awaits below.
+    const visitUserId = existing.user_id;
+    if (!visitUserId) {
+      throw new Error(`Attendance ${attendanceId} has no user; cannot set tent visits`);
+    }
+
+    // The day the visits belong to, after any date change in this same call.
+    const visitDate = attendanceFields.date ?? existing.date;
+
+    const { error: deleteError } = await this.supabase
+      .from("tent_visits")
+      .delete()
+      .eq("user_id", visitUserId)
+      .eq("visit_date", visitDate);
+
+    if (deleteError) {
+      throw new Error(`Error clearing tent visits: ${deleteError.message}`);
+    }
+
+    if (tent_ids.length === 0) {
+      return;
+    }
+
+    const { error: insertError } = await this.supabase.from("tent_visits").insert(
+      tent_ids.map((tentId) => ({
+        // tent_visits.id has no database default, so it must be supplied.
+        id: crypto.randomUUID(),
+        user_id: visitUserId,
+        festival_id: existing.festival_id,
+        tent_id: tentId,
+        visit_date: visitDate,
+      })),
+    );
+
+    if (insertError) {
+      throw new Error(`Error adding tent visits: ${insertError.message}`);
+    }
+  }
+
+  async deleteAttendance(attendanceId: string): Promise<void> {
+    const { error } = await this.supabase.from("attendances").delete().eq("id", attendanceId);
+
+    if (error) {
+      throw new Error(`Error deleting attendance: ${error.message}`);
+    }
+  }
+}
