@@ -23,7 +23,9 @@ export const AdminLocationSessionSchema = z.object({
   updatedAt: z.string(),
   user: z.object({
     id: z.string().uuid(),
-    username: z.string(),
+    // profiles.username is nullable and the admin query returns it unchanged,
+    // so a half-finished profile surfaces here as null.
+    username: z.string().nullable(),
     fullName: z.string().nullable(),
   }),
   festival: z.object({
@@ -219,9 +221,28 @@ export const AdminFestivalSchema = z.object({
 
 export type AdminFestival = z.infer<typeof AdminFestivalSchema>;
 
+/**
+ * A real calendar day, not just YYYY-MM-DD shaped.
+ *
+ * The regex alone lets 2026-13-45 through, and it also passes the string
+ * comparison the range refinements use, so it reaches Postgres and comes back
+ * as a 500. Same reasoning as the positive() guard on beer_cost: mirror what
+ * the column will accept rather than letting the database do the rejecting.
+ */
+const calendarDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Expected YYYY-MM-DD" })
+  .refine(
+    (value) => {
+      const date = new Date(`${value}T00:00:00.000Z`);
+      return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+    },
+    { error: "Not a real calendar date" },
+  );
+
 const festivalDateRange = {
-  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Expected YYYY-MM-DD" }),
-  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, { error: "Expected YYYY-MM-DD" }),
+  start_date: calendarDate,
+  end_date: calendarDate,
 };
 
 export const CreateAdminFestivalSchema = z

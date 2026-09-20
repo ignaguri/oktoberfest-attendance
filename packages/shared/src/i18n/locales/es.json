@@ -1570,15 +1570,17 @@
         "dangerZone": "Zona de peligro",
         "deleteFestival": "Eliminar festival",
         "deleteFestivalHint": "Elimina permanentemente este festival",
-        "deleteFestivalConfirm": "Esto elimina permanentemente el festival. ¿Continuar?",
-        "deleteBlockedHint": "Un festival con asistencias o grupos no se puede eliminar. Márcalo como Finalizado.",
+        "deleteFestivalConfirm": "Esto elimina permanentemente el festival, junto con su lista de carpas, precios, logros y datos de Wrapped. ¿Continuar?",
+        "deactivateConfirm": "Esto deja sin festival activo, así que la app no tiene ninguno por defecto. ¿Continuar?",
+        "deleteBlockedHint": "Un festival con asistencias, grupos o visitas a carpas no se puede eliminar. Márcalo como Finalizado.",
         "updateError": "No se pudo guardar el cambio",
         "deleteError": "No se pudo eliminar"
       },
       "groups": {
         "loading": "Cargando grupos...",
         "empty": "No se encontraron grupos",
-        "memberCount": "{{count}} miembro(s)",
+        "memberCount_one": "{{count}} miembro",
+        "memberCount_other": "{{count}} miembros",
         "openHint": "Abre los detalles de este grupo"
       },
       "groupDetail": {

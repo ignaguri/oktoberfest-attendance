@@ -7,8 +7,20 @@ import {
   createTestApp,
 } from "../../__tests__/helpers/test-server";
 import { ConflictError, NotFoundError } from "../../middleware/error";
+import { SupabaseLocationRepository } from "../../repositories/supabase";
 import { LocationService } from "../../services/location.service";
+import { createAdminClient } from "../../utils/admin-client";
 import locationRoutes from "../location.route";
+
+const ELEVATED_CLIENT = { tag: "service-role" };
+
+vi.mock("../../utils/admin-client", () => ({
+  createAdminClient: vi.fn(() => ELEVATED_CLIENT),
+}));
+
+vi.mock("../../repositories/supabase", () => ({
+  SupabaseLocationRepository: vi.fn(),
+}));
 
 // Mock the LocationService
 vi.mock("../../services/location.service", () => ({
@@ -18,6 +30,9 @@ vi.mock("../../services/location.service", () => ({
       stopSession: vi.fn(),
       updateLocation: vi.fn(),
       getNearbyMembers: vi.fn(),
+      getActiveSessionsAdmin: vi.fn(),
+      forceStopSession: vi.fn(),
+      cleanupExpiredSessions: vi.fn(),
     };
   }),
 }));
@@ -31,6 +46,9 @@ describe("Location Routes - Unit Tests", () => {
     stopSession: ReturnType<typeof vi.fn>;
     updateLocation: ReturnType<typeof vi.fn>;
     getNearbyMembers: ReturnType<typeof vi.fn>;
+    getActiveSessionsAdmin: ReturnType<typeof vi.fn>;
+    forceStopSession: ReturnType<typeof vi.fn>;
+    cleanupExpiredSessions: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -44,6 +62,9 @@ describe("Location Routes - Unit Tests", () => {
       stopSession: vi.fn(),
       updateLocation: vi.fn(),
       getNearbyMembers: vi.fn(),
+      getActiveSessionsAdmin: vi.fn(),
+      forceStopSession: vi.fn(),
+      cleanupExpiredSessions: vi.fn(),
     };
 
     // Make the mocked constructor return our mock instance
@@ -594,6 +615,63 @@ describe("Location Routes - Unit Tests", () => {
       });
 
       expect(res.status).toBe(400);
+    });
+  });
+
+  /**
+   * `location_sessions` carries owner and group-member policies only, with no
+   * super-admin escape. Run on the caller's own client these three handlers
+   * quietly degrade -- the list narrows to the admin's own sessions, and
+   * force-stop and cleanup match no rows -- rather than failing loudly, so the
+   * client they are built with is worth pinning down.
+   */
+  describe("admin session endpoints", () => {
+    const adminRequest = (path: string, method: string) => {
+      const req = createAuthRequest(path, { method });
+      return app.request(req.url, { method: req.method, headers: req.headers });
+    };
+
+    const repositoryClients = () =>
+      vi.mocked(SupabaseLocationRepository).mock.calls.map(([client]) => client);
+
+    it("lists sessions through the elevated client", async () => {
+      mockLocationService.getActiveSessionsAdmin.mockResolvedValueOnce([]);
+
+      const res = await adminRequest("/admin/location/sessions", "GET");
+
+      expect(res.status).toBe(200);
+      expect(createAdminClient).toHaveBeenCalled();
+      expect(repositoryClients()).toEqual([ELEVATED_CLIENT]);
+    });
+
+    it("force-stops through the elevated client", async () => {
+      const sessionId = "123e4567-e89b-12d3-a456-426614174001";
+      mockLocationService.forceStopSession.mockResolvedValueOnce({ id: sessionId });
+
+      const res = await adminRequest(`/admin/location/sessions/${sessionId}`, "DELETE");
+
+      expect(res.status).toBe(200);
+      expect(repositoryClients()).toEqual([ELEVATED_CLIENT]);
+      expect(mockLocationService.forceStopSession).toHaveBeenCalledWith(mockUser.id, sessionId);
+    });
+
+    it("cleans up through the elevated client", async () => {
+      mockLocationService.cleanupExpiredSessions.mockResolvedValueOnce(3);
+
+      const res = await adminRequest("/admin/location/sessions/cleanup", "POST");
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({ success: true, cleanedCount: 3 });
+      expect(repositoryClients()).toEqual([ELEVATED_CLIENT]);
+    });
+
+    it("leaves the user-facing endpoints on the caller's own client", async () => {
+      mockLocationService.stopSession.mockResolvedValueOnce({ id: "s-1" });
+
+      await adminRequest("/location/sessions/123e4567-e89b-12d3-a456-426614174001", "DELETE");
+
+      expect(createAdminClient).not.toHaveBeenCalled();
+      expect(repositoryClients()).toEqual([mockSupabase]);
     });
   });
 

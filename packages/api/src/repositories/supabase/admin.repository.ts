@@ -20,6 +20,8 @@ import type {
   UpdateAdminUserProfileInput,
   WinningCriterion,
 } from "@prostcounter/shared";
+import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
+import { atZonedTime, formatDateForDatabase } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
@@ -31,6 +33,40 @@ import { createAdminClient } from "../../utils/admin-client";
  * at the first 50 accounts.
  */
 const AUTH_PAGE_SIZE = 200;
+
+/**
+ * The UTC window that can contain any instant bucketing to `date`.
+ *
+ * `tent_visits.visit_date` is a timestamp, and the day it belongs to is
+ * `(visit_date AT TIME ZONE tz)::date` since
+ * 20260811100000_bucket_tent_visits_by_festival_timezone. The query builder
+ * cannot express that, so callers read a day either side and bucket in JS, the
+ * same shape attendance.repository.ts uses. No real offset comes near 24h.
+ */
+function dayWindowUtc(date: string): { start: string; end: string } {
+  const start = new Date(`${date}T00:00:00.000Z`);
+  start.setUTCDate(start.getUTCDate() - 1);
+  const end = new Date(`${date}T00:00:00.000Z`);
+  end.setUTCDate(end.getUTCDate() + 2);
+  return { start: start.toISOString(), end: end.toISOString() };
+}
+
+/**
+ * Midday on `date`, on the festival's clock, as an instant.
+ *
+ * An admin setting a day's tents asserts a day, not a time, but the column is a
+ * timestamp that everything else buckets by local day. Storing the bare date
+ * string would write midnight UTC, which reads back as the previous day
+ * anywhere west of Greenwich. Midday survives every real offset.
+ */
+function middayOn(date: string, timezone: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return atZonedTime(
+    new Date(year, month - 1, day),
+    new Date(2000, 0, 1, 12, 0),
+    timezone,
+  ).toISOString();
+}
 
 /**
  * Hard ceiling on auth pages scanned in one request. Emails live in
@@ -260,6 +296,58 @@ export class SupabaseAdminRepository {
     }
   }
 
+  private async festivalTimezones(festivalIds: (string | null)[]): Promise<Map<string, string>> {
+    const ids = [...new Set(festivalIds.filter((id): id is string => !!id))];
+    if (ids.length === 0) {
+      return new Map();
+    }
+
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("id, timezone")
+      .in("id", ids);
+
+    if (error) {
+      throw new Error(`Error fetching festival timezones: ${error.message}`);
+    }
+
+    return new Map((data ?? []).map((f) => [f.id, f.timezone ?? DEFAULT_TIMEZONE]));
+  }
+
+  /**
+   * The ids of a user's tent visits on one festival day.
+   *
+   * Windowed and bucketed rather than matched on equality: `visit_date` holds
+   * the real visit time, so `.eq(visit_date, "2026-09-21")` compares against
+   * midnight UTC and matches nothing a person actually logged.
+   */
+  private async visitIdsOnDay(
+    userId: string,
+    festivalId: string,
+    date: string,
+    timezone: string,
+  ): Promise<string[]> {
+    const window = dayWindowUtc(date);
+
+    const { data, error } = await this.supabase
+      .from("tent_visits")
+      .select("id, visit_date")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .gte("visit_date", window.start)
+      .lt("visit_date", window.end);
+
+    if (error) {
+      throw new Error(`Error reading the day's tent visits: ${error.message}`);
+    }
+
+    return (data ?? [])
+      .filter(
+        (v) => !!v.visit_date && formatDateForDatabase(new Date(v.visit_date), timezone) === date,
+      )
+      .map((v) => v.id);
+  }
+
   /**
    * Lists a user's attendances with the tents visited on each day.
    *
@@ -283,30 +371,40 @@ export class SupabaseAdminRepository {
 
     const { data: tentVisits, error: tentError } = await this.supabase
       .from("tent_visits")
-      .select("tent_id, visit_date")
+      .select("tent_id, visit_date, festival_id")
       .eq("user_id", userId);
 
     if (tentError) {
       throw new Error(`Error fetching tent visits: ${tentError.message}`);
     }
 
-    // visit_date is a timestamp; attendances.date is a calendar day. Group by
-    // the day part so a visit logged at 21:00 lands on the right attendance.
+    const timezones = await this.festivalTimezones([
+      ...attendances.map((a) => a.festival_id),
+      ...(tentVisits ?? []).map((v) => v.festival_id),
+    ]);
+
+    // visit_date is a timestamp; attendances.date is a calendar day. The day a
+    // visit belongs to is its date on the *festival's* clock, not UTC: slicing
+    // the timestamp files a 01:00 Munich visit under the previous day, which is
+    // what 20260811100000_bucket_tent_visits_by_festival_timezone exists to
+    // stop. Keyed by festival too, since one user's days can overlap across
+    // festivals in different timezones.
     const tentsByDay = new Map<string, string[]>();
     for (const visit of tentVisits ?? []) {
-      if (!visit.visit_date || !visit.tent_id) continue;
-      const day = visit.visit_date.slice(0, 10);
-      const existing = tentsByDay.get(day);
+      if (!visit.visit_date || !visit.tent_id || !visit.festival_id) continue;
+      const timezone = timezones.get(visit.festival_id) ?? DEFAULT_TIMEZONE;
+      const key = `${visit.festival_id}|${formatDateForDatabase(new Date(visit.visit_date), timezone)}`;
+      const existing = tentsByDay.get(key);
       if (existing) {
         existing.push(visit.tent_id);
       } else {
-        tentsByDay.set(day, [visit.tent_id]);
+        tentsByDay.set(key, [visit.tent_id]);
       }
     }
 
     return attendances.map((attendance) => ({
       ...attendance,
-      tent_ids: tentsByDay.get(attendance.date.slice(0, 10)) ?? [],
+      tent_ids: tentsByDay.get(`${attendance.festival_id}|${attendance.date}`) ?? [],
     }));
   }
 
@@ -357,15 +455,27 @@ export class SupabaseAdminRepository {
 
     // The day the visits belong to, after any date change in this same call.
     const visitDate = attendanceFields.date ?? existing.date;
+    const timezone = (await this.festivalTimezones([existing.festival_id])).get(
+      existing.festival_id ?? "",
+    );
+    const visitTimezone = timezone ?? DEFAULT_TIMEZONE;
 
-    const { error: deleteError } = await this.supabase
-      .from("tent_visits")
-      .delete()
-      .eq("user_id", visitUserId)
-      .eq("visit_date", visitDate);
+    // Cleared by id. Matching on `visit_date` equality compares a calendar day
+    // against a timestamp, so it silently deletes nothing and this "replace"
+    // becomes an append: edit a day twice and every tent is listed twice.
+    const staleVisitIds = existing.festival_id
+      ? await this.visitIdsOnDay(visitUserId, existing.festival_id, visitDate, visitTimezone)
+      : [];
 
-    if (deleteError) {
-      throw new Error(`Error clearing tent visits: ${deleteError.message}`);
+    if (staleVisitIds.length > 0) {
+      const { error: deleteError } = await this.supabase
+        .from("tent_visits")
+        .delete()
+        .in("id", staleVisitIds);
+
+      if (deleteError) {
+        throw new Error(`Error clearing tent visits: ${deleteError.message}`);
+      }
     }
 
     if (tent_ids.length === 0) {
@@ -379,7 +489,7 @@ export class SupabaseAdminRepository {
         user_id: visitUserId,
         festival_id: existing.festival_id,
         tent_id: tentId,
-        visit_date: visitDate,
+        visit_date: middayOn(visitDate, visitTimezone),
       })),
     );
 
@@ -416,7 +526,14 @@ export class SupabaseAdminRepository {
     });
   }
 
-  /** Fetches one group, so the detail screen survives a reload or deep link. */
+  /**
+   * Fetches one group, so the detail screen survives a reload or deep link.
+   *
+   * `maybeSingle` with the error rethrown, rather than collapsing both into
+   * null: the route turns null into "Group not found", so swallowing a real
+   * Supabase failure here tells the admin the group is gone when the database
+   * is merely unreachable.
+   */
   async getGroup(groupId: string): Promise<AdminGroup | null> {
     const { data, error } = await this.supabase
       .from("groups")
@@ -424,9 +541,13 @@ export class SupabaseAdminRepository {
         "id, name, description, winning_criteria_id, festival_id, created_at, created_by, group_members(count)",
       )
       .eq("id", groupId)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
+    if (error) {
+      throw new Error(`Error fetching group: ${error.message}`);
+    }
+
+    if (!data) {
       return null;
     }
 
@@ -434,27 +555,59 @@ export class SupabaseAdminRepository {
     return { ...rest, member_count: group_members?.[0]?.count ?? 0 };
   }
 
-  async updateGroup(groupId: string, input: UpdateAdminGroupInput): Promise<void> {
-    const { error } = await this.supabase.from("groups").update(input).eq("id", groupId);
+  /**
+   * Updates a group. Returns false when no such group exists.
+   *
+   * PostgREST counts a write that matches no rows as a success, so without the
+   * `select` this reports a saved rename for a group another admin has already
+   * deleted -- and the detail screen leaves edit mode showing the new name.
+   */
+  async updateGroup(groupId: string, input: UpdateAdminGroupInput): Promise<boolean> {
+    // Every field on UpdateAdminGroupSchema is optional, so an empty patch is a
+    // valid request. PostgREST rejects an update with no columns, so read
+    // instead of writing: the answer the caller wants is still "does it exist".
+    const query =
+      Object.keys(input).length > 0
+        ? this.supabase.from("groups").update(input).eq("id", groupId).select("id")
+        : this.supabase.from("groups").select("id").eq("id", groupId);
+
+    const { data, error } = await query;
 
     if (error) {
       throw new Error(`Error updating group: ${error.message}`);
     }
+
+    return (data ?? []).length > 0;
   }
 
-  async deleteGroup(groupId: string): Promise<void> {
-    const { error } = await this.supabase.from("groups").delete().eq("id", groupId);
+  /** Deletes a group. Returns false when no such group exists. */
+  async deleteGroup(groupId: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .delete()
+      .eq("id", groupId)
+      .select("id");
 
     if (error) {
       throw new Error(`Error deleting group: ${error.message}`);
     }
+
+    return (data ?? []).length > 0;
   }
 
-  /** Lists a group's members, flattened from the joined profile. */
+  /**
+   * Lists a group's members, flattened from the joined profile.
+   *
+   * A plain join rather than `!inner`: `group_members.user_id` is nullable, and
+   * an inner join drops those rows silently. The detail screen shows
+   * `member_count` (which counts every row) directly above this list, so the
+   * two would disagree with nothing on screen explaining the gap. A member with
+   * no profile comes back with null names instead, which the schema allows.
+   */
   async listGroupMembers(groupId: string): Promise<AdminGroupMember[]> {
     const { data, error } = await this.supabase
       .from("group_members")
-      .select("id, user_id, joined_at, profiles!inner(username, full_name, avatar_url)")
+      .select("id, user_id, joined_at, profiles(username, full_name, avatar_url)")
       .eq("group_id", groupId)
       .order("joined_at", { ascending: false });
 
@@ -463,7 +616,7 @@ export class SupabaseAdminRepository {
     }
 
     return (data ?? []).map((member) => {
-      // The !inner join yields an object, but the generated types model the
+      // The join yields an object, but the generated types model the
       // relationship as possibly-array; normalize before reading it.
       const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
       return {
@@ -494,18 +647,23 @@ export class SupabaseAdminRepository {
     return (data ?? []) as AdminFestival[];
   }
 
+  /**
+   * Fetches one festival. Null means no such row, not "the read failed" --
+   * the route turns null into a 404, so a real error has to be rethrown or an
+   * unreachable database reads as a missing festival.
+   */
   async getFestival(festivalId: string): Promise<AdminFestival | null> {
     const { data, error } = await this.supabase
       .from("festivals")
       .select("*")
       .eq("id", festivalId)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
-      return null;
+    if (error) {
+      throw new Error(`Error fetching festival: ${error.message}`);
     }
 
-    return data as AdminFestival;
+    return (data as AdminFestival) ?? null;
   }
 
   /**
@@ -530,37 +688,116 @@ export class SupabaseAdminRepository {
     }
   }
 
+  /**
+   * Creates a festival, activating it last.
+   *
+   * Inserted inactive and then activated, rather than sweeping first: none of
+   * this is in a transaction, so a sweep followed by a rejected insert would
+   * leave the app with no active festival at all. Every client keys off that
+   * row, so the ordering here is what decides whether a bad request costs
+   * nothing or takes the whole app's festival selection down.
+   */
   async createFestival(input: CreateAdminFestivalInput): Promise<AdminFestival> {
-    if (input.is_active) {
-      await this.deactivateOtherFestivals();
-    }
+    const { is_active, ...fields } = input;
 
-    const { data, error } = await this.supabase.from("festivals").insert(input).select().single();
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .insert({ ...fields, is_active: false })
+      .select()
+      .single();
 
     if (error || !data) {
       throw new Error(`Error creating festival: ${error?.message}`);
     }
 
-    return data as AdminFestival;
+    if (!is_active) {
+      return data as AdminFestival;
+    }
+
+    return this.setActiveFestival(data.id);
   }
 
-  async updateFestival(
-    festivalId: string,
-    input: UpdateAdminFestivalInput,
-  ): Promise<AdminFestival> {
-    if (input.is_active) {
-      await this.deactivateOtherFestivals(festivalId);
-    }
+  /**
+   * Clears every other festival's flag, then sets this one's.
+   *
+   * Both halves are needed because `idx_festivals_single_active` is a unique
+   * partial index: the set fails outright while another row is still active.
+   */
+  private async setActiveFestival(festivalId: string): Promise<AdminFestival> {
+    await this.deactivateOtherFestivals(festivalId);
 
     const { data, error } = await this.supabase
       .from("festivals")
-      .update({ ...input, updated_at: new Date().toISOString() })
+      .update({ is_active: true })
       .eq("id", festivalId)
       .select()
       .single();
 
     if (error || !data) {
-      throw new Error(`Error updating festival: ${error?.message}`);
+      throw new Error(`Error activating festival: ${error?.message}`);
+    }
+
+    return data as AdminFestival;
+  }
+
+  /**
+   * Updates a festival. Null means no such festival, so the route can 404.
+   *
+   * The plain fields are written before any is_active change, and the
+   * deactivate sweep runs last. Sweeping first (the shape this replaces) meant
+   * a PATCH naming a festival that no longer exists still cleared is_active on
+   * the real active one, and then failed -- leaving the app with no active
+   * festival and the admin told only that the update did not work.
+   *
+   * updated_at is not set here: `update_festivals_updated_at` is a BEFORE
+   * UPDATE trigger, so the database keeps it on its own clock.
+   */
+  async updateFestival(
+    festivalId: string,
+    input: UpdateAdminFestivalInput,
+  ): Promise<AdminFestival | null> {
+    const { is_active, ...fields } = input;
+
+    let current: AdminFestival | null;
+
+    if (Object.keys(fields).length > 0) {
+      const { data, error } = await this.supabase
+        .from("festivals")
+        .update(fields)
+        .eq("id", festivalId)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(`Error updating festival: ${error.message}`);
+      }
+
+      current = (data as AdminFestival) ?? null;
+    } else {
+      current = await this.getFestival(festivalId);
+    }
+
+    if (!current) {
+      return null;
+    }
+
+    if (is_active === undefined || is_active === current.is_active) {
+      return current;
+    }
+
+    if (is_active) {
+      return this.setActiveFestival(festivalId);
+    }
+
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .update({ is_active: false })
+      .eq("id", festivalId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error deactivating festival: ${error?.message}`);
     }
 
     return data as AdminFestival;
@@ -569,14 +806,22 @@ export class SupabaseAdminRepository {
   /**
    * Deletes a festival, refusing when dependent data exists.
    *
-   * Ported from the web panel: attendances and groups reference the festival,
-   * and losing a season's attendance to a stray tap is not recoverable.
+   * The three tables checked here are exactly the ones whose foreign key to
+   * `festivals` has no ON DELETE CASCADE, so the delete would fail on the
+   * constraint and surface a raw Postgres message as a 500. Everything else
+   * (achievements, festival_tents, reservations, location_sessions, the
+   * wrapped cache) cascades and is destroyed silently, which is why the
+   * confirmation copy says so.
+   *
    * Returns a reason string instead of throwing so the route can answer 409.
    */
-  async deleteFestival(festivalId: string): Promise<{ deleted: true } | { blockedBy: string }> {
-    const [attendances, groups] = await Promise.all([
+  async deleteFestival(
+    festivalId: string,
+  ): Promise<{ deleted: true } | { blockedBy: "attendances" | "groups" | "tent_visits" }> {
+    const [attendances, groups, tentVisits] = await Promise.all([
       this.supabase.from("attendances").select("id").eq("festival_id", festivalId).limit(1),
       this.supabase.from("groups").select("id").eq("festival_id", festivalId).limit(1),
+      this.supabase.from("tent_visits").select("id").eq("festival_id", festivalId).limit(1),
     ]);
 
     if (attendances.error) {
@@ -585,12 +830,18 @@ export class SupabaseAdminRepository {
     if (groups.error) {
       throw new Error(`Error checking festival groups: ${groups.error.message}`);
     }
+    if (tentVisits.error) {
+      throw new Error(`Error checking festival tent visits: ${tentVisits.error.message}`);
+    }
 
     if (attendances.data && attendances.data.length > 0) {
       return { blockedBy: "attendances" };
     }
     if (groups.data && groups.data.length > 0) {
       return { blockedBy: "groups" };
+    }
+    if (tentVisits.data && tentVisits.data.length > 0) {
+      return { blockedBy: "tent_visits" };
     }
 
     const { error } = await this.supabase.from("festivals").delete().eq("id", festivalId);
@@ -615,7 +866,48 @@ export class SupabaseAdminRepository {
     return data ?? [];
   }
 
+  /**
+   * Deletes an attendance and that day's tent visits.
+   *
+   * The visits go too because nothing else removes them: `tent_visits` has no
+   * FK to `attendances` (they are keyed by user, festival and day), so dropping
+   * the attendance alone leaves them readable by the user's own app, and the
+   * next edit to that day resurrects an attendance with ghost tents attached.
+   */
   async deleteAttendance(attendanceId: string): Promise<void> {
+    const { data: existing, error: fetchError } = await this.supabase
+      .from("attendances")
+      .select("id, user_id, festival_id, date")
+      .eq("id", attendanceId)
+      .maybeSingle();
+
+    if (fetchError) {
+      throw new Error(`Error reading attendance: ${fetchError.message}`);
+    }
+
+    if (existing?.user_id && existing.festival_id) {
+      const timezone =
+        (await this.festivalTimezones([existing.festival_id])).get(existing.festival_id) ??
+        DEFAULT_TIMEZONE;
+      const visitIds = await this.visitIdsOnDay(
+        existing.user_id,
+        existing.festival_id,
+        existing.date,
+        timezone,
+      );
+
+      if (visitIds.length > 0) {
+        const { error: visitError } = await this.supabase
+          .from("tent_visits")
+          .delete()
+          .in("id", visitIds);
+
+        if (visitError) {
+          throw new Error(`Error deleting tent visits: ${visitError.message}`);
+        }
+      }
+    }
+
     const { error } = await this.supabase.from("attendances").delete().eq("id", attendanceId);
 
     if (error) {

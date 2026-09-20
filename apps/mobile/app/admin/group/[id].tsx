@@ -36,7 +36,11 @@ export default function AdminGroupDetailScreen() {
   const { members, isLoading: membersLoading } = useAdminGroupMembers(id);
   const { criteria } = useAdminWinningCriteria();
 
+  // Two mutation instances rather than one shared: the criteria rows and the
+  // name/description form each have their own pending state, and sharing it
+  // would let a criterion tap disable the form's Save button.
   const updateGroup = useUpdateAdminGroup();
+  const updateCriterion = useUpdateAdminGroup();
   const deleteGroup = useDeleteAdminGroup();
 
   // Draft state is seeded from the loaded group on first edit rather than in an
@@ -63,13 +67,18 @@ export default function AdminGroupDetailScreen() {
 
   const handleSelectCriterion = useCallback(
     async (criterionId: number) => {
+      // Ignored while a write is in flight. The rows are plain Pressables, so
+      // without this a second tap races the first and whichever write lands
+      // last at the database wins -- not necessarily the one last tapped.
+      if (updateCriterion.loading) return;
+
       try {
-        await updateGroup.mutate({ groupId: id, data: { winning_criteria_id: criterionId } });
+        await updateCriterion.mutate({ groupId: id, data: { winning_criteria_id: criterionId } });
       } catch {
         showDialog(t("common.status.error"), t("admin.mobile.groupDetail.updateError"));
       }
     },
-    [id, updateGroup, showDialog, t],
+    [id, updateCriterion, showDialog, t],
   );
 
   const handleDelete = useCallback(() => {
@@ -186,11 +195,15 @@ export default function AdminGroupDetailScreen() {
                   className={cn(
                     "flex-row items-center justify-between py-3",
                     index < criteria.length - 1 && "border-b border-outline-100",
+                    updateCriterion.loading && "opacity-50",
                   )}
                   onPress={() => handleSelectCriterion(criterion.id)}
                   accessibilityRole="button"
                   accessibilityLabel={criterion.name}
-                  accessibilityState={{ selected: group.winning_criteria_id === criterion.id }}
+                  accessibilityState={{
+                    selected: group.winning_criteria_id === criterion.id,
+                    disabled: updateCriterion.loading,
+                  }}
                 >
                   <Text className="text-typography-900">{criterion.name}</Text>
                   {group.winning_criteria_id === criterion.id && (

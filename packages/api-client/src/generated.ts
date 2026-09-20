@@ -7161,7 +7161,7 @@ export interface paths {
                                 user: {
                                     /** Format: uuid */
                                     id: string;
-                                    username: string;
+                                    username: string | null;
                                     fullName: string | null;
                                 };
                                 festival: {
@@ -10747,7 +10747,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a festival (admin)
-         * @description Refuses with 409 when attendances or groups still reference the festival; archive it instead.
+         * @description Refuses with 409 when attendances, groups or tent visits still reference the festival; archive it instead.
          */
         delete: {
             parameters: {
@@ -10802,9 +10802,10 @@ export interface paths {
                     };
                     content: {
                         "application/json": {
-                            error: string;
-                            message: string;
-                            blockedBy?: string;
+                            error: {
+                                code: string;
+                                message: string;
+                            };
                         };
                     };
                 };

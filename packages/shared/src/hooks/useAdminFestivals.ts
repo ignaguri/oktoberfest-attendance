@@ -93,9 +93,12 @@ export function useUpdateAdminFestival() {
     async ({ festivalId, data }: { festivalId: string; data: UpdateAdminFestivalInput }) =>
       apiClient.admin.festivals.update(festivalId, data),
     {
-      onSuccess: (_result, variables) => {
+      onSuccess: () => {
         invalidateQueries(QueryKeys.adminFestivals());
-        invalidateQueries(QueryKeys.adminFestival(variables.festivalId));
+        // The whole detail prefix, not just the edited row: activating this
+        // festival cleared is_active on another one, whose cached detail would
+        // otherwise keep its Active badge until it went stale.
+        invalidateQueries(QueryKeys.adminFestivalAll());
       },
     },
   );

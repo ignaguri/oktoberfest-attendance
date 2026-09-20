@@ -1729,15 +1729,17 @@
         "dangerZone": "Gefahrenbereich",
         "deleteFestival": "Festival löschen",
         "deleteFestivalHint": "Entfernt dieses Festival dauerhaft",
-        "deleteFestivalConfirm": "Damit wird das Festival dauerhaft gelöscht. Fortfahren?",
-        "deleteBlockedHint": "Ein Festival mit Besuchen oder Gruppen kann nicht gelöscht werden. Setze es stattdessen auf Beendet.",
+        "deleteFestivalConfirm": "Damit werden das Festival und seine Zeltliste, Preise, Erfolge und Wrapped-Daten dauerhaft gelöscht. Fortfahren?",
+        "deactivateConfirm": "Damit ist kein Festival mehr aktiv, und die App hat für niemanden eine Vorauswahl. Fortfahren?",
+        "deleteBlockedHint": "Ein Festival mit Besuchen, Gruppen oder Zeltbesuchen kann nicht gelöscht werden. Setze es stattdessen auf Beendet.",
         "updateError": "Änderung konnte nicht gespeichert werden",
         "deleteError": "Löschen fehlgeschlagen"
       },
       "groups": {
         "loading": "Gruppen werden geladen...",
         "empty": "Keine Gruppen gefunden",
-        "memberCount": "{{count}} Mitglied(er)",
+        "memberCount_one": "{{count}} Mitglied",
+        "memberCount_other": "{{count}} Mitglieder",
         "openHint": "Öffnet die Details dieser Gruppe"
       },
       "groupDetail": {
@@ -1909,6 +1911,14 @@
     "users": {
       "title": "Benutzer-Verwaltung",
       "search": "Benutzer suchen",
+      "form": {
+        "emailNote": "Die E-Mail-Adresse kann nicht geändert werden",
+        "newPassword": "Neues Passwort (leer lassen, um es beizubehalten)",
+        "fullName": "Vollständiger Name",
+        "username": "Benutzername",
+        "isSuperAdmin": "Ist Super-Admin",
+        "updateUser": "Benutzer aktualisieren"
+      },
       "makeAdmin": "Zum Admin machen",
       "removeAdmin": "Admin entfernen"
     }

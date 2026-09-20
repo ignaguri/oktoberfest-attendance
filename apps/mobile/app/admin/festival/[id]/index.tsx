@@ -33,7 +33,11 @@ export default function AdminFestivalDetailScreen() {
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
   const { festival, isLoading, error, refetch } = useAdminFestival(id);
+  // One mutation instance per control. Sharing one would let a status tap
+  // disable the name/location form's Save button, and vice versa.
   const updateFestival = useUpdateAdminFestival();
+  const updateStatus = useUpdateAdminFestival();
+  const updateActive = useUpdateAdminFestival();
   const deleteFestival = useDeleteAdminFestival();
 
   // Seeded on first edit rather than in an effect, so a background refetch
@@ -60,24 +64,48 @@ export default function AdminFestivalDetailScreen() {
 
   const handleSetStatus = useCallback(
     async (status: (typeof STATUSES)[number]) => {
+      // Ignored while a write is in flight: the rows are plain Pressables, so a
+      // second tap would race the first and the later write need not win.
+      if (updateStatus.loading) return;
+
       try {
-        await updateFestival.mutate({ festivalId: id, data: { status } });
+        await updateStatus.mutate({ festivalId: id, data: { status } });
       } catch {
         showDialog(t("common.status.error"), t("admin.mobile.festivalDetail.updateError"));
       }
     },
-    [id, updateFestival, showDialog, t],
+    [id, updateStatus, showDialog, t],
+  );
+
+  const setActive = useCallback(
+    async (value: boolean) => {
+      try {
+        await updateActive.mutate({ festivalId: id, data: { is_active: value } });
+      } catch {
+        showDialog(t("common.status.error"), t("admin.mobile.festivalDetail.updateError"));
+      }
+    },
+    [id, updateActive, showDialog, t],
   );
 
   const handleToggleActive = useCallback(
-    async (value: boolean) => {
-      try {
-        await updateFestival.mutate({ festivalId: id, data: { is_active: value } });
-      } catch {
-        showDialog(t("common.status.error"), t("admin.mobile.festivalDetail.updateError"));
+    (value: boolean) => {
+      // Turning the switch on just moves the flag to this festival. Turning it
+      // off leaves none active at all, and every client keys off that row, so
+      // that direction gets a confirmation.
+      if (!value) {
+        showDialog(
+          t("admin.mobile.festivalDetail.isActive"),
+          t("admin.mobile.festivalDetail.deactivateConfirm"),
+          "destructive",
+          () => setActive(false),
+        );
+        return;
       }
+
+      void setActive(true);
     },
-    [id, updateFestival, showDialog, t],
+    [setActive, showDialog, t],
   );
 
   const handleDelete = useCallback(() => {
@@ -203,7 +231,7 @@ export default function AdminFestivalDetailScreen() {
               <Switch
                 value={festival.is_active}
                 onValueChange={handleToggleActive}
-                isDisabled={updateFestival.loading}
+                isDisabled={updateActive.loading}
                 trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
                 thumbColor={SwitchColors.thumb}
                 accessibilityLabel={t("admin.mobile.festivalDetail.isActive")}
@@ -221,11 +249,15 @@ export default function AdminFestivalDetailScreen() {
                   className={cn(
                     "flex-row items-center justify-between py-3",
                     index < STATUSES.length - 1 && "border-b border-outline-100",
+                    updateStatus.loading && "opacity-50",
                   )}
                   onPress={() => handleSetStatus(status)}
                   accessibilityRole="button"
                   accessibilityLabel={t(`admin.mobile.festivals.status.${status}`)}
-                  accessibilityState={{ selected: festival.status === status }}
+                  accessibilityState={{
+                    selected: festival.status === status,
+                    disabled: updateStatus.loading,
+                  }}
                 >
                   <Text className="text-typography-900">
                     {t(`admin.mobile.festivals.status.${status}`)}
