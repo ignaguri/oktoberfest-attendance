@@ -38,6 +38,17 @@ describe("mapQueryOptions", () => {
     expect(resolved.retry).toBe(sentinelRetry);
   });
 
+  it("forwards refetchInterval, so a polling caller actually polls", () => {
+    expect(mapQueryOptions({ refetchInterval: 30000 }).refetchInterval).toBe(30000);
+  });
+
+  // Asserting absence, not `toBeUndefined()`: the latter passes either way,
+  // and an emitted `refetchInterval: undefined` would beat a QueryClient
+  // default exactly as the retry case above does.
+  it("omits refetchInterval entirely when the caller does not poll", () => {
+    expect(mapQueryOptions({ staleTime: 30000 })).not.toHaveProperty("refetchInterval");
+  });
+
   it("still forwards an explicit retry value, overriding the QueryClient default", () => {
     const queryClient = new QueryClient({
       defaultOptions: {

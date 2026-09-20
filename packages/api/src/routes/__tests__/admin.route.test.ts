@@ -244,12 +244,20 @@ describe("Admin Routes - Unit Tests", () => {
               {
                 tent_id: "55555555-5555-4555-8555-555555555555",
                 visit_date: "2026-09-20T21:00:00Z",
+                festival_id: "44444444-4444-4444-8444-444444444444",
               },
               {
                 tent_id: "66666666-6666-4666-8666-666666666666",
                 visit_date: "2026-09-21T10:00:00Z",
+                festival_id: "44444444-4444-4444-8444-444444444444",
               },
             ],
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
             error: null,
           }),
         );
@@ -259,8 +267,53 @@ describe("Admin Routes - Unit Tests", () => {
       expect(res.status).toBe(200);
       const body = (await res.json()) as any;
       // Only the visit on 2026-09-20 belongs to this attendance, even though it
-      // was logged at 21:00 -- the timestamp is matched on its day part.
+      // was logged at 21:00 -- the timestamp is bucketed by its festival day.
       expect(body.attendances[0].tent_ids).toEqual(["55555555-5555-4555-8555-555555555555"]);
+    });
+
+    // The regression the UTC-slicing version got wrong: 23:00 UTC is already
+    // the next day in Munich, which is the calendar the DB buckets by since
+    // 20260811100000_bucket_tent_visits_by_festival_timezone.
+    it("buckets a visit after local midnight onto the local day", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [
+              {
+                id: ATTENDANCE_ID,
+                user_id: OTHER_ID,
+                festival_id: "44444444-4444-4444-8444-444444444444",
+                date: "2026-09-20",
+                beer_count: 3,
+              },
+            ],
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [
+              {
+                tent_id: "55555555-5555-4555-8555-555555555555",
+                visit_date: "2026-09-20T23:00:00Z",
+                festival_id: "44444444-4444-4444-8444-444444444444",
+              },
+            ],
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
+            error: null,
+          }),
+        );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/attendances`));
+
+      const body = (await res.json()) as any;
+      // 01:00 on the 21st in Munich, so it belongs to the 21st, not this row.
+      expect(body.attendances[0].tent_ids).toEqual([]);
     });
   });
 
@@ -399,6 +452,58 @@ describe("Admin Routes - Unit Tests", () => {
     });
   });
 
+  describe("PATCH /admin/attendances/:attendanceId", () => {
+    // The day's visits are cleared by id. Matching `visit_date` against the
+    // calendar day compares it to midnight UTC, deletes nothing, and turns this
+    // replace into an append: edit twice and every tent appears twice.
+    it("clears the day's existing visits by id before inserting", async () => {
+      const attendanceChain = createMockChain({
+        data: {
+          id: ATTENDANCE_ID,
+          user_id: OTHER_ID,
+          festival_id: "44444444-4444-4444-8444-444444444444",
+          date: "2026-09-20",
+        },
+        error: null,
+      });
+      const festivalChain = createMockChain({
+        data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
+        error: null,
+      });
+      const staleChain = createMockChain({
+        data: [{ id: "77777777-7777-4777-8777-777777777777", visit_date: "2026-09-20T19:00:00Z" }],
+        error: null,
+      });
+      const deleteChain = createMockChain({ data: null, error: null });
+      const insertChain = createMockChain({ data: null, error: null });
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(attendanceChain)
+        .mockReturnValueOnce(festivalChain)
+        .mockReturnValueOnce(staleChain)
+        .mockReturnValueOnce(deleteChain)
+        .mockReturnValueOnce(insertChain);
+
+      const res = await app.request(
+        createAuthRequest(`/admin/attendances/${ATTENDANCE_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ tent_ids: ["55555555-5555-4555-8555-555555555555"] }),
+        }),
+      );
+
+      expect(res.status).toBe(200);
+      expect(deleteChain.delete).toHaveBeenCalled();
+      expect(deleteChain.in).toHaveBeenCalledWith("id", ["77777777-7777-4777-8777-777777777777"]);
+
+      // The insert must carry an instant, not the bare day: a date-only string
+      // stores midnight UTC, which buckets to the previous local day west of
+      // Greenwich and is indistinguishable from a real visit time.
+      const [inserted] = insertChain.insert.mock.calls[0];
+      expect(inserted[0].visit_date).not.toBe("2026-09-20");
+      expect(new Date(inserted[0].visit_date).toISOString()).toBe("2026-09-20T10:00:00.000Z");
+    });
+  });
+
   describe("DELETE /admin/attendances/:attendanceId", () => {
     it("deletes the attendance", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
@@ -411,6 +516,48 @@ describe("Admin Routes - Unit Tests", () => {
 
       expect(res.status).toBe(200);
       expect(mockSupabase.from).toHaveBeenCalledWith("attendances");
+    });
+
+    // tent_visits has no FK to attendances, so nothing else removes them. Left
+    // behind, they stay readable by the user's own app and reattach themselves
+    // to the next attendance created for that day.
+    it("takes that day's tent visits with it", async () => {
+      const attendanceChain = createMockChain({
+        data: {
+          id: ATTENDANCE_ID,
+          user_id: OTHER_ID,
+          festival_id: "44444444-4444-4444-8444-444444444444",
+          date: "2026-09-20",
+        },
+        error: null,
+      });
+      const festivalChain = createMockChain({
+        data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
+        error: null,
+      });
+      const visitsChain = createMockChain({
+        data: [{ id: "77777777-7777-4777-8777-777777777777", visit_date: "2026-09-20T19:00:00Z" }],
+        error: null,
+      });
+      const visitDeleteChain = createMockChain({ data: null, error: null });
+      const attendanceDeleteChain = createMockChain({ data: null, error: null });
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(attendanceChain)
+        .mockReturnValueOnce(festivalChain)
+        .mockReturnValueOnce(visitsChain)
+        .mockReturnValueOnce(visitDeleteChain)
+        .mockReturnValueOnce(attendanceDeleteChain);
+
+      const res = await app.request(
+        createAuthRequest(`/admin/attendances/${ATTENDANCE_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(200);
+      expect(visitDeleteChain.in).toHaveBeenCalledWith("id", [
+        "77777777-7777-4777-8777-777777777777",
+      ]);
+      expect(attendanceDeleteChain.delete).toHaveBeenCalled();
     });
   });
 });

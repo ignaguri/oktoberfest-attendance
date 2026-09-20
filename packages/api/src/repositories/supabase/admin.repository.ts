@@ -11,6 +11,8 @@ import type {
   UpdateAdminUserProfileInput,
   WinningCriterion,
 } from "@prostcounter/shared";
+import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
+import { atZonedTime, formatDateForDatabase } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
@@ -22,6 +24,40 @@ import { createAdminClient } from "../../utils/admin-client";
  * at the first 50 accounts.
  */
 const AUTH_PAGE_SIZE = 200;
+
+/**
+ * The UTC window that can contain any instant bucketing to `date`.
+ *
+ * `tent_visits.visit_date` is a timestamp, and the day it belongs to is
+ * `(visit_date AT TIME ZONE tz)::date` since
+ * 20260811100000_bucket_tent_visits_by_festival_timezone. The query builder
+ * cannot express that, so callers read a day either side and bucket in JS, the
+ * same shape attendance.repository.ts uses. No real offset comes near 24h.
+ */
+function dayWindowUtc(date: string): { start: string; end: string } {
+  const start = new Date(`${date}T00:00:00.000Z`);
+  start.setUTCDate(start.getUTCDate() - 1);
+  const end = new Date(`${date}T00:00:00.000Z`);
+  end.setUTCDate(end.getUTCDate() + 2);
+  return { start: start.toISOString(), end: end.toISOString() };
+}
+
+/**
+ * Midday on `date`, on the festival's clock, as an instant.
+ *
+ * An admin setting a day's tents asserts a day, not a time, but the column is a
+ * timestamp that everything else buckets by local day. Storing the bare date
+ * string would write midnight UTC, which reads back as the previous day
+ * anywhere west of Greenwich. Midday survives every real offset.
+ */
+function middayOn(date: string, timezone: string): string {
+  const [year, month, day] = date.split("-").map(Number);
+  return atZonedTime(
+    new Date(year, month - 1, day),
+    new Date(2000, 0, 1, 12, 0),
+    timezone,
+  ).toISOString();
+}
 
 /**
  * Hard ceiling on auth pages scanned in one request. Emails live in
@@ -245,6 +281,58 @@ export class SupabaseAdminRepository {
    * Tent visits are fetched in one query for the whole set and grouped in
    * memory; the web panel issues one query per attendance instead.
    */
+  private async festivalTimezones(festivalIds: (string | null)[]): Promise<Map<string, string>> {
+    const ids = [...new Set(festivalIds.filter((id): id is string => !!id))];
+    if (ids.length === 0) {
+      return new Map();
+    }
+
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("id, timezone")
+      .in("id", ids);
+
+    if (error) {
+      throw new Error(`Error fetching festival timezones: ${error.message}`);
+    }
+
+    return new Map((data ?? []).map((f) => [f.id, f.timezone ?? DEFAULT_TIMEZONE]));
+  }
+
+  /**
+   * The ids of a user's tent visits on one festival day.
+   *
+   * Windowed and bucketed rather than matched on equality: `visit_date` holds
+   * the real visit time, so `.eq(visit_date, "2026-09-21")` compares against
+   * midnight UTC and matches nothing a person actually logged.
+   */
+  private async visitIdsOnDay(
+    userId: string,
+    festivalId: string,
+    date: string,
+    timezone: string,
+  ): Promise<string[]> {
+    const window = dayWindowUtc(date);
+
+    const { data, error } = await this.supabase
+      .from("tent_visits")
+      .select("id, visit_date")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .gte("visit_date", window.start)
+      .lt("visit_date", window.end);
+
+    if (error) {
+      throw new Error(`Error reading the day's tent visits: ${error.message}`);
+    }
+
+    return (data ?? [])
+      .filter(
+        (v) => !!v.visit_date && formatDateForDatabase(new Date(v.visit_date), timezone) === date,
+      )
+      .map((v) => v.id);
+  }
+
   async listUserAttendances(userId: string): Promise<AdminAttendance[]> {
     const { data: attendances, error } = await this.supabase
       .from("attendances")
@@ -262,30 +350,40 @@ export class SupabaseAdminRepository {
 
     const { data: tentVisits, error: tentError } = await this.supabase
       .from("tent_visits")
-      .select("tent_id, visit_date")
+      .select("tent_id, visit_date, festival_id")
       .eq("user_id", userId);
 
     if (tentError) {
       throw new Error(`Error fetching tent visits: ${tentError.message}`);
     }
 
-    // visit_date is a timestamp; attendances.date is a calendar day. Group by
-    // the day part so a visit logged at 21:00 lands on the right attendance.
+    const timezones = await this.festivalTimezones([
+      ...attendances.map((a) => a.festival_id),
+      ...(tentVisits ?? []).map((v) => v.festival_id),
+    ]);
+
+    // visit_date is a timestamp; attendances.date is a calendar day. The day a
+    // visit belongs to is its date on the *festival's* clock, not UTC: slicing
+    // the timestamp files a 01:00 Munich visit under the previous day, which is
+    // what 20260811100000_bucket_tent_visits_by_festival_timezone exists to
+    // stop. Keyed by festival too, since one user's days can overlap across
+    // festivals in different timezones.
     const tentsByDay = new Map<string, string[]>();
     for (const visit of tentVisits ?? []) {
-      if (!visit.visit_date || !visit.tent_id) continue;
-      const day = visit.visit_date.slice(0, 10);
-      const existing = tentsByDay.get(day);
+      if (!visit.visit_date || !visit.tent_id || !visit.festival_id) continue;
+      const timezone = timezones.get(visit.festival_id) ?? DEFAULT_TIMEZONE;
+      const key = `${visit.festival_id}|${formatDateForDatabase(new Date(visit.visit_date), timezone)}`;
+      const existing = tentsByDay.get(key);
       if (existing) {
         existing.push(visit.tent_id);
       } else {
-        tentsByDay.set(day, [visit.tent_id]);
+        tentsByDay.set(key, [visit.tent_id]);
       }
     }
 
     return attendances.map((attendance) => ({
       ...attendance,
-      tent_ids: tentsByDay.get(attendance.date.slice(0, 10)) ?? [],
+      tent_ids: tentsByDay.get(`${attendance.festival_id}|${attendance.date}`) ?? [],
     }));
   }
 
@@ -336,15 +434,27 @@ export class SupabaseAdminRepository {
 
     // The day the visits belong to, after any date change in this same call.
     const visitDate = attendanceFields.date ?? existing.date;
+    const timezone = (await this.festivalTimezones([existing.festival_id])).get(
+      existing.festival_id ?? "",
+    );
+    const visitTimezone = timezone ?? DEFAULT_TIMEZONE;
 
-    const { error: deleteError } = await this.supabase
-      .from("tent_visits")
-      .delete()
-      .eq("user_id", visitUserId)
-      .eq("visit_date", visitDate);
+    // Cleared by id. Matching on `visit_date` equality compares a calendar day
+    // against a timestamp, so it silently deletes nothing and this "replace"
+    // becomes an append: edit a day twice and every tent is listed twice.
+    const staleVisitIds = existing.festival_id
+      ? await this.visitIdsOnDay(visitUserId, existing.festival_id, visitDate, visitTimezone)
+      : [];
 
-    if (deleteError) {
-      throw new Error(`Error clearing tent visits: ${deleteError.message}`);
+    if (staleVisitIds.length > 0) {
+      const { error: deleteError } = await this.supabase
+        .from("tent_visits")
+        .delete()
+        .in("id", staleVisitIds);
+
+      if (deleteError) {
+        throw new Error(`Error clearing tent visits: ${deleteError.message}`);
+      }
     }
 
     if (tent_ids.length === 0) {
@@ -358,7 +468,7 @@ export class SupabaseAdminRepository {
         user_id: visitUserId,
         festival_id: existing.festival_id,
         tent_id: tentId,
-        visit_date: visitDate,
+        visit_date: middayOn(visitDate, visitTimezone),
       })),
     );
 
@@ -469,7 +579,48 @@ export class SupabaseAdminRepository {
     return data ?? [];
   }
 
+  /**
+   * Deletes an attendance and that day's tent visits.
+   *
+   * The visits go too because nothing else removes them: `tent_visits` has no
+   * FK to `attendances` (they are keyed by user, festival and day), so dropping
+   * the attendance alone leaves them readable by the user's own app, and the
+   * next edit to that day resurrects an attendance with ghost tents attached.
+   */
   async deleteAttendance(attendanceId: string): Promise<void> {
+    const { data: existing, error: fetchError } = await this.supabase
+      .from("attendances")
+      .select("id, user_id, festival_id, date")
+      .eq("id", attendanceId)
+      .maybeSingle();
+
+    if (fetchError) {
+      throw new Error(`Error reading attendance: ${fetchError.message}`);
+    }
+
+    if (existing?.user_id && existing.festival_id) {
+      const timezone =
+        (await this.festivalTimezones([existing.festival_id])).get(existing.festival_id) ??
+        DEFAULT_TIMEZONE;
+      const visitIds = await this.visitIdsOnDay(
+        existing.user_id,
+        existing.festival_id,
+        existing.date,
+        timezone,
+      );
+
+      if (visitIds.length > 0) {
+        const { error: visitError } = await this.supabase
+          .from("tent_visits")
+          .delete()
+          .in("id", visitIds);
+
+        if (visitError) {
+          throw new Error(`Error deleting tent visits: ${visitError.message}`);
+        }
+      }
+    }
+
     const { error } = await this.supabase.from("attendances").delete().eq("id", attendanceId);
 
     if (error) {

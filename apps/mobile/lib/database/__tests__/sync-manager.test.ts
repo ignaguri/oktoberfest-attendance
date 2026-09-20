@@ -408,6 +408,52 @@ describe("Pull functions", () => {
 
       expect(result.table).toBe("profiles");
     });
+
+    // is_super_admin is server-owned, so a pending local username edit must not
+    // hold back a grant or a revocation until the user happens to sync clean.
+    it("writes is_super_admin through to a row with unsynced local edits", async () => {
+      vi.mocked(apiClient.profile.get).mockResolvedValueOnce({
+        profile: {
+          username: "testuser",
+          full_name: "Test User",
+          avatar_url: null,
+          preferred_language: "en",
+          tip_mode: "none",
+          tip_fixed_amount: null,
+          is_super_admin: true,
+        },
+      });
+      mockDb._records.profiles.push({ id: "user-1", _dirty: 1 });
+      const db = mockDb as unknown as Parameters<typeof pullProfile>[0];
+
+      await pullProfile(db, "user-1");
+
+      const [sql, params] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.includes("UPDATE profiles SET"),
+        ) ?? [];
+
+      expect(sql).toContain("is_super_admin = ?");
+      expect(params).toEqual([1, "user-1"]);
+    });
+
+    it("leaves a dirty row's local edits and its dirty marker alone", async () => {
+      mockDb._records.profiles.push({ id: "user-1", _dirty: 1 });
+      const db = mockDb as unknown as Parameters<typeof pullProfile>[0];
+
+      const result = await pullProfile(db, "user-1");
+
+      const [sql] =
+        mockDb.runAsync.mock.calls.find(
+          ([query]) => typeof query === "string" && query.includes("UPDATE profiles SET"),
+        ) ?? [];
+
+      // The username/full_name columns and _dirty must all be untouched, so
+      // the pending edit still gets pushed on the next sync.
+      expect(sql).not.toContain("username");
+      expect(sql).not.toContain("_dirty");
+      expect(result.updated).toBe(0);
+    });
   });
 
   describe("pullAttendances", () => {

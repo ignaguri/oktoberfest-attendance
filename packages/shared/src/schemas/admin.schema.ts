@@ -23,7 +23,9 @@ export const AdminLocationSessionSchema = z.object({
   updatedAt: z.string(),
   user: z.object({
     id: z.string().uuid(),
-    username: z.string(),
+    // profiles.username is nullable and the admin query returns it unchanged,
+    // so a half-finished profile surfaces here as null.
+    username: z.string().nullable(),
     fullName: z.string().nullable(),
   }),
   festival: z.object({

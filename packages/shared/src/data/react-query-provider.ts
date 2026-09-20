@@ -35,6 +35,9 @@ export function mapQueryOptions(
     enabled: options.enabled,
     gcTime: options.gcTime,
     staleTime: options.staleTime,
+    // Conditional for the same reason as `retry` below: an explicit
+    // `refetchInterval: undefined` would override a QueryClient default.
+    ...(options.refetchInterval !== undefined ? { refetchInterval: options.refetchInterval } : {}),
     // Only forward `retry` when explicitly set. Emitting `retry: undefined`
     // would override the QueryClient default retry predicate.
     ...(options.retry !== undefined ? { retry: options.retry } : {}),
@@ -75,8 +78,8 @@ export function useQuery<T>(
     data: (query.data ?? null) as T | null,
     loading: query.isLoading,
     error: query.error,
-    refetch: () => {
-      query.refetch();
+    refetch: async () => {
+      await query.refetch();
     },
     isInitialLoading: query.isLoading && query.isFetching && !query.data,
     isRefetching: query.isFetching && !query.isLoading,
