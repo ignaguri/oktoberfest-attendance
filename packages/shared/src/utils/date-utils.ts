@@ -150,6 +150,12 @@ export function formatTimeInTimezone(
 }
 
 /**
+ * How far ahead of the device clock a server timestamp may sit before it reads
+ * as a wait rather than as "now".
+ */
+const CLOCK_SKEW_SECONDS = 5;
+
+/**
  * Formats a date for relative time using Intl.RelativeTimeFormat
  * Uses the current i18n language for localized output (e.g., "vor 2 Stunden" in German)
  *
@@ -158,8 +164,6 @@ export function formatTimeInTimezone(
  * @param locale - Optional locale for formatting (defaults to current i18n language)
  * @returns Relative time string (e.g., "2 minutes ago", "1 hour ago", "in 2 hours")
  */
-const CLOCK_SKEW_SECONDS = 5;
-
 export function formatRelativeTime(
   date: Date,
   timezone: string = TIMEZONE,
@@ -183,7 +187,11 @@ export function formatRelativeTime(
       const rtf = new Intl.RelativeTimeFormat(language, { numeric: "auto" });
 
       if (distanceInSeconds < 60) {
-        return rtf.format(-diffInSeconds, "second");
+        // Clamp to zero rather than to an English literal, so this stays
+        // localized: format(0) is "now", "jetzt", "ahora".
+        const seconds =
+          diffInSeconds < 0 && distanceInSeconds < CLOCK_SKEW_SECONDS ? 0 : -diffInSeconds;
+        return rtf.format(seconds, "second");
       } else if (distanceInSeconds < 3600) {
         return rtf.format(-Math.trunc(diffInSeconds / 60), "minute");
       } else if (distanceInSeconds < 86400) {
