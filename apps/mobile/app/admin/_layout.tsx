@@ -50,6 +50,18 @@ export default function AdminLayout() {
         }}
       />
       <Stack.Screen
+        name="groups"
+        options={{
+          title: t("admin.tabs.groups"),
+        }}
+      />
+      <Stack.Screen
+        name="group/[id]"
+        options={{
+          title: t("admin.mobile.groupDetail.title"),
+        }}
+      />
+      <Stack.Screen
         name="location"
         options={{
           title: t("admin.location.title"),

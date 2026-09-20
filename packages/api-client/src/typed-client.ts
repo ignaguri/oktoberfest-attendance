@@ -8,6 +8,8 @@
 // Import shared schema types
 import type {
   AdminAttendance,
+  AdminGroup,
+  AdminGroupMember,
   AdminLocationSession,
   AdminUser,
   AttendanceByDate,
@@ -63,12 +65,14 @@ import type {
   SubmitCrowdReportResponse,
   TutorialStatus,
   UpdateAdminAttendanceInput,
+  UpdateAdminGroupInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
   UpdateGroupMessageResponse,
   UpdatePersonalAttendanceResponse,
   UpsertDayPlanInput,
   WinningCriteriaListResponse,
+  WinningCriterion,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -2744,6 +2748,82 @@ export function createTypedApiClient(config: ApiClientConfig) {
           }
           return parseJsonResponse<{ success: boolean }>(response);
         },
+      },
+
+      groups: {
+        async list(): Promise<{ groups: AdminGroup[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/groups`, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch groups");
+          }
+          return parseJsonResponse<{ groups: AdminGroup[] }>(response);
+        },
+
+        async get(groupId: string): Promise<{ group: AdminGroup }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/groups/${groupId}`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch group");
+          }
+          return parseJsonResponse<{ group: AdminGroup }>(response);
+        },
+
+        async update(groupId: string, data: UpdateAdminGroupInput): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/groups/${groupId}`,
+            {
+              method: "PATCH",
+              headers,
+              body: JSON.stringify(data),
+            },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update group");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async delete(groupId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/groups/${groupId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to delete group");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async listMembers(groupId: string): Promise<{ members: AdminGroupMember[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/groups/${groupId}/members`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch group members");
+          }
+          return parseJsonResponse<{ members: AdminGroupMember[] }>(response);
+        },
+      },
+
+      async listWinningCriteria(): Promise<{ criteria: WinningCriterion[] }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/winning-criteria`, {
+          headers,
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch winning criteria");
+        }
+        return parseJsonResponse<{ criteria: WinningCriterion[] }>(response);
       },
 
       location: {

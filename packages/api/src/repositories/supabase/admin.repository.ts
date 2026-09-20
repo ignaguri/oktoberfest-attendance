@@ -1,11 +1,15 @@
 import type { Database } from "@prostcounter/db";
 import type {
   AdminAttendance,
+  AdminGroup,
+  AdminGroupMember,
   AdminUser,
   ListAdminUsersResponse,
   UpdateAdminAttendanceInput,
+  UpdateAdminGroupInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
+  WinningCriterion,
 } from "@prostcounter/shared";
 import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
 import { atZonedTime, formatDateForDatabase } from "@prostcounter/shared/utils";
@@ -271,12 +275,6 @@ export class SupabaseAdminRepository {
     }
   }
 
-  /**
-   * Lists a user's attendances with the tents visited on each day.
-   *
-   * Tent visits are fetched in one query for the whole set and grouped in
-   * memory; the web panel issues one query per attendance instead.
-   */
   private async festivalTimezones(festivalIds: (string | null)[]): Promise<Map<string, string>> {
     const ids = [...new Set(festivalIds.filter((id): id is string => !!id))];
     if (ids.length === 0) {
@@ -329,6 +327,12 @@ export class SupabaseAdminRepository {
       .map((v) => v.id);
   }
 
+  /**
+   * Lists a user's attendances with the tents visited on each day.
+   *
+   * Tent visits are fetched in one query for the whole set and grouped in
+   * memory; the web panel issues one query per attendance instead.
+   */
   async listUserAttendances(userId: string): Promise<AdminAttendance[]> {
     const { data: attendances, error } = await this.supabase
       .from("attendances")
@@ -471,6 +475,151 @@ export class SupabaseAdminRepository {
     if (insertError) {
       throw new Error(`Error adding tent visits: ${insertError.message}`);
     }
+  }
+
+  /**
+   * Lists every group with its member count.
+   *
+   * Columns are named explicitly rather than selected with "*": `groups` also
+   * holds `password` and `invite_token`, and neither belongs in an API
+   * response just because the caller is an admin.
+   */
+  async listGroups(): Promise<AdminGroup[]> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .select(
+        "id, name, description, winning_criteria_id, festival_id, created_at, created_by, group_members(count)",
+      )
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching groups: ${error.message}`);
+    }
+
+    return (data ?? []).map((group) => {
+      const { group_members, ...rest } = group;
+      return {
+        ...rest,
+        member_count: group_members?.[0]?.count ?? 0,
+      };
+    });
+  }
+
+  /**
+   * Fetches one group, so the detail screen survives a reload or deep link.
+   *
+   * `maybeSingle` with the error rethrown, rather than collapsing both into
+   * null: the route turns null into "Group not found", so swallowing a real
+   * Supabase failure here tells the admin the group is gone when the database
+   * is merely unreachable.
+   */
+  async getGroup(groupId: string): Promise<AdminGroup | null> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .select(
+        "id, name, description, winning_criteria_id, festival_id, created_at, created_by, group_members(count)",
+      )
+      .eq("id", groupId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error fetching group: ${error.message}`);
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const { group_members, ...rest } = data;
+    return { ...rest, member_count: group_members?.[0]?.count ?? 0 };
+  }
+
+  /**
+   * Updates a group. Returns false when no such group exists.
+   *
+   * PostgREST counts a write that matches no rows as a success, so without the
+   * `select` this reports a saved rename for a group another admin has already
+   * deleted -- and the detail screen leaves edit mode showing the new name.
+   */
+  async updateGroup(groupId: string, input: UpdateAdminGroupInput): Promise<boolean> {
+    // Every field on UpdateAdminGroupSchema is optional, so an empty patch is a
+    // valid request. PostgREST rejects an update with no columns, so read
+    // instead of writing: the answer the caller wants is still "does it exist".
+    const query =
+      Object.keys(input).length > 0
+        ? this.supabase.from("groups").update(input).eq("id", groupId).select("id")
+        : this.supabase.from("groups").select("id").eq("id", groupId);
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Error(`Error updating group: ${error.message}`);
+    }
+
+    return (data ?? []).length > 0;
+  }
+
+  /** Deletes a group. Returns false when no such group exists. */
+  async deleteGroup(groupId: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .delete()
+      .eq("id", groupId)
+      .select("id");
+
+    if (error) {
+      throw new Error(`Error deleting group: ${error.message}`);
+    }
+
+    return (data ?? []).length > 0;
+  }
+
+  /**
+   * Lists a group's members, flattened from the joined profile.
+   *
+   * A plain join rather than `!inner`: `group_members.user_id` is nullable, and
+   * an inner join drops those rows silently. The detail screen shows
+   * `member_count` (which counts every row) directly above this list, so the
+   * two would disagree with nothing on screen explaining the gap. A member with
+   * no profile comes back with null names instead, which the schema allows.
+   */
+  async listGroupMembers(groupId: string): Promise<AdminGroupMember[]> {
+    const { data, error } = await this.supabase
+      .from("group_members")
+      .select("id, user_id, joined_at, profiles(username, full_name, avatar_url)")
+      .eq("group_id", groupId)
+      .order("joined_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching group members: ${error.message}`);
+    }
+
+    return (data ?? []).map((member) => {
+      // The join yields an object, but the generated types model the
+      // relationship as possibly-array; normalize before reading it.
+      const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
+      return {
+        id: member.id,
+        user_id: member.user_id,
+        joined_at: member.joined_at,
+        username: profile?.username ?? null,
+        full_name: profile?.full_name ?? null,
+        avatar_url: profile?.avatar_url ?? null,
+      };
+    });
+  }
+
+  async listWinningCriteria(): Promise<WinningCriterion[]> {
+    const { data, error } = await this.supabase
+      .from("winning_criteria")
+      .select("id, name")
+      .order("id");
+
+    if (error) {
+      throw new Error(`Error fetching winning criteria: ${error.message}`);
+    }
+
+    return data ?? [];
   }
 
   /**

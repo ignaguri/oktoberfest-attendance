@@ -1,11 +1,15 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   AdminAttendanceSchema,
+  AdminGroupMemberSchema,
+  AdminGroupSchema,
   AdminUserSchema,
   ListAdminUsersResponseSchema,
   UpdateAdminAttendanceSchema,
   UpdateAdminUserAuthSchema,
+  UpdateAdminGroupSchema,
   UpdateAdminUserProfileSchema,
+  WinningCriterionSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
@@ -315,6 +319,188 @@ app.openapi(deleteAttendanceRoute, async (c) => {
   await adminRepo.deleteAttendance(attendanceId);
 
   return c.json({ success: true }, 200);
+});
+
+// GET /admin/groups - List all groups
+const listGroupsRoute = createRoute({
+  method: "get",
+  path: "/admin/groups",
+  tags: ["admin"],
+  summary: "List groups (admin)",
+  description: "Lists every group with its member count. Excludes group passwords.",
+  responses: {
+    200: {
+      description: "Groups retrieved successfully",
+      content: {
+        "application/json": { schema: z.object({ groups: z.array(AdminGroupSchema) }) },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listGroupsRoute, async (c) => {
+  const { supabase } = c.var;
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const groups = await adminRepo.listGroups();
+  return c.json({ groups }, 200);
+});
+
+// GET /admin/winning-criteria - List winning criteria
+const listWinningCriteriaRoute = createRoute({
+  method: "get",
+  path: "/admin/winning-criteria",
+  tags: ["admin"],
+  summary: "List winning criteria (admin)",
+  responses: {
+    200: {
+      description: "Winning criteria retrieved successfully",
+      content: {
+        "application/json": { schema: z.object({ criteria: z.array(WinningCriterionSchema) }) },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listWinningCriteriaRoute, async (c) => {
+  const { supabase } = c.var;
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const criteria = await adminRepo.listWinningCriteria();
+  return c.json({ criteria }, 200);
+});
+
+// GET /admin/groups/:groupId - Get one group
+const getGroupRoute = createRoute({
+  method: "get",
+  path: "/admin/groups/{groupId}",
+  tags: ["admin"],
+  summary: "Get a group (admin)",
+  request: { params: z.object({ groupId: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Group retrieved successfully",
+      content: { "application/json": { schema: z.object({ group: AdminGroupSchema }) } },
+    },
+    ...errorResponses,
+    404: {
+      description: "Group not found",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getGroupRoute, async (c) => {
+  const { supabase } = c.var;
+  const { groupId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const group = await adminRepo.getGroup(groupId);
+
+  if (!group) {
+    throw new NotFoundError("Group not found");
+  }
+
+  return c.json({ group }, 200);
+});
+
+// PATCH /admin/groups/:groupId - Update a group
+const updateGroupRoute = createRoute({
+  method: "patch",
+  path: "/admin/groups/{groupId}",
+  tags: ["admin"],
+  summary: "Update a group (admin)",
+  request: {
+    params: z.object({ groupId: z.string().uuid() }),
+    body: { content: { "application/json": { schema: UpdateAdminGroupSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Group updated successfully",
+      content: { "application/json": { schema: z.object({ success: z.boolean() }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(updateGroupRoute, async (c) => {
+  const { supabase } = c.var;
+  const { groupId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const updated = await adminRepo.updateGroup(groupId, body);
+
+  if (!updated) {
+    throw new NotFoundError("Group not found");
+  }
+
+  return c.json({ success: true }, 200);
+});
+
+// DELETE /admin/groups/:groupId - Delete a group
+const deleteGroupRoute = createRoute({
+  method: "delete",
+  path: "/admin/groups/{groupId}",
+  tags: ["admin"],
+  summary: "Delete a group (admin)",
+  description: "Deletes the group; memberships cascade.",
+  request: { params: z.object({ groupId: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Group deleted successfully",
+      content: { "application/json": { schema: z.object({ success: z.boolean() }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(deleteGroupRoute, async (c) => {
+  const { supabase } = c.var;
+  const { groupId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const deleted = await adminRepo.deleteGroup(groupId);
+
+  if (!deleted) {
+    throw new NotFoundError("Group not found");
+  }
+
+  return c.json({ success: true }, 200);
+});
+
+// GET /admin/groups/:groupId/members - List a group's members
+const listGroupMembersRoute = createRoute({
+  method: "get",
+  path: "/admin/groups/{groupId}/members",
+  tags: ["admin"],
+  summary: "List a group's members (admin)",
+  request: { params: z.object({ groupId: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Members retrieved successfully",
+      content: {
+        "application/json": { schema: z.object({ members: z.array(AdminGroupMemberSchema) }) },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listGroupMembersRoute, async (c) => {
+  const { supabase } = c.var;
+  const { groupId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const members = await adminRepo.listGroupMembers(groupId);
+
+  return c.json({ members }, 200);
 });
 
 export default app;
