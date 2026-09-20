@@ -1,5 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  AdminLocationSessionSchema,
   GetNearbyMembersQuerySchema,
   GetNearbyMembersResponseSchema,
   StartLocationSessionResponseSchema,
@@ -12,9 +13,27 @@ import type { AuthContext } from "../middleware/auth";
 import { SupabaseLocationRepository } from "../repositories/supabase";
 import { LocationService } from "../services/location.service";
 import { NotificationService } from "../services/notification.service";
+import { createAdminClient } from "../utils/admin-client";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
+
+/**
+ * Builds the location service for the `/admin/location/*` handlers.
+ *
+ * These read and write other users' sessions, which the caller's own token
+ * cannot do: `location_sessions` carries owner and group-member policies only,
+ * with no super-admin escape like the one `attendances` or `groups` have. Under
+ * the caller-scoped client the admin list silently narrows to the admin's own
+ * sessions and force-stop/cleanup match nothing.
+ *
+ * Authorization is not lost by going elevated -- `requireAdmin` guards the
+ * whole `/admin/*` prefix before any of this runs, and LocationService re-checks
+ * `isAdmin` against the id from the verified token.
+ */
+function adminLocationService() {
+  return new LocationService(new SupabaseLocationRepository(createAdminClient()));
+}
 
 // POST /location/sessions - Start location sharing session
 const startSessionRoute = createRoute({
@@ -342,28 +361,10 @@ const adminGetSessionsRoute = createRoute({
       description: "Sessions retrieved successfully",
       content: {
         "application/json": {
+          // The shared schema rather than a copy of it: the inline duplicate
+          // this replaces had already drifted from it on username nullability.
           schema: z.object({
-            sessions: z.array(
-              z.object({
-                id: z.string().uuid(),
-                userId: z.string().uuid(),
-                festivalId: z.string().uuid(),
-                isActive: z.boolean(),
-                startedAt: z.string(),
-                expiresAt: z.string(),
-                createdAt: z.string(),
-                updatedAt: z.string(),
-                user: z.object({
-                  id: z.string().uuid(),
-                  username: z.string(),
-                  fullName: z.string().nullable(),
-                }),
-                festival: z.object({
-                  id: z.string().uuid(),
-                  name: z.string(),
-                }),
-              }),
-            ),
+            sessions: z.array(AdminLocationSessionSchema),
           }),
         },
       },
@@ -395,11 +396,10 @@ const adminGetSessionsRoute = createRoute({
 });
 
 app.openapi(adminGetSessionsRoute, async (c) => {
-  const { user, supabase } = c.var;
+  const { user } = c.var;
   const query = c.req.valid("query");
 
-  const locationRepo = new SupabaseLocationRepository(supabase);
-  const locationService = new LocationService(locationRepo);
+  const locationService = adminLocationService();
 
   const sessions = await locationService.getActiveSessionsAdmin(user.id, {
     festivalId: query.festivalId,
@@ -479,11 +479,10 @@ const adminForceStopSessionRoute = createRoute({
 });
 
 app.openapi(adminForceStopSessionRoute, async (c) => {
-  const { user, supabase } = c.var;
+  const { user } = c.var;
   const { id } = c.req.valid("param");
 
-  const locationRepo = new SupabaseLocationRepository(supabase);
-  const locationService = new LocationService(locationRepo);
+  const locationService = adminLocationService();
 
   const session = await locationService.forceStopSession(user.id, id);
 
@@ -536,10 +535,9 @@ const adminCleanupSessionsRoute = createRoute({
 });
 
 app.openapi(adminCleanupSessionsRoute, async (c) => {
-  const { user, supabase } = c.var;
+  const { user } = c.var;
 
-  const locationRepo = new SupabaseLocationRepository(supabase);
-  const locationService = new LocationService(locationRepo);
+  const locationService = adminLocationService();
 
   const cleanedCount = await locationService.cleanupExpiredSessions(user.id);
 

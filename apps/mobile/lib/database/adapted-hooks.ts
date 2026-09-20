@@ -55,7 +55,9 @@ function toDataQueryResult<T>(query: UseQueryResult<T, Error>): DataQueryResult<
     data: query.data ?? null,
     loading: query.isLoading,
     error: query.error,
-    refetch: query.refetch,
+    refetch: async () => {
+      await query.refetch();
+    },
     isInitialLoading: query.isLoading && !query.data,
     isRefetching: query.isRefetching,
   };
@@ -407,7 +409,9 @@ export function useAdaptedProfile(userId: string | undefined): DataQueryResult<P
     data: query.data ? adaptLocalProfile(query.data) : null,
     loading: query.isLoading,
     error: query.error,
-    refetch: query.refetch,
+    refetch: async () => {
+      await query.refetch();
+    },
     isInitialLoading: query.isLoading && !query.data,
     isRefetching: query.isRefetching,
   };
