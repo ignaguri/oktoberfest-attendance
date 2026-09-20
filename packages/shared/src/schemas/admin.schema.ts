@@ -271,3 +271,98 @@ export const UpdateAdminFestivalSchema = z
   );
 
 export type UpdateAdminFestivalInput = z.infer<typeof UpdateAdminFestivalSchema>;
+
+// =============================================================================
+// Tents
+// =============================================================================
+
+/**
+ * A tent in the global `tents` catalogue, independent of any festival.
+ *
+ * Assignment and pricing live in `festival_tents`, so editing a tent here
+ * changes it for every festival that uses it.
+ */
+export const AdminTentSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  category: z.string().nullable(),
+});
+
+export type AdminTent = z.infer<typeof AdminTentSchema>;
+
+export const CreateAdminTentSchema = z.object({
+  name: z.string().min(1).max(255),
+  category: z.string().min(1).max(100).nullable().optional(),
+});
+
+export type CreateAdminTentInput = z.infer<typeof CreateAdminTentSchema>;
+
+export const UpdateAdminTentSchema = z.object({
+  name: z.string().min(1).max(255).optional(),
+  category: z.string().min(1).max(100).nullable().optional(),
+});
+
+export type UpdateAdminTentInput = z.infer<typeof UpdateAdminTentSchema>;
+
+/**
+ * A beer price in euros, or null to clear it.
+ *
+ * Positive rather than non-negative because `drink_type_prices_positive_price`
+ * rejects anything <= 0. "No price" is therefore null, which deletes the
+ * canonical row rather than storing a zero that would read as free beer.
+ */
+const beerPriceEuros = z.number().positive().nullable();
+
+/** A tent as assigned to one festival, carrying that festival's price for it. */
+export const AdminFestivalTentSchema = z.object({
+  festival_tent_id: z.string().uuid(),
+  tent_id: z.string().uuid(),
+  name: z.string(),
+  category: z.string().nullable(),
+  beer_price: z.number().nullable(),
+});
+
+export type AdminFestivalTent = z.infer<typeof AdminFestivalTentSchema>;
+
+export const AddAdminFestivalTentSchema = z.object({
+  tent_id: z.string().uuid(),
+  beer_price: beerPriceEuros.optional(),
+});
+
+export type AddAdminFestivalTentInput = z.infer<typeof AddAdminFestivalTentSchema>;
+
+export const AddAllAdminFestivalTentsSchema = z.object({
+  beer_price: beerPriceEuros.optional(),
+});
+
+export type AddAllAdminFestivalTentsInput = z.infer<typeof AddAllAdminFestivalTentsSchema>;
+
+export const UpdateAdminFestivalTentPriceSchema = z.object({
+  beer_price: beerPriceEuros,
+});
+
+export type UpdateAdminFestivalTentPriceInput = z.infer<typeof UpdateAdminFestivalTentPriceSchema>;
+
+export const CopyAdminFestivalTentsSchema = z.object({
+  source_festival_id: z.string().uuid(),
+  tent_ids: z.array(z.string().uuid()).min(1),
+  copy_prices: z.boolean().optional(),
+  override_price: beerPriceEuros.optional(),
+});
+
+export type CopyAdminFestivalTentsInput = z.infer<typeof CopyAdminFestivalTentsSchema>;
+
+/**
+ * Per-festival tent counts.
+ *
+ * `avg_price` is null when no tent has a price, rather than the web panel's 0 —
+ * an average of nothing is not free beer.
+ */
+export const AdminFestivalTentStatsSchema = z.object({
+  total_tents: z.number(),
+  categories: z.record(z.string(), z.number()),
+  with_custom_pricing: z.number(),
+  avg_price: z.number().nullable(),
+});
+
+export type AdminFestivalTentStats = z.infer<typeof AdminFestivalTentStatsSchema>;

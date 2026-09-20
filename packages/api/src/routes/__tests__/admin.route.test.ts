@@ -34,6 +34,16 @@ const OTHER_ID = "22222222-2222-4222-8222-222222222222";
 const ATTENDANCE_ID = "33333333-3333-4333-8333-333333333333";
 const GROUP_ID = "88888888-8888-4888-8888-888888888888";
 const FESTIVAL_ID = "99999999-9999-4999-8999-999999999999";
+const TENT_ID = "44444444-4444-4444-8444-444444444444";
+const FESTIVAL_TENT_ID = "55555555-5555-4555-8555-555555555555";
+const SOURCE_FESTIVAL_ID = "66666666-6666-4666-8666-666666666666";
+
+/** A `festival_tents` row as `updateFestivalTentPrice` selects it back. */
+const festivalTentRow = (beerPrice: number | null) => ({
+  id: FESTIVAL_TENT_ID,
+  beer_price: beerPrice,
+  tent: { id: TENT_ID, name: "Schottenhamel", category: "large" },
+});
 
 describe("Admin Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;
@@ -546,6 +556,140 @@ describe("Admin Routes - Unit Tests", () => {
 
       expect(res.status).toBe(200);
       expect(mockSupabase.from).toHaveBeenCalledWith("attendances");
+    });
+  });
+
+  describe("PATCH /admin/festivals/:festivalId/tents/:tentId", () => {
+    it("writes the canonical drink_type_prices row, not just the tent columns", async () => {
+      vi.mocked(mockSupabase.from)
+        // festival_tents update
+        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(9.5), error: null }))
+        // drink_type_prices read-back: no existing row
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        // drink_type_prices insert
+        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ beer_price: 9.5 }),
+        }),
+      );
+
+      expect(res.status).toBe(200);
+      // The point of the write-through: a price that lands only in
+      // festival_tents leaves pricing.repository reading a stale value.
+      expect(mockSupabase.from).toHaveBeenCalledWith("festival_tents");
+      expect(mockSupabase.from).toHaveBeenCalledWith("drink_type_prices");
+    });
+
+    it("clears a price by deleting the canonical row rather than storing zero", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(null), error: null }))
+        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ beer_price: null }),
+        }),
+      );
+
+      expect(res.status).toBe(200);
+      // Two calls only: the update and the delete. A zero row would violate
+      // drink_type_prices_positive_price anyway.
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(2);
+      expect(mockSupabase.from).toHaveBeenCalledWith("drink_type_prices");
+    });
+
+    it("rejects a non-positive price, matching the database CHECK", async () => {
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ beer_price: 0 }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    it("404s when the tent is not assigned to this festival", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ beer_price: 9.5 }),
+        }),
+      );
+
+      expect(res.status).toBe(404);
+    });
+  });
+
+  describe("DELETE /admin/festivals/:festivalId/tents/:tentId", () => {
+    it("refuses with 409 when people have visited the tent here", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: [{ id: "visit-1" }], error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
+          method: "DELETE",
+        }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.message).toMatch(/visit/i);
+    });
+
+    it("removes the tent when it has no visits", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
+          method: "DELETE",
+        }),
+      );
+
+      expect(res.status).toBe(200);
+      expect(mockSupabase.from).toHaveBeenCalledWith("tent_visits");
+      expect(mockSupabase.from).toHaveBeenCalledWith("festival_tents");
+    });
+  });
+
+  describe("POST /admin/festivals/:festivalId/tents/copy", () => {
+    it("skips tents the target festival already serves", async () => {
+      vi.mocked(mockSupabase.from)
+        // source rows
+        .mockReturnValueOnce(
+          createMockChain({ data: [{ tent_id: TENT_ID, beer_price: 9.5 }], error: null }),
+        )
+        // target already has it
+        .mockReturnValueOnce(createMockChain({ data: [{ tent_id: TENT_ID }], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/copy`, {
+          method: "POST",
+          body: JSON.stringify({
+            source_festival_id: SOURCE_FESTIVAL_ID,
+            tent_ids: [TENT_ID],
+            copy_prices: true,
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.copied).toBe(0);
+      // No insert: overwriting would clobber the target's own price.
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(2);
     });
   });
 });

@@ -147,6 +147,11 @@ export class QueryKeys {
   static adminGroup = (groupId: string) => ["admin", "group", groupId] as const;
   static adminGroupMembers = (groupId: string) => ["admin", "group", groupId, "members"] as const;
   static adminWinningCriteria = () => ["admin", "winning-criteria"] as const;
+  static adminTents = () => ["admin", "tents"] as const;
+  static adminFestivalTents = (festivalId: string) =>
+    ["admin", "festival", festivalId, "tents"] as const;
+  static adminFestivalTentsAvailable = (festivalId: string) =>
+    ["admin", "festival", festivalId, "tents-available"] as const;
   static adminLocationSessions = (filters?: {
     festivalId?: string;
     userId?: string;

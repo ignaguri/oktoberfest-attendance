@@ -7,17 +7,24 @@
 
 // Import shared schema types
 import type {
+  AddAdminFestivalTentInput,
+  AddAllAdminFestivalTentsInput,
   AdminAttendance,
   AdminFestival,
+  AdminFestivalTent,
+  AdminFestivalTentStats,
   AdminGroup,
   AdminGroupMember,
   AdminLocationSession,
+  AdminTent,
   AdminUser,
+  CopyAdminFestivalTentsInput,
   AttendanceByDate,
   CarryOverCandidatesResponse,
   Consumption,
   CreateMessageResponse,
   CreateAdminFestivalInput,
+  CreateAdminTentInput,
   CrowdLevel,
   DayPlanResponse,
   DeleteAttendanceResponse,
@@ -69,6 +76,7 @@ import type {
   UpdateAdminAttendanceInput,
   UpdateAdminFestivalInput,
   UpdateAdminGroupInput,
+  UpdateAdminTentInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
   UpdateGroupMessageResponse,
@@ -2818,6 +2826,159 @@ export function createTypedApiClient(config: ApiClientConfig) {
             // A 409 here means the festival still has attendances or groups;
             // extractApiError surfaces the server's message verbatim.
             await extractApiError(response, "Failed to delete festival");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+      },
+
+      /**
+       * Tents, split the way the schema is: `list`/`create`/`update` act on the
+       * global catalogue, everything else on one festival's assignments.
+       */
+      tents: {
+        async list(): Promise<{ tents: AdminTent[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/tents`, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch tents");
+          }
+          return parseJsonResponse<{ tents: AdminTent[] }>(response);
+        },
+
+        async create(data: CreateAdminTentInput): Promise<{ tent: AdminTent }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("POST", `${baseUrl}/v1/admin/tents`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to create tent");
+          }
+          return parseJsonResponse<{ tent: AdminTent }>(response);
+        },
+
+        async update(tentId: string, data: UpdateAdminTentInput): Promise<{ tent: AdminTent }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("PATCH", `${baseUrl}/v1/admin/tents/${tentId}`, {
+            method: "PATCH",
+            headers,
+            body: JSON.stringify(data),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update tent");
+          }
+          return parseJsonResponse<{ tent: AdminTent }>(response);
+        },
+
+        async forFestival(
+          festivalId: string,
+        ): Promise<{ tents: AdminFestivalTent[]; stats: AdminFestivalTentStats }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch festival tents");
+          }
+          return parseJsonResponse<{ tents: AdminFestivalTent[]; stats: AdminFestivalTentStats }>(
+            response,
+          );
+        },
+
+        async availableFor(festivalId: string): Promise<{ tents: AdminTent[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/available`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch available tents");
+          }
+          return parseJsonResponse<{ tents: AdminTent[] }>(response);
+        },
+
+        async addToFestival(
+          festivalId: string,
+          data: AddAdminFestivalTentInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents`,
+            { method: "POST", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to add tent to festival");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async addAllToFestival(
+          festivalId: string,
+          data: AddAllAdminFestivalTentsInput,
+        ): Promise<{ added: number }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/all`,
+            { method: "POST", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to add tents to festival");
+          }
+          return parseJsonResponse<{ added: number }>(response);
+        },
+
+        async copyToFestival(
+          festivalId: string,
+          data: CopyAdminFestivalTentsInput,
+        ): Promise<{ copied: number }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/copy`,
+            { method: "POST", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to copy tents");
+          }
+          return parseJsonResponse<{ copied: number }>(response);
+        },
+
+        async setPrice(
+          festivalId: string,
+          tentId: string,
+          beerPrice: number | null,
+        ): Promise<{ tent: AdminFestivalTent }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/${tentId}`,
+            { method: "PATCH", headers, body: JSON.stringify({ beer_price: beerPrice }) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update tent price");
+          }
+          return parseJsonResponse<{ tent: AdminFestivalTent }>(response);
+        },
+
+        async removeFromFestival(
+          festivalId: string,
+          tentId: string,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/${tentId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            // A 409 here means people have visited the tent at this festival.
+            await extractApiError(response, "Failed to remove tent from festival");
           }
           return parseJsonResponse<{ success: boolean }>(response);
         },

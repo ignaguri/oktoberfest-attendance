@@ -1,16 +1,25 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  AddAdminFestivalTentSchema,
+  AddAllAdminFestivalTentsSchema,
   AdminAttendanceSchema,
   AdminFestivalSchema,
+  AdminFestivalTentSchema,
+  AdminFestivalTentStatsSchema,
   AdminGroupMemberSchema,
   AdminGroupSchema,
+  AdminTentSchema,
   AdminUserSchema,
+  CopyAdminFestivalTentsSchema,
   CreateAdminFestivalSchema,
+  CreateAdminTentSchema,
   ListAdminUsersResponseSchema,
   UpdateAdminAttendanceSchema,
+  UpdateAdminFestivalTentPriceSchema,
   UpdateAdminUserAuthSchema,
   UpdateAdminFestivalSchema,
   UpdateAdminGroupSchema,
+  UpdateAdminTentSchema,
   UpdateAdminUserProfileSchema,
   WinningCriterionSchema,
 } from "@prostcounter/shared";
@@ -670,6 +679,336 @@ app.openapi(deleteFestivalRoute, async (c) => {
       result.blockedBy === "attendances"
         ? "Cannot delete a festival with existing attendance data. Archive it instead."
         : "Cannot delete a festival with existing groups. Archive it instead.",
+    );
+  }
+
+  return c.json({ success: true }, 200);
+});
+
+// =============================================================================
+// Tents
+//
+// Split in two, following the schema: `/admin/tents` is the global catalogue,
+// and `/admin/festivals/{id}/tents` is what one festival serves, with its
+// prices. Editing a catalogue tent changes it for every festival using it.
+// =============================================================================
+
+// GET /admin/tents - List the tent catalogue
+const listTentsRoute = createRoute({
+  method: "get",
+  path: "/admin/tents",
+  tags: ["admin"],
+  summary: "List tents (admin)",
+  responses: {
+    200: {
+      description: "Tents retrieved successfully",
+      content: { "application/json": { schema: z.object({ tents: z.array(AdminTentSchema) }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listTentsRoute, async (c) => {
+  const { supabase } = c.var;
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const tents = await adminRepo.listTents();
+  return c.json({ tents }, 200);
+});
+
+// POST /admin/tents - Create a tent
+const createTentRoute = createRoute({
+  method: "post",
+  path: "/admin/tents",
+  tags: ["admin"],
+  summary: "Create a tent (admin)",
+  request: { body: { content: { "application/json": { schema: CreateAdminTentSchema } } } },
+  responses: {
+    201: {
+      description: "Tent created successfully",
+      content: { "application/json": { schema: z.object({ tent: AdminTentSchema }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(createTentRoute, async (c) => {
+  const { supabase } = c.var;
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const tent = await adminRepo.createTent(body);
+
+  return c.json({ tent }, 201);
+});
+
+// PATCH /admin/tents/:tentId - Update a tent
+const updateTentRoute = createRoute({
+  method: "patch",
+  path: "/admin/tents/{tentId}",
+  tags: ["admin"],
+  summary: "Update a tent (admin)",
+  description: "Edits the catalogue entry, which changes it for every festival serving this tent.",
+  request: {
+    params: z.object({ tentId: z.string().uuid() }),
+    body: { content: { "application/json": { schema: UpdateAdminTentSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Tent updated successfully",
+      content: { "application/json": { schema: z.object({ tent: AdminTentSchema }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(updateTentRoute, async (c) => {
+  const { supabase } = c.var;
+  const { tentId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const tent = await adminRepo.updateTent(tentId, body);
+
+  return c.json({ tent }, 200);
+});
+
+// GET /admin/festivals/:festivalId/tents - Tents this festival serves
+const listFestivalTentsRoute = createRoute({
+  method: "get",
+  path: "/admin/festivals/{festivalId}/tents",
+  tags: ["admin"],
+  summary: "List a festival's tents (admin)",
+  request: { params: z.object({ festivalId: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Festival tents retrieved successfully",
+      content: {
+        "application/json": {
+          schema: z.object({
+            tents: z.array(AdminFestivalTentSchema),
+            stats: AdminFestivalTentStatsSchema,
+          }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listFestivalTentsRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const [tents, stats] = await Promise.all([
+    adminRepo.listFestivalTents(festivalId),
+    adminRepo.getFestivalTentStats(festivalId),
+  ]);
+
+  return c.json({ tents, stats }, 200);
+});
+
+// GET /admin/festivals/:festivalId/tents/available - Catalogue tents not yet served
+const listAvailableTentsRoute = createRoute({
+  method: "get",
+  path: "/admin/festivals/{festivalId}/tents/available",
+  tags: ["admin"],
+  summary: "List tents available to a festival (admin)",
+  request: { params: z.object({ festivalId: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Available tents retrieved successfully",
+      content: { "application/json": { schema: z.object({ tents: z.array(AdminTentSchema) }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listAvailableTentsRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const tents = await adminRepo.listAvailableTents(festivalId);
+
+  return c.json({ tents }, 200);
+});
+
+// POST /admin/festivals/:festivalId/tents - Add one tent to a festival
+const addFestivalTentRoute = createRoute({
+  method: "post",
+  path: "/admin/festivals/{festivalId}/tents",
+  tags: ["admin"],
+  summary: "Add a tent to a festival (admin)",
+  request: {
+    params: z.object({ festivalId: z.string().uuid() }),
+    body: { content: { "application/json": { schema: AddAdminFestivalTentSchema } } },
+  },
+  responses: {
+    201: {
+      description: "Tent added successfully",
+      content: { "application/json": { schema: z.object({ success: z.boolean() }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(addFestivalTentRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  await adminRepo.addFestivalTent(festivalId, body.tent_id, body.beer_price ?? null);
+
+  return c.json({ success: true }, 201);
+});
+
+// POST /admin/festivals/:festivalId/tents/all - Add every remaining tent
+const addAllFestivalTentsRoute = createRoute({
+  method: "post",
+  path: "/admin/festivals/{festivalId}/tents/all",
+  tags: ["admin"],
+  summary: "Add all available tents to a festival (admin)",
+  description: "Adds every catalogue tent the festival does not already serve, at one price.",
+  request: {
+    params: z.object({ festivalId: z.string().uuid() }),
+    body: { content: { "application/json": { schema: AddAllAdminFestivalTentsSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Tents added successfully",
+      content: { "application/json": { schema: z.object({ added: z.number() }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(addAllFestivalTentsRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const added = await adminRepo.addAllAvailableTents(festivalId, body.beer_price ?? null);
+
+  return c.json({ added }, 200);
+});
+
+// POST /admin/festivals/:festivalId/tents/copy - Copy assignments from another festival
+const copyFestivalTentsRoute = createRoute({
+  method: "post",
+  path: "/admin/festivals/{festivalId}/tents/copy",
+  tags: ["admin"],
+  summary: "Copy tents from another festival (admin)",
+  description: "Tents the target already serves are skipped, so an existing price is never lost.",
+  request: {
+    params: z.object({ festivalId: z.string().uuid() }),
+    body: { content: { "application/json": { schema: CopyAdminFestivalTentsSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Tents copied successfully",
+      content: { "application/json": { schema: z.object({ copied: z.number() }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(copyFestivalTentsRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const copied = await adminRepo.copyFestivalTents(festivalId, body);
+
+  return c.json({ copied }, 200);
+});
+
+// PATCH /admin/festivals/:festivalId/tents/:tentId - Set a tent's price here
+const updateFestivalTentPriceRoute = createRoute({
+  method: "patch",
+  path: "/admin/festivals/{festivalId}/tents/{tentId}",
+  tags: ["admin"],
+  summary: "Set a tent's beer price at a festival (admin)",
+  description:
+    "Writes the euro column, the cents column and the canonical drink_type_prices row together. A null price clears all three.",
+  request: {
+    params: z.object({ festivalId: z.string().uuid(), tentId: z.string().uuid() }),
+    body: { content: { "application/json": { schema: UpdateAdminFestivalTentPriceSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Price updated successfully",
+      content: { "application/json": { schema: z.object({ tent: AdminFestivalTentSchema }) } },
+    },
+    ...errorResponses,
+    404: {
+      description: "Tent is not assigned to this festival",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(updateFestivalTentPriceRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId, tentId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const tent = await adminRepo.updateFestivalTentPrice(festivalId, tentId, body.beer_price);
+
+  if (!tent) {
+    throw new NotFoundError("Tent is not assigned to this festival");
+  }
+
+  return c.json({ tent }, 200);
+});
+
+// DELETE /admin/festivals/:festivalId/tents/:tentId - Stop serving a tent
+const removeFestivalTentRoute = createRoute({
+  method: "delete",
+  path: "/admin/festivals/{festivalId}/tents/{tentId}",
+  tags: ["admin"],
+  summary: "Remove a tent from a festival (admin)",
+  description: "Refuses with 409 when the tent has visits at this festival.",
+  request: {
+    params: z.object({ festivalId: z.string().uuid(), tentId: z.string().uuid() }),
+  },
+  responses: {
+    200: {
+      description: "Tent removed successfully",
+      content: { "application/json": { schema: z.object({ success: z.boolean() }) } },
+    },
+    ...errorResponses,
+    409: {
+      description: "Tent has visits at this festival",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(removeFestivalTentRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId, tentId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const result = await adminRepo.removeFestivalTent(festivalId, tentId);
+
+  if ("blockedBy" in result) {
+    throw new ConflictError(
+      "Cannot remove a tent people have visited at this festival. Their visit history references it.",
     );
   }
 
