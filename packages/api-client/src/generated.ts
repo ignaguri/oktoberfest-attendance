@@ -7161,7 +7161,7 @@ export interface paths {
                                 user: {
                                     /** Format: uuid */
                                     id: string;
-                                    username: string;
+                                    username: string | null;
                                     fullName: string | null;
                                 };
                                 festival: {

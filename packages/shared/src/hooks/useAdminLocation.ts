@@ -20,8 +20,10 @@ interface AdminLocationSessionFilters {
 /**
  * Hook to list active location sharing sessions across all users.
  *
- * Deliberately short staleTime: sessions expire on their own, so a stale list
- * shows admins sessions that are already gone.
+ * Polled rather than merely short-lived: sessions expire on a timer of their
+ * own, and `staleTime` only marks cached data refetchable, it does not schedule
+ * anything. Without the interval a screen left open keeps listing sessions that
+ * ended minutes ago.
  */
 export function useAdminLocationSessions(filters?: AdminLocationSessionFilters) {
   const apiClient = useApiClient();
@@ -33,7 +35,8 @@ export function useAdminLocationSessions(filters?: AdminLocationSessionFilters) 
       return response.sessions || [];
     },
     {
-      staleTime: 30 * 1000, // 30 seconds - sessions expire on their own
+      staleTime: 30 * 1000,
+      refetchInterval: 30 * 1000,
       gcTime: 5 * 60 * 1000,
     },
   );

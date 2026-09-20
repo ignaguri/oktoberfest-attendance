@@ -25,12 +25,25 @@ export default function AdminLocationScreen() {
   const { t } = useTranslation();
   const { dialog, showDialog, closeDialog } = useAlertDialog();
 
-  const { sessions, isLoading, error, refetch, isRefetching } = useAdminLocationSessions();
+  const { sessions, isLoading, error, refetch } = useAdminLocationSessions();
   const forceStop = useForceStopLocationSession();
   const cleanup = useCleanupExpiredLocationSessions();
 
   // Tracked per row so only the tapped session shows a spinner.
   const [stoppingId, setStoppingId] = useState<string | null>(null);
+  // Scoped to the user's own pull rather than taken from the query's fetching
+  // state, which the 30s poll would otherwise flip -- yanking the list down
+  // under a reading admin every half minute.
+  const [isPullRefreshing, setIsPullRefreshing] = useState(false);
+
+  const handlePullRefresh = useCallback(async () => {
+    setIsPullRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsPullRefreshing(false);
+    }
+  }, [refetch]);
 
   const handleForceStop = useCallback(
     (sessionId: string) => {
@@ -74,7 +87,9 @@ export default function AdminLocationScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         contentContainerClassName="p-4"
-        refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={refetch} />}
+        refreshControl={
+          <RefreshControl refreshing={isPullRefreshing} onRefresh={handlePullRefresh} />
+        }
       >
         <VStack space="md">
           <Button
@@ -106,7 +121,7 @@ export default function AdminLocationScreen() {
               <VStack space="sm">
                 <View>
                   <Text className="font-semibold text-typography-900">
-                    {session.user.fullName || session.user.username}
+                    {session.user.fullName || session.user.username || t("common.unknownUser")}
                   </Text>
                   <Text className="text-sm text-typography-500">{session.festival.name}</Text>
                 </View>
