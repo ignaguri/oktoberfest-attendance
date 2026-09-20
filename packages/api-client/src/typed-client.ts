@@ -8,6 +8,7 @@
 // Import shared schema types
 import type {
   AdminAttendance,
+  AdminFestival,
   AdminGroup,
   AdminGroupMember,
   AdminLocationSession,
@@ -16,6 +17,7 @@ import type {
   CarryOverCandidatesResponse,
   Consumption,
   CreateMessageResponse,
+  CreateAdminFestivalInput,
   CrowdLevel,
   DayPlanResponse,
   DeleteAttendanceResponse,
@@ -65,6 +67,7 @@ import type {
   SubmitCrowdReportResponse,
   TutorialStatus,
   UpdateAdminAttendanceInput,
+  UpdateAdminFestivalInput,
   UpdateAdminGroupInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
@@ -2745,6 +2748,76 @@ export function createTypedApiClient(config: ApiClientConfig) {
           );
           if (!response.ok) {
             await extractApiError(response, "Failed to delete attendance");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+      },
+
+      festivals: {
+        async list(): Promise<{ festivals: AdminFestival[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/festivals`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch festivals");
+          }
+          return parseJsonResponse<{ festivals: AdminFestival[] }>(response);
+        },
+
+        async get(festivalId: string): Promise<{ festival: AdminFestival }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch festival");
+          }
+          return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async create(data: CreateAdminFestivalInput): Promise<{ festival: AdminFestival }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("POST", `${baseUrl}/v1/admin/festivals`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to create festival");
+          }
+          return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async update(
+          festivalId: string,
+          data: UpdateAdminFestivalInput,
+        ): Promise<{ festival: AdminFestival }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/festivals/${festivalId}`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update festival");
+          }
+          return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async delete(festivalId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/festivals/${festivalId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            // A 409 here means the festival still has attendances or groups;
+            // extractApiError surfaces the server's message verbatim.
+            await extractApiError(response, "Failed to delete festival");
           }
           return parseJsonResponse<{ success: boolean }>(response);
         },

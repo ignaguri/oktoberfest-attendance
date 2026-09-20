@@ -1,11 +1,14 @@
 import type { Database } from "@prostcounter/db";
 import type {
   AdminAttendance,
+  AdminFestival,
   AdminGroup,
   AdminGroupMember,
   AdminUser,
   ListAdminUsersResponse,
+  CreateAdminFestivalInput,
   UpdateAdminAttendanceInput,
+  UpdateAdminFestivalInput,
   UpdateAdminGroupInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
@@ -607,6 +610,229 @@ export class SupabaseAdminRepository {
         avatar_url: profile?.avatar_url ?? null,
       };
     });
+  }
+
+  // ===========================================================================
+  // Festivals
+  // ===========================================================================
+
+  async listFestivals(): Promise<AdminFestival[]> {
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("*")
+      .order("start_date", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching festivals: ${error.message}`);
+    }
+
+    return (data ?? []) as AdminFestival[];
+  }
+
+  /**
+   * Fetches one festival. Null means no such row, not "the read failed" --
+   * the route turns null into a 404, so a real error has to be rethrown or an
+   * unreachable database reads as a missing festival.
+   */
+  async getFestival(festivalId: string): Promise<AdminFestival | null> {
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select("*")
+      .eq("id", festivalId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error fetching festival: ${error.message}`);
+    }
+
+    return (data as AdminFestival) ?? null;
+  }
+
+  /**
+   * Clears is_active on every other festival.
+   *
+   * `idx_festivals_single_active` is a unique partial index over
+   * `is_active WHERE is_active = true`, so marking a second festival active
+   * fails with a constraint violation unless the previous one is cleared first.
+   * The web panel does not do this, so activating a festival there errors.
+   */
+  private async deactivateOtherFestivals(exceptFestivalId?: string): Promise<void> {
+    let query = this.supabase.from("festivals").update({ is_active: false }).eq("is_active", true);
+
+    if (exceptFestivalId) {
+      query = query.neq("id", exceptFestivalId);
+    }
+
+    const { error } = await query;
+
+    if (error) {
+      throw new Error(`Error deactivating current festival: ${error.message}`);
+    }
+  }
+
+  /**
+   * Creates a festival, activating it last.
+   *
+   * Inserted inactive and then activated, rather than sweeping first: none of
+   * this is in a transaction, so a sweep followed by a rejected insert would
+   * leave the app with no active festival at all. Every client keys off that
+   * row, so the ordering here is what decides whether a bad request costs
+   * nothing or takes the whole app's festival selection down.
+   */
+  async createFestival(input: CreateAdminFestivalInput): Promise<AdminFestival> {
+    const { is_active, ...fields } = input;
+
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .insert({ ...fields, is_active: false })
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error creating festival: ${error?.message}`);
+    }
+
+    if (!is_active) {
+      return data as AdminFestival;
+    }
+
+    return this.setActiveFestival(data.id);
+  }
+
+  /**
+   * Clears every other festival's flag, then sets this one's.
+   *
+   * Both halves are needed because `idx_festivals_single_active` is a unique
+   * partial index: the set fails outright while another row is still active.
+   */
+  private async setActiveFestival(festivalId: string): Promise<AdminFestival> {
+    await this.deactivateOtherFestivals(festivalId);
+
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .update({ is_active: true })
+      .eq("id", festivalId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error activating festival: ${error?.message}`);
+    }
+
+    return data as AdminFestival;
+  }
+
+  /**
+   * Updates a festival. Null means no such festival, so the route can 404.
+   *
+   * The plain fields are written before any is_active change, and the
+   * deactivate sweep runs last. Sweeping first (the shape this replaces) meant
+   * a PATCH naming a festival that no longer exists still cleared is_active on
+   * the real active one, and then failed -- leaving the app with no active
+   * festival and the admin told only that the update did not work.
+   *
+   * updated_at is not set here: `update_festivals_updated_at` is a BEFORE
+   * UPDATE trigger, so the database keeps it on its own clock.
+   */
+  async updateFestival(
+    festivalId: string,
+    input: UpdateAdminFestivalInput,
+  ): Promise<AdminFestival | null> {
+    const { is_active, ...fields } = input;
+
+    let current: AdminFestival | null;
+
+    if (Object.keys(fields).length > 0) {
+      const { data, error } = await this.supabase
+        .from("festivals")
+        .update(fields)
+        .eq("id", festivalId)
+        .select()
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(`Error updating festival: ${error.message}`);
+      }
+
+      current = (data as AdminFestival) ?? null;
+    } else {
+      current = await this.getFestival(festivalId);
+    }
+
+    if (!current) {
+      return null;
+    }
+
+    if (is_active === undefined || is_active === current.is_active) {
+      return current;
+    }
+
+    if (is_active) {
+      return this.setActiveFestival(festivalId);
+    }
+
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .update({ is_active: false })
+      .eq("id", festivalId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error deactivating festival: ${error?.message}`);
+    }
+
+    return data as AdminFestival;
+  }
+
+  /**
+   * Deletes a festival, refusing when dependent data exists.
+   *
+   * The three tables checked here are exactly the ones whose foreign key to
+   * `festivals` has no ON DELETE CASCADE, so the delete would fail on the
+   * constraint and surface a raw Postgres message as a 500. Everything else
+   * (achievements, festival_tents, reservations, location_sessions, the
+   * wrapped cache) cascades and is destroyed silently, which is why the
+   * confirmation copy says so.
+   *
+   * Returns a reason string instead of throwing so the route can answer 409.
+   */
+  async deleteFestival(
+    festivalId: string,
+  ): Promise<{ deleted: true } | { blockedBy: "attendances" | "groups" | "tent_visits" }> {
+    const [attendances, groups, tentVisits] = await Promise.all([
+      this.supabase.from("attendances").select("id").eq("festival_id", festivalId).limit(1),
+      this.supabase.from("groups").select("id").eq("festival_id", festivalId).limit(1),
+      this.supabase.from("tent_visits").select("id").eq("festival_id", festivalId).limit(1),
+    ]);
+
+    if (attendances.error) {
+      throw new Error(`Error checking festival attendances: ${attendances.error.message}`);
+    }
+    if (groups.error) {
+      throw new Error(`Error checking festival groups: ${groups.error.message}`);
+    }
+    if (tentVisits.error) {
+      throw new Error(`Error checking festival tent visits: ${tentVisits.error.message}`);
+    }
+
+    if (attendances.data && attendances.data.length > 0) {
+      return { blockedBy: "attendances" };
+    }
+    if (groups.data && groups.data.length > 0) {
+      return { blockedBy: "groups" };
+    }
+    if (tentVisits.data && tentVisits.data.length > 0) {
+      return { blockedBy: "tent_visits" };
+    }
+
+    const { error } = await this.supabase.from("festivals").delete().eq("id", festivalId);
+
+    if (error) {
+      throw new Error(`Error deleting festival: ${error.message}`);
+    }
+
+    return { deleted: true };
   }
 
   async listWinningCriteria(): Promise<WinningCriterion[]> {

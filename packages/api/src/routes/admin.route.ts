@@ -1,19 +1,22 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   AdminAttendanceSchema,
+  AdminFestivalSchema,
   AdminGroupMemberSchema,
   AdminGroupSchema,
   AdminUserSchema,
+  CreateAdminFestivalSchema,
   ListAdminUsersResponseSchema,
   UpdateAdminAttendanceSchema,
   UpdateAdminUserAuthSchema,
+  UpdateAdminFestivalSchema,
   UpdateAdminGroupSchema,
   UpdateAdminUserProfileSchema,
   WinningCriterionSchema,
 } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
-import { ForbiddenError, NotFoundError } from "../middleware/error";
+import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from "../middleware/error";
 import { SupabaseAdminRepository } from "../repositories/supabase/admin.repository";
 
 /**
@@ -501,6 +504,211 @@ app.openapi(listGroupMembersRoute, async (c) => {
   const members = await adminRepo.listGroupMembers(groupId);
 
   return c.json({ members }, 200);
+});
+
+// ===========================================================================
+// Festivals
+// ===========================================================================
+
+// GET /admin/festivals - List all festivals
+const listFestivalsRoute = createRoute({
+  method: "get",
+  path: "/admin/festivals",
+  tags: ["admin"],
+  summary: "List festivals (admin)",
+  responses: {
+    200: {
+      description: "Festivals retrieved successfully",
+      content: {
+        "application/json": { schema: z.object({ festivals: z.array(AdminFestivalSchema) }) },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listFestivalsRoute, async (c) => {
+  const { supabase } = c.var;
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const festivals = await adminRepo.listFestivals();
+  return c.json({ festivals }, 200);
+});
+
+// POST /admin/festivals - Create a festival
+const createFestivalRoute = createRoute({
+  method: "post",
+  path: "/admin/festivals",
+  tags: ["admin"],
+  summary: "Create a festival (admin)",
+  description:
+    "Creates a festival. Marking it active clears is_active on the current one, which a unique partial index otherwise rejects.",
+  request: {
+    body: { content: { "application/json": { schema: CreateAdminFestivalSchema } } },
+  },
+  responses: {
+    201: {
+      description: "Festival created successfully",
+      content: { "application/json": { schema: z.object({ festival: AdminFestivalSchema }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(createFestivalRoute, async (c) => {
+  const { supabase } = c.var;
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const festival = await adminRepo.createFestival(body);
+
+  return c.json({ festival }, 201);
+});
+
+// GET /admin/festivals/:festivalId - Get one festival
+const getFestivalRoute = createRoute({
+  method: "get",
+  path: "/admin/festivals/{festivalId}",
+  tags: ["admin"],
+  summary: "Get a festival (admin)",
+  request: { params: z.object({ festivalId: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Festival retrieved successfully",
+      content: { "application/json": { schema: z.object({ festival: AdminFestivalSchema }) } },
+    },
+    ...errorResponses,
+    404: {
+      description: "Festival not found",
+      content: { "application/json": { schema: errorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getFestivalRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const festival = await adminRepo.getFestival(festivalId);
+
+  if (!festival) {
+    throw new NotFoundError("Festival not found");
+  }
+
+  return c.json({ festival }, 200);
+});
+
+// PATCH /admin/festivals/:festivalId - Update a festival
+const updateFestivalRoute = createRoute({
+  method: "patch",
+  path: "/admin/festivals/{festivalId}",
+  tags: ["admin"],
+  summary: "Update a festival (admin)",
+  request: {
+    params: z.object({ festivalId: z.string().uuid() }),
+    body: { content: { "application/json": { schema: UpdateAdminFestivalSchema } } },
+  },
+  responses: {
+    200: {
+      description: "Festival updated successfully",
+      content: { "application/json": { schema: z.object({ festival: AdminFestivalSchema }) } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(updateFestivalRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+
+  // The schema can only compare the two dates when a request carries both.
+  // Patching one alone has to be checked against the stored other, or a lone
+  // end_date silently writes a festival that ends before it starts -- which no
+  // database constraint catches and which isFestivalLive then never matches.
+  if (body.start_date !== undefined || body.end_date !== undefined) {
+    const existing = await adminRepo.getFestival(festivalId);
+
+    if (!existing) {
+      throw new NotFoundError("Festival not found");
+    }
+
+    const startDate = body.start_date ?? existing.start_date;
+    const endDate = body.end_date ?? existing.end_date;
+
+    if (endDate < startDate) {
+      throw new ValidationError("end_date must not be before start_date");
+    }
+  }
+
+  const festival = await adminRepo.updateFestival(festivalId, body);
+
+  if (!festival) {
+    throw new NotFoundError("Festival not found");
+  }
+
+  return c.json({ festival }, 200);
+});
+
+// DELETE /admin/festivals/:festivalId - Delete a festival
+const deleteFestivalRoute = createRoute({
+  method: "delete",
+  path: "/admin/festivals/{festivalId}",
+  tags: ["admin"],
+  summary: "Delete a festival (admin)",
+  description:
+    "Refuses with 409 when attendances, groups or tent visits still reference the festival; archive it instead.",
+  request: { params: z.object({ festivalId: z.string().uuid() }) },
+  responses: {
+    200: {
+      description: "Festival deleted successfully",
+      content: { "application/json": { schema: z.object({ success: z.boolean() }) } },
+    },
+    ...errorResponses,
+    409: {
+      description: "Festival still has dependent data",
+      content: {
+        "application/json": {
+          // Shaped like every other error response: ConflictError serialises
+          // as { error: { code, message } }. An earlier draft documented a
+          // top-level `blockedBy` that nothing ever sets, so a client reading
+          // it to tell the reasons apart only ever saw undefined.
+          schema: z.object({
+            error: z.object({ code: z.string(), message: z.string() }),
+          }),
+        },
+      },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(deleteFestivalRoute, async (c) => {
+  const { supabase } = c.var;
+  const { festivalId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const result = await adminRepo.deleteFestival(festivalId);
+
+  if ("blockedBy" in result) {
+    // 409 rather than 400: the request is well-formed, the festival's state is
+    // what refuses it. The client shows "archive instead".
+    const reason = {
+      attendances: "existing attendance data",
+      groups: "existing groups",
+      tent_visits: "existing tent visits",
+    }[result.blockedBy];
+
+    throw new ConflictError(`Cannot delete a festival with ${reason}. Archive it instead.`);
+  }
+
+  return c.json({ success: true }, 200);
 });
 
 export default app;

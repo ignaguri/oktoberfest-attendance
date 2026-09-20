@@ -33,6 +33,7 @@ const ADMIN_ID = "11111111-1111-4111-8111-111111111111";
 const OTHER_ID = "22222222-2222-4222-8222-222222222222";
 const ATTENDANCE_ID = "33333333-3333-4333-8333-333333333333";
 const GROUP_ID = "88888888-8888-4888-8888-888888888888";
+const FESTIVAL_ID = "99999999-9999-4999-8999-999999999999";
 
 describe("Admin Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;
@@ -572,6 +573,252 @@ describe("Admin Routes - Unit Tests", () => {
       const [inserted] = insertChain.insert.mock.calls[0];
       expect(inserted[0].visit_date).not.toBe("2026-09-20");
       expect(new Date(inserted[0].visit_date).toISOString()).toBe("2026-09-20T10:00:00.000Z");
+    });
+  });
+
+  describe("DELETE /admin/festivals/:festivalId", () => {
+    it("refuses with 409 when attendances still reference the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [{ id: ATTENDANCE_ID }], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.message).toMatch(/attendance/i);
+    });
+
+    it("refuses with 409 when groups still reference the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [{ id: GROUP_ID }], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.message).toMatch(/group/i);
+    });
+
+    // tent_visits_festival_id_fkey has no ON DELETE CASCADE either, so a
+    // festival whose attendances were already cleaned up but whose tent visits
+    // were not used to pass both guards and die on the constraint as a 500.
+    it("refuses with 409 when tent visits still reference the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(
+          createMockChain({ data: [{ id: "77777777-7777-4777-8777-777777777777" }], error: null }),
+        );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.message).toMatch(/tent visit/i);
+    });
+
+    it("deletes when nothing references the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe("PATCH /admin/festivals/:festivalId", () => {
+    const STORED = {
+      id: FESTIVAL_ID,
+      name: "Stored Fest",
+      short_name: "SF",
+      festival_type: "other",
+      location: "Munich",
+      start_date: "2026-09-19",
+      end_date: "2026-09-20",
+      map_url: null,
+      timezone: "Europe/Berlin",
+      is_active: false,
+      status: "upcoming",
+      description: null,
+      beer_cost: null,
+      created_at: "2026-09-19T00:00:00Z",
+      updated_at: "2026-09-19T00:00:00Z",
+    };
+
+    // The schema can only compare two dates it was given. A lone end_date has
+    // to be checked against the stored start_date, or this writes a festival
+    // that ends before it starts -- no CHECK constraint catches that, and
+    // isFestivalLive then never matches it again.
+    it("rejects an end_date before the stored start_date", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: STORED, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ end_date: "2026-09-18" }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    // Sweeping before knowing the target exists cleared is_active on the real
+    // active festival and then failed, leaving none active at all.
+    it("404s without touching the active flag when the festival is gone", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name: "Renamed" }),
+        }),
+      );
+
+      expect(res.status).toBe(404);
+      // One call: the update that found nothing. No deactivate sweep.
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(1);
+    });
+  });
+
+  describe("POST /admin/festivals", () => {
+    it("rejects an end_date before start_date", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Backwards Fest",
+            short_name: "BF",
+            festival_type: "other",
+            location: "Nowhere",
+            start_date: "2026-09-20",
+            end_date: "2026-09-19",
+            status: "upcoming",
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    it("rejects a non-positive beer_cost, matching the database CHECK", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Free Fest",
+            short_name: "FF",
+            festival_type: "other",
+            location: "Somewhere",
+            start_date: "2026-09-19",
+            end_date: "2026-09-20",
+            status: "upcoming",
+            beer_cost: 0,
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    // The sweep has to run before the flag can be set, because
+    // idx_festivals_single_active is a unique partial index. What must not
+    // happen is the sweep running first and the insert then failing, which
+    // would leave no active festival at all -- so the row is inserted
+    // inactive, then swept, then activated.
+    it("inserts inactive, then sweeps, then activates", async () => {
+      const festivalRow = {
+        id: FESTIVAL_ID,
+        name: "New Fest",
+        short_name: "NF",
+        festival_type: "other",
+        location: "Munich",
+        start_date: "2026-09-19",
+        end_date: "2026-09-20",
+        map_url: null,
+        timezone: "Europe/Berlin",
+        is_active: false,
+        status: "upcoming",
+        description: null,
+        beer_cost: null,
+        created_at: "2026-09-19T00:00:00Z",
+        updated_at: "2026-09-19T00:00:00Z",
+      };
+
+      const insertChain = createMockChain({ data: festivalRow, error: null });
+      const sweepChain = createMockChain({ data: null, error: null });
+      const activateChain = createMockChain({
+        data: { ...festivalRow, is_active: true },
+        error: null,
+      });
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(insertChain)
+        .mockReturnValueOnce(sweepChain)
+        .mockReturnValueOnce(activateChain);
+
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "New Fest",
+            short_name: "NF",
+            festival_type: "other",
+            location: "Munich",
+            start_date: "2026-09-19",
+            end_date: "2026-09-20",
+            status: "upcoming",
+            is_active: true,
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(201);
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(3);
+      // The insert must not carry is_active: true, or it races the index
+      // against the festival that is still active at that point.
+      expect(insertChain.insert.mock.calls[0][0].is_active).toBe(false);
+      const body = (await res.json()) as any;
+      expect(body.festival.is_active).toBe(true);
+    });
+
+    it("rejects a date that is well-formed but not a real day", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Impossible Fest",
+            short_name: "IF",
+            festival_type: "other",
+            location: "Nowhere",
+            start_date: "2026-02-30",
+            end_date: "2026-03-01",
+            status: "upcoming",
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
     });
   });
 
