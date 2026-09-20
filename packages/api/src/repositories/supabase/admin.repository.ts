@@ -275,12 +275,6 @@ export class SupabaseAdminRepository {
     }
   }
 
-  /**
-   * Lists a user's attendances with the tents visited on each day.
-   *
-   * Tent visits are fetched in one query for the whole set and grouped in
-   * memory; the web panel issues one query per attendance instead.
-   */
   private async festivalTimezones(festivalIds: (string | null)[]): Promise<Map<string, string>> {
     const ids = [...new Set(festivalIds.filter((id): id is string => !!id))];
     if (ids.length === 0) {
@@ -333,6 +327,12 @@ export class SupabaseAdminRepository {
       .map((v) => v.id);
   }
 
+  /**
+   * Lists a user's attendances with the tents visited on each day.
+   *
+   * Tent visits are fetched in one query for the whole set and grouped in
+   * memory; the web panel issues one query per attendance instead.
+   */
   async listUserAttendances(userId: string): Promise<AdminAttendance[]> {
     const { data: attendances, error } = await this.supabase
       .from("attendances")
