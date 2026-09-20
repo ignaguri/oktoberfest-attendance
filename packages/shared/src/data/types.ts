@@ -47,6 +47,8 @@ export interface DataQueryOptions {
   gcTime?: number;
   /** Stale time in milliseconds */
   staleTime?: number;
+  /** Poll every N milliseconds while the query is mounted */
+  refetchInterval?: number;
   /** Retry failed queries */
   retry?: boolean | number;
   /** Refetch on window focus */

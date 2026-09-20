@@ -35,6 +35,7 @@ export function mapQueryOptions(
     enabled: options.enabled,
     gcTime: options.gcTime,
     staleTime: options.staleTime,
+    refetchInterval: options.refetchInterval,
     // Only forward `retry` when explicitly set. Emitting `retry: undefined`
     // would override the QueryClient default retry predicate.
     ...(options.retry !== undefined ? { retry: options.retry } : {}),

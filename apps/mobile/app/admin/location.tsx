@@ -106,7 +106,7 @@ export default function AdminLocationScreen() {
               <VStack space="sm">
                 <View>
                   <Text className="font-semibold text-typography-900">
-                    {session.user.fullName || session.user.username}
+                    {session.user.fullName || session.user.username || t("common.unknownUser")}
                   </Text>
                   <Text className="text-sm text-typography-500">{session.festival.name}</Text>
                 </View>

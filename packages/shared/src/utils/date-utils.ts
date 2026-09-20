@@ -156,7 +156,7 @@ export function formatTimeInTimezone(
  * @param date - The date to format
  * @param timezone - Optional timezone (defaults to festival timezone)
  * @param locale - Optional locale for formatting (defaults to current i18n language)
- * @returns Relative time string (e.g., "2 minutes ago", "1 hour ago", "2 days ago", "1 week ago")
+ * @returns Relative time string (e.g., "2 minutes ago", "1 hour ago", "in 2 hours")
  */
 export function formatRelativeTime(
   date: Date,
@@ -166,6 +166,10 @@ export function formatRelativeTime(
   const now = new TZDate(new Date(), timezone);
   const tzDate = new TZDate(date, timezone);
   const diffInSeconds = Math.floor((now.getTime() - tzDate.getTime()) / 1000);
+  // The unit comes from the distance, the direction from the sign. Selecting on
+  // the signed value would send every future date down the seconds branch
+  // ("in 7200 seconds" rather than "in 2 hours").
+  const distanceInSeconds = Math.abs(diffInSeconds);
 
   // Intl.RelativeTimeFormat may not be fully available in Hermes (React Native).
   // On Android it's typically missing; on iOS it may pass the typeof check but
@@ -176,16 +180,16 @@ export function formatRelativeTime(
       const language = locale ?? getCurrentLanguage();
       const rtf = new Intl.RelativeTimeFormat(language, { numeric: "auto" });
 
-      if (diffInSeconds < 60) {
+      if (distanceInSeconds < 60) {
         return rtf.format(-diffInSeconds, "second");
-      } else if (diffInSeconds < 3600) {
-        return rtf.format(-Math.floor(diffInSeconds / 60), "minute");
-      } else if (diffInSeconds < 86400) {
-        return rtf.format(-Math.floor(diffInSeconds / 3600), "hour");
-      } else if (diffInSeconds < 604800) {
-        return rtf.format(-Math.floor(diffInSeconds / 86400), "day");
+      } else if (distanceInSeconds < 3600) {
+        return rtf.format(-Math.trunc(diffInSeconds / 60), "minute");
+      } else if (distanceInSeconds < 86400) {
+        return rtf.format(-Math.trunc(diffInSeconds / 3600), "hour");
+      } else if (distanceInSeconds < 604800) {
+        return rtf.format(-Math.trunc(diffInSeconds / 86400), "day");
       } else {
-        return rtf.format(-Math.floor(diffInSeconds / 604800), "week");
+        return rtf.format(-Math.trunc(diffInSeconds / 604800), "week");
       }
     } catch {
       // Fall through to fallback below (Hermes may expose but not fully implement this API)
@@ -193,19 +197,26 @@ export function formatRelativeTime(
   }
 
   // Fallback for runtimes without Intl.RelativeTimeFormat (e.g. Hermes)
-  if (diffInSeconds < 60) {
-    return diffInSeconds <= 1 ? "just now" : `${diffInSeconds}s ago`;
-  } else if (diffInSeconds < 3600) {
-    const mins = Math.floor(diffInSeconds / 60);
-    return mins === 1 ? "1 min ago" : `${mins} min ago`;
-  } else if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600);
-    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
-  } else if (diffInSeconds < 604800) {
-    const days = Math.floor(diffInSeconds / 86400);
-    return days === 1 ? "1 day ago" : `${days} days ago`;
+  const withDirection = (amount: string) => {
+    return diffInSeconds < 0 ? `in ${amount}` : `${amount} ago`;
+  };
+
+  if (distanceInSeconds < 60) {
+    if (distanceInSeconds <= 1) {
+      return "just now";
+    }
+    return withDirection(`${distanceInSeconds}s`);
+  } else if (distanceInSeconds < 3600) {
+    const mins = Math.floor(distanceInSeconds / 60);
+    return withDirection(mins === 1 ? "1 min" : `${mins} min`);
+  } else if (distanceInSeconds < 86400) {
+    const hours = Math.floor(distanceInSeconds / 3600);
+    return withDirection(hours === 1 ? "1 hour" : `${hours} hours`);
+  } else if (distanceInSeconds < 604800) {
+    const days = Math.floor(distanceInSeconds / 86400);
+    return withDirection(days === 1 ? "1 day" : `${days} days`);
   } else {
-    const weeks = Math.floor(diffInSeconds / 604800);
-    return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+    const weeks = Math.floor(distanceInSeconds / 604800);
+    return withDirection(weeks === 1 ? "1 week" : `${weeks} weeks`);
   }
 }

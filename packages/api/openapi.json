@@ -13481,7 +13481,8 @@
                                 "format": "uuid"
                               },
                               "username": {
-                                "type": "string"
+                                "type": "string",
+                                "nullable": true
                               },
                               "fullName": {
                                 "type": "string",

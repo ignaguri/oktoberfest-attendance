@@ -38,6 +38,14 @@ describe("mapQueryOptions", () => {
     expect(resolved.retry).toBe(sentinelRetry);
   });
 
+  it("forwards refetchInterval, so a polling caller actually polls", () => {
+    expect(mapQueryOptions({ refetchInterval: 30000 }).refetchInterval).toBe(30000);
+  });
+
+  it("leaves refetchInterval unset when the caller does not ask for polling", () => {
+    expect(mapQueryOptions({ staleTime: 30000 }).refetchInterval).toBeUndefined();
+  });
+
   it("still forwards an explicit retry value, overriding the QueryClient default", () => {
     const queryClient = new QueryClient({
       defaultOptions: {
