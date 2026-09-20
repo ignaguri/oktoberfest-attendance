@@ -1510,8 +1510,9 @@
         "dangerZone": "Danger zone",
         "deleteFestival": "Delete festival",
         "deleteFestivalHint": "Permanently removes this festival",
-        "deleteFestivalConfirm": "This permanently deletes the festival. Continue?",
-        "deleteBlockedHint": "A festival with attendances or groups cannot be deleted. Set it to Ended instead.",
+        "deleteFestivalConfirm": "This permanently deletes the festival, along with its tent list, prices, achievements and Wrapped data. Continue?",
+        "deactivateConfirm": "This leaves no active festival, so the app has no default for anyone. Continue?",
+        "deleteBlockedHint": "A festival with attendances, groups or tent visits cannot be deleted. Set it to Ended instead.",
         "updateError": "Could not save the change",
         "deleteError": "Could not delete"
       },

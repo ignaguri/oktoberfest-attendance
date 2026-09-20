@@ -605,8 +605,29 @@ describe("Admin Routes - Unit Tests", () => {
       expect(body.error.message).toMatch(/group/i);
     });
 
+    // tent_visits_festival_id_fkey has no ON DELETE CASCADE either, so a
+    // festival whose attendances were already cleaned up but whose tent visits
+    // were not used to pass both guards and die on the constraint as a 500.
+    it("refuses with 409 when tent visits still reference the festival", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(
+          createMockChain({ data: [{ id: "77777777-7777-4777-8777-777777777777" }], error: null }),
+        );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.message).toMatch(/tent visit/i);
+    });
+
     it("deletes when nothing references the festival", async () => {
       vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
         .mockReturnValueOnce(createMockChain({ data: [], error: null }))
         .mockReturnValueOnce(createMockChain({ data: [], error: null }))
         .mockReturnValueOnce(createMockChain({ data: null, error: null }));
@@ -616,6 +637,64 @@ describe("Admin Routes - Unit Tests", () => {
       );
 
       expect(res.status).toBe(200);
+    });
+  });
+
+  describe("PATCH /admin/festivals/:festivalId", () => {
+    const STORED = {
+      id: FESTIVAL_ID,
+      name: "Stored Fest",
+      short_name: "SF",
+      festival_type: "other",
+      location: "Munich",
+      start_date: "2026-09-19",
+      end_date: "2026-09-20",
+      map_url: null,
+      timezone: "Europe/Berlin",
+      is_active: false,
+      status: "upcoming",
+      description: null,
+      beer_cost: null,
+      created_at: "2026-09-19T00:00:00Z",
+      updated_at: "2026-09-19T00:00:00Z",
+    };
+
+    // The schema can only compare two dates it was given. A lone end_date has
+    // to be checked against the stored start_date, or this writes a festival
+    // that ends before it starts -- no CHECK constraint catches that, and
+    // isFestivalLive then never matches it again.
+    it("rejects an end_date before the stored start_date", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: STORED, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ end_date: "2026-09-18" }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+    });
+
+    // Sweeping before knowing the target exists cleared is_active on the real
+    // active festival and then failed, leaving none active at all.
+    it("404s without touching the active flag when the festival is gone", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name: "Renamed" }),
+        }),
+      );
+
+      expect(res.status).toBe(404);
+      // One call: the update that found nothing. No deactivate sweep.
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(1);
     });
   });
 
@@ -661,31 +740,41 @@ describe("Admin Routes - Unit Tests", () => {
       expect(mockSupabase.from).not.toHaveBeenCalled();
     });
 
-    it("clears the current active festival before inserting an active one", async () => {
+    // The sweep has to run before the flag can be set, because
+    // idx_festivals_single_active is a unique partial index. What must not
+    // happen is the sweep running first and the insert then failing, which
+    // would leave no active festival at all -- so the row is inserted
+    // inactive, then swept, then activated.
+    it("inserts inactive, then sweeps, then activates", async () => {
+      const festivalRow = {
+        id: FESTIVAL_ID,
+        name: "New Fest",
+        short_name: "NF",
+        festival_type: "other",
+        location: "Munich",
+        start_date: "2026-09-19",
+        end_date: "2026-09-20",
+        map_url: null,
+        timezone: "Europe/Berlin",
+        is_active: false,
+        status: "upcoming",
+        description: null,
+        beer_cost: null,
+        created_at: "2026-09-19T00:00:00Z",
+        updated_at: "2026-09-19T00:00:00Z",
+      };
+
+      const insertChain = createMockChain({ data: festivalRow, error: null });
+      const sweepChain = createMockChain({ data: null, error: null });
+      const activateChain = createMockChain({
+        data: { ...festivalRow, is_active: true },
+        error: null,
+      });
+
       vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(createMockChain({ data: null, error: null }))
-        .mockReturnValueOnce(
-          createMockChain({
-            data: {
-              id: FESTIVAL_ID,
-              name: "New Fest",
-              short_name: "NF",
-              festival_type: "other",
-              location: "Munich",
-              start_date: "2026-09-19",
-              end_date: "2026-09-20",
-              map_url: null,
-              timezone: "Europe/Berlin",
-              is_active: true,
-              status: "upcoming",
-              description: null,
-              beer_cost: null,
-              created_at: "2026-09-19T00:00:00Z",
-              updated_at: "2026-09-19T00:00:00Z",
-            },
-            error: null,
-          }),
-        );
+        .mockReturnValueOnce(insertChain)
+        .mockReturnValueOnce(sweepChain)
+        .mockReturnValueOnce(activateChain);
 
       const res = await app.request(
         createAuthRequest("/admin/festivals", {
@@ -704,9 +793,32 @@ describe("Admin Routes - Unit Tests", () => {
       );
 
       expect(res.status).toBe(201);
-      // Two calls: the deactivate sweep, then the insert. Without the sweep the
-      // unique partial index on is_active rejects the insert.
-      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(2);
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(3);
+      // The insert must not carry is_active: true, or it races the index
+      // against the festival that is still active at that point.
+      expect(insertChain.insert.mock.calls[0][0].is_active).toBe(false);
+      const body = (await res.json()) as any;
+      expect(body.festival.is_active).toBe(true);
+    });
+
+    it("rejects a date that is well-formed but not a real day", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/festivals", {
+          method: "POST",
+          body: JSON.stringify({
+            name: "Impossible Fest",
+            short_name: "IF",
+            festival_type: "other",
+            location: "Nowhere",
+            start_date: "2026-02-30",
+            end_date: "2026-03-01",
+            status: "upcoming",
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
     });
   });
 
