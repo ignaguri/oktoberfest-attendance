@@ -13,8 +13,14 @@ import type {
   UpdateAdminFestivalInput,
 } from "../schemas/admin.schema";
 
-/** Hook to list every festival, newest first. */
-export function useAdminFestivals() {
+/**
+ * Hook to list every festival, newest first.
+ *
+ * Pass `enabled` false to keep the query off until it is needed: a sheet that
+ * is mounted but closed would otherwise fetch the whole list on the host
+ * screen's first load, the same way useAdminAvailableTents is gated.
+ */
+export function useAdminFestivals(enabled = true) {
   const apiClient = useApiClient();
 
   const query = useQuery<AdminFestival[]>(
@@ -26,6 +32,7 @@ export function useAdminFestivals() {
     {
       staleTime: 60 * 1000,
       gcTime: 5 * 60 * 1000,
+      enabled,
     },
   );
 

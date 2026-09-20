@@ -227,6 +227,18 @@ export {
   useUpdateAdminGroup,
 } from "./useAdminGroups";
 export {
+  useAddAdminFestivalTent,
+  useAddAllAdminFestivalTents,
+  useAdminAvailableTents,
+  useAdminFestivalTents,
+  useAdminTents,
+  useCopyAdminFestivalTents,
+  useCreateAdminTent,
+  useRemoveAdminFestivalTent,
+  useSetAdminFestivalTentPrice,
+  useUpdateAdminTent,
+} from "./useAdminTents";
+export {
   useAdminUser,
   useAdminUserAttendances,
   useAdminUsers,

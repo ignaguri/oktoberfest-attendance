@@ -2,16 +2,23 @@ import type { Database } from "@prostcounter/db";
 import type {
   AdminAttendance,
   AdminFestival,
+  AdminFestivalTent,
+  AdminFestivalTentStats,
   AdminGroup,
   AdminGroupMember,
+  AdminTent,
   AdminUser,
+  CopyAdminFestivalTentsInput,
   ListAdminUsersResponse,
   CreateAdminFestivalInput,
+  CreateAdminTentInput,
   UpdateAdminAttendanceInput,
   UpdateAdminFestivalInput,
   UpdateAdminGroupInput,
+  UpdateAdminTentInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
+  TentCategory,
   WinningCriterion,
 } from "@prostcounter/shared";
 import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
@@ -19,6 +26,7 @@ import { atZonedTime, formatDateForDatabase } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
+import { PgErrorCode } from "../../lib/postgres-errors";
 import { createAdminClient } from "../../utils/admin-client";
 
 /**
@@ -83,6 +91,25 @@ interface AuthUserRow {
   email: string | null;
   created_at: string | null;
   last_sign_in_at: string | null;
+}
+
+/**
+ * A `festival_tents` row joined to its tent, as `listFestivalTents` selects it.
+ *
+ * `category` is narrowed to the three `tents_category_check` allows. The
+ * generated database types say `string | null` because they do not encode CHECK
+ * constraints, so every read of this column needs the same narrowing; the
+ * constraint is what makes it sound.
+ */
+interface FestivalTentRow {
+  id: string;
+  beer_price: number | null;
+  tent: { id: string; name: string; category: TentCategory | null };
+}
+
+/** Euros to cents, the unit `beer_price_cents` and `drink_type_prices` store. */
+function toCents(beerPrice: number | null): number | null {
+  return beerPrice === null ? null : Math.round(beerPrice * 100);
 }
 
 export class SupabaseAdminRepository {
@@ -895,5 +922,481 @@ export class SupabaseAdminRepository {
     if (error) {
       throw new Error(`Error deleting attendance: ${error.message}`);
     }
+  }
+
+  // ===========================================================================
+  // Tents
+  // ===========================================================================
+
+  /**
+   * Keeps `drink_type_prices` in step with a tent's beer price.
+   *
+   * Three places hold this one number: `festival_tents.beer_price` in euros,
+   * which `tent.repository` reads; `beer_price_cents`, added by the pricing
+   * overhaul; and a `drink_type_prices` row, which is the canonical source that
+   * overhaul moved to and which `pricing.repository` reads. Callers write the
+   * two columns, this writes the canonical row, and they always move together --
+   * updating one alone leaves a reader showing a stale price.
+   *
+   * Only `drink_type` "beer" is touched. The web panel's per-tent price has
+   * always been a beer price; the other drink types fall back to the festival
+   * default.
+   */
+  private async syncTentBeerPrices(
+    entries: { festivalTentId: string; priceCents: number | null }[],
+  ): Promise<void> {
+    if (entries.length === 0) {
+      return;
+    }
+
+    const toClear = entries.filter((e) => e.priceCents === null).map((e) => e.festivalTentId);
+    const toSet = entries.filter(
+      (e): e is { festivalTentId: string; priceCents: number } => e.priceCents !== null,
+    );
+
+    if (toClear.length > 0) {
+      // No zero row: `drink_type_prices_positive_price` rejects <= 0, so an
+      // absent price is an absent row.
+      const { error } = await this.supabase
+        .from("drink_type_prices")
+        .delete()
+        .in("festival_tent_id", toClear)
+        .eq("drink_type", "beer");
+
+      if (error) {
+        throw new Error(`Error clearing tent beer price: ${error.message}`);
+      }
+    }
+
+    if (toSet.length === 0) {
+      return;
+    }
+
+    // Read first rather than upsert. The uniqueness that would drive ON CONFLICT
+    // is a *partial* index (`drink_type_prices_tent_unique ... WHERE
+    // festival_tent_id IS NOT NULL`), and PostgREST's on_conflict cannot supply
+    // the predicate Postgres needs to infer one.
+    const { data: existing, error: existingError } = await this.supabase
+      .from("drink_type_prices")
+      .select("id, festival_tent_id")
+      .in(
+        "festival_tent_id",
+        toSet.map((e) => e.festivalTentId),
+      )
+      .eq("drink_type", "beer");
+
+    if (existingError) {
+      throw new Error(`Error reading tent beer prices: ${existingError.message}`);
+    }
+
+    const existingIdByTent = new Map(
+      (existing ?? []).map((row) => [row.festival_tent_id as string, row.id]),
+    );
+
+    const inserts = toSet
+      .filter((e) => !existingIdByTent.has(e.festivalTentId))
+      .map((e) => ({
+        festival_tent_id: e.festivalTentId,
+        drink_type: "beer" as const,
+        price_cents: e.priceCents,
+      }));
+
+    if (inserts.length > 0) {
+      const { error } = await this.supabase.from("drink_type_prices").insert(inserts);
+
+      if (error) {
+        throw new Error(`Error creating tent beer price: ${error.message}`);
+      }
+    }
+
+    for (const entry of toSet) {
+      const rowId = existingIdByTent.get(entry.festivalTentId);
+      if (!rowId) {
+        continue;
+      }
+
+      const { error } = await this.supabase
+        .from("drink_type_prices")
+        .update({ price_cents: entry.priceCents, updated_at: new Date().toISOString() })
+        .eq("id", rowId);
+
+      if (error) {
+        throw new Error(`Error updating tent beer price: ${error.message}`);
+      }
+    }
+  }
+
+  async listTents(): Promise<AdminTent[]> {
+    const { data, error } = await this.supabase
+      .from("tents")
+      .select("id, name, category")
+      .order("name", { ascending: true });
+
+    if (error) {
+      throw new Error(`Error fetching tents: ${error.message}`);
+    }
+
+    return (data ?? []) as AdminTent[];
+  }
+
+  async createTent(input: CreateAdminTentInput): Promise<AdminTent> {
+    const { data, error } = await this.supabase
+      .from("tents")
+      // `tents.id` has no database default, so it is generated here.
+      .insert({ id: crypto.randomUUID(), name: input.name, category: input.category ?? null })
+      .select("id, name, category")
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error creating tent: ${error?.message}`);
+    }
+
+    return data as AdminTent;
+  }
+
+  /**
+   * Renames or recategorises a catalogue tent. Null means no such tent.
+   *
+   * Every field on UpdateAdminTentSchema is optional, so an empty patch is a
+   * valid request. PostgREST rejects an update with no columns, so read
+   * instead of writing: the answer the caller wants is still "does it exist".
+   * Same shape as updateGroup.
+   */
+  async updateTent(tentId: string, input: UpdateAdminTentInput): Promise<AdminTent | null> {
+    const columns = "id, name, category";
+    const query =
+      Object.keys(input).length > 0
+        ? this.supabase.from("tents").update(input).eq("id", tentId).select(columns)
+        : this.supabase.from("tents").select(columns).eq("id", tentId);
+
+    const { data, error } = await query.maybeSingle();
+
+    if (error) {
+      throw new Error(`Error updating tent: ${error.message}`);
+    }
+
+    return (data as AdminTent | null) ?? null;
+  }
+
+  async listFestivalTents(festivalId: string): Promise<AdminFestivalTent[]> {
+    const { data, error } = await this.supabase
+      .from("festival_tents")
+      .select("id, beer_price, tent:tents!inner(id, name, category)")
+      .eq("festival_id", festivalId)
+      .order("tent(name)", { ascending: true });
+
+    if (error) {
+      throw new Error(`Error fetching festival tents: ${error.message}`);
+    }
+
+    return ((data ?? []) as unknown as FestivalTentRow[]).map((row) => ({
+      festival_tent_id: row.id,
+      tent_id: row.tent.id,
+      name: row.tent.name,
+      category: row.tent.category,
+      beer_price: row.beer_price,
+    }));
+  }
+
+  /** Tents in the catalogue that this festival has not been given yet. */
+  async listAvailableTents(festivalId: string): Promise<AdminTent[]> {
+    const { data: assigned, error: assignedError } = await this.supabase
+      .from("festival_tents")
+      .select("tent_id")
+      .eq("festival_id", festivalId);
+
+    if (assignedError) {
+      throw new Error(`Error fetching festival tents: ${assignedError.message}`);
+    }
+
+    const assignedIds = (assigned ?? []).map((row) => row.tent_id);
+
+    let query = this.supabase.from("tents").select("id, name, category");
+
+    if (assignedIds.length > 0) {
+      query = query.not("id", "in", `(${assignedIds.join(",")})`);
+    }
+
+    const { data, error } = await query.order("name", { ascending: true });
+
+    if (error) {
+      throw new Error(`Error fetching available tents: ${error.message}`);
+    }
+
+    return (data ?? []) as AdminTent[];
+  }
+
+  /**
+   * Adds one catalogue tent to a festival, idempotently.
+   *
+   * `unique_festival_tent` covers (festival_id, tent_id), so a second add of
+   * the same tent raises 23505. That is not a bug worth a 500: the tent is
+   * already served, which is the state the caller asked for. The picker rows
+   * are tappable while a write is in flight, so the realistic source of a
+   * duplicate is one admin's double tap, and reporting a failure for an add
+   * that worked is worse than saying nothing.
+   *
+   * A price sent with the duplicate is still applied. Swallowing the conflict
+   * and returning early would answer "added" for a request that wrote nothing,
+   * which is the same lie in the other direction.
+   */
+  async addFestivalTent(
+    festivalId: string,
+    tentId: string,
+    beerPrice: number | null,
+  ): Promise<void> {
+    const { data, error } = await this.supabase
+      .from("festival_tents")
+      .insert({
+        festival_id: festivalId,
+        tent_id: tentId,
+        beer_price: beerPrice,
+        beer_price_cents: toCents(beerPrice),
+      })
+      .select("id")
+      .single();
+
+    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+      if (beerPrice !== null) {
+        await this.updateFestivalTentPrice(festivalId, tentId, beerPrice);
+      }
+      return;
+    }
+
+    if (error || !data) {
+      throw new Error(`Error adding tent to festival: ${error?.message}`);
+    }
+
+    await this.syncTentBeerPrices([{ festivalTentId: data.id, priceCents: toCents(beerPrice) }]);
+  }
+
+  /**
+   * Adds every catalogue tent this festival does not serve yet, at one price.
+   *
+   * The read of what is missing and the insert are two statements, so another
+   * admin adding a single tent in between would make one row of the batch a
+   * duplicate. A plain insert fails the whole batch on that one row and adds
+   * none of the other thirty, so the conflict is ignored instead: the returned
+   * rows are the ones actually inserted, which is both the count to report and
+   * the set to price.
+   */
+  async addAllAvailableTents(festivalId: string, beerPrice: number | null): Promise<number> {
+    const available = await this.listAvailableTents(festivalId);
+
+    if (available.length === 0) {
+      return 0;
+    }
+
+    const priceCents = toCents(beerPrice);
+    const { data, error } = await this.supabase
+      .from("festival_tents")
+      .upsert(
+        available.map((tent) => ({
+          festival_id: festivalId,
+          tent_id: tent.id,
+          beer_price: beerPrice,
+          beer_price_cents: priceCents,
+        })),
+        { onConflict: "festival_id,tent_id", ignoreDuplicates: true },
+      )
+      .select("id");
+
+    if (error || !data) {
+      throw new Error(`Error adding tents to festival: ${error?.message}`);
+    }
+
+    await this.syncTentBeerPrices(data.map((row) => ({ festivalTentId: row.id, priceCents })));
+
+    return data.length;
+  }
+
+  /**
+   * Removes a tent from a festival, refusing when people have visited it.
+   *
+   * Ported from the web panel: `tent_visits` rows reference the pair, and
+   * dropping the assignment would orphan a visitor's history. Returns a reason
+   * instead of throwing so the route can answer 409.
+   */
+  async removeFestivalTent(
+    festivalId: string,
+    tentId: string,
+  ): Promise<{ deleted: true } | { blockedBy: "visits" }> {
+    const { data: visits, error: visitsError } = await this.supabase
+      .from("tent_visits")
+      .select("id")
+      .eq("festival_id", festivalId)
+      .eq("tent_id", tentId)
+      .limit(1);
+
+    if (visitsError) {
+      throw new Error(`Error checking tent visits: ${visitsError.message}`);
+    }
+
+    if (visits && visits.length > 0) {
+      return { blockedBy: "visits" };
+    }
+
+    // The drink_type_prices row goes with it via ON DELETE CASCADE on
+    // festival_tent_id, so there is nothing to clean up here.
+    const { error } = await this.supabase
+      .from("festival_tents")
+      .delete()
+      .eq("festival_id", festivalId)
+      .eq("tent_id", tentId);
+
+    if (error) {
+      throw new Error(`Error removing tent from festival: ${error.message}`);
+    }
+
+    return { deleted: true };
+  }
+
+  async updateFestivalTentPrice(
+    festivalId: string,
+    tentId: string,
+    beerPrice: number | null,
+  ): Promise<AdminFestivalTent | null> {
+    const priceCents = toCents(beerPrice);
+
+    const { data, error } = await this.supabase
+      .from("festival_tents")
+      .update({ beer_price: beerPrice, beer_price_cents: priceCents })
+      .eq("festival_id", festivalId)
+      .eq("tent_id", tentId)
+      .select("id, beer_price, tent:tents!inner(id, name, category)")
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error updating tent price: ${error.message}`);
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    const row = data as unknown as FestivalTentRow;
+    await this.syncTentBeerPrices([{ festivalTentId: row.id, priceCents }]);
+
+    return {
+      festival_tent_id: row.id,
+      tent_id: row.tent.id,
+      name: row.tent.name,
+      category: row.tent.category,
+      beer_price: row.beer_price,
+    };
+  }
+
+  /**
+   * Copies tent assignments from one festival to another.
+   *
+   * Tents already present in the target are skipped rather than overwritten, so
+   * running this twice is harmless and an existing price is never clobbered.
+   */
+  async copyFestivalTents(
+    targetFestivalId: string,
+    input: CopyAdminFestivalTentsInput,
+  ): Promise<number> {
+    const { data: source, error: sourceError } = await this.supabase
+      .from("festival_tents")
+      .select("tent_id, beer_price")
+      .eq("festival_id", input.source_festival_id)
+      .in("tent_id", input.tent_ids);
+
+    if (sourceError) {
+      throw new Error(`Error fetching source tents: ${sourceError.message}`);
+    }
+
+    if (!source || source.length === 0) {
+      return 0;
+    }
+
+    const { data: alreadyThere, error: targetError } = await this.supabase
+      .from("festival_tents")
+      .select("tent_id")
+      .eq("festival_id", targetFestivalId)
+      .in(
+        "tent_id",
+        source.map((row) => row.tent_id),
+      );
+
+    if (targetError) {
+      throw new Error(`Error fetching target tents: ${targetError.message}`);
+    }
+
+    const present = new Set((alreadyThere ?? []).map((row) => row.tent_id));
+    const toCopy = source.filter((row) => !present.has(row.tent_id));
+
+    if (toCopy.length === 0) {
+      return 0;
+    }
+
+    // An explicit `override_price: null` means "copy the tents, price none of
+    // them", and outranks copy_prices. Omitting the field is what leaves the
+    // source's prices in play; the two are not interchangeable.
+    const priceFor = (sourcePrice: number | null): number | null => {
+      if (input.override_price !== undefined) {
+        return input.override_price;
+      }
+      return input.copy_prices ? sourcePrice : null;
+    };
+
+    // Ignoring the conflict rather than failing the batch, for the same reason
+    // as addAllAvailableTents: the "already there" read above is a separate
+    // statement, and one tent arriving in between should not cost the copy.
+    const { data, error } = await this.supabase
+      .from("festival_tents")
+      .upsert(
+        toCopy.map((row) => ({
+          festival_id: targetFestivalId,
+          tent_id: row.tent_id,
+          beer_price: priceFor(row.beer_price),
+          beer_price_cents: toCents(priceFor(row.beer_price)),
+        })),
+        { onConflict: "festival_id,tent_id", ignoreDuplicates: true },
+      )
+      .select("id, tent_id");
+
+    if (error || !data) {
+      throw new Error(`Error copying tents: ${error?.message}`);
+    }
+
+    const sourcePriceByTent = new Map(toCopy.map((row) => [row.tent_id, row.beer_price]));
+    await this.syncTentBeerPrices(
+      data.map((row) => ({
+        festivalTentId: row.id,
+        priceCents: toCents(priceFor(sourcePriceByTent.get(row.tent_id) ?? null)),
+      })),
+    );
+
+    return data.length;
+  }
+
+  /**
+   * Counts a festival's tents.
+   *
+   * Takes the list rather than fetching it: the one caller has already read it
+   * to return alongside these numbers, and deriving them here cost a second
+   * identical query on every load of the screen.
+   */
+  getFestivalTentStats(tents: AdminFestivalTent[]): AdminFestivalTentStats {
+    const categories: Record<string, number> = {};
+    const prices: number[] = [];
+
+    for (const tent of tents) {
+      const category = tent.category ?? "Uncategorized";
+      categories[category] = (categories[category] ?? 0) + 1;
+
+      if (tent.beer_price !== null) {
+        prices.push(tent.beer_price);
+      }
+    }
+
+    return {
+      total_tents: tents.length,
+      categories,
+      with_custom_pricing: prices.length,
+      avg_price:
+        prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : null,
+    };
   }
 }
