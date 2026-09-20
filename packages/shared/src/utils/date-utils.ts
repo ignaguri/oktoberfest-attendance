@@ -158,6 +158,8 @@ export function formatTimeInTimezone(
  * @param locale - Optional locale for formatting (defaults to current i18n language)
  * @returns Relative time string (e.g., "2 minutes ago", "1 hour ago", "in 2 hours")
  */
+const CLOCK_SKEW_SECONDS = 5;
+
 export function formatRelativeTime(
   date: Date,
   timezone: string = TIMEZONE,
@@ -202,7 +204,10 @@ export function formatRelativeTime(
   };
 
   if (distanceInSeconds < 60) {
-    if (distanceInSeconds <= 1) {
+    // A server timestamp routinely lands a few seconds ahead of the device
+    // clock. That is "just now", not a wait, and it is the common case here:
+    // these strings mostly date freshly created rows.
+    if (distanceInSeconds <= 1 || (diffInSeconds < 0 && distanceInSeconds < CLOCK_SKEW_SECONDS)) {
       return "just now";
     }
     return withDirection(`${distanceInSeconds}s`);

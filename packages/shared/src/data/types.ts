@@ -17,8 +17,10 @@ export interface DataQueryResult<T = unknown> {
   loading: boolean;
   /** Error object if the query failed */
   error: Error | null;
-  /** Function to manually refetch the data */
-  refetch: () => void;
+  /** Manually refetch. Resolves when the refetch settles, so a caller can
+   * scope a pull-to-refresh spinner to its own request rather than to every
+   * background fetch the query makes. */
+  refetch: () => Promise<void>;
   /** Whether this is the initial load */
   isInitialLoading?: boolean;
   /** Whether the data is stale and being refetched in background */

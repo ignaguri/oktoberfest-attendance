@@ -81,5 +81,15 @@ describe("formatRelativeTime", () => {
     it("keeps the past phrasing unchanged", () => {
       expect(formatRelativeTime(secondsFromNow(-7201), KIRITIMATI, "en")).toBe("2 hours ago");
     });
+
+    // Server timestamps land a little ahead of the device clock all the time,
+    // and this fallback dates freshly created rows on Android.
+    it("reads a few seconds of clock skew as 'just now', not as a wait", () => {
+      expect(formatRelativeTime(secondsFromNow(3), KIRITIMATI, "en")).toBe("just now");
+    });
+
+    it("still reports a genuine short wait", () => {
+      expect(formatRelativeTime(secondsFromNow(31), KIRITIMATI, "en")).toBe("in 31s");
+    });
   });
 });
