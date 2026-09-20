@@ -2,7 +2,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
 import type { LucideIcon } from "lucide-react-native";
-import { CalendarDays, ChevronRight, MapPin, Users, UsersRound } from "lucide-react-native";
+import { CalendarDays, ChevronRight, MapPin, Tent, Users, UsersRound } from "lucide-react-native";
 
 import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
@@ -34,6 +34,11 @@ const SECTIONS = [
     key: "festivals" as const,
     href: "/admin/festivals" as const,
     Icon: CalendarDays,
+  },
+  {
+    key: "tents" as const,
+    href: "/admin/tents" as const,
+    Icon: Tent,
   },
   {
     key: "location" as const,

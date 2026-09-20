@@ -6,7 +6,7 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Check, Trash2 } from "lucide-react-native";
+import { Check, ChevronRight, Trash2 } from "lucide-react-native";
 import { useCallback, useState } from "react";
 
 import { useAlertDialog } from "@/components/ui/alert-dialog";
@@ -235,6 +235,28 @@ export default function AdminFestivalDetailScreen() {
               ))}
             </VStack>
           </Card>
+
+          {/* Tents */}
+          <Pressable
+            onPress={() => router.push(`/admin/festival/${id}/tents`)}
+            accessibilityRole="button"
+            accessibilityLabel={t("admin.mobile.festivalTents.title")}
+            accessibilityHint={t("admin.mobile.festivalTents.openHint")}
+          >
+            <Card size="md" variant="elevated">
+              <HStack className="items-center justify-between">
+                <VStack className="flex-1 pr-3">
+                  <Text className="text-typography-900">
+                    {t("admin.mobile.festivalTents.title")}
+                  </Text>
+                  <Text className="text-sm text-typography-500">
+                    {t("admin.mobile.festivalTents.openHint")}
+                  </Text>
+                </VStack>
+                <ChevronRight size={20} color={IconColors.muted} />
+              </HStack>
+            </Card>
+          </Pressable>
 
           {/* Delete */}
           <Card size="md" variant="outline" className="border-error-300">
