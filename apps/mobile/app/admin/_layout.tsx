@@ -38,6 +38,18 @@ export default function AdminLayout() {
         }}
       />
       <Stack.Screen
+        name="users"
+        options={{
+          title: t("admin.tabs.users"),
+        }}
+      />
+      <Stack.Screen
+        name="user/[id]"
+        options={{
+          title: t("admin.mobile.userDetail.title"),
+        }}
+      />
+      <Stack.Screen
         name="location"
         options={{
           title: t("admin.location.title"),

@@ -7,7 +7,9 @@
 
 // Import shared schema types
 import type {
+  AdminAttendance,
   AdminLocationSession,
+  AdminUser,
   AttendanceByDate,
   CarryOverCandidatesResponse,
   Consumption,
@@ -40,6 +42,7 @@ import type {
   Highlights,
   LeaderboardResponse,
   ListAchievementsResponse,
+  ListAdminUsersResponse,
   ListAttendancesResponse,
   ListAvailableAchievementsResponse,
   ListDayPlansResponse,
@@ -59,6 +62,9 @@ import type {
   SearchUsersResponse,
   SubmitCrowdReportResponse,
   TutorialStatus,
+  UpdateAdminAttendanceInput,
+  UpdateAdminUserAuthInput,
+  UpdateAdminUserProfileInput,
   UpdateGroupMessageResponse,
   UpdatePersonalAttendanceResponse,
   UpsertDayPlanInput,
@@ -2620,6 +2626,126 @@ export function createTypedApiClient(config: ApiClientConfig) {
      * caller gets a 403 ApiError rather than an empty result.
      */
     admin: {
+      users: {
+        async list(query?: {
+          search?: string;
+          page?: number;
+          limit?: number;
+        }): Promise<ListAdminUsersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query?.search) params.set("search", query.search);
+          if (query?.page) params.set("page", query.page.toString());
+          if (query?.limit) params.set("limit", query.limit.toString());
+
+          const url = `${baseUrl}/v1/admin/users?${params}`;
+          const response = await fetchWithLogging("GET", url, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch users");
+          }
+          return parseJsonResponse<ListAdminUsersResponse>(response);
+        },
+
+        async get(userId: string): Promise<{ user: AdminUser }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/users/${userId}`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch user");
+          }
+          return parseJsonResponse<{ user: AdminUser }>(response);
+        },
+
+        async updateProfile(
+          userId: string,
+          data: UpdateAdminUserProfileInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/users/${userId}/profile`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update user profile");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async updateAuth(
+          userId: string,
+          data: UpdateAdminUserAuthInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/users/${userId}/auth`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update user credentials");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async delete(userId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("DELETE", `${baseUrl}/v1/admin/users/${userId}`, {
+            method: "DELETE",
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to delete user");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async listAttendances(userId: string): Promise<{ attendances: AdminAttendance[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/users/${userId}/attendances`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch attendances");
+          }
+          return parseJsonResponse<{ attendances: AdminAttendance[] }>(response);
+        },
+      },
+
+      attendances: {
+        async update(
+          attendanceId: string,
+          data: UpdateAdminAttendanceInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/attendances/${attendanceId}`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update attendance");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async delete(attendanceId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/attendances/${attendanceId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to delete attendance");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+      },
+
       location: {
         async listSessions(query?: {
           festivalId?: string;

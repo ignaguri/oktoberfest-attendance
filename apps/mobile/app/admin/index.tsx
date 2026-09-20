@@ -2,7 +2,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
 import type { LucideIcon } from "lucide-react-native";
-import { ChevronRight, MapPin } from "lucide-react-native";
+import { ChevronRight, MapPin, Users } from "lucide-react-native";
 
 import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
@@ -20,6 +20,11 @@ import { IconColors } from "@/lib/constants/colors";
  * lands; image conversion stays web-only (a server-side maintenance chore).
  */
 const SECTIONS = [
+  {
+    key: "users" as const,
+    href: "/admin/users" as const,
+    Icon: Users,
+  },
   {
     key: "location" as const,
     href: "/admin/location" as const,

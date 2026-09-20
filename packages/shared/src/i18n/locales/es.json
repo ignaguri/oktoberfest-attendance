@@ -1547,11 +1547,49 @@
   },
   "admin": {
     "mobile": {
+      "users": {
+        "searchPlaceholder": "Buscar por nombre, usuario o correo",
+        "loading": "Cargando usuarios...",
+        "empty": "No se encontraron usuarios",
+        "noName": "Usuario sin nombre",
+        "adminBadge": "Admin",
+        "resultCount": "{{count}} usuario(s)",
+        "openHint": "Abre los detalles de este usuario",
+        "previousPage": "Anterior",
+        "nextPage": "Siguiente",
+        "pageOf": "Página {{page}} de {{totalPages}}",
+        "truncated": "Hay más cuentas de las que se pueden recorrer a la vez. Afina la búsqueda para asegurarte."
+      },
+      "userDetail": {
+        "title": "Usuario",
+        "loading": "Cargando...",
+        "adminHint": "Otorga acceso completo a esta área de administración",
+        "cannotDemoteSelf": "No puedes cambiar tu propio acceso de administrador",
+        "setPassword": "Establecer nueva contraseña",
+        "setPasswordHint": "Reemplaza la contraseña de este usuario de inmediato",
+        "setPasswordConfirm": "Esto reemplaza la contraseña del usuario de inmediato. ¿Continuar?",
+        "newPasswordPlaceholder": "Nueva contraseña (mín. 8 caracteres)",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+        "passwordChanged": "Contraseña actualizada",
+        "attendances": "Asistencias",
+        "noAttendances": "No hay asistencias registradas",
+        "attendanceSummary": "{{beers}} cerveza(s), {{tents}} carpa(s)",
+        "deleteAttendance": "Eliminar asistencia",
+        "deleteAttendanceHint": "Elimina el registro de asistencia de este día",
+        "deleteAttendanceConfirm": "Esto elimina la asistencia y sus visitas a carpas. ¿Continuar?",
+        "dangerZone": "Zona de peligro",
+        "deleteUser": "Eliminar cuenta",
+        "deleteUserHint": "Elimina permanentemente esta cuenta de usuario",
+        "deleteUserConfirm": "Esto elimina permanentemente la cuenta y todos sus datos. ¿Continuar?",
+        "updateError": "No se pudo guardar el cambio",
+        "deleteError": "No se pudo eliminar"
+      },
       "subtitle": "Gestiona usuarios, grupos y datos del festival",
       "openAdmin": "Abrir panel de administración",
       "openAdminHint": "Abre el área de administración",
       "hubDescription": "Herramientas de administración. Los cambios aquí afectan a todos los usuarios.",
       "sections": {
+        "users": "Buscar y gestionar cuentas de usuario",
         "location": "Sesiones activas de ubicación compartida"
       },
       "location": {

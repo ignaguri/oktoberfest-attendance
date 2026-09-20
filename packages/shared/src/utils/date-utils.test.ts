@@ -58,6 +58,16 @@ describe("formatRelativeTime", () => {
     expect(formatRelativeTime(secondsFromNow(-7201), KIRITIMATI, "en")).toBe("2 hours ago");
   });
 
+  // Both runtimes must agree here: the fallback said "just now" while the Intl
+  // path counted down, so the same row read differently on Android and iOS.
+  it("reads clock skew as 'now' on the Intl path too", () => {
+    expect(formatRelativeTime(secondsFromNow(3), KIRITIMATI, "en")).toBe("now");
+  });
+
+  it("localizes that clamp rather than hardcoding English", () => {
+    expect(formatRelativeTime(secondsFromNow(3), KIRITIMATI, "de")).toBe("jetzt");
+  });
+
   it("rounds a future distance towards zero, not away from it", () => {
     // Flooring the negative difference would call 91 seconds out "in 2 minutes".
     expect(formatRelativeTime(secondsFromNow(91), KIRITIMATI, "en")).toBe("in 1 minute");
