@@ -505,7 +505,14 @@ export class SupabaseAdminRepository {
     });
   }
 
-  /** Fetches one group, so the detail screen survives a reload or deep link. */
+  /**
+   * Fetches one group, so the detail screen survives a reload or deep link.
+   *
+   * `maybeSingle` with the error rethrown, rather than collapsing both into
+   * null: the route turns null into "Group not found", so swallowing a real
+   * Supabase failure here tells the admin the group is gone when the database
+   * is merely unreachable.
+   */
   async getGroup(groupId: string): Promise<AdminGroup | null> {
     const { data, error } = await this.supabase
       .from("groups")
@@ -513,9 +520,13 @@ export class SupabaseAdminRepository {
         "id, name, description, winning_criteria_id, festival_id, created_at, created_by, group_members(count)",
       )
       .eq("id", groupId)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
+    if (error) {
+      throw new Error(`Error fetching group: ${error.message}`);
+    }
+
+    if (!data) {
       return null;
     }
 
@@ -523,27 +534,59 @@ export class SupabaseAdminRepository {
     return { ...rest, member_count: group_members?.[0]?.count ?? 0 };
   }
 
-  async updateGroup(groupId: string, input: UpdateAdminGroupInput): Promise<void> {
-    const { error } = await this.supabase.from("groups").update(input).eq("id", groupId);
+  /**
+   * Updates a group. Returns false when no such group exists.
+   *
+   * PostgREST counts a write that matches no rows as a success, so without the
+   * `select` this reports a saved rename for a group another admin has already
+   * deleted -- and the detail screen leaves edit mode showing the new name.
+   */
+  async updateGroup(groupId: string, input: UpdateAdminGroupInput): Promise<boolean> {
+    // Every field on UpdateAdminGroupSchema is optional, so an empty patch is a
+    // valid request. PostgREST rejects an update with no columns, so read
+    // instead of writing: the answer the caller wants is still "does it exist".
+    const query =
+      Object.keys(input).length > 0
+        ? this.supabase.from("groups").update(input).eq("id", groupId).select("id")
+        : this.supabase.from("groups").select("id").eq("id", groupId);
+
+    const { data, error } = await query;
 
     if (error) {
       throw new Error(`Error updating group: ${error.message}`);
     }
+
+    return (data ?? []).length > 0;
   }
 
-  async deleteGroup(groupId: string): Promise<void> {
-    const { error } = await this.supabase.from("groups").delete().eq("id", groupId);
+  /** Deletes a group. Returns false when no such group exists. */
+  async deleteGroup(groupId: string): Promise<boolean> {
+    const { data, error } = await this.supabase
+      .from("groups")
+      .delete()
+      .eq("id", groupId)
+      .select("id");
 
     if (error) {
       throw new Error(`Error deleting group: ${error.message}`);
     }
+
+    return (data ?? []).length > 0;
   }
 
-  /** Lists a group's members, flattened from the joined profile. */
+  /**
+   * Lists a group's members, flattened from the joined profile.
+   *
+   * A plain join rather than `!inner`: `group_members.user_id` is nullable, and
+   * an inner join drops those rows silently. The detail screen shows
+   * `member_count` (which counts every row) directly above this list, so the
+   * two would disagree with nothing on screen explaining the gap. A member with
+   * no profile comes back with null names instead, which the schema allows.
+   */
   async listGroupMembers(groupId: string): Promise<AdminGroupMember[]> {
     const { data, error } = await this.supabase
       .from("group_members")
-      .select("id, user_id, joined_at, profiles!inner(username, full_name, avatar_url)")
+      .select("id, user_id, joined_at, profiles(username, full_name, avatar_url)")
       .eq("group_id", groupId)
       .order("joined_at", { ascending: false });
 
@@ -552,7 +595,7 @@ export class SupabaseAdminRepository {
     }
 
     return (data ?? []).map((member) => {
-      // The !inner join yields an object, but the generated types model the
+      // The join yields an object, but the generated types model the
       // relationship as possibly-array; normalize before reading it.
       const profile = Array.isArray(member.profiles) ? member.profiles[0] : member.profiles;
       return {

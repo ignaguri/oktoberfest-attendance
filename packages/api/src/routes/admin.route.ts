@@ -348,7 +348,6 @@ app.openapi(listGroupsRoute, async (c) => {
 });
 
 // GET /admin/winning-criteria - List winning criteria
-// Declared before /admin/groups/{groupId} so the literal path is not shadowed.
 const listWinningCriteriaRoute = createRoute({
   method: "get",
   path: "/admin/winning-criteria",
@@ -434,7 +433,11 @@ app.openapi(updateGroupRoute, async (c) => {
   const body = c.req.valid("json");
 
   const adminRepo = new SupabaseAdminRepository(supabase);
-  await adminRepo.updateGroup(groupId, body);
+  const updated = await adminRepo.updateGroup(groupId, body);
+
+  if (!updated) {
+    throw new NotFoundError("Group not found");
+  }
 
   return c.json({ success: true }, 200);
 });
@@ -462,7 +465,11 @@ app.openapi(deleteGroupRoute, async (c) => {
   const { groupId } = c.req.valid("param");
 
   const adminRepo = new SupabaseAdminRepository(supabase);
-  await adminRepo.deleteGroup(groupId);
+  const deleted = await adminRepo.deleteGroup(groupId);
+
+  if (!deleted) {
+    throw new NotFoundError("Group not found");
+  }
 
   return c.json({ success: true }, 200);
 });

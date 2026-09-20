@@ -1709,7 +1709,8 @@
       "groups": {
         "loading": "Gruppen werden geladen...",
         "empty": "Keine Gruppen gefunden",
-        "memberCount": "{{count}} Mitglied(er)",
+        "memberCount_one": "{{count}} Mitglied",
+        "memberCount_other": "{{count}} Mitglieder",
         "openHint": "Öffnet die Details dieser Gruppe"
       },
       "groupDetail": {

@@ -400,6 +400,33 @@ describe("Admin Routes - Unit Tests", () => {
       expect(body.members[0].full_name).toBe("Some One");
     });
 
+    // group_members.user_id is nullable, so an inner join would drop these rows
+    // -- and the screen prints member_count, which counts every row, directly
+    // above the list. The two must not disagree.
+    it("keeps a member whose profile did not join", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              id: "77777777-7777-4777-8777-777777777777",
+              user_id: null,
+              joined_at: null,
+              profiles: null,
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/groups/${GROUP_ID}/members`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.members).toHaveLength(1);
+      expect(body.members[0].username).toBeNull();
+      expect(body.members[0].user_id).toBeNull();
+    });
+
     it("handles the join arriving as an array", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({
@@ -426,7 +453,7 @@ describe("Admin Routes - Unit Tests", () => {
   describe("DELETE /admin/groups/:groupId", () => {
     it("deletes the group", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain({ data: null, error: null }),
+        createMockChain({ data: [{ id: GROUP_ID }], error: null }),
       );
 
       const res = await app.request(
@@ -435,6 +462,19 @@ describe("Admin Routes - Unit Tests", () => {
 
       expect(res.status).toBe(200);
       expect(mockSupabase.from).toHaveBeenCalledWith("groups");
+    });
+
+    // PostgREST counts a delete matching no rows as a success. Reported as a
+    // 200, the screen closes its confirm dialog and navigates back, giving the
+    // admin the whole "deleted" experience for a delete that removed nothing.
+    it("404s when the group is already gone", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain({ data: [], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/groups/${GROUP_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(404);
     });
   });
 
@@ -449,6 +489,37 @@ describe("Admin Routes - Unit Tests", () => {
 
       expect(res.status).toBe(400);
       expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    it("updates the group", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: [{ id: GROUP_ID }], error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/groups/${GROUP_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name: "Renamed" }),
+        }),
+      );
+
+      expect(res.status).toBe(200);
+    });
+
+    // Without the row check this reports a saved rename for a group another
+    // admin has already deleted, and the detail screen leaves edit mode showing
+    // the new name as if it had stuck.
+    it("404s when the group no longer exists", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain({ data: [], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/groups/${GROUP_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name: "Renamed" }),
+        }),
+      );
+
+      expect(res.status).toBe(404);
     });
   });
 
