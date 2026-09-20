@@ -20046,7 +20046,13 @@
                           },
                           "category": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                              "large",
+                              "small",
+                              "old",
+                              null
+                            ]
                           }
                         },
                         "required": [
@@ -20134,8 +20140,12 @@
                   "category": {
                     "type": "string",
                     "nullable": true,
-                    "minLength": 1,
-                    "maxLength": 100
+                    "enum": [
+                      "large",
+                      "small",
+                      "old",
+                      null
+                    ]
                   }
                 },
                 "required": [
@@ -20165,7 +20175,13 @@
                         },
                         "category": {
                           "type": "string",
-                          "nullable": true
+                          "nullable": true,
+                          "enum": [
+                            "large",
+                            "small",
+                            "old",
+                            null
+                          ]
                         }
                       },
                       "required": [
@@ -20266,8 +20282,12 @@
                   "category": {
                     "type": "string",
                     "nullable": true,
-                    "minLength": 1,
-                    "maxLength": 100
+                    "enum": [
+                      "large",
+                      "small",
+                      "old",
+                      null
+                    ]
                   }
                 }
               }
@@ -20294,7 +20314,13 @@
                         },
                         "category": {
                           "type": "string",
-                          "nullable": true
+                          "nullable": true,
+                          "enum": [
+                            "large",
+                            "small",
+                            "old",
+                            null
+                          ]
                         }
                       },
                       "required": [
@@ -20335,6 +20361,28 @@
           },
           "403": {
             "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tent not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -20406,7 +20454,13 @@
                           },
                           "category": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                              "large",
+                              "small",
+                              "old",
+                              null
+                            ]
                           },
                           "beer_price": {
                             "type": "number",
@@ -20539,7 +20593,8 @@
                     "type": "number",
                     "nullable": true,
                     "minimum": 0,
-                    "exclusiveMinimum": true
+                    "exclusiveMinimum": true,
+                    "maximum": 999.99
                   }
                 },
                 "required": [
@@ -20659,7 +20714,13 @@
                           },
                           "category": {
                             "type": "string",
-                            "nullable": true
+                            "nullable": true,
+                            "enum": [
+                              "large",
+                              "small",
+                              "old",
+                              null
+                            ]
                           }
                         },
                         "required": [
@@ -20757,7 +20818,8 @@
                     "type": "number",
                     "nullable": true,
                     "minimum": 0,
-                    "exclusiveMinimum": true
+                    "exclusiveMinimum": true,
+                    "maximum": 999.99
                   }
                 }
               }
@@ -20878,7 +20940,8 @@
                     "type": "number",
                     "nullable": true,
                     "minimum": 0,
-                    "exclusiveMinimum": true
+                    "exclusiveMinimum": true,
+                    "maximum": 999.99
                   }
                 },
                 "required": [
@@ -20997,7 +21060,8 @@
                     "type": "number",
                     "nullable": true,
                     "minimum": 0,
-                    "exclusiveMinimum": true
+                    "exclusiveMinimum": true,
+                    "maximum": 999.99
                   }
                 },
                 "required": [
@@ -21031,7 +21095,13 @@
                         },
                         "category": {
                           "type": "string",
-                          "nullable": true
+                          "nullable": true,
+                          "enum": [
+                            "large",
+                            "small",
+                            "old",
+                            null
+                          ]
                         },
                         "beer_price": {
                           "type": "number",

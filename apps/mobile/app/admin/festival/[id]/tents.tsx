@@ -180,7 +180,9 @@ export default function AdminFestivalTentsScreen() {
                   <VStack className="flex-1 pr-3">
                     <Text className="font-semibold text-typography-900">{tent.name}</Text>
                     <Text className="text-sm text-typography-500">
-                      {tent.category ?? t("admin.mobile.tents.uncategorized")}
+                      {tent.category
+                        ? t(`admin.mobile.tents.category.${tent.category}`)
+                        : t("admin.mobile.tents.uncategorized")}
                     </Text>
                   </VStack>
                   <Pressable

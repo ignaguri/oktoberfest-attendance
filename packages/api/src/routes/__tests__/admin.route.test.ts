@@ -1022,4 +1022,171 @@ describe("Admin Routes - Unit Tests", () => {
       expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(2);
     });
   });
+
+  describe("POST /admin/festivals/:festivalId/tents", () => {
+    it("treats a re-add as success rather than surfacing the unique violation", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: null,
+          error: {
+            code: "23505",
+            message: 'duplicate key value violates unique constraint "unique_festival_tent"',
+          },
+        }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents`, {
+          method: "POST",
+          body: JSON.stringify({ tent_id: TENT_ID }),
+        }),
+      );
+
+      // The tent is already served, which is the state the caller asked for.
+      // A double tap on the picker should not report a failed add.
+      expect(res.status).toBe(201);
+      // Nothing else to do: no price came with the request.
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(1);
+    });
+
+    it("still applies a price sent with a duplicate add", async () => {
+      vi.mocked(mockSupabase.from)
+        // the insert, rejected by unique_festival_tent
+        .mockReturnValueOnce(
+          createMockChain({ data: null, error: { code: "23505", message: "duplicate key" } }),
+        )
+        // falls through to the price update on the existing assignment
+        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(9.5), error: null }))
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents`, {
+          method: "POST",
+          body: JSON.stringify({ tent_id: TENT_ID, beer_price: 9.5 }),
+        }),
+      );
+
+      // Answering "added" for a request that wrote nothing is the same lie as
+      // answering "failed" for one that worked.
+      expect(res.status).toBe(201);
+      expect(mockSupabase.from).toHaveBeenCalledWith("drink_type_prices");
+    });
+
+    it("rejects a price the numeric(5,2) column cannot hold", async () => {
+      const res = await app.request(
+        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents`, {
+          method: "POST",
+          body: JSON.stringify({ tent_id: TENT_ID, beer_price: 1000 }),
+        }),
+      );
+
+      // Without the cap this reaches Postgres as `numeric field overflow`.
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("POST /admin/tents", () => {
+    it("rejects a category tents_category_check would refuse", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/tents", {
+          method: "POST",
+          body: JSON.stringify({ name: "Festzelt", category: "Beer Gardens" }),
+        }),
+      );
+
+      // The CHECK allows large/small/old only. Free text here means the first
+      // category an admin types comes back as a 500.
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    it("accepts one of the three the constraint allows", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: { id: TENT_ID, name: "Schottenhamel", category: "large" },
+          error: null,
+        }),
+      );
+
+      const res = await app.request(
+        createAuthRequest("/admin/tents", {
+          method: "POST",
+          body: JSON.stringify({ name: "Schottenhamel", category: "large" }),
+        }),
+      );
+
+      expect(res.status).toBe(201);
+    });
+  });
+
+  describe("GET /admin/festivals/:festivalId/tents", () => {
+    it("reads the tent list once and derives the stats from it", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              id: FESTIVAL_TENT_ID,
+              beer_price: 9.5,
+              tent: { id: TENT_ID, name: "A", category: "large" },
+            },
+            { id: "other", beer_price: null, tent: { id: OTHER_ID, name: "B", category: null } },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.tents).toHaveLength(2);
+      expect(body.stats.total_tents).toBe(2);
+      expect(body.stats.with_custom_pricing).toBe(1);
+      expect(body.stats.avg_price).toBe(9.5);
+      expect(body.stats.categories).toEqual({ large: 1, Uncategorized: 1 });
+      // One query, not two: the stats used to refetch the same list.
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(1);
+    });
+  });
+
+  describe("PATCH /admin/tents/:tentId", () => {
+    it("404s instead of 500ing when the tent does not exist", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/tents/${TENT_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name: "Schottenhamel" }),
+        }),
+      );
+
+      expect(res.status).toBe(404);
+    });
+
+    it("reads rather than writes when the patch is empty", async () => {
+      const chain = createMockChain({
+        data: { id: TENT_ID, name: "Schottenhamel", category: "large" },
+        error: null,
+      });
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(chain);
+
+      const res = await app.request(
+        createAuthRequest(`/admin/tents/${TENT_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({}),
+        }),
+      );
+
+      // PostgREST rejects an update with no columns, so an empty patch has to
+      // become a read. Every field on the schema is optional, so this request
+      // is valid and has to answer something.
+      expect(res.status).toBe(200);
+      expect(chain.update).not.toHaveBeenCalled();
+      expect(chain.select).toHaveBeenCalled();
+    });
+  });
 });

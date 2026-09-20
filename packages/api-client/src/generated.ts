@@ -10931,7 +10931,8 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
-                                category: string | null;
+                                /** @enum {string|null} */
+                                category: "large" | "small" | "old" | null;
                             }[];
                         };
                     };
@@ -10975,7 +10976,8 @@ export interface paths {
                 content: {
                     "application/json": {
                         name: string;
-                        category?: string | null;
+                        /** @enum {string|null} */
+                        category?: "large" | "small" | "old" | null;
                     };
                 };
             };
@@ -10991,7 +10993,8 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
-                                category: string | null;
+                                /** @enum {string|null} */
+                                category: "large" | "small" | "old" | null;
                             };
                         };
                     };
@@ -11058,7 +11061,8 @@ export interface paths {
                 content: {
                     "application/json": {
                         name?: string;
-                        category?: string | null;
+                        /** @enum {string|null} */
+                        category?: "large" | "small" | "old" | null;
                     };
                 };
             };
@@ -11074,7 +11078,8 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
-                                category: string | null;
+                                /** @enum {string|null} */
+                                category: "large" | "small" | "old" | null;
                             };
                         };
                     };
@@ -11093,6 +11098,18 @@ export interface paths {
                 };
                 /** @description Forbidden - User is not an admin */
                 403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Tent not found */
+                404: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -11139,7 +11156,8 @@ export interface paths {
                                 /** Format: uuid */
                                 tent_id: string;
                                 name: string;
-                                category: string | null;
+                                /** @enum {string|null} */
+                                category: "large" | "small" | "old" | null;
                                 beer_price: number | null;
                             }[];
                             stats: {
@@ -11273,7 +11291,8 @@ export interface paths {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
-                                category: string | null;
+                                /** @enum {string|null} */
+                                category: "large" | "small" | "old" | null;
                             }[];
                         };
                     };
@@ -11574,7 +11593,8 @@ export interface paths {
                                 /** Format: uuid */
                                 tent_id: string;
                                 name: string;
-                                category: string | null;
+                                /** @enum {string|null} */
+                                category: "large" | "small" | "old" | null;
                                 beer_price: number | null;
                             };
                         };

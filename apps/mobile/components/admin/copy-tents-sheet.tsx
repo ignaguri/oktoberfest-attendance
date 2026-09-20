@@ -45,7 +45,8 @@ export function CopyTentsSheet({
   const { t } = useTranslation();
   const apiClient = useApiClient();
 
-  const { festivals, isLoading } = useAdminFestivals();
+  // Only fetched while open, so the tents screen's first load stays cheap.
+  const { festivals, isLoading } = useAdminFestivals(isOpen);
   const copyTents = useCopyAdminFestivalTents();
 
   const [busyFestivalId, setBusyFestivalId] = useState<string | null>(null);

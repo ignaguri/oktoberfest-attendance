@@ -1,5 +1,8 @@
 import { useAdminTents, useCreateAdminTent, useUpdateAdminTent } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { TentCategory } from "@prostcounter/shared/schemas";
+import { TENT_CATEGORIES } from "@prostcounter/shared/schemas";
+import { cn } from "@prostcounter/ui";
 import { Plus, Tent } from "lucide-react-native";
 import { useCallback, useState } from "react";
 import { RefreshControl } from "react-native";
@@ -18,9 +21,57 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
-type Draft = { name: string; category: string };
+type Draft = { name: string; category: TentCategory | null };
 
-const emptyDraft: Draft = { name: "", category: "" };
+const emptyDraft: Draft = { name: "", category: null };
+
+/**
+ * Picks one of the three categories `tents_category_check` allows, or none.
+ *
+ * A text field here would let an admin type anything, and everything except
+ * those three comes back from Postgres as a constraint violation.
+ */
+function CategoryPicker({
+  value,
+  onChange,
+}: {
+  value: TentCategory | null;
+  onChange: (category: TentCategory | null) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <HStack space="sm">
+      {TENT_CATEGORIES.map((category) => {
+        const selected = value === category;
+        return (
+          <Pressable
+            key={category}
+            className={cn(
+              "flex-1 rounded-md border px-3 py-2",
+              selected ? "border-primary-500 bg-primary-50" : "border-outline-200",
+            )}
+            // Tapping the selected one clears it: category is nullable, and
+            // there is no other way back to "none" once one is chosen.
+            onPress={() => onChange(selected ? null : category)}
+            accessibilityRole="button"
+            accessibilityLabel={t(`admin.mobile.tents.category.${category}`)}
+            accessibilityState={{ selected }}
+          >
+            <Text
+              className={cn(
+                "text-center text-sm",
+                selected ? "text-primary-700" : "text-typography-600",
+              )}
+            >
+              {t(`admin.mobile.tents.category.${category}`)}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </HStack>
+  );
+}
 
 /**
  * The global tent catalogue.
@@ -47,7 +98,7 @@ export default function AdminTentsScreen() {
     try {
       await createTent.mutate({
         name: newTent.name.trim(),
-        category: newTent.category.trim() || null,
+        category: newTent.category,
       });
       setNewTent(null);
     } catch {
@@ -62,7 +113,7 @@ export default function AdminTentsScreen() {
         tentId: editing.id,
         data: {
           name: editing.draft.name.trim(),
-          category: editing.draft.category.trim() || null,
+          category: editing.draft.category,
         },
       });
       setEditing(null);
@@ -104,13 +155,10 @@ export default function AdminTentsScreen() {
                 <Text className="text-sm text-typography-500">
                   {t("admin.mobile.tents.categoryLabel")}
                 </Text>
-                <Input>
-                  <InputField
-                    value={newTent.category}
-                    onChangeText={(category) => setNewTent({ ...newTent, category })}
-                    accessibilityLabel={t("admin.mobile.tents.categoryLabel")}
-                  />
-                </Input>
+                <CategoryPicker
+                  value={newTent.category}
+                  onChange={(category) => setNewTent({ ...newTent, category })}
+                />
 
                 <HStack space="sm">
                   <Button
@@ -179,15 +227,12 @@ export default function AdminTentsScreen() {
                   <Text className="text-sm text-typography-500">
                     {t("admin.mobile.tents.categoryLabel")}
                   </Text>
-                  <Input>
-                    <InputField
-                      value={editing.draft.category}
-                      onChangeText={(category) =>
-                        setEditing({ ...editing, draft: { ...editing.draft, category } })
-                      }
-                      accessibilityLabel={t("admin.mobile.tents.categoryLabel")}
-                    />
-                  </Input>
+                  <CategoryPicker
+                    value={editing.draft.category}
+                    onChange={(category) =>
+                      setEditing({ ...editing, draft: { ...editing.draft, category } })
+                    }
+                  />
 
                   <Text className="text-sm text-typography-400">
                     {t("admin.mobile.tents.sharedHint")}
@@ -221,7 +266,7 @@ export default function AdminTentsScreen() {
                 onPress={() =>
                   setEditing({
                     id: tent.id,
-                    draft: { name: tent.name, category: tent.category ?? "" },
+                    draft: { name: tent.name, category: tent.category },
                   })
                 }
                 accessibilityRole="button"
@@ -233,7 +278,9 @@ export default function AdminTentsScreen() {
                     <VStack className="flex-1">
                       <Text className="font-semibold text-typography-900">{tent.name}</Text>
                       <Text className="text-sm text-typography-500">
-                        {tent.category ?? t("admin.mobile.tents.uncategorized")}
+                        {tent.category
+                          ? t(`admin.mobile.tents.category.${tent.category}`)
+                          : t("admin.mobile.tents.uncategorized")}
                       </Text>
                     </VStack>
                     <Tent size={20} color={IconColors.muted} />

@@ -298,6 +298,21 @@ export type UpdateAdminFestivalInput = z.infer<typeof UpdateAdminFestivalSchema>
 // =============================================================================
 
 /**
+ * The only categories a tent can have.
+ *
+ * `tents_category_check` allows exactly these three, so free text is not a
+ * looser validation, it is a 500 waiting for the first admin who types
+ * "Festzelt". Mirror the constraint here and the request fails as a 400 with
+ * a usable message instead. (The web panel offers a six-item dropdown of which
+ * none pass the check, so there is no working precedent to port.)
+ */
+export const TENT_CATEGORIES = ["large", "small", "old"] as const;
+
+const tentCategory = z.enum(TENT_CATEGORIES);
+
+export type TentCategory = (typeof TENT_CATEGORIES)[number];
+
+/**
  * A tent in the global `tents` catalogue, independent of any festival.
  *
  * Assignment and pricing live in `festival_tents`, so editing a tent here
@@ -306,21 +321,21 @@ export type UpdateAdminFestivalInput = z.infer<typeof UpdateAdminFestivalSchema>
 export const AdminTentSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  category: z.string().nullable(),
+  category: tentCategory.nullable(),
 });
 
 export type AdminTent = z.infer<typeof AdminTentSchema>;
 
 export const CreateAdminTentSchema = z.object({
   name: z.string().min(1).max(255),
-  category: z.string().min(1).max(100).nullable().optional(),
+  category: tentCategory.nullable().optional(),
 });
 
 export type CreateAdminTentInput = z.infer<typeof CreateAdminTentSchema>;
 
 export const UpdateAdminTentSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  category: z.string().min(1).max(100).nullable().optional(),
+  category: tentCategory.nullable().optional(),
 });
 
 export type UpdateAdminTentInput = z.infer<typeof UpdateAdminTentSchema>;
@@ -331,15 +346,19 @@ export type UpdateAdminTentInput = z.infer<typeof UpdateAdminTentSchema>;
  * Positive rather than non-negative because `drink_type_prices_positive_price`
  * rejects anything <= 0. "No price" is therefore null, which deletes the
  * canonical row rather than storing a zero that would read as free beer.
+ *
+ * Capped at what `festival_tents.beer_price` can hold: the column is
+ * numeric(5,2), so a typo'd 1000 would come back as `numeric field overflow`
+ * and a 500 rather than a rejected request.
  */
-const beerPriceEuros = z.number().positive().nullable();
+const beerPriceEuros = z.number().positive().max(999.99).nullable();
 
 /** A tent as assigned to one festival, carrying that festival's price for it. */
 export const AdminFestivalTentSchema = z.object({
   festival_tent_id: z.string().uuid(),
   tent_id: z.string().uuid(),
   name: z.string(),
-  category: z.string().nullable(),
+  category: tentCategory.nullable(),
   beer_price: z.number().nullable(),
 });
 

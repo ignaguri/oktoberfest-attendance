@@ -795,6 +795,10 @@ const updateTentRoute = createRoute({
       content: { "application/json": { schema: z.object({ tent: AdminTentSchema }) } },
     },
     ...errorResponses,
+    404: {
+      description: "Tent not found",
+      content: { "application/json": { schema: errorSchema } },
+    },
   },
   security: [{ bearerAuth: [] }],
 });
@@ -806,6 +810,10 @@ app.openapi(updateTentRoute, async (c) => {
 
   const adminRepo = new SupabaseAdminRepository(supabase);
   const tent = await adminRepo.updateTent(tentId, body);
+
+  if (!tent) {
+    throw new NotFoundError("Tent not found");
+  }
 
   return c.json({ tent }, 200);
 });
@@ -839,12 +847,9 @@ app.openapi(listFestivalTentsRoute, async (c) => {
   const { festivalId } = c.req.valid("param");
 
   const adminRepo = new SupabaseAdminRepository(supabase);
-  const [tents, stats] = await Promise.all([
-    adminRepo.listFestivalTents(festivalId),
-    adminRepo.getFestivalTentStats(festivalId),
-  ]);
+  const tents = await adminRepo.listFestivalTents(festivalId);
 
-  return c.json({ tents, stats }, 200);
+  return c.json({ tents, stats: adminRepo.getFestivalTentStats(tents) }, 200);
 });
 
 // GET /admin/festivals/:festivalId/tents/available - Catalogue tents not yet served

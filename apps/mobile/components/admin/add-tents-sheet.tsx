@@ -4,6 +4,7 @@ import {
   useAdminAvailableTents,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { Plus, Tent, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
 
@@ -50,6 +51,11 @@ export function AddTentsSheet({ festivalId, isOpen, onClose, onError }: AddTents
 
   const handleAdd = useCallback(
     async (tentId: string) => {
+      // Ignored while a write is in flight: the rows are plain Pressables and
+      // stay on screen until the refetch drops them, so a second tap would
+      // otherwise fire a duplicate add.
+      if (addTent.loading) return;
+
       try {
         await addTent.mutate({ festivalId, data: { tent_id: tentId } });
       } catch {
@@ -143,17 +149,21 @@ export function AddTentsSheet({ festivalId, isOpen, onClose, onError }: AddTents
             {tents.map((tent) => (
               <Pressable
                 key={tent.id}
+                className={cn(addTent.loading && "opacity-50")}
                 onPress={() => handleAdd(tent.id)}
                 accessibilityRole="button"
                 accessibilityLabel={tent.name}
                 accessibilityHint={t("admin.mobile.festivalTents.addOneHint")}
+                accessibilityState={{ disabled: addTent.loading }}
               >
                 <Card size="sm" variant="elevated">
                   <HStack className="items-center justify-between">
                     <VStack className="flex-1">
                       <Text className="text-typography-900">{tent.name}</Text>
                       <Text className="text-sm text-typography-500">
-                        {tent.category ?? t("admin.mobile.tents.uncategorized")}
+                        {tent.category
+                          ? t(`admin.mobile.tents.category.${tent.category}`)
+                          : t("admin.mobile.tents.uncategorized")}
                       </Text>
                     </VStack>
                     <Plus size={20} color={IconColors.primary} />

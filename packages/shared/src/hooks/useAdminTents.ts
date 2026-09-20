@@ -112,6 +112,10 @@ export function useCreateAdminTent() {
   return useMutation(async (data: CreateAdminTentInput) => apiClient.admin.tents.create(data), {
     onSuccess: () => {
       invalidateQueries(QueryKeys.adminTents());
+      // A new catalogue tent is available to every festival, so the pickers
+      // have to refetch. Without this the tent is missing from them until
+      // their own staleTime expires.
+      invalidateQueries(QueryKeys.adminFestivalAll());
     },
   });
 }
@@ -132,7 +136,9 @@ export function useUpdateAdminTent() {
     {
       onSuccess: () => {
         invalidateQueries(QueryKeys.adminTents());
-        invalidateQueries(["admin", "festival"]);
+        // Every festival's list and picker, via the shared prefix rather than
+        // a literal copy of it.
+        invalidateQueries(QueryKeys.adminFestivalAll());
       },
     },
   );
