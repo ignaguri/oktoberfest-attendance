@@ -132,6 +132,22 @@ export class QueryKeys {
   static tentCrowdReports = (tentId: string, festivalId: string) =>
     ["crowd-reports", tentId, festivalId] as const;
 
+  // Admin queries
+  static adminLocationSessions = (filters?: {
+    festivalId?: string;
+    userId?: string;
+    includeExpired?: boolean;
+  }) =>
+    [
+      "admin",
+      "location-sessions",
+      filters?.festivalId ?? null,
+      filters?.userId ?? null,
+      filters?.includeExpired ?? false,
+    ] as const;
+  /** Prefix covering every cached session list, for invalidation after a mutation. */
+  static adminLocationSessionsAll = () => ["admin", "location-sessions"] as const;
+
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
 }

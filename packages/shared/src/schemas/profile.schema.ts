@@ -21,6 +21,7 @@ export const ProfileSchema = z.object({
   updated_at: z.string().nullable(),
   tip_mode: TipModeSchema.default("ceiling_plus_1"),
   tip_fixed_amount: z.number().nullable().default(null),
+  is_super_admin: z.boolean().nullable().default(false),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -33,6 +34,10 @@ export const ProfileShortSchema = z.object({
   email: z.string().nullable().optional(),
   tip_mode: TipModeSchema.default("ceiling_plus_1"),
   tip_fixed_amount: z.number().nullable().default(null),
+  // Server-owned: gates the admin section in both apps. Never client-editable --
+  // UpdateProfileSchema deliberately omits it, and the only way to change it is
+  // an admin endpoint acting on another user.
+  is_super_admin: z.boolean().nullable().default(false),
 });
 
 export type ProfileShort = z.infer<typeof ProfileShortSchema>;

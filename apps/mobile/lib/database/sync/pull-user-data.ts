@@ -54,36 +54,48 @@ export async function pullProfile(db: SQLite.SQLiteDatabase, userId: string): Pr
       userId,
     ]);
 
+    const isSuperAdmin = profile.is_super_admin ? 1 : 0;
+
     if (existing) {
       // Only update if not dirty (don't overwrite local changes)
       if (existing._dirty === 0) {
         await db.runAsync(
           `UPDATE profiles SET
-            username = ?, full_name = ?, avatar_url = ?,
+            username = ?, full_name = ?, avatar_url = ?, is_super_admin = ?,
             updated_at = ?, _synced_at = ?
           WHERE id = ?`,
           [
             profile.username ?? null,
             profile.full_name ?? null,
             profile.avatar_url ?? null,
+            isSuperAdmin,
             now,
             now,
             userId,
           ],
         );
         result.updated++;
+      } else {
+        // is_super_admin is server-owned and never edited locally, so a pending
+        // local edit to username/full_name must not stall a revoked or granted
+        // admin flag. Write it on its own without clearing the dirty marker.
+        await db.runAsync(`UPDATE profiles SET is_super_admin = ? WHERE id = ?`, [
+          isSuperAdmin,
+          userId,
+        ]);
       }
     } else {
       await db.runAsync(
         `INSERT INTO profiles (
-          id, username, full_name, avatar_url, updated_at,
+          id, username, full_name, avatar_url, is_super_admin, updated_at,
           _synced_at, _dirty, _deleted
-        ) VALUES (?, ?, ?, ?, ?, ?, 0, 0)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)`,
         [
           userId,
           profile.username ?? null,
           profile.full_name ?? null,
           profile.avatar_url ?? null,
+          isSuperAdmin,
           now,
           now,
         ],

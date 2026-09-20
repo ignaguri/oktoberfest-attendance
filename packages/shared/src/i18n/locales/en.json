@@ -1486,6 +1486,20 @@
     }
   },
   "admin": {
+    "mobile": {
+      "subtitle": "Manage users, groups and festival data",
+      "openAdmin": "Open admin panel",
+      "openAdminHint": "Opens the administration area",
+      "hubDescription": "Administration tools. Changes here affect all users.",
+      "sections": {
+        "location": "Active location sharing sessions"
+      },
+      "location": {
+        "cleanupHint": "Marks every expired session as inactive",
+        "forceStopHint": "Stops this session regardless of who started it",
+        "forceStopConfirm": "This stops the session for that user immediately. Continue?"
+      }
+    },
     "pageTitle": "Admin Panel",
     "dashboard": "Admin Dashboard",
     "tabs": {

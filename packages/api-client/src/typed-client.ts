@@ -7,6 +7,7 @@
 
 // Import shared schema types
 import type {
+  AdminLocationSession,
   AttendanceByDate,
   CarryOverCandidatesResponse,
   Consumption,
@@ -2609,6 +2610,81 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to get friendship status");
         }
         return parseJsonResponse<FriendshipStatusCheck>(response);
+      },
+    },
+
+    /**
+     * Admin API
+     *
+     * Every path here sits behind the requireAdmin middleware, so a non-admin
+     * caller gets a 403 ApiError rather than an empty result.
+     */
+    admin: {
+      location: {
+        async listSessions(query?: {
+          festivalId?: string;
+          userId?: string;
+          includeExpired?: boolean;
+        }): Promise<{ sessions: AdminLocationSession[] }> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query?.festivalId) params.set("festivalId", query.festivalId);
+          if (query?.userId) params.set("userId", query.userId);
+          if (query?.includeExpired) params.set("includeExpired", "true");
+
+          const url = `${baseUrl}/v1/admin/location/sessions?${params}`;
+          const response = await fetchWithLogging("GET", url, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch location sessions");
+          }
+          return parseJsonResponse<{ sessions: AdminLocationSession[] }>(response);
+        },
+
+        async forceStopSession(sessionId: string): Promise<{
+          success: boolean;
+          session: {
+            id: string;
+            userId: string;
+            festivalId: string;
+            isActive: boolean;
+            startedAt: string;
+            expiresAt: string;
+          };
+        }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/location/sessions/${sessionId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to stop location session");
+          }
+          return parseJsonResponse<{
+            success: boolean;
+            session: {
+              id: string;
+              userId: string;
+              festivalId: string;
+              isActive: boolean;
+              startedAt: string;
+              expiresAt: string;
+            };
+          }>(response);
+        },
+
+        async cleanupExpiredSessions(): Promise<{ success: boolean; cleanedCount: number }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/location/sessions/cleanup`,
+            { method: "POST", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to cleanup expired sessions");
+          }
+          return parseJsonResponse<{ success: boolean; cleanedCount: number }>(response);
+        },
       },
     },
   };
