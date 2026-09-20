@@ -1828,6 +1828,14 @@
     "users": {
       "title": "Benutzer-Verwaltung",
       "search": "Benutzer suchen",
+      "form": {
+        "emailNote": "Die E-Mail-Adresse kann nicht geändert werden",
+        "newPassword": "Neues Passwort (leer lassen, um es beizubehalten)",
+        "fullName": "Vollständiger Name",
+        "username": "Benutzername",
+        "isSuperAdmin": "Ist Super-Admin",
+        "updateUser": "Benutzer aktualisieren"
+      },
       "makeAdmin": "Zum Admin machen",
       "removeAdmin": "Admin entfernen"
     }
