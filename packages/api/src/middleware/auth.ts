@@ -38,8 +38,12 @@ function recordActiveDay(
       p_user_id: userId,
       p_platform: platform ?? null,
       p_app_version: appVersion ?? null,
-      // Omitted rather than null when absent, so web and older mobile clients
-      // still hit the pre-migration 3-arg function if the API deploys first.
+      // Omitted rather than sent as null when the client did not report it.
+      // 20260919120000 dropped the 3-arg function for this one, whose
+      // p_push_permission defaults to null, so on a migrated database the two
+      // forms resolve identically. Omitting only still matters against a local
+      // database that has not run that migration, where a fourth argument finds
+      // no function to bind to.
       ...(pushPermission !== undefined ? { p_push_permission: pushPermission } : {}),
     })
     .then(({ data: isNewDay, error }) => {
