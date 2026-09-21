@@ -14,6 +14,7 @@ import {
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseReservationRepository } from "../repositories/supabase";
 import { ReservationService } from "../services/reservation.service";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -48,10 +49,7 @@ const createReservationRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -59,10 +57,7 @@ const createReservationRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -108,10 +103,7 @@ const checkinReservationRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -119,10 +111,7 @@ const checkinReservationRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -130,10 +119,7 @@ const checkinReservationRoute = createRoute({
       description: "Reservation not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -176,10 +162,7 @@ const listReservationsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -239,10 +222,7 @@ const cancelReservationRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -250,10 +230,7 @@ const cancelReservationRoute = createRoute({
       description: "Reservation not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -296,10 +273,7 @@ const getReservationRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -307,10 +281,7 @@ const getReservationRoute = createRoute({
       description: "Reservation not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -360,10 +331,7 @@ const updateReservationRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -371,10 +339,7 @@ const updateReservationRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -382,10 +347,7 @@ const updateReservationRoute = createRoute({
       description: "Reservation not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },

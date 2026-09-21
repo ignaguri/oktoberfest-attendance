@@ -14,6 +14,7 @@ import { SupabaseLocationRepository } from "../repositories/supabase";
 import { LocationService } from "../services/location.service";
 import { NotificationService } from "../services/notification.service";
 import { createAdminClient } from "../utils/admin-client";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -65,10 +66,7 @@ const startSessionRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -76,10 +74,7 @@ const startSessionRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -87,10 +82,7 @@ const startSessionRoute = createRoute({
       description: "Conflict - User already has active session for this festival",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -148,10 +140,7 @@ const stopSessionRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -159,10 +148,7 @@ const stopSessionRoute = createRoute({
       description: "Session not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -216,10 +202,7 @@ const updateLocationRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -227,10 +210,7 @@ const updateLocationRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -238,10 +218,7 @@ const updateLocationRoute = createRoute({
       description: "Session not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -285,10 +262,7 @@ const getNearbyMembersRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -296,10 +270,7 @@ const getNearbyMembersRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -373,10 +344,7 @@ const adminGetSessionsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -384,10 +352,7 @@ const adminGetSessionsRoute = createRoute({
       description: "Forbidden - User is not an admin",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -445,10 +410,7 @@ const adminForceStopSessionRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -456,10 +418,7 @@ const adminForceStopSessionRoute = createRoute({
       description: "Forbidden - User is not an admin",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -467,10 +426,7 @@ const adminForceStopSessionRoute = createRoute({
       description: "Session not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -512,10 +468,7 @@ const adminCleanupSessionsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -523,10 +476,7 @@ const adminCleanupSessionsRoute = createRoute({
       description: "Forbidden - User is not an admin",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },

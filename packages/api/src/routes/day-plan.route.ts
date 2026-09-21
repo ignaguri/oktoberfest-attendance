@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   DayPlanFestivalParamSchema,
   DayPlanPathParamsSchema,
@@ -15,13 +15,11 @@ import type { AuthContext } from "../middleware/auth";
 import { SupabaseDayPlanRepository } from "../repositories/supabase";
 import { DayPlanService } from "../services/day-plan.service";
 import { NotificationService } from "../services/notification.service";
+import { ApiErrorSchema } from "../lib/error-response";
 
 const app = new OpenAPIHono<AuthContext>();
 
-const ErrorResponseSchema = z.object({
-  error: z.string(),
-  message: z.string(),
-});
+const ErrorResponseSchema = ApiErrorSchema;
 
 function errorResponse(description: string) {
   return {

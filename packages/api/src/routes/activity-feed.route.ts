@@ -1,8 +1,9 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import type { ActivityFeedItem } from "@prostcounter/shared";
 import { GetActivityFeedQuerySchema, GetActivityFeedResponseSchema } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -30,10 +31,7 @@ const getActivityFeedRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },

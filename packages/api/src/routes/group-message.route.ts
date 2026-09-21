@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   CreateMessageResponseSchema,
   CreateMessageSchema,
@@ -15,6 +15,7 @@ import {
 
 import type { AuthContext } from "../middleware/auth";
 import { ForbiddenError, NotFoundError } from "../middleware/error";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -80,7 +81,7 @@ const listGroupMessagesRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -88,7 +89,7 @@ const listGroupMessagesRoute = createRoute({
       description: "Forbidden - Not a group member",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -236,7 +237,7 @@ const getMessageFeedRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -367,7 +368,7 @@ const createMessageRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -375,7 +376,7 @@ const createMessageRoute = createRoute({
       description: "Forbidden - Not a member of any group in this festival",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -473,7 +474,7 @@ const updateMessageRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -481,7 +482,7 @@ const updateMessageRoute = createRoute({
       description: "Forbidden - Not the message author",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -489,7 +490,7 @@ const updateMessageRoute = createRoute({
       description: "Message not found",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -584,7 +585,7 @@ const deleteMessageRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -592,7 +593,7 @@ const deleteMessageRoute = createRoute({
       description: "Forbidden - Not the message author",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -600,7 +601,7 @@ const deleteMessageRoute = createRoute({
       description: "Message not found",
       content: {
         "application/json": {
-          schema: z.object({ error: z.string(), message: z.string() }),
+          schema: ApiErrorSchema,
         },
       },
     },

@@ -6,6 +6,7 @@ import {
 
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseCalendarRepository } from "../repositories/supabase";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -34,10 +35,7 @@ const getPersonalCalendarRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -89,10 +87,7 @@ const getGroupCalendarRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -100,10 +95,7 @@ const getGroupCalendarRoute = createRoute({
       description: "Group not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },

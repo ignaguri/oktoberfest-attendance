@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   FriendActionResponseSchema,
   FriendRequestCountResponseSchema,
@@ -19,13 +19,11 @@ import { SupabaseFriendRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { FriendService } from "../services/friend.service";
 import { NotificationService } from "../services/notification.service";
+import { ApiErrorSchema } from "../lib/error-response";
 
 const app = new OpenAPIHono<AuthContext>();
 
-const ErrorResponseSchema = z.object({
-  error: z.string(),
-  message: z.string(),
-});
+const ErrorResponseSchema = ApiErrorSchema;
 
 // GET /friends - List accepted friends
 const listFriendsRoute = createRoute({

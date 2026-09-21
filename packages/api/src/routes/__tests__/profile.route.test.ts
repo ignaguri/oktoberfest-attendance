@@ -352,7 +352,7 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
 
       expect(res.status).toBe(404);
       const body = (await res.json()) as any;
-      expect(body.error).toBe("Not Found");
+      expect(body.error.code).toBe("NOT_FOUND");
     });
 
     it("should validate UUID format for userId", async () => {

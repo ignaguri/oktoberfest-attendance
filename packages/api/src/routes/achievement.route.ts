@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import type { AchievementLeaderboardEntry, AvailableAchievement } from "@prostcounter/shared";
 import {
   GetAchievementLeaderboardResponseSchema,
@@ -16,6 +16,7 @@ import type { AuthContext } from "../middleware/auth";
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
 import { SupabaseAchievementRepository } from "../repositories/supabase";
 import { buildRecentUnlocks, buildSeriesCards } from "../services/achievement-cards";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -43,10 +44,7 @@ const listAchievementsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -88,10 +86,7 @@ const getAchievementsWithProgressRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -162,10 +157,7 @@ const getAchievementLeaderboardRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -217,10 +209,7 @@ const listAvailableAchievementsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -279,10 +268,7 @@ const getPendingUnlocksRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -330,10 +316,7 @@ const markUnlocksSeenRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },

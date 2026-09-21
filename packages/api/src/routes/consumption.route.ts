@@ -12,6 +12,7 @@ import {
 } from "../repositories/supabase";
 import { ConsumptionService } from "../services/consumption.service";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Query schema for listing consumptions
 const ListConsumptionsQuerySchema = z.object({
@@ -67,10 +68,7 @@ const logConsumptionRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -78,10 +76,7 @@ const logConsumptionRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -137,10 +132,7 @@ const listConsumptionsRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -148,10 +140,7 @@ const listConsumptionsRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -193,10 +182,7 @@ const deleteConsumptionRoute = createRoute({
       description: "Validation error",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -204,10 +190,7 @@ const deleteConsumptionRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -215,10 +198,7 @@ const deleteConsumptionRoute = createRoute({
       description: "Consumption not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },

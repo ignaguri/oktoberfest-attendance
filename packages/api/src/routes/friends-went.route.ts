@@ -1,16 +1,14 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { GetFriendsWentQuerySchema, GetFriendsWentResponseSchema } from "@prostcounter/shared";
 
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseFriendsWentRepository } from "../repositories/supabase";
 import { FriendsWentService } from "../services/friends-went.service";
+import { ApiErrorSchema } from "../lib/error-response";
 
 const app = new OpenAPIHono<AuthContext>();
 
-const ErrorResponseSchema = z.object({
-  error: z.string(),
-  message: z.string(),
-});
+const ErrorResponseSchema = ApiErrorSchema;
 
 function errorResponse(description: string) {
   return {

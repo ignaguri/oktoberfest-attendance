@@ -64,10 +64,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -76,10 +73,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -177,10 +171,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -189,10 +180,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -246,10 +234,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -258,10 +243,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Consumption not found */
@@ -270,10 +252,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -366,10 +345,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -432,10 +408,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -444,10 +417,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -530,10 +500,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -589,10 +556,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Attendance not found */
@@ -601,10 +565,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -682,10 +643,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -694,10 +652,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -765,10 +720,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -777,10 +729,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -848,10 +797,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Reservation not found or already processed */
@@ -860,10 +806,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -924,10 +867,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -990,10 +930,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -1002,10 +939,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1139,10 +1073,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1206,10 +1137,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1278,10 +1206,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -1290,10 +1215,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1349,10 +1271,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1417,10 +1336,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1485,10 +1401,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1535,10 +1448,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1598,10 +1508,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict */
@@ -1610,10 +1517,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1666,10 +1570,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Not found */
@@ -1678,10 +1579,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1734,10 +1632,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Not found */
@@ -1746,10 +1641,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1803,10 +1695,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1859,10 +1748,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1913,10 +1799,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -1975,10 +1858,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2030,10 +1910,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2088,10 +1965,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden */
@@ -2100,10 +1974,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Not found */
@@ -2112,10 +1983,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict */
@@ -2124,10 +1992,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2178,10 +2043,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden */
@@ -2190,10 +2052,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Not found */
@@ -2202,10 +2061,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict */
@@ -2214,10 +2070,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2275,10 +2128,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2330,10 +2180,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden */
@@ -2342,10 +2189,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Not found */
@@ -2354,10 +2198,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict */
@@ -2366,10 +2207,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2422,10 +2260,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden */
@@ -2434,10 +2269,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Not found */
@@ -2446,10 +2278,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict */
@@ -2458,10 +2287,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2531,10 +2357,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2599,10 +2422,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2662,10 +2482,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2727,10 +2544,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2800,10 +2614,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not a group member */
@@ -2812,10 +2623,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -2824,10 +2632,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2888,10 +2693,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not the group creator */
@@ -2900,10 +2702,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -2912,10 +2711,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -2975,10 +2771,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Invalid invite token */
@@ -2987,10 +2780,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -2999,10 +2789,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict - Already a member */
@@ -3011,10 +2798,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3067,10 +2851,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not a group member */
@@ -3079,10 +2860,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -3091,10 +2869,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3153,10 +2928,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not a group member */
@@ -3165,10 +2937,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -3177,10 +2946,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3237,10 +3003,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not the group creator */
@@ -3249,10 +3012,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group or member not found */
@@ -3261,10 +3021,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3315,10 +3072,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not the group creator */
@@ -3327,10 +3081,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -3339,10 +3090,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3417,10 +3165,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not the group creator */
@@ -3429,10 +3174,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group or festival not found */
@@ -3441,10 +3183,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Already carried over, name taken, or festival ended */
@@ -3453,10 +3192,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3521,10 +3257,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not a group member */
@@ -3533,10 +3266,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -3545,10 +3275,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3626,10 +3353,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Invalid invite token */
@@ -3638,10 +3362,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict - Already a member */
@@ -3650,10 +3371,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3724,10 +3442,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not a group member */
@@ -3736,10 +3451,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3811,10 +3523,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3895,10 +3604,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not a member of any group in this festival */
@@ -3907,10 +3613,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -3986,10 +3689,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not the message author */
@@ -3998,10 +3698,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Message not found */
@@ -4010,10 +3707,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4051,10 +3745,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not the message author */
@@ -4063,10 +3754,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Message not found */
@@ -4075,10 +3763,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4128,10 +3813,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4201,10 +3883,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4270,10 +3949,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - Not a group member */
@@ -4282,10 +3958,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -4294,10 +3967,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4383,10 +4053,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4532,10 +4199,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4596,10 +4260,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4661,10 +4322,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4728,10 +4386,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4789,10 +4444,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4850,10 +4502,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4914,10 +4563,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -4977,10 +4623,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5041,10 +4684,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5092,10 +4732,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5193,10 +4830,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival not found */
@@ -5205,10 +4839,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5316,10 +4947,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival not found or no data available */
@@ -5328,10 +4956,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5384,10 +5009,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5444,10 +5066,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5510,10 +5129,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - not an admin */
@@ -5522,10 +5138,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5612,10 +5225,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5701,10 +5311,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -5713,10 +5320,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5804,10 +5408,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -5816,10 +5417,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Reservation not found */
@@ -5828,10 +5426,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -5911,10 +5506,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Reservation not found */
@@ -5923,10 +5515,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6006,10 +5595,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -6018,10 +5604,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Reservation not found */
@@ -6030,10 +5613,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6101,10 +5681,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Reservation not found */
@@ -6113,10 +5690,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6213,10 +5787,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6348,10 +5919,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -6360,10 +5928,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival not found */
@@ -6372,10 +5937,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description The day's reservation can no longer be changed */
@@ -6384,10 +5946,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6426,10 +5985,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description The day has no plan */
@@ -6438,10 +5994,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description The day's reservation already happened and can't be cancelled */
@@ -6450,10 +6003,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6532,10 +6082,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival not found */
@@ -6544,10 +6091,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6610,10 +6154,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival not found */
@@ -6622,10 +6163,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6699,10 +6237,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -6711,10 +6246,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival not found */
@@ -6723,10 +6255,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6819,10 +6348,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -6831,10 +6357,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict - User already has active session for this festival */
@@ -6843,10 +6366,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6911,10 +6431,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -6923,10 +6440,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Session not found */
@@ -6935,10 +6449,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -6994,10 +6505,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Session not found */
@@ -7006,10 +6514,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7087,10 +6592,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7099,10 +6601,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7179,10 +6678,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -7191,10 +6687,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7260,10 +6753,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -7272,10 +6762,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Session not found */
@@ -7284,10 +6771,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7337,10 +6821,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -7349,10 +6830,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7412,10 +6890,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7424,10 +6899,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Attendance not found */
@@ -7436,10 +6908,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7516,10 +6985,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Photo not found */
@@ -7528,10 +6994,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7601,10 +7064,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7613,10 +7073,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7671,10 +7128,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Photo not found */
@@ -7683,10 +7137,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7735,10 +7186,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7781,10 +7229,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7840,10 +7285,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7900,10 +7342,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -7951,10 +7390,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8013,10 +7449,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Photo not found */
@@ -8025,10 +7458,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8087,10 +7517,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - some photos don't belong to user */
@@ -8099,10 +7526,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8164,10 +7588,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - not a group member */
@@ -8176,10 +7597,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8225,10 +7643,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - not a group member */
@@ -8237,10 +7652,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Conflict - reaction already exists */
@@ -8249,10 +7661,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8297,10 +7706,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8358,10 +7764,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - not a group member */
@@ -8370,10 +7773,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8423,10 +7823,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - not a group member */
@@ -8435,10 +7832,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8492,10 +7886,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Comment not found */
@@ -8504,10 +7895,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8569,10 +7957,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8636,10 +8021,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description The requested username already belongs to another account */
@@ -8648,10 +8030,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8688,10 +8067,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8756,10 +8132,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description User not found */
@@ -8768,10 +8141,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8824,10 +8194,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8879,10 +8246,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8932,10 +8296,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -8988,10 +8349,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9058,10 +8416,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9118,10 +8473,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */
@@ -9130,10 +8482,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9192,10 +8541,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9263,10 +8609,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9329,10 +8672,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9402,10 +8742,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9476,10 +8813,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Rate limited - recent report exists */
@@ -9488,10 +8822,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9561,10 +8892,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -9573,10 +8901,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9642,10 +8967,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -9654,10 +8976,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description User not found */
@@ -9666,10 +8985,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9705,10 +9021,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -9717,10 +9030,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9782,10 +9092,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -9794,10 +9101,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description The requested username already belongs to another account */
@@ -9806,10 +9110,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9869,10 +9170,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -9881,10 +9179,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -9941,10 +9236,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -9953,10 +9245,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10016,10 +9305,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10028,10 +9314,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10083,10 +9366,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10095,10 +9375,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10145,10 +9422,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10157,10 +9431,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Attendance not found */
@@ -10169,10 +9440,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description The user already has an attendance on the requested date */
@@ -10181,10 +9449,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10240,10 +9505,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10252,10 +9514,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10305,10 +9564,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10317,10 +9573,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10381,10 +9634,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10393,10 +9643,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Group not found */
@@ -10405,10 +9652,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10447,10 +9691,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10459,10 +9700,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10506,10 +9744,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10518,10 +9753,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10573,10 +9805,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10585,10 +9814,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10654,10 +9880,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10666,10 +9889,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10744,10 +9964,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10756,10 +9973,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10825,10 +10039,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10837,10 +10048,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival not found */
@@ -10849,10 +10057,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -10891,10 +10096,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -10903,10 +10105,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Festival still has dependent data */
@@ -10995,10 +10194,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11007,10 +10203,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11057,10 +10250,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11069,10 +10259,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11119,10 +10306,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11131,10 +10315,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11204,10 +10385,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11216,10 +10394,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Tent not found */
@@ -11228,10 +10403,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11291,10 +10463,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11303,10 +10472,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11349,10 +10515,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11361,10 +10524,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11417,10 +10577,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11429,10 +10586,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11492,10 +10646,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11504,10 +10655,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11569,10 +10717,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11581,10 +10726,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11638,10 +10780,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11650,10 +10789,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Tent has visits at this festival */
@@ -11662,10 +10798,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11720,10 +10853,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11732,10 +10862,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Tent is not assigned to this festival */
@@ -11744,10 +10871,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11802,10 +10926,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Forbidden - User is not an admin */
@@ -11814,10 +10935,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            error: string;
-                            message: string;
-                        };
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
             };
@@ -11833,7 +10951,16 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        ApiError: {
+            error: {
+                message: string;
+                code: string;
+                statusCode: number;
+                errors?: unknown;
+            };
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;

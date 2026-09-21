@@ -12,18 +12,17 @@ import {
 } from "@prostcounter/shared";
 
 import { logger } from "../lib/logger";
+import { ConflictError, ForbiddenError, NotFoundError } from "../middleware/error";
 import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
 
 // ===== Error Schemas =====
-const ErrorSchema = z.object({
-  error: z.string(),
-  message: z.string(),
-});
+const ErrorSchema = ApiErrorSchema;
 
 // ===== GET /photos/:photoId/reactions =====
 const getReactionsRoute = createRoute({
@@ -73,7 +72,7 @@ app.openapi(getReactionsRoute, async (c) => {
     .single();
 
   if (!membership) {
-    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
+    throw new ForbiddenError("You are not a member of this group");
   }
 
   // Fetch reactions with user profiles
@@ -204,7 +203,7 @@ app.openapi(addReactionRoute, async (c) => {
   }
 
   if (!membership) {
-    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
+    throw new ForbiddenError("You are not a member of this group");
   }
 
   // Insert reaction (unique constraint prevents duplicates)
@@ -218,7 +217,7 @@ app.openapi(addReactionRoute, async (c) => {
   if (error) {
     if (error.code === PgErrorCode.UNIQUE_VIOLATION) {
       // Unique constraint violation
-      return c.json({ error: "CONFLICT", message: "You already reacted with this emoji" }, 409);
+      throw new ConflictError("You already reacted with this emoji");
     }
     throw new Error(`Failed to add reaction: ${error.message}`);
   }
@@ -347,7 +346,7 @@ app.openapi(getCommentsRoute, async (c) => {
     .single();
 
   if (!membership) {
-    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
+    throw new ForbiddenError("You are not a member of this group");
   }
 
   // Fetch comments with user profiles
@@ -441,7 +440,7 @@ app.openapi(addCommentRoute, async (c) => {
     .single();
 
   if (!membership) {
-    return c.json({ error: "FORBIDDEN", message: "You are not a member of this group" }, 403);
+    throw new ForbiddenError("You are not a member of this group");
   }
 
   // Insert comment
@@ -518,13 +517,7 @@ app.openapi(deleteCommentRoute, async (c) => {
   }
 
   if (count === 0) {
-    return c.json(
-      {
-        error: "NOT_FOUND",
-        message: "Comment not found or you do not have permission to delete it",
-      },
-      404,
-    );
+    throw new NotFoundError("Comment not found or you do not have permission to delete it");
   }
 
   return c.json({ success: true }, 200);

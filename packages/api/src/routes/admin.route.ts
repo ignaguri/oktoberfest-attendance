@@ -29,6 +29,7 @@ import {
 import type { AuthContext } from "../middleware/auth";
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from "../middleware/error";
 import { SupabaseAdminRepository } from "../repositories/supabase/admin.repository";
+import { ApiErrorSchema } from "../lib/error-response";
 
 /**
  * Admin routes for user and attendance management.
@@ -40,17 +41,14 @@ import { SupabaseAdminRepository } from "../repositories/supabase/admin.reposito
  */
 const app = new OpenAPIHono<AuthContext>();
 
-/** Shared error body for the documented failure responses. */
-const errorSchema = z.object({ error: z.string(), message: z.string() });
-
 const errorResponses = {
   401: {
     description: "Unauthorized",
-    content: { "application/json": { schema: errorSchema } },
+    content: { "application/json": { schema: ApiErrorSchema } },
   },
   403: {
     description: "Forbidden - User is not an admin",
-    content: { "application/json": { schema: errorSchema } },
+    content: { "application/json": { schema: ApiErrorSchema } },
   },
 } as const;
 
@@ -107,7 +105,7 @@ const getUserRoute = createRoute({
     ...errorResponses,
     404: {
       description: "User not found",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -149,7 +147,7 @@ const updateUserProfileRoute = createRoute({
     ...errorResponses,
     409: {
       description: "The requested username already belongs to another account",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -323,11 +321,11 @@ const updateAttendanceRoute = createRoute({
     ...errorResponses,
     404: {
       description: "Attendance not found",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
     409: {
       description: "The user already has an attendance on the requested date",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -439,7 +437,7 @@ const getGroupRoute = createRoute({
     ...errorResponses,
     404: {
       description: "Group not found",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -630,7 +628,7 @@ const getFestivalRoute = createRoute({
     ...errorResponses,
     404: {
       description: "Festival not found",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -837,7 +835,7 @@ const updateTentRoute = createRoute({
     ...errorResponses,
     404: {
       description: "Tent not found",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -1034,7 +1032,7 @@ const updateFestivalTentPriceRoute = createRoute({
     ...errorResponses,
     404: {
       description: "Tent is not assigned to this festival",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],
@@ -1073,7 +1071,7 @@ const removeFestivalTentRoute = createRoute({
     ...errorResponses,
     409: {
       description: "Tent has visits at this festival",
-      content: { "application/json": { schema: errorSchema } },
+      content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
   security: [{ bearerAuth: [] }],

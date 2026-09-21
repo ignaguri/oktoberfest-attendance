@@ -190,7 +190,7 @@ describe("Photo Social Routes", () => {
       const json = (await res.json()) as any;
 
       expect(res.status).toBe(403);
-      expect(json.error).toBe("FORBIDDEN");
+      expect(json.error.code).toBe("FORBIDDEN");
     });
 
     it("should return 401 when not authenticated", async () => {
@@ -260,7 +260,7 @@ describe("Photo Social Routes", () => {
       const json = (await res.json()) as any;
 
       expect(res.status).toBe(409);
-      expect(json.error).toBe("CONFLICT");
+      expect(json.error.code).toBe("CONFLICT");
     });
 
     it("should return 403 when user is not a group member", async () => {
@@ -276,7 +276,7 @@ describe("Photo Social Routes", () => {
       const json = (await res.json()) as any;
 
       expect(res.status).toBe(403);
-      expect(json.error).toBe("FORBIDDEN");
+      expect(json.error.code).toBe("FORBIDDEN");
     });
 
     // Distinct from the 403 above: a failed membership query must not be
@@ -295,7 +295,7 @@ describe("Photo Social Routes", () => {
       const json = (await res.json()) as any;
 
       expect(res.status).toBe(500);
-      expect(json.error).not.toBe("FORBIDDEN");
+      expect(json.error.code).not.toBe("FORBIDDEN");
     });
 
     it("should return 401 when not authenticated", async () => {
@@ -494,7 +494,7 @@ describe("Photo Social Routes", () => {
       const json = (await res.json()) as any;
 
       expect(res.status).toBe(403);
-      expect(json.error).toBe("FORBIDDEN");
+      expect(json.error.code).toBe("FORBIDDEN");
     });
 
     it("should return 401 when not authenticated", async () => {
@@ -575,7 +575,7 @@ describe("Photo Social Routes", () => {
       const json = (await res.json()) as any;
 
       expect(res.status).toBe(403);
-      expect(json.error).toBe("FORBIDDEN");
+      expect(json.error.code).toBe("FORBIDDEN");
     });
 
     it("should return 401 when not authenticated", async () => {
@@ -654,7 +654,7 @@ describe("Photo Social Routes", () => {
       const json = (await res.json()) as any;
 
       expect(res.status).toBe(404);
-      expect(json.error).toBe("NOT_FOUND");
+      expect(json.error.code).toBe("NOT_FOUND");
     });
 
     it("should return 401 when not authenticated", async () => {

@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   GroupActionResponseSchema,
   GroupIdParamSchema,
@@ -13,15 +13,13 @@ import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupJoinRequestService } from "../services/group-join-request.service";
 import { NotificationService } from "../services/notification.service";
 import { createAdminClient } from "../utils/admin-client";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Registered before group.route.ts in index.ts: GET /groups/{id} there would
 // otherwise match GET /groups/join-requests/incoming and reject it as a bad uuid.
 const app = new OpenAPIHono<AuthContext>();
 
-const ErrorResponseSchema = z.object({
-  error: z.string(),
-  message: z.string(),
-});
+const ErrorResponseSchema = ApiErrorSchema;
 
 const errorResponses = {
   401: {

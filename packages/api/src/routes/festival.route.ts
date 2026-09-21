@@ -1,4 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
   FestivalIdParamSchema,
   GetFestivalResponseSchema,
@@ -9,6 +9,7 @@ import {
 import type { AuthContext } from "../middleware/auth";
 import { NotFoundError } from "../middleware/error";
 import { SupabaseFestivalRepository } from "../repositories/supabase";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -69,10 +70,7 @@ const getFestivalRoute = createRoute({
       description: "Festival not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },

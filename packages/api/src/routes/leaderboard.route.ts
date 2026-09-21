@@ -10,6 +10,7 @@ import {
 import type { AuthContext } from "../middleware/auth";
 import { ForbiddenError, NotFoundError } from "../middleware/error";
 import { SupabaseGroupRepository, SupabaseLeaderboardRepository } from "../repositories/supabase";
+import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -34,10 +35,7 @@ const winningCriteriaRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -77,10 +75,7 @@ const globalLeaderboardRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -132,10 +127,7 @@ const groupLeaderboardRoute = createRoute({
       description: "Unauthorized",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -143,10 +135,7 @@ const groupLeaderboardRoute = createRoute({
       description: "Forbidden - Not a group member",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
@@ -154,10 +143,7 @@ const groupLeaderboardRoute = createRoute({
       description: "Group not found",
       content: {
         "application/json": {
-          schema: z.object({
-            error: z.string(),
-            message: z.string(),
-          }),
+          schema: ApiErrorSchema,
         },
       },
     },
