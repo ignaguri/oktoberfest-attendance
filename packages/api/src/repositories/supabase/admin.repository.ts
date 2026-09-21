@@ -201,8 +201,14 @@ export class SupabaseAdminRepository {
 
     if (search) {
       const term = sanitizeSearchTerm(search);
-      const lowered = term.toLowerCase();
       const pattern = `%${term}%`;
+
+      // Email is compared in JS below, so it uses the raw term rather than the
+      // sanitized one. sanitizeSearchTerm strips `.` along with the wildcards,
+      // which turns a pasted address into "user5examplecom" and matches
+      // nobody; there is no filter syntax on this side to protect, and no
+      // length cap either, since truncating the needle would only widen it.
+      const emailTerm = search.trim().toLowerCase();
 
       // Two separate ilike queries rather than one .or() filter: the search
       // term would otherwise be interpolated into PostgREST filter syntax.
@@ -226,7 +232,7 @@ export class SupabaseAdminRepository {
       matchingIds = authUsers
         .filter(
           (user) =>
-            profileMatches.has(user.id) || user.email?.toLowerCase().includes(lowered) === true,
+            profileMatches.has(user.id) || user.email?.toLowerCase().includes(emailTerm) === true,
         )
         .map((user) => user.id);
     } else {

@@ -116,6 +116,28 @@ describe("Admin Routes - Unit Tests", () => {
       expect(body.truncated).toBe(false);
     });
 
+    // A pasted address is the natural way to look one user up, and the dot is
+    // stripped by the wildcard sanitizer that guards the profile ilike lanes.
+    // The email lane compares in memory, so it has to see the term untouched.
+    it("finds a user by their full email address", async () => {
+      mockListUsers.mockResolvedValue({
+        data: {
+          users: [
+            { id: OTHER_ID, email: "user5@example.com", created_at: "2026-01-01T00:00:00Z" },
+            { id: ADMIN_ID, email: "someone@example.com", created_at: "2026-01-01T00:00:00Z" },
+          ],
+        },
+        error: null,
+      });
+
+      const res = await app.request(createAuthRequest("/admin/users?search=user5%40example.com"));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.users).toHaveLength(1);
+      expect(body.users[0].email).toBe("user5@example.com");
+    });
+
     it("requires an authorization header", async () => {
       const res = await app.request("/admin/users");
       expect(res.status).toBe(401);
