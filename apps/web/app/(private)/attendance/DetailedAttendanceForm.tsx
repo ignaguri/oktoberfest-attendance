@@ -5,7 +5,7 @@
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useConsumptions, useDrinkPrice, useTipCalculation } from "@prostcounter/shared/hooks";
+import { useConsumptions, useTipCalculation } from "@prostcounter/shared/hooks";
 import type {
   AttendanceByDate,
   DetailedAttendanceForm,
@@ -18,6 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { DrinkTypePicker } from "@/components/attendance/drink-type-picker";
+import { useDrinkPrice } from "@/hooks/useDrinkPrice";
 import { LocalDrinkStepper } from "@/components/attendance/local-drink-stepper";
 import TentSelector from "@/components/TentSelector";
 import { Button } from "@/components/ui/button";
@@ -43,9 +44,7 @@ export default function DetailedAttendanceForm({
 }: DetailedAttendanceFormProps) {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const { getDrinkPriceCents } = useDrinkPrice({
-    festivalBeerCost: currentFestival?.beerCost,
-  });
+  const { getDrinkPriceCents } = useDrinkPrice();
   const { calculatePricePaid } = useTipCalculation();
   const [existingAttendance, setExistingAttendance] = useState<AttendanceByDate | null>(null);
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");

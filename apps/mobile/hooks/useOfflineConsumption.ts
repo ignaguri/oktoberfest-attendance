@@ -22,6 +22,15 @@ import {
 import { logger } from "@/lib/logger";
 
 type OfflineLogConsumptionInput = LogConsumptionInput & {
+  /**
+   * Still required here, even though the API now treats it as optional.
+   *
+   * The local SQLite row is NOT NULL and is written before anything touches
+   * the network, so the device has to have a number to show straight away.
+   * The server recomputes the authoritative price when the row is pushed, so
+   * this is an optimistic value rather than the stored one.
+   */
+  pricePaidCents: number;
   skipDedup?: boolean;
   skipSideEffects?: boolean;
 };
@@ -29,7 +38,7 @@ type OfflineLogConsumptionInput = LogConsumptionInput & {
 function buildConsumptionResult(
   id: string,
   attendanceId: string,
-  input: LogConsumptionInput,
+  input: OfflineLogConsumptionInput,
   now: string,
 ): Consumption {
   return {

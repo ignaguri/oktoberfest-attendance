@@ -10,6 +10,7 @@ function festival(id: string, startDate: string, endDate: string): Festival {
     startDate,
     endDate,
     beerCost: null,
+    drinkPrices: {},
     location: null,
     latitude: null,
     longitude: null,

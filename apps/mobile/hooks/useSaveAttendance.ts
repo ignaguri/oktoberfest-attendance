@@ -127,7 +127,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
             if (delta > 0) {
               // Need to create more consumptions
               const tentId = tents?.[0]; // Use first tent
-              const priceCents = getDrinkPriceCents(drinkType, tentId);
+              const priceCents = getDrinkPriceCents(drinkType);
               for (let i = 0; i < delta; i++) {
                 await logConsumption.mutateAsync({
                   festivalId,

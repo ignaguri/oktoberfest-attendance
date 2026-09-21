@@ -105,6 +105,10 @@
                     "type": "integer",
                     "minimum": 0
                   },
+                  "pricePaidOverrideCents": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
                   "volumeMl": {
                     "type": "integer",
                     "minimum": 1,
@@ -125,8 +129,7 @@
                 },
                 "required": [
                   "festivalId",
-                  "date",
-                  "pricePaidCents"
+                  "date"
                 ]
               }
             }
@@ -1843,6 +1846,30 @@
                             "type": "integer",
                             "nullable": true
                           },
+                          "drinkPrices": {
+                            "type": "object",
+                            "properties": {
+                              "beer": {
+                                "type": "integer"
+                              },
+                              "radler": {
+                                "type": "integer"
+                              },
+                              "alcohol_free": {
+                                "type": "integer"
+                              },
+                              "wine": {
+                                "type": "integer"
+                              },
+                              "soft_drink": {
+                                "type": "integer"
+                              },
+                              "other": {
+                                "type": "integer"
+                              }
+                            },
+                            "default": {}
+                          },
                           "location": {
                             "type": "string",
                             "nullable": true
@@ -1962,6 +1989,30 @@
                     "beerCost": {
                       "type": "integer",
                       "nullable": true
+                    },
+                    "drinkPrices": {
+                      "type": "object",
+                      "properties": {
+                        "beer": {
+                          "type": "integer"
+                        },
+                        "radler": {
+                          "type": "integer"
+                        },
+                        "alcohol_free": {
+                          "type": "integer"
+                        },
+                        "wine": {
+                          "type": "integer"
+                        },
+                        "soft_drink": {
+                          "type": "integer"
+                        },
+                        "other": {
+                          "type": "integer"
+                        }
+                      },
+                      "default": {}
                     },
                     "location": {
                       "type": "string",

@@ -17,5 +17,6 @@ export function useDrinkPrice() {
 
   return useSharedDrinkPrice({
     festivalBeerCost: currentFestival?.beerCost,
+    festivalDrinkPrices: currentFestival?.drinkPrices,
   });
 }

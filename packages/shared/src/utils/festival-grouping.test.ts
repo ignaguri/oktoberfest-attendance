@@ -15,6 +15,7 @@ function makeFestival(name: string, startDate: string, endDate: string): Festiva
     startDate,
     endDate,
     beerCost: null,
+    drinkPrices: {},
     location: null,
     latitude: null,
     longitude: null,

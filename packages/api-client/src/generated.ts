@@ -105,7 +105,8 @@ export interface paths {
                         drinkType?: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
                         drinkName?: string;
                         basePriceCents?: number;
-                        pricePaidCents: number;
+                        pricePaidCents?: number;
+                        pricePaidOverrideCents?: number;
                         /** @default 1000 */
                         volumeMl?: number;
                         /** Format: date-time */
@@ -989,6 +990,15 @@ export interface paths {
                                 startDate: string;
                                 endDate: string;
                                 beerCost: number | null;
+                                /** @default {} */
+                                drinkPrices: {
+                                    beer?: number;
+                                    radler?: number;
+                                    alcohol_free?: number;
+                                    wine?: number;
+                                    soft_drink?: number;
+                                    other?: number;
+                                };
                                 location: string | null;
                                 latitude: number | null;
                                 longitude: number | null;
@@ -1051,6 +1061,15 @@ export interface paths {
                             startDate: string;
                             endDate: string;
                             beerCost: number | null;
+                            /** @default {} */
+                            drinkPrices: {
+                                beer?: number;
+                                radler?: number;
+                                alcohol_free?: number;
+                                wine?: number;
+                                soft_drink?: number;
+                                other?: number;
+                            };
                             location: string | null;
                             latitude: number | null;
                             longitude: number | null;

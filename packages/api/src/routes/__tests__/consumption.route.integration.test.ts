@@ -736,13 +736,18 @@ describe("Consumption Routes Integration (Local DB)", () => {
         }),
       ).rejects.toThrow();
 
-      // And the victim's row is untouched.
+      // And the victim's row is untouched. Compared against what was actually
+      // stored rather than a literal: the server resolves the price itself, so
+      // the 999 passed in above never reaches the row.
       const { data: untouched } = await supabaseAdmin
         .from("consumptions")
         .select("drink_type, price_paid_cents")
         .eq("id", consumptionId)
         .single();
-      expect(untouched).toMatchObject({ drink_type: "wine", price_paid_cents: 999 });
+      expect(untouched).toMatchObject({
+        drink_type: "wine",
+        price_paid_cents: victims.pricePaidCents,
+      });
     });
 
     it("still lets the server mint an id when none is supplied", async () => {

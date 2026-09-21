@@ -10,6 +10,7 @@ import { Loader2, Minus, Plus } from "lucide-react";
 import { useCallback, useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useDrinkPrice } from "@/hooks/useDrinkPrice";
 import { cn } from "@/lib/utils";
 
 interface DrinkStepperProps {
@@ -18,7 +19,6 @@ interface DrinkStepperProps {
   drinkType: DrinkType;
   tentId?: string;
   consumptions: Consumption[];
-  defaultPriceCents?: number;
   min?: number;
   max?: number;
   disabled?: boolean;
@@ -41,7 +41,6 @@ export function DrinkStepper({
   drinkType,
   tentId,
   consumptions,
-  defaultPriceCents = 1620,
   min = 0,
   max = 99,
   disabled = false,
@@ -51,6 +50,7 @@ export function DrinkStepper({
   const logConsumption = useLogConsumption();
   const deleteConsumption = useDeleteConsumption();
   const { calculatePricePaid } = useTipCalculation();
+  const { getDrinkPriceCents } = useDrinkPrice();
 
   // Filter consumptions by drink type and calculate count
   const typeConsumptions = useMemo(() => {
@@ -92,8 +92,8 @@ export function DrinkStepper({
         date,
         drinkType,
         tentId,
-        pricePaidCents: calculatePricePaid(defaultPriceCents),
-        basePriceCents: defaultPriceCents,
+        pricePaidCents: calculatePricePaid(getDrinkPriceCents(drinkType)),
+        basePriceCents: getDrinkPriceCents(drinkType),
         volumeMl: 1000,
       });
       onSuccess?.();
@@ -107,7 +107,7 @@ export function DrinkStepper({
     date,
     drinkType,
     tentId,
-    defaultPriceCents,
+    getDrinkPriceCents,
     calculatePricePaid,
     logConsumption,
     onSuccess,

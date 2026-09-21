@@ -15,6 +15,7 @@ function festival(id: string, startDate: string, endDate: string, isActive = fal
     startDate,
     endDate,
     beerCost: null,
+    drinkPrices: {},
     location: null,
     latitude: null,
     longitude: null,
