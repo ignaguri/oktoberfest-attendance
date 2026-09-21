@@ -131,7 +131,7 @@ describe("Admin Routes - Unit Tests", () => {
       const res = await app.request(
         createAuthRequest(`/admin/users/${OTHER_ID}/profile`, {
           method: "PATCH",
-          body: JSON.stringify({ is_super_admin: true }),
+          body: JSON.stringify({ full_name: "Renamed" }),
         }),
       );
 
@@ -139,20 +139,22 @@ describe("Admin Routes - Unit Tests", () => {
       expect(mockSupabase.from).toHaveBeenCalledWith("profiles");
     });
 
-    it("refuses to let an admin revoke their own access", async () => {
+    // Admin rights are granted in the database, never through an app. The body
+    // schema is strict, so an attempt is refused rather than quietly dropped:
+    // a stripped key would answer 200 and leave the caller believing it took.
+    it("refuses a request that tries to grant admin rights", async () => {
       const res = await app.request(
-        createAuthRequest(`/admin/users/${ADMIN_ID}/profile`, {
+        createAuthRequest(`/admin/users/${OTHER_ID}/profile`, {
           method: "PATCH",
-          body: JSON.stringify({ is_super_admin: false }),
+          body: JSON.stringify({ is_super_admin: true }),
         }),
       );
 
-      expect(res.status).toBe(403);
-      // The write must not have been attempted at all.
+      expect(res.status).toBe(400);
       expect(mockSupabase.from).not.toHaveBeenCalled();
     });
 
-    it("still allows an admin to edit their own non-admin fields", async () => {
+    it("still allows an admin to edit their own profile", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({ data: null, error: null }),
       );

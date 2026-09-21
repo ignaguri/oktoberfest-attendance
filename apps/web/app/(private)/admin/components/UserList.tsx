@@ -13,7 +13,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { formatDate } from "date-fns/format";
 import { Beer, Tent, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { UserSearch } from "@/components/admin/search/UserSearch";
@@ -28,7 +28,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogClose,
@@ -73,7 +72,6 @@ const UserEditForm = ({
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors, isSubmitting },
   } = useForm<AdminUserUpdateForm>({
     resolver: standardSchemaResolver(AdminUserUpdateFormSchema),
@@ -81,7 +79,6 @@ const UserEditForm = ({
       password: "",
       full_name: user.profile?.full_name || "",
       username: user.profile?.username || "",
-      is_super_admin: user.profile?.is_super_admin || false,
     },
   });
 
@@ -142,25 +139,6 @@ const UserEditForm = ({
             {...register("username")}
           />
           {errors.username && <span className="error">{errors.username.message}</span>}
-        </div>
-        <div className="flex items-center gap-2">
-          <Controller
-            name="is_super_admin"
-            control={control}
-            render={({ field }) => (
-              <Checkbox
-                id="is_super_admin"
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            )}
-          />
-          <Label
-            htmlFor="is_super_admin"
-            className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            {t("admin.users.form.isSuperAdmin")}
-          </Label>
         </div>
         <Button type="submit" disabled={isSubmitting}>
           {t("admin.users.form.updateUser")}
@@ -449,10 +427,9 @@ const UserList = () => {
         authData.password = data.password;
       }
 
-      const profileData: Partial<Tables<"profiles">> = {
+      const profileData = {
         full_name: data.full_name,
         username: data.username,
-        is_super_admin: data.is_super_admin,
       };
 
       if (Object.keys(authData).length > 0) {

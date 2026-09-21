@@ -187,7 +187,18 @@ export async function updateUserAuth(
   return data;
 }
 
-export async function updateUserProfile(userId: string, profileData: Partial<Tables<"profiles">>) {
+/**
+ * Updates the profile fields the admin panel offers.
+ *
+ * Named explicitly rather than taking `Partial<Tables<"profiles">>`: this runs
+ * on the service-role client, so a wide signature would let any caller write
+ * `is_super_admin` and mint an admin from the browser. Granting admin rights
+ * is a database-only operation.
+ */
+export async function updateUserProfile(
+  userId: string,
+  profileData: { full_name?: string; username?: string },
+) {
   const supabase = await createClient(true);
   const { data, error } = await supabase
     .from("profiles")

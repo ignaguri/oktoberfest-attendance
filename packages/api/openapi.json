@@ -17814,6 +17814,7 @@
           "admin"
         ],
         "summary": "Update a user's profile (admin)",
+        "description": "Updates username and/or full name. Admin rights are not settable here: they are granted in the database only.",
         "security": [
           {
             "bearerAuth": []
@@ -17847,11 +17848,9 @@
                     "nullable": true,
                     "minLength": 1,
                     "maxLength": 100
-                  },
-                  "is_super_admin": {
-                    "type": "boolean"
                   }
-                }
+                },
+                "additionalProperties": false
               }
             }
           }

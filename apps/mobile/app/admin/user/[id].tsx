@@ -4,7 +4,6 @@ import {
   useDeleteAdminAttendance,
   useDeleteAdminUser,
   useUpdateAdminUserAuth,
-  useUpdateAdminUserProfile,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AdminAttendance } from "@prostcounter/shared/schemas";
@@ -22,12 +21,11 @@ import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { IconColors, SwitchColors } from "@/lib/constants/colors";
+import { IconColors } from "@/lib/constants/colors";
 
 export default function AdminUserDetailScreen() {
   const { t } = useTranslation();
@@ -39,7 +37,6 @@ export default function AdminUserDetailScreen() {
   const { user, isLoading, error, refetch } = useAdminUser(id);
   const { attendances, isLoading: attendancesLoading } = useAdminUserAttendances(id);
 
-  const updateProfile = useUpdateAdminUserProfile();
   const updateAuth = useUpdateAdminUserAuth();
   const deleteUser = useDeleteAdminUser();
   const deleteAttendance = useDeleteAdminAttendance();
@@ -50,20 +47,13 @@ export default function AdminUserDetailScreen() {
   // background refetch of the list cannot overwrite an open draft.
   const [editing, setEditing] = useState<AdminAttendance | null>(null);
 
-  // An admin editing themselves cannot self-demote or self-delete; the server
-  // rejects both, and hiding the controls avoids a confusing 403.
+  // An admin cannot delete their own account; the server rejects it, and hiding
+  // the control avoids a confusing 403.
+  //
+  // Granting or revoking super admin is not offered here at all. It is a
+  // database-only change by deliberate policy, so the panel that every admin
+  // can reach cannot mint another one.
   const isSelf = currentUser?.id === id;
-
-  const handleToggleAdmin = useCallback(
-    async (value: boolean) => {
-      try {
-        await updateProfile.mutate({ userId: id, data: { is_super_admin: value } });
-      } catch {
-        showDialog(t("common.status.error"), t("admin.mobile.userDetail.updateError"));
-      }
-    },
-    [id, updateProfile, showDialog, t],
-  );
 
   const handleSetPassword = useCallback(() => {
     showDialog(
@@ -154,28 +144,6 @@ export default function AdminUserDetailScreen() {
               )}
               <Text className="text-sm text-typography-500">{user.email}</Text>
             </VStack>
-          </Card>
-
-          {/* Admin flag */}
-          <Card size="md" variant="elevated">
-            <HStack className="items-center justify-between">
-              <VStack className="flex-1 pr-3">
-                <Text className="text-typography-900">{t("admin.users.form.isSuperAdmin")}</Text>
-                <Text className="text-sm text-typography-500">
-                  {isSelf
-                    ? t("admin.mobile.userDetail.cannotDemoteSelf")
-                    : t("admin.mobile.userDetail.adminHint")}
-                </Text>
-              </VStack>
-              <Switch
-                value={user.profile?.is_super_admin === true}
-                onValueChange={handleToggleAdmin}
-                isDisabled={isSelf || updateProfile.loading}
-                trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
-                thumbColor={SwitchColors.thumb}
-                accessibilityLabel={t("admin.users.form.isSuperAdmin")}
-              />
-            </HStack>
           </Card>
 
           {/* Password reset */}

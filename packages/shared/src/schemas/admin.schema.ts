@@ -81,12 +81,20 @@ export const ListAdminUsersResponseSchema = z.object({
 
 export type ListAdminUsersResponse = z.infer<typeof ListAdminUsersResponseSchema>;
 
-/** Profile fields an admin may change on another user. */
-export const UpdateAdminUserProfileSchema = z.object({
-  username: z.string().min(3).max(30).nullable().optional(),
-  full_name: z.string().min(1).max(100).nullable().optional(),
-  is_super_admin: z.boolean().optional(),
-});
+/**
+ * Profile fields an admin may change on another user.
+ *
+ * `is_super_admin` is deliberately absent. Granting admin rights is a
+ * database-only operation, so no signed-in admin can mint another one through
+ * an app; `.strict()` makes an attempt a 400 rather than a silently dropped
+ * key, which would otherwise read as success to whoever sent it.
+ */
+export const UpdateAdminUserProfileSchema = z
+  .object({
+    username: z.string().min(3).max(30).nullable().optional(),
+    full_name: z.string().min(1).max(100).nullable().optional(),
+  })
+  .strict();
 
 export type UpdateAdminUserProfileInput = z.infer<typeof UpdateAdminUserProfileSchema>;
 

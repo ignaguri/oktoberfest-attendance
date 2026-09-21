@@ -1555,8 +1555,6 @@
       "userDetail": {
         "title": "User",
         "loading": "Loading...",
-        "adminHint": "Grants full access to this admin area",
-        "cannotDemoteSelf": "You cannot change your own admin access",
         "setPassword": "Set a new password",
         "setPasswordHint": "Replaces this user's password immediately",
         "setPasswordConfirm": "This replaces the user's password immediately. Continue?",
@@ -1853,7 +1851,6 @@
         "newPassword": "New Password (leave blank to keep unchanged)",
         "fullName": "Full Name",
         "username": "Username",
-        "isSuperAdmin": "Is Super Admin",
         "updateUser": "Update User"
       },
       "attendances": {

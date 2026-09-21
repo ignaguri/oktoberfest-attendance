@@ -1615,8 +1615,6 @@
       "userDetail": {
         "title": "Usuario",
         "loading": "Cargando...",
-        "adminHint": "Otorga acceso completo a esta área de administración",
-        "cannotDemoteSelf": "No puedes cambiar tu propio acceso de administrador",
         "setPassword": "Establecer nueva contraseña",
         "setPasswordHint": "Reemplaza la contraseña de este usuario de inmediato",
         "setPasswordConfirm": "Esto reemplaza la contraseña del usuario de inmediato. ¿Continuar?",
@@ -1913,7 +1911,6 @@
         "newPassword": "Nueva contraseña (dejalo en blanco para mantener la actual)",
         "fullName": "Nombre completo",
         "username": "Nombre de usuario",
-        "isSuperAdmin": "Es super admin",
         "updateUser": "Actualizar usuario"
       },
       "attendances": {

@@ -9731,7 +9731,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update a user's profile (admin) */
+        /**
+         * Update a user's profile (admin)
+         * @description Updates username and/or full name. Admin rights are not settable here: they are granted in the database only.
+         */
         patch: {
             parameters: {
                 query?: never;
@@ -9746,7 +9749,6 @@ export interface paths {
                     "application/json": {
                         username?: string | null;
                         full_name?: string | null;
-                        is_super_admin?: boolean;
                     };
                 };
             };

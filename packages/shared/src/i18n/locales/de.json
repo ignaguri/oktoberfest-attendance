@@ -1774,8 +1774,6 @@
       "userDetail": {
         "title": "Benutzer",
         "loading": "Wird geladen...",
-        "adminHint": "Gewährt vollen Zugriff auf diesen Adminbereich",
-        "cannotDemoteSelf": "Du kannst deinen eigenen Adminzugang nicht ändern",
         "setPassword": "Neues Passwort setzen",
         "setPasswordHint": "Ersetzt das Passwort dieses Benutzers sofort",
         "setPasswordConfirm": "Das Passwort des Benutzers wird sofort ersetzt. Fortfahren?",
@@ -1963,7 +1961,6 @@
         "newPassword": "Neues Passwort (leer lassen, um es beizubehalten)",
         "fullName": "Vollständiger Name",
         "username": "Benutzername",
-        "isSuperAdmin": "Ist Super-Admin",
         "updateUser": "Benutzer aktualisieren"
       },
       "makeAdmin": "Zum Admin machen",

@@ -34,7 +34,6 @@ export const AdminUserFormSchema = z.object({
     .optional(),
   full_name: z.string().optional(),
   username: z.string().optional(),
-  is_super_admin: z.boolean().optional(),
 });
 
 export type AdminUserUpdateForm = z.infer<typeof AdminUserUpdateFormSchema>;
@@ -47,7 +46,6 @@ export const AdminUserUpdateFormSchema = z.object({
     .optional(),
   full_name: z.string().optional(),
   username: z.string().optional(),
-  is_super_admin: z.boolean().optional(),
 });
 
 // =============================================================================

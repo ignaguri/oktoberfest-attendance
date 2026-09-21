@@ -132,6 +132,8 @@ const updateUserProfileRoute = createRoute({
   path: "/admin/users/{userId}/profile",
   tags: ["admin"],
   summary: "Update a user's profile (admin)",
+  description:
+    "Updates username and/or full name. Admin rights are not settable here: they are granted in the database only.",
   request: {
     params: z.object({ userId: z.string().uuid() }),
     body: {
@@ -149,15 +151,9 @@ const updateUserProfileRoute = createRoute({
 });
 
 app.openapi(updateUserProfileRoute, async (c) => {
-  const { user, supabase } = c.var;
+  const { supabase } = c.var;
   const { userId } = c.req.valid("param");
   const body = c.req.valid("json");
-
-  // Revoking your own admin rights locks you out of this panel with no way
-  // back in from either app.
-  if (userId === user.id && body.is_super_admin === false) {
-    throw new ForbiddenError("You cannot revoke your own admin access");
-  }
 
   const adminRepo = new SupabaseAdminRepository(supabase);
   await adminRepo.updateUserProfile(userId, body);
