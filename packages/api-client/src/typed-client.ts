@@ -7,10 +7,25 @@
 
 // Import shared schema types
 import type {
+  AddAdminFestivalTentInput,
+  AddAllAdminFestivalTentsInput,
+  AdminAttendance,
+  AdminFestival,
+  AdminFestivalTent,
+  AdminFestivalTentStats,
+  AdminGroup,
+  AdminGroupMember,
+  AdminLocationSession,
+  AdminTent,
+  AdminUser,
+  AdminWrappedCacheEntry,
+  CopyAdminFestivalTentsInput,
   AttendanceByDate,
   CarryOverCandidatesResponse,
   Consumption,
   CreateMessageResponse,
+  CreateAdminFestivalInput,
+  CreateAdminTentInput,
   CrowdLevel,
   DayPlanResponse,
   DeleteAttendanceResponse,
@@ -39,6 +54,7 @@ import type {
   Highlights,
   LeaderboardResponse,
   ListAchievementsResponse,
+  ListAdminUsersResponse,
   ListAttendancesResponse,
   ListAvailableAchievementsResponse,
   ListDayPlansResponse,
@@ -58,10 +74,17 @@ import type {
   SearchUsersResponse,
   SubmitCrowdReportResponse,
   TutorialStatus,
+  UpdateAdminAttendanceInput,
+  UpdateAdminFestivalInput,
+  UpdateAdminGroupInput,
+  UpdateAdminTentInput,
+  UpdateAdminUserAuthInput,
+  UpdateAdminUserProfileInput,
   UpdateGroupMessageResponse,
   UpdatePersonalAttendanceResponse,
   UpsertDayPlanInput,
   WinningCriteriaListResponse,
+  WinningCriterion,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -2609,6 +2632,517 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to get friendship status");
         }
         return parseJsonResponse<FriendshipStatusCheck>(response);
+      },
+    },
+
+    /**
+     * Admin API
+     *
+     * Every path here sits behind the requireAdmin middleware, so a non-admin
+     * caller gets a 403 ApiError rather than an empty result.
+     */
+    admin: {
+      users: {
+        async list(query?: {
+          search?: string;
+          page?: number;
+          limit?: number;
+        }): Promise<ListAdminUsersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query?.search) params.set("search", query.search);
+          if (query?.page) params.set("page", query.page.toString());
+          if (query?.limit) params.set("limit", query.limit.toString());
+
+          const url = `${baseUrl}/v1/admin/users?${params}`;
+          const response = await fetchWithLogging("GET", url, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch users");
+          }
+          return parseJsonResponse<ListAdminUsersResponse>(response);
+        },
+
+        async get(userId: string): Promise<{ user: AdminUser }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/users/${userId}`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch user");
+          }
+          return parseJsonResponse<{ user: AdminUser }>(response);
+        },
+
+        async updateProfile(
+          userId: string,
+          data: UpdateAdminUserProfileInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/users/${userId}/profile`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update user profile");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async updateAuth(
+          userId: string,
+          data: UpdateAdminUserAuthInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/users/${userId}/auth`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update user credentials");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async delete(userId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("DELETE", `${baseUrl}/v1/admin/users/${userId}`, {
+            method: "DELETE",
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to delete user");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async listAttendances(userId: string): Promise<{ attendances: AdminAttendance[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/users/${userId}/attendances`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch attendances");
+          }
+          return parseJsonResponse<{ attendances: AdminAttendance[] }>(response);
+        },
+      },
+
+      attendances: {
+        async update(
+          attendanceId: string,
+          data: UpdateAdminAttendanceInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/attendances/${attendanceId}`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update attendance");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async delete(attendanceId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/attendances/${attendanceId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to delete attendance");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+      },
+
+      festivals: {
+        async list(): Promise<{ festivals: AdminFestival[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/festivals`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch festivals");
+          }
+          return parseJsonResponse<{ festivals: AdminFestival[] }>(response);
+        },
+
+        async get(festivalId: string): Promise<{ festival: AdminFestival }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch festival");
+          }
+          return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async create(data: CreateAdminFestivalInput): Promise<{ festival: AdminFestival }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("POST", `${baseUrl}/v1/admin/festivals`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to create festival");
+          }
+          return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async update(
+          festivalId: string,
+          data: UpdateAdminFestivalInput,
+        ): Promise<{ festival: AdminFestival }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/festivals/${festivalId}`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update festival");
+          }
+          return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async delete(festivalId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/festivals/${festivalId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            // A 409 here means the festival still has attendances or groups;
+            // extractApiError surfaces the server's message verbatim.
+            await extractApiError(response, "Failed to delete festival");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+      },
+
+      /**
+       * Tents, split the way the schema is: `list`/`create`/`update` act on the
+       * global catalogue, everything else on one festival's assignments.
+       */
+      tents: {
+        async list(): Promise<{ tents: AdminTent[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/tents`, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch tents");
+          }
+          return parseJsonResponse<{ tents: AdminTent[] }>(response);
+        },
+
+        async create(data: CreateAdminTentInput): Promise<{ tent: AdminTent }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("POST", `${baseUrl}/v1/admin/tents`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to create tent");
+          }
+          return parseJsonResponse<{ tent: AdminTent }>(response);
+        },
+
+        async update(tentId: string, data: UpdateAdminTentInput): Promise<{ tent: AdminTent }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("PATCH", `${baseUrl}/v1/admin/tents/${tentId}`, {
+            method: "PATCH",
+            headers,
+            body: JSON.stringify(data),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update tent");
+          }
+          return parseJsonResponse<{ tent: AdminTent }>(response);
+        },
+
+        async forFestival(
+          festivalId: string,
+        ): Promise<{ tents: AdminFestivalTent[]; stats: AdminFestivalTentStats }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch festival tents");
+          }
+          return parseJsonResponse<{ tents: AdminFestivalTent[]; stats: AdminFestivalTentStats }>(
+            response,
+          );
+        },
+
+        async availableFor(festivalId: string): Promise<{ tents: AdminTent[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/available`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch available tents");
+          }
+          return parseJsonResponse<{ tents: AdminTent[] }>(response);
+        },
+
+        async addToFestival(
+          festivalId: string,
+          data: AddAdminFestivalTentInput,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents`,
+            { method: "POST", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to add tent to festival");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async addAllToFestival(
+          festivalId: string,
+          data: AddAllAdminFestivalTentsInput,
+        ): Promise<{ added: number }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/all`,
+            { method: "POST", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to add tents to festival");
+          }
+          return parseJsonResponse<{ added: number }>(response);
+        },
+
+        async copyToFestival(
+          festivalId: string,
+          data: CopyAdminFestivalTentsInput,
+        ): Promise<{ copied: number }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/copy`,
+            { method: "POST", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to copy tents");
+          }
+          return parseJsonResponse<{ copied: number }>(response);
+        },
+
+        async setPrice(
+          festivalId: string,
+          tentId: string,
+          beerPrice: number | null,
+        ): Promise<{ tent: AdminFestivalTent }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/${tentId}`,
+            { method: "PATCH", headers, body: JSON.stringify({ beer_price: beerPrice }) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update tent price");
+          }
+          return parseJsonResponse<{ tent: AdminFestivalTent }>(response);
+        },
+
+        async removeFromFestival(
+          festivalId: string,
+          tentId: string,
+        ): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/tents/${tentId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            // A 409 here means people have visited the tent at this festival.
+            await extractApiError(response, "Failed to remove tent from festival");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+      },
+
+      groups: {
+        async list(): Promise<{ groups: AdminGroup[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/groups`, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch groups");
+          }
+          return parseJsonResponse<{ groups: AdminGroup[] }>(response);
+        },
+
+        async get(groupId: string): Promise<{ group: AdminGroup }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/groups/${groupId}`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch group");
+          }
+          return parseJsonResponse<{ group: AdminGroup }>(response);
+        },
+
+        async update(groupId: string, data: UpdateAdminGroupInput): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/groups/${groupId}`,
+            {
+              method: "PATCH",
+              headers,
+              body: JSON.stringify(data),
+            },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update group");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async delete(groupId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/groups/${groupId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to delete group");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async listMembers(groupId: string): Promise<{ members: AdminGroupMember[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/groups/${groupId}/members`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch group members");
+          }
+          return parseJsonResponse<{ members: AdminGroupMember[] }>(response);
+        },
+      },
+
+      async listWinningCriteria(): Promise<{ criteria: WinningCriterion[] }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/winning-criteria`, {
+          headers,
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch winning criteria");
+        }
+        return parseJsonResponse<{ criteria: WinningCriterion[] }>(response);
+      },
+
+      location: {
+        async listSessions(query?: {
+          festivalId?: string;
+          userId?: string;
+          includeExpired?: boolean;
+        }): Promise<{ sessions: AdminLocationSession[] }> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query?.festivalId) params.set("festivalId", query.festivalId);
+          if (query?.userId) params.set("userId", query.userId);
+          if (query?.includeExpired) params.set("includeExpired", "true");
+
+          const url = `${baseUrl}/v1/admin/location/sessions?${params}`;
+          const response = await fetchWithLogging("GET", url, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch location sessions");
+          }
+          return parseJsonResponse<{ sessions: AdminLocationSession[] }>(response);
+        },
+
+        async forceStopSession(sessionId: string): Promise<{
+          success: boolean;
+          session: {
+            id: string;
+            userId: string;
+            festivalId: string;
+            isActive: boolean;
+            startedAt: string;
+            expiresAt: string;
+          };
+        }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/location/sessions/${sessionId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to stop location session");
+          }
+          return parseJsonResponse<{
+            success: boolean;
+            session: {
+              id: string;
+              userId: string;
+              festivalId: string;
+              isActive: boolean;
+              startedAt: string;
+              expiresAt: string;
+            };
+          }>(response);
+        },
+
+        async cleanupExpiredSessions(): Promise<{ success: boolean; cleanedCount: number }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/location/sessions/cleanup`,
+            { method: "POST", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to cleanup expired sessions");
+          }
+          return parseJsonResponse<{ success: boolean; cleanedCount: number }>(response);
+        },
+      },
+
+      wrappedCache: {
+        /**
+         * Lists the cached Wrapped entries. Regeneration is not here: it lives
+         * on `wrapped.regenerateCache`, which predates the admin namespace.
+         */
+        async list(): Promise<{ entries: AdminWrappedCacheEntry[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/wrapped-cache`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch wrapped cache");
+          }
+          return parseJsonResponse<{ entries: AdminWrappedCacheEntry[] }>(response);
+        },
       },
     },
   };

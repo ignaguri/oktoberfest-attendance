@@ -271,7 +271,7 @@ export class SupabaseLocationRepository implements ILocationRepository {
   }): Promise<
     Array<
       LocationSession & {
-        user: { id: string; username: string; fullName: string | null };
+        user: { id: string; username: string | null; fullName: string | null };
         festival: { id: string; name: string };
       }
     >

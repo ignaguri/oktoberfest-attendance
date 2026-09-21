@@ -54,36 +54,48 @@ export async function pullProfile(db: SQLite.SQLiteDatabase, userId: string): Pr
       userId,
     ]);
 
+    const isSuperAdmin = profile.is_super_admin ? 1 : 0;
+
     if (existing) {
       // Only update if not dirty (don't overwrite local changes)
       if (existing._dirty === 0) {
         await db.runAsync(
           `UPDATE profiles SET
-            username = ?, full_name = ?, avatar_url = ?,
+            username = ?, full_name = ?, avatar_url = ?, is_super_admin = ?,
             updated_at = ?, _synced_at = ?
           WHERE id = ?`,
           [
             profile.username ?? null,
             profile.full_name ?? null,
             profile.avatar_url ?? null,
+            isSuperAdmin,
             now,
             now,
             userId,
           ],
         );
         result.updated++;
+      } else {
+        // is_super_admin is server-owned and never edited locally, so a pending
+        // local edit to username/full_name must not stall a revoked or granted
+        // admin flag. Write it on its own without clearing the dirty marker.
+        await db.runAsync(`UPDATE profiles SET is_super_admin = ? WHERE id = ?`, [
+          isSuperAdmin,
+          userId,
+        ]);
       }
     } else {
       await db.runAsync(
         `INSERT INTO profiles (
-          id, username, full_name, avatar_url, updated_at,
+          id, username, full_name, avatar_url, is_super_admin, updated_at,
           _synced_at, _dirty, _deleted
-        ) VALUES (?, ?, ?, ?, ?, ?, 0, 0)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)`,
         [
           userId,
           profile.username ?? null,
           profile.full_name ?? null,
           profile.avatar_url ?? null,
+          isSuperAdmin,
           now,
           now,
         ],
@@ -170,6 +182,34 @@ export async function pullAttendances(
   return [attendancesResult, tentVisitsResult];
 }
 
+/**
+ * Points everything that referenced a local attendance id at the server's id.
+ *
+ * Covers the dependent rows and the sync queue, not the attendance row itself:
+ * the two callers differ in what else they write to it. Must run inside a
+ * transaction so a half-remapped row is never visible.
+ */
+async function remapAttendanceId(
+  db: SQLite.SQLiteDatabase,
+  oldId: string,
+  newId: string,
+): Promise<void> {
+  await db.runAsync(`UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`, [
+    newId,
+    oldId,
+  ]);
+
+  await db.runAsync(`UPDATE beer_pictures SET attendance_id = ? WHERE attendance_id = ?`, [
+    newId,
+    oldId,
+  ]);
+
+  await db.runAsync(
+    `UPDATE _sync_queue SET record_id = ? WHERE record_id = ? AND table_name = 'attendances' AND status IN ('pending', 'failed')`,
+    [newId, oldId],
+  );
+}
+
 async function processAttendances(
   db: SQLite.SQLiteDatabase,
   festivalId: string,
@@ -250,6 +290,30 @@ async function processAttendances(
         // the pending DELETE will reach the server and the next pull will stop
         // returning it. Reviving it below would silently undo the user, and
         // inserting alongside it would hit the UNIQUE constraint.
+        //
+        // The ids still have to be reconciled first. A day created offline
+        // carries a client-generated id, so the queued DELETE would be sent for
+        // an id the server has never seen; the route answers an unknown id as
+        // idempotent success, nothing is removed, and the next pull -- now with
+        // no pending delete -- falls into the branch below and clears the
+        // tombstone. The day the user deleted comes back.
+        if (byNaturalKey.id !== att.id) {
+          await db.withTransactionAsync(async () => {
+            await remapAttendanceId(db, byNaturalKey.id, att.id);
+            // Only the id moves. `_deleted` stays 1 and the server's
+            // beer_count is not applied: the user deleted this day and the
+            // queued DELETE is still the pending truth.
+            await db.runAsync(`UPDATE attendances SET id = ? WHERE id = ?`, [
+              att.id,
+              byNaturalKey.id,
+            ]);
+          });
+
+          logger.info(
+            `[SyncManager] Reconciled queued-delete attendance ID: ${byNaturalKey.id} → ${att.id}`,
+          );
+        }
+
         logConflict(
           "attendances",
           byNaturalKey.id,
@@ -265,22 +329,7 @@ async function processAttendances(
         const serverUpdatedAt = att.updatedAt ?? att.createdAt;
 
         await db.withTransactionAsync(async () => {
-          // Update all dependent tables referencing the old local ID
-          await db.runAsync(`UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`, [
-            att.id,
-            oldId,
-          ]);
-
-          await db.runAsync(`UPDATE beer_pictures SET attendance_id = ? WHERE attendance_id = ?`, [
-            att.id,
-            oldId,
-          ]);
-
-          // Update pending sync queue entries that reference the old ID
-          await db.runAsync(
-            `UPDATE _sync_queue SET record_id = ? WHERE record_id = ? AND table_name = 'attendances' AND status IN ('pending', 'failed')`,
-            [att.id, oldId],
-          );
+          await remapAttendanceId(db, oldId, att.id);
 
           // Update the attendance ID itself. `_deleted` clears for the same
           // reason as in the by-id branch above: the server returned this day,

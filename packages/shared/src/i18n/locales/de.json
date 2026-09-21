@@ -1705,6 +1705,193 @@
     }
   },
   "admin": {
+    "mobile": {
+      "festivals": {
+        "loading": "Festivals werden geladen...",
+        "empty": "Keine Festivals gefunden",
+        "openHint": "Öffnet die Details dieses Festivals",
+        "activeBadge": "Aktiv",
+        "status": {
+          "upcoming": "Bevorstehend",
+          "active": "Aktiv",
+          "ended": "Beendet"
+        }
+      },
+      "festivalDetail": {
+        "title": "Festival",
+        "loading": "Wird geladen...",
+        "name": "Name",
+        "location": "Ort",
+        "edit": "Details bearbeiten",
+        "isActive": "Aktives Festival",
+        "isActiveHint": "Nur ein Festival kann aktiv sein; das Einschalten deaktiviert das andere.",
+        "status": "Status",
+        "dangerZone": "Gefahrenbereich",
+        "deleteFestival": "Festival löschen",
+        "deleteFestivalHint": "Entfernt dieses Festival dauerhaft",
+        "deleteFestivalConfirm": "Damit werden das Festival und seine Zeltliste, Preise, Erfolge und Wrapped-Daten dauerhaft gelöscht. Fortfahren?",
+        "deactivateConfirm": "Damit ist kein Festival mehr aktiv, und die App hat für niemanden eine Vorauswahl. Fortfahren?",
+        "deleteBlockedHint": "Ein Festival mit Besuchen, Gruppen oder Zeltbesuchen kann nicht gelöscht werden. Setze es stattdessen auf Beendet.",
+        "updateError": "Änderung konnte nicht gespeichert werden",
+        "deleteError": "Löschen fehlgeschlagen"
+      },
+      "groups": {
+        "loading": "Gruppen werden geladen...",
+        "empty": "Keine Gruppen gefunden",
+        "memberCount_one": "{{count}} Mitglied",
+        "memberCount_other": "{{count}} Mitglieder",
+        "openHint": "Öffnet die Details dieser Gruppe"
+      },
+      "groupDetail": {
+        "title": "Gruppe",
+        "loading": "Wird geladen...",
+        "name": "Name",
+        "description": "Beschreibung",
+        "noDescription": "Keine Beschreibung",
+        "edit": "Details bearbeiten",
+        "winningCriteria": "Gewinnkriterium",
+        "noMembers": "Noch keine Mitglieder",
+        "dangerZone": "Gefahrenbereich",
+        "deleteGroup": "Gruppe löschen",
+        "deleteGroupHint": "Entfernt diese Gruppe und ihre Mitgliedschaften dauerhaft",
+        "deleteGroupConfirm": "Damit werden die Gruppe und alle ihre Mitglieder dauerhaft entfernt. Fortfahren?",
+        "updateError": "Änderung konnte nicht gespeichert werden",
+        "deleteError": "Löschen fehlgeschlagen"
+      },
+      "users": {
+        "searchPlaceholder": "Nach Name, Benutzername oder E-Mail suchen",
+        "loading": "Benutzer werden geladen...",
+        "empty": "Keine Benutzer gefunden",
+        "noName": "Benutzer ohne Namen",
+        "adminBadge": "Admin",
+        "resultCount": "{{count}} Benutzer",
+        "openHint": "Öffnet die Details dieses Benutzers",
+        "previousPage": "Zurück",
+        "nextPage": "Weiter",
+        "pageOf": "Seite {{page}} von {{totalPages}}",
+        "truncated": "Es gibt mehr Konten, als auf einmal durchsucht werden können. Grenze die Suche ein, um sicherzugehen."
+      },
+      "userDetail": {
+        "title": "Benutzer",
+        "loading": "Wird geladen...",
+        "adminHint": "Gewährt vollen Zugriff auf diesen Adminbereich",
+        "cannotDemoteSelf": "Du kannst deinen eigenen Adminzugang nicht ändern",
+        "setPassword": "Neues Passwort setzen",
+        "setPasswordHint": "Ersetzt das Passwort dieses Benutzers sofort",
+        "setPasswordConfirm": "Das Passwort des Benutzers wird sofort ersetzt. Fortfahren?",
+        "newPasswordPlaceholder": "Neues Passwort (mind. 8 Zeichen)",
+        "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+        "passwordChanged": "Passwort aktualisiert",
+        "attendances": "Besuche",
+        "noAttendances": "Keine Besuche erfasst",
+        "attendanceSummary": "{{beers}} Bier, {{tents}} Zelt(e)",
+        "deleteAttendance": "Besuch löschen",
+        "deleteAttendanceHint": "Entfernt den Besuchseintrag dieses Tages",
+        "deleteAttendanceConfirm": "Damit werden der Besuch und seine Zeltbesuche entfernt. Fortfahren?",
+        "dangerZone": "Gefahrenbereich",
+        "deleteUser": "Konto löschen",
+        "deleteUserHint": "Entfernt dieses Benutzerkonto dauerhaft",
+        "deleteUserConfirm": "Damit werden das Konto und alle Daten dauerhaft gelöscht. Fortfahren?",
+        "updateError": "Änderung konnte nicht gespeichert werden",
+        "deleteError": "Löschen fehlgeschlagen"
+      },
+      "subtitle": "Benutzer, Gruppen und Festivaldaten verwalten",
+      "openAdmin": "Adminbereich öffnen",
+      "openAdminHint": "Öffnet den Verwaltungsbereich",
+      "hubDescription": "Verwaltungswerkzeuge. Änderungen hier betreffen alle Benutzer.",
+      "sections": {
+        "festivals": "Festivals erstellen und bearbeiten",
+        "groups": "Gruppen bearbeiten und entfernen",
+        "users": "Benutzerkonten suchen und verwalten",
+        "location": "Aktive Standortfreigaben",
+        "tents": "Zeltkatalog erstellen und bearbeiten",
+        "cache": "Zwischengespeicherte Wrapped-Daten neu berechnen"
+      },
+      "cache": {
+        "description": "Wrapped-Statistiken werden einmal berechnet und zwischengespeichert. Eine Neuberechnung aktualisiert einen vorhandenen Eintrag; sie kann keinen für jemanden anlegen, der sein Wrapped nie geöffnet hat.",
+        "regenerateAll": "Alle neu berechnen",
+        "regenerateAllHint": "Berechnet jeden zwischengespeicherten Eintrag unten neu",
+        "regenerating": "Wird neu berechnet...",
+        "regenerateEntry": "Neu berechnen",
+        "regenerateEntryHint": "Berechnet das Wrapped dieses Benutzers für dieses Festival neu",
+        "regenerateSuccess_one": "1 Eintrag neu berechnet",
+        "regenerateSuccess_other": "{{count}} Einträge neu berechnet",
+        "regenerateError": "Der Cache konnte nicht neu berechnet werden",
+        "empty": "Noch nichts zwischengespeichert",
+        "emptyHint": "Ein Eintrag entsteht, sobald jemand sein Wrapped zum ersten Mal öffnet.",
+        "columns": {
+          "firstGenerated": "Zuerst erstellt",
+          "lastRefreshed": "Zuletzt aktualisiert"
+        },
+        "source": {
+          "system": "Beim ersten Aufruf erstellt",
+          "admin": "Zuletzt von einem Admin aktualisiert"
+        }
+      },
+      "tents": {
+        "catalogueHint": "Zelte, die alle Festivals gemeinsam nutzen. Welches Festival ein Zelt anbietet und zu welchem Preis, wird beim jeweiligen Festival festgelegt.",
+        "loading": "Zelte werden geladen...",
+        "empty": "Noch keine Zelte",
+        "addTent": "Zelt hinzufügen",
+        "addTentHint": "Erstellt ein Zelt im gemeinsamen Katalog",
+        "nameLabel": "Name",
+        "categoryLabel": "Kategorie",
+        "category": {
+          "large": "Großes Zelt",
+          "small": "Kleines Zelt",
+          "old": "Oide Wiesn"
+        },
+        "editHint": "Dieses Zelt bearbeiten",
+        "sharedHint": "Dieses Zelt wird gemeinsam genutzt, die Änderung gilt daher für jedes Festival, das es anbietet.",
+        "uncategorized": "Ohne Kategorie",
+        "createError": "Zelt konnte nicht erstellt werden",
+        "updateError": "Zelt konnte nicht aktualisiert werden"
+      },
+      "festivalTents": {
+        "title": "Zelte",
+        "openHint": "Zelte auf diesem Festival und ihre Preise",
+        "loading": "Zelte werden geladen...",
+        "empty": "Dieses Festival bietet noch keine Zelte an",
+        "addTents": "Zelte hinzufügen",
+        "addTentsHint": "Zelte aus dem Katalog auswählen",
+        "addOneHint": "Fügt dieses Zelt zum Festival hinzu",
+        "addAll_one": "Das übrige Zelt hinzufügen",
+        "addAll_other": "Alle {{count}} übrigen Zelte hinzufügen",
+        "addAllAction": "Alle hinzufügen",
+        "addAllHint": "Preis leer lassen, um sie ohne Preis hinzuzufügen.",
+        "loadingAvailable": "Verfügbare Zelte werden geladen...",
+        "noneAvailable": "Alle Zelte werden hier bereits angeboten",
+        "addError": "Zelt konnte nicht hinzugefügt werden",
+        "copyFrom": "Von einem Festival kopieren",
+        "copyAction": "Kopieren",
+        "copyFromHint": "Kopiert die Zelte und Preise dieses Festivals",
+        "copyHint": "Bereits angebotene Zelte werden übersprungen, ihre Preise bleiben unverändert.",
+        "copyError": "Zelte konnten nicht kopiert werden",
+        "copyResult_one": "{{count}} Zelt kopiert",
+        "copyResult_other": "{{count}} Zelte kopiert",
+        "sourceEmpty": "Dieses Festival bietet keine Zelte an",
+        "noOtherFestivals": "Es gibt kein anderes Festival zum Kopieren",
+        "priceLabel": "Bierpreis",
+        "pricePlaceholder": "16,20",
+        "priceInvalid": "Preis über null eingeben oder für keinen Preis leer lassen",
+        "priceError": "Preis konnte nicht aktualisiert werden",
+        "priceEditHint": "Bierpreis auf diesem Festival bearbeiten",
+        "priceClearHint": "Leer lassen, um den Preis zu entfernen.",
+        "noPrice": "Nicht festgelegt",
+        "remove": "Zelt entfernen",
+        "removeHint": "Das Festival bietet dieses Zelt nicht mehr an",
+        "removeConfirm": "{{name}} auf diesem Festival nicht mehr anbieten?",
+        "removeError": "Zelt konnte nicht entfernt werden",
+        "statTents": "Zelte",
+        "statPriced": "Mit Preis",
+        "statAverage": "Durchschnitt"
+      },
+      "location": {
+        "cleanupHint": "Markiert alle abgelaufenen Sitzungen als inaktiv",
+        "forceStopHint": "Beendet diese Sitzung unabhängig davon, wer sie gestartet hat",
+        "forceStopConfirm": "Damit wird die Sitzung für diesen Benutzer sofort beendet. Fortfahren?"
+      }
+    },
     "pageTitle": "Admin-Panel",
     "dashboard": "Admin-Dashboard",
     "tabs": {
@@ -1721,7 +1908,8 @@
       "noSessions": "Keine aktiven Standort-Sitzungen",
       "forceStop": "Stoppen erzwingen",
       "cleanupExpired": "Abgelaufene bereinigen",
-      "cleanupSuccess": "{{count}} abgelaufene Sitzungen bereinigt",
+      "cleanupSuccess_one": "{{count}} abgelaufene Sitzung bereinigt",
+      "cleanupSuccess_other": "{{count}} abgelaufene Sitzungen bereinigt",
       "stopSuccess": "Sitzung erfolgreich gestoppt",
       "stopError": "Sitzung konnte nicht gestoppt werden",
       "loading": "Sitzungen werden geladen...",
@@ -1753,6 +1941,14 @@
     "users": {
       "title": "Benutzer-Verwaltung",
       "search": "Benutzer suchen",
+      "form": {
+        "emailNote": "Die E-Mail-Adresse kann nicht geändert werden",
+        "newPassword": "Neues Passwort (leer lassen, um es beizubehalten)",
+        "fullName": "Vollständiger Name",
+        "username": "Benutzername",
+        "isSuperAdmin": "Ist Super-Admin",
+        "updateUser": "Benutzer aktualisieren"
+      },
       "makeAdmin": "Zum Admin machen",
       "removeAdmin": "Admin entfernen"
     }

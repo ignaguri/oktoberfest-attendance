@@ -84,6 +84,8 @@ export class QueryKeys {
   static wrapped = (festivalId: string) => ["wrapped", festivalId] as const;
   static wrappedAccess = (festivalId: string) => ["wrapped", "access", festivalId] as const;
   static availableWrapped = () => ["wrapped", "available"] as const;
+  /** Prefix covering every Wrapped read, for invalidation after a regeneration. */
+  static wrappedAll = () => ["wrapped"] as const;
 
   // Calendar queries
   static personalCalendar = (festivalId: string) => ["calendar", "personal", festivalId] as const;
@@ -131,6 +133,55 @@ export class QueryKeys {
   static crowdStatus = (festivalId: string) => ["crowd-status", festivalId] as const;
   static tentCrowdReports = (tentId: string, festivalId: string) =>
     ["crowd-reports", tentId, festivalId] as const;
+
+  // Admin queries
+  /**
+   * Keyed by page size as well as page number: page 2 of 50 and page 2 of 20
+   * are different slices of the directory, and sharing one entry would serve
+   * whichever landed first to both.
+   */
+  static adminUsers = (search?: string, page?: number, limit?: number) =>
+    ["admin", "users", search ?? "", page ?? 1, limit ?? 50] as const;
+  /** Prefix covering every cached user page, for invalidation after a mutation. */
+  static adminUsersAll = () => ["admin", "users"] as const;
+  static adminUser = (userId: string) => ["admin", "user", userId] as const;
+  static adminUserAttendances = (userId: string) => ["admin", "user-attendances", userId] as const;
+  /** Prefix covering every cached attendance list. */
+  static adminUserAttendancesAll = () => ["admin", "user-attendances"] as const;
+  static adminFestivals = () => ["admin", "festivals"] as const;
+  static adminFestival = (festivalId: string) => ["admin", "festival", festivalId] as const;
+  /**
+   * Prefix covering every cached festival detail.
+   *
+   * Activating one festival deactivates the others server-side, so invalidating
+   * only the edited row leaves the previously active festival's cached copy
+   * still showing its Active badge.
+   */
+  static adminFestivalAll = () => ["admin", "festival"] as const;
+  static adminGroups = () => ["admin", "groups"] as const;
+  static adminGroup = (groupId: string) => ["admin", "group", groupId] as const;
+  static adminGroupMembers = (groupId: string) => ["admin", "group", groupId, "members"] as const;
+  static adminWinningCriteria = () => ["admin", "winning-criteria"] as const;
+  static adminTents = () => ["admin", "tents"] as const;
+  static adminFestivalTents = (festivalId: string) =>
+    ["admin", "festival", festivalId, "tents"] as const;
+  static adminFestivalTentsAvailable = (festivalId: string) =>
+    ["admin", "festival", festivalId, "tents-available"] as const;
+  static adminLocationSessions = (filters?: {
+    festivalId?: string;
+    userId?: string;
+    includeExpired?: boolean;
+  }) =>
+    [
+      "admin",
+      "location-sessions",
+      filters?.festivalId ?? null,
+      filters?.userId ?? null,
+      filters?.includeExpired ?? false,
+    ] as const;
+  /** Prefix covering every cached session list, for invalidation after a mutation. */
+  static adminLocationSessionsAll = () => ["admin", "location-sessions"] as const;
+  static adminWrappedCache = () => ["admin", "wrapped-cache"] as const;
 
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;

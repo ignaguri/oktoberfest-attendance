@@ -204,3 +204,48 @@ export {
   useWrappedAccess,
   useWrappedDataApi,
 } from "./useWrapped";
+
+// Admin hooks
+export {
+  useAdminLocationSessions,
+  useCleanupExpiredLocationSessions,
+  useForceStopLocationSession,
+} from "./useAdminLocation";
+export {
+  useAdminFestival,
+  useAdminFestivals,
+  useCreateAdminFestival,
+  useDeleteAdminFestival,
+  useUpdateAdminFestival,
+} from "./useAdminFestivals";
+export {
+  useAdminGroup,
+  useAdminGroupMembers,
+  useAdminGroups,
+  useAdminWinningCriteria,
+  useDeleteAdminGroup,
+  useUpdateAdminGroup,
+} from "./useAdminGroups";
+export {
+  useAddAdminFestivalTent,
+  useAddAllAdminFestivalTents,
+  useAdminAvailableTents,
+  useAdminFestivalTents,
+  useAdminTents,
+  useCopyAdminFestivalTents,
+  useCreateAdminTent,
+  useRemoveAdminFestivalTent,
+  useSetAdminFestivalTentPrice,
+  useUpdateAdminTent,
+} from "./useAdminTents";
+export {
+  useAdminUser,
+  useAdminUserAttendances,
+  useAdminUsers,
+  useDeleteAdminAttendance,
+  useDeleteAdminUser,
+  useUpdateAdminAttendance,
+  useUpdateAdminUserAuth,
+  useUpdateAdminUserProfile,
+} from "./useAdminUsers";
+export { useAdminWrappedCache, useRegenerateWrappedCache } from "./useAdminWrappedCache";
