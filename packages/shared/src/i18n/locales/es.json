@@ -1645,7 +1645,29 @@
         "groups": "Editar y eliminar grupos",
         "users": "Buscar y gestionar cuentas de usuario",
         "location": "Sesiones activas de ubicación compartida",
-        "tents": "Crear y editar el catálogo de carpas"
+        "tents": "Crear y editar el catálogo de carpas",
+        "cache": "Regenerar los datos de Wrapped en caché"
+      },
+      "cache": {
+        "description": "Las estadísticas de Wrapped se calculan una vez y se guardan en caché. Regenerar actualiza una entrada existente; no puede crear una para alguien que nunca abrió su Wrapped.",
+        "regenerateAll": "Regenerar todo",
+        "regenerateAllHint": "Recalcula todas las entradas en caché de abajo",
+        "regenerating": "Regenerando...",
+        "regenerateEntry": "Regenerar",
+        "regenerateEntryHint": "Recalcula el Wrapped de este usuario para este festival",
+        "regenerateSuccess_one": "1 entrada regenerada",
+        "regenerateSuccess_other": "{{count}} entradas regeneradas",
+        "regenerateError": "No se pudo regenerar la caché",
+        "empty": "Todavía no hay nada en caché",
+        "emptyHint": "Una entrada aparece la primera vez que alguien abre su Wrapped.",
+        "columns": {
+          "firstGenerated": "Generada por primera vez",
+          "lastRefreshed": "Última actualización"
+        },
+        "source": {
+          "system": "Generada en la primera visita",
+          "admin": "Actualizada por un admin"
+        }
       },
       "tents": {
         "catalogueHint": "Carpas compartidas por todos los festivales. Qué festival ofrece una carpa, y a qué precio, se define en ese festival.",

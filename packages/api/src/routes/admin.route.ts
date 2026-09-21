@@ -10,6 +10,7 @@ import {
   AdminGroupSchema,
   AdminTentSchema,
   AdminUserSchema,
+  AdminWrappedCacheEntrySchema,
   CopyAdminFestivalTentsSchema,
   CreateAdminFestivalSchema,
   CreateAdminTentSchema,
@@ -1053,6 +1054,41 @@ app.openapi(removeFestivalTentRoute, async (c) => {
   }
 
   return c.json({ success: true }, 200);
+});
+
+// ===========================================================================
+// Wrapped cache
+// ===========================================================================
+
+// GET /admin/wrapped-cache - List every cached Wrapped payload
+const listWrappedCacheRoute = createRoute({
+  method: "get",
+  path: "/admin/wrapped-cache",
+  tags: ["admin"],
+  summary: "List cached Wrapped entries (admin)",
+  description:
+    "One row per user and festival whose Wrapped has been calculated, newest first. The cached payload itself is not returned. Regeneration lives at POST /wrapped/regenerate.",
+  responses: {
+    200: {
+      description: "Cached Wrapped entries",
+      content: {
+        "application/json": {
+          schema: z.object({ entries: z.array(AdminWrappedCacheEntrySchema) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listWrappedCacheRoute, async (c) => {
+  const { supabase } = c.var;
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const entries = await adminRepo.listWrappedCache();
+
+  return c.json({ entries }, 200);
 });
 
 export default app;

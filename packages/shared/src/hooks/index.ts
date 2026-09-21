@@ -248,3 +248,4 @@ export {
   useUpdateAdminUserAuth,
   useUpdateAdminUserProfile,
 } from "./useAdminUsers";
+export { useAdminWrappedCache, useRegenerateWrappedCache } from "./useAdminWrappedCache";

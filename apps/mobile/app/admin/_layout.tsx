@@ -91,6 +91,12 @@ export default function AdminLayout() {
           title: t("admin.location.title"),
         }}
       />
+      <Stack.Screen
+        name="cache"
+        options={{
+          title: t("admin.tabs.cache"),
+        }}
+      />
     </Stack>
   );
 }

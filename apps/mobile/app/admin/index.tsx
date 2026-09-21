@@ -2,7 +2,15 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
 import type { LucideIcon } from "lucide-react-native";
-import { CalendarDays, ChevronRight, MapPin, Tent, Users, UsersRound } from "lucide-react-native";
+import {
+  CalendarDays,
+  ChevronRight,
+  Database,
+  MapPin,
+  Tent,
+  Users,
+  UsersRound,
+} from "lucide-react-native";
 
 import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
@@ -44,6 +52,11 @@ const SECTIONS = [
     key: "location" as const,
     href: "/admin/location" as const,
     Icon: MapPin,
+  },
+  {
+    key: "cache" as const,
+    href: "/admin/cache" as const,
+    Icon: Database,
   },
 ] satisfies { key: string; href: string; Icon: LucideIcon }[];
 

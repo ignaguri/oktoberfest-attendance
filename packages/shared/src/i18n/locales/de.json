@@ -1804,7 +1804,29 @@
         "groups": "Gruppen bearbeiten und entfernen",
         "users": "Benutzerkonten suchen und verwalten",
         "location": "Aktive Standortfreigaben",
-        "tents": "Zeltkatalog erstellen und bearbeiten"
+        "tents": "Zeltkatalog erstellen und bearbeiten",
+        "cache": "Zwischengespeicherte Wrapped-Daten neu berechnen"
+      },
+      "cache": {
+        "description": "Wrapped-Statistiken werden einmal berechnet und zwischengespeichert. Eine Neuberechnung aktualisiert einen vorhandenen Eintrag; sie kann keinen für jemanden anlegen, der sein Wrapped nie geöffnet hat.",
+        "regenerateAll": "Alle neu berechnen",
+        "regenerateAllHint": "Berechnet jeden zwischengespeicherten Eintrag unten neu",
+        "regenerating": "Wird neu berechnet...",
+        "regenerateEntry": "Neu berechnen",
+        "regenerateEntryHint": "Berechnet das Wrapped dieses Benutzers für dieses Festival neu",
+        "regenerateSuccess_one": "1 Eintrag neu berechnet",
+        "regenerateSuccess_other": "{{count}} Einträge neu berechnet",
+        "regenerateError": "Der Cache konnte nicht neu berechnet werden",
+        "empty": "Noch nichts zwischengespeichert",
+        "emptyHint": "Ein Eintrag entsteht, sobald jemand sein Wrapped zum ersten Mal öffnet.",
+        "columns": {
+          "firstGenerated": "Zuerst erstellt",
+          "lastRefreshed": "Zuletzt aktualisiert"
+        },
+        "source": {
+          "system": "Beim ersten Aufruf erstellt",
+          "admin": "Zuletzt von einem Admin aktualisiert"
+        }
       },
       "tents": {
         "catalogueHint": "Zelte, die alle Festivals gemeinsam nutzen. Welches Festival ein Zelt anbietet und zu welchem Preis, wird beim jeweiligen Festival festgelegt.",

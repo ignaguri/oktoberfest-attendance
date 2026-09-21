@@ -18,6 +18,7 @@ import type {
   AdminLocationSession,
   AdminTent,
   AdminUser,
+  AdminWrappedCacheEntry,
   CopyAdminFestivalTentsInput,
   AttendanceByDate,
   CarryOverCandidatesResponse,
@@ -3124,6 +3125,23 @@ export function createTypedApiClient(config: ApiClientConfig) {
             await extractApiError(response, "Failed to cleanup expired sessions");
           }
           return parseJsonResponse<{ success: boolean; cleanedCount: number }>(response);
+        },
+      },
+
+      wrappedCache: {
+        /**
+         * Lists the cached Wrapped entries. Regeneration is not here: it lives
+         * on `wrapped.regenerateCache`, which predates the admin namespace.
+         */
+        async list(): Promise<{ entries: AdminWrappedCacheEntry[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/admin/wrapped-cache`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch wrapped cache");
+          }
+          return parseJsonResponse<{ entries: AdminWrappedCacheEntry[] }>(response);
         },
       },
     },

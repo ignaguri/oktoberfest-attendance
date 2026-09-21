@@ -84,6 +84,8 @@ export class QueryKeys {
   static wrapped = (festivalId: string) => ["wrapped", festivalId] as const;
   static wrappedAccess = (festivalId: string) => ["wrapped", "access", festivalId] as const;
   static availableWrapped = () => ["wrapped", "available"] as const;
+  /** Prefix covering every Wrapped read, for invalidation after a regeneration. */
+  static wrappedAll = () => ["wrapped"] as const;
 
   // Calendar queries
   static personalCalendar = (festivalId: string) => ["calendar", "personal", festivalId] as const;
@@ -174,6 +176,7 @@ export class QueryKeys {
     ] as const;
   /** Prefix covering every cached session list, for invalidation after a mutation. */
   static adminLocationSessionsAll = () => ["admin", "location-sessions"] as const;
+  static adminWrappedCache = () => ["admin", "wrapped-cache"] as const;
 
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;

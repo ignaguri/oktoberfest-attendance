@@ -1585,7 +1585,29 @@
         "groups": "Edit and remove groups",
         "users": "Find and manage user accounts",
         "location": "Active location sharing sessions",
-        "tents": "Create and edit the tent catalogue"
+        "tents": "Create and edit the tent catalogue",
+        "cache": "Regenerate cached Wrapped data"
+      },
+      "cache": {
+        "description": "Wrapped statistics are calculated once and cached. Regenerating refreshes an existing entry; it cannot create one for someone who has never opened their Wrapped.",
+        "regenerateAll": "Regenerate all",
+        "regenerateAllHint": "Recalculates every cached entry below",
+        "regenerating": "Regenerating...",
+        "regenerateEntry": "Regenerate",
+        "regenerateEntryHint": "Recalculates this user's Wrapped for this festival",
+        "regenerateSuccess_one": "1 entry regenerated",
+        "regenerateSuccess_other": "{{count}} entries regenerated",
+        "regenerateError": "Could not regenerate the cache",
+        "empty": "Nothing cached yet",
+        "emptyHint": "An entry appears the first time someone opens their Wrapped.",
+        "columns": {
+          "firstGenerated": "First generated",
+          "lastRefreshed": "Last refreshed"
+        },
+        "source": {
+          "system": "Generated on first view",
+          "admin": "Last refreshed by an admin"
+        }
       },
       "tents": {
         "catalogueHint": "Tents shared by every festival. Which festival serves a tent, and at what price, is set on that festival.",

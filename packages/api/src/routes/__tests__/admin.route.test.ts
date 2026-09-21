@@ -1189,4 +1189,67 @@ describe("Admin Routes - Unit Tests", () => {
       expect(chain.select).toHaveBeenCalled();
     });
   });
+
+  describe("GET /admin/wrapped-cache", () => {
+    it("flattens the profile and festival embeds onto each entry", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              id: FESTIVAL_TENT_ID,
+              user_id: OTHER_ID,
+              festival_id: FESTIVAL_ID,
+              generated_by: "admin",
+              created_at: "2026-09-01T10:00:00Z",
+              updated_at: "2026-09-19T22:44:14Z",
+              user: { username: "hansi", full_name: "Hans Meier" },
+              festival: { name: "Oktoberfest 2025" },
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest("/admin/wrapped-cache"));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.entries).toEqual([
+        {
+          id: FESTIVAL_TENT_ID,
+          user_id: OTHER_ID,
+          username: "hansi",
+          full_name: "Hans Meier",
+          festival_id: FESTIVAL_ID,
+          festival_name: "Oktoberfest 2025",
+          generated_by: "admin",
+          created_at: "2026-09-01T10:00:00Z",
+          updated_at: "2026-09-19T22:44:14Z",
+        },
+      ]);
+    });
+
+    it("never selects the cached payload", async () => {
+      const chain = createMockChain({ data: [], error: null });
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(chain);
+
+      const res = await app.request(createAuthRequest("/admin/wrapped-cache"));
+
+      expect(res.status).toBe(200);
+      // wrapped_data is a fat jsonb blob per row and the screen shows none of
+      // it; pulling it would make the list cost multiples of what it needs.
+      expect(chain.select).toHaveBeenCalledWith(expect.not.stringContaining("wrapped_data"));
+    });
+
+    it("answers with an empty list rather than null when nothing is cached", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
+
+      const res = await app.request(createAuthRequest("/admin/wrapped-cache"));
+
+      expect(res.status).toBe(200);
+      expect(((await res.json()) as any).entries).toEqual([]);
+    });
+  });
 });

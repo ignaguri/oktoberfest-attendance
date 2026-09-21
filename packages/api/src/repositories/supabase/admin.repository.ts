@@ -8,6 +8,7 @@ import type {
   AdminGroupMember,
   AdminTent,
   AdminUser,
+  AdminWrappedCacheEntry,
   CopyAdminFestivalTentsInput,
   ListAdminUsersResponse,
   CreateAdminFestivalInput,
@@ -105,6 +106,23 @@ interface FestivalTentRow {
   id: string;
   beer_price: number | null;
   tent: { id: string; name: string; category: TentCategory | null };
+}
+
+/**
+ * A `wrapped_data_cache` row with its two embeds.
+ *
+ * `generated_by` is narrowed to the CHECK constraint's two values; the
+ * generated DB types widen it to string, the same way they do tent categories.
+ */
+interface WrappedCacheRow {
+  id: string;
+  user_id: string;
+  festival_id: string;
+  generated_by: "system" | "admin";
+  created_at: string;
+  updated_at: string;
+  user: { username: string | null; full_name: string | null };
+  festival: { name: string };
 }
 
 /** Euros to cents, the unit `beer_price_cents` and `drink_type_prices` store. */
@@ -1398,5 +1416,41 @@ export class SupabaseAdminRepository {
       avg_price:
         prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : null,
     };
+  }
+
+  // =========================================================================
+  // Wrapped cache
+  // =========================================================================
+
+  /**
+   * Every cached Wrapped payload, most recently regenerated first.
+   *
+   * Read on the caller's own token: "Admins can manage wrapped cache" is an
+   * ALL policy over the whole table, so a super admin sees every row while
+   * everyone else sees only their own.
+   */
+  async listWrappedCache(): Promise<AdminWrappedCacheEntry[]> {
+    const { data, error } = await this.supabase
+      .from("wrapped_data_cache")
+      .select(
+        "id, user_id, festival_id, generated_by, created_at, updated_at, user:profiles!inner(username, full_name), festival:festivals!inner(name)",
+      )
+      .order("updated_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching wrapped cache: ${error.message}`);
+    }
+
+    return ((data ?? []) as unknown as WrappedCacheRow[]).map((row) => ({
+      id: row.id,
+      user_id: row.user_id,
+      username: row.user.username,
+      full_name: row.user.full_name,
+      festival_id: row.festival_id,
+      festival_name: row.festival.name,
+      generated_by: row.generated_by,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    }));
   }
 }

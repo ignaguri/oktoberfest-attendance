@@ -21310,6 +21310,133 @@
           }
         }
       }
+    },
+    "/v1/admin/wrapped-cache": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List cached Wrapped entries (admin)",
+        "description": "One row per user and festival whose Wrapped has been calculated, newest first. The cached payload itself is not returned. Regeneration lives at POST /wrapped/regenerate.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cached Wrapped entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "full_name": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "festival_id": {
+                            "type": "string"
+                          },
+                          "festival_name": {
+                            "type": "string"
+                          },
+                          "generated_by": {
+                            "type": "string",
+                            "enum": [
+                              "system",
+                              "admin"
+                            ]
+                          },
+                          "created_at": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "username",
+                          "full_name",
+                          "festival_id",
+                          "festival_name",
+                          "generated_by",
+                          "created_at",
+                          "updated_at"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

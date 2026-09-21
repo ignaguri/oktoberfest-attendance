@@ -406,3 +406,31 @@ export const AdminFestivalTentStatsSchema = z.object({
 });
 
 export type AdminFestivalTentStats = z.infer<typeof AdminFestivalTentStatsSchema>;
+
+// ===========================================================================
+// Wrapped cache
+// ===========================================================================
+
+/**
+ * One cached Wrapped payload, without the payload.
+ *
+ * The blob itself is a fat jsonb column the admin screen has no use for; all
+ * it needs to say is whose it is, which festival, and how stale.
+ *
+ * `generated_by` is an enum here because `wrapped_data_cache_generated_by_check`
+ * allows exactly these two: "system" when the row was written the first time
+ * that user opened their Wrapped, "admin" once a regeneration has touched it.
+ */
+export const AdminWrappedCacheEntrySchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  username: z.string().nullable(),
+  full_name: z.string().nullable(),
+  festival_id: z.string(),
+  festival_name: z.string(),
+  generated_by: z.enum(["system", "admin"]),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export type AdminWrappedCacheEntry = z.infer<typeof AdminWrappedCacheEntrySchema>;
