@@ -1,9 +1,10 @@
 import type { Database } from "@prostcounter/db";
 import type { Consumption, LogConsumptionInput, TipMode } from "@prostcounter/shared";
-import { calculatePricePaidCents } from "@prostcounter/shared";
+import { calculatePricePaidCents, DEFAULT_DRINK_PRICES } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError, ValidationError } from "../../middleware/error";
 import type { IConsumptionRepository } from "../interfaces";
@@ -80,8 +81,19 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       p_drink_type: drinkType,
     });
 
-    // Fallback to system default
-    const finalBasePriceCents = priceError || price === null ? 1620 : price;
+    // If the cascade cannot answer, fall back per drink type rather than to a
+    // single number: a flat beer price here would recreate the exact bug this
+    // resolution exists to prevent, just on a rarer path. Losing the write
+    // instead is worse, since an offline push would drop the user's drink.
+    const finalBasePriceCents =
+      priceError || price === null ? DEFAULT_DRINK_PRICES[drinkType] : price;
+
+    if (priceError) {
+      logger.error(
+        { festivalId: attendance.festival_id, tentId, drinkType, error: priceError.message },
+        "get_drink_price_cents failed; stored the system default for this drink type",
+      );
+    }
 
     const finalPricePaidCents =
       pricePaidOverrideCents !== undefined

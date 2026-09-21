@@ -38,9 +38,9 @@ DECLARE
 BEGIN
     -- Priority 1: Tent-specific price (if tent_id provided)
     IF p_tent_id IS NOT NULL THEN
-        -- beer_price_cents is the newer column; beer_price (euros) is what the
-        -- web admin panel still writes, so fall back to it rather than lose the
-        -- tent's price entirely.
+        -- beer_price_cents is the newer column, and every writer now keeps it
+        -- in step with beer_price (euros). The COALESCE covers the rows that
+        -- predate the cents column rather than a writer that skips it.
         SELECT ft.id, COALESCE(ft.beer_price_cents, ROUND(ft.beer_price * 100)::integer)
         INTO v_festival_tent_id, v_tent_beer_cents
         FROM festival_tents ft

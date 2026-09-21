@@ -23,7 +23,19 @@ export type FestivalTentInsert = {
   festival_id: string;
   tent_id: string;
   beer_price?: number | null;
+  beer_price_cents?: number | null;
 };
+
+/**
+ * Euros to cents, the unit `beer_price_cents` stores.
+ *
+ * `get_drink_price_cents` prefers that column, so every writer here has to keep
+ * it in step with `beer_price` or the cascade charges a stale price. The mobile
+ * admin repository does the same thing in `admin.repository.ts`.
+ */
+function toCents(beerPrice: number | null | undefined): number | null {
+  return beerPrice === null || beerPrice === undefined ? null : Math.round(beerPrice * 100);
+}
 
 /**
  * Get all tents available for a specific festival
@@ -108,6 +120,7 @@ export async function addTentToFestival(
     festival_id: festivalId,
     tent_id: tentId,
     beer_price: beerPrice,
+    beer_price_cents: toCents(beerPrice),
   };
 
   const { error } = await supabase.from("festival_tents").insert(insertData);
@@ -144,6 +157,7 @@ export async function addAllAvailableTentsToFestival(
     festival_id: festivalId,
     tent_id: tent.id,
     beer_price: defaultBeerPrice,
+    beer_price_cents: toCents(defaultBeerPrice),
   }));
 
   // Insert all tents at once
@@ -210,7 +224,7 @@ export async function updateTentPrice(
 
   const { error } = await supabase
     .from("festival_tents")
-    .update({ beer_price: beerPrice })
+    .update({ beer_price: beerPrice, beer_price_cents: toCents(beerPrice) })
     .eq("festival_id", festivalId)
     .eq("tent_id", tentId);
 
@@ -321,16 +335,21 @@ export async function copyTentsToFestival(
   }
 
   // Prepare insert data
-  const insertData = sourceTents.map((tent) => ({
-    festival_id: targetFestivalId,
-    tent_id: tent.tent_id,
-    beer_price:
+  const insertData = sourceTents.map((tent) => {
+    const beerPrice =
       options.overridePrice !== undefined
         ? options.overridePrice
         : options.copyPrices
           ? tent.beer_price
-          : null,
-  }));
+          : null;
+
+    return {
+      festival_id: targetFestivalId,
+      tent_id: tent.tent_id,
+      beer_price: beerPrice,
+      beer_price_cents: toCents(beerPrice),
+    };
+  });
 
   // Insert tents (ignore conflicts - tent already exists in target festival)
   const { error: insertError } = await supabase.from("festival_tents").upsert(insertData, {
