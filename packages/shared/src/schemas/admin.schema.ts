@@ -81,12 +81,20 @@ export const ListAdminUsersResponseSchema = z.object({
 
 export type ListAdminUsersResponse = z.infer<typeof ListAdminUsersResponseSchema>;
 
-/** Profile fields an admin may change on another user. */
-export const UpdateAdminUserProfileSchema = z.object({
-  username: z.string().min(3).max(30).nullable().optional(),
-  full_name: z.string().min(1).max(100).nullable().optional(),
-  is_super_admin: z.boolean().optional(),
-});
+/**
+ * Profile fields an admin may change on another user.
+ *
+ * `is_super_admin` is deliberately absent. Granting admin rights is a
+ * database-only operation, so no signed-in admin can mint another one through
+ * an app; `.strict()` makes an attempt a 400 rather than a silently dropped
+ * key, which would otherwise read as success to whoever sent it.
+ */
+export const UpdateAdminUserProfileSchema = z
+  .object({
+    username: z.string().min(3).max(30).nullable().optional(),
+    full_name: z.string().min(1).max(100).nullable().optional(),
+  })
+  .strict();
 
 export type UpdateAdminUserProfileInput = z.infer<typeof UpdateAdminUserProfileSchema>;
 
@@ -115,6 +123,15 @@ export const AdminAttendanceSchema = z.object({
   festival_id: z.string().uuid(),
   date: z.string(),
   beer_count: z.number(),
+  /**
+   * Consumptions logged on this day, of any drink type.
+   *
+   * Zero means `beer_count` came from `attendances.beer_count`, the column the
+   * RPCs stopped writing, and editing it is the only case where that write is
+   * visible afterwards. Anything above zero means the count is derived from
+   * `consumptions` and a beer_count write is inert.
+   */
+  drink_count: z.number(),
   tent_ids: z.array(z.string().uuid()),
 });
 
@@ -172,6 +189,23 @@ export const AdminGroupMemberSchema = z.object({
 });
 
 export type AdminGroupMember = z.infer<typeof AdminGroupMemberSchema>;
+
+/**
+ * A group seen from one of its members: the group, plus when that user joined.
+ *
+ * `festival_name` rides along rather than only the id. A user's groups span
+ * festivals, and a group carried over from last year keeps its name, so the
+ * name alone does not say which edition a row belongs to.
+ */
+export const AdminUserGroupSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  festival_id: z.string().uuid(),
+  festival_name: z.string(),
+  joined_at: z.string().nullable(),
+});
+
+export type AdminUserGroup = z.infer<typeof AdminUserGroupSchema>;
 
 export const WinningCriterionSchema = z.object({
   id: z.number(),

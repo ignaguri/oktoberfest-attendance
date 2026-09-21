@@ -9,6 +9,7 @@ import {
   AdminGroupMemberSchema,
   AdminGroupSchema,
   AdminTentSchema,
+  AdminUserGroupSchema,
   AdminUserSchema,
   AdminWrappedCacheEntrySchema,
   CopyAdminFestivalTentsSchema,
@@ -132,6 +133,8 @@ const updateUserProfileRoute = createRoute({
   path: "/admin/users/{userId}/profile",
   tags: ["admin"],
   summary: "Update a user's profile (admin)",
+  description:
+    "Updates username and/or full name. Admin rights are not settable here: they are granted in the database only.",
   request: {
     params: z.object({ userId: z.string().uuid() }),
     body: {
@@ -144,20 +147,18 @@ const updateUserProfileRoute = createRoute({
       content: { "application/json": { schema: z.object({ success: z.boolean() }) } },
     },
     ...errorResponses,
+    409: {
+      description: "The requested username already belongs to another account",
+      content: { "application/json": { schema: errorSchema } },
+    },
   },
   security: [{ bearerAuth: [] }],
 });
 
 app.openapi(updateUserProfileRoute, async (c) => {
-  const { user, supabase } = c.var;
+  const { supabase } = c.var;
   const { userId } = c.req.valid("param");
   const body = c.req.valid("json");
-
-  // Revoking your own admin rights locks you out of this panel with no way
-  // back in from either app.
-  if (userId === user.id && body.is_super_admin === false) {
-    throw new ForbiddenError("You cannot revoke your own admin access");
-  }
 
   const adminRepo = new SupabaseAdminRepository(supabase);
   await adminRepo.updateUserProfile(userId, body);
@@ -264,6 +265,40 @@ app.openapi(listUserAttendancesRoute, async (c) => {
   const attendances = await adminRepo.listUserAttendances(userId);
 
   return c.json({ attendances }, 200);
+});
+
+// GET /admin/users/:userId/groups - List the groups a user belongs to
+const listUserGroupsRoute = createRoute({
+  method: "get",
+  path: "/admin/users/{userId}/groups",
+  tags: ["admin"],
+  summary: "List a user's groups (admin)",
+  description: "Returns every group the user is a member of, most recently joined first.",
+  request: {
+    params: z.object({ userId: z.string().uuid() }),
+  },
+  responses: {
+    200: {
+      description: "Groups retrieved successfully",
+      content: {
+        "application/json": {
+          schema: z.object({ groups: z.array(AdminUserGroupSchema) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listUserGroupsRoute, async (c) => {
+  const { supabase } = c.var;
+  const { userId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const groups = await adminRepo.listUserGroups(userId);
+
+  return c.json({ groups }, 200);
 });
 
 // PATCH /admin/attendances/:attendanceId - Update an attendance

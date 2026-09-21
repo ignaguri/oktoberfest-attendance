@@ -16011,6 +16011,28 @@
                 }
               }
             }
+          },
+          "409": {
+            "description": "The requested username already belongs to another account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
           }
         }
       },
@@ -17814,6 +17836,7 @@
           "admin"
         ],
         "summary": "Update a user's profile (admin)",
+        "description": "Updates username and/or full name. Admin rights are not settable here: they are granted in the database only.",
         "security": [
           {
             "bearerAuth": []
@@ -17847,11 +17870,9 @@
                     "nullable": true,
                     "minLength": 1,
                     "maxLength": 100
-                  },
-                  "is_super_admin": {
-                    "type": "boolean"
                   }
-                }
+                },
+                "additionalProperties": false
               }
             }
           }
@@ -17899,6 +17920,28 @@
           },
           "403": {
             "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The requested username already belongs to another account",
             "content": {
               "application/json": {
                 "schema": {
@@ -18085,6 +18128,9 @@
                           "beer_count": {
                             "type": "number"
                           },
+                          "drink_count": {
+                            "type": "number"
+                          },
                           "tent_ids": {
                             "type": "array",
                             "items": {
@@ -18099,6 +18145,7 @@
                           "festival_id",
                           "date",
                           "beer_count",
+                          "drink_count",
                           "tent_ids"
                         ]
                       }
@@ -18106,6 +18153,125 @@
                   },
                   "required": [
                     "attendances"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/users/{userId}/groups": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List a user's groups (admin)",
+        "description": "Returns every group the user is a member of, most recently joined first.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Groups retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "groups": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "festival_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "festival_name": {
+                            "type": "string"
+                          },
+                          "joined_at": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "festival_id",
+                          "festival_name",
+                          "joined_at"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "groups"
                   ]
                 }
               }

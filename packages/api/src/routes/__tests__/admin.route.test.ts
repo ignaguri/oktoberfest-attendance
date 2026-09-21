@@ -116,6 +116,28 @@ describe("Admin Routes - Unit Tests", () => {
       expect(body.truncated).toBe(false);
     });
 
+    // A pasted address is the natural way to look one user up, and the dot is
+    // stripped by the wildcard sanitizer that guards the profile ilike lanes.
+    // The email lane compares in memory, so it has to see the term untouched.
+    it("finds a user by their full email address", async () => {
+      mockListUsers.mockResolvedValue({
+        data: {
+          users: [
+            { id: OTHER_ID, email: "user5@example.com", created_at: "2026-01-01T00:00:00Z" },
+            { id: ADMIN_ID, email: "someone@example.com", created_at: "2026-01-01T00:00:00Z" },
+          ],
+        },
+        error: null,
+      });
+
+      const res = await app.request(createAuthRequest("/admin/users?search=user5%40example.com"));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.users).toHaveLength(1);
+      expect(body.users[0].email).toBe("user5@example.com");
+    });
+
     it("requires an authorization header", async () => {
       const res = await app.request("/admin/users");
       expect(res.status).toBe(401);
@@ -131,7 +153,7 @@ describe("Admin Routes - Unit Tests", () => {
       const res = await app.request(
         createAuthRequest(`/admin/users/${OTHER_ID}/profile`, {
           method: "PATCH",
-          body: JSON.stringify({ is_super_admin: true }),
+          body: JSON.stringify({ full_name: "Renamed" }),
         }),
       );
 
@@ -139,20 +161,45 @@ describe("Admin Routes - Unit Tests", () => {
       expect(mockSupabase.from).toHaveBeenCalledWith("profiles");
     });
 
-    it("refuses to let an admin revoke their own access", async () => {
+    // Admin rights are granted in the database, never through an app. The body
+    // schema is strict, so an attempt is refused rather than quietly dropped:
+    // a stripped key would answer 200 and leave the caller believing it took.
+    it("refuses a request that tries to grant admin rights", async () => {
       const res = await app.request(
-        createAuthRequest(`/admin/users/${ADMIN_ID}/profile`, {
+        createAuthRequest(`/admin/users/${OTHER_ID}/profile`, {
           method: "PATCH",
-          body: JSON.stringify({ is_super_admin: false }),
+          body: JSON.stringify({ is_super_admin: true }),
         }),
       );
 
-      expect(res.status).toBe(403);
-      // The write must not have been attempted at all.
+      expect(res.status).toBe(400);
       expect(mockSupabase.from).not.toHaveBeenCalled();
     });
 
-    it("still allows an admin to edit their own non-admin fields", async () => {
+    // `profiles.username` is UNIQUE. Answering 409 with a code the client can
+    // read is what lets the panel say "that username is taken" instead of
+    // showing a generic save failure for a fixable mistake.
+    it("reports 409 when the username is already taken", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: null,
+          error: { code: "23505", message: "duplicate key value violates unique constraint" },
+        }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/users/${OTHER_ID}/profile`, {
+          method: "PATCH",
+          body: JSON.stringify({ username: "taken" }),
+        }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.code).toBe("USERNAME_TAKEN");
+    });
+
+    it("still allows an admin to edit their own profile", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({ data: null, error: null }),
       );
@@ -342,6 +389,7 @@ describe("Admin Routes - Unit Tests", () => {
                 festival_id: "44444444-4444-4444-8444-444444444444",
                 date: "2026-09-20",
                 beer_count: 7,
+                drink_count: 9,
               },
             ],
             error: null,
@@ -361,6 +409,97 @@ describe("Admin Routes - Unit Tests", () => {
       expect(mockSupabase.from).toHaveBeenNthCalledWith(1, "attendance_with_totals");
       const body = (await res.json()) as any;
       expect(body.attendances[0].beer_count).toBe(7);
+      expect(body.attendances[0].drink_count).toBe(9);
+    });
+
+    // The view's LATERAL carries HAVING count(*) > 0, so a day with no
+    // consumptions gets no row from it: drink_count comes back null and
+    // beer_count falls through to the dead column. That pair is what tells the
+    // editor a beer_count write on this day is the one that still lands.
+    it("reports drink_count 0 for a day the view found no consumptions on", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [
+              {
+                id: ATTENDANCE_ID,
+                user_id: OTHER_ID,
+                festival_id: "44444444-4444-4444-8444-444444444444",
+                date: "2026-09-20",
+                beer_count: 3,
+                drink_count: null,
+              },
+            ],
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
+            error: null,
+          }),
+        );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/attendances`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.attendances[0].drink_count).toBe(0);
+      expect(body.attendances[0].beer_count).toBe(3);
+    });
+  });
+
+  describe("GET /admin/users/:userId/groups", () => {
+    it("flattens the group and its festival onto each membership", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              joined_at: "2026-09-01T10:00:00Z",
+              groups: {
+                id: GROUP_ID,
+                name: "Wiesn Crew",
+                festival_id: FESTIVAL_ID,
+                festivals: { name: "Oktoberfest 2026" },
+              },
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/groups`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.groups).toEqual([
+        {
+          id: GROUP_ID,
+          name: "Wiesn Crew",
+          festival_id: FESTIVAL_ID,
+          festival_name: "Oktoberfest 2026",
+          joined_at: "2026-09-01T10:00:00Z",
+        },
+      ]);
+    });
+
+    // group_members.group_id carries no NOT NULL constraint, so a membership
+    // pointing at nothing is representable. It has no group to open, which
+    // makes it a row to drop rather than one to render half of.
+    it("drops a membership whose group did not resolve", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [{ joined_at: "2026-09-01T10:00:00Z", groups: null }],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/groups`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.groups).toEqual([]);
     });
   });
 

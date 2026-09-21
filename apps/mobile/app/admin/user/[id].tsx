@@ -1,17 +1,21 @@
 import {
   useAdminUser,
   useAdminUserAttendances,
+  useAdminUserGroups,
   useDeleteAdminAttendance,
   useDeleteAdminUser,
   useUpdateAdminUserAuth,
-  useUpdateAdminUserProfile,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AdminAttendance } from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { CalendarDays, Trash2 } from "lucide-react-native";
+import { CalendarDays, Trash2, UsersRound } from "lucide-react-native";
 import { useCallback, useState } from "react";
 
 import { AdminAttendanceList } from "@/components/admin/admin-attendance-list";
+import { EditAttendanceSheet } from "@/components/admin/edit-attendance-sheet";
+import { UserGroupsList } from "@/components/admin/user-groups-list";
+import { UserIdentityCard } from "@/components/admin/user-identity-card";
 import { useAlertDialog } from "@/components/ui/alert-dialog";
 import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -20,12 +24,11 @@ import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField } from "@/components/ui/input";
 import { ScrollView } from "@/components/ui/scroll-view";
-import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { IconColors, SwitchColors } from "@/lib/constants/colors";
+import { IconColors } from "@/lib/constants/colors";
 
 export default function AdminUserDetailScreen() {
   const { t } = useTranslation();
@@ -36,28 +39,30 @@ export default function AdminUserDetailScreen() {
 
   const { user, isLoading, error, refetch } = useAdminUser(id);
   const { attendances, isLoading: attendancesLoading } = useAdminUserAttendances(id);
+  const {
+    groups,
+    isLoading: groupsLoading,
+    error: groupsError,
+    refetch: refetchGroups,
+  } = useAdminUserGroups(id);
 
-  const updateProfile = useUpdateAdminUserProfile();
   const updateAuth = useUpdateAdminUserAuth();
   const deleteUser = useDeleteAdminUser();
   const deleteAttendance = useDeleteAdminAttendance();
 
   const [newPassword, setNewPassword] = useState("");
 
-  // An admin editing themselves cannot self-demote or self-delete; the server
-  // rejects both, and hiding the controls avoids a confusing 403.
-  const isSelf = currentUser?.id === id;
+  // The row being edited, seeded on tap rather than in an effect, so a
+  // background refetch of the list cannot overwrite an open draft.
+  const [editing, setEditing] = useState<AdminAttendance | null>(null);
 
-  const handleToggleAdmin = useCallback(
-    async (value: boolean) => {
-      try {
-        await updateProfile.mutate({ userId: id, data: { is_super_admin: value } });
-      } catch {
-        showDialog(t("common.status.error"), t("admin.mobile.userDetail.updateError"));
-      }
-    },
-    [id, updateProfile, showDialog, t],
-  );
+  // An admin cannot delete their own account; the server rejects it, and hiding
+  // the control avoids a confusing 403.
+  //
+  // Granting or revoking super admin is not offered here at all. It is a
+  // database-only change by deliberate policy, so the panel that every admin
+  // can reach cannot mint another one.
+  const isSelf = currentUser?.id === id;
 
   const handleSetPassword = useCallback(() => {
     showDialog(
@@ -91,6 +96,13 @@ export default function AdminUserDetailScreen() {
       },
     );
   }, [id, deleteUser, router, showDialog, t]);
+
+  const showError = useCallback(
+    (message: string) => {
+      showDialog(t("common.status.error"), message);
+    },
+    [showDialog, t],
+  );
 
   const handleDeleteAttendance = useCallback(
     (attendanceId: string) => {
@@ -129,41 +141,7 @@ export default function AdminUserDetailScreen() {
       <ScrollView className="flex-1 bg-background-50" contentContainerClassName="p-4">
         <VStack space="md">
           {/* Identity */}
-          <Card size="md" variant="elevated">
-            <VStack space="xs">
-              <Text className="text-lg font-semibold text-typography-900">
-                {user.profile?.full_name ||
-                  user.profile?.username ||
-                  t("admin.mobile.users.noName")}
-              </Text>
-              {user.profile?.username && (
-                <Text className="text-sm text-typography-500">@{user.profile.username}</Text>
-              )}
-              <Text className="text-sm text-typography-500">{user.email}</Text>
-            </VStack>
-          </Card>
-
-          {/* Admin flag */}
-          <Card size="md" variant="elevated">
-            <HStack className="items-center justify-between">
-              <VStack className="flex-1 pr-3">
-                <Text className="text-typography-900">{t("admin.users.form.isSuperAdmin")}</Text>
-                <Text className="text-sm text-typography-500">
-                  {isSelf
-                    ? t("admin.mobile.userDetail.cannotDemoteSelf")
-                    : t("admin.mobile.userDetail.adminHint")}
-                </Text>
-              </VStack>
-              <Switch
-                value={user.profile?.is_super_admin === true}
-                onValueChange={handleToggleAdmin}
-                isDisabled={isSelf || updateProfile.loading}
-                trackColor={{ false: SwitchColors.trackOff, true: SwitchColors.trackOn }}
-                thumbColor={SwitchColors.thumb}
-                accessibilityLabel={t("admin.users.form.isSuperAdmin")}
-              />
-            </HStack>
-          </Card>
+          <UserIdentityCard user={user} onError={showError} />
 
           {/* Password reset */}
           <Card size="md" variant="elevated">
@@ -212,7 +190,26 @@ export default function AdminUserDetailScreen() {
               <AdminAttendanceList
                 attendances={attendances}
                 isLoading={attendancesLoading}
+                onEdit={setEditing}
                 onDelete={handleDeleteAttendance}
+              />
+            </VStack>
+          </Card>
+
+          {/* Groups */}
+          <Card size="md" variant="elevated">
+            <VStack space="sm">
+              <HStack space="sm" className="items-center">
+                <UsersRound size={18} color={IconColors.primary} />
+                <Text className="text-typography-900">{t("admin.mobile.userDetail.groups")}</Text>
+              </HStack>
+
+              <UserGroupsList
+                groups={groups}
+                isLoading={groupsLoading}
+                error={groupsError}
+                onRetry={refetchGroups}
+                onOpen={(groupId) => router.push(`/admin/group/${groupId}`)}
               />
             </VStack>
           </Card>
@@ -244,6 +241,15 @@ export default function AdminUserDetailScreen() {
           <View className="h-4" />
         </VStack>
       </ScrollView>
+
+      {editing && (
+        <EditAttendanceSheet
+          key={editing.id}
+          attendance={editing}
+          onClose={() => setEditing(null)}
+          onError={showError}
+        />
+      )}
 
       <ConfirmAlertDialog dialog={dialog} onClose={closeDialog} />
     </>

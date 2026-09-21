@@ -4,6 +4,7 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useTipCalculation } from "@prostcounter/shared/hooks";
 import { changeLanguage } from "@prostcounter/shared/i18n";
 import type { ProfileForm, TipMode } from "@prostcounter/shared/schemas";
@@ -24,7 +25,8 @@ import { Label } from "@/components/ui/label";
 import { PhotoPrivacySettings } from "@/components/ui/photo-privacy-settings";
 import { useDeleteProfile, useResetTutorial } from "@/hooks/useProfile";
 import { useCurrentProfile, useCurrentUser, useUpdateProfile } from "@/lib/data";
-import { useTranslation } from "@/lib/i18n/client";
+import { ApiError } from "@/lib/api-client";
+import { translateError, useTranslation } from "@/lib/i18n/client";
 
 export default function AccountForm() {
   const { t } = useTranslation();
@@ -131,7 +133,13 @@ export default function AccountForm() {
       toast.success(t("notifications.success.profileUpdated"));
       setIsEditing(false);
       // Form will be automatically reset when profile data updates via React Query
-    } catch {
+    } catch (error) {
+      // Usernames are unique across accounts, and the form stays open on a
+      // 409 so the name can be changed rather than retyped from scratch.
+      if (error instanceof ApiError && error.code === ErrorCodes.USERNAME_TAKEN) {
+        toast.error(translateError(t, error.code));
+        return;
+      }
       toast.error(t("notifications.error.profileUpdateFailed"));
     }
   };

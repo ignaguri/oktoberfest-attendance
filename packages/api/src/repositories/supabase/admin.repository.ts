@@ -8,6 +8,7 @@ import type {
   AdminGroupMember,
   AdminTent,
   AdminUser,
+  AdminUserGroup,
   AdminWrappedCacheEntry,
   CopyAdminFestivalTentsInput,
   ListAdminUsersResponse,
@@ -201,8 +202,14 @@ export class SupabaseAdminRepository {
 
     if (search) {
       const term = sanitizeSearchTerm(search);
-      const lowered = term.toLowerCase();
       const pattern = `%${term}%`;
+
+      // Email is compared in JS below, so it uses the raw term rather than the
+      // sanitized one. sanitizeSearchTerm strips `.` along with the wildcards,
+      // which turns a pasted address into "user5examplecom" and matches
+      // nobody; there is no filter syntax on this side to protect, and no
+      // length cap either, since truncating the needle would only widen it.
+      const emailTerm = search.trim().toLowerCase();
 
       // Two separate ilike queries rather than one .or() filter: the search
       // term would otherwise be interpolated into PostgREST filter syntax.
@@ -226,7 +233,7 @@ export class SupabaseAdminRepository {
       matchingIds = authUsers
         .filter(
           (user) =>
-            profileMatches.has(user.id) || user.email?.toLowerCase().includes(lowered) === true,
+            profileMatches.has(user.id) || user.email?.toLowerCase().includes(emailTerm) === true,
         )
         .map((user) => user.id);
     } else {
@@ -299,6 +306,12 @@ export class SupabaseAdminRepository {
    */
   async updateUserProfile(userId: string, input: UpdateAdminUserProfileInput): Promise<void> {
     const { error } = await this.supabase.from("profiles").update(input).eq("id", userId);
+
+    // `profiles.username` is UNIQUE, so handing a taken name to this is the
+    // admin asking for something impossible, not the server falling over.
+    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+      throw new ConflictError(ErrorCodes.USERNAME_TAKEN);
+    }
 
     if (error) {
       throw new Error(`Error updating user profile: ${error.message}`);
@@ -387,13 +400,20 @@ export class SupabaseAdminRepository {
    * `consumptions` and falls back to the column only for days that have none,
    * which is what every other read in the API uses.
    *
+   * `drink_count` rides along for the editor's benefit. The view's LATERAL
+   * carries `HAVING count(*) > 0`, so `attendances.beer_count` is only reached
+   * on a day with no consumptions at all -- which is exactly the set of days
+   * where writing it through `updateAttendance` changes what anyone sees. A
+   * client cannot tell those days apart from the count alone, since a day with
+   * three beers and a day whose dead column says three look identical.
+   *
    * Tent visits are fetched in one query for the whole set and grouped in
    * memory; the web panel issues one query per attendance instead.
    */
   async listUserAttendances(userId: string): Promise<AdminAttendance[]> {
     const { data: attendances, error } = await this.supabase
       .from("attendance_with_totals")
-      .select("id, user_id, festival_id, date, beer_count")
+      .select("id, user_id, festival_id, date, beer_count, drink_count")
       .eq("user_id", userId)
       .order("date", { ascending: false });
 
@@ -454,6 +474,7 @@ export class SupabaseAdminRepository {
           festival_id: attendance.festival_id,
           date: attendance.date,
           beer_count: attendance.beer_count ?? 0,
+          drink_count: attendance.drink_count ?? 0,
           tent_ids: tentsByDay.get(`${attendance.festival_id}|${attendance.date}`) ?? [],
         },
       ];
@@ -703,6 +724,56 @@ export class SupabaseAdminRepository {
         full_name: profile?.full_name ?? null,
         avatar_url: profile?.avatar_url ?? null,
       };
+    });
+  }
+
+  /**
+   * Lists the groups one user belongs to, most recently joined first.
+   *
+   * Read from `group_members` rather than `groups` because the membership row
+   * is what carries `joined_at`, and `idx_group_members_user_id` makes the
+   * lookup an index hit rather than a scan of every membership in the app.
+   *
+   * Both embeds are inner: `groups.festival_id` and `groups.name` are NOT NULL,
+   * so a membership whose group resolves to nothing is a dangling row rather
+   * than a group to show.
+   */
+  async listUserGroups(userId: string): Promise<AdminUserGroup[]> {
+    const { data, error } = await this.supabase
+      .from("group_members")
+      // The festival embed names its foreign key: `festival_group_standings`
+      // points at both groups and festivals, which PostgREST reads as a second,
+      // many-to-many relationship between them and refuses to guess between.
+      .select(
+        "joined_at, groups!inner(id, name, festival_id, festivals!groups_festival_id_fkey(name))",
+      )
+      .eq("user_id", userId)
+      .order("joined_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching user groups: ${error.message}`);
+    }
+
+    return (data ?? []).flatMap((membership) => {
+      // Each join yields an object, but the generated types model the
+      // relationship as possibly-array; normalize before reading it, the same
+      // way listGroupMembers does with its profile embed.
+      const group = Array.isArray(membership.groups) ? membership.groups[0] : membership.groups;
+      if (!group) {
+        return [];
+      }
+
+      const festival = Array.isArray(group.festivals) ? group.festivals[0] : group.festivals;
+
+      return [
+        {
+          id: group.id,
+          name: group.name,
+          festival_id: group.festival_id,
+          festival_name: festival?.name ?? "",
+          joined_at: membership.joined_at,
+        },
+      ];
     });
   }
 

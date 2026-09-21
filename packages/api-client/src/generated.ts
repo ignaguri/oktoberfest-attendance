@@ -8642,6 +8642,18 @@ export interface paths {
                         };
                     };
                 };
+                /** @description The requested username already belongs to another account */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
             };
         };
         post?: never;
@@ -9731,7 +9743,10 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Update a user's profile (admin) */
+        /**
+         * Update a user's profile (admin)
+         * @description Updates username and/or full name. Admin rights are not settable here: they are granted in the database only.
+         */
         patch: {
             parameters: {
                 query?: never;
@@ -9746,7 +9761,6 @@ export interface paths {
                     "application/json": {
                         username?: string | null;
                         full_name?: string | null;
-                        is_super_admin?: boolean;
                     };
                 };
             };
@@ -9776,6 +9790,18 @@ export interface paths {
                 };
                 /** @description Forbidden - User is not an admin */
                 403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description The requested username already belongs to another account */
+                409: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -9903,7 +9929,83 @@ export interface paths {
                                 festival_id: string;
                                 date: string;
                                 beer_count: number;
+                                drink_count: number;
                                 tent_ids: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users/{userId}/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List a user's groups (admin)
+         * @description Returns every group the user is a member of, most recently joined first.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Groups retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            groups: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                /** Format: uuid */
+                                festival_id: string;
+                                festival_name: string;
+                                joined_at: string | null;
                             }[];
                         };
                     };
