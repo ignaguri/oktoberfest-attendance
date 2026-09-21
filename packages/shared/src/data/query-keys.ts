@@ -135,8 +135,13 @@ export class QueryKeys {
     ["crowd-reports", tentId, festivalId] as const;
 
   // Admin queries
-  static adminUsers = (search?: string, page?: number) =>
-    ["admin", "users", search ?? "", page ?? 1] as const;
+  /**
+   * Keyed by page size as well as page number: page 2 of 50 and page 2 of 20
+   * are different slices of the directory, and sharing one entry would serve
+   * whichever landed first to both.
+   */
+  static adminUsers = (search?: string, page?: number, limit?: number) =>
+    ["admin", "users", search ?? "", page ?? 1, limit ?? 50] as const;
   /** Prefix covering every cached user page, for invalidation after a mutation. */
   static adminUsersAll = () => ["admin", "users"] as const;
   static adminUser = (userId: string) => ["admin", "user", userId] as const;

@@ -34,7 +34,7 @@ export function useAdminUsers(search?: string, page = 1, limit = 50) {
   const apiClient = useApiClient();
 
   const query = useQuery<ListAdminUsersResponse>(
-    QueryKeys.adminUsers(search, page),
+    QueryKeys.adminUsers(search, page, limit),
     async () => apiClient.admin.users.list({ search, page, limit }),
     {
       staleTime: 60 * 1000,

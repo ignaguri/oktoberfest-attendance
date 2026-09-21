@@ -46,16 +46,18 @@ describe("formatTimeInTimezone", () => {
 });
 
 describe("formatRelativeTime", () => {
-  // A second of slack either side of the boundary, so a slow test run cannot
-  // drift the difference into the neighbouring unit.
+  // The distances below sit a full minute clear of their unit boundary. The
+  // clock keeps running between this call and the one inside
+  // formatRelativeTime, and a future distance drifts towards zero, so a second
+  // of slack is thin enough for a loaded runner to drop it into the unit below.
   const secondsFromNow = (seconds: number) => new Date(Date.now() + seconds * 1000);
 
   it("picks the unit from the distance, not the signed difference", () => {
-    expect(formatRelativeTime(secondsFromNow(7201), KIRITIMATI, "en")).toBe("in 2 hours");
+    expect(formatRelativeTime(secondsFromNow(7260), KIRITIMATI, "en")).toBe("in 2 hours");
   });
 
   it("still reads past dates as elapsed time", () => {
-    expect(formatRelativeTime(secondsFromNow(-7201), KIRITIMATI, "en")).toBe("2 hours ago");
+    expect(formatRelativeTime(secondsFromNow(-7260), KIRITIMATI, "en")).toBe("2 hours ago");
   });
 
   // Both runtimes must agree here: the fallback said "just now" while the Intl
@@ -85,11 +87,11 @@ describe("formatRelativeTime", () => {
     });
 
     it("phrases a future date as a wait rather than 'just now'", () => {
-      expect(formatRelativeTime(secondsFromNow(7201), KIRITIMATI, "en")).toBe("in 2 hours");
+      expect(formatRelativeTime(secondsFromNow(7260), KIRITIMATI, "en")).toBe("in 2 hours");
     });
 
     it("keeps the past phrasing unchanged", () => {
-      expect(formatRelativeTime(secondsFromNow(-7201), KIRITIMATI, "en")).toBe("2 hours ago");
+      expect(formatRelativeTime(secondsFromNow(-7260), KIRITIMATI, "en")).toBe("2 hours ago");
     });
 
     // Server timestamps land a little ahead of the device clock all the time,
