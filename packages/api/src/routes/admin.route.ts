@@ -9,6 +9,7 @@ import {
   AdminGroupMemberSchema,
   AdminGroupSchema,
   AdminTentSchema,
+  AdminUserGroupSchema,
   AdminUserSchema,
   AdminWrappedCacheEntrySchema,
   CopyAdminFestivalTentsSchema,
@@ -260,6 +261,40 @@ app.openapi(listUserAttendancesRoute, async (c) => {
   const attendances = await adminRepo.listUserAttendances(userId);
 
   return c.json({ attendances }, 200);
+});
+
+// GET /admin/users/:userId/groups - List the groups a user belongs to
+const listUserGroupsRoute = createRoute({
+  method: "get",
+  path: "/admin/users/{userId}/groups",
+  tags: ["admin"],
+  summary: "List a user's groups (admin)",
+  description: "Returns every group the user is a member of, most recently joined first.",
+  request: {
+    params: z.object({ userId: z.string().uuid() }),
+  },
+  responses: {
+    200: {
+      description: "Groups retrieved successfully",
+      content: {
+        "application/json": {
+          schema: z.object({ groups: z.array(AdminUserGroupSchema) }),
+        },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listUserGroupsRoute, async (c) => {
+  const { supabase } = c.var;
+  const { userId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const groups = await adminRepo.listUserGroups(userId);
+
+  return c.json({ groups }, 200);
 });
 
 // PATCH /admin/attendances/:attendanceId - Update an attendance

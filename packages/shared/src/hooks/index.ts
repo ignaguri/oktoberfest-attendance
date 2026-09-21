@@ -241,6 +241,7 @@ export {
 export {
   useAdminUser,
   useAdminUserAttendances,
+  useAdminUserGroups,
   useAdminUsers,
   useDeleteAdminAttendance,
   useDeleteAdminUser,

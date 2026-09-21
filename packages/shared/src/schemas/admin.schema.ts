@@ -190,6 +190,23 @@ export const AdminGroupMemberSchema = z.object({
 
 export type AdminGroupMember = z.infer<typeof AdminGroupMemberSchema>;
 
+/**
+ * A group seen from one of its members: the group, plus when that user joined.
+ *
+ * `festival_name` rides along rather than only the id. A user's groups span
+ * festivals, and a group carried over from last year keeps its name, so the
+ * name alone does not say which edition a row belongs to.
+ */
+export const AdminUserGroupSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  festival_id: z.string().uuid(),
+  festival_name: z.string(),
+  joined_at: z.string().nullable(),
+});
+
+export type AdminUserGroup = z.infer<typeof AdminUserGroupSchema>;
+
 export const WinningCriterionSchema = z.object({
   id: z.number(),
   name: z.string(),

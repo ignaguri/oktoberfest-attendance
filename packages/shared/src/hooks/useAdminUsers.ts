@@ -10,6 +10,7 @@ import { QueryKeys, useApiClient, useInvalidateQueries, useMutation, useQuery } 
 import type {
   AdminAttendance,
   AdminUser,
+  AdminUserGroup,
   ListAdminUsersResponse,
   UpdateAdminAttendanceInput,
   UpdateAdminUserAuthInput,
@@ -84,7 +85,11 @@ export function useAdminUser(userId?: string) {
   };
 }
 
-/** Hook to update another user's profile fields, including the admin flag. */
+/**
+ * Hook to update another user's name or username.
+ *
+ * Super admin is not among the fields; it is granted in the database only.
+ */
 export function useUpdateAdminUserProfile() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
@@ -153,6 +158,32 @@ export function useAdminUserAttendances(userId?: string) {
     error: query.error?.message || null,
     refetch: query.refetch,
     isRefetching: query.isRefetching,
+  };
+}
+
+/** Hook to list the groups one user belongs to, most recently joined first. */
+export function useAdminUserGroups(userId?: string) {
+  const apiClient = useApiClient();
+
+  const query = useQuery<AdminUserGroup[]>(
+    QueryKeys.adminUserGroups(userId ?? ""),
+    async () => {
+      if (!userId) return [];
+      const response = await apiClient.admin.users.listGroups(userId);
+      return response.groups || [];
+    },
+    {
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      enabled: !!userId,
+    },
+  );
+
+  return {
+    groups: query.data || [],
+    isLoading: query.loading,
+    error: query.error?.message || null,
+    refetch: query.refetch,
   };
 }
 

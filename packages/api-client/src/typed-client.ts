@@ -18,6 +18,7 @@ import type {
   AdminLocationSession,
   AdminTent,
   AdminUser,
+  AdminUserGroup,
   AdminWrappedCacheEntry,
   CopyAdminFestivalTentsInput,
   AttendanceByDate,
@@ -2728,6 +2729,19 @@ export function createTypedApiClient(config: ApiClientConfig) {
             await extractApiError(response, "Failed to fetch attendances");
           }
           return parseJsonResponse<{ attendances: AdminAttendance[] }>(response);
+        },
+
+        async listGroups(userId: string): Promise<{ groups: AdminUserGroup[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/users/${userId}/groups`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch user groups");
+          }
+          return parseJsonResponse<{ groups: AdminUserGroup[] }>(response);
         },
       },
 

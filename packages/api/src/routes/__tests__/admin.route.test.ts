@@ -176,6 +176,29 @@ describe("Admin Routes - Unit Tests", () => {
       expect(mockSupabase.from).not.toHaveBeenCalled();
     });
 
+    // `profiles.username` is UNIQUE. Answering 409 with a code the client can
+    // read is what lets the panel say "that username is taken" instead of
+    // showing a generic save failure for a fixable mistake.
+    it("reports 409 when the username is already taken", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: null,
+          error: { code: "23505", message: "duplicate key value violates unique constraint" },
+        }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/users/${OTHER_ID}/profile`, {
+          method: "PATCH",
+          body: JSON.stringify({ username: "taken" }),
+        }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.code).toBe("USERNAME_TAKEN");
+    });
+
     it("still allows an admin to edit their own profile", async () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({ data: null, error: null }),
@@ -424,6 +447,59 @@ describe("Admin Routes - Unit Tests", () => {
       const body = (await res.json()) as any;
       expect(body.attendances[0].drink_count).toBe(0);
       expect(body.attendances[0].beer_count).toBe(3);
+    });
+  });
+
+  describe("GET /admin/users/:userId/groups", () => {
+    it("flattens the group and its festival onto each membership", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [
+            {
+              joined_at: "2026-09-01T10:00:00Z",
+              groups: {
+                id: GROUP_ID,
+                name: "Wiesn Crew",
+                festival_id: FESTIVAL_ID,
+                festivals: { name: "Oktoberfest 2026" },
+              },
+            },
+          ],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/groups`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.groups).toEqual([
+        {
+          id: GROUP_ID,
+          name: "Wiesn Crew",
+          festival_id: FESTIVAL_ID,
+          festival_name: "Oktoberfest 2026",
+          joined_at: "2026-09-01T10:00:00Z",
+        },
+      ]);
+    });
+
+    // group_members.group_id carries no NOT NULL constraint, so a membership
+    // pointing at nothing is representable. It has no group to open, which
+    // makes it a row to drop rather than one to render half of.
+    it("drops a membership whose group did not resolve", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: [{ joined_at: "2026-09-01T10:00:00Z", groups: null }],
+          error: null,
+        }),
+      );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/groups`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.groups).toEqual([]);
     });
   });
 

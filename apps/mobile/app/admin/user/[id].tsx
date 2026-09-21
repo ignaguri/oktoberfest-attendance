@@ -1,6 +1,7 @@
 import {
   useAdminUser,
   useAdminUserAttendances,
+  useAdminUserGroups,
   useDeleteAdminAttendance,
   useDeleteAdminUser,
   useUpdateAdminUserAuth,
@@ -8,11 +9,13 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AdminAttendance } from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { CalendarDays, Trash2 } from "lucide-react-native";
+import { CalendarDays, Trash2, UsersRound } from "lucide-react-native";
 import { useCallback, useState } from "react";
 
 import { AdminAttendanceList } from "@/components/admin/admin-attendance-list";
 import { EditAttendanceSheet } from "@/components/admin/edit-attendance-sheet";
+import { UserGroupsList } from "@/components/admin/user-groups-list";
+import { UserIdentityCard } from "@/components/admin/user-identity-card";
 import { useAlertDialog } from "@/components/ui/alert-dialog";
 import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -36,6 +39,7 @@ export default function AdminUserDetailScreen() {
 
   const { user, isLoading, error, refetch } = useAdminUser(id);
   const { attendances, isLoading: attendancesLoading } = useAdminUserAttendances(id);
+  const { groups, isLoading: groupsLoading } = useAdminUserGroups(id);
 
   const updateAuth = useUpdateAdminUserAuth();
   const deleteUser = useDeleteAdminUser();
@@ -88,7 +92,7 @@ export default function AdminUserDetailScreen() {
     );
   }, [id, deleteUser, router, showDialog, t]);
 
-  const handleAttendanceError = useCallback(
+  const showError = useCallback(
     (message: string) => {
       showDialog(t("common.status.error"), message);
     },
@@ -132,19 +136,7 @@ export default function AdminUserDetailScreen() {
       <ScrollView className="flex-1 bg-background-50" contentContainerClassName="p-4">
         <VStack space="md">
           {/* Identity */}
-          <Card size="md" variant="elevated">
-            <VStack space="xs">
-              <Text className="text-lg font-semibold text-typography-900">
-                {user.profile?.full_name ||
-                  user.profile?.username ||
-                  t("admin.mobile.users.noName")}
-              </Text>
-              {user.profile?.username && (
-                <Text className="text-sm text-typography-500">@{user.profile.username}</Text>
-              )}
-              <Text className="text-sm text-typography-500">{user.email}</Text>
-            </VStack>
-          </Card>
+          <UserIdentityCard user={user} onError={showError} />
 
           {/* Password reset */}
           <Card size="md" variant="elevated">
@@ -199,6 +191,22 @@ export default function AdminUserDetailScreen() {
             </VStack>
           </Card>
 
+          {/* Groups */}
+          <Card size="md" variant="elevated">
+            <VStack space="sm">
+              <HStack space="sm" className="items-center">
+                <UsersRound size={18} color={IconColors.primary} />
+                <Text className="text-typography-900">{t("admin.mobile.userDetail.groups")}</Text>
+              </HStack>
+
+              <UserGroupsList
+                groups={groups}
+                isLoading={groupsLoading}
+                onOpen={(groupId) => router.push(`/admin/group/${groupId}`)}
+              />
+            </VStack>
+          </Card>
+
           {/* Delete account */}
           {!isSelf && (
             <Card size="md" variant="outline" className="border-error-300">
@@ -232,7 +240,7 @@ export default function AdminUserDetailScreen() {
           key={editing.id}
           attendance={editing}
           onClose={() => setEditing(null)}
-          onError={handleAttendanceError}
+          onError={showError}
         />
       )}
 

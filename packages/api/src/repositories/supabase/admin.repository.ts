@@ -8,6 +8,7 @@ import type {
   AdminGroupMember,
   AdminTent,
   AdminUser,
+  AdminUserGroup,
   AdminWrappedCacheEntry,
   CopyAdminFestivalTentsInput,
   ListAdminUsersResponse,
@@ -305,6 +306,12 @@ export class SupabaseAdminRepository {
    */
   async updateUserProfile(userId: string, input: UpdateAdminUserProfileInput): Promise<void> {
     const { error } = await this.supabase.from("profiles").update(input).eq("id", userId);
+
+    // `profiles.username` is UNIQUE, so handing a taken name to this is the
+    // admin asking for something impossible, not the server falling over.
+    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+      throw new ConflictError(ErrorCodes.USERNAME_TAKEN);
+    }
 
     if (error) {
       throw new Error(`Error updating user profile: ${error.message}`);
@@ -717,6 +724,56 @@ export class SupabaseAdminRepository {
         full_name: profile?.full_name ?? null,
         avatar_url: profile?.avatar_url ?? null,
       };
+    });
+  }
+
+  /**
+   * Lists the groups one user belongs to, most recently joined first.
+   *
+   * Read from `group_members` rather than `groups` because the membership row
+   * is what carries `joined_at`, and `idx_group_members_user_id` makes the
+   * lookup an index hit rather than a scan of every membership in the app.
+   *
+   * Both embeds are inner: `groups.festival_id` and `groups.name` are NOT NULL,
+   * so a membership whose group resolves to nothing is a dangling row rather
+   * than a group to show.
+   */
+  async listUserGroups(userId: string): Promise<AdminUserGroup[]> {
+    const { data, error } = await this.supabase
+      .from("group_members")
+      // The festival embed names its foreign key: `festival_group_standings`
+      // points at both groups and festivals, which PostgREST reads as a second,
+      // many-to-many relationship between them and refuses to guess between.
+      .select(
+        "joined_at, groups!inner(id, name, festival_id, festivals!groups_festival_id_fkey(name))",
+      )
+      .eq("user_id", userId)
+      .order("joined_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`Error fetching user groups: ${error.message}`);
+    }
+
+    return (data ?? []).flatMap((membership) => {
+      // Each join yields an object, but the generated types model the
+      // relationship as possibly-array; normalize before reading it, the same
+      // way listGroupMembers does with its profile embed.
+      const group = Array.isArray(membership.groups) ? membership.groups[0] : membership.groups;
+      if (!group) {
+        return [];
+      }
+
+      const festival = Array.isArray(group.festivals) ? group.festivals[0] : group.festivals;
+
+      return [
+        {
+          id: group.id,
+          name: group.name,
+          festival_id: group.festival_id,
+          festival_name: festival?.name ?? "",
+          joined_at: membership.joined_at,
+        },
+      ];
     });
   }
 
