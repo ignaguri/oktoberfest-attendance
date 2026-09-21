@@ -164,6 +164,17 @@ const updateProfileRoute = createRoute({
         },
       },
     },
+    409: {
+      description: "The requested username already belongs to another account",
+      content: {
+        "application/json": {
+          schema: z.object({
+            error: z.string(),
+            message: z.string(),
+          }),
+        },
+      },
+    },
   },
   security: [{ bearerAuth: [] }],
 });

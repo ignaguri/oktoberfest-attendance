@@ -8642,6 +8642,18 @@ export interface paths {
                         };
                     };
                 };
+                /** @description The requested username already belongs to another account */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
             };
         };
         post?: never;
@@ -9778,6 +9790,18 @@ export interface paths {
                 };
                 /** @description Forbidden - User is not an admin */
                 403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description The requested username already belongs to another account */
+                409: {
                     headers: {
                         [name: string]: unknown;
                     };

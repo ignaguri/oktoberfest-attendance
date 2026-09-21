@@ -384,3 +384,52 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
     });
   });
 });
+
+describe("Profile Routes - PUT /profile", () => {
+  let app: ReturnType<typeof createTestApp>;
+  let mockSupabase: ReturnType<typeof createMockSupabase>;
+  let mockUser: ReturnType<typeof createMockUser>;
+
+  beforeEach(() => {
+    app = createTestApp();
+    mockSupabase = createMockSupabase();
+    mockUser = createMockUser();
+
+    app.use("*", async (c, next) => {
+      if (!c.req.header("Authorization")) {
+        return c.json({ error: "Unauthorized", message: "Missing authorization header" }, 401);
+      }
+      c.set("user", mockUser);
+      c.set("supabase", mockSupabase);
+      await next();
+    });
+
+    app.route("/", profileRoutes);
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  // `profiles.username` is UNIQUE, so picking a name another account holds is
+  // a fixable mistake rather than a server fault. It used to escape as a 500.
+  it("reports 409 when the username belongs to another account", async () => {
+    vi.mocked(mockSupabase.from).mockReturnValueOnce(
+      createMockChain({
+        data: null,
+        error: { code: "23505", message: "duplicate key value violates unique constraint" },
+      }),
+    );
+
+    const res = await app.request(
+      createAuthRequest("/profile", {
+        method: "PUT",
+        body: JSON.stringify({ username: "taken" }),
+      }),
+    );
+
+    expect(res.status).toBe(409);
+    const body = (await res.json()) as any;
+    expect(body.error.code).toBe("USERNAME_TAKEN");
+  });
+});

@@ -10,8 +10,12 @@ import type {
   TutorialStatus,
   UpdateProfileInput,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+import { PgErrorCode } from "../../lib/postgres-errors";
+import { ConflictError } from "../../middleware/error";
 
 export class SupabaseProfileRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -156,6 +160,13 @@ export class SupabaseProfileRepository {
       .eq("id", userId)
       .select()
       .single();
+
+    // `profiles.username` is UNIQUE. Someone choosing a name another account
+    // already holds is a fixable mistake, so it answers 409 with a code the
+    // clients can translate rather than escaping as a 500.
+    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+      throw new ConflictError(ErrorCodes.USERNAME_TAKEN);
+    }
 
     if (error || !data) {
       throw new Error(`Failed to update profile: ${error?.message}`);

@@ -1,10 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ApiError } from "@prostcounter/api-client";
 import {
   useDeleteProfile,
   useFriendRequestCount,
   useResetTutorial,
   useUpdateProfile,
 } from "@prostcounter/shared/hooks";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { type UpdateProfileInput, UpdateProfileSchema } from "@prostcounter/shared/schemas";
 import * as Application from "expo-application";
@@ -107,7 +109,13 @@ export default function ProfileScreen() {
         await updateProfileMutation.mutateAsync(data);
         setIsEditing(false);
         showDialog(t("common.status.success"), t("profile.updateSuccess"));
-      } catch {
+      } catch (err) {
+        // Usernames are unique across accounts. Saying which name is the
+        // problem keeps the form open on a mistake the user can correct.
+        if (err instanceof ApiError && err.code === ErrorCodes.USERNAME_TAKEN) {
+          showDialog(t("common.status.error"), t("apiErrors.USERNAME_TAKEN"));
+          return;
+        }
         showDialog(t("common.status.error"), t("profile.updateError"));
       }
     },
