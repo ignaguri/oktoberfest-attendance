@@ -1,6 +1,6 @@
 import type { AdminAttendance } from "@prostcounter/shared/schemas";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Trash2 } from "lucide-react-native";
+import { Pencil, Trash2 } from "lucide-react-native";
 
 import { Button, ButtonText } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
@@ -12,19 +12,20 @@ import { IconColors } from "@/lib/constants/colors";
 interface AdminAttendanceListProps {
   attendances: AdminAttendance[];
   isLoading: boolean;
+  onEdit: (attendance: AdminAttendance) => void;
   onDelete: (attendanceId: string) => void;
 }
 
 /**
- * Read-and-delete view of a user's attendances.
+ * A user's attendances, with an editor and a delete on each row.
  *
- * Editing beer counts and tent visits is supported by the API
- * (PATCH /admin/attendances/:id) but not yet wired up here -- the tent picker
- * needs a festival context this screen does not have.
+ * Each row carries its own festival_id, which is what the editor's tent picker
+ * needs; there is no festival context to thread down from this screen.
  */
 export function AdminAttendanceList({
   attendances,
   isLoading,
+  onEdit,
   onDelete,
 }: AdminAttendanceListProps) {
   const { t } = useTranslation();
@@ -57,17 +58,30 @@ export function AdminAttendanceList({
               </Text>
             </VStack>
 
-            <Button
-              variant="outline"
-              action="negative"
-              size="xs"
-              onPress={() => onDelete(attendance.id)}
-              accessibilityLabel={t("admin.mobile.userDetail.deleteAttendance")}
-              accessibilityHint={t("admin.mobile.userDetail.deleteAttendanceHint")}
-            >
-              <Trash2 size={14} color={IconColors.error} />
-              <ButtonText>{t("common.buttons.delete")}</ButtonText>
-            </Button>
+            <HStack space="xs">
+              <Button
+                variant="outline"
+                size="xs"
+                onPress={() => onEdit(attendance)}
+                accessibilityLabel={t("admin.mobile.userDetail.edit.open")}
+                accessibilityHint={t("admin.mobile.userDetail.edit.openHint")}
+              >
+                <Pencil size={14} color={IconColors.primary} />
+                <ButtonText>{t("admin.mobile.userDetail.edit.open")}</ButtonText>
+              </Button>
+
+              <Button
+                variant="outline"
+                action="negative"
+                size="xs"
+                onPress={() => onDelete(attendance.id)}
+                accessibilityLabel={t("admin.mobile.userDetail.deleteAttendance")}
+                accessibilityHint={t("admin.mobile.userDetail.deleteAttendanceHint")}
+              >
+                <Trash2 size={14} color={IconColors.error} />
+                <ButtonText>{t("common.buttons.delete")}</ButtonText>
+              </Button>
+            </HStack>
           </HStack>
         </View>
       ))}

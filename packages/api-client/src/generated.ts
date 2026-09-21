@@ -9903,6 +9903,7 @@ export interface paths {
                                 festival_id: string;
                                 date: string;
                                 beer_count: number;
+                                drink_count: number;
                                 tent_ids: string[];
                             }[];
                         };

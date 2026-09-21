@@ -7,11 +7,13 @@ import {
   useUpdateAdminUserProfile,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AdminAttendance } from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { CalendarDays, Trash2 } from "lucide-react-native";
 import { useCallback, useState } from "react";
 
 import { AdminAttendanceList } from "@/components/admin/admin-attendance-list";
+import { EditAttendanceSheet } from "@/components/admin/edit-attendance-sheet";
 import { useAlertDialog } from "@/components/ui/alert-dialog";
 import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -43,6 +45,10 @@ export default function AdminUserDetailScreen() {
   const deleteAttendance = useDeleteAdminAttendance();
 
   const [newPassword, setNewPassword] = useState("");
+
+  // The row being edited, seeded on tap rather than in an effect, so a
+  // background refetch of the list cannot overwrite an open draft.
+  const [editing, setEditing] = useState<AdminAttendance | null>(null);
 
   // An admin editing themselves cannot self-demote or self-delete; the server
   // rejects both, and hiding the controls avoids a confusing 403.
@@ -91,6 +97,13 @@ export default function AdminUserDetailScreen() {
       },
     );
   }, [id, deleteUser, router, showDialog, t]);
+
+  const handleAttendanceError = useCallback(
+    (message: string) => {
+      showDialog(t("common.status.error"), message);
+    },
+    [showDialog, t],
+  );
 
   const handleDeleteAttendance = useCallback(
     (attendanceId: string) => {
@@ -212,6 +225,7 @@ export default function AdminUserDetailScreen() {
               <AdminAttendanceList
                 attendances={attendances}
                 isLoading={attendancesLoading}
+                onEdit={setEditing}
                 onDelete={handleDeleteAttendance}
               />
             </VStack>
@@ -244,6 +258,15 @@ export default function AdminUserDetailScreen() {
           <View className="h-4" />
         </VStack>
       </ScrollView>
+
+      {editing && (
+        <EditAttendanceSheet
+          key={editing.id}
+          attendance={editing}
+          onClose={() => setEditing(null)}
+          onError={handleAttendanceError}
+        />
+      )}
 
       <ConfirmAlertDialog dialog={dialog} onClose={closeDialog} />
     </>

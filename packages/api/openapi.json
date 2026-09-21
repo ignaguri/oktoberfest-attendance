@@ -18085,6 +18085,9 @@
                           "beer_count": {
                             "type": "number"
                           },
+                          "drink_count": {
+                            "type": "number"
+                          },
                           "tent_ids": {
                             "type": "array",
                             "items": {
@@ -18099,6 +18102,7 @@
                           "festival_id",
                           "date",
                           "beer_count",
+                          "drink_count",
                           "tent_ids"
                         ]
                       }

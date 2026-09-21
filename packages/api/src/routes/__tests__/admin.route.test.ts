@@ -342,6 +342,7 @@ describe("Admin Routes - Unit Tests", () => {
                 festival_id: "44444444-4444-4444-8444-444444444444",
                 date: "2026-09-20",
                 beer_count: 7,
+                drink_count: 9,
               },
             ],
             error: null,
@@ -361,6 +362,44 @@ describe("Admin Routes - Unit Tests", () => {
       expect(mockSupabase.from).toHaveBeenNthCalledWith(1, "attendance_with_totals");
       const body = (await res.json()) as any;
       expect(body.attendances[0].beer_count).toBe(7);
+      expect(body.attendances[0].drink_count).toBe(9);
+    });
+
+    // The view's LATERAL carries HAVING count(*) > 0, so a day with no
+    // consumptions gets no row from it: drink_count comes back null and
+    // beer_count falls through to the dead column. That pair is what tells the
+    // editor a beer_count write on this day is the one that still lands.
+    it("reports drink_count 0 for a day the view found no consumptions on", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [
+              {
+                id: ATTENDANCE_ID,
+                user_id: OTHER_ID,
+                festival_id: "44444444-4444-4444-8444-444444444444",
+                date: "2026-09-20",
+                beer_count: 3,
+                drink_count: null,
+              },
+            ],
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
+            error: null,
+          }),
+        );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/attendances`));
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.attendances[0].drink_count).toBe(0);
+      expect(body.attendances[0].beer_count).toBe(3);
     });
   });
 

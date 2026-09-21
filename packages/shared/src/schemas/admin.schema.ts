@@ -115,6 +115,15 @@ export const AdminAttendanceSchema = z.object({
   festival_id: z.string().uuid(),
   date: z.string(),
   beer_count: z.number(),
+  /**
+   * Consumptions logged on this day, of any drink type.
+   *
+   * Zero means `beer_count` came from `attendances.beer_count`, the column the
+   * RPCs stopped writing, and editing it is the only case where that write is
+   * visible afterwards. Anything above zero means the count is derived from
+   * `consumptions` and a beer_count write is inert.
+   */
+  drink_count: z.number(),
   tent_ids: z.array(z.string().uuid()),
 });
 

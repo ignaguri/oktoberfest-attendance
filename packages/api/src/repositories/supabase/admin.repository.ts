@@ -387,13 +387,20 @@ export class SupabaseAdminRepository {
    * `consumptions` and falls back to the column only for days that have none,
    * which is what every other read in the API uses.
    *
+   * `drink_count` rides along for the editor's benefit. The view's LATERAL
+   * carries `HAVING count(*) > 0`, so `attendances.beer_count` is only reached
+   * on a day with no consumptions at all -- which is exactly the set of days
+   * where writing it through `updateAttendance` changes what anyone sees. A
+   * client cannot tell those days apart from the count alone, since a day with
+   * three beers and a day whose dead column says three look identical.
+   *
    * Tent visits are fetched in one query for the whole set and grouped in
    * memory; the web panel issues one query per attendance instead.
    */
   async listUserAttendances(userId: string): Promise<AdminAttendance[]> {
     const { data: attendances, error } = await this.supabase
       .from("attendance_with_totals")
-      .select("id, user_id, festival_id, date, beer_count")
+      .select("id, user_id, festival_id, date, beer_count, drink_count")
       .eq("user_id", userId)
       .order("date", { ascending: false });
 
@@ -454,6 +461,7 @@ export class SupabaseAdminRepository {
           festival_id: attendance.festival_id,
           date: attendance.date,
           beer_count: attendance.beer_count ?? 0,
+          drink_count: attendance.drink_count ?? 0,
           tent_ids: tentsByDay.get(`${attendance.festival_id}|${attendance.date}`) ?? [],
         },
       ];
