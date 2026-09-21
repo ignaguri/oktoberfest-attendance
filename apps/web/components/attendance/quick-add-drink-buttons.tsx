@@ -8,6 +8,7 @@ import { Beer, BeerOff, Check, CupSoda, Loader2, Wine } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { RadlerIcon } from "@/components/icons/radler-icon";
+import { useDrinkPrice } from "@/hooks/useDrinkPrice";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +39,6 @@ interface QuickAddDrinkButtonsProps {
   festivalId: string;
   date: string;
   tentId?: string;
-  defaultPriceCents?: number;
   disabled?: boolean;
   onSuccess?: () => void;
   className?: string;
@@ -99,7 +99,6 @@ export function QuickAddDrinkButtons({
   festivalId,
   date,
   tentId,
-  defaultPriceCents = 1620,
   disabled = false,
   onSuccess,
   className,
@@ -107,6 +106,7 @@ export function QuickAddDrinkButtons({
   const { t } = useTranslation();
   const logConsumption = useLogConsumption();
   const { calculatePricePaid } = useTipCalculation();
+  const { getDrinkPriceCents } = useDrinkPrice();
   const [successType, setSuccessType] = useState<DrinkType | null>(null);
   const [loadingType, setLoadingType] = useState<DrinkType | null>(null);
 
@@ -122,8 +122,8 @@ export function QuickAddDrinkButtons({
           date,
           drinkType: type,
           tentId,
-          pricePaidCents: calculatePricePaid(defaultPriceCents),
-          basePriceCents: defaultPriceCents,
+          pricePaidCents: calculatePricePaid(getDrinkPriceCents(type)),
+          basePriceCents: getDrinkPriceCents(type),
           volumeMl: 1000,
         });
 
@@ -146,7 +146,7 @@ export function QuickAddDrinkButtons({
       festivalId,
       date,
       tentId,
-      defaultPriceCents,
+      getDrinkPriceCents,
       calculatePricePaid,
       logConsumption,
       onSuccess,

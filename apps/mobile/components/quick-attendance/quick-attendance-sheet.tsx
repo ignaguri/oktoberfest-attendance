@@ -1,5 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTipCalculation } from "@prostcounter/shared/hooks";
+
+import { useDrinkPrice } from "@/hooks/useDrinkPrice";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { getCurrentTentId } from "@prostcounter/shared/utils";
@@ -141,6 +143,7 @@ export function QuickAttendanceSheet({
 }: QuickAttendanceSheetProps) {
   const { t } = useTranslation();
   const { calculatePricePaid } = useTipCalculation();
+  const { getDrinkPriceCents } = useDrinkPrice();
   const toast = useToast();
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
@@ -340,10 +343,10 @@ export function QuickAttendanceSheet({
 
       // Log the consumption only if a drink is selected
       if (saveActions.shouldLogConsumption && selectedDrinkType) {
-        // beerCost is in euros, we need cents
-        const priceCents = currentFestival?.beerCost
-          ? Math.round(currentFestival.beerCost * 100)
-          : 1620; // Default €16.20
+        // The festival's price for this drink type, not for beer. The server
+        // resolves the stored price itself; this one is for the local row the
+        // sheet writes before anything reaches the network.
+        const priceCents = getDrinkPriceCents(selectedDrinkType);
 
         await logConsumption.mutateAsync({
           festivalId,
@@ -433,7 +436,7 @@ export function QuickAttendanceSheet({
     pendingPhotos,
     attendance?.id,
     currentTentId,
-    currentFestival?.beerCost,
+    getDrinkPriceCents,
     calculatePricePaid,
     logConsumption,
     updateAttendance,

@@ -1,16 +1,26 @@
 import type { Database } from "@prostcounter/db";
-import type { Festival, ListFestivalsQuery } from "@prostcounter/shared";
+import type { Festival, FestivalDrinkPrices, ListFestivalsQuery } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError } from "../../middleware/error";
 import type { IFestivalRepository } from "../interfaces";
 
+/**
+ * Festival columns plus the festival's drink price sheet.
+ *
+ * The embed resolves through drink_type_prices.festival_id, and a tent-scoped
+ * row has that column null (the table allows exactly one parent), so this
+ * returns festival-level prices only, which is what a client should predict
+ * with.
+ */
+const FESTIVAL_SELECT = "*, drink_type_prices(drink_type, price_cents)";
+
 export class SupabaseFestivalRepository implements IFestivalRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
   async list(query?: ListFestivalsQuery): Promise<Festival[]> {
-    let supabaseQuery = this.supabase.from("festivals").select("*");
+    let supabaseQuery = this.supabase.from("festivals").select(FESTIVAL_SELECT);
 
     if (query?.status) {
       supabaseQuery = supabaseQuery.eq("status", query.status);
@@ -32,7 +42,11 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
   }
 
   async findById(id: string): Promise<Festival | null> {
-    const { data, error } = await this.supabase.from("festivals").select("*").eq("id", id).single();
+    const { data, error } = await this.supabase
+      .from("festivals")
+      .select(FESTIVAL_SELECT)
+      .eq("id", id)
+      .single();
 
     if (error) {
       if (error.code === PgErrorCode.NO_ROWS) {
@@ -47,7 +61,7 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
   async findActive(): Promise<Festival | null> {
     const { data, error } = await this.supabase
       .from("festivals")
-      .select("*")
+      .select(FESTIVAL_SELECT)
       .eq("is_active", true)
       .single();
 
@@ -68,6 +82,7 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
       startDate: data.start_date,
       endDate: data.end_date,
       beerCost: data.beer_cost,
+      drinkPrices: mapDrinkPrices(data.drink_type_prices),
       location: data.location,
       latitude: data.latitude,
       longitude: data.longitude,
@@ -79,4 +94,24 @@ export class SupabaseFestivalRepository implements IFestivalRepository {
       updatedAt: data.updated_at,
     };
   }
+}
+
+/**
+ * Folds the embedded price rows into a lookup keyed by drink type.
+ *
+ * An empty sheet is a normal answer, not a failure: a festival that has never
+ * been priced falls back to the system defaults on both sides.
+ */
+function mapDrinkPrices(rows: unknown): FestivalDrinkPrices {
+  if (!Array.isArray(rows)) {
+    return {};
+  }
+
+  const prices: FestivalDrinkPrices = {};
+  for (const row of rows) {
+    if (row?.drink_type && typeof row.price_cents === "number") {
+      prices[row.drink_type as keyof FestivalDrinkPrices] = row.price_cents;
+    }
+  }
+  return prices;
 }

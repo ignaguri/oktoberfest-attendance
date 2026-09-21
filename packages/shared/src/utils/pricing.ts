@@ -1,3 +1,6 @@
+import type { DrinkType } from "../schemas/consumption.schema";
+import { DEFAULT_DRINK_PRICES } from "../schemas/pricing.schema";
+
 export type TipMode = "none" | "ceiling_plus_1" | "ceiling_plus_2" | "percentage_10" | "fixed";
 
 export const TIP_MODES: TipMode[] = [
@@ -61,4 +64,41 @@ export function calculatePricePaidCents(
     case "fixed":
       return basePriceCents + Math.round(Math.max(fixedAmountEuros ?? 0, 0) * 100);
   }
+}
+
+/**
+ * What each drink type costs at a festival, in cents, from the client's point
+ * of view.
+ *
+ * Mirrors the first two rungs of `get_drink_price_cents`, which is what the
+ * server actually stores a consumption at: the festival's own price for the
+ * type, then its beer cost for beer-like drinks, then the system default.
+ *
+ * `beerCost` is applied before the sheet and overridden by it. It only ever
+ * described beer, and a festival that prices beer explicitly means that price
+ * rather than one derived from a column kept around for older clients.
+ *
+ * Per-tent overrides are deliberately absent. They live server-side, so a tent
+ * dearer than its festival is corrected when the row syncs rather than guessed
+ * at here.
+ */
+export function resolveFestivalDrinkPrices(
+  festivalBeerCost?: number | null,
+  festivalDrinkPrices?: Partial<Record<DrinkType, number>> | null,
+): Record<DrinkType, number> {
+  const prices: Record<DrinkType, number> = { ...DEFAULT_DRINK_PRICES };
+
+  if (festivalBeerCost) {
+    const beerCents = Math.round(festivalBeerCost * 100);
+    prices.beer = beerCents;
+    prices.radler = beerCents;
+  }
+
+  for (const [drinkType, priceCents] of Object.entries(festivalDrinkPrices ?? {})) {
+    if (typeof priceCents === "number") {
+      prices[drinkType as DrinkType] = priceCents;
+    }
+  }
+
+  return prices;
 }

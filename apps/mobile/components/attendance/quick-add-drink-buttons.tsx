@@ -1,4 +1,6 @@
 import { useTipCalculation } from "@prostcounter/shared/hooks";
+
+import { useDrinkPrice } from "@/hooks/useDrinkPrice";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { DrinkType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
@@ -21,7 +23,6 @@ interface QuickAddDrinkButtonsProps {
   festivalId: string;
   date: string;
   tentId?: string;
-  defaultPriceCents?: number;
   disabled?: boolean;
   onSuccess?: () => void;
 }
@@ -74,12 +75,12 @@ export function QuickAddDrinkButtons({
   festivalId,
   date,
   tentId,
-  defaultPriceCents = 1620,
   disabled = false,
   onSuccess,
 }: QuickAddDrinkButtonsProps) {
   const { t } = useTranslation();
   const { calculatePricePaid } = useTipCalculation();
+  const { getDrinkPriceCents } = useDrinkPrice();
   const logConsumption = useOfflineLogConsumption();
   const [successType, setSuccessType] = useState<DrinkType | null>(null);
   const [loadingType, setLoadingType] = useState<DrinkType | null>(null);
@@ -112,8 +113,8 @@ export function QuickAddDrinkButtons({
           date,
           drinkType: type,
           tentId,
-          pricePaidCents: calculatePricePaid(defaultPriceCents),
-          basePriceCents: defaultPriceCents,
+          pricePaidCents: calculatePricePaid(getDrinkPriceCents(type)),
+          basePriceCents: getDrinkPriceCents(type),
           volumeMl: 1000, // Default 1L
         });
 
@@ -137,7 +138,7 @@ export function QuickAddDrinkButtons({
       festivalId,
       date,
       tentId,
-      defaultPriceCents,
+      getDrinkPriceCents,
       calculatePricePaid,
       logConsumption,
       onSuccess,

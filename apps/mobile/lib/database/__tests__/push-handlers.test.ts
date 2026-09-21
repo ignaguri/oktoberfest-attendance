@@ -95,10 +95,26 @@ describe("pushInsert", () => {
       date: "2026-09-23",
       drinkType: "beer",
       tentId: "tent-1",
-      pricePaidCents: 1550,
       volumeMl: 1000,
       consumptionId: "local-cons-id",
     });
+  });
+
+  it("does not push the local row's price, which is only an optimistic value", async () => {
+    await pushInsert("consumptions", "local-cons-id", {
+      festival_id: "festival-1",
+      date: "2026-09-23",
+      drink_type: "soft_drink",
+      tent_id: "tent-1",
+      price_paid_cents: 1580,
+      volume_ml: 1000,
+    });
+
+    // A soft drink used to be pushed at the beer price and stored at it. The
+    // server resolves the price itself now, so sending one can only disagree.
+    expect(logConsumption).toHaveBeenCalledWith(
+      expect.not.objectContaining({ pricePaidCents: expect.anything() }),
+    );
   });
 
   it("still routes attendances to updatePersonal, carrying the local id", async () => {

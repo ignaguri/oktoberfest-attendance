@@ -14,6 +14,7 @@ function makeFestival(overrides: Partial<Festival>): Festival {
     startDate: "2026-09-19",
     endDate: "2026-10-04",
     beerCost: null,
+    drinkPrices: {},
     location: null,
     latitude: null,
     longitude: null,

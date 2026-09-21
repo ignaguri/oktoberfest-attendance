@@ -4,7 +4,7 @@
  * Web-specific wrapper for the shared useDrinkPrice hook
  *
  * This wrapper integrates with the web FestivalContext to automatically
- * provide the current festival's beer cost to the shared hook.
+ * provide the current festival's pricing to the shared hook.
  */
 
 import { useFestival } from "@prostcounter/shared/contexts";
@@ -15,12 +15,13 @@ import {
 
 /**
  * Web hook for getting drink prices
- * Automatically uses the current festival's beer cost from FestivalContext
+ * Automatically uses the current festival's price sheet from FestivalContext
  */
 export function useDrinkPrice(): UseDrinkPriceReturn {
   const { currentFestival } = useFestival();
 
   return useSharedDrinkPrice({
     festivalBeerCost: currentFestival?.beerCost,
+    festivalDrinkPrices: currentFestival?.drinkPrices,
   });
 }

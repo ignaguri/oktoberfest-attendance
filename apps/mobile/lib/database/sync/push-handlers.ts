@@ -49,7 +49,10 @@ export async function pushInsert(
           | "soft_drink"
           | "other",
         tentId: payload.tent_id as string | undefined,
-        pricePaidCents: (payload.price_paid_cents as number) ?? 0,
+        // No price is sent: the server resolves the base from the pricing
+        // cascade and applies the user's tip preference. The local row carries
+        // an optimistic price so the UI has something to show offline, and the
+        // next pull replaces it with the stored one.
         volumeMl: (payload.volume_ml as number) ?? 1000,
         consumptionId: recordId,
         ...(idempotencyKey ? { idempotencyKey } : {}),
@@ -106,12 +109,7 @@ export async function pushUpdate(
         | "wine"
         | "soft_drink"
         | "other";
-      const pricePaidCents =
-        typeof payload.pricePaidCents === "number"
-          ? payload.pricePaidCents
-          : typeof payload.price_paid_cents === "number"
-            ? payload.price_paid_cents
-            : 0;
+      // No price is read off the payload: see the insert case above.
       const volumeMl =
         typeof payload.volumeMl === "number"
           ? payload.volumeMl
@@ -129,7 +127,6 @@ export async function pushUpdate(
         festivalId,
         date,
         drinkType,
-        pricePaidCents,
         volumeMl,
         tentId: (payload.tentId || payload.tent_id) as string | undefined,
         ...(idempotencyKey ? { idempotencyKey } : {}),
