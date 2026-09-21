@@ -42,6 +42,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { searchKeys } from "@/lib/data/search-query-keys";
 import { formatDateForDatabase } from "@/lib/date-utils";
+import { translateError } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 
 import {
@@ -436,7 +437,14 @@ const UserList = () => {
         await updateUserAuth(selectedUser!.id, authData);
       }
       if (Object.keys(profileData).length > 0) {
-        await updateUserProfile(selectedUser!.id, profileData);
+        const { error } = await updateUserProfile(selectedUser!.id, profileData);
+
+        // Usernames are unique across accounts. The dialog stays open on a
+        // conflict so the name can be changed rather than retyped.
+        if (error) {
+          toast.error(translateError(t, error));
+          return;
+        }
       }
       setSelectedUser(null);
       toast.success(t("notifications.success.userUpdated"));

@@ -4,6 +4,7 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { ChevronRight } from "lucide-react-native";
 
+import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -13,6 +14,8 @@ import { IconColors } from "@/lib/constants/colors";
 interface UserGroupsListProps {
   groups: AdminUserGroup[];
   isLoading: boolean;
+  error: string | null;
+  onRetry: () => void;
   onOpen: (groupId: string) => void;
 }
 
@@ -22,8 +25,20 @@ interface UserGroupsListProps {
  * The festival is shown beside the group name because a group carried over to a
  * new festival keeps its name, so two rows can otherwise read identically.
  */
-export function UserGroupsList({ groups, isLoading, onOpen }: UserGroupsListProps) {
+export function UserGroupsList({
+  groups,
+  isLoading,
+  error,
+  onRetry,
+  onOpen,
+}: UserGroupsListProps) {
   const { t } = useTranslation();
+
+  // A failed fetch leaves the list empty, which would otherwise read as "this
+  // user belongs to no groups" rather than "the endpoint is down".
+  if (error) {
+    return <ErrorState message={error} onRetry={onRetry} />;
+  }
 
   if (isLoading) {
     return <Text className="text-typography-500">{t("admin.mobile.userDetail.loading")}</Text>;

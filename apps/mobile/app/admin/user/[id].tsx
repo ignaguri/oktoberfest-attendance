@@ -39,7 +39,12 @@ export default function AdminUserDetailScreen() {
 
   const { user, isLoading, error, refetch } = useAdminUser(id);
   const { attendances, isLoading: attendancesLoading } = useAdminUserAttendances(id);
-  const { groups, isLoading: groupsLoading } = useAdminUserGroups(id);
+  const {
+    groups,
+    isLoading: groupsLoading,
+    error: groupsError,
+    refetch: refetchGroups,
+  } = useAdminUserGroups(id);
 
   const updateAuth = useUpdateAdminUserAuth();
   const deleteUser = useDeleteAdminUser();
@@ -202,6 +207,8 @@ export default function AdminUserDetailScreen() {
               <UserGroupsList
                 groups={groups}
                 isLoading={groupsLoading}
+                error={groupsError}
+                onRetry={refetchGroups}
                 onOpen={(groupId) => router.push(`/admin/group/${groupId}`)}
               />
             </VStack>

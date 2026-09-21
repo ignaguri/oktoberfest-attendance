@@ -3,6 +3,8 @@
 import "server-only";
 
 import type { Tables } from "@prostcounter/db";
+import type { ErrorCode } from "@prostcounter/shared/errors";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { revalidatePath, unstable_cache } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
 
@@ -187,28 +189,45 @@ export async function updateUserAuth(
   return data;
 }
 
+/** Unique violation. Raised here by `profiles_username_key`. */
+const PG_UNIQUE_VIOLATION = "23505";
+
 /**
  * Updates the profile fields the admin panel offers.
  *
- * Named explicitly rather than taking `Partial<Tables<"profiles">>`: this runs
- * on the service-role client, so a wide signature would let any caller write
- * `is_super_admin` and mint an admin from the browser. Granting admin rights
- * is a database-only operation.
+ * The two columns are copied across by name rather than passed through. A
+ * server action takes whatever the caller sends it and the type annotation is
+ * gone at runtime, so handing the argument straight to `.update()` on the
+ * service-role client would let anyone write `is_super_admin` and mint an
+ * admin from the browser. Granting admin rights is a database-only operation.
+ *
+ * The username conflict comes back as a value instead of being thrown:
+ * Next.js replaces a server action's error message with a generic one in
+ * production, so a thrown marker would not survive the trip to the form.
  */
 export async function updateUserProfile(
   userId: string,
   profileData: { full_name?: string; username?: string },
-) {
+): Promise<{ error: ErrorCode | null }> {
   const supabase = await createClient(true);
-  const { data, error } = await supabase
-    .from("profiles")
-    .update(profileData)
-    .eq("id", userId)
-    .single();
+
+  const update: { full_name?: string; username?: string } = {};
+  if (profileData.full_name !== undefined) {
+    update.full_name = profileData.full_name;
+  }
+  if (profileData.username !== undefined) {
+    update.username = profileData.username;
+  }
+
+  const { error } = await supabase.from("profiles").update(update).eq("id", userId).single();
+
+  if (error?.code === PG_UNIQUE_VIOLATION) {
+    return { error: ErrorCodes.USERNAME_TAKEN };
+  }
 
   if (error) throw new Error("Error updating user profile: " + error.message);
   revalidatePath("/admin");
-  return data;
+  return { error: null };
 }
 
 export async function deleteUser(userId: string) {

@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/actionsheet";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField } from "@/components/ui/input";
 import { Pressable } from "@/components/ui/pressable";
@@ -49,7 +50,12 @@ interface EditAttendanceSheetProps {
 export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttendanceSheetProps) {
   const { t } = useTranslation();
 
-  const { tents, isLoading: tentsLoading } = useAdminFestivalTents(attendance.festival_id);
+  const {
+    tents,
+    isLoading: tentsLoading,
+    error: tentsError,
+    refetch: refetchTents,
+  } = useAdminFestivalTents(attendance.festival_id);
   const updateAttendance = useUpdateAdminAttendance();
 
   // Midday rather than midnight: the picker hands back a local Date, and a
@@ -224,13 +230,19 @@ export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttend
                 {t("admin.mobile.userDetail.edit.tents")}
               </Text>
 
-              {tentsLoading && (
+              {/* A failed fetch also leaves the list empty, so the "no tents"
+                  message below would blame the festival for a broken endpoint.
+                  Saving stays available: the draft still holds the day's own
+                  tent ids, so a save here writes them back unchanged. */}
+              {tentsError && <ErrorState message={tentsError} onRetry={refetchTents} />}
+
+              {!tentsError && tentsLoading && (
                 <Text className="text-typography-500">
                   {t("admin.mobile.userDetail.edit.tentsLoading")}
                 </Text>
               )}
 
-              {!tentsLoading && tents.length === 0 && (
+              {!tentsError && !tentsLoading && tents.length === 0 && (
                 <Text className="text-typography-500">
                   {t("admin.mobile.userDetail.edit.tentsEmpty")}
                 </Text>
