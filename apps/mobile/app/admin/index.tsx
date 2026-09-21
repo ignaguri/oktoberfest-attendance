@@ -69,13 +69,15 @@ export default function AdminHubScreen() {
       <VStack space="md">
         <Text className="text-sm text-typography-500">{t("admin.mobile.hubDescription")}</Text>
 
-        <Card size="md" variant="elevated">
+        {/* The card carries no padding of its own: each row brings its own, so
+            every row is the same height and the dividers sit between equals. */}
+        <Card size="md" variant="elevated" className="overflow-hidden p-0">
           <VStack>
             {SECTIONS.map((section, index) => (
               <Pressable
                 key={section.key}
                 className={cn(
-                  "flex-row items-center justify-between py-3",
+                  "flex-row items-center gap-3 px-4 py-3.5",
                   index < SECTIONS.length - 1 && "border-b border-outline-100",
                 )}
                 onPress={() => router.push(section.href)}
@@ -83,14 +85,15 @@ export default function AdminHubScreen() {
                 accessibilityLabel={t(`admin.tabs.${section.key}`)}
                 accessibilityHint={t(`admin.mobile.sections.${section.key}`)}
               >
-                <View className="flex-row items-center gap-3">
-                  <section.Icon size={20} color={IconColors.default} />
-                  <View className="flex-1">
-                    <Text className="text-typography-900">{t(`admin.tabs.${section.key}`)}</Text>
-                    <Text className="text-sm text-typography-500">
-                      {t(`admin.mobile.sections.${section.key}`)}
-                    </Text>
-                  </View>
+                <section.Icon size={20} color={IconColors.default} />
+                {/* flex-1 on the label column, not on a wrapper: a hugging
+                    wrapper does not shrink in RN, so a long description used to
+                    push the chevron past the card edge. */}
+                <View className="flex-1">
+                  <Text className="text-typography-900">{t(`admin.tabs.${section.key}`)}</Text>
+                  <Text className="text-sm text-typography-500">
+                    {t(`admin.mobile.sections.${section.key}`)}
+                  </Text>
                 </View>
                 <ChevronRight size={20} color={IconColors.muted} />
               </Pressable>

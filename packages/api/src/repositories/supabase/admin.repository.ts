@@ -23,11 +23,13 @@ import type {
   WinningCriterion,
 } from "@prostcounter/shared";
 import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { atZonedTime, formatDateForDatabase } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
+import { ConflictError } from "../../middleware/error";
 import { createAdminClient } from "../../utils/admin-client";
 
 /**
@@ -378,12 +380,19 @@ export class SupabaseAdminRepository {
   /**
    * Lists a user's attendances with the tents visited on each day.
    *
+   * Reads `attendance_with_totals`, not `attendances`: the RPCs stopped
+   * writing `attendances.beer_count` in 20260317130000_stop_writing_beer_count,
+   * so that column is 0 on every day created since and a panel reading it
+   * reports "0 beers" for essentially all recent attendance. The view counts
+   * `consumptions` and falls back to the column only for days that have none,
+   * which is what every other read in the API uses.
+   *
    * Tent visits are fetched in one query for the whole set and grouped in
    * memory; the web panel issues one query per attendance instead.
    */
   async listUserAttendances(userId: string): Promise<AdminAttendance[]> {
     const { data: attendances, error } = await this.supabase
-      .from("attendances")
+      .from("attendance_with_totals")
       .select("id, user_id, festival_id, date, beer_count")
       .eq("user_id", userId)
       .order("date", { ascending: false });
@@ -429,10 +438,26 @@ export class SupabaseAdminRepository {
       }
     }
 
-    return attendances.map((attendance) => ({
-      ...attendance,
-      tent_ids: tentsByDay.get(`${attendance.festival_id}|${attendance.date}`) ?? [],
-    }));
+    // A view loses the base table's NOT NULL, so every column here is typed
+    // nullable; id, festival_id and date cannot actually be null on
+    // `attendances`. Skipped rather than coerced -- a row that did come back
+    // that way is not a shape this panel can say anything true about.
+    return attendances.flatMap((attendance) => {
+      if (!attendance.id || !attendance.festival_id || !attendance.date) {
+        return [];
+      }
+
+      return [
+        {
+          id: attendance.id,
+          user_id: attendance.user_id,
+          festival_id: attendance.festival_id,
+          date: attendance.date,
+          beer_count: attendance.beer_count ?? 0,
+          tent_ids: tentsByDay.get(`${attendance.festival_id}|${attendance.date}`) ?? [],
+        },
+      ];
+    });
   }
 
   /**
@@ -443,6 +468,11 @@ export class SupabaseAdminRepository {
    * the row's real user/festival/date rather than values supplied by the
    * caller -- the web version trusts the client for all three, which lets a
    * malformed payload write visits onto the wrong day.
+   *
+   * `beer_count` still writes to `attendances.beer_count`, which the view only
+   * reads for days that have no consumptions. On a day with drinks logged the
+   * value is therefore inert; reconciling it would mean synthesising or
+   * deleting consumption rows, which is a different feature from editing a day.
    */
   async updateAttendance(attendanceId: string, input: UpdateAdminAttendanceInput): Promise<void> {
     const { tent_ids, ...attendanceFields } = input;
@@ -463,6 +493,14 @@ export class SupabaseAdminRepository {
         .update(attendanceFields)
         .eq("id", attendanceId);
 
+      // `attendances` carries UNIQUE(user_id, festival_id, date), so moving a
+      // day onto one the user already has is the caller asking for something
+      // impossible, not the server falling over. Raised as 409 rather than
+      // escaping as a raw 500.
+      if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+        throw new ConflictError(ErrorCodes.DUPLICATE_ATTENDANCE);
+      }
+
       if (error) {
         throw new Error(`Error updating attendance: ${error.message}`);
       }
@@ -482,17 +520,28 @@ export class SupabaseAdminRepository {
 
     // The day the visits belong to, after any date change in this same call.
     const visitDate = attendanceFields.date ?? existing.date;
-    const timezone = (await this.festivalTimezones([existing.festival_id])).get(
-      existing.festival_id ?? "",
-    );
+    const visitFestivalId = existing.festival_id;
+    const timezone = (await this.festivalTimezones([visitFestivalId])).get(visitFestivalId ?? "");
     const visitTimezone = timezone ?? DEFAULT_TIMEZONE;
+
+    // Both days when the attendance moved. Clearing only the new one leaves the
+    // old day's visits behind with no attendance covering them: they still feed
+    // leaderboards and achievements, but listUserAttendances groups by
+    // festival|date and no longer surfaces them, so they are invisible to the
+    // admin who just moved the day.
+    const daysToClear = visitDate === existing.date ? [existing.date] : [existing.date, visitDate];
 
     // Cleared by id. Matching on `visit_date` equality compares a calendar day
     // against a timestamp, so it silently deletes nothing and this "replace"
     // becomes an append: edit a day twice and every tent is listed twice.
-    const staleVisitIds = existing.festival_id
-      ? await this.visitIdsOnDay(visitUserId, existing.festival_id, visitDate, visitTimezone)
-      : [];
+    const staleVisitIds: string[] = [];
+    if (visitFestivalId) {
+      for (const day of daysToClear) {
+        staleVisitIds.push(
+          ...(await this.visitIdsOnDay(visitUserId, visitFestivalId, day, visitTimezone)),
+        );
+      }
+    }
 
     if (staleVisitIds.length > 0) {
       const { error: deleteError } = await this.supabase

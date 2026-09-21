@@ -14,6 +14,7 @@ import { pullGroups } from "../sync/pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "../sync/pull-reference";
 import { pullAttendances, pullProfile } from "../sync/pull-user-data";
 import { createSyncManager, SyncManager } from "../sync/sync-manager";
+import { hasPendingDelete } from "../sync-queue";
 
 // Mock the API client
 vi.mock("../../api-client", () => ({
@@ -154,6 +155,7 @@ vi.mock("../sync-queue", () => ({
   updateLastSyncAt: vi.fn().mockResolvedValue(undefined),
   enqueueOperation: vi.fn().mockResolvedValue("op-1"),
   getPendingOperations: vi.fn().mockResolvedValue([]),
+  hasPendingDelete: vi.fn().mockResolvedValue(false),
   markOperationProcessing: vi.fn().mockResolvedValue(undefined),
   markOperationCompleted: vi.fn().mockResolvedValue(undefined),
   markOperationFailed: vi.fn().mockResolvedValue(undefined),
@@ -191,6 +193,18 @@ function createMockDb() {
       const table = match?.[1];
       if (!table || !records[table]) return null;
 
+      // The attendance pull looks a day up by its natural key before falling
+      // back to the id, which is how a row created offline under a local uuid
+      // is matched to the server's copy.
+      if (/WHERE user_id = \? AND festival_id = \? AND date = \?/.test(query)) {
+        const [userId, festivalId, date] = params ?? [];
+        return (
+          records[table].find(
+            (r) => r.user_id === userId && r.festival_id === festivalId && r.date === date,
+          ) ?? null
+        );
+      }
+
       const id = params?.[0];
       return records[table].find((r) => r.id === id) ?? null;
     }),
@@ -212,6 +226,7 @@ function createMockDb() {
       return { changes: 1 };
     }),
     execAsync: vi.fn().mockResolvedValue(undefined),
+    withTransactionAsync: vi.fn().mockImplementation(async (fn: () => Promise<void>) => fn()),
     // Helper for tests to access mock records
     _records: records,
   };
@@ -462,6 +477,42 @@ describe("Pull functions", () => {
       const results = await pullAttendances(db, "festival-1");
 
       expect(results.map((r) => r.table)).toEqual(["attendances", "tent_visits"]);
+    });
+
+    // A day created offline carries a local uuid, so a queued DELETE for it is
+    // addressed to an id the server has never seen. The route answers an
+    // unknown id as idempotent success, nothing is removed, and the next pull
+    // -- no longer seeing a pending delete -- clears the tombstone and the day
+    // the user deleted comes back.
+    it("repoints a queued delete at the server id before leaving the tombstone", async () => {
+      vi.mocked(hasPendingDelete).mockResolvedValue(true);
+      mockDb._records.attendances.push({
+        id: "local-uuid",
+        user_id: "user-1",
+        festival_id: "festival-1",
+        date: "2024-09-21",
+        beer_count: 5,
+        updated_at: "2024-09-21T13:00:00Z",
+        _deleted: 1,
+        _dirty: 0,
+      });
+
+      const db = mockDb as unknown as Parameters<typeof pullAttendances>[0];
+      await pullAttendances(db, "festival-1");
+
+      const queueCall = mockDb.runAsync.mock.calls.find(
+        ([query]) => typeof query === "string" && query.includes("UPDATE _sync_queue SET record_id"),
+      );
+      expect(queueCall?.[1]).toEqual(["att-1", "local-uuid"]);
+
+      // The delete is still the pending truth: nothing may revive the row.
+      const revived = mockDb.runAsync.mock.calls.find(
+        ([query]) =>
+          typeof query === "string" &&
+          query.includes("UPDATE attendances SET") &&
+          query.includes("_deleted = 0"),
+      );
+      expect(revived).toBeUndefined();
     });
   });
 

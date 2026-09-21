@@ -199,13 +199,17 @@ export default function AdminGroupDetailScreen() {
                   )}
                   onPress={() => handleSelectCriterion(criterion.id)}
                   accessibilityRole="button"
-                  accessibilityLabel={criterion.name}
+                  accessibilityLabel={t(`groups.winningCriteria.${criterion.name}`)}
                   accessibilityState={{
                     selected: group.winning_criteria_id === criterion.id,
                     disabled: updateCriterion.loading,
                   }}
                 >
-                  <Text className="text-typography-900">{criterion.name}</Text>
+                  {/* `criterion.name` is the database identifier (total_beers);
+                      the same keys the web panel and group settings read. */}
+                  <Text className="text-typography-900">
+                    {t(`groups.winningCriteria.${criterion.name}`)}
+                  </Text>
                   {group.winning_criteria_id === criterion.id && (
                     <Check size={20} color={IconColors.primary} />
                   )}

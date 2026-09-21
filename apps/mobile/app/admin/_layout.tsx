@@ -12,16 +12,26 @@ import { Redirect, Stack } from "expo-router";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useAdaptedProfile } from "@/lib/database/adapted-hooks";
+import { useOfflineReady } from "@/lib/database/offline-provider";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 
 export default function AdminLayout() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const offlineReady = useOfflineReady();
   const { data: profile, loading } = useAdaptedProfile(user?.id);
 
   // Wait for the local profile read before deciding -- redirecting on the first
   // render would bounce admins out of a deep link before the flag is known.
-  if (loading) {
+  //
+  // `loading` alone does not express that wait. The query behind it is
+  // `enabled: isReady && !!userId`, and a disabled TanStack query reports
+  // `isLoading: false`, so until the session resolves and SQLite opens this
+  // reads as "done, no profile" -- which is exactly the bounce the paragraph
+  // above is about, on every cold start into an admin route (restored
+  // navigation, a deep link, an OTA reload). Once auth says there is nobody,
+  // there is nothing to wait for and the redirect below is correct.
+  if (authLoading || (user && (!offlineReady || loading))) {
     return null;
   }
 

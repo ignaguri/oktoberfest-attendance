@@ -10005,7 +10005,7 @@ export interface paths {
         head?: never;
         /**
          * Update an attendance (admin)
-         * @description Updates beer count and/or date, and replaces that day's tent visits when tent_ids is supplied.
+         * @description Updates beer count and/or date, and replaces that day's tent visits when tent_ids is supplied. Changing the date clears the old day's visits too.
          */
         patch: {
             parameters: {
@@ -10063,6 +10063,18 @@ export interface paths {
                 };
                 /** @description Attendance not found */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            message: string;
+                        };
+                    };
+                };
+                /** @description The user already has an attendance on the requested date */
+                409: {
                     headers: {
                         [name: string]: unknown;
                     };

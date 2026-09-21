@@ -273,7 +273,7 @@ const updateAttendanceRoute = createRoute({
   tags: ["admin"],
   summary: "Update an attendance (admin)",
   description:
-    "Updates beer count and/or date, and replaces that day's tent visits when tent_ids is supplied.",
+    "Updates beer count and/or date, and replaces that day's tent visits when tent_ids is supplied. Changing the date clears the old day's visits too.",
   request: {
     params: z.object({ attendanceId: z.string().uuid() }),
     body: {
@@ -288,6 +288,10 @@ const updateAttendanceRoute = createRoute({
     ...errorResponses,
     404: {
       description: "Attendance not found",
+      content: { "application/json": { schema: errorSchema } },
+    },
+    409: {
+      description: "The user already has an attendance on the requested date",
       content: { "application/json": { schema: errorSchema } },
     },
   },

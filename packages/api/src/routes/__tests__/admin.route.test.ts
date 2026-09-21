@@ -326,6 +326,42 @@ describe("Admin Routes - Unit Tests", () => {
       // 01:00 on the 21st in Munich, so it belongs to the 21st, not this row.
       expect(body.attendances[0].tent_ids).toEqual([]);
     });
+
+    // attendances.beer_count has not been written since
+    // 20260317130000_stop_writing_beer_count, so reading the table directly
+    // reports 0 beers for every day created since. The view counts
+    // consumptions and only falls back to the column when a day has none.
+    it("reads the count from attendance_with_totals, not attendances", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [
+              {
+                id: ATTENDANCE_ID,
+                user_id: OTHER_ID,
+                festival_id: "44444444-4444-4444-8444-444444444444",
+                date: "2026-09-20",
+                beer_count: 7,
+              },
+            ],
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
+        .mockReturnValueOnce(
+          createMockChain({
+            data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
+            error: null,
+          }),
+        );
+
+      const res = await app.request(createAuthRequest(`/admin/users/${OTHER_ID}/attendances`));
+
+      expect(res.status).toBe(200);
+      expect(mockSupabase.from).toHaveBeenNthCalledWith(1, "attendance_with_totals");
+      const body = (await res.json()) as any;
+      expect(body.attendances[0].beer_count).toBe(7);
+    });
   });
 
   describe("GET /admin/groups", () => {
@@ -583,6 +619,95 @@ describe("Admin Routes - Unit Tests", () => {
       const [inserted] = insertChain.insert.mock.calls[0];
       expect(inserted[0].visit_date).not.toBe("2026-09-20");
       expect(new Date(inserted[0].visit_date).toISOString()).toBe("2026-09-20T10:00:00.000Z");
+    });
+
+    // Clearing only the new day strands the old day's visits: nothing covers
+    // them, listUserAttendances groups by festival|date and stops showing
+    // them, and they keep feeding leaderboards and achievements.
+    it("clears the old day's visits too when the date moves", async () => {
+      const attendanceChain = createMockChain({
+        data: {
+          id: ATTENDANCE_ID,
+          user_id: OTHER_ID,
+          festival_id: "44444444-4444-4444-8444-444444444444",
+          date: "2026-09-20",
+        },
+        error: null,
+      });
+      const updateChain = createMockChain({ data: null, error: null });
+      const festivalChain = createMockChain({
+        data: [{ id: "44444444-4444-4444-8444-444444444444", timezone: "Europe/Berlin" }],
+        error: null,
+      });
+      const oldDayChain = createMockChain({
+        data: [{ id: "77777777-7777-4777-8777-777777777777", visit_date: "2026-09-20T19:00:00Z" }],
+        error: null,
+      });
+      const newDayChain = createMockChain({
+        data: [{ id: "88888888-8888-4888-8888-888888888881", visit_date: "2026-09-22T19:00:00Z" }],
+        error: null,
+      });
+      const deleteChain = createMockChain({ data: null, error: null });
+      const insertChain = createMockChain({ data: null, error: null });
+
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(attendanceChain)
+        .mockReturnValueOnce(updateChain)
+        .mockReturnValueOnce(festivalChain)
+        .mockReturnValueOnce(oldDayChain)
+        .mockReturnValueOnce(newDayChain)
+        .mockReturnValueOnce(deleteChain)
+        .mockReturnValueOnce(insertChain);
+
+      const res = await app.request(
+        createAuthRequest(`/admin/attendances/${ATTENDANCE_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({
+            date: "2026-09-22",
+            tent_ids: ["55555555-5555-4555-8555-555555555555"],
+          }),
+        }),
+      );
+
+      expect(res.status).toBe(200);
+      expect(deleteChain.in).toHaveBeenCalledWith("id", [
+        "77777777-7777-4777-8777-777777777777",
+        "88888888-8888-4888-8888-888888888881",
+      ]);
+    });
+
+    // attendances carries UNIQUE(user_id, festival_id, date). Moving a day onto
+    // one the user already has used to escape as a raw 500.
+    it("answers 409 when the target date is already taken", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(
+          createMockChain({
+            data: {
+              id: ATTENDANCE_ID,
+              user_id: OTHER_ID,
+              festival_id: "44444444-4444-4444-8444-444444444444",
+              date: "2026-09-20",
+            },
+            error: null,
+          }),
+        )
+        .mockReturnValueOnce(
+          createMockChain({
+            data: null,
+            error: { code: "23505", message: "duplicate key" },
+          }),
+        );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/attendances/${ATTENDANCE_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ date: "2026-09-22" }),
+        }),
+      );
+
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as any;
+      expect(body.error.code).toBe("DUPLICATE_ATTENDANCE");
     });
   });
 

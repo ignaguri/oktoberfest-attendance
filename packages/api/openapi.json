@@ -18164,7 +18164,7 @@
           "admin"
         ],
         "summary": "Update an attendance (admin)",
-        "description": "Updates beer count and/or date, and replaces that day's tent visits when tent_ids is supplied.",
+        "description": "Updates beer count and/or date, and replaces that day's tent visits when tent_ids is supplied. Changing the date clears the old day's visits too.",
         "security": [
           {
             "bearerAuth": []
@@ -18271,6 +18271,28 @@
           },
           "404": {
             "description": "Attendance not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "message"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The user already has an attendance on the requested date",
             "content": {
               "application/json": {
                 "schema": {
