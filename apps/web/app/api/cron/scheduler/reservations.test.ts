@@ -45,9 +45,13 @@ function createMockSupabase(reminders: any[] = [], prompts: any[] = []) {
 
 function createMockNotifications() {
   return {
-    notifyReservationReminder: vi.fn().mockResolvedValue(undefined),
-    notifyReservationPrompt: vi.fn().mockResolvedValue(undefined),
+    notifyReservationReminder: vi.fn().mockResolvedValue(true),
+    notifyReservationPrompt: vi.fn().mockResolvedValue(true),
   } as unknown as NotificationService;
+}
+
+function makeRow(id: string, userId: string, tentId: string) {
+  return { id, user_id: userId, tent_id: tentId, start_at: new Date().toISOString() };
 }
 
 describe("processReservationNotifications", () => {
@@ -95,5 +99,58 @@ describe("processReservationNotifications", () => {
     expect((notifications as any).notifyReservationPrompt).toHaveBeenCalledTimes(1);
     expect((supabase as any).__updates.length).toBeGreaterThan(0);
     expect((supabase as any).__updates.at(-1).payload).toHaveProperty("prompt_sent_at");
+  });
+
+  it("leaves prompt_sent_at unset when the notification failed", async () => {
+    const supabase = createMockSupabase([], [makeRow("p1", "u2", "t2")]);
+    const notifications = createMockNotifications();
+    (notifications as any).notifyReservationPrompt.mockResolvedValue(false);
+
+    await processReservationNotifications(
+      supabase as unknown as SupabaseClient<Database>,
+      notifications,
+      "http://localhost:3008",
+      new Date().toISOString(),
+    );
+
+    // Unstamped is what lets the next cron run retry it.
+    expect((supabase as any).__updates).toHaveLength(0);
+  });
+
+  it("leaves reminder_sent_at unset when the notification failed", async () => {
+    const supabase = createMockSupabase([makeRow("r1", "u1", "t1")], []);
+    const notifications = createMockNotifications();
+    (notifications as any).notifyReservationReminder.mockResolvedValue(false);
+
+    await processReservationNotifications(
+      supabase as unknown as SupabaseClient<Database>,
+      notifications,
+      "http://localhost:3008",
+      new Date().toISOString(),
+    );
+
+    expect((supabase as any).__updates).toHaveLength(0);
+  });
+
+  it("stamps only the reservations that were delivered", async () => {
+    const supabase = createMockSupabase(
+      [],
+      [makeRow("p1", "u1", "t1"), makeRow("p2", "u2", "t2"), makeRow("p3", "u3", "t3")],
+    );
+    const notifications = createMockNotifications();
+    (notifications as any).notifyReservationPrompt
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(true);
+
+    await processReservationNotifications(
+      supabase as unknown as SupabaseClient<Database>,
+      notifications,
+      "http://localhost:3008",
+      new Date().toISOString(),
+    );
+
+    expect((supabase as any).__updates).toHaveLength(1);
+    expect((supabase as any).__updates[0].ids).toEqual(["p1", "p3"]);
   });
 });

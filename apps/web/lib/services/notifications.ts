@@ -52,6 +52,12 @@ export class NotificationService {
 
   /**
    * Send reservation reminder to a user (respects reminders_enabled)
+   *
+   * Returns false when the trigger failed. Novu rejects a payload that does not
+   * match the workflow schema, and that rejection is caught here, so callers
+   * that record "already notified" must key off this instead of assuming the
+   * absence of a throw means delivery. Opting out via reminders_enabled returns
+   * true: nothing was sent, but there is nothing to retry either.
    */
   async notifyReservationReminder(
     userId: string,
@@ -61,7 +67,7 @@ export class NotificationService {
       startAtISO: string;
       festivalName?: string;
     },
-  ): Promise<void> {
+  ): Promise<boolean> {
     try {
       const { data: prefs } = await this.supabase
         .from("user_notification_preferences")
@@ -70,7 +76,7 @@ export class NotificationService {
         .single();
 
       if (prefs && prefs.reminders_enabled === false) {
-        return;
+        return true;
       }
 
       await this.novu.trigger({
@@ -78,14 +84,19 @@ export class NotificationService {
         to: userId,
         payload,
       });
+
+      return true;
     } catch (error) {
       reportNotificationException("notifyReservationReminder", error as Error);
+      return false;
     }
   }
 
   /**
    * Send reservation check-in prompt to a user at reservation start time
    * (respects reminders_enabled)
+   *
+   * Returns false on failure, for the same reason as notifyReservationReminder.
    */
   async notifyReservationPrompt(
     userId: string,
@@ -94,7 +105,7 @@ export class NotificationService {
       tentName: string;
       deepLinkUrl: string;
     },
-  ): Promise<void> {
+  ): Promise<boolean> {
     try {
       const { data: prefs } = await this.supabase
         .from("user_notification_preferences")
@@ -103,7 +114,7 @@ export class NotificationService {
         .single();
 
       if (prefs && prefs.reminders_enabled === false) {
-        return;
+        return true;
       }
 
       await this.novu.trigger({
@@ -111,8 +122,11 @@ export class NotificationService {
         to: userId,
         payload,
       });
+
+      return true;
     } catch (error) {
       reportNotificationException("notifyReservationPrompt", error as Error);
+      return false;
     }
   }
 
