@@ -48,6 +48,27 @@ describe("Consumption Routes - Unit Tests", () => {
     vi.clearAllMocks();
   });
 
+  /**
+   * The repository resolves pricing itself now, rather than storing whatever
+   * the client sent: it reads the attendance's festival, calls the pricing
+   * RPC, then reads the user's tip preference. Queue those two `from` calls
+   * between findOrCreate and the consumption insert.
+   *
+   * `rpc` is already mocked to return null by createMockSupabase, so the base
+   * price falls back to the system default. What a drink really costs is
+   * covered against the live cascade in
+   * repositories/supabase/__tests__/consumption-pricing.integration.test.ts;
+   * these tests only care about routing and response shape.
+   */
+  function mockPriceResolution(festivalId: string) {
+    vi.mocked(mockSupabase.from).mockReturnValueOnce(
+      createMockChain(mockSupabaseSuccess({ festival_id: festivalId })),
+    );
+    vi.mocked(mockSupabase.from).mockReturnValueOnce(
+      createMockChain(mockSupabaseSuccess({ tip_mode: "none", tip_fixed_amount: null })),
+    );
+  }
+
   describe("POST /consumption", () => {
     it("should log a new consumption and return updated attendance", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
@@ -73,6 +94,8 @@ describe("Consumption Routes - Unit Tests", () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(mockAttendance)),
       );
+
+      mockPriceResolution(festivalId);
 
       // Mock consumption create
       const mockConsumption = {
@@ -179,15 +202,7 @@ describe("Consumption Routes - Unit Tests", () => {
         ),
       );
 
-      // Mock consumption create - first query for base price (since not provided in request)
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseSuccess({
-            festival_id: festivalId,
-            festivals: { beer_cost: 1620 },
-          }),
-        ),
-      );
+      mockPriceResolution(festivalId);
 
       // Mock consumption insert
       const mockConsumption = {
@@ -269,6 +284,8 @@ describe("Consumption Routes - Unit Tests", () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(mockAttendance)),
       );
+
+      mockPriceResolution(festivalId);
 
       // Mock consumption create for soft drink
       const mockConsumption = {
@@ -453,6 +470,8 @@ describe("Consumption Routes - Unit Tests", () => {
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(mockAttendance)),
       );
+
+      mockPriceResolution(festivalId);
 
       // Mock consumption create with optional fields
       const mockConsumption = {

@@ -33,13 +33,9 @@ export class ConsumptionService {
       throw new ValidationError(ErrorCodes.INVALID_DATE_FORMAT);
     }
 
-    // Validate price paid >= base price (if base price provided)
-    if (
-      consumptionData.basePriceCents !== undefined &&
-      consumptionData.pricePaidCents < consumptionData.basePriceCents
-    ) {
-      throw new ValidationError(ErrorCodes.PRICE_BELOW_BASE);
-    }
+    // Pricing is not validated here any more. Both prices in the payload are
+    // ignored, so comparing them said nothing about what would be stored; the
+    // repository resolves the base price and checks any override against it.
 
     // 1. Get or create attendance for this date
     const attendance = await this.attendanceRepo.findOrCreate(userId, festivalId, date);

@@ -105,6 +105,10 @@
                     "type": "integer",
                     "minimum": 0
                   },
+                  "pricePaidOverrideCents": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
                   "volumeMl": {
                     "type": "integer",
                     "minimum": 1,
@@ -125,8 +129,7 @@
                 },
                 "required": [
                   "festivalId",
-                  "date",
-                  "pricePaidCents"
+                  "date"
                 ]
               }
             }

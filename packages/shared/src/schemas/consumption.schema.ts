@@ -26,8 +26,24 @@ export const LogConsumptionSchema = z.object({
   tentId: z.uuid({ error: "Invalid tent ID" }).optional(),
   drinkType: DrinkTypeSchema.default("beer"),
   drinkName: z.string().max(255).optional(),
+  /**
+   * Ignored. The server resolves the base price from the pricing cascade
+   * (tent -> festival -> system default), so that what a drink costs does not
+   * depend on which client logged it. Older binaries still send a beer-derived
+   * value here; it is accepted and discarded rather than rejected.
+   */
   basePriceCents: z.number().int().min(0, "Price must be non-negative").optional(),
-  pricePaidCents: z.number().int().min(0, "Price must be non-negative"),
+  /**
+   * Ignored, for the same reason. The server applies the user's tip preference
+   * to the resolved base price. To record an amount the user actually typed,
+   * send `pricePaidOverrideCents`.
+   */
+  pricePaidCents: z.number().int().min(0, "Price must be non-negative").optional(),
+  /**
+   * An amount the user explicitly entered, which replaces the tip calculation.
+   * Must be at least the resolved base price.
+   */
+  pricePaidOverrideCents: z.number().int().min(0, "Price must be non-negative").optional(),
   volumeMl: z.number().int().min(1, "Volume must be positive").default(1000),
   recordedAt: z.iso.datetime().optional(),
   idempotencyKey: z.string().max(255).optional(),

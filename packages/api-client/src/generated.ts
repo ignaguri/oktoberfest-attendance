@@ -105,7 +105,8 @@ export interface paths {
                         drinkType?: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
                         drinkName?: string;
                         basePriceCents?: number;
-                        pricePaidCents: number;
+                        pricePaidCents?: number;
+                        pricePaidOverrideCents?: number;
                         /** @default 1000 */
                         volumeMl?: number;
                         /** Format: date-time */
