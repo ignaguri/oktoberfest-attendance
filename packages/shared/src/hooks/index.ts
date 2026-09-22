@@ -138,6 +138,8 @@ export {
   useDeleteProfile,
   useHighlights,
   useMissingProfileFields,
+  useProfileDetail,
+  useProfileFestivalDays,
   usePublicProfile,
   useResetTutorial,
   useTutorialStatus,
