@@ -63,8 +63,11 @@ import type {
   ListFriendRequestsResponse,
   ListFriendsResponse,
   ListFriendSuggestionsResponse,
+  ListGroupInvitationsResponse,
   ListGroupJoinRequestsResponse,
   ListGroupsResponse,
+  ListInvitableUsersResponse,
+  ListSentGroupInvitationsResponse,
   LogConsumptionInput,
   LogConsumptionResponse,
   MarkUnlocksSeenResponse,
@@ -641,6 +644,101 @@ export function createTypedApiClient(config: ApiClientConfig) {
         );
         if (!response.ok) {
           await extractApiError(response, "Failed to decline join request");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async getInvitableUsers(groupId: string, q: string): Promise<ListInvitableUsersResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/groups/${groupId}/invitable-users?q=${encodeURIComponent(q)}`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to search people to invite");
+        }
+        return parseJsonResponse<ListInvitableUsersResponse>(response);
+      },
+
+      async inviteToGroup(groupId: string, inviteeId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/${groupId}/invitations`,
+          {
+            method: "POST",
+            headers: { ...headers, "Content-Type": "application/json" },
+            body: JSON.stringify({ inviteeId }),
+          },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to send invitation");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async getSentInvitations(groupId: string): Promise<ListSentGroupInvitationsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/groups/${groupId}/invitations`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch sent invitations");
+        }
+        return parseJsonResponse<ListSentGroupInvitationsResponse>(response);
+      },
+
+      async getIncomingInvitations(): Promise<ListGroupInvitationsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/groups/invitations/incoming`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch group invitations");
+        }
+        return parseJsonResponse<ListGroupInvitationsResponse>(response);
+      },
+
+      async acceptGroupInvitation(invitationId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/invitations/${invitationId}/accept`,
+          { method: "POST", headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to accept invitation");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async declineGroupInvitation(invitationId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "POST",
+          `${baseUrl}/v1/groups/invitations/${invitationId}/decline`,
+          { method: "POST", headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to decline invitation");
+        }
+        return parseJsonResponse<GroupActionResponse>(response);
+      },
+
+      async cancelGroupInvitation(invitationId: string): Promise<GroupActionResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "DELETE",
+          `${baseUrl}/v1/groups/invitations/${invitationId}`,
+          { method: "DELETE", headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to withdraw invitation");
         }
         return parseJsonResponse<GroupActionResponse>(response);
       },
