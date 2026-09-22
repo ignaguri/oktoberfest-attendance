@@ -12,6 +12,7 @@ import { CreateGroupSheet } from "@/components/groups/create-group-sheet";
 import { EmptyGroupsState } from "@/components/groups/empty-groups-state";
 import { GroupListItem } from "@/components/groups/group-list-item";
 import { JoinGroupSheet } from "@/components/groups/join-group-sheet";
+import { PendingInvitationsSection } from "@/components/groups/pending-invitations-section";
 import { GroupsSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
@@ -150,6 +151,12 @@ export default function GroupsScreen() {
         className="flex-1 bg-background-50"
         refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
       >
+        {/* Outside the hasGroups branch for the same reason CarryOverGroups is:
+            someone with no groups yet is exactly who has a pending invitation.
+            Spacing lives inside the component so nothing is left behind when it
+            renders null. */}
+        <PendingInvitationsSection showDialog={showDialog} />
+
         {/* Outside the hasGroups branch on purpose: the most valuable case is a
             festival where you have no groups yet but last time's crew exists.
             Spacing lives inside the component so nothing is left behind when it

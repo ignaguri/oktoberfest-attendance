@@ -19,6 +19,7 @@ import { z } from "zod";
 import { GroupMembersList } from "@/components/groups/group-members-list";
 import { InviteLinkSection } from "@/components/groups/invite-link-section";
 import { JoinRequestsSection } from "@/components/groups/join-requests-section";
+import { SentInvitationsSection } from "@/components/groups/sent-invitations-section";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -389,6 +390,9 @@ export default function GroupSettingsScreen() {
 
           {/* Join Requests (Creator only; renders nothing when there are none) */}
           {isCreator && <JoinRequestsSection groupId={id!} showDialog={showDialog} />}
+
+          {/* Invitations you sent (Creator only; renders nothing when there are none) */}
+          {isCreator && <SentInvitationsSection groupId={id!} showDialog={showDialog} />}
 
           {/* Invite Link Section (Creator only) */}
           {isCreator && (
