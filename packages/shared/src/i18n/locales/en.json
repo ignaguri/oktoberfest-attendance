@@ -1337,7 +1337,10 @@
       "uploading": "Uploading...",
       "uploadSuccess": "Profile picture updated",
       "uploadError": "Failed to update profile picture",
-      "permissionDenied": "Permission is required to access photos"
+      "permissionDenied": "Permission is required to access photos",
+      "viewFullSize": "View full size",
+      "fullSizeTitle": "Profile picture",
+      "fullSizeClose": "Close"
     },
     "biometric": {
       "label": "Biometric Login",

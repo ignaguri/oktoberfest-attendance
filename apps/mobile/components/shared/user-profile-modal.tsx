@@ -7,9 +7,10 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { getInitials } from "@prostcounter/ui";
 import { Beer, Calendar, Check, Clock, TrendingUp, UserPlus, Users, X } from "lucide-react-native";
 import type { ReactNode } from "react";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
+import { AvatarViewerModal } from "@/components/shared/avatar-viewer-modal";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Badge, BadgeIcon, BadgeText } from "@/components/ui/badge";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
@@ -80,122 +81,140 @@ export function UserProfileModal({
   userId,
 }: UserProfileModalProps) {
   const { t } = useTranslation();
+  const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
 
   const modalTitle = title || t("activityFeed.userProfile");
+  const displayName = profile?.fullName || profile?.username || "User";
+  const fullSizeAvatarUrl = profile?.avatarUrl ? getAvatarUrl(profile.avatarUrl) : null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="sm">
-      <ModalBackdrop />
-      <ModalContent>
-        <ModalHeader>
-          <Heading size="md" className="text-typography-900">
-            {modalTitle}
-          </Heading>
-          <ModalCloseButton>
-            <X size={20} color={IconColors.default} />
-          </ModalCloseButton>
-        </ModalHeader>
-        <ModalBody className="pb-6">
-          {loading ? (
-            <VStack className="items-center py-8">
-              <Spinner size="large" color={Colors.primary[500]} />
-              <Text className="mt-2 text-typography-500">{t("common.loading")}</Text>
-            </VStack>
-          ) : profile ? (
-            <VStack space="md" className="items-center">
-              {/* Large Avatar */}
-              <Avatar size="xl">
-                {profile.avatarUrl ? (
-                  <AvatarImage
-                    source={{ uri: getAvatarUrl(profile.avatarUrl) }}
-                    alt={profile.fullName || profile.username || "User"}
-                  />
-                ) : (
-                  <AvatarFallbackText>
-                    {getInitials({
-                      fullName: profile.fullName,
-                      username: profile.username,
-                    })}
-                  </AvatarFallbackText>
-                )}
-              </Avatar>
-
-              {/* User Info */}
-              <VStack space="xs" className="items-center">
-                {profile.username && (
-                  <Text className="text-lg font-semibold text-typography-900">
-                    {profile.username}
-                  </Text>
-                )}
-                {profile.fullName && (
-                  <Text className="text-sm text-typography-500">{profile.fullName}</Text>
-                )}
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} size="sm">
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Heading size="md" className="text-typography-900">
+              {modalTitle}
+            </Heading>
+            <ModalCloseButton>
+              <X size={20} color={IconColors.default} />
+            </ModalCloseButton>
+          </ModalHeader>
+          <ModalBody className="pb-6">
+            {loading ? (
+              <VStack className="items-center py-8">
+                <Spinner size="large" color={Colors.primary[500]} />
+                <Text className="mt-2 text-typography-500">{t("common.loading")}</Text>
               </VStack>
+            ) : profile ? (
+              <VStack space="md" className="items-center">
+                {/* Large Avatar - opens full size when there is a picture to show */}
+                <Pressable
+                  onPress={fullSizeAvatarUrl ? () => setIsAvatarViewerOpen(true) : undefined}
+                  disabled={!fullSizeAvatarUrl}
+                  accessibilityRole={fullSizeAvatarUrl ? "button" : undefined}
+                  accessibilityLabel={fullSizeAvatarUrl ? t("profile.avatar.viewFullSize") : undefined}
+                >
+                  <Avatar size="xl">
+                    {fullSizeAvatarUrl ? (
+                      <AvatarImage source={{ uri: fullSizeAvatarUrl }} alt={displayName} />
+                    ) : (
+                      <AvatarFallbackText>
+                        {getInitials({
+                          fullName: profile.fullName,
+                          username: profile.username,
+                        })}
+                      </AvatarFallbackText>
+                    )}
+                  </Avatar>
+                </Pressable>
 
-              {/* Friendship badge / action button */}
-              {profile.friendshipStatus && profile.friendshipStatus !== "self" && (
-                <MobileFriendshipBadge status={profile.friendshipStatus} userId={userId} />
-              )}
+                {/* User Info */}
+                <VStack space="xs" className="items-center">
+                  {profile.username && (
+                    <Text className="text-lg font-semibold text-typography-900">
+                      {profile.username}
+                    </Text>
+                  )}
+                  {profile.fullName && (
+                    <Text className="text-sm text-typography-500">{profile.fullName}</Text>
+                  )}
+                </VStack>
 
-              {/* Stats - only shown if we have stats */}
-              {profile.stats && (
-                <HStack space="lg" className="mt-2">
-                  <VStack className="items-center">
-                    <HStack space="xs" className="items-center">
-                      <Calendar size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
-                        {profile.stats.daysAttended}
-                      </Text>
-                    </HStack>
-                    <Text className="text-xs text-typography-500">
-                      {t("leaderboard.stats.days")}
-                    </Text>
-                  </VStack>
-                  <VStack className="items-center">
-                    <HStack space="xs" className="items-center">
-                      <Beer size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
-                        {profile.stats.totalBeers}
-                      </Text>
-                    </HStack>
-                    <Text className="text-xs text-typography-500">
-                      {t("leaderboard.stats.drinks")}
-                    </Text>
-                  </VStack>
-                  <VStack className="items-center">
-                    <HStack space="xs" className="items-center">
-                      <TrendingUp size={16} color={IconColors.muted} />
-                      <Text className="text-xl font-bold text-typography-900">
-                        {profile.stats.avgBeers.toFixed(1)}
-                      </Text>
-                    </HStack>
-                    <Text className="text-xs text-typography-500">
-                      {t("leaderboard.stats.avg")}
-                    </Text>
-                  </VStack>
-                </HStack>
-              )}
+                {/* Friendship badge / action button */}
+                {profile.friendshipStatus && profile.friendshipStatus !== "self" && (
+                  <MobileFriendshipBadge status={profile.friendshipStatus} userId={userId} />
+                )}
 
-              {/* Shared groups */}
-              {profile.sharedGroups != null &&
-                profile.sharedGroups > 0 &&
-                profile.friendshipStatus !== "self" && (
-                  <HStack space="xs" className="items-center">
-                    <Users size={14} color={IconColors.muted} />
-                    <Text className="text-sm text-typography-500">
-                      {profile.sharedGroups} {t("friends.sharedGroups")}
-                    </Text>
+                {/* Stats - only shown if we have stats */}
+                {profile.stats && (
+                  <HStack space="lg" className="mt-2">
+                    <VStack className="items-center">
+                      <HStack space="xs" className="items-center">
+                        <Calendar size={16} color={IconColors.muted} />
+                        <Text className="text-xl font-bold text-typography-900">
+                          {profile.stats.daysAttended}
+                        </Text>
+                      </HStack>
+                      <Text className="text-xs text-typography-500">
+                        {t("leaderboard.stats.days")}
+                      </Text>
+                    </VStack>
+                    <VStack className="items-center">
+                      <HStack space="xs" className="items-center">
+                        <Beer size={16} color={IconColors.muted} />
+                        <Text className="text-xl font-bold text-typography-900">
+                          {profile.stats.totalBeers}
+                        </Text>
+                      </HStack>
+                      <Text className="text-xs text-typography-500">
+                        {t("leaderboard.stats.drinks")}
+                      </Text>
+                    </VStack>
+                    <VStack className="items-center">
+                      <HStack space="xs" className="items-center">
+                        <TrendingUp size={16} color={IconColors.muted} />
+                        <Text className="text-xl font-bold text-typography-900">
+                          {profile.stats.avgBeers.toFixed(1)}
+                        </Text>
+                      </HStack>
+                      <Text className="text-xs text-typography-500">
+                        {t("leaderboard.stats.avg")}
+                      </Text>
+                    </VStack>
                   </HStack>
                 )}
-            </VStack>
-          ) : (
-            <VStack className="items-center py-4">
-              <Text className="text-typography-500">{t("activityFeed.profileNotFound")}</Text>
-            </VStack>
-          )}
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+
+                {/* Shared groups */}
+                {profile.sharedGroups != null &&
+                  profile.sharedGroups > 0 &&
+                  profile.friendshipStatus !== "self" && (
+                    <HStack space="xs" className="items-center">
+                      <Users size={14} color={IconColors.muted} />
+                      <Text className="text-sm text-typography-500">
+                        {profile.sharedGroups} {t("friends.sharedGroups")}
+                      </Text>
+                    </HStack>
+                  )}
+              </VStack>
+            ) : (
+              <VStack className="items-center py-4">
+                <Text className="text-typography-500">{t("activityFeed.profileNotFound")}</Text>
+              </VStack>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
+      {fullSizeAvatarUrl && (
+        <AvatarViewerModal
+          visible={isAvatarViewerOpen}
+          imageUrl={fullSizeAvatarUrl}
+          name={displayName}
+          onClose={() => setIsAvatarViewerOpen(false)}
+        />
+      )}
+    </>
   );
 }
 

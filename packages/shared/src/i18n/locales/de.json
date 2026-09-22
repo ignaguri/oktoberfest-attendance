@@ -1574,7 +1574,10 @@
       "uploading": "Lädt hoch...",
       "uploadSuccess": "Profilbild aktualisiert",
       "uploadError": "Aktualisierung des Profilbilds fehlgeschlagen",
-      "permissionDenied": "Berechtigung zum Zugriff auf Fotos erforderlich"
+      "permissionDenied": "Berechtigung zum Zugriff auf Fotos erforderlich",
+      "viewFullSize": "In voller Größe ansehen",
+      "fullSizeTitle": "Profilbild",
+      "fullSizeClose": "Schließen"
     },
     "biometric": {
       "label": "Biometrische Anmeldung",
