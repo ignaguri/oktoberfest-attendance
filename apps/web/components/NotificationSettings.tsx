@@ -148,6 +148,25 @@ export function NotificationSettings() {
               disabled={isUpdating}
             />
           </div>
+
+          {/* Friends Starting Their Day */}
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4" />
+                <span className="font-medium">{t("notificationSettings.dayStart")}</span>
+              </div>
+              <p className="text-left text-sm text-gray-600">
+                {t("notificationSettings.description.dayStart")}
+              </p>
+            </div>
+            <Switch
+              aria-label={t("notificationSettings.dayStart")}
+              checked={preferences.day_start_enabled ?? true}
+              onCheckedChange={(checked) => handleToggle("day_start_enabled", checked)}
+              disabled={isUpdating}
+            />
+          </div>
         </div>
 
         {/* Divider */}

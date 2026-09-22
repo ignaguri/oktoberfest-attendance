@@ -1174,7 +1174,7 @@
           "attendance"
         ],
         "summary": "Update personal attendance",
-        "description": "Updates personal attendance without triggering group notifications. Preserves existing tent visit timestamps.",
+        "description": "Updates personal attendance. Preserves existing tent visit timestamps. Notifies group members when the update actually adds a tent for the day.",
         "security": [
           {
             "bearerAuth": []
@@ -1400,12 +1400,21 @@
                     "visitedAt": {
                       "type": "string",
                       "format": "date-time"
+                    },
+                    "visitDate": {
+                      "type": "string",
+                      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                    },
+                    "replayed": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
                     "tentVisitId",
                     "attendanceId",
-                    "visitedAt"
+                    "visitedAt",
+                    "visitDate",
+                    "replayed"
                   ]
                 }
               }
@@ -7688,6 +7697,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "dayStartEnabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "createdAt": {
                       "type": "string",
                       "nullable": true,
@@ -7709,6 +7722,7 @@
                     "groupNotificationsEnabled",
                     "dailyReminderEnabled",
                     "friendPlansEnabled",
+                    "dayStartEnabled",
                     "createdAt",
                     "updatedAt"
                   ]
@@ -7767,6 +7781,9 @@
                     "type": "boolean"
                   },
                   "friendPlansEnabled": {
+                    "type": "boolean"
+                  },
+                  "dayStartEnabled": {
                     "type": "boolean"
                   }
                 }

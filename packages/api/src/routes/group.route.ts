@@ -1,4 +1,6 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import type { Database } from "@prostcounter/db";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   CarryOverCandidatesQuerySchema,
   CarryOverCandidatesResponseSchema,
@@ -33,6 +35,28 @@ import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
 import { NotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
+
+/** Fire-and-forget group-join push. Never throws: the join already succeeded. */
+async function announceGroupJoin(
+  supabase: SupabaseClient<Database>,
+  groupId: string,
+  newUserId: string,
+): Promise<void> {
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (!novuApiKey) {
+    return;
+  }
+
+  try {
+    const notificationService = new NotificationService(supabase, novuApiKey);
+    await notificationService.notifyGroupJoin(groupId, newUserId);
+  } catch (notificationError) {
+    logger.error(
+      { error: notificationError, groupId, newUserId },
+      "Failed to send group join notification",
+    );
+  }
+}
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -444,6 +468,7 @@ app.openapi(joinGroupRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   await service.joinGroup(id, user.id, body.inviteToken);
+  await announceGroupJoin(supabase, id, user.id);
 
   const { data: group, error: groupError } = await supabase
     .from("groups")
@@ -963,6 +988,7 @@ app.openapi(joinByTokenRoute, async (c) => {
   const service = new GroupService(groupRepo);
 
   const group = await service.joinByToken(inviteToken, user.id);
+  await announceGroupJoin(supabase, group.id, user.id);
 
   // Evaluate-only: the unlock reaches the client through the outbox, not this
   // response. Awaited so the outbox row exists before the client's next read.

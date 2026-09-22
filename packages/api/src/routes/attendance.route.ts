@@ -27,8 +27,8 @@ import {
   SupabasePhotoRepository,
   SupabaseWrappedRepository,
 } from "../repositories/supabase";
+import { announceCheckIn } from "../services/check-in-notifications";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
-import { NotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
@@ -298,57 +298,14 @@ app.openapi(createAttendanceRoute, async (c) => {
     );
   }
 
-  // Trigger tent check-in notifications only if tents were actually changed
+  // Trigger check-in notifications only if tents were actually changed
   if (data.tents && data.tents.length > 0 && result.tentsChanged) {
-    const novuApiKey = process.env.NOVU_API_KEY;
-    if (novuApiKey) {
-      try {
-        // Get user's group memberships for this festival
-        const { data: groupMemberships, error: groupError } = await supabase
-          .from("group_members")
-          .select(
-            `
-            group_id,
-            groups!inner(festival_id)
-          `,
-          )
-          .eq("user_id", user.id)
-          .eq("groups.festival_id", data.festivalId);
-
-        if (!groupError && groupMemberships && groupMemberships.length > 0) {
-          // Get tent names for better notifications
-          const { data: tentData } = await supabase
-            .from("tents")
-            .select("id, name")
-            .in("id", data.tents);
-
-          const tentNames =
-            tentData
-              ?.map((tent) => tent.name)
-              .filter((name) => name)
-              .join(", ") || "Multiple tents";
-          const groupIds = groupMemberships
-            .map((membership) => membership.group_id)
-            .filter((id): id is string => id !== null);
-
-          const notificationService = new NotificationService(supabase, novuApiKey);
-          await notificationService.notifyTentCheckin(
-            user.id,
-            tentNames,
-            groupIds,
-            data.festivalId,
-          );
-        }
-      } catch (notificationError) {
-        // Don't fail the attendance operation if notification fails
-        logger.error(
-          {
-            error: notificationError,
-          },
-          "Failed to send tent check-in notification",
-        );
-      }
-    }
+    await announceCheckIn(supabase, {
+      userId: user.id,
+      festivalId: data.festivalId,
+      date: data.date,
+      tentIds: data.tents,
+    });
   }
 
   const unlocked = await evaluateAfterWrite(supabase, user.id, data.festivalId, "POST /attendance");
@@ -356,14 +313,14 @@ app.openapi(createAttendanceRoute, async (c) => {
   return c.json({ ...result, unlocked }, 200);
 });
 
-// POST /attendance/personal - Update personal attendance (no notifications)
+// POST /attendance/personal - Update personal attendance
 const updatePersonalAttendanceRoute = createRoute({
   method: "post",
   path: "/attendance/personal",
   tags: ["attendance"],
   summary: "Update personal attendance",
   description:
-    "Updates personal attendance without triggering group notifications. Preserves existing tent visit timestamps.",
+    "Updates personal attendance. Preserves existing tent visit timestamps. Notifies group members when the update actually adds a tent for the day.",
   request: {
     body: {
       content: {
@@ -417,6 +374,19 @@ app.openapi(updatePersonalAttendanceRoute, async (c) => {
 
   // Update personal attendance
   const result = await attendanceRepo.updatePersonal(user.id, data);
+
+  // Gated on tentsAdded, not on data.tents having entries: mobile pushes the
+  // whole day's tent set on every save, so "has tents" is true on a save that
+  // added nothing. tentsAdded is the RPC's own diff against what was already
+  // stored for the day, so re-saving an unchanged set announces nothing.
+  if (result.tentsAdded.length > 0) {
+    await announceCheckIn(supabase, {
+      userId: user.id,
+      festivalId: data.festivalId,
+      date: data.date,
+      tentIds: result.tentsAdded,
+    });
+  }
 
   // Invalidate wrapped data cache (attendance changes affect wrapped stats)
   try {
@@ -498,6 +468,24 @@ app.openapi(logTentVisitRoute, async (c) => {
   }
 
   const result = await attendanceRepo.logTentVisit(user.id, data);
+
+  // visit_date as the repository stored it, already bucketed into the
+  // festival's timezone. Never re-derive it from the incoming timestamp.
+  const visitDate = result.visitDate;
+
+  // A replay inserted nothing — the original call already announced this
+  // visit (or didn't, if notifications were off then, but replaying it is
+  // still not a new check-in). Announcing here as well is the exact double
+  // push the offline sync queue's at-least-once delivery would otherwise
+  // cause every time a push is retried.
+  if (visitDate && !result.replayed) {
+    await announceCheckIn(supabase, {
+      userId: user.id,
+      festivalId: data.festivalId,
+      date: visitDate,
+      tentIds: [data.tentId],
+    });
+  }
 
   try {
     const wrappedRepo = new SupabaseWrappedRepository(supabase);
@@ -645,8 +633,9 @@ app.openapi(checkInFromReservationRoute, async (c) => {
   // idempotent, so it costs a redundant touch and keeps attendanceId defined
   // above even when the visit turns out to be a no-op.
   const attendanceRepo = new SupabaseAttendanceRepository(supabase);
+  let tentVisitResult: Awaited<ReturnType<typeof attendanceRepo.logTentVisit>> | null = null;
   try {
-    await attendanceRepo.logTentVisit(user.id, {
+    tentVisitResult = await attendanceRepo.logTentVisit(user.id, {
       festivalId: reservation.festival_id,
       tentId: reservation.tent_id,
       visitedAt: startDate.toISOString(),
@@ -654,12 +643,26 @@ app.openapi(checkInFromReservationRoute, async (c) => {
   } catch (error) {
     // Already the day's current tent, so the check-in adds nothing: the user is
     // confirming a tent they are recorded as being in. Not a failed check-in.
+    // Nothing was recorded, so there is nothing to announce either.
     if (
       !(error instanceof ValidationError) ||
       error.code !== ErrorCodes.TENT_ALREADY_CURRENT_VISIT
     ) {
       throw error;
     }
+  }
+
+  // This is a real tent check-in — the notification the user originally
+  // reported never receiving — so it announces on the same terms as
+  // /attendance/tent-visits: skip when nothing was recorded, and skip a
+  // replay so an at-least-once retry can't send a second push.
+  if (tentVisitResult && !tentVisitResult.replayed) {
+    await announceCheckIn(supabase, {
+      userId: user.id,
+      festivalId: reservation.festival_id,
+      date: tentVisitResult.visitDate,
+      tentIds: [reservation.tent_id],
+    });
   }
 
   // Mark reservation as completed

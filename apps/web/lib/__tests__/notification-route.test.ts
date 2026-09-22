@@ -13,6 +13,16 @@ describe("toWebRoute", () => {
     expect(toWebRoute(`/group-detail/${GROUP_ID}`)).toBe(`/groups/${GROUP_ID}`);
   });
 
+  it("sends group messages to the web messages page", () => {
+    expect(toWebRoute(`/group-detail/${GROUP_ID}/messages`)).toBe(`/groups/${GROUP_ID}/messages`);
+  });
+
+  it("keeps a query string on a group sub-page", () => {
+    expect(toWebRoute(`/group-detail/${GROUP_ID}/messages?highlight=1`)).toBe(
+      `/groups/${GROUP_ID}/messages?highlight=1`,
+    );
+  });
+
   it("keeps a query string", () => {
     expect(toWebRoute(`/group-detail/${GROUP_ID}?tab=members`)).toBe(
       `/groups/${GROUP_ID}?tab=members`,

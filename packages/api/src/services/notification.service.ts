@@ -7,12 +7,19 @@ import {
   NOTIFICATION_PUSH_TYPES,
   NOTIFICATION_WORKFLOWS,
 } from "@prostcounter/shared/constants";
-import { createGetAvatarUrl, runNovuWriteTolerantly } from "@prostcounter/shared/utils";
+import {
+  createGetAvatarUrl,
+  formatDateForDatabase,
+  runNovuWriteTolerantly,
+} from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
+import { SupabaseAttendanceRepository } from "../repositories/supabase/attendance.repository";
 import { createAdminClient } from "../utils/admin-client";
 import { buildOverlapBody, formatOverlapDayLabel } from "./plan-overlap-copy";
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
@@ -328,7 +335,8 @@ export class NotificationService {
       | "group_notifications_enabled"
       | "group_join_enabled"
       | "checkin_enabled"
-      | "friend_plans_enabled",
+      | "friend_plans_enabled"
+      | "day_start_enabled",
   ): Promise<string[] | null> {
     if (recipientIds.length === 0) {
       return [];
@@ -348,7 +356,7 @@ export class NotificationService {
     const { data, error } = await prefsClient
       .from("user_notification_preferences")
       .select(
-        "user_id, group_notifications_enabled, group_join_enabled, checkin_enabled, friend_plans_enabled",
+        "user_id, group_notifications_enabled, group_join_enabled, checkin_enabled, friend_plans_enabled, day_start_enabled",
       )
       .in("user_id", recipientIds);
 
@@ -382,6 +390,7 @@ export class NotificationService {
         group_notifications_enabled: preferences.groupNotificationsEnabled,
         daily_reminder_enabled: preferences.dailyReminderEnabled,
         friend_plans_enabled: preferences.friendPlansEnabled,
+        day_start_enabled: preferences.dayStartEnabled,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" },
@@ -476,8 +485,8 @@ export class NotificationService {
     payload: {
       achievementName: string;
       description?: string;
-      rarity: "common" | "rare" | "epic";
-      achievementId: string;
+      tier: 1 | 2 | 3 | 4;
+      slug: string;
     },
   ): Promise<void> {
     try {
@@ -490,7 +499,12 @@ export class NotificationService {
       await this.novu.trigger({
         workflowId: NOTIFICATION_WORKFLOWS.ACHIEVEMENT_UNLOCKED,
         to: userId,
-        payload,
+        payload: {
+          achievementName: payload.achievementName,
+          description: payload.description ?? "",
+          tier: payload.tier,
+          slug: payload.slug,
+        },
       });
     } catch (error) {
       logger.error({ error }, "Error sending achievement notification");
@@ -506,7 +520,7 @@ export class NotificationService {
     payload: {
       achieverName: string;
       achievementName: string;
-      rarity: "rare" | "epic";
+      tier: 3 | 4;
       groupName?: string;
     },
   ): Promise<void> {
@@ -520,15 +534,34 @@ export class NotificationService {
 
       if (!enabledRecipientIds || enabledRecipientIds.length === 0) return;
 
-      await Promise.allSettled(
+      const results = await Promise.allSettled(
         enabledRecipientIds.map((to) =>
           this.novu.trigger({
             workflowId: NOTIFICATION_WORKFLOWS.GROUP_ACHIEVEMENT_UNLOCKED,
             to,
-            payload,
+            payload: {
+              achieverName: payload.achieverName,
+              achievementName: payload.achievementName,
+              tier: payload.tier,
+              groupName: payload.groupName,
+            },
           }),
         ),
       );
+
+      // allSettled hides rejections, so surface them: a trigger that fails
+      // here is otherwise indistinguishable from one that was never sent.
+      const failures = results.filter((r) => r.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((f) => String((f as PromiseRejectedResult).reason)),
+          },
+          "Some group achievement notifications failed to send",
+        );
+      }
     } catch (error) {
       logger.error({ error }, "Error sending group achievement notification");
     }
@@ -1032,6 +1065,313 @@ export class NotificationService {
   }
 
   /**
+   * Announce that someone has started their festival day — their first drink or
+   * first check-in, whichever landed first.
+   *
+   * The ledger insert is the claim. `ON CONFLICT DO NOTHING ... RETURNING`
+   * hands a row only to the writer that won, so the four endpoints that can
+   * produce a day's first action (POST /consumption, POST /attendance,
+   * /attendance/personal, /attendance/tent-visits) collapse to one
+   * notification, even when the mobile sync queue flushes a backlog and they
+   * arrive at once.
+   *
+   * @returns true when this call claimed the day and sent the notification.
+   *   false otherwise — including on error, so a caller falls back to the
+   *   ordinary tent check-in rather than going silent.
+   */
+  async notifyDayStart(input: {
+    actorId: string;
+    festivalId: string;
+    date: string;
+    kind: "drink" | "checkin";
+    tentName: string | null;
+  }): Promise<boolean> {
+    let adminClient;
+    try {
+      adminClient = createAdminClient();
+    } catch (adminError) {
+      logger.error(
+        { error: adminError },
+        "Admin client unavailable; skipping day-start notification",
+      );
+      return false;
+    }
+
+    try {
+      // Both clients let a user backfill a past date. Claiming the ledger for
+      // anything older than yesterday would announce a day that isn't
+      // starting, so bound the claim to today-or-yesterday in the festival's
+      // own timezone rather than the server's. Yesterday (not just today) is
+      // deliberate: a visit near midnight festival-time can have its
+      // offline-queue push land after the server has already rolled to the
+      // next day.
+      const attendanceRepo = new SupabaseAttendanceRepository(this.supabase);
+      const timezone = await attendanceRepo.getFestivalTimezone(input.festivalId);
+      const now = new Date();
+      const todayInTz = formatDateForDatabase(now, timezone);
+      const yesterdayInTz = formatDateForDatabase(new Date(now.getTime() - ONE_DAY_MS), timezone);
+
+      if (input.date !== todayInTz && input.date !== yesterdayInTz) {
+        logger.warn(
+          {
+            actorId: input.actorId,
+            festivalId: input.festivalId,
+            date: input.date,
+            todayInTz,
+            yesterdayInTz,
+          },
+          "Day-start date outside today/yesterday window; skipping claim",
+        );
+        return false;
+      }
+
+      const { data: claimed, error: claimError } = await adminClient
+        .from("day_start_notifications")
+        .upsert(
+          { actor_id: input.actorId, festival_id: input.festivalId, date: input.date },
+          { onConflict: "actor_id,festival_id,date", ignoreDuplicates: true },
+        )
+        .select("actor_id");
+
+      if (claimError) {
+        logger.error({ error: claimError }, "Error claiming day-start ledger row");
+        return false;
+      }
+
+      // Someone else already started this day for this actor.
+      if (!claimed || claimed.length === 0) {
+        return false;
+      }
+
+      const { data: recipientIds, error: recipientsError } = await adminClient.rpc(
+        "get_day_start_recipients",
+        { p_actor_id: input.actorId, p_festival_id: input.festivalId },
+      );
+
+      // The ledger row is already claimed, so this day-start is spent either
+      // way. Report failure so the caller still falls back to its ordinary
+      // notification rather than staying silent on our behalf.
+      if (recipientsError) {
+        logger.error({ error: recipientsError }, "Error resolving day-start recipients");
+        return false;
+      }
+
+      const recipients = (recipientIds ?? []) as string[];
+      const toNotify = await this.filterByPreference(recipients, "day_start_enabled");
+
+      // null means the preference lookup itself failed (not "nobody opted
+      // in"), so degrade to the tent check-in fallback rather than going
+      // silent for this user-day.
+      if (toNotify === null) {
+        return false;
+      }
+
+      if (toNotify.length === 0) {
+        return true;
+      }
+
+      const { data: actor, error: actorError } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.actorId)
+        .single();
+
+      if (actorError || !actor) {
+        logger.error({ error: actorError }, "Error fetching actor for day-start notification");
+        return false;
+      }
+
+      const actorName = actor.username || actor.full_name || "Someone";
+      const actorAvatar = resolveAvatarUrl(actor.avatar_url);
+
+      const results = await Promise.allSettled(
+        toNotify.map((recipientId) =>
+          this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.DAY_START,
+            to: recipientId,
+            payload: {
+              actorName,
+              actorAvatar,
+              kind: input.kind,
+              tentName: input.tentName ?? "",
+            },
+          }),
+        ),
+      );
+
+      // allSettled hides rejections, so surface them: a trigger that fails
+      // here is otherwise indistinguishable from one that was never sent. The
+      // ledger row stays claimed regardless (this actor's day-start is used
+      // up either way), but the caller reads the return value to decide
+      // whether to fall back to the ordinary check-in push, so it must be
+      // false unless at least one trigger actually went out.
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((failure) => String((failure as PromiseRejectedResult).reason)),
+          },
+          "Some day-start notifications failed to send",
+        );
+      }
+
+      return failures.length < results.length;
+    } catch (error) {
+      logger.error({ error }, "Error sending day-start notifications");
+      return false;
+    }
+  }
+
+  /**
+   * Notify everyone who can see a freshly published group message.
+   *
+   * Messages are festival-scoped, not group-scoped: they reach everyone sharing
+   * at least one group with the author in that festival, which is exactly the
+   * audience this fans out to. Gated on group_notifications_enabled — no
+   * dedicated preference.
+   */
+  async notifyGroupMessage(input: {
+    authorId: string;
+    festivalId: string;
+    messageType: "message" | "alert";
+  }): Promise<void> {
+    try {
+      const { data: viewers, error: viewersError } = await this.supabase
+        .from("v_user_shared_group_members")
+        .select("viewer_id")
+        .eq("owner_id", input.authorId)
+        .eq("festival_id", input.festivalId);
+
+      if (viewersError) {
+        logger.error({ error: viewersError }, "Error resolving group message recipients");
+        return;
+      }
+
+      const recipientIds = [
+        ...new Set(
+          (viewers ?? [])
+            .map((viewer) => viewer.viewer_id)
+            .filter((viewerId): viewerId is string => !!viewerId && viewerId !== input.authorId),
+        ),
+      ];
+
+      if (recipientIds.length === 0) {
+        return;
+      }
+
+      const toNotify = await this.filterByPreference(recipientIds, "group_notifications_enabled");
+
+      if (!toNotify || toNotify.length === 0) {
+        return;
+      }
+
+      const { data: author, error: authorError } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.authorId)
+        .single();
+
+      if (authorError || !author) {
+        logger.error({ error: authorError }, "Error fetching author for group message");
+        return;
+      }
+
+      const authorName = author.username || author.full_name || "Someone";
+      const authorAvatar = resolveAvatarUrl(author.avatar_url);
+      const groupByRecipient = await this.resolveFirstSharedGroup(input.authorId, input.festivalId);
+
+      const results = await Promise.allSettled(
+        toNotify.map((recipientId) => {
+          const payload: Record<string, unknown> = {
+            authorName,
+            authorAvatar,
+            messageType: input.messageType,
+          };
+          const groupId = groupByRecipient.get(recipientId);
+          if (groupId) {
+            payload.groupId = groupId;
+          }
+          return this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.GROUP_MESSAGE,
+            to: recipientId,
+            payload,
+          });
+        }),
+      );
+
+      // allSettled hides rejections, so surface them: a trigger that fails
+      // here is otherwise indistinguishable from one that was never sent.
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((failure) => String((failure as PromiseRejectedResult).reason)),
+          },
+          "Some group message notifications failed to send",
+        );
+      }
+    } catch (error) {
+      logger.error({ error }, "Error sending group message notifications");
+    }
+  }
+
+  /**
+   * Best-effort deep link: the first group (by DB return order) that the
+   * author and a recipient both belong to, in this festival. Deliberately
+   * separate from recipient resolution above — a failure or empty result here
+   * never drops a recipient, it just means their push omits `groupId` and the
+   * client falls back to the groups list.
+   */
+  private async resolveFirstSharedGroup(
+    authorId: string,
+    festivalId: string,
+  ): Promise<Map<string, string>> {
+    const groupByRecipient = new Map<string, string>();
+    try {
+      const { data: authorMemberships, error: authorGroupsError } = await this.supabase
+        .from("group_members")
+        .select("group_id, groups!inner(festival_id)")
+        .eq("user_id", authorId)
+        .eq("groups.festival_id", festivalId);
+
+      if (authorGroupsError || !authorMemberships || authorMemberships.length === 0) {
+        return groupByRecipient;
+      }
+
+      const authorGroupIds = authorMemberships.map((membership) => membership.group_id);
+
+      const { data: coMembers, error: coMembersError } = await this.supabase
+        .from("group_members")
+        .select("user_id, group_id")
+        .in("group_id", authorGroupIds);
+
+      if (coMembersError) {
+        return groupByRecipient;
+      }
+
+      for (const member of coMembers ?? []) {
+        if (
+          !member.user_id ||
+          !member.group_id ||
+          member.user_id === authorId ||
+          groupByRecipient.has(member.user_id)
+        ) {
+          continue;
+        }
+        groupByRecipient.set(member.user_id, member.group_id);
+      }
+    } catch (error) {
+      logger.error({ error }, "Error resolving shared group for group message deep link");
+    }
+
+    return groupByRecipient;
+  }
+
+  /**
    * Notify group members when someone checks into a tent
    */
   async notifyTentCheckin(
@@ -1116,7 +1456,19 @@ export class NotificationService {
         });
       });
 
-      await Promise.allSettled(notificationPromises);
+      const results = await Promise.allSettled(notificationPromises);
+
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((failure) => String((failure as PromiseRejectedResult).reason)),
+          },
+          "Some tent checkin notifications failed to send",
+        );
+      }
     } catch (error) {
       logger.error({ error }, "Error sending tent checkin notifications");
     }

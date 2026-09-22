@@ -1428,6 +1428,8 @@
       "groupsDescription": "Recibí notificaciones de tus grupos (check-ins, logros, etc.)",
       "friendPlans": "Planes de amigos",
       "friendPlansDescription": "Cuando un amigo va un día que marcaste",
+      "dayStart": "Amigos que empiezan el día",
+      "dayStartDescription": "Cuando un amigo o alguien de tu grupo toma su primera bebida o hace su primer check-in del día",
       "groupActivity": "Actividad del grupo",
       "reminders": "Recordatorios",
       "remindersDescription": "Recordatorios de reservas y avisos de check-in",
@@ -2583,6 +2585,7 @@
     "title": "Configuración de notificaciones",
     "preferences": "Preferencias",
     "reminders": "Recordatorios",
+    "dayStart": "Amigos que empiezan el día",
     "achievementNotifications": "Notificaciones de logros",
     "groupNotifications": "Notificaciones de grupos",
     "pushNotifications": "Notificaciones push",
@@ -2591,6 +2594,7 @@
       "achievements": "Recibí notificaciones cuando desbloquees logros",
       "groups": "Recibí notificaciones de tus grupos (check-ins, logros, etc.)",
       "reminders": "Recordatorios de reservas y avisos de check-in",
+      "dayStart": "Cuando un amigo o alguien de tu grupo toma su primera bebida o hace su primer check-in del día",
       "push": "Recibí notificaciones incluso cuando la app esté cerrada"
     },
     "status": {
@@ -2616,6 +2620,7 @@
     "dailyTotal": "Total diario"
   },
   "activityFeed": {
+    "atTent": "{{activity}} en {{tent}}",
     "drankBeers": "tomó {{count}} cerveza",
     "drankBeers_other": "tomó {{count}} cervezas",
     "drankDrinks": "tomó {{count}} bebida",

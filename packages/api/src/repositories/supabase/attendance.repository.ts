@@ -327,7 +327,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
    * result is the behaviour those endpoints already had. Turning that into an
    * error would be a change of contract smuggled in with a timezone fix.
    */
-  private async getFestivalTimezone(festivalId: string, strict = false): Promise<string> {
+  async getFestivalTimezone(festivalId: string, strict = false): Promise<string> {
     const { data, error } = await this.supabase
       .from("festivals")
       .select("timezone")
@@ -435,6 +435,8 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
           tentVisitId: replayed.id,
           attendanceId,
           visitedAt: new Date(replayed.visit_date).toISOString(),
+          visitDate: storedDate,
+          replayed: true,
         };
       }
     }
@@ -495,6 +497,8 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       tentVisitId: tentVisit.id,
       attendanceId,
       visitedAt: new Date(tentVisit.visit_date).toISOString(),
+      visitDate: date,
+      replayed: false,
     };
   }
 

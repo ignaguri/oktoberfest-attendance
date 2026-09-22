@@ -16,6 +16,8 @@ import {
 import type { AuthContext } from "../middleware/auth";
 import { ForbiddenError, NotFoundError } from "../middleware/error";
 import { ApiErrorSchema } from "../lib/error-response";
+import { logger } from "../lib/logger";
+import { NotificationService } from "../services/notification.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -438,6 +440,20 @@ app.openapi(createMessageRoute, async (c) => {
     .single();
 
   const message = mapMessageResponse(newMessage, profile);
+
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (novuApiKey) {
+    try {
+      const notificationService = new NotificationService(supabase, novuApiKey);
+      await notificationService.notifyGroupMessage({
+        authorId: user.id,
+        festivalId,
+        messageType,
+      });
+    } catch (notificationError) {
+      logger.error({ error: notificationError }, "Failed to send group message notification");
+    }
+  }
 
   return c.json({ message }, 201);
 });

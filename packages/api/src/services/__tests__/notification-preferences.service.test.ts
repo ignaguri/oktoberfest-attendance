@@ -83,7 +83,7 @@ describe("NotificationService recipient preferences", () => {
     await service.notifyGroupAchievement([JOINER_ID], {
       achieverName: "Someone",
       achievementName: "Maß Master",
-      rarity: "rare",
+      tier: 3,
     });
 
     expect(createAdminClient).toHaveBeenCalled();
@@ -96,7 +96,7 @@ describe("NotificationService recipient preferences", () => {
     await service.notifyGroupAchievement([JOINER_ID], {
       achieverName: "Someone",
       achievementName: "Maß Master",
-      rarity: "rare",
+      tier: 3,
     });
 
     expect(triggerMock).toHaveBeenCalledTimes(1);
@@ -113,7 +113,7 @@ describe("NotificationService recipient preferences", () => {
     await service.notifyGroupAchievement([JOINER_ID, optedOut], {
       achieverName: "Someone",
       achievementName: "Maß Master",
-      rarity: "rare",
+      tier: 3,
     });
 
     expect(triggerMock).toHaveBeenCalledTimes(1);
@@ -148,7 +148,7 @@ describe("NotificationService recipient preferences", () => {
     await service.notifyGroupAchievement([JOINER_ID], {
       achieverName: "Someone",
       achievementName: "Maß Master",
-      rarity: "rare",
+      tier: 3,
     });
 
     expect(triggerMock).not.toHaveBeenCalled();

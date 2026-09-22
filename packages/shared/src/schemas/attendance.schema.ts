@@ -83,7 +83,7 @@ export const CreateAttendanceResponseSchema = CreateAttendanceResultSchema.exten
 export type CreateAttendanceResponse = z.infer<typeof CreateAttendanceResponseSchema>;
 
 /**
- * Update personal attendance request (no notifications)
+ * Update personal attendance request
  * POST /api/v1/attendance/personal
  */
 export const UpdatePersonalAttendanceSchema = z.object({
@@ -183,6 +183,24 @@ export const LogTentVisitResponseSchema = z.object({
   tentVisitId: z.uuid(),
   attendanceId: z.uuid(),
   visitedAt: z.iso.datetime(),
+  /**
+   * The festival day this visit was bucketed into, already resolved in the
+   * festival's timezone (20260811100000_bucket_tent_visits_by_festival_timezone).
+   * Callers must use this instead of deriving a date from `visitedAt`
+   * themselves — slicing that ISO string reads the UTC date and misfiles a
+   * visit logged after local midnight under the previous day.
+   */
+  visitDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
+  /**
+   * True when this call matched an existing row by `tentVisitId` and
+   * inserted nothing — the mobile sync queue is at-least-once, and
+   * `tentVisitId` exists precisely so a retried push can be recognised as
+   * the same visit rather than a new one. Callers must skip check-in
+   * notifications on a replay: the original call already made the
+   * notification decision for this visit, and re-announcing it on every
+   * retry is the double push the single-push rule exists to prevent.
+   */
+  replayed: z.boolean(),
 });
 
 export type LogTentVisitResponse = z.infer<typeof LogTentVisitResponseSchema>;

@@ -28,6 +28,8 @@ export const NOTIFICATION_WORKFLOWS = {
   FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
   GROUP_JOIN_REQUEST: "group-join-request",
   GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
+  DAY_START: "day-start",
+  GROUP_MESSAGE: "group-message",
 } as const;
 
 export type NotificationWorkflowId =
@@ -50,6 +52,8 @@ export const NOTIFICATION_PUSH_TYPES = {
   FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
   GROUP_JOIN_REQUEST: "group-join-request",
   GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
+  DAY_START: "day-start",
+  GROUP_MESSAGE: "group-message",
 } as const;
 
 export type NotificationPushType =
@@ -129,12 +133,21 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
       case NOTIFICATION_PUSH_TYPES.FRIEND_PLAN_OVERLAP:
         return payload.date ? buildDayRoute(payload.date, payload.festivalId) : "/attendance";
 
+      case NOTIFICATION_PUSH_TYPES.DAY_START:
+        return "/home";
+
       // The creator reviews requests in the group's settings
       case NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST:
         return payload.groupId ? `/group-detail/${payload.groupId}/settings` : "/groups";
 
       case NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST_ACCEPTED:
         return payload.groupId ? `/group-detail/${payload.groupId}` : "/groups";
+
+      // groupId is a best-effort deep link (the first shared group found for
+      // this recipient); omitted when it couldn't be resolved, so fall back
+      // to the groups list rather than a broken group-detail route.
+      case NOTIFICATION_PUSH_TYPES.GROUP_MESSAGE:
+        return payload.groupId ? `/group-detail/${payload.groupId}/messages` : "/groups";
     }
   }
 

@@ -847,7 +847,12 @@ describe("Attendance Routes Integration (Local DB)", () => {
       const first = await repo.logTentVisit(testUser.id, input);
       const replayed = await repo.logTentVisit(testUser.id, input);
 
-      expect(replayed).toEqual(first);
+      // Same visit, same identifying fields — but `replayed` legitimately
+      // differs: it is what tells a caller not to re-announce a check-in
+      // notification for a push it already handled the first time.
+      expect(first.replayed).toBe(false);
+      expect(replayed.replayed).toBe(true);
+      expect(replayed).toEqual({ ...first, replayed: true });
       expect(await visitsOnDate(replayDate)).toHaveLength(1);
     });
 

@@ -1605,6 +1605,8 @@
       "groupsDescription": "Benachrichtigungen von deinen Gruppen erhalten (Check-ins, Erfolge, etc.)",
       "friendPlans": "Pläne von Freunden",
       "friendPlansDescription": "Wenn Freunde an einem Tag hingehen, den du markiert hast",
+      "dayStart": "Freunde starten in den Tag",
+      "dayStartDescription": "Wenn ein Freund oder Gruppenmitglied das erste Getränk oder den ersten Check-in des Tages hat",
       "groupActivity": "Gruppen-Aktivität",
       "reminders": "Erinnerungen",
       "remindersDescription": "Reservierungserinnerungen und Check-in-Aufforderungen",
@@ -2586,7 +2588,7 @@
       "title": "Zeit zum Einchecken!",
       "description": "deine Reservierung ist bereit. Möchten du jetzt einchecken?",
       "prompt": "Bist du schon da?",
-      "timeForReservation": "Es ist Zeit für deine Reservierung im {{tentName}}.",
+      "timeForReservation": "Es ist Zeit für deine Reservierung bei {{tentName}}.",
       "theTent": "dem Zelt",
       "unknownTent": "Unbekanntes Zelt",
       "note": "Notiz",
@@ -2609,7 +2611,7 @@
     "membersWithinRadius": "Mitglieder im Umkreis von {{radius}} erscheinen hier.",
     "showingMembersWithinRadius": "Mitglieder im Umkreis von {{radius}}",
     "checkIn": "Einchecken",
-    "checkInAt": "Einchecken im {{tent}}",
+    "checkInAt": "Einchecken bei {{tent}}",
     "callout": {
       "away": "entfernt"
     },
@@ -2760,6 +2762,7 @@
     "title": "Benachrichtigungseinstellungen",
     "preferences": "Einstellungen",
     "reminders": "Erinnerungen",
+    "dayStart": "Freunde starten in den Tag",
     "achievementNotifications": "Erfolgs-Benachrichtigungen",
     "groupNotifications": "Gruppen-Benachrichtigungen",
     "pushNotifications": "Push-Benachrichtigungen",
@@ -2768,6 +2771,7 @@
       "achievements": "Benachrichtigung erhalten, wenn du Erfolge freischaltest",
       "groups": "Benachrichtigungen von deinen Gruppen erhalten (Check-ins, Erfolge, etc.)",
       "reminders": "Reservierungserinnerungen und Check-in-Aufforderungen",
+      "dayStart": "Wenn ein Freund oder Gruppenmitglied das erste Getränk oder den ersten Check-in des Tages hat",
       "push": "Benachrichtigungen auch bei geschlossener App erhalten"
     },
     "status": {
@@ -2793,6 +2797,7 @@
     "dailyTotal": "Tagesgesamt"
   },
   "activityFeed": {
+    "atTent": "{{activity}} bei {{tent}}",
     "drankBeers": "trank {{count}} Mass",
     "drankBeers_other": "trank {{count}} Mass",
     "drankDrinks": "trank {{count}} Getränk",
@@ -2809,7 +2814,7 @@
     "drank_alcohol_free_other": "hatte {{count}} alkoholfreie Getränke",
     "drank_other": "hatte {{count}} Getränk",
     "drank_other_other": "hatte {{count}} Getränke",
-    "checkedInto": "checkte ein im {{tent}}",
+    "checkedInto": "checkte ein bei {{tent}}",
     "uploadedPhoto": "lud ein Foto hoch",
     "joinedGroup": "ist {{group}} beigetreten",
     "unlockedAchievement": "hat einen Erfolg freigeschaltet",

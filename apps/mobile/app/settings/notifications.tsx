@@ -3,7 +3,15 @@ import {
   useUpdateNotificationPreferences,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Bell, Clock, ExternalLink, Footprints, Trophy, Users } from "lucide-react-native";
+import {
+  Bell,
+  Clock,
+  ExternalLink,
+  Footprints,
+  Sunrise,
+  Trophy,
+  Users,
+} from "lucide-react-native";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -61,6 +69,7 @@ export default function NotificationSettingsScreen() {
     achievement_notifications_enabled: preferences?.achievementNotificationsEnabled ?? true,
     group_notifications_enabled: preferences?.groupNotificationsEnabled ?? true,
     friend_plans_enabled: preferences?.friendPlansEnabled ?? true,
+    day_start_enabled: preferences?.dayStartEnabled ?? true,
     push_enabled: preferences?.pushEnabled ?? false,
   };
 
@@ -69,7 +78,8 @@ export default function NotificationSettingsScreen() {
       | "reminders_enabled"
       | "achievement_notifications_enabled"
       | "group_notifications_enabled"
-      | "friend_plans_enabled",
+      | "friend_plans_enabled"
+      | "day_start_enabled",
     value: boolean,
   ) => {
     // Map snake_case to camelCase for API
@@ -78,13 +88,15 @@ export default function NotificationSettingsScreen() {
       achievement_notifications_enabled: "achievementNotificationsEnabled",
       group_notifications_enabled: "groupNotificationsEnabled",
       friend_plans_enabled: "friendPlansEnabled",
+      day_start_enabled: "dayStartEnabled",
     };
 
     const apiKey = apiKeyMap[key] as
       | "remindersEnabled"
       | "achievementNotificationsEnabled"
       | "groupNotificationsEnabled"
-      | "friendPlansEnabled";
+      | "friendPlansEnabled"
+      | "dayStartEnabled";
 
     try {
       await updatePreferences.mutateAsync({ [apiKey]: value });
@@ -243,7 +255,7 @@ export default function NotificationSettingsScreen() {
             </View>
 
             {/* Friends' Plans */}
-            <View className="flex-row items-center justify-between py-3">
+            <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
               <View className="flex-1 flex-row items-center gap-3">
                 <Footprints size={24} color={IconColors.default} />
                 <View className="flex-1">
@@ -259,6 +271,33 @@ export default function NotificationSettingsScreen() {
                 value={mappedPreferences.friend_plans_enabled}
                 onValueChange={(value) => handleToggle("friend_plans_enabled", value)}
                 disabled={isSaving}
+                trackColor={{
+                  false: SwitchColors.trackOff,
+                  true: SwitchColors.trackOn,
+                }}
+                thumbColor={SwitchColors.thumb}
+              />
+            </View>
+
+            {/* Friends starting their day */}
+            <View className="flex-row items-center justify-between py-3">
+              <View className="flex-1 flex-row items-center gap-3">
+                <Sunrise size={24} color={IconColors.default} />
+                <View className="flex-1">
+                  <Text className="text-typography-900">
+                    {t("profile.notifications.dayStart")}
+                  </Text>
+                  <Text className="text-sm text-typography-500">
+                    {t("profile.notifications.dayStartDescription")}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={mappedPreferences.day_start_enabled}
+                onValueChange={(value) => handleToggle("day_start_enabled", value)}
+                disabled={isSaving}
+                accessibilityLabel={t("profile.notifications.dayStart")}
+                accessibilityHint={t("profile.notifications.dayStartDescription")}
                 trackColor={{
                   false: SwitchColors.trackOff,
                   true: SwitchColors.trackOn,

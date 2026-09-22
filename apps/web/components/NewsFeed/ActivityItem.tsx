@@ -76,9 +76,30 @@ const getActivityDescription = (activity: ActivityFeedItem, t: TFunction) => {
   const { activity_type, activity_data } = activity;
 
   switch (activity_type) {
-    case "beer_count_update":
-      const beerCount = getActivityDataValue<number>(activity_data, "beer_count", 0);
-      return t("activityFeed.drankBeers", { count: beerCount });
+    case "beer_count_update": {
+      // The feed groups consumptions by drink_type, so radler, wine and soft
+      // drinks each get their own label. beer_count is the legacy field kept
+      // for rows written before the consumptions table existed.
+      const drinkType = getActivityDataValue<string | undefined>(
+        activity_data,
+        "drink_type",
+        undefined,
+      );
+      const drinkCount = getActivityDataValue<number>(activity_data, "drink_count", 0);
+      const beerCount = getActivityDataValue<number>(activity_data, "beer_count", drinkCount || 0);
+      const drankDescription =
+        drinkType && drinkCount > 0
+          ? t(`activityFeed.drank_${drinkType}`, { count: drinkCount })
+          : t("activityFeed.drankBeers", { count: beerCount });
+      const drinkTentName = getActivityDataValue<string | undefined>(
+        activity_data,
+        "tent_name",
+        undefined,
+      );
+      return drinkTentName
+        ? t("activityFeed.atTent", { activity: drankDescription, tent: drinkTentName })
+        : drankDescription;
+    }
 
     case "tent_checkin":
       const tentName = getActivityDataValue(activity_data, "tent_name", t("activityFeed.aTent"));

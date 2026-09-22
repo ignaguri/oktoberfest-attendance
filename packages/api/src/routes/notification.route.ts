@@ -265,6 +265,7 @@ app.openapi(getPreferencesRoute, async (c) => {
       groupNotificationsEnabled: preferences.group_notifications_enabled,
       dailyReminderEnabled: preferences.daily_reminder_enabled,
       friendPlansEnabled: preferences.friend_plans_enabled,
+      dayStartEnabled: preferences.day_start_enabled,
       createdAt: preferences.created_at,
       updatedAt: preferences.updated_at,
     },
