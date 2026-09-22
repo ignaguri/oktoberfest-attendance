@@ -3357,6 +3357,10 @@
       "download": {
         "title": "ProstCounter herunterladen - iOS, Android & Web",
         "description": "Lade ProstCounter kostenlos für iOS oder Android, oder nutze die Web-App. Zähle dein Bierfest-Erlebnis auf jedem Gerät."
+      },
+      "blogIndex": {
+        "title": "Blog - Wiesn-Guides und Münchner Bierfeste",
+        "description": "Guides, Tipps und Neuigkeiten rund ums Oktoberfest, die Münchner Bierfeste und die ProstCounter-App."
       }
     },
     "header": {
@@ -3368,7 +3372,7 @@
     "hero": {
       "title1": "Dein Bierfest",
       "title2": "Begleiter-App",
-      "subtitle": "Zähle jeden Masskrug, messe dich mit Freunden in Bestenlisten und erlebe deine Oktoberfest-Erinnerungen neu — alles in einer App.",
+      "subtitle": "Zähle jede Maß, messe dich mit Freunden in Bestenlisten und erlebe deine Oktoberfest-Erinnerungen neu — alles in einer App.",
       "getStarted": "Kostenlos starten",
       "downloadApp": "App herunterladen",
       "free": "Kostenlos, keine Werbung. Verfügbar für iOS, Android & Web."
@@ -3378,7 +3382,7 @@
       "sectionSubtitle": "Von Festgängern für Festgänger entwickelt.",
       "trackBeers": {
         "title": "Bier zählen",
-        "description": "Erfasse deinen täglichen Konsum, protokolliere Zeltbesuche, knipse Fotos deiner Masskrüge und erstelle eine Chronik jedes Festtages."
+        "description": "Erfasse deinen täglichen Konsum, protokolliere Zeltbesuche, knipse Fotos deiner Maß und erstelle eine Chronik jedes Festtages."
       },
       "competeWithFriends": {
         "title": "Tritt gegen Freunde an",

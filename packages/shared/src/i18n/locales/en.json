@@ -3371,6 +3371,10 @@
       "download": {
         "title": "Download ProstCounter - iOS, Android & Web",
         "description": "Download ProstCounter for free on iOS, Android, or use the web app. Track your beer festival experience on any device."
+      },
+      "blogIndex": {
+        "title": "Blog - Oktoberfest and Munich Beer Festival Guides",
+        "description": "Guides, tips and news about Oktoberfest, Munich beer festivals, and the ProstCounter app."
       }
     },
     "header": {
@@ -3382,7 +3386,7 @@
     "hero": {
       "title1": "Your beer festival",
       "title2": "Companion App",
-      "subtitle": "Track every Masskrug, compete with friends on leaderboards, and relive your Oktoberfest memories — all in one app.",
+      "subtitle": "Track every Maß, compete with friends on leaderboards, and relive your Oktoberfest memories — all in one app.",
       "getStarted": "Get Started Free",
       "downloadApp": "Download App",
       "free": "Free, no ads. Available on iOS, Android & Web."
@@ -3392,7 +3396,7 @@
       "sectionSubtitle": "Built by festival-goers, for festival-goers.",
       "trackBeers": {
         "title": "Track Your Beers",
-        "description": "Log daily consumption, record tent visits, snap photos of your Masskrugs, and build a timeline of every festival day."
+        "description": "Log daily consumption, record tent visits, snap photos of your Maß, and build a timeline of every festival day."
       },
       "competeWithFriends": {
         "title": "Compete with Friends",
@@ -3409,7 +3413,7 @@
     },
     "appleWatchHighlight": {
       "title": "Now on Apple Watch",
-      "subtitle": "Log every Mass without pulling out your phone. Our Apple Watch companion is built for the tent, the biergarten, and everywhere in between.",
+      "subtitle": "Log every Maß without pulling out your phone. Our Apple Watch companion is built for the tent, the biergarten, and everywhere in between.",
       "bulletFastLog": "Log a drink in two taps",
       "bulletAutoTent": "Auto-detect which tent you're in via GPS",
       "bulletGroupActivity": "See your group's latest beers in real time",

@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
+import { SUPPORTED_LANGUAGES } from "@prostcounter/shared/i18n/core";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { ViewTransitions } from "next-view-transitions";
@@ -12,7 +13,7 @@ import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
 import { APP_VERSION } from "@/lib/version";
 
-import { SerwistProvider } from "./serwist-provider";
+import { SerwistProvider } from "../serwist-provider";
 
 const ogImages = [
   "/images/prost-counter-og-1.jpg",
@@ -70,10 +71,25 @@ export const viewport = {
   themeColor: "#ffffff",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Every page sits under this segment so that `lang` is known here, where <html>
+// is rendered. Nothing above a layout can read a route param, so this is the
+// only place the document language can be set correctly per locale.
+export function generateStaticParams() {
+  return SUPPORTED_LANGUAGES.map((lang) => ({ lang }));
+}
+
+export default async function RootLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+
   return (
     <ViewTransitions>
-      <html lang="en" data-version={APP_VERSION}>
+      <html lang={lang} data-version={APP_VERSION}>
         <body className="bg-slate-50">
           <SerwistProvider swUrl="/serwist/sw.js">
             <DataProvider>

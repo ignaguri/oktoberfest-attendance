@@ -3431,6 +3431,10 @@
       "download": {
         "title": "Descargar ProstCounter - iOS, Android y Web",
         "description": "Descargá ProstCounter gratis para iOS o Android, o usá la app web. Registrá tu experiencia cervecera en cualquier dispositivo."
+      },
+      "blogIndex": {
+        "title": "Blog - Guías del Oktoberfest y festivales de Múnich",
+        "description": "Guías, consejos y novedades sobre el Oktoberfest, los festivales cerveceros de Múnich y la app ProstCounter."
       }
     },
     "header": {
@@ -3442,37 +3446,37 @@
     "hero": {
       "title1": "La app para tu",
       "title2": "festival cervecero",
-      "subtitle": "Cuenta cada Masskrug, compite con amigos en clasificaciones y revive tus recuerdos del Oktoberfest — todo en una app.",
-      "getStarted": "Empieza gratis",
+      "subtitle": "Contá cada Maß, competí con amigos en clasificaciones y reviví tus recuerdos del Oktoberfest — todo en una app.",
+      "getStarted": "Empezá gratis",
       "downloadApp": "Descargar app",
       "free": "Gratis, sin anuncios. Disponible en iOS, Android y Web."
     },
     "features": {
-      "sectionTitle": "Todo lo que necesitas en la Wiesn",
+      "sectionTitle": "Todo lo que necesitás en la Wiesn",
       "sectionSubtitle": "De festivaleros, para festivaleros.",
       "trackBeers": {
-        "title": "Cuenta tus cervezas",
-        "description": "Registra tu consumo diario, apunta tus visitas a carpas, saca fotos de tus Masskrugs y construye la cronología de cada día de festival."
+        "title": "Contá tus cervezas",
+        "description": "Registrá tu consumo diario, apuntá tus visitas a carpas, sacá fotos de tus Maß y construí la cronología de cada día de festival."
       },
       "competeWithFriends": {
-        "title": "Compite con amigos",
-        "description": "Crea grupos, desafía a tu equipo en clasificaciones y descubre quién acumula más días de festival (o cervezas)."
+        "title": "Competí con amigos",
+        "description": "Creá grupos, desafiá a tu equipo en clasificaciones y descubrí quién acumula más días de festival (o cervezas)."
       },
       "liveLocation": {
         "title": "Ubicación en tiempo real",
-        "description": "¿No encuentras a tus amigos en la Wiesn? Comparte tu ubicación en tiempo real entre las carpas para que nadie beba solo."
+        "description": "¿No encontrás a tus amigos en la Wiesn? Compartí tu ubicación en tiempo real entre las carpas para que nadie beba solo."
       },
       "achievements": {
-        "title": "Consigue logros",
-        "description": "Desbloquea más de 40 insignias en distintas categorías — desde hitos de primerizo hasta rachas legendarias y sorpresas ocultas."
+        "title": "Conseguí logros",
+        "description": "Desbloqueá más de 40 insignias en distintas categorías — desde hitos de primerizo hasta rachas legendarias y sorpresas ocultas."
       }
     },
     "appleWatchHighlight": {
       "title": "Ya disponible en Apple Watch",
-      "subtitle": "Registrá cada jarra sin sacar el móvil. Nuestra app complementaria para Apple Watch está pensada para la carpa, el biergarten y todo lo que hay en medio.",
-      "bulletFastLog": "Registrá una jarra en dos toques",
+      "subtitle": "Registrá cada Maß sin sacar el celular. Nuestra app complementaria para Apple Watch está pensada para la carpa, el biergarten y todo lo que hay en medio.",
+      "bulletFastLog": "Registrá una Maß en dos toques",
       "bulletAutoTent": "Detectá la carpa automáticamente por GPS",
-      "bulletGroupActivity": "Mirá las últimas jarras de tu grupo en tiempo real",
+      "bulletGroupActivity": "Mirá las últimas Maß de tu grupo en tiempo real",
       "cta": "Descargar en iOS"
     },
     "festivals": {
@@ -3497,21 +3501,21 @@
     },
     "cta": {
       "title": "¿Listo para el próximo festival?",
-      "subtitle": "Descarga ProstCounter y empieza a registrar tu aventura cervecera hoy.",
+      "subtitle": "Descargá ProstCounter y empezá a registrar tu aventura cervecera hoy.",
       "downloadIos": "Descargar en iOS",
       "downloadAndroid": "Disponible en Google Play",
       "tryWebApp": "Probar la app web",
-      "scanToDownload": "Escanea para descargar en tu móvil"
+      "scanToDownload": "Escaneá para descargar en tu celular"
     },
     "download": {
       "title": "Descargar ProstCounter",
-      "subtitle": "Registra tu experiencia cervecera en cualquier dispositivo. Gratis, sin anuncios.",
+      "subtitle": "Registrá tu experiencia cervecera en cualquier dispositivo. Gratis, sin anuncios.",
       "ios": {
         "description": "iPhone e iPad",
         "action": "Descargar en el App Store"
       },
       "android": {
-        "description": "Móviles y tablets Android",
+        "description": "Celulares y tablets Android",
         "action": "Disponible en Google Play"
       },
       "webApp": {
@@ -3523,11 +3527,11 @@
         "description": "Instalá la app de iOS y la app complementaria estará disponible automáticamente en tu Apple Watch emparejado.",
         "requirements": "Requiere watchOS 10 o posterior"
       },
-      "scanWithPhone": "Escanea con tu móvil",
+      "scanWithPhone": "Escaneá con tu celular",
       "opensAppStore": "El QR abre el App Store — los usuarios de Android tocan el botón de arriba"
     },
     "footer": {
-      "tagline": "Registra tu asistencia a festivales cerveceros y compite con amigos.",
+      "tagline": "Registrá tu asistencia a festivales cerveceros y competí con amigos.",
       "blog": "Blog",
       "download": "Descargar",
       "legal": "Legal",

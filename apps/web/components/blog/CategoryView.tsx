@@ -3,35 +3,12 @@ import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import type { BlogCategory, BlogPostMeta } from "@/lib/blog";
 
 import { ArticleCard } from "./ArticleCard";
-import { localizeCategory } from "./blog-i18n";
-
-const categoryDescriptions: Record<BlogCategory, Record<SupportedLanguage, string>> = {
-  festivals: {
-    en: "Guides and information about Munich beer festivals",
-    de: "Guides und Informationen zu Münchner Bierfesten",
-    es: "Guías e información sobre los festivales cerveceros de Múnich",
-  },
-  tips: {
-    en: "Practical tips for your beer festival experience",
-    de: "Praktische Tipps für dein Bierfest-Erlebnis",
-    es: "Consejos prácticos para tu experiencia en el festival cervecero",
-  },
-  culture: {
-    en: "Explore beer festival traditions and customs",
-    de: "Entdecke Bierfest-Traditionen und Bräuche",
-    es: "Descubre las tradiciones y costumbres de los festivales cerveceros",
-  },
-  news: {
-    en: "Latest news about upcoming festivals and events",
-    de: "Neuigkeiten über kommende Feste und Veranstaltungen",
-    es: "Últimas noticias sobre próximos festivales y eventos",
-  },
-};
+import { localizeCategory, localizeCategoryDescription } from "./blog-i18n";
 
 const emptyText: Record<SupportedLanguage, string> = {
   en: "No articles in this category yet. Check back soon!",
   de: "Noch keine Artikel in dieser Kategorie. Schau bald wieder vorbei!",
-  es: "Aún no hay artículos en esta categoría. ¡Vuelve pronto!",
+  es: "Aún no hay artículos en esta categoría. ¡Volvé pronto!",
 };
 
 export function CategoryView({
@@ -44,7 +21,7 @@ export function CategoryView({
   locale: SupportedLanguage;
 }) {
   const label = localizeCategory(category, locale);
-  const description = categoryDescriptions[category]?.[locale] ?? "";
+  const description = localizeCategoryDescription(category, locale);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">

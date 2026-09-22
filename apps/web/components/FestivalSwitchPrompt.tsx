@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n/client";
+import { publicPathname } from "@/lib/utils/marketingUrl";
 
 /**
  * Offers the live festival when the one restored on launch is not live, so a
@@ -22,7 +23,7 @@ export function FestivalSwitchPrompt() {
   const { t } = useTranslation();
   const { currentFestival, switchSuggestion, setCurrentFestival, dismissSwitchSuggestion } =
     useFestival();
-  const pathname = usePathname();
+  const pathname = publicPathname(usePathname());
 
   // A group page picks its own festival once the group loads, so the prompt
   // must not flash over it while that request is still in flight

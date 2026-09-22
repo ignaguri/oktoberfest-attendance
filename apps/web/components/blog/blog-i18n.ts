@@ -109,3 +109,35 @@ export function localizeCategory(category: string, locale: SupportedLanguage): s
 export function localizeTag(tag: string, locale: SupportedLanguage): string {
   return tagNames[tag]?.[locale] ?? tag;
 }
+
+// Shared with generateMetadata so a category's meta description and its on-page
+// subtitle cannot drift apart.
+const categoryDescriptions: Record<BlogCategory, Record<SupportedLanguage, string>> = {
+  festivals: {
+    en: "Guides and information about Munich beer festivals",
+    de: "Guides und Informationen zu Münchner Bierfesten",
+    es: "Guías e información sobre los festivales cerveceros de Múnich",
+  },
+  tips: {
+    en: "Practical tips for your beer festival experience",
+    de: "Praktische Tipps für dein Bierfest-Erlebnis",
+    es: "Consejos prácticos para tu experiencia en el festival cervecero",
+  },
+  culture: {
+    en: "Explore beer festival traditions and customs",
+    de: "Entdecke Bierfest-Traditionen und Bräuche",
+    es: "Descubrí las tradiciones y costumbres de los festivales cerveceros",
+  },
+  news: {
+    en: "Latest news about upcoming festivals and events",
+    de: "Neuigkeiten über kommende Feste und Veranstaltungen",
+    es: "Últimas noticias sobre próximos festivales y eventos",
+  },
+};
+
+export function localizeCategoryDescription(
+  category: BlogCategory,
+  locale: SupportedLanguage,
+): string {
+  return categoryDescriptions[category]?.[locale] ?? "";
+}

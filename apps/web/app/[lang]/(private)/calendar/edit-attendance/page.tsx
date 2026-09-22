@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
-import DetailedAttendanceForm from "@/app/(private)/attendance/DetailedAttendanceForm";
+import DetailedAttendanceForm from "@/app/[lang]/(private)/attendance/DetailedAttendanceForm";
 import { Button } from "@/components/ui/button";
 
 export default function DirectAttendancePage() {

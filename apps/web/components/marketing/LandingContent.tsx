@@ -7,7 +7,8 @@ import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
-import { i18n, useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/lib/i18n/client";
+import { useMarketingLocale } from "@/lib/i18n/MarketingLocaleProvider";
 import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 
@@ -53,7 +54,7 @@ const festivalKeys = [
 
 export function LandingContent() {
   const { t } = useTranslation();
-  const lang = i18n.language;
+  const lang = useMarketingLocale();
 
   return (
     <div className="entrance-scope overflow-hidden">

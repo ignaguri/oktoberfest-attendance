@@ -1,32 +1,41 @@
 import "server-only";
 
 import { PROD_URL } from "@prostcounter/shared/constants";
+import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import type { Metadata } from "next";
 
 import { FestivalCountdownBanner } from "@/components/marketing/FestivalCountdownBanner";
 import { LandingContent } from "@/components/marketing/LandingContent";
+import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCountdownFestival } from "@/lib/marketing/getCountdownFestival";
 import { seoCopy } from "@/lib/marketing/seoCopy";
+import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  title: seoCopy("en", "home").title,
-  description: seoCopy("en", "home").description,
-  alternates: {
-    canonical: PROD_URL,
-    languages: {
-      en: PROD_URL,
-      de: `${PROD_URL}/de`,
-      es: `${PROD_URL}/es`,
+type Params = { lang: string };
+
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { lang: langParam } = await params;
+  const lang = toSupportedLanguage(langParam);
+  const copy = seoCopy(lang, "home");
+
+  return {
+    title: copy.title,
+    description: copy.description,
+    alternates: {
+      canonical: marketingUrlAbsolute("/", lang),
+      languages: localeAlternates("/"),
     },
-  },
-};
+  };
+}
 
 // Deliberately takes no searchParams: reading them opts the route out of static
 // prerendering. OAuth `?code=` is redirected to /auth/callback in proxy.ts.
-export default async function LandingPage() {
+export default async function LandingPage({ params }: { params: Promise<Params> }) {
+  const { lang: langParam } = await params;
+  const lang = toSupportedLanguage(langParam);
   const countdownFestival = await getCountdownFestival();
 
   const jsonLd = {
@@ -38,6 +47,7 @@ export default async function LandingPage() {
       "Track your beer festival attendance, compete with friends, and keep memories of every Oktoberfest visit.",
     applicationCategory: "LifestyleApplication",
     operatingSystem: "iOS, Android, Web",
+    inLanguage: lang,
     offers: {
       "@type": "Offer",
       price: "0",
@@ -55,6 +65,7 @@ export default async function LandingPage() {
 
   return (
     <>
+      <SyncLocale locale={lang} />
       <JsonLd data={jsonLd} />
       {countdownFestival && <FestivalCountdownBanner festival={countdownFestival} />}
       <LandingContent />

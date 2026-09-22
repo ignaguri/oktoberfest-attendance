@@ -6,12 +6,12 @@
 
 import { QueryKeys } from "@prostcounter/shared/data";
 
-import { getGroups, getUsers } from "@/app/(private)/admin/actions";
+import { getGroups, getUsers } from "@/app/[lang]/(private)/admin/actions";
 import {
   createFestival,
   deleteFestival,
   updateFestival,
-} from "@/app/(private)/admin/festivalActions";
+} from "@/app/[lang]/(private)/admin/festivalActions";
 import { useInvalidateQueries, useMutation, useQuery } from "@/lib/data/react-query-provider";
 
 /**
