@@ -30,16 +30,62 @@ vi.mock("expo-file-system/legacy", () => ({
   readDirectoryAsync: vi.fn().mockResolvedValue([]),
 }));
 
-// Mock expo-image-manipulator
+// Mock expo-image-manipulator.
+//
+// The mock actually applies the scaling rather than returning a fixed size,
+// so the dimensions reaching saveAsync are the ones the code really produced.
+// Without that, saving the un-resized image looks identical to saving the
+// resized one and the aspect-ratio assertions below prove nothing.
+//
+// `sourceSize` drives portrait/landscape/small sources, `resize` records the
+// size asked for, `render` counts native renders (the expensive part), and
+// `saved` records the dimensions of whatever image was actually written.
+const imageManipulator = vi.hoisted(() => ({
+  sourceSize: { width: 3024, height: 4032 },
+  resize: vi.fn(),
+  render: vi.fn(),
+  saved: vi.fn(),
+}));
+
 vi.mock("expo-image-manipulator", () => ({
   ImageManipulator: {
-    manipulate: vi.fn().mockReturnValue({
-      resize: vi.fn().mockReturnThis(),
-      renderAsync: vi.fn().mockResolvedValue({
-        saveAsync: vi.fn().mockResolvedValue({
-          uri: "file:///mock/compressed.webp",
+    manipulate: vi.fn(() => {
+      // Mirrors the native context: a scheduled resize applies to every render
+      // after it, and resize() scales the unspecified edge to keep the ratio.
+      let scheduled: { width?: number; height?: number } | null = null;
+
+      const context = {
+        resize: vi.fn((size: { width?: number; height?: number }) => {
+          scheduled = size;
+          imageManipulator.resize(size);
+          return context;
         }),
-      }),
+        renderAsync: vi.fn(async () => {
+          imageManipulator.render();
+
+          const { width, height } = imageManipulator.sourceSize;
+          let scale = 1;
+          if (scheduled?.width) {
+            scale = scheduled.width / width;
+          } else if (scheduled?.height) {
+            scale = scheduled.height / height;
+          }
+
+          const rendered = {
+            width: Math.round(width * scale),
+            height: Math.round(height * scale),
+          };
+
+          return {
+            ...rendered,
+            saveAsync: vi.fn(async () => {
+              imageManipulator.saved(rendered);
+              return { uri: "file:///mock/compressed.webp" };
+            }),
+          };
+        }),
+      };
+      return context;
     }),
   },
   SaveFormat: {
@@ -97,13 +143,15 @@ describe("Photo Queue", () => {
   });
 
   describe("photo compression", () => {
-    it("should compress photos with default options", async () => {
-      // Mock fetch for ArrayBuffer conversion
-      const mockArrayBuffer = new ArrayBuffer(1024);
+    beforeEach(() => {
+      imageManipulator.sourceSize = { width: 3024, height: 4032 };
+      // compressPhoto reads the saved file back through fetch()
       global.fetch = vi.fn().mockResolvedValue({
-        arrayBuffer: () => Promise.resolve(mockArrayBuffer),
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(1024)),
       });
+    });
 
+    it("should compress photos with default options", async () => {
       const result = await compressPhoto("file:///mock/original.jpg");
 
       expect(result).toHaveProperty("uri");
@@ -123,6 +171,54 @@ describe("Photo Queue", () => {
       });
 
       expect(result.arrayBuffer.byteLength).toBe(512);
+    });
+
+    // Passing both width and height to resize() stretches the photo to exactly
+    // that box instead of scaling it, which squared every portrait upload.
+    it("caps the height of a portrait photo and lets the width follow", async () => {
+      imageManipulator.sourceSize = { width: 3024, height: 4032 };
+
+      await compressPhoto("file:///mock/portrait.jpg");
+
+      expect(imageManipulator.resize).toHaveBeenCalledWith({ height: 1200 });
+      // 3:4 in, 3:4 out. A squared photo would be 1200x1200 here.
+      expect(imageManipulator.saved).toHaveBeenCalledWith({ width: 900, height: 1200 });
+    });
+
+    it("caps the width of a landscape photo and lets the height follow", async () => {
+      imageManipulator.sourceSize = { width: 4032, height: 3024 };
+
+      await compressPhoto("file:///mock/landscape.jpg");
+
+      expect(imageManipulator.resize).toHaveBeenCalledWith({ width: 1200 });
+      expect(imageManipulator.saved).toHaveBeenCalledWith({ width: 1200, height: 900 });
+    });
+
+    it("leaves a photo already within maxSize untouched rather than upscaling", async () => {
+      imageManipulator.sourceSize = { width: 640, height: 480 };
+
+      await compressPhoto("file:///mock/small.jpg");
+
+      expect(imageManipulator.resize).not.toHaveBeenCalled();
+      expect(imageManipulator.saved).toHaveBeenCalledWith({ width: 640, height: 480 });
+    });
+
+    // renderAsync() is a native image render, so the probe that reads the
+    // source dimensions is the only extra one we should ever pay for.
+    it("renders once when no resize is needed", async () => {
+      imageManipulator.sourceSize = { width: 640, height: 480 };
+
+      await compressPhoto("file:///mock/small.jpg");
+
+      expect(imageManipulator.render).toHaveBeenCalledTimes(1);
+    });
+
+    it("renders twice at most when a resize is needed", async () => {
+      imageManipulator.sourceSize = { width: 3024, height: 4032 };
+
+      await compressPhoto("file:///mock/portrait.jpg");
+
+      expect(imageManipulator.render).toHaveBeenCalledTimes(2);
     });
   });
 
