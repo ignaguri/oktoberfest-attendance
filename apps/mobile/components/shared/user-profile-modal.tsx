@@ -114,6 +114,9 @@ export function UserProfileModal({
                   disabled={!fullSizeAvatarUrl}
                   accessibilityRole={fullSizeAvatarUrl ? "button" : undefined}
                   accessibilityLabel={fullSizeAvatarUrl ? t("profile.avatar.viewFullSize") : undefined}
+                  accessibilityHint={
+                    fullSizeAvatarUrl ? t("profile.avatar.viewFullSizeHint") : undefined
+                  }
                 >
                   <Avatar size="xl">
                     {fullSizeAvatarUrl ? (

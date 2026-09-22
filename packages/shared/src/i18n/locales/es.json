@@ -1399,8 +1399,10 @@
       "uploadError": "Error al actualizar la foto de perfil",
       "permissionDenied": "Se requiere permiso para acceder a las fotos",
       "viewFullSize": "Ver en tamaño completo",
+      "viewFullSizeHint": "Tocá para ver la foto en tamaño completo",
       "fullSizeTitle": "Foto de perfil",
-      "fullSizeClose": "Cerrar"
+      "fullSizeClose": "Cerrar",
+      "fullSizeCloseHint": "Tocá para cerrar la foto en tamaño completo"
     },
     "biometric": {
       "label": "Inicio de sesión biométrico",

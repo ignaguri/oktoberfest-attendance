@@ -55,6 +55,7 @@ export function AvatarViewerModal({ visible, imageUrl, name, onClose }: AvatarVi
           onPress={onClose}
           accessibilityRole="button"
           accessibilityLabel={t("profile.avatar.fullSizeClose")}
+          accessibilityHint={t("profile.avatar.fullSizeCloseHint")}
           className="absolute right-4 rounded-full bg-black/50 p-2"
           style={{ top: Math.max(insets.top, 12) }}
         >
