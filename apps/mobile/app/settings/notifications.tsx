@@ -255,7 +255,7 @@ export default function NotificationSettingsScreen() {
             </View>
 
             {/* Friends' Plans */}
-            <View className="flex-row items-center justify-between py-3">
+            <View className="flex-row items-center justify-between border-b border-outline-100 py-3">
               <View className="flex-1 flex-row items-center gap-3">
                 <Footprints size={24} color={IconColors.default} />
                 <View className="flex-1">
