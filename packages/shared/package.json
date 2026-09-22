@@ -12,6 +12,7 @@
     "./errors": "./src/errors/index.ts",
     "./i18n": "./src/i18n/index.ts",
     "./i18n/core": "./src/i18n/core.ts",
+    "./i18n/en": "./src/i18n/en.ts",
     "./data": "./src/data/index.ts",
     "./hooks": "./src/hooks/index.ts",
     "./constants": "./src/constants/index.ts",

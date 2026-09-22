@@ -478,8 +478,8 @@ export class NotificationService {
     payload: {
       achievementName: string;
       description?: string;
-      rarity: "common" | "rare" | "epic";
-      achievementId: string;
+      tier: 1 | 2 | 3 | 4;
+      slug: string;
     },
   ): Promise<void> {
     try {
@@ -492,7 +492,12 @@ export class NotificationService {
       await this.novu.trigger({
         workflowId: NOTIFICATION_WORKFLOWS.ACHIEVEMENT_UNLOCKED,
         to: userId,
-        payload,
+        payload: {
+          achievementName: payload.achievementName,
+          description: payload.description ?? "",
+          tier: payload.tier,
+          slug: payload.slug,
+        },
       });
     } catch (error) {
       logger.error({ error }, "Error sending achievement notification");
@@ -508,7 +513,7 @@ export class NotificationService {
     payload: {
       achieverName: string;
       achievementName: string;
-      rarity: "rare" | "epic";
+      tier: 3 | 4;
       groupName?: string;
     },
   ): Promise<void> {
@@ -527,7 +532,12 @@ export class NotificationService {
           this.novu.trigger({
             workflowId: NOTIFICATION_WORKFLOWS.GROUP_ACHIEVEMENT_UNLOCKED,
             to,
-            payload,
+            payload: {
+              achieverName: payload.achieverName,
+              achievementName: payload.achievementName,
+              tier: payload.tier,
+              groupName: payload.groupName,
+            },
           }),
         ),
       );
