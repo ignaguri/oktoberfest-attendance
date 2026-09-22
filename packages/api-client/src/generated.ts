@@ -8177,6 +8177,157 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/profiles/{userId}/detail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the full profile page payload for a user
+         * @description Returns identity, festival stats, shared group names, favourite tent and attendance history. History and favourite tent are visible only to a friend or a group mate; RLS returns them empty to anyone else.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    festivalId?: string;
+                };
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Profile detail retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            profile: {
+                                /** Format: uuid */
+                                id: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                                stats: {
+                                    daysAttended: number;
+                                    totalBeers: number;
+                                    avgBeers: number;
+                                } | null;
+                                /** @enum {string|null} */
+                                friendshipStatus: "friends" | "pending_sent" | "pending_received" | "none" | "self" | null;
+                                friendsSince: string | null;
+                                sharedGroups: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                }[];
+                                favouriteTent: {
+                                    name: string;
+                                    visits: number;
+                                } | null;
+                                history: {
+                                    /** Format: uuid */
+                                    festivalId: string;
+                                    festivalName: string;
+                                    daysAttended: number;
+                                    totalBeers: number;
+                                    avgBeers: number;
+                                }[];
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description User not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/profiles/{userId}/festivals/{festivalId}/days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a user's day-by-day breakdown for one festival
+         * @description Returns one row per day attended, with drink count and tents. Empty for a viewer who is neither a friend nor a group mate.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: string;
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Days retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            days: {
+                                date: string;
+                                totalDrinks: number;
+                                tents: string[];
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/profile/tutorial": {
         parameters: {
             query?: never;
