@@ -1098,7 +1098,14 @@ export class NotificationService {
       const recipients = (recipientIds ?? []) as string[];
       const toNotify = await this.filterByPreference(recipients, "day_start_enabled");
 
-      if (!toNotify || toNotify.length === 0) {
+      // null means the preference lookup itself failed (not "nobody opted
+      // in"), so degrade to the tent check-in fallback rather than going
+      // silent for this user-day.
+      if (toNotify === null) {
+        return false;
+      }
+
+      if (toNotify.length === 0) {
         return true;
       }
 
@@ -1116,7 +1123,7 @@ export class NotificationService {
       const actorName = actor.username || actor.full_name || "Someone";
       const actorAvatar = resolveAvatarUrl(actor.avatar_url);
 
-      await Promise.allSettled(
+      const results = await Promise.allSettled(
         toNotify.map((recipientId) =>
           this.novu.trigger({
             workflowId: NOTIFICATION_WORKFLOWS.DAY_START,
@@ -1130,6 +1137,21 @@ export class NotificationService {
           }),
         ),
       );
+
+      // allSettled hides rejections, so surface them: a trigger that fails
+      // here is otherwise indistinguishable from one that was never sent, and
+      // the ledger row is already claimed, so there is no fallback path left.
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((failure) => String((failure as PromiseRejectedResult).reason)),
+          },
+          "Some day-start notifications failed to send",
+        );
+      }
 
       return true;
     } catch (error) {

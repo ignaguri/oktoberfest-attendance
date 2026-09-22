@@ -100,7 +100,15 @@ describe("NotificationService.notifyDayStart", () => {
     expect(claimed).toBe(true);
     expect(triggerMock).toHaveBeenCalledTimes(1);
     expect(triggerMock).toHaveBeenCalledWith(
-      expect.objectContaining({ workflowId: "day-start", to: FRIEND_ID }),
+      expect.objectContaining({
+        workflowId: "day-start",
+        to: FRIEND_ID,
+        payload: expect.objectContaining({
+          actorName: "nacho",
+          kind: "drink",
+          tentName: "Hofbräu",
+        }),
+      }),
     );
   });
 
@@ -135,7 +143,12 @@ describe("NotificationService.notifyDayStart", () => {
     });
 
     expect(triggerMock).toHaveBeenCalledTimes(1);
-    expect(triggerMock).toHaveBeenCalledWith(expect.objectContaining({ to: FRIEND_ID }));
+    expect(triggerMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: FRIEND_ID,
+        payload: expect.objectContaining({ tentName: "" }),
+      }),
+    );
   });
 
   it("reports false when the admin client is unavailable, so the caller falls back", async () => {

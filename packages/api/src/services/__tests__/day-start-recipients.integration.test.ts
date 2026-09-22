@@ -165,3 +165,60 @@ describe("get_day_start_recipients", () => {
     expect(recipients).not.toContain(strangerId);
   });
 });
+
+// The exactly-once claim is the whole point of the ledger: ON CONFLICT DO
+// NOTHING ... RETURNING must hand a row to the first writer and nothing to
+// the second for the same (actor, festival, date). notifyDayStart's own test
+// suite only asserts against a mock that is told what to return, so it can
+// never catch this behavior actually breaking (e.g. a typo'd onConflict
+// column list, or a unique constraint that stops matching the upsert). This
+// runs the real upsert against the real table.
+describe("day_start_notifications ledger claim", () => {
+  let ledgerFestivalId: string;
+  let ledgerActorId: string;
+  const ledgerDate = "2026-09-22";
+
+  beforeAll(async () => {
+    supabaseAdmin = createTestSupabaseAdmin();
+    ledgerFestivalId = await createTestFestival();
+    ledgerActorId = await createTestUser("ledger-actor");
+  });
+
+  afterAll(async () => {
+    await supabaseAdmin
+      .from("day_start_notifications")
+      .delete()
+      .eq("actor_id", ledgerActorId)
+      .eq("festival_id", ledgerFestivalId)
+      .eq("date", ledgerDate);
+    await supabaseAdmin.from("festivals").delete().eq("id", ledgerFestivalId);
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(ledgerActorId);
+    if (error) {
+      console.warn(`Failed to delete test user ${ledgerActorId}: ${error.message}`);
+    }
+  });
+
+  it("hands the claim to the first writer only, for the same actor/festival/date", async () => {
+    const claimRow = {
+      actor_id: ledgerActorId,
+      festival_id: ledgerFestivalId,
+      date: ledgerDate,
+    };
+    const upsertOptions = { onConflict: "actor_id,festival_id,date", ignoreDuplicates: true };
+
+    const first = await supabaseAdmin
+      .from("day_start_notifications")
+      .upsert(claimRow, upsertOptions)
+      .select("actor_id");
+
+    const second = await supabaseAdmin
+      .from("day_start_notifications")
+      .upsert(claimRow, upsertOptions)
+      .select("actor_id");
+
+    expect(first.error).toBeNull();
+    expect(first.data).toHaveLength(1);
+    expect(second.error).toBeNull();
+    expect(second.data).toHaveLength(0);
+  });
+});
