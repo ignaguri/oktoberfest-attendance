@@ -40,6 +40,14 @@ export class QueryKeys {
   /** Prefix covering every cached group search, for invalidation. */
   static groupSearchAll = () => ["groups", "search"] as const;
   static groupJoinRequestsIncoming = () => ["groups", "join-requests", "incoming"] as const;
+  static groupInvitationsIncoming = () => ["groups", "invitations", "incoming"] as const;
+  static groupInvitationsSent = (groupId: string) =>
+    ["group", groupId, "invitations", "sent"] as const;
+  static invitableUsers = (groupId: string, query: string) =>
+    ["group", groupId, "invitable-users", query] as const;
+  /** Prefix covering every cached invitable-user search for a group, for invalidation. */
+  static invitableUsersAll = (groupId: string) =>
+    ["group", groupId, "invitable-users"] as const;
   static groupGallery = (groupId: string) => ["group", groupId, "gallery"] as const;
   static carryOverCandidates = (festivalId: string) =>
     ["groups", "carry-over-candidates", festivalId] as const;
