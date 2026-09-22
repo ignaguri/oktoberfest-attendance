@@ -226,9 +226,36 @@ export default function GroupsScreen() {
             </Text>
           </AlertDialogBody>
           <AlertDialogFooter className="gap-3">
-            <Button action="primary" onPress={closeDialog} className="flex-1">
-              <ButtonText>{t("common.buttons.ok")}</ButtonText>
-            </Button>
+            {dialog.onConfirm ? (
+              <>
+                <Button
+                  variant="outline"
+                  action="secondary"
+                  onPress={closeDialog}
+                  className="flex-1"
+                >
+                  <ButtonText>{t("common.buttons.cancel")}</ButtonText>
+                </Button>
+                <Button
+                  action={dialog.type === "destructive" ? "negative" : "primary"}
+                  onPress={() => {
+                    dialog.onConfirm?.();
+                    closeDialog();
+                  }}
+                  className="flex-1"
+                >
+                  <ButtonText>
+                    {dialog.type === "destructive"
+                      ? t("common.buttons.confirm")
+                      : t("common.buttons.ok")}
+                  </ButtonText>
+                </Button>
+              </>
+            ) : (
+              <Button action="primary" onPress={closeDialog} className="flex-1">
+                <ButtonText>{t("common.buttons.ok")}</ButtonText>
+              </Button>
+            )}
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
