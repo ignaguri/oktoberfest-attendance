@@ -46,6 +46,7 @@ function FestivalHistoryRow({ row, userId }: { row: ProfileHistoryRow; userId: s
         onPress={() => setIsExpanded((open) => !open)}
         accessibilityRole="button"
         accessibilityLabel={row.festivalName}
+        accessibilityHint={t("profile.page.historyRowHint")}
       >
         <HStack className="items-center justify-between">
           <VStack space="xs" className="flex-1">
@@ -126,6 +127,9 @@ export default function UserProfileScreen() {
               disabled={!fullSizeAvatarUrl}
               accessibilityRole={fullSizeAvatarUrl ? "button" : undefined}
               accessibilityLabel={fullSizeAvatarUrl ? t("profile.avatar.viewFullSize") : undefined}
+              accessibilityHint={
+                fullSizeAvatarUrl ? t("profile.avatar.viewFullSizeHint") : undefined
+              }
             >
               <Avatar size="xl">
                 {fullSizeAvatarUrl ? (
@@ -171,6 +175,7 @@ export default function UserProfileScreen() {
                     onPress={() => router.push(`/group-detail/${group.id}`)}
                     accessibilityRole="button"
                     accessibilityLabel={group.name}
+                    accessibilityHint={t("profile.page.sharedGroupHint")}
                   >
                     <Text className="text-sm text-primary-600">{group.name}</Text>
                   </Pressable>

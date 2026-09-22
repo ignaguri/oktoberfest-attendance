@@ -212,6 +212,7 @@ export function UserProfileModal({
                       router.push(`/user/${userId}`);
                     }}
                     accessibilityLabel={t("profile.page.viewFullProfile")}
+                    accessibilityHint={t("profile.page.viewFullProfileHint")}
                   >
                     <ButtonText>{t("profile.page.viewFullProfile")}</ButtonText>
                   </Button>
