@@ -21,6 +21,7 @@ const ACTOR_ID = "11111111-1111-4111-8111-111111111111";
 const FRIEND_ID = "22222222-2222-4222-8222-222222222222";
 const OPTED_OUT_ID = "33333333-3333-4333-8333-333333333333";
 const FESTIVAL_ID = "44444444-4444-4444-8444-444444444444";
+const FRIEND_ID_2 = "55555555-5555-4555-8555-555555555555";
 const DATE = "2026-09-22";
 
 type PrefsRow = { user_id: string; day_start_enabled?: boolean | null };
@@ -250,5 +251,45 @@ describe("NotificationService.notifyDayStart", () => {
 
     expect(claimed).toBe(true);
     expect(triggerMock).not.toHaveBeenCalled();
+  });
+
+  // Fix 2: a fully-failed fan-out must not report success. announceCheckIn
+  // reads `true` as "handled" and skips the tent check-in fallback, and the
+  // day-start Novu workflow does not exist in production yet, so every
+  // trigger call rejects there today. Reverting to a bare `return true`
+  // would leave this exact gap live.
+  it("reports false when every trigger rejects", async () => {
+    mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
+    triggerMock.mockRejectedValue(new Error("workflow not found"));
+
+    const claimed = await service.notifyDayStart({
+      actorId: ACTOR_ID,
+      festivalId: FESTIVAL_ID,
+      date: DATE,
+      kind: "checkin",
+      tentName: null,
+    });
+
+    expect(claimed).toBe(false);
+  });
+
+  // The other side of the same boundary: one real push among failures still
+  // counts as handled, so the caller must not also run the check-in
+  // fallback and double-notify.
+  it("reports true when at least one trigger succeeds among failures", async () => {
+    mockAdminClient({ claimed: true, recipients: [FRIEND_ID, FRIEND_ID_2], prefs: [] });
+    triggerMock.mockRejectedValueOnce(new Error("workflow not found"));
+    triggerMock.mockResolvedValueOnce({ result: {} });
+
+    const claimed = await service.notifyDayStart({
+      actorId: ACTOR_ID,
+      festivalId: FESTIVAL_ID,
+      date: DATE,
+      kind: "checkin",
+      tentName: null,
+    });
+
+    expect(claimed).toBe(true);
+    expect(triggerMock).toHaveBeenCalledTimes(2);
   });
 });
