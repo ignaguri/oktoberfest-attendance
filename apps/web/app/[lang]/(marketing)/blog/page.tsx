@@ -1,4 +1,3 @@
-import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import type { Metadata } from "next";
 
 import { BlogIndexView } from "@/components/blog/BlogIndexView";

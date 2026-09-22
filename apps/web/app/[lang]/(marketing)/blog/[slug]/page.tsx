@@ -1,5 +1,4 @@
 import { PROD_URL } from "@prostcounter/shared/constants";
-import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";

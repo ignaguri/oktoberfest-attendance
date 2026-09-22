@@ -1,5 +1,3 @@
-import type { SupportedLanguage } from "@prostcounter/shared/i18n";
-
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingLocaleProvider } from "@/lib/i18n/MarketingLocaleProvider";

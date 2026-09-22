@@ -1,7 +1,6 @@
 import "server-only";
 
 import { PROD_URL } from "@prostcounter/shared/constants";
-import type { SupportedLanguage } from "@prostcounter/shared/i18n";
 import type { Metadata } from "next";
 
 import { FestivalCountdownBanner } from "@/components/marketing/FestivalCountdownBanner";
