@@ -8,6 +8,7 @@ import { Link } from "next-view-transitions";
 import { Button } from "@/components/ui/button";
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
 import { useTranslation } from "@/lib/i18n/client";
+import { cn } from "@/lib/utils";
 
 // See LandingContent: an `opacity: 0` hidden state is serialized into the SSR
 // markup, blanking the page until hydration. Slide only, and let the
@@ -81,18 +82,26 @@ export function DownloadContent() {
             <motion.div
               key={platform.key}
               variants={entrance}
-              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+              className="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
             >
               <platform.icon
                 size={32}
-                className={`mx-auto mb-3 ${platform.available ? "text-yellow-500" : "text-gray-300"}`}
+                className={cn(
+                  "mx-auto mb-3",
+                  platform.available ? "text-yellow-500" : "text-gray-300",
+                )}
               />
               <h2 className="text-lg font-bold text-gray-900">{platform.name}</h2>
               <p className="mb-4 text-sm text-gray-500">
                 {t(`marketing.download.${platform.key}.description`)}
               </p>
               {platform.available ? (
-                <Button variant="yellow" size="sm" asChild className="w-fit">
+                <Button
+                  variant="yellow"
+                  size="sm"
+                  asChild
+                  className="mt-auto h-auto max-w-full self-center whitespace-normal py-1.5"
+                >
                   {platform.href.startsWith("http") ? (
                     <a href={platform.href} target="_blank" rel="noopener noreferrer">
                       <Download size={16} />
@@ -116,7 +125,7 @@ export function DownloadContent() {
         {/* QR Code */}
         <motion.div
           variants={entrance}
-          className="mx-auto max-w-xs rounded-2xl border border-gray-200 bg-white p-8"
+          className="mx-auto max-w-xs rounded-2xl border border-gray-200 bg-white p-8 shadow-sm"
         >
           <p className="mb-4 text-sm font-medium text-gray-600">
             {t("marketing.download.scanWithPhone")}
@@ -127,8 +136,9 @@ export function DownloadContent() {
             width={200}
             height={200}
             className="mx-auto"
+            priority
           />
-          <p className="mt-4 text-xs text-gray-400">{t("marketing.download.opensAppStore")}</p>
+          <p className="mt-4 text-xs text-gray-500">{t("marketing.download.opensAppStore")}</p>
         </motion.div>
 
         {/* Apple Watch Companion */}
