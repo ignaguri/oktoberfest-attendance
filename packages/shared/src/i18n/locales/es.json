@@ -1404,6 +1404,18 @@
       "fullSizeClose": "Cerrar",
       "fullSizeCloseHint": "Tocá para cerrar la foto en tamaño completo"
     },
+    "page": {
+      "title": "Perfil",
+      "viewFullProfile": "Ver perfil completo",
+      "sharedGroups": "Grupos en común",
+      "favouriteTent": "Carpa favorita",
+      "favouriteTentVisits": "{{count}} visitas",
+      "history": "Historial de festivales",
+      "days": "{{count}} días",
+      "drinks": "{{count}} bebidas",
+      "noHistory": "Todavía no hay nada que mostrar.",
+      "notFound": "No se pudo encontrar este perfil."
+    },
     "biometric": {
       "label": "Inicio de sesión biométrico",
       "description": "Inicio rápido con biometría"

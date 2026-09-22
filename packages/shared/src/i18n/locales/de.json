@@ -1581,6 +1581,18 @@
       "fullSizeClose": "Schließen",
       "fullSizeCloseHint": "Tippen, um das Vollbild zu schließen"
     },
+    "page": {
+      "title": "Profil",
+      "viewFullProfile": "Vollständiges Profil ansehen",
+      "sharedGroups": "Gemeinsame Gruppen",
+      "favouriteTent": "Lieblingszelt",
+      "favouriteTentVisits": "{{count}} Besuche",
+      "history": "Festival-Verlauf",
+      "days": "{{count}} Tage",
+      "drinks": "{{count}} Getränke",
+      "noHistory": "Hier gibt es noch nichts zu sehen.",
+      "notFound": "Dieses Profil konnte nicht gefunden werden."
+    },
     "biometric": {
       "label": "Biometrische Anmeldung",
       "description": "Schnelle Anmeldung mit Biometrie"
