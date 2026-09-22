@@ -9,13 +9,17 @@ import { AchievementService } from "./achievement.service";
 import { NotificationService } from "./notification.service";
 
 /**
- * Push every unlock this write produced.
+ * Push every unlock this write produced, in parallel.
  *
  * Lives here because evaluateAfterWrite is the single chokepoint all unlocks
  * pass through — eleven call sites, all of which previously discarded the
  * result, which is why achievement-unlocked had not fired since a manual test.
  *
- * Never throws: an unlock that fails to notify is still an unlock.
+ * Never throws, and one unlock's notification failing cannot stop another's:
+ * the try/catch is per-iteration rather than wrapping the whole batch, so it
+ * does not depend on notifyAchievementUnlocked's current never-rejects
+ * behaviour — a future change there, or a throw from translateEn/nameKeyFor,
+ * stays contained to its own unlock instead of aborting the rest.
  */
 async function notifyUnlocks(
   supabase: SupabaseClient,
@@ -27,23 +31,31 @@ async function notifyUnlocks(
     return;
   }
 
-  try {
-    const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = new NotificationService(supabase, novuApiKey);
 
-    for (const unlock of unlocked) {
-      const achievementName = translateEn(nameKeyFor(unlock.slug)) ?? unlock.slug;
-      const description = translateEn(descriptionKeyFor(unlock.slug));
+  // Promise.all, not allSettled: each mapped task catches its own error
+  // below, so none of them ever rejects, and there is nothing for allSettled's
+  // rejection-surfacing to add.
+  await Promise.all(
+    unlocked.map(async (unlock) => {
+      try {
+        const achievementName = translateEn(nameKeyFor(unlock.slug)) ?? unlock.slug;
+        const description = translateEn(descriptionKeyFor(unlock.slug));
 
-      await notificationService.notifyAchievementUnlocked(userId, {
-        achievementName,
-        description,
-        tier: unlock.tier,
-        slug: unlock.slug,
-      });
-    }
-  } catch (error) {
-    logger.error({ error, userId }, "Failed to send achievement notifications");
-  }
+        await notificationService.notifyAchievementUnlocked(userId, {
+          achievementName,
+          description,
+          tier: unlock.tier,
+          slug: unlock.slug,
+        });
+      } catch (error) {
+        logger.error(
+          { error, userId, slug: unlock.slug },
+          "Failed to send achievement notification",
+        );
+      }
+    }),
+  );
 }
 
 /**

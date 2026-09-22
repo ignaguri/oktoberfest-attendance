@@ -58,9 +58,18 @@ describe("evaluateAfterWrite notification wiring", () => {
 
     expect(result).toEqual([UNLOCK]);
     expect(notifyAchievementUnlockedMock).toHaveBeenCalledTimes(1);
+    // Only NotificationService is mocked here — translateEn/nameKeyFor/
+    // descriptionKeyFor run for real, so this pins the actual resolved copy
+    // rather than just the passthrough fields. A key miss would otherwise
+    // silently push "undefined" and no test would catch it.
     expect(notifyAchievementUnlockedMock).toHaveBeenCalledWith(
       USER_ID,
-      expect.objectContaining({ tier: 2, slug: "drinks_day_max.t2" }),
+      expect.objectContaining({
+        achievementName: "Big Day",
+        description: "Drink 5 beers in a single day",
+        tier: 2,
+        slug: "drinks_day_max.t2",
+      }),
     );
   });
 

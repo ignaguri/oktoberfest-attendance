@@ -527,7 +527,7 @@ export class NotificationService {
 
       if (!enabledRecipientIds || enabledRecipientIds.length === 0) return;
 
-      await Promise.allSettled(
+      const results = await Promise.allSettled(
         enabledRecipientIds.map((to) =>
           this.novu.trigger({
             workflowId: NOTIFICATION_WORKFLOWS.GROUP_ACHIEVEMENT_UNLOCKED,
@@ -541,6 +541,20 @@ export class NotificationService {
           }),
         ),
       );
+
+      // allSettled hides rejections, so surface them: a trigger that fails
+      // here is otherwise indistinguishable from one that was never sent.
+      const failures = results.filter((r) => r.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((f) => String((f as PromiseRejectedResult).reason)),
+          },
+          "Some group achievement notifications failed to send",
+        );
+      }
     } catch (error) {
       logger.error({ error }, "Error sending group achievement notification");
     }
