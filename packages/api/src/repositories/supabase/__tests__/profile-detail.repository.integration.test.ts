@@ -38,8 +38,10 @@ describe("getProfileDetail (Local DB)", () => {
   let groupMate: TestUser;
   let stranger: TestUser;
   let festival: TestFestival;
+  let otherFestival: TestFestival;
   let tent: TestTent;
   let sharedGroupId: string;
+  let otherFestivalGroupId: string;
 
   function repoFor(user: TestUser) {
     return new SupabaseProfileRepository(createTestSupabaseWithAuth(user.token));
@@ -52,10 +54,17 @@ describe("getProfileDetail (Local DB)", () => {
     groupMate = await createTestUser("pd-mate");
     stranger = await createTestUser("pd-stranger");
     festival = await createLiveFestival(admin);
+    otherFestival = await createLiveFestival(admin);
     tent = await createTestTent(admin);
 
     await makeFriends(admin, owner.id, friend.id);
     sharedGroupId = await createSharedGroup(admin, festival.id, [owner.id, groupMate.id]);
+    // Carrying a group over to a new festival keeps its name, so the same two
+    // people routinely share same-named groups in several festivals.
+    otherFestivalGroupId = await createSharedGroup(admin, otherFestival.id, [
+      owner.id,
+      groupMate.id,
+    ]);
 
     const attendanceId = await insertAttendance(admin, owner.id, festival.id, dayFromToday(-1));
     await insertConsumption(admin, attendanceId, "beer");
@@ -69,9 +78,9 @@ describe("getProfileDetail (Local DB)", () => {
   });
 
   afterAll(async () => {
-    await cleanupAttendanceFixtures(admin, [festival.id]);
+    await cleanupAttendanceFixtures(admin, [festival.id, otherFestival.id]);
     await cleanupDayPlanFixtures(admin, {
-      festivalIds: [festival.id],
+      festivalIds: [festival.id, otherFestival.id],
       tentIds: [tent.id],
       userIds: [owner.id, friend.id, groupMate.id, stranger.id],
     });
@@ -110,6 +119,22 @@ describe("getProfileDetail (Local DB)", () => {
     expect(profile.sharedGroups[0].id).toBe(sharedGroupId);
     expect(profile.sharedGroups[0].name).toBeTruthy();
     expect(profile.friendshipStatus).toBe("none");
+  });
+
+  it("scopes shared groups to the requested festival", async () => {
+    const repo = repoFor(groupMate);
+
+    const thisFestival = await repo.getProfileDetail(owner.id, festival.id, groupMate.id);
+    const other = await repo.getProfileDetail(owner.id, otherFestival.id, groupMate.id);
+
+    expect(thisFestival.sharedGroups.map((group) => group.id)).toEqual([sharedGroupId]);
+    expect(other.sharedGroups.map((group) => group.id)).toEqual([otherFestivalGroupId]);
+  });
+
+  it("returns no shared groups when no festival is requested", async () => {
+    const profile = await repoFor(groupMate).getProfileDetail(owner.id, undefined, groupMate.id);
+
+    expect(profile.sharedGroups).toEqual([]);
   });
 
   it("marks the owner's own profile as self", async () => {

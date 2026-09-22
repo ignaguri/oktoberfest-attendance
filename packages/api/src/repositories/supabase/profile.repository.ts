@@ -176,7 +176,7 @@ export class SupabaseProfileRepository {
     const [stats, relationship, sharedGroups, history, favouriteTent] = await Promise.all([
       this.fetchFestivalStats(userId, festivalId),
       this.fetchRelationship(userId, currentUserId),
-      this.fetchSharedGroups(userId, currentUserId),
+      this.fetchSharedGroups(userId, currentUserId, festivalId),
       this.fetchAttendanceHistory(userId),
       this.fetchFavouriteTent(userId, festivalId),
     ]);
@@ -261,11 +261,19 @@ export class SupabaseProfileRepository {
     return { friendshipStatus: "none", friendsSince: null };
   }
 
+  /**
+   * Groups both people belong to, in one festival.
+   *
+   * Scoped to the festival for the same reason the stats are: carrying a group
+   * over to a new festival keeps its name, so an unscoped list shows the same
+   * name several times with nothing to tell the entries apart.
+   */
   private async fetchSharedGroups(
     userId: string,
     currentUserId?: string,
+    festivalId?: string,
   ): Promise<ProfileSharedGroup[]> {
-    if (!currentUserId || currentUserId === userId) {
+    if (!currentUserId || currentUserId === userId || !festivalId) {
       return [];
     }
 
@@ -281,9 +289,10 @@ export class SupabaseProfileRepository {
 
     const { data: shared } = await this.supabase
       .from("group_members")
-      .select("group_id, groups(id, name)")
+      .select("group_id, groups!inner(id, name, festival_id)")
       .eq("user_id", userId)
-      .in("group_id", myGroupIds);
+      .in("group_id", myGroupIds)
+      .eq("groups.festival_id", festivalId);
 
     return (shared ?? []).flatMap((row) =>
       row.groups ? [{ id: row.groups.id, name: row.groups.name }] : [],
