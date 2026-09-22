@@ -19,7 +19,8 @@ CREATE TABLE public.group_invitations (
   status public.group_invitation_status NOT NULL DEFAULT 'pending',
   created_at timestamptz NOT NULL DEFAULT now(),
   responded_at timestamptz,
-  CONSTRAINT group_invitations_no_self CHECK (inviter_id <> invitee_id)
+  CONSTRAINT group_invitations_no_self CHECK (inviter_id <> invitee_id),
+  CONSTRAINT group_invitations_responded_at_set CHECK (status = 'pending' OR responded_at IS NOT NULL)
 );
 
 -- One live invitation per person per group; answered rows are kept because the
@@ -32,9 +33,11 @@ CREATE INDEX group_invitations_invitee_pending
   ON public.group_invitations (invitee_id)
   WHERE status = 'pending';
 
-CREATE INDEX group_invitations_group_pending
-  ON public.group_invitations (group_id)
-  WHERE status = 'pending';
+-- Unfiltered so it also serves the decline-cooldown lookup (status = 'declined') and the
+-- creator's sent-invitations list; group_invitations_one_pending already covers the
+-- pending-only case with group_id leading, so a filtered (group_id) index would be redundant
+CREATE INDEX group_invitations_group_invitee
+  ON public.group_invitations (group_id, invitee_id);
 
 ALTER TABLE public.group_invitations ENABLE ROW LEVEL SECURITY;
 
