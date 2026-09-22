@@ -5,6 +5,7 @@ import {
   LogConsumptionSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import {
   SupabaseAttendanceRepository,
@@ -12,6 +13,7 @@ import {
 } from "../repositories/supabase";
 import { ConsumptionService } from "../services/consumption.service";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { NotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 // Query schema for listing consumptions
@@ -96,6 +98,24 @@ app.openapi(logConsumptionRoute, async (c) => {
 
   // Log consumption
   const attendance = await service.logConsumption(user.id, data);
+
+  // First drink of the day announces the day to friends and group-mates. The
+  // ledger inside notifyDayStart makes this a no-op for every later drink.
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (novuApiKey) {
+    try {
+      const notificationService = new NotificationService(supabase, novuApiKey);
+      await notificationService.notifyDayStart({
+        actorId: user.id,
+        festivalId: data.festivalId,
+        date: data.date,
+        kind: "drink",
+        tentName: null,
+      });
+    } catch (notificationError) {
+      logger.error({ error: notificationError }, "Failed to send day-start notification");
+    }
+  }
 
   // Evaluate achievements. This must never fail the mutation: a broken
   // achievement engine cannot be allowed to stop someone logging a drink.

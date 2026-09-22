@@ -435,6 +435,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
           tentVisitId: replayed.id,
           attendanceId,
           visitedAt: new Date(replayed.visit_date).toISOString(),
+          visitDate: storedDate,
         };
       }
     }
@@ -495,6 +496,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       tentVisitId: tentVisit.id,
       attendanceId,
       visitedAt: new Date(tentVisit.visit_date).toISOString(),
+      visitDate: date,
     };
   }
 

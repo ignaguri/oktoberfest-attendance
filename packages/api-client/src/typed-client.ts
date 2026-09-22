@@ -367,6 +367,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         tentVisitId: string;
         attendanceId: string;
         visitedAt: string;
+        visitDate: string;
       }> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("POST", `${baseUrl}/v1/attendance/tent-visits`, {
@@ -381,6 +382,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
           tentVisitId: string;
           attendanceId: string;
           visitedAt: string;
+          visitDate: string;
         }>(response);
       },
 

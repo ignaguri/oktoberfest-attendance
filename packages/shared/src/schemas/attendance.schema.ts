@@ -183,6 +183,14 @@ export const LogTentVisitResponseSchema = z.object({
   tentVisitId: z.uuid(),
   attendanceId: z.uuid(),
   visitedAt: z.iso.datetime(),
+  /**
+   * The festival day this visit was bucketed into, already resolved in the
+   * festival's timezone (20260811100000_bucket_tent_visits_by_festival_timezone).
+   * Callers must use this instead of deriving a date from `visitedAt`
+   * themselves — slicing that ISO string reads the UTC date and misfiles a
+   * visit logged after local midnight under the previous day.
+   */
+  visitDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be YYYY-MM-DD format"),
 });
 
 export type LogTentVisitResponse = z.infer<typeof LogTentVisitResponseSchema>;

@@ -712,6 +712,7 @@ export interface paths {
                             attendanceId: string;
                             /** Format: date-time */
                             visitedAt: string;
+                            visitDate: string;
                         };
                     };
                 };
