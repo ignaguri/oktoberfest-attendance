@@ -30,16 +30,32 @@ vi.mock("expo-file-system/legacy", () => ({
   readDirectoryAsync: vi.fn().mockResolvedValue([]),
 }));
 
-// Mock expo-image-manipulator
+// Mock expo-image-manipulator.
+// `sourceSize` is what the manipulator reports for the image being compressed,
+// so tests can drive portrait/landscape/small sources; `resize` records the
+// size compressPhoto asks for.
+const imageManipulator = vi.hoisted(() => ({
+  sourceSize: { width: 3024, height: 4032 },
+  resize: vi.fn(),
+}));
+
 vi.mock("expo-image-manipulator", () => ({
   ImageManipulator: {
-    manipulate: vi.fn().mockReturnValue({
-      resize: vi.fn().mockReturnThis(),
-      renderAsync: vi.fn().mockResolvedValue({
-        saveAsync: vi.fn().mockResolvedValue({
-          uri: "file:///mock/compressed.webp",
+    manipulate: vi.fn(() => {
+      const context = {
+        resize: vi.fn((size: { width?: number; height?: number }) => {
+          imageManipulator.resize(size);
+          return context;
         }),
-      }),
+        renderAsync: vi.fn().mockResolvedValue({
+          width: imageManipulator.sourceSize.width,
+          height: imageManipulator.sourceSize.height,
+          saveAsync: vi.fn().mockResolvedValue({
+            uri: "file:///mock/compressed.webp",
+          }),
+        }),
+      };
+      return context;
     }),
   },
   SaveFormat: {
@@ -97,13 +113,15 @@ describe("Photo Queue", () => {
   });
 
   describe("photo compression", () => {
-    it("should compress photos with default options", async () => {
-      // Mock fetch for ArrayBuffer conversion
-      const mockArrayBuffer = new ArrayBuffer(1024);
+    beforeEach(() => {
+      imageManipulator.sourceSize = { width: 3024, height: 4032 };
+      // compressPhoto reads the saved file back through fetch()
       global.fetch = vi.fn().mockResolvedValue({
-        arrayBuffer: () => Promise.resolve(mockArrayBuffer),
+        arrayBuffer: () => Promise.resolve(new ArrayBuffer(1024)),
       });
+    });
 
+    it("should compress photos with default options", async () => {
       const result = await compressPhoto("file:///mock/original.jpg");
 
       expect(result).toHaveProperty("uri");
@@ -123,6 +141,32 @@ describe("Photo Queue", () => {
       });
 
       expect(result.arrayBuffer.byteLength).toBe(512);
+    });
+
+    // Passing both width and height to resize() stretches the photo to exactly
+    // that box instead of scaling it, which squared every portrait upload.
+    it("caps the height of a portrait photo and lets the width follow", async () => {
+      imageManipulator.sourceSize = { width: 3024, height: 4032 };
+
+      await compressPhoto("file:///mock/portrait.jpg");
+
+      expect(imageManipulator.resize).toHaveBeenCalledWith({ height: 1200 });
+    });
+
+    it("caps the width of a landscape photo and lets the height follow", async () => {
+      imageManipulator.sourceSize = { width: 4032, height: 3024 };
+
+      await compressPhoto("file:///mock/landscape.jpg");
+
+      expect(imageManipulator.resize).toHaveBeenCalledWith({ width: 1200 });
+    });
+
+    it("leaves a photo already within maxSize untouched rather than upscaling", async () => {
+      imageManipulator.sourceSize = { width: 640, height: 480 };
+
+      await compressPhoto("file:///mock/small.jpg");
+
+      expect(imageManipulator.resize).not.toHaveBeenCalled();
     });
   });
 
