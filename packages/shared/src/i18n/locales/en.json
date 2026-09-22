@@ -1565,7 +1565,7 @@
         "passwordTooShort": "Password must be at least 8 characters",
         "passwordChanged": "Password updated",
         "editProfile": "Edit name",
-        "editProfileHint": "Change this user's name and username",
+        "editProfileHint": "Opens this user's name and username for editing",
         "fullName": "Full name",
         "username": "Username",
         "noUsername": "No username set",
@@ -1580,7 +1580,7 @@
         "edit": {
           "title": "Edit attendance",
           "open": "Edit",
-          "openHint": "Change this day's date, beers and tents",
+          "openHint": "Opens this day's date, beers and tents for editing",
           "date": "Date",
           "beers": "Beers",
           "beersStored": "No drinks logged on this day, so this is the stored number.",
@@ -1591,6 +1591,7 @@
           "tentsLoading": "Loading tents...",
           "tentsEmpty": "This festival has no tents yet",
           "save": "Save changes",
+        "saveHint": "Saves the changes to this attendance",
           "saveError": "Could not save the changes",
           "duplicateDate": "This user already has an attendance on that date"
         },

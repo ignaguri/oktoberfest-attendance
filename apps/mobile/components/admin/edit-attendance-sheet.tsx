@@ -289,7 +289,7 @@ export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttend
             isDisabled={updateAttendance.loading || beerCountInvalid}
             onPress={handleSave}
             accessibilityLabel={t("admin.mobile.userDetail.edit.save")}
-            accessibilityHint={t("admin.mobile.userDetail.edit.openHint")}
+            accessibilityHint={t("admin.mobile.userDetail.edit.saveHint")}
           >
             {updateAttendance.loading && <ButtonSpinner />}
             <ButtonText>{t("admin.mobile.userDetail.edit.save")}</ButtonText>

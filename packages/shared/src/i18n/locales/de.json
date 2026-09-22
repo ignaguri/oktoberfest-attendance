@@ -1637,9 +1637,6 @@
       "archive": "Archivieren"
     },
     "privacy": {
-      "title": "Privatsphäre-Einstellungen",
-      "locationSharing": "Standortfreigabe",
-      "profileVisibility": "Profil-Sichtbarkeit",
       "location": {
         "title": "Standort-Privatsphäre",
         "description": "Lege fest, wer deinen Standort sehen kann",
@@ -1805,7 +1802,7 @@
         "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
         "passwordChanged": "Passwort aktualisiert",
         "editProfile": "Namen bearbeiten",
-        "editProfileHint": "Ändert Namen und Benutzernamen dieses Benutzers",
+        "editProfileHint": "Öffnet Namen und Benutzernamen dieses Benutzers zum Bearbeiten",
         "fullName": "Vollständiger Name",
         "username": "Benutzername",
         "noUsername": "Kein Benutzername festgelegt",
@@ -1820,7 +1817,7 @@
         "edit": {
           "title": "Besuch bearbeiten",
           "open": "Bearbeiten",
-          "openHint": "Datum, Biere und Zelte dieses Tages ändern",
+          "openHint": "Öffnet Datum, Biere und Zelte dieses Tages zum Bearbeiten",
           "date": "Datum",
           "beers": "Biere",
           "beersStored": "An diesem Tag sind keine Getränke erfasst, daher ist dies der gespeicherte Wert.",
@@ -1832,7 +1829,8 @@
           "tentsEmpty": "Dieses Fest hat noch keine Zelte",
           "save": "Änderungen speichern",
           "saveError": "Änderungen konnten nicht gespeichert werden",
-          "duplicateDate": "Dieser Nutzer hat an diesem Datum bereits einen Besuch"
+          "duplicateDate": "Dieser Nutzer hat an diesem Datum bereits einen Besuch",
+          "saveHint": "Speichert die Änderungen an diesem Besuch"
         },
         "deleteAttendance": "Besuch löschen",
         "deleteAttendanceHint": "Entfernt den Besuchseintrag dieses Tages",
@@ -1977,9 +1975,6 @@
     },
     "festivals": {
       "title": "Festival-Verwaltung",
-      "create": "Festival erstellen",
-      "edit": "Festival bearbeiten",
-      "delete": "Festival löschen",
       "newFestival": "Neues Fest",
       "editFestival": "Fest bearbeiten",
       "createFestival": "Neues Fest anlegen",
@@ -2034,9 +2029,6 @@
     },
     "tents": {
       "title": "Zelt-Verwaltung",
-      "create": "Zelt erstellen",
-      "edit": "Zelt bearbeiten",
-      "delete": "Zelt löschen",
       "createNew": "Neues Zelt anlegen",
       "copyFromFestival": "Von einem anderen Fest kopieren",
       "selectFestival": "Fest auswählen",
@@ -2101,7 +2093,6 @@
     },
     "users": {
       "title": "Benutzer-Verwaltung",
-      "search": "Benutzer suchen",
       "form": {
         "emailNote": "Die E-Mail-Adresse kann nicht geändert werden",
         "newPassword": "Neues Passwort (leer lassen, um es beizubehalten)",
@@ -2109,8 +2100,6 @@
         "username": "Benutzername",
         "updateUser": "Benutzer aktualisieren"
       },
-      "makeAdmin": "Zum Admin machen",
-      "removeAdmin": "Admin entfernen",
       "editUser": "Benutzer bearbeiten",
       "editUserDescription": "Benutzerdaten aktualisieren",
       "editAttendances": "Besuche bearbeiten",
@@ -2120,7 +2109,7 @@
         "titleFor": "Besuche von {{name}}",
         "headers": {
           "date": "Datum",
-          "beers": "Maß",
+          "beers": "Biere",
           "tents": "Zelte"
         },
         "loading": "Besuche werden geladen...",
