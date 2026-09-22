@@ -2382,7 +2382,7 @@
       "title": "Zeit zum Einchecken!",
       "description": "deine Reservierung ist bereit. Möchten du jetzt einchecken?",
       "prompt": "Bist du schon da?",
-      "timeForReservation": "Es ist Zeit für deine Reservierung im {{tentName}}.",
+      "timeForReservation": "Es ist Zeit für deine Reservierung bei {{tentName}}.",
       "theTent": "dem Zelt",
       "unknownTent": "Unbekanntes Zelt",
       "note": "Notiz",
@@ -2405,7 +2405,7 @@
     "membersWithinRadius": "Mitglieder im Umkreis von {{radius}} erscheinen hier.",
     "showingMembersWithinRadius": "Mitglieder im Umkreis von {{radius}}",
     "checkIn": "Einchecken",
-    "checkInAt": "Einchecken im {{tent}}",
+    "checkInAt": "Einchecken bei {{tent}}",
     "callout": {
       "away": "entfernt"
     },
@@ -2589,7 +2589,7 @@
     "dailyTotal": "Tagesgesamt"
   },
   "activityFeed": {
-    "atTent": "{{activity}} im {{tent}}",
+    "atTent": "{{activity}} bei {{tent}}",
     "drankBeers": "trank {{count}} Mass",
     "drankBeers_other": "trank {{count}} Mass",
     "drankDrinks": "trank {{count}} Getränk",
@@ -2606,7 +2606,7 @@
     "drank_alcohol_free_other": "hatte {{count}} alkoholfreie Getränke",
     "drank_other": "hatte {{count}} Getränk",
     "drank_other_other": "hatte {{count}} Getränke",
-    "checkedInto": "checkte ein im {{tent}}",
+    "checkedInto": "checkte ein bei {{tent}}",
     "uploadedPhoto": "lud ein Foto hoch",
     "joinedGroup": "ist {{group}} beigetreten",
     "unlockedAchievement": "hat einen Erfolg freigeschaltet",
