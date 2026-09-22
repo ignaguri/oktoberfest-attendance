@@ -5,9 +5,9 @@ import type { Metadata } from "next";
 
 import { FestivalCountdownBanner } from "@/components/marketing/FestivalCountdownBanner";
 import { LandingContent } from "@/components/marketing/LandingContent";
-import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCountdownFestival } from "@/lib/marketing/getCountdownFestival";
+import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { seoCopy } from "@/lib/marketing/seoCopy";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
@@ -23,6 +23,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: copy.title,
     description: copy.description,
+    openGraph: {
+      ...marketingOpenGraph({ locale: lang, path: "/", ...copy }),
+      type: "website",
+    },
     alternates: {
       canonical: marketingUrlAbsolute("/", lang),
       languages: localeAlternates("/"),
@@ -64,7 +68,6 @@ export default async function LandingPage({ params }: { params: Promise<Params> 
 
   return (
     <>
-      <SyncLocale locale={lang} />
       <JsonLd data={jsonLd} />
       {countdownFestival && <FestivalCountdownBanner festival={countdownFestival} />}
       <LandingContent />

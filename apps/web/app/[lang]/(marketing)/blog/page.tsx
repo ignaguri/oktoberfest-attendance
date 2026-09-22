@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { BlogIndexView } from "@/components/blog/BlogIndexView";
 import { getAllPosts, getCategories } from "@/lib/blog";
+import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { blogIndexCopy } from "@/lib/marketing/seoCopy";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
@@ -17,6 +18,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: copy.title,
     description: copy.description,
+    openGraph: {
+      ...marketingOpenGraph({ locale: lang, path: "/blog", ...copy }),
+      type: "website",
+    },
     alternates: {
       canonical: marketingUrlAbsolute("/blog", lang),
       languages: localeAlternates("/blog"),

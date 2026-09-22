@@ -10,6 +10,7 @@ import { ArticleLayout } from "@/components/blog/ArticleLayout";
 import { getMdxComponents } from "@/components/blog/MDXComponents";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getAllPosts, getAvailableLocales, getPostBySlug } from "@/lib/blog";
+import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
 export const revalidate = 3600;
@@ -39,23 +40,24 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: `${post.title} - ProstCounter Blog`,
     description: post.description,
     openGraph: {
-      title: post.title,
-      description: post.description,
+      ...marketingOpenGraph({
+        locale: lang,
+        title: post.title,
+        description: post.description,
+        path: `/blog/${slug}`,
+        images: [
+          {
+            url: `/api/og?title=${encodeURIComponent(post.title)}&category=${post.category}`,
+            width: 1200,
+            height: 630,
+            alt: post.title,
+          },
+        ],
+      }),
       type: "article",
       publishedTime: post.date,
       modifiedTime: post.lastModified,
       authors: [post.author],
-      ...(lang !== "en" && {
-        locale: lang === "de" ? "de_DE" : "es_ES",
-      }),
-      images: [
-        {
-          url: `/api/og?title=${encodeURIComponent(post.title)}&category=${post.category}`,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        },
-      ],
     },
     robots: { index: true, follow: true },
     alternates: {

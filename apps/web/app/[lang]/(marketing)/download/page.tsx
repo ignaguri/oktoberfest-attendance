@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 import { DownloadContent } from "@/components/marketing/DownloadContent";
-import { SyncLocale } from "@/components/marketing/SyncLocale";
+import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { seoCopy } from "@/lib/marketing/seoCopy";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
@@ -17,6 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: copy.title,
     description: copy.description,
+    openGraph: {
+      ...marketingOpenGraph({ locale: lang, path: "/download", ...copy }),
+      type: "website",
+    },
     alternates: {
       canonical: marketingUrlAbsolute("/download", lang),
       languages: localeAlternates("/download"),
@@ -28,10 +32,5 @@ export default async function DownloadPage({ params }: { params: Promise<Params>
   const { lang: langParam } = await params;
   const lang = toSupportedLanguage(langParam);
 
-  return (
-    <>
-      <SyncLocale locale={lang} />
-      <DownloadContent />
-    </>
-  );
+  return <DownloadContent />;
 }

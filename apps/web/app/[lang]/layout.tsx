@@ -11,22 +11,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { GA_ID } from "@/lib/constants";
 import { DataProvider } from "@/lib/data/query-client";
 import { I18nProvider } from "@/lib/i18n/client";
+import { randomOgImage } from "@/lib/marketing/openGraph";
 import { APP_VERSION } from "@/lib/version";
 
 import { SerwistProvider } from "../serwist-provider";
 
-const ogImages = [
-  "/images/prost-counter-og-1.jpg",
-  "/images/prost-counter-og-2.jpg",
-  "/images/prost-counter-og-3.jpg",
-  "/images/prost-counter-og-4.jpg",
-  "/images/prost-counter-og-5.jpg",
-  "/images/prost-counter-og-6.jpg",
-  "/images/prost-counter-og-7.jpg",
-];
-
-const getRandomImage = () => ogImages[Math.floor(Math.random() * ogImages.length)];
-
+// Only the fallback for routes that set no openGraph of their own; every
+// marketing page builds a localized block instead. See lib/marketing/openGraph.
 export const metadata: Metadata = {
   metadataBase: new URL(IS_PROD ? PROD_URL : DEV_URL),
   description: "Track your beer festival attendance and compete with friends!",
@@ -37,7 +28,7 @@ export const metadata: Metadata = {
     url: PROD_URL,
     images: [
       {
-        url: getRandomImage(),
+        url: randomOgImage(),
         width: 1200,
         height: 670,
         alt: "ProstCounter",
@@ -51,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ProstCounter 🍻",
     description: "Join your friends in tracking beer festival attendance!",
-    images: [getRandomImage()],
+    images: [randomOgImage()],
     creator: "@ignaguri",
   },
   appleWebApp: {

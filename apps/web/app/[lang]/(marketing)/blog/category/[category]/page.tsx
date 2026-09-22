@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CategoryView } from "@/components/blog/CategoryView";
 import type { BlogCategory } from "@/lib/blog";
 import { getCategories, getPostsByCategory, VALID_CATEGORIES } from "@/lib/blog";
+import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { categoryCopy } from "@/lib/marketing/seoCopy";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
@@ -24,6 +25,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: copy.title,
     description: copy.description,
+    openGraph: {
+      ...marketingOpenGraph({ locale: lang, path: `/blog/category/${category}`, ...copy }),
+      type: "website",
+    },
     alternates: {
       canonical: marketingUrlAbsolute(`/blog/category/${category}`, lang),
       languages: localeAlternates(`/blog/category/${category}`),
