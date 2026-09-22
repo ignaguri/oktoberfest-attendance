@@ -159,6 +159,15 @@ app.openapi(acceptRoute, async (c) => {
   const service = new GroupJoinRequestService(new SupabaseGroupJoinRequestRepository(supabase));
   const accepted = await service.accept(requestId);
 
+  const joinNotificationService = notificationService(supabase);
+  if (joinNotificationService) {
+    try {
+      await joinNotificationService.notifyGroupJoin(accepted.groupId, accepted.requesterId);
+    } catch (notificationError) {
+      logger.error({ error: notificationError }, "Failed to send group join notification");
+    }
+  }
+
   // The new member is the requester, not the caller, so evaluate their
   // achievements with the service-role client. Awaited so the outbox row exists
   // before the requester's next read; never fails the accept.
