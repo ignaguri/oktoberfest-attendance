@@ -1586,10 +1586,13 @@
       "viewFullProfile": "Vollständiges Profil ansehen",
       "sharedGroups": "Gemeinsame Gruppen",
       "favouriteTent": "Lieblingszelt",
-      "favouriteTentVisits": "{{count}} Besuche",
+      "favouriteTentVisits_one": "{{count}} Besuch",
+      "favouriteTentVisits_other": "{{count}} Besuche",
       "history": "Festival-Verlauf",
-      "days": "{{count}} Tage",
-      "drinks": "{{count}} Getränke",
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "drinks_one": "{{count}} Getränk",
+      "drinks_other": "{{count}} Getränke",
       "noHistory": "Hier gibt es noch nichts zu sehen.",
       "notFound": "Dieses Profil konnte nicht gefunden werden."
     },
@@ -2496,7 +2499,8 @@
         "beers_one": "{{count}} Maß",
         "tents": "{{count}} Zelte",
         "tents_one": "{{count}} Zelt",
-        "days": "{{count}} Tage",
+        "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
         "days_one": "{{count}} Tag",
         "across": "in {{days}} voller Spaß beim {{festival}}"
       }

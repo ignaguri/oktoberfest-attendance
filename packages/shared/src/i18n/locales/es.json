@@ -1409,10 +1409,13 @@
       "viewFullProfile": "Ver perfil completo",
       "sharedGroups": "Grupos en común",
       "favouriteTent": "Carpa favorita",
-      "favouriteTentVisits": "{{count}} visitas",
+      "favouriteTentVisits_one": "{{count}} visita",
+      "favouriteTentVisits_other": "{{count}} visitas",
       "history": "Historial de festivales",
-      "days": "{{count}} días",
-      "drinks": "{{count}} bebidas",
+      "days_one": "{{count}} día",
+      "days_other": "{{count}} días",
+      "drinks_one": "{{count}} bebida",
+      "drinks_other": "{{count}} bebidas",
       "noHistory": "Todavía no hay nada que mostrar.",
       "notFound": "No se pudo encontrar este perfil."
     },
@@ -2331,7 +2334,8 @@
         "beers_one": "{{count}} cerveza",
         "tents": "{{count}} carpas",
         "tents_one": "{{count}} carpa",
-        "days": "{{count}} días",
+        "days_one": "{{count}} día",
+      "days_other": "{{count}} días",
         "days_one": "{{count}} día",
         "across": "en {{days}} de diversión en {{festival}}"
       }

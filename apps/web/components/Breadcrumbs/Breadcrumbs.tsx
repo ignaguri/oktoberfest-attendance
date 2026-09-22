@@ -49,6 +49,13 @@ export default function Breadcrumbs() {
       return [];
     }
 
+    // A user profile is reached from a modal anywhere in the app, so there is no
+    // chain to show: `/user` is not a route, and the UUID would otherwise be run
+    // through the group-name lookup below and render as "Unknown Group".
+    if (pathname.startsWith("/user/")) {
+      return [];
+    }
+
     const segments = pathname.split("/").filter((segment) => segment !== "");
     const newBreadcrumbs: BreadcrumbSegment[] = [];
 

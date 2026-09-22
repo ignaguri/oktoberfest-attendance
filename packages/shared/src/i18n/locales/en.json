@@ -1349,10 +1349,13 @@
       "viewFullProfile": "View full profile",
       "sharedGroups": "Groups you share",
       "favouriteTent": "Favourite tent",
-      "favouriteTentVisits": "{{count}} visits",
+      "favouriteTentVisits_one": "{{count}} visit",
+      "favouriteTentVisits_other": "{{count}} visits",
       "history": "Festival history",
-      "days": "{{count}} days",
-      "drinks": "{{count}} drinks",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "drinks_one": "{{count}} drink",
+      "drinks_other": "{{count}} drinks",
       "noHistory": "Nothing to show here yet.",
       "notFound": "This profile could not be found."
     },
@@ -2271,7 +2274,8 @@
         "beers_one": "{{count}} beer",
         "tents": "{{count}} tents",
         "tents_one": "{{count}} tent",
-        "days": "{{count}} days",
+        "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
         "days_one": "{{count}} day",
         "across": "across {{days}} of fun at {{festival}}"
       }

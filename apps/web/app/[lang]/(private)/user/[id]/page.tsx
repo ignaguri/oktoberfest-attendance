@@ -151,15 +151,16 @@ export default function UserProfilePage() {
           )}
         </div>
 
+        {/* The private layout centres <main>, so each card opts back out. */}
         {profile.sharedGroups.length > 0 && (
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="gap-3 text-left">
+            <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
                 <Users className="h-4 w-4" />
                 {t("profile.page.sharedGroups")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-2 pt-0">
+            <CardContent className="flex flex-wrap gap-2">
               {profile.sharedGroups.map((group) => (
                 <Link
                   key={group.id}
@@ -175,7 +176,7 @@ export default function UserProfilePage() {
 
         {profile.stats && (
           <Card>
-            <CardContent className="flex justify-center gap-8 py-6">
+            <CardContent className="flex justify-center gap-8">
               <div className="flex flex-col items-center">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4 text-gray-400" />
@@ -202,14 +203,14 @@ export default function UserProfilePage() {
         )}
 
         {profile.favouriteTent && (
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="gap-3 text-left">
+            <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-600">
                 <Tent className="h-4 w-4" />
                 {t("profile.page.favouriteTent")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent>
               <p className="font-medium">{profile.favouriteTent.name}</p>
               <p className="text-xs text-gray-500">
                 {t("profile.page.favouriteTentVisits", { count: profile.favouriteTent.visits })}
@@ -219,13 +220,13 @@ export default function UserProfilePage() {
         )}
 
         {profile.history.length > 0 && (
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="gap-3 text-left">
+            <CardHeader>
               <CardTitle className="text-sm font-medium text-gray-600">
                 {t("profile.page.history")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent>
               {profile.history.map((row) => (
                 <FestivalHistoryRow key={row.festivalId} row={row} userId={id} />
               ))}
