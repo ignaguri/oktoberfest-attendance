@@ -328,7 +328,8 @@ export class NotificationService {
       | "group_notifications_enabled"
       | "group_join_enabled"
       | "checkin_enabled"
-      | "friend_plans_enabled",
+      | "friend_plans_enabled"
+      | "day_start_enabled",
   ): Promise<string[] | null> {
     if (recipientIds.length === 0) {
       return [];
@@ -348,7 +349,7 @@ export class NotificationService {
     const { data, error } = await prefsClient
       .from("user_notification_preferences")
       .select(
-        "user_id, group_notifications_enabled, group_join_enabled, checkin_enabled, friend_plans_enabled",
+        "user_id, group_notifications_enabled, group_join_enabled, checkin_enabled, friend_plans_enabled, day_start_enabled",
       )
       .in("user_id", recipientIds);
 
@@ -382,6 +383,7 @@ export class NotificationService {
         group_notifications_enabled: preferences.groupNotificationsEnabled,
         daily_reminder_enabled: preferences.dailyReminderEnabled,
         friend_plans_enabled: preferences.friendPlansEnabled,
+        day_start_enabled: preferences.dayStartEnabled,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "user_id" },

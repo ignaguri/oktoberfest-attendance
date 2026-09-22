@@ -50,6 +50,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
       groupNotificationsEnabled: data.group_notifications_enabled,
       dailyReminderEnabled: data.daily_reminder_enabled,
       friendPlansEnabled: data.friend_plans_enabled,
+      dayStartEnabled: data.day_start_enabled,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };
@@ -72,6 +73,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
           group_notifications_enabled: preferences.groupNotificationsEnabled,
           daily_reminder_enabled: preferences.dailyReminderEnabled,
           friend_plans_enabled: preferences.friendPlansEnabled,
+          day_start_enabled: preferences.dayStartEnabled,
           updated_at: new Date().toISOString(),
         },
         { onConflict: "user_id" },
@@ -95,6 +97,7 @@ export class SupabaseNotificationRepository implements INotificationRepository {
       groupNotificationsEnabled: data.group_notifications_enabled,
       dailyReminderEnabled: data.daily_reminder_enabled,
       friendPlansEnabled: data.friend_plans_enabled,
+      dayStartEnabled: data.day_start_enabled,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };

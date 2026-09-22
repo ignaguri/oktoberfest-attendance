@@ -7688,6 +7688,10 @@
                       "type": "boolean",
                       "nullable": true
                     },
+                    "dayStartEnabled": {
+                      "type": "boolean",
+                      "nullable": true
+                    },
                     "createdAt": {
                       "type": "string",
                       "nullable": true,
@@ -7709,6 +7713,7 @@
                     "groupNotificationsEnabled",
                     "dailyReminderEnabled",
                     "friendPlansEnabled",
+                    "dayStartEnabled",
                     "createdAt",
                     "updatedAt"
                   ]
@@ -7767,6 +7772,9 @@
                     "type": "boolean"
                   },
                   "friendPlansEnabled": {
+                    "type": "boolean"
+                  },
+                  "dayStartEnabled": {
                     "type": "boolean"
                   }
                 }

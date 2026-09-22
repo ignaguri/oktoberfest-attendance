@@ -4690,6 +4690,7 @@ export interface paths {
                             groupNotificationsEnabled: boolean | null;
                             dailyReminderEnabled: boolean | null;
                             friendPlansEnabled: boolean | null;
+                            dayStartEnabled: boolean | null;
                             /** Format: date-time */
                             createdAt: string | null;
                             /** Format: date-time */
@@ -4730,6 +4731,7 @@ export interface paths {
                         groupNotificationsEnabled?: boolean;
                         dailyReminderEnabled?: boolean;
                         friendPlansEnabled?: boolean;
+                        dayStartEnabled?: boolean;
                     };
                 };
             };
