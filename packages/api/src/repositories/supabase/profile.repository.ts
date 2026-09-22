@@ -5,7 +5,10 @@ import type {
   Highlights,
   MissingProfileFields,
   Profile,
+  ProfileDetail,
+  ProfileHistoryRow,
   ProfileShort,
+  ProfileSharedGroup,
   PublicProfile,
   TutorialStatus,
   UpdateProfileInput,
@@ -15,7 +18,7 @@ import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError } from "../../middleware/error";
+import { ConflictError, DatabaseError } from "../../middleware/error";
 
 export class SupabaseProfileRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -144,6 +147,237 @@ export class SupabaseProfileRepository {
       friendshipStatus,
       sharedGroups,
     };
+  }
+
+  /**
+   * The profile page in one payload.
+   *
+   * Every gated read here runs on the viewer's JWT-scoped client, so the
+   * `own OR shared-group OR is_friend()` policy on attendances and tent_visits
+   * is what empties `history` and `favouriteTent` for a stranger. There is
+   * deliberately no permission check in this method.
+   */
+  async getProfileDetail(
+    userId: string,
+    festivalId?: string,
+    currentUserId?: string,
+  ): Promise<ProfileDetail> {
+    const { data, error } = await this.supabase
+      .from("profiles")
+      .select("id, username, full_name, avatar_url")
+      .eq("id", userId)
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Profile not found: ${error?.message}`);
+    }
+
+    const [stats, relationship, sharedGroups, history, favouriteTent] = await Promise.all([
+      this.fetchFestivalStats(userId, festivalId),
+      this.fetchRelationship(userId, currentUserId),
+      this.fetchSharedGroups(userId, currentUserId),
+      this.fetchAttendanceHistory(userId),
+      this.fetchFavouriteTent(userId, festivalId),
+    ]);
+
+    return {
+      id: data.id,
+      username: data.username,
+      fullName: data.full_name,
+      avatarUrl: data.avatar_url,
+      stats,
+      friendshipStatus: relationship.friendshipStatus,
+      friendsSince: relationship.friendsSince,
+      sharedGroups,
+      favouriteTent,
+      history,
+    };
+  }
+
+  private async fetchFestivalStats(
+    userId: string,
+    festivalId?: string,
+  ): Promise<ProfileDetail["stats"]> {
+    if (!festivalId) {
+      return null;
+    }
+
+    const { data } = await this.supabase
+      .from("user_festival_stats")
+      .select("days_attended, total_beers, avg_beers")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .maybeSingle();
+
+    if (!data) {
+      return null;
+    }
+
+    return {
+      daysAttended: Number(data.days_attended) || 0,
+      totalBeers: Number(data.total_beers) || 0,
+      avgBeers: Number(data.avg_beers) || 0,
+    };
+  }
+
+  private async fetchRelationship(
+    userId: string,
+    currentUserId?: string,
+  ): Promise<{
+    friendshipStatus: ProfileDetail["friendshipStatus"];
+    friendsSince: string | null;
+  }> {
+    if (!currentUserId) {
+      return { friendshipStatus: null, friendsSince: null };
+    }
+    if (currentUserId === userId) {
+      return { friendshipStatus: "self", friendsSince: null };
+    }
+
+    const { data: friendship } = await this.supabase
+      .from("friendships")
+      .select("requester_id, status, updated_at")
+      .or(
+        `and(requester_id.eq.${currentUserId},addressee_id.eq.${userId}),and(requester_id.eq.${userId},addressee_id.eq.${currentUserId})`,
+      )
+      .limit(1)
+      .maybeSingle();
+
+    if (!friendship) {
+      return { friendshipStatus: "none", friendsSince: null };
+    }
+    if (friendship.status === "accepted") {
+      return { friendshipStatus: "friends", friendsSince: friendship.updated_at };
+    }
+    if (friendship.status === "pending") {
+      return {
+        friendshipStatus:
+          friendship.requester_id === currentUserId ? "pending_sent" : "pending_received",
+        friendsSince: null,
+      };
+    }
+
+    return { friendshipStatus: "none", friendsSince: null };
+  }
+
+  private async fetchSharedGroups(
+    userId: string,
+    currentUserId?: string,
+  ): Promise<ProfileSharedGroup[]> {
+    if (!currentUserId || currentUserId === userId) {
+      return [];
+    }
+
+    const { data: myGroups } = await this.supabase
+      .from("group_members")
+      .select("group_id")
+      .eq("user_id", currentUserId);
+
+    const myGroupIds = (myGroups ?? []).map((row) => row.group_id);
+    if (myGroupIds.length === 0) {
+      return [];
+    }
+
+    const { data: shared } = await this.supabase
+      .from("group_members")
+      .select("group_id, groups(id, name)")
+      .eq("user_id", userId)
+      .in("group_id", myGroupIds);
+
+    return (shared ?? []).flatMap((row) =>
+      row.groups ? [{ id: row.groups.id, name: row.groups.name }] : [],
+    );
+  }
+
+  /**
+   * The festival list comes from `attendances`, never from `user_festival_stats`.
+   * That view is not security_invoker, so reading the list from it would hand a
+   * stranger every festival the user ever attended.
+   */
+  private async fetchAttendanceHistory(userId: string): Promise<ProfileHistoryRow[]> {
+    const { data: attendanceRows, error } = await this.supabase
+      .from("attendances")
+      .select("festival_id")
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new DatabaseError(`Failed to list attendance history: ${error.message}`);
+    }
+
+    const festivalIds = [
+      ...new Set(
+        (attendanceRows ?? []).flatMap((row) => (row.festival_id ? [row.festival_id] : [])),
+      ),
+    ];
+    if (festivalIds.length === 0) {
+      return [];
+    }
+
+    const [statsResult, festivalsResult] = await Promise.all([
+      this.supabase
+        .from("user_festival_stats")
+        .select("festival_id, days_attended, total_beers, avg_beers")
+        .eq("user_id", userId)
+        .in("festival_id", festivalIds),
+      this.supabase.from("festivals").select("id, name, start_date").in("id", festivalIds),
+    ]);
+
+    const festivals = new Map(
+      (festivalsResult.data ?? []).map((row) => [
+        row.id,
+        { name: row.name, startDate: row.start_date },
+      ]),
+    );
+
+    return (statsResult.data ?? [])
+      .flatMap((row) => {
+        const festival = row.festival_id ? festivals.get(row.festival_id) : undefined;
+        if (!row.festival_id || !festival) {
+          return [];
+        }
+        return [
+          {
+            festivalId: row.festival_id,
+            festivalName: festival.name,
+            daysAttended: Number(row.days_attended) || 0,
+            totalBeers: Number(row.total_beers) || 0,
+            avgBeers: Number(row.avg_beers) || 0,
+            startDate: festival.startDate,
+          },
+        ];
+      })
+      .sort((a, b) => b.startDate.localeCompare(a.startDate))
+      .map(({ startDate: _startDate, ...row }) => row);
+  }
+
+  private async fetchFavouriteTent(
+    userId: string,
+    festivalId?: string,
+  ): Promise<ProfileDetail["favouriteTent"]> {
+    let query = this.supabase.from("tent_visits").select("tents(name)").eq("user_id", userId);
+
+    if (festivalId) {
+      query = query.eq("festival_id", festivalId);
+    }
+
+    const { data } = await query;
+
+    const visitsByTent = new Map<string, number>();
+    for (const row of data ?? []) {
+      if (!row.tents) {
+        continue;
+      }
+      visitsByTent.set(row.tents.name, (visitsByTent.get(row.tents.name) ?? 0) + 1);
+    }
+
+    let favourite: { name: string; visits: number } | null = null;
+    for (const [name, visits] of visitsByTent) {
+      if (!favourite || visits > favourite.visits) {
+        favourite = { name, visits };
+      }
+    }
+
+    return favourite;
   }
 
   async updateProfile(userId: string, input: UpdateProfileInput): Promise<Profile> {
