@@ -1,3 +1,4 @@
+import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useAcceptGroupInvitation,
   useDeclineGroupInvitation,
@@ -35,11 +36,31 @@ interface PendingInvitationsSectionProps {
  */
 export function PendingInvitationsSection({ showDialog }: PendingInvitationsSectionProps) {
   const { t } = useTranslation();
+  const { currentFestival, festivals } = useFestival();
   const { data } = useIncomingGroupInvitations();
   const accept = useAcceptGroupInvitation();
   const decline = useDeclineGroupInvitation();
 
   const invitations = (data as GroupInvitation[] | undefined) ?? [];
+
+  // Coded API errors set `error.code` to the error code itself, so a specific
+  // message (e.g. the invitation was already answered) can be shown instead of
+  // the generic fallback. i18next returns the key when it is missing, which is
+  // how we detect an unmapped code without a defaultValue.
+  const translateApiError = useCallback(
+    (error: unknown, fallbackKey: string): string => {
+      const code = (error as { code?: string })?.code;
+      if (code) {
+        const key = `apiErrors.${code}`;
+        const translated = t(key);
+        if (translated !== key) {
+          return translated;
+        }
+      }
+      return t(fallbackKey);
+    },
+    [t],
+  );
 
   const handleAccept = useCallback(
     async (invitation: GroupInvitation) => {
@@ -47,10 +68,14 @@ export function PendingInvitationsSection({ showDialog }: PendingInvitationsSect
         await accept.mutateAsync(invitation.id);
       } catch (error) {
         logger.error("Failed to accept group invitation:", error);
-        showDialog(t("common.status.error"), t("groups.invitations.acceptFailed"), "destructive");
+        showDialog(
+          t("common.status.error"),
+          translateApiError(error, "groups.invitations.acceptFailed"),
+          "destructive",
+        );
       }
     },
-    [accept, showDialog, t],
+    [accept, showDialog, t, translateApiError],
   );
 
   const handleDecline = useCallback(
@@ -66,14 +91,14 @@ export function PendingInvitationsSection({ showDialog }: PendingInvitationsSect
             logger.error("Failed to decline group invitation:", error);
             showDialog(
               t("common.status.error"),
-              t("groups.invitations.declineFailed"),
+              translateApiError(error, "groups.invitations.declineFailed"),
               "destructive",
             );
           }
         },
       );
     },
-    [decline, showDialog, t],
+    [decline, showDialog, t, translateApiError],
   );
 
   if (invitations.length === 0) {
@@ -96,6 +121,13 @@ export function PendingInvitationsSection({ showDialog }: PendingInvitationsSect
           {invitations.map((invitation) => {
             const { inviter } = invitation;
             const inviterName = inviter.fullName || inviter.username || t("common.unknownUser");
+            // Groups lists are festival-scoped, so an invitation for a group
+            // outside the active festival needs a label: accepting it joins a
+            // group that then shows up nowhere in the app otherwise.
+            const otherFestival =
+              invitation.festivalId !== currentFestival?.id
+                ? festivals.find((festival) => festival.id === invitation.festivalId)
+                : undefined;
 
             return (
               <VStack key={invitation.id} space="sm">
@@ -116,6 +148,11 @@ export function PendingInvitationsSection({ showDialog }: PendingInvitationsSect
                         groupName: invitation.groupName,
                       })}
                     </Text>
+                    {otherFestival && (
+                      <Text className="text-sm text-typography-500">
+                        {t("groups.carryOver.fromFestival", { festival: otherFestival.name })}
+                      </Text>
+                    )}
                   </VStack>
                 </HStack>
 

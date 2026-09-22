@@ -100,3 +100,94 @@ describe("SupabaseGroupInvitationRepository.listInvitableUsers", () => {
     await expect(repo.listInvitableUsers(ME, GROUP, "   ")).resolves.toEqual([]);
   });
 });
+
+describe("SupabaseGroupInvitationRepository.isGroupCreator", () => {
+  function createGroupsStub(row: { id: string } | null) {
+    return {
+      from(table: string) {
+        if (table !== "groups") {
+          throw new Error(`unexpected table ${table}`);
+        }
+        const builder: Record<string, unknown> = {};
+        for (const method of ["select", "eq"]) {
+          builder[method] = () => builder;
+        }
+        builder.maybeSingle = () => Promise.resolve({ data: row, error: null });
+        return builder;
+      },
+    } as unknown as SupabaseClient<Database>;
+  }
+
+  it("returns true when the caller created the group", async () => {
+    const repo = new SupabaseGroupInvitationRepository(createGroupsStub({ id: GROUP }));
+
+    await expect(repo.isGroupCreator(GROUP, ME)).resolves.toBe(true);
+  });
+
+  it("returns false for a missing group, the same as for a non-creator", async () => {
+    const repo = new SupabaseGroupInvitationRepository(createGroupsStub(null));
+
+    await expect(repo.isGroupCreator(GROUP, STRANGER)).resolves.toBe(false);
+  });
+});
+
+describe("SupabaseGroupInvitationRepository.listSent", () => {
+  const PENDING_INVITEE = "00000000-0000-4000-8000-000000000010";
+  const ALREADY_MEMBER_INVITEE = "00000000-0000-4000-8000-000000000011";
+
+  const SENT_ROWS = [
+    {
+      id: "aaaaaaaa-0000-4000-8000-000000000001",
+      group_id: GROUP,
+      invitee_id: PENDING_INVITEE,
+      created_at: "2026-01-01T00:00:00Z",
+      profiles: {
+        id: PENDING_INVITEE,
+        username: "pending",
+        full_name: "Pending Invitee",
+        avatar_url: null,
+      },
+    },
+    {
+      id: "aaaaaaaa-0000-4000-8000-000000000002",
+      group_id: GROUP,
+      invitee_id: ALREADY_MEMBER_INVITEE,
+      created_at: "2026-01-02T00:00:00Z",
+      profiles: {
+        id: ALREADY_MEMBER_INVITEE,
+        username: "joined",
+        full_name: "Already Joined",
+        avatar_url: null,
+      },
+    },
+  ];
+
+  function createListSentStub() {
+    const results: Record<string, unknown[]> = {
+      group_invitations: SENT_ROWS,
+      // Became a member through some other path (invite link, or an approved
+      // join request) while the invitation row is still "pending"
+      group_members: [{ user_id: ALREADY_MEMBER_INVITEE }],
+    };
+
+    return {
+      from(table: string) {
+        const builder: Record<string, unknown> = {};
+        for (const method of ["select", "eq", "in", "order"]) {
+          builder[method] = () => builder;
+        }
+        builder.then = (resolve: (value: unknown) => unknown) =>
+          Promise.resolve({ data: results[table] ?? [], error: null }).then(resolve);
+        return builder;
+      },
+    } as unknown as SupabaseClient<Database>;
+  }
+
+  it("excludes an invitee who already became a member", async () => {
+    const repo = new SupabaseGroupInvitationRepository(createListSentStub());
+
+    const results = await repo.listSent(GROUP);
+
+    expect(results.map((r) => r.invitee.id)).toEqual([PENDING_INVITEE]);
+  });
+});

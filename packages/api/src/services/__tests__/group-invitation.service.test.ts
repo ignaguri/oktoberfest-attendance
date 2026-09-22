@@ -30,6 +30,7 @@ describe("GroupInvitationService", () => {
       listIncoming: vi.fn().mockResolvedValue([]),
       listSent: vi.fn().mockResolvedValue([]),
       listInvitableUsers: vi.fn().mockResolvedValue([]),
+      isGroupCreator: vi.fn().mockResolvedValue(true),
     };
     service = new GroupInvitationService(repo);
   });
@@ -101,5 +102,29 @@ describe("GroupInvitationService", () => {
   it("passes a search straight through to the repository", async () => {
     await service.listInvitableUsers(INVITER_ID, GROUP_ID, "ana");
     expect(repo.listInvitableUsers).toHaveBeenCalledWith(INVITER_ID, GROUP_ID, "ana");
+  });
+
+  it("rejects listInvitableUsers for a non-creator", async () => {
+    vi.mocked(repo.isGroupCreator).mockResolvedValue(false);
+    await expect(service.listInvitableUsers(INVITER_ID, GROUP_ID, "ana")).rejects.toMatchObject({
+      code: ErrorCodes.NOT_GROUP_CREATOR,
+      statusCode: 403,
+    });
+    expect(repo.listInvitableUsers).not.toHaveBeenCalled();
+  });
+
+  it("passes listSent straight through to the repository for the creator", async () => {
+    await service.listSent(GROUP_ID, INVITER_ID);
+    expect(repo.isGroupCreator).toHaveBeenCalledWith(GROUP_ID, INVITER_ID);
+    expect(repo.listSent).toHaveBeenCalledWith(GROUP_ID);
+  });
+
+  it("rejects listSent for a non-creator, the same as for a missing group", async () => {
+    vi.mocked(repo.isGroupCreator).mockResolvedValue(false);
+    await expect(service.listSent(GROUP_ID, INVITEE_ID)).rejects.toMatchObject({
+      code: ErrorCodes.NOT_GROUP_CREATOR,
+      statusCode: 403,
+    });
+    expect(repo.listSent).not.toHaveBeenCalled();
   });
 });

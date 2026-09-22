@@ -36,16 +36,39 @@ export function SentInvitationsSection({ groupId, showDialog }: SentInvitationsS
 
   const invitations = (data as SentGroupInvitation[] | undefined) ?? [];
 
+  // Coded API errors set `error.code` to the error code itself, so a specific
+  // message (e.g. the invitation is no longer available) can be shown instead
+  // of the generic fallback. i18next returns the key when it is missing,
+  // which is how we detect an unmapped code without a defaultValue.
+  const translateApiError = useCallback(
+    (error: unknown, fallbackKey: string): string => {
+      const code = (error as { code?: string })?.code;
+      if (code) {
+        const key = `apiErrors.${code}`;
+        const translated = t(key);
+        if (translated !== key) {
+          return translated;
+        }
+      }
+      return t(fallbackKey);
+    },
+    [t],
+  );
+
   const handleCancel = useCallback(
     async (invitation: SentGroupInvitation) => {
       try {
         await cancel.mutateAsync(invitation.id);
       } catch (error) {
         logger.error("Failed to withdraw group invitation:", error);
-        showDialog(t("common.status.error"), t("groups.invitations.cancelFailed"), "destructive");
+        showDialog(
+          t("common.status.error"),
+          translateApiError(error, "groups.invitations.cancelFailed"),
+          "destructive",
+        );
       }
     },
-    [cancel, showDialog, t],
+    [cancel, showDialog, t, translateApiError],
   );
 
   if (invitations.length === 0) {

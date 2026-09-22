@@ -15,7 +15,7 @@ import {
   useInviteToGroup,
   useSentGroupInvitations,
 } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@/lib/i18n/client";
+import { translateError, useTranslation } from "@/lib/i18n/client";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
@@ -49,19 +49,35 @@ export function InviteMembers({ groupId, groupName }: { groupId: string; groupNa
 
   const sentInvitations = (sent as SentGroupInvitation[] | undefined) ?? [];
 
+  // Coded API errors set `error.code` to the error code itself, so a specific
+  // message (e.g. that person already has a pending invitation) can be shown
+  // instead of the generic fallback. i18next returns the key when it is
+  // missing, which is how we detect an unmapped code without a defaultValue.
+  const getErrorMessage = (error: unknown, fallbackKey: string): string => {
+    const code = (error as { code?: string })?.code;
+    if (code) {
+      const key = `apiErrors.${code}`;
+      const translated = translateError(t, code);
+      if (translated !== key) {
+        return translated;
+      }
+    }
+    return t(fallbackKey);
+  };
+
   const handleInvite = async (userId: string) => {
     try {
       await invite.mutateAsync(userId);
-    } catch {
-      toast.error(t("groups.invitations.inviteFailed"));
+    } catch (error) {
+      toast.error(getErrorMessage(error, "groups.invitations.inviteFailed"));
     }
   };
 
   const handleCancel = async (invitationId: string) => {
     try {
       await cancel.mutateAsync(invitationId);
-    } catch {
-      toast.error(t("groups.invitations.cancelFailed"));
+    } catch (error) {
+      toast.error(getErrorMessage(error, "groups.invitations.cancelFailed"));
     }
   };
 

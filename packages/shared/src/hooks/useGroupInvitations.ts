@@ -83,6 +83,12 @@ export function useInviteToGroup(groupId: string) {
         invalidateQueries(QueryKeys.invitableUsersAll(groupId));
         invalidateQueries(QueryKeys.groupInvitationsSent(groupId));
       },
+      onError: () => {
+        // A 409 (already pending, already a member, a join request pending)
+        // means the cached row's invitationStatus is already stale. Without
+        // this the button keeps showing "Invite" and every retry 409s again.
+        invalidateQueries(QueryKeys.invitableUsersAll(groupId));
+      },
     },
   );
 }
@@ -146,6 +152,12 @@ export function useCancelGroupInvitation(groupId: string) {
     },
     {
       onSuccess: () => {
+        invalidateQueries(QueryKeys.invitableUsersAll(groupId));
+        invalidateQueries(QueryKeys.groupInvitationsSent(groupId));
+      },
+      onError: () => {
+        // A stale row (e.g. the invitee already answered) still shows a
+        // "Withdraw" button that would just 409 again without this.
         invalidateQueries(QueryKeys.invitableUsersAll(groupId));
         invalidateQueries(QueryKeys.groupInvitationsSent(groupId));
       },

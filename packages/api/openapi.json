@@ -4352,6 +4352,7 @@
           "groups"
         ],
         "summary": "List pending invitations you sent for a group",
+        "description": "Creator only.",
         "security": [
           {
             "bearerAuth": []

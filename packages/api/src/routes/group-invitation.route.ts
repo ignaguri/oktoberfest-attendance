@@ -241,6 +241,7 @@ const sentRoute = createRoute({
   path: "/groups/{id}/invitations",
   tags: ["groups"],
   summary: "List pending invitations you sent for a group",
+  description: "Creator only.",
   request: { params: GroupIdParamSchema },
   responses: {
     200: {
@@ -253,8 +254,9 @@ const sentRoute = createRoute({
 });
 
 app.openapi(sentRoute, async (c) => {
+  const user = c.var.user;
   const { id } = c.req.valid("param");
-  const data = await service(c.var.supabase).listSent(id);
+  const data = await service(c.var.supabase).listSent(id, user.id);
   return c.json({ data }, 200);
 });
 

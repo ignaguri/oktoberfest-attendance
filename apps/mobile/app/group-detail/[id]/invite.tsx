@@ -187,20 +187,47 @@ function InviteResultItem({
 
   const displayName = user.fullName || user.username || "";
 
+  // Coded API errors set `error.code` to the error code itself, so a specific
+  // message (e.g. that person already has a pending invitation) can be shown
+  // instead of the generic fallback. i18next returns the key when it is
+  // missing, which is how we detect an unmapped code without a defaultValue.
+  const translateApiError = useCallback(
+    (error: unknown, fallbackKey: string): string => {
+      const code = (error as { code?: string })?.code;
+      if (code) {
+        const key = `apiErrors.${code}`;
+        const translated = t(key);
+        if (translated !== key) {
+          return translated;
+        }
+      }
+      return t(fallbackKey);
+    },
+    [t],
+  );
+
   const handleInvite = useCallback(() => {
-    invite.mutate(user.id).catch(() => {
-      showDialog(t("common.status.error"), t("groups.invitations.inviteFailed"), "destructive");
+    invite.mutate(user.id).catch((error) => {
+      showDialog(
+        t("common.status.error"),
+        translateApiError(error, "groups.invitations.inviteFailed"),
+        "destructive",
+      );
     });
-  }, [invite, user.id, showDialog, t]);
+  }, [invite, user.id, showDialog, t, translateApiError]);
 
   const handleCancel = useCallback(() => {
     if (!user.invitationId) {
       return;
     }
-    cancel.mutate(user.invitationId).catch(() => {
-      showDialog(t("common.status.error"), t("groups.invitations.cancelFailed"), "destructive");
+    cancel.mutate(user.invitationId).catch((error) => {
+      showDialog(
+        t("common.status.error"),
+        translateApiError(error, "groups.invitations.cancelFailed"),
+        "destructive",
+      );
     });
-  }, [cancel, user.invitationId, showDialog, t]);
+  }, [cancel, user.invitationId, showDialog, t, translateApiError]);
 
   // Approving a join request needs the request card's context, which lives on
   // the settings screen. Dismiss back down to it rather than pushing a copy.
@@ -236,7 +263,7 @@ function InviteResultItem({
           action="primary"
           size="sm"
           onPress={handleInvite}
-          disabled={busy}
+          isDisabled={busy}
           accessibilityLabel={t("groups.invitations.invite")}
           accessibilityHint={t("groups.invitations.inviteHint", { name: displayName })}
         >
@@ -248,13 +275,13 @@ function InviteResultItem({
         </Button>
       )}
 
-      {user.invitationStatus === "invited" && (
+      {user.invitationStatus === "invited" && user.invitationId && (
         <Button
           variant="outline"
           action="secondary"
           size="sm"
           onPress={handleCancel}
-          disabled={busy}
+          isDisabled={busy}
           accessibilityLabel={t("groups.invitations.cancelInvite")}
           accessibilityHint={t("groups.invitations.cancelInviteHint", { name: displayName })}
         >

@@ -85,15 +85,28 @@ export class GroupInvitationService {
     return await this.repo.listIncoming();
   }
 
-  async listSent(groupId: string): Promise<SentGroupInvitation[]> {
+  /** Creator only. A missing group answers the same as a non-creator, so
+   * existence cannot be probed. */
+  async listSent(groupId: string, userId: string): Promise<SentGroupInvitation[]> {
+    await this.assertCreator(groupId, userId);
     return await this.repo.listSent(groupId);
   }
 
+  /** Creator only. A missing group answers the same as a non-creator, so
+   * existence cannot be probed. */
   async listInvitableUsers(
     userId: string,
     groupId: string,
     query: string,
   ): Promise<InvitableUser[]> {
+    await this.assertCreator(groupId, userId);
     return await this.repo.listInvitableUsers(userId, groupId, query);
+  }
+
+  private async assertCreator(groupId: string, userId: string): Promise<void> {
+    const isCreator = await this.repo.isGroupCreator(groupId, userId);
+    if (!isCreator) {
+      throw new ForbiddenError(ErrorCodes.NOT_GROUP_CREATOR);
+    }
   }
 }

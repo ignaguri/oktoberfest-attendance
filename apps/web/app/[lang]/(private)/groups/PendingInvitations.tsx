@@ -1,5 +1,6 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
 import type { GroupInvitation } from "@prostcounter/shared/schemas";
 import { Check, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,11 +14,12 @@ import {
   useDeclineGroupInvitation,
   useIncomingGroupInvitations,
 } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@/lib/i18n/client";
+import { translateError, useTranslation } from "@/lib/i18n/client";
 
 export default function PendingInvitations() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { currentFestival, festivals } = useFestival();
   const { data } = useIncomingGroupInvitations();
   const accept = useAcceptGroupInvitation();
   const decline = useDeclineGroupInvitation();
@@ -28,21 +30,37 @@ export default function PendingInvitations() {
     return null;
   }
 
+  // Coded API errors set `error.code` to the error code itself, so a specific
+  // message (e.g. the invitation was already answered) can be shown instead of
+  // the generic fallback. i18next returns the key when it is missing, which is
+  // how we detect an unmapped code without a defaultValue.
+  const getErrorMessage = (error: unknown, fallbackKey: string): string => {
+    const code = (error as { code?: string })?.code;
+    if (code) {
+      const key = `apiErrors.${code}`;
+      const translated = translateError(t, code);
+      if (translated !== key) {
+        return translated;
+      }
+    }
+    return t(fallbackKey);
+  };
+
   const handleAccept = async (invitationId: string) => {
     try {
       await accept.mutateAsync(invitationId);
       // The groups list comes from server props
       router.refresh();
-    } catch {
-      toast.error(t("groups.invitations.acceptFailed"));
+    } catch (error) {
+      toast.error(getErrorMessage(error, "groups.invitations.acceptFailed"));
     }
   };
 
   const handleDecline = async (invitationId: string) => {
     try {
       await decline.mutateAsync(invitationId);
-    } catch {
-      toast.error(t("groups.invitations.declineFailed"));
+    } catch (error) {
+      toast.error(getErrorMessage(error, "groups.invitations.declineFailed"));
     }
   };
 
@@ -58,6 +76,13 @@ export default function PendingInvitations() {
           {invitations.map((invitation) => {
             const { inviter } = invitation;
             const inviterName = inviter.fullName || inviter.username || "";
+            // Groups lists are festival-scoped, so an invitation for a group
+            // outside the active festival needs a label: accepting it joins a
+            // group that then shows up nowhere in the app otherwise.
+            const otherFestival =
+              invitation.festivalId !== currentFestival?.id
+                ? festivals.find((festival) => festival.id === invitation.festivalId)
+                : undefined;
 
             return (
               <Card key={invitation.id} className="py-0">
@@ -72,12 +97,19 @@ export default function PendingInvitations() {
                       email: inviter.username || "user",
                     }}
                   />
-                  <p className="min-w-0 flex-1 truncate font-medium">
-                    {t("groups.invitations.invitedYou", {
-                      inviterName,
-                      groupName: invitation.groupName,
-                    })}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium">
+                      {t("groups.invitations.invitedYou", {
+                        inviterName,
+                        groupName: invitation.groupName,
+                      })}
+                    </p>
+                    {otherFestival && (
+                      <p className="truncate text-sm text-gray-500">
+                        {t("groups.carryOver.fromFestival", { festival: otherFestival.name })}
+                      </p>
+                    )}
+                  </div>
                   <div className="flex gap-2">
                     <Button
                       variant="yellow"

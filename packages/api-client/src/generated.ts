@@ -2714,7 +2714,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List pending invitations you sent for a group */
+        /**
+         * List pending invitations you sent for a group
+         * @description Creator only.
+         */
         get: {
             parameters: {
                 query?: never;

@@ -148,18 +148,40 @@ export class SupabaseGroupInvitationRepository implements IGroupInvitationReposi
     }
 
     const rows = (data ?? []) as unknown as SentRow[];
+    if (rows.length === 0) {
+      return [];
+    }
 
-    return rows.map((row) => ({
-      id: row.id,
-      groupId: row.group_id,
-      createdAt: row.created_at,
-      invitee: {
-        id: row.profiles?.id ?? row.invitee_id,
-        username: row.profiles?.username ?? null,
-        fullName: row.profiles?.full_name ?? null,
-        avatarUrl: row.profiles?.avatar_url ?? null,
-      },
-    }));
+    // An invitee who already became a member (invite link, or an approved join
+    // request) has nothing left to answer, mirroring list_my_group_invitations()'s
+    // exclusion on the invitee's side. The invitation row itself stays "pending"
+    // in that case, since nothing here marks it answered.
+    const inviteeIds = rows.map((row) => row.invitee_id);
+    const { data: members, error: membersError } = await this.supabase
+      .from("group_members")
+      .select("user_id")
+      .eq("group_id", groupId)
+      .in("user_id", inviteeIds);
+
+    if (membersError) {
+      throw new DatabaseError(`Failed to list group members: ${membersError.message}`);
+    }
+
+    const memberIds = new Set((members ?? []).map((m) => m.user_id));
+
+    return rows
+      .filter((row) => !memberIds.has(row.invitee_id))
+      .map((row) => ({
+        id: row.id,
+        groupId: row.group_id,
+        createdAt: row.created_at,
+        invitee: {
+          id: row.profiles?.id ?? row.invitee_id,
+          username: row.profiles?.username ?? null,
+          fullName: row.profiles?.full_name ?? null,
+          avatarUrl: row.profiles?.avatar_url ?? null,
+        },
+      }));
   }
 
   async listInvitableUsers(
@@ -257,5 +279,22 @@ export class SupabaseGroupInvitationRepository implements IGroupInvitationReposi
         invitationId: null,
       };
     });
+  }
+
+  async isGroupCreator(groupId: string, userId: string): Promise<boolean> {
+    // Filtered on both id and created_by, so a missing group and a group owned
+    // by someone else both come back empty: the caller can't tell them apart.
+    const { data, error } = await this.supabase
+      .from("groups")
+      .select("id")
+      .eq("id", groupId)
+      .eq("created_by", userId)
+      .maybeSingle();
+
+    if (error) {
+      throw new DatabaseError(`Failed to verify group creator: ${error.message}`);
+    }
+
+    return data !== null;
   }
 }

@@ -393,4 +393,49 @@ describe("group invitations (integration)", () => {
     const sentBody = (await sent.json()) as { data: unknown[] };
     expect(sentBody.data).toHaveLength(0);
   });
+
+  it("only lets the creator list sent invitations or search invitable users", async () => {
+    const { app, outsider, groupId } = await setup();
+
+    const sent = await call(app, outsider, "GET", `/groups/${groupId}/invitations`);
+    expect(sent.status).toBe(403);
+    expect(await errorCode(sent)).toBe("NOT_GROUP_CREATOR");
+
+    const invitable = await call(app, outsider, "GET", `/groups/${groupId}/invitable-users?q=a`);
+    expect(invitable.status).toBe(403);
+    expect(await errorCode(invitable)).toBe("NOT_GROUP_CREATOR");
+  });
+
+  it("gives the same error for a missing group as for a non-creator, on both endpoints", async () => {
+    const { app, outsider } = await setup();
+    const missingGroupId = randomUUID();
+
+    const sent = await call(app, outsider, "GET", `/groups/${missingGroupId}/invitations`);
+    expect(sent.status).toBe(403);
+    expect(await errorCode(sent)).toBe("NOT_GROUP_CREATOR");
+
+    const invitable = await call(
+      app,
+      outsider,
+      "GET",
+      `/groups/${missingGroupId}/invitable-users?q=a`,
+    );
+    expect(invitable.status).toBe(403);
+    expect(await errorCode(invitable)).toBe("NOT_GROUP_CREATOR");
+  });
+
+  it("drops an invitee from the sent list once they became a member some other way", async () => {
+    // Mirrors "reports a person as a member" above, but for the creator's own
+    // sent list: it must not keep showing "invitation sent" for someone who
+    // is now listed as a member right below it.
+    const { app, creator, invitee, groupId } = await setup();
+    await call(app, creator, "POST", `/groups/${groupId}/invitations`, { inviteeId: invitee.id });
+
+    await admin.from("group_members").insert({ group_id: groupId, user_id: invitee.id });
+
+    const sent = await call(app, creator, "GET", `/groups/${groupId}/invitations`);
+    expect(sent.status).toBe(200);
+    const sentBody = (await sent.json()) as { data: Array<{ invitee: { id: string } }> };
+    expect(sentBody.data.find((row) => row.invitee.id === invitee.id)).toBeUndefined();
+  });
 });

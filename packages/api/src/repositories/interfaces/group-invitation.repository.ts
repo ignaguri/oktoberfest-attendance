@@ -36,4 +36,7 @@ export interface IGroupInvitationRepository {
     groupId: string,
     query: string,
   ): Promise<InvitableUser[]>;
+
+  /** Whether userId created groupId. False for a missing group too. */
+  isGroupCreator(groupId: string, userId: string): Promise<boolean>;
 }
