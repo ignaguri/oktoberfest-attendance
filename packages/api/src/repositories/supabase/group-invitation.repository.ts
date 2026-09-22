@@ -11,7 +11,7 @@ const SEARCH_LIMIT = 20;
 
 /**
  * Days invite_to_group refuses a re-invite after a decline. Must match the
- * interval in 20260922120000_group_invitations.sql: the search list reports the
+ * interval in 20260922193312_group_invitations.sql: the search list reports the
  * same status for a person inside this window as for one with a live
  * invitation, so the creator is never offered a button that is going to fail.
  */
