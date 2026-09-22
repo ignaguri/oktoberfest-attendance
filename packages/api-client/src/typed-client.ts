@@ -1683,6 +1683,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         groupNotificationsEnabled: boolean | null;
         dailyReminderEnabled: boolean | null;
         friendPlansEnabled: boolean | null;
+        dayStartEnabled: boolean | null;
         createdAt: string;
         updatedAt: string | null;
       } | null> {
@@ -1705,6 +1706,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         groupNotificationsEnabled?: boolean;
         dailyReminderEnabled?: boolean;
         friendPlansEnabled?: boolean;
+        dayStartEnabled?: boolean;
       }): Promise<{ success: boolean }> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("PUT", `${baseUrl}/v1/notifications/preferences`, {
