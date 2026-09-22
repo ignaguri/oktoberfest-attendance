@@ -7,12 +7,19 @@ import {
   NOTIFICATION_PUSH_TYPES,
   NOTIFICATION_WORKFLOWS,
 } from "@prostcounter/shared/constants";
-import { createGetAvatarUrl, runNovuWriteTolerantly } from "@prostcounter/shared/utils";
+import {
+  createGetAvatarUrl,
+  formatDateForDatabase,
+  runNovuWriteTolerantly,
+} from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
+import { SupabaseAttendanceRepository } from "../repositories/supabase/attendance.repository";
 import { createAdminClient } from "../utils/admin-client";
 import { buildOverlapBody, formatOverlapDayLabel } from "./plan-overlap-copy";
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
@@ -1091,6 +1098,33 @@ export class NotificationService {
     }
 
     try {
+      // Both clients let a user backfill a past date. Claiming the ledger for
+      // anything older than yesterday would announce a day that isn't
+      // starting, so bound the claim to today-or-yesterday in the festival's
+      // own timezone rather than the server's. Yesterday (not just today) is
+      // deliberate: a visit near midnight festival-time can have its
+      // offline-queue push land after the server has already rolled to the
+      // next day.
+      const attendanceRepo = new SupabaseAttendanceRepository(this.supabase);
+      const timezone = await attendanceRepo.getFestivalTimezone(input.festivalId);
+      const now = new Date();
+      const todayInTz = formatDateForDatabase(now, timezone);
+      const yesterdayInTz = formatDateForDatabase(new Date(now.getTime() - ONE_DAY_MS), timezone);
+
+      if (input.date !== todayInTz && input.date !== yesterdayInTz) {
+        logger.warn(
+          {
+            actorId: input.actorId,
+            festivalId: input.festivalId,
+            date: input.date,
+            todayInTz,
+            yesterdayInTz,
+          },
+          "Day-start date outside today/yesterday window; skipping claim",
+        );
+        return false;
+      }
+
       const { data: claimed, error: claimError } = await adminClient
         .from("day_start_notifications")
         .upsert(
@@ -1163,8 +1197,11 @@ export class NotificationService {
       );
 
       // allSettled hides rejections, so surface them: a trigger that fails
-      // here is otherwise indistinguishable from one that was never sent, and
-      // the ledger row is already claimed, so there is no fallback path left.
+      // here is otherwise indistinguishable from one that was never sent. The
+      // ledger row stays claimed regardless (this actor's day-start is used
+      // up either way), but the caller reads the return value to decide
+      // whether to fall back to the ordinary check-in push, so it must be
+      // false unless at least one trigger actually went out.
       const failures = results.filter((result) => result.status === "rejected");
       if (failures.length > 0) {
         logger.error(
@@ -1177,7 +1214,7 @@ export class NotificationService {
         );
       }
 
-      return true;
+      return failures.length < results.length;
     } catch (error) {
       logger.error({ error }, "Error sending day-start notifications");
       return false;
@@ -1240,10 +1277,7 @@ export class NotificationService {
 
       const authorName = author.username || author.full_name || "Someone";
       const authorAvatar = resolveAvatarUrl(author.avatar_url);
-      const groupByRecipient = await this.resolveFirstSharedGroup(
-        input.authorId,
-        input.festivalId,
-      );
+      const groupByRecipient = await this.resolveFirstSharedGroup(input.authorId, input.festivalId);
 
       const results = await Promise.allSettled(
         toNotify.map((recipientId) => {
@@ -1419,7 +1453,19 @@ export class NotificationService {
         });
       });
 
-      await Promise.allSettled(notificationPromises);
+      const results = await Promise.allSettled(notificationPromises);
+
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((failure) => String((failure as PromiseRejectedResult).reason)),
+          },
+          "Some tent checkin notifications failed to send",
+        );
+      }
     } catch (error) {
       logger.error({ error }, "Error sending tent checkin notifications");
     }

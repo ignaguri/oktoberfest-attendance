@@ -13,6 +13,7 @@ import {
 import { createTestApp } from "../../__tests__/helpers/test-server";
 import { authMiddleware } from "../../middleware/auth";
 import attendanceRoutes from "../attendance.route";
+import consumptionRoutes from "../consumption.route";
 
 // Stub the service so nothing reaches Novu and the calls are observable.
 const { notifyDayStartMock, notifyTentCheckinMock } = vi.hoisted(() => ({
@@ -43,6 +44,13 @@ function mountRoutes() {
   const app = createTestApp();
   app.use("*", authMiddleware);
   app.route("/", attendanceRoutes);
+  return app;
+}
+
+function mountConsumptionRoutes() {
+  const app = createTestApp();
+  app.use("*", authMiddleware);
+  app.route("/", consumptionRoutes);
   return app;
 }
 
@@ -382,5 +390,60 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
     expect(notifyDayStartMock).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "checkin", date: "2024-09-21" }),
     );
+  });
+
+  // Fix-wave item 4.3: the plan's enumeration of hook points missed the plain
+  // create/update endpoint entirely. Deleting the announceCheckIn call from
+  // the POST /attendance handler would pass every other test in this suite.
+  it("POST /attendance announces day start on first attendance with tents", async () => {
+    const app = mountRoutes();
+    const user = await createTestUser();
+    const festivalId = await createTestFestival();
+    const tentId = await anyTentId();
+    await putUserInGroup(user.id, festivalId);
+
+    const response = await app.request("/attendance", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        festivalId,
+        date: "2024-09-21",
+        tents: [tentId],
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+    expect(notifyDayStartMock).toHaveBeenCalledWith(expect.objectContaining({ kind: "checkin" }));
+  });
+
+  // Fix-wave item 4.3: POST /consumption calls notifyDayStart directly
+  // (not through announceCheckIn) and had no coverage at all. Deleting the
+  // notifyDayStart block from consumption.route.ts would pass every other
+  // test in the suite.
+  it("POST /consumption announces day start on first drink", async () => {
+    const app = mountConsumptionRoutes();
+    const user = await createTestUser();
+    const festivalId = await createTestFestival();
+
+    const response = await app.request("/consumption", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        festivalId,
+        date: "2024-09-21",
+        drinkType: "beer",
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+    expect(notifyDayStartMock).toHaveBeenCalledWith(expect.objectContaining({ kind: "drink" }));
   });
 });
