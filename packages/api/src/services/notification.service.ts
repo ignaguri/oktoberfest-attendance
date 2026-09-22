@@ -1148,9 +1148,12 @@ export class NotificationService {
         { p_actor_id: input.actorId, p_festival_id: input.festivalId },
       );
 
+      // The ledger row is already claimed, so this day-start is spent either
+      // way. Report failure so the caller still falls back to its ordinary
+      // notification rather than staying silent on our behalf.
       if (recipientsError) {
         logger.error({ error: recipientsError }, "Error resolving day-start recipients");
-        return true;
+        return false;
       }
 
       const recipients = (recipientIds ?? []) as string[];
@@ -1175,7 +1178,7 @@ export class NotificationService {
 
       if (actorError || !actor) {
         logger.error({ error: actorError }, "Error fetching actor for day-start notification");
-        return true;
+        return false;
       }
 
       const actorName = actor.username || actor.full_name || "Someone";

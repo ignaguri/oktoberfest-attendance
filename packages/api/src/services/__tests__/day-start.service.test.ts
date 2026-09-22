@@ -61,7 +61,7 @@ function mockAdminClient(options: { claimed: boolean; recipients: string[]; pref
  * request-scoped client (profiles for the actor name, festivals for the
  * recency check). Table-aware so one mock can serve both queries.
  */
-function mockRequestScopedSupabase(options?: { timezone?: string }) {
+function mockRequestScopedSupabase(options?: { timezone?: string; profileError?: boolean }) {
   const timezone = options?.timezone ?? "UTC";
   return {
     from: vi.fn((table: string) => {
@@ -77,10 +77,14 @@ function mockRequestScopedSupabase(options?: { timezone?: string }) {
       return {
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({
-              data: { username: "nacho", full_name: "Nacho", avatar_url: null },
-              error: null,
-            }),
+            single: vi.fn().mockResolvedValue(
+              options?.profileError
+                ? { data: null, error: new Error("profile read failed") }
+                : {
+                    data: { username: "nacho", full_name: "Nacho", avatar_url: null },
+                    error: null,
+                  },
+            ),
           }),
         }),
       };
@@ -291,5 +295,44 @@ describe("NotificationService.notifyDayStart", () => {
 
     expect(claimed).toBe(true);
     expect(triggerMock).toHaveBeenCalledTimes(2);
+  });
+
+  // Every bail-out after the claim has the same shape: the ledger row is
+  // spent, nothing was pushed, so the caller has to hear `false` and run its
+  // ordinary notification. Reporting `true` here would silence the day
+  // entirely.
+  it("reports false when the recipient lookup fails", async () => {
+    const client = mockAdminClient({ claimed: true, recipients: [], prefs: [] });
+    client.rpc.mockResolvedValue({ data: null, error: new Error("rpc exploded") });
+
+    const claimed = await service.notifyDayStart({
+      actorId: ACTOR_ID,
+      festivalId: FESTIVAL_ID,
+      date: DATE,
+      kind: "checkin",
+      tentName: null,
+    });
+
+    expect(claimed).toBe(false);
+    expect(triggerMock).not.toHaveBeenCalled();
+  });
+
+  it("reports false when the actor profile cannot be read", async () => {
+    service = new NotificationService(
+      mockRequestScopedSupabase({ profileError: true }),
+      "test-novu-key",
+    );
+    mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
+
+    const claimed = await service.notifyDayStart({
+      actorId: ACTOR_ID,
+      festivalId: FESTIVAL_ID,
+      date: DATE,
+      kind: "checkin",
+      tentName: null,
+    });
+
+    expect(claimed).toBe(false);
+    expect(triggerMock).not.toHaveBeenCalled();
   });
 });
