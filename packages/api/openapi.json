@@ -13832,6 +13832,306 @@
         }
       }
     },
+    "/v1/profiles/{userId}/detail": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Get the full profile page payload for a user",
+        "description": "Returns identity, festival stats, shared group names, favourite tent and attendance history. History and favourite tent are visible only to a friend or a group mate; RLS returns them empty to anyone else.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "festivalId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile detail retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profile": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "username": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "fullName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "avatarUrl": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "stats": {
+                          "type": "object",
+                          "nullable": true,
+                          "properties": {
+                            "daysAttended": {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "totalBeers": {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "avgBeers": {
+                              "type": "number",
+                              "minimum": 0
+                            }
+                          },
+                          "required": [
+                            "daysAttended",
+                            "totalBeers",
+                            "avgBeers"
+                          ]
+                        },
+                        "friendshipStatus": {
+                          "type": "string",
+                          "nullable": true,
+                          "enum": [
+                            "friends",
+                            "pending_sent",
+                            "pending_received",
+                            "none",
+                            "self",
+                            null
+                          ]
+                        },
+                        "friendsSince": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "sharedGroups": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ]
+                          }
+                        },
+                        "favouriteTent": {
+                          "type": "object",
+                          "nullable": true,
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "visits": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": [
+                            "name",
+                            "visits"
+                          ]
+                        },
+                        "history": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "festivalId": {
+                                "type": "string",
+                                "format": "uuid"
+                              },
+                              "festivalName": {
+                                "type": "string"
+                              },
+                              "daysAttended": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "totalBeers": {
+                                "type": "integer",
+                                "minimum": 0
+                              },
+                              "avgBeers": {
+                                "type": "number",
+                                "minimum": 0
+                              }
+                            },
+                            "required": [
+                              "festivalId",
+                              "festivalName",
+                              "daysAttended",
+                              "totalBeers",
+                              "avgBeers"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "username",
+                        "fullName",
+                        "avatarUrl",
+                        "stats",
+                        "friendshipStatus",
+                        "friendsSince",
+                        "sharedGroups",
+                        "favouriteTent",
+                        "history"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/profiles/{userId}/festivals/{festivalId}/days": {
+      "get": {
+        "tags": [
+          "profile"
+        ],
+        "summary": "Get a user's day-by-day breakdown for one festival",
+        "description": "Returns one row per day attended, with drink count and tents. Empty for a viewer who is neither a friend nor a group mate.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Days retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string"
+                          },
+                          "totalDrinks": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "tents": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "required": [
+                          "date",
+                          "totalDrinks",
+                          "tents"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "days"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/profile/tutorial": {
       "get": {
         "tags": [

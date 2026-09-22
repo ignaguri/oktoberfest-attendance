@@ -7,6 +7,9 @@ import {
   GetAvatarUploadUrlResponseSchema,
   GetHighlightsResponseSchema,
   GetMissingProfileFieldsResponseSchema,
+  GetProfileDaysResponseSchema,
+  GetProfileDetailQuerySchema,
+  GetProfileDetailResponseSchema,
   GetProfileShortResponseSchema,
   GetPublicProfileQuerySchema,
   GetPublicProfileResponseSchema,
@@ -119,6 +122,89 @@ app.openapi(getPublicProfileRoute, async (c) => {
   } catch {
     throw new NotFoundError("User not found");
   }
+});
+
+// GET /profiles/:userId/detail - Full profile page payload
+const getProfileDetailRoute = createRoute({
+  method: "get",
+  path: "/profiles/{userId}/detail",
+  tags: ["profile"],
+  summary: "Get the full profile page payload for a user",
+  description:
+    "Returns identity, festival stats, shared group names, favourite tent and attendance history. History and favourite tent are visible only to a friend or a group mate; RLS returns them empty to anyone else.",
+  request: {
+    params: z.object({
+      userId: z.string().uuid({ message: "Invalid user ID" }),
+    }),
+    query: GetProfileDetailQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Profile detail retrieved successfully",
+      content: { "application/json": { schema: GetProfileDetailResponseSchema } },
+    },
+    401: {
+      description: "Unauthorized",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+    404: {
+      description: "User not found",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getProfileDetailRoute, async (c) => {
+  const { supabase, user } = c.var;
+  const { userId } = c.req.valid("param");
+  const { festivalId } = c.req.valid("query");
+
+  const profileRepo = new SupabaseProfileRepository(supabase);
+
+  try {
+    const profile = await profileRepo.getProfileDetail(userId, festivalId, user?.id);
+    return c.json({ profile }, 200);
+  } catch {
+    throw new NotFoundError("User not found");
+  }
+});
+
+// GET /profiles/:userId/festivals/:festivalId/days - Lazy day breakdown
+const getProfileDaysRoute = createRoute({
+  method: "get",
+  path: "/profiles/{userId}/festivals/{festivalId}/days",
+  tags: ["profile"],
+  summary: "Get a user's day-by-day breakdown for one festival",
+  description:
+    "Returns one row per day attended, with drink count and tents. Empty for a viewer who is neither a friend nor a group mate.",
+  request: {
+    params: z.object({
+      userId: z.string().uuid({ message: "Invalid user ID" }),
+      festivalId: z.string().uuid({ message: "Invalid festival ID" }),
+    }),
+  },
+  responses: {
+    200: {
+      description: "Days retrieved successfully",
+      content: { "application/json": { schema: GetProfileDaysResponseSchema } },
+    },
+    401: {
+      description: "Unauthorized",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(getProfileDaysRoute, async (c) => {
+  const { supabase } = c.var;
+  const { userId, festivalId } = c.req.valid("param");
+
+  const profileRepo = new SupabaseProfileRepository(supabase);
+  const days = await profileRepo.listProfileDays(userId, festivalId);
+
+  return c.json({ days }, 200);
 });
 
 // PUT /profile - Update current user's profile
