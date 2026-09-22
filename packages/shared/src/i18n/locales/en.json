@@ -372,6 +372,7 @@
       "invitePeopleHint": "Opens a search to invite someone to this group",
       "searchTitle": "Invite to {{groupName}}",
       "searchPlaceholder": "Search by name or username",
+      "searchHint": "Results update as you type",
       "noResults": "Nobody found",
       "invite": "Invite",
       "inviteHint": "Sends {{name}} an invitation to this group",

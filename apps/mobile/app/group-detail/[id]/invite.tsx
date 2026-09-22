@@ -10,8 +10,18 @@ import { Search } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FlatList } from "react-native";
 
+import {
+  AlertDialog,
+  AlertDialogBackdrop,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  useAlertDialog,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -22,10 +32,13 @@ import { getAvatarUrl } from "@/lib/utils";
 
 const SEARCH_DEBOUNCE_MS = 300;
 
+type ShowDialog = ReturnType<typeof useAlertDialog>["showDialog"];
+
 export default function GroupInviteScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const groupId = id ?? "";
+  const { dialog, showDialog, closeDialog } = useAlertDialog();
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -52,8 +65,10 @@ export default function GroupInviteScreen() {
   }, [results]);
 
   const renderItem = useCallback(
-    ({ item }: { item: InvitableUser }) => <InviteResultItem user={item} groupId={groupId} />,
-    [groupId],
+    ({ item }: { item: InvitableUser }) => (
+      <InviteResultItem user={item} groupId={groupId} showDialog={showDialog} />
+    ),
+    [groupId, showDialog],
   );
 
   const keyExtractor = useCallback((item: InvitableUser) => item.id, []);
@@ -76,6 +91,7 @@ export default function GroupInviteScreen() {
             autoCorrect={false}
             returnKeyType="search"
             accessibilityLabel={t("groups.invitations.searchPlaceholder")}
+            accessibilityHint={t("groups.invitations.searchHint")}
           />
         </Input>
       </VStack>
@@ -100,11 +116,70 @@ export default function GroupInviteScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       />
+
+      <AlertDialog isOpen={dialog.isOpen} onClose={closeDialog} size="md">
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <Heading
+              size="lg"
+              className={dialog.type === "destructive" ? "text-error-600" : "text-typography-950"}
+            >
+              {dialog.title}
+            </Heading>
+          </AlertDialogHeader>
+          <AlertDialogBody className="mb-4 mt-3">
+            <Text size="sm" className="text-typography-500">
+              {dialog.message}
+            </Text>
+          </AlertDialogBody>
+          <AlertDialogFooter className="gap-3">
+            {dialog.onConfirm ? (
+              <>
+                <Button
+                  variant="outline"
+                  action="secondary"
+                  onPress={closeDialog}
+                  className="flex-1"
+                >
+                  <ButtonText>{t("common.buttons.cancel")}</ButtonText>
+                </Button>
+                <Button
+                  action={dialog.type === "destructive" ? "negative" : "primary"}
+                  onPress={() => {
+                    dialog.onConfirm?.();
+                    closeDialog();
+                  }}
+                  className="flex-1"
+                >
+                  <ButtonText>
+                    {dialog.type === "destructive"
+                      ? t("common.buttons.confirm")
+                      : t("common.buttons.ok")}
+                  </ButtonText>
+                </Button>
+              </>
+            ) : (
+              <Button action="primary" onPress={closeDialog} className="flex-1">
+                <ButtonText>{t("common.buttons.ok")}</ButtonText>
+              </Button>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </VStack>
   );
 }
 
-function InviteResultItem({ user, groupId }: { user: InvitableUser; groupId: string }) {
+function InviteResultItem({
+  user,
+  groupId,
+  showDialog,
+}: {
+  user: InvitableUser;
+  groupId: string;
+  showDialog: ShowDialog;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
   const invite = useInviteToGroup(groupId);
@@ -113,17 +188,19 @@ function InviteResultItem({ user, groupId }: { user: InvitableUser; groupId: str
   const displayName = user.fullName || user.username || "";
 
   const handleInvite = useCallback(() => {
-    // No error UI on this row; the catch only keeps a failed request from
-    // becoming an unhandled rejection.
-    invite.mutate(user.id).catch(() => {});
-  }, [invite, user.id]);
+    invite.mutate(user.id).catch(() => {
+      showDialog(t("common.status.error"), t("groups.invitations.inviteFailed"), "destructive");
+    });
+  }, [invite, user.id, showDialog, t]);
 
   const handleCancel = useCallback(() => {
     if (!user.invitationId) {
       return;
     }
-    cancel.mutate(user.invitationId).catch(() => {});
-  }, [cancel, user.invitationId]);
+    cancel.mutate(user.invitationId).catch(() => {
+      showDialog(t("common.status.error"), t("groups.invitations.cancelFailed"), "destructive");
+    });
+  }, [cancel, user.invitationId, showDialog, t]);
 
   // Approving a join request needs the request card's context, which lives on
   // the settings screen. Dismiss back down to it rather than pushing a copy.
