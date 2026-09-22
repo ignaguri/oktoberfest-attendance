@@ -18,7 +18,6 @@ import {
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import { formatDateForDatabase } from "@prostcounter/shared/utils";
 
-import { announceCheckIn } from "../lib/check-in-notifications";
 import { logger } from "../lib/logger";
 import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
@@ -28,6 +27,7 @@ import {
   SupabasePhotoRepository,
   SupabaseWrappedRepository,
 } from "../repositories/supabase";
+import { announceCheckIn } from "../services/check-in-notifications";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { ApiErrorSchema } from "../lib/error-response";
 

@@ -109,6 +109,32 @@ async function putUserInGroup(userId: string, festivalId: string) {
   createdGroupIds.push(group[0].group_id);
 }
 
+// A confirmed tent reservation, the minimum row day_plans_reservation_fields
+// accepts (kind='reservation' requires tent_id, start_at, status,
+// reminder_offset_minutes and auto_checkin all set). Cascades away with its
+// festival, so no separate cleanup is tracked.
+async function createTestReservation(userId: string, festivalId: string, tentId: string) {
+  const { data, error } = await admin
+    .from("day_plans")
+    .insert({
+      user_id: userId,
+      festival_id: festivalId,
+      date: "2024-09-21",
+      kind: "reservation",
+      tent_id: tentId,
+      start_at: "2024-09-21T18:00:00.000Z",
+      status: "confirmed",
+      reminder_offset_minutes: 30,
+      auto_checkin: false,
+    })
+    .select("id")
+    .single();
+  if (error || !data) {
+    throw new Error(`Failed to create test reservation: ${error?.message}`);
+  }
+  return data.id;
+}
+
 describe("check-in notifications reach the endpoints mobile actually calls", () => {
   beforeAll(() => {
     admin = createTestSupabaseAdmin();
@@ -282,6 +308,79 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
     expect(response.status).toBe(201);
     expect(notifyDayStartMock).toHaveBeenCalledWith(
       expect.objectContaining({ date: "2024-09-22" }),
+    );
+  });
+
+  // Important 2's fix: mobile resends the whole day's tent set on every save
+  // (push-handlers.ts:28), so gating on "the request has tents" announces on
+  // every save. Gating on the RPC's own tentsAdded diff must announce once,
+  // on the save that actually adds a tent, and not again on an identical
+  // resave.
+  it("/attendance/personal announces only on an actual tent change", async () => {
+    const app = mountRoutes();
+    const user = await createTestUser();
+    const festivalId = await createTestFestival();
+    const tentId = await anyTentId();
+    await putUserInGroup(user.id, festivalId);
+
+    const requestBody = JSON.stringify({
+      festivalId,
+      date: "2024-09-21",
+      tents: [tentId],
+    });
+
+    const first = await app.request("/attendance/personal", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: requestBody,
+    });
+    expect(first.status).toBe(200);
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+
+    // Same tent set again — tentsAdded is empty this time, so nothing should
+    // be sent. Reusing the mocks from the first call (no vi.clearAllMocks in
+    // between) so a regression back to `data.tents.length > 0` shows up as a
+    // second call here.
+    const second = await app.request("/attendance/personal", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: requestBody,
+    });
+    expect(second.status).toBe(200);
+
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+    expect(notifyTentCheckinMock).not.toHaveBeenCalled();
+  });
+
+  // Important 4's fix: POST /attendance/check-in/{reservationId} is a real
+  // tent check-in — the notification the user originally reported never
+  // receiving — and the plan's four-endpoint enumeration missed it entirely.
+  it("POST /attendance/check-in/{reservationId} announces", async () => {
+    const app = mountRoutes();
+    const user = await createTestUser();
+    const festivalId = await createTestFestival();
+    const tentId = await anyTentId();
+    const reservationId = await createTestReservation(user.id, festivalId, tentId);
+
+    const response = await app.request(`/attendance/check-in/${reservationId}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    });
+
+    expect(response.status).toBe(200);
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+    // The date comes from the stored visit (festival-timezone-bucketed),
+    // not from slicing the reservation's start_at directly.
+    expect(notifyDayStartMock).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: "checkin", date: "2024-09-21" }),
     );
   });
 });

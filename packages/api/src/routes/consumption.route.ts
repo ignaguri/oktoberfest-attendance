@@ -5,13 +5,13 @@ import {
   LogConsumptionSchema,
 } from "@prostcounter/shared";
 
-import { tentNamesFor } from "../lib/check-in-notifications";
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import {
   SupabaseAttendanceRepository,
   SupabaseConsumptionRepository,
 } from "../repositories/supabase";
+import { tentNamesFor } from "../services/check-in-notifications";
 import { ConsumptionService } from "../services/consumption.service";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { NotificationService } from "../services/notification.service";

@@ -1,8 +1,8 @@
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { logger } from "./logger";
-import { NotificationService } from "../services/notification.service";
+import { logger } from "../lib/logger";
+import { NotificationService } from "./notification.service";
 
 /**
  * One push per check-in.
@@ -65,7 +65,7 @@ export async function announceCheckIn(
 }
 
 /** The caller's group ids for a festival. Empty on any failure. */
-export async function groupIdsForFestival(
+async function groupIdsForFestival(
   supabase: SupabaseClient<Database>,
   userId: string,
   festivalId: string,
