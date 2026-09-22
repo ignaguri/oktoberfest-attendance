@@ -56,6 +56,16 @@ export {
   useRequestToJoinGroup,
 } from "./useGroupJoinRequests";
 
+export {
+  useAcceptGroupInvitation,
+  useCancelGroupInvitation,
+  useDeclineGroupInvitation,
+  useIncomingGroupInvitations,
+  useInvitableUsers,
+  useInviteToGroup,
+  useSentGroupInvitations,
+} from "./useGroupInvitations";
+
 // Leaderboard hooks
 export { useGlobalLeaderboard, useGroupLeaderboard, useWinningCriterias } from "./useLeaderboard";
 
