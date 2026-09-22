@@ -1161,6 +1161,156 @@ export class NotificationService {
   }
 
   /**
+   * Notify everyone who can see a freshly published group message.
+   *
+   * Messages are festival-scoped, not group-scoped: they reach everyone sharing
+   * at least one group with the author in that festival, which is exactly the
+   * audience this fans out to. Gated on group_notifications_enabled — no
+   * dedicated preference.
+   */
+  async notifyGroupMessage(input: {
+    authorId: string;
+    festivalId: string;
+    messageType: "message" | "alert";
+  }): Promise<void> {
+    try {
+      const { data: viewers, error: viewersError } = await this.supabase
+        .from("v_user_shared_group_members")
+        .select("viewer_id")
+        .eq("owner_id", input.authorId)
+        .eq("festival_id", input.festivalId);
+
+      if (viewersError) {
+        logger.error({ error: viewersError }, "Error resolving group message recipients");
+        return;
+      }
+
+      const recipientIds = [
+        ...new Set(
+          (viewers ?? [])
+            .map((viewer) => viewer.viewer_id)
+            .filter((viewerId): viewerId is string => !!viewerId && viewerId !== input.authorId),
+        ),
+      ];
+
+      if (recipientIds.length === 0) {
+        return;
+      }
+
+      const toNotify = await this.filterByPreference(recipientIds, "group_notifications_enabled");
+
+      if (!toNotify || toNotify.length === 0) {
+        return;
+      }
+
+      const { data: author, error: authorError } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.authorId)
+        .single();
+
+      if (authorError || !author) {
+        logger.error({ error: authorError }, "Error fetching author for group message");
+        return;
+      }
+
+      const authorName = author.username || author.full_name || "Someone";
+      const authorAvatar = resolveAvatarUrl(author.avatar_url);
+      const groupByRecipient = await this.resolveFirstSharedGroup(
+        input.authorId,
+        input.festivalId,
+      );
+
+      const results = await Promise.allSettled(
+        toNotify.map((recipientId) => {
+          const payload: Record<string, unknown> = {
+            authorName,
+            authorAvatar,
+            messageType: input.messageType,
+          };
+          const groupId = groupByRecipient.get(recipientId);
+          if (groupId) {
+            payload.groupId = groupId;
+          }
+          return this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.GROUP_MESSAGE,
+            to: recipientId,
+            payload,
+          });
+        }),
+      );
+
+      // allSettled hides rejections, so surface them: a trigger that fails
+      // here is otherwise indistinguishable from one that was never sent.
+      const failures = results.filter((result) => result.status === "rejected");
+      if (failures.length > 0) {
+        logger.error(
+          {
+            failed: failures.length,
+            total: results.length,
+            reasons: failures.map((failure) => String((failure as PromiseRejectedResult).reason)),
+          },
+          "Some group message notifications failed to send",
+        );
+      }
+    } catch (error) {
+      logger.error({ error }, "Error sending group message notifications");
+    }
+  }
+
+  /**
+   * Best-effort deep link: the first group (by DB return order) that the
+   * author and a recipient both belong to, in this festival. Deliberately
+   * separate from recipient resolution above — a failure or empty result here
+   * never drops a recipient, it just means their push omits `groupId` and the
+   * client falls back to the groups list.
+   */
+  private async resolveFirstSharedGroup(
+    authorId: string,
+    festivalId: string,
+  ): Promise<Map<string, string>> {
+    const groupByRecipient = new Map<string, string>();
+    try {
+      const { data: authorMemberships, error: authorGroupsError } = await this.supabase
+        .from("group_members")
+        .select("group_id, groups!inner(festival_id)")
+        .eq("user_id", authorId)
+        .eq("groups.festival_id", festivalId);
+
+      if (authorGroupsError || !authorMemberships || authorMemberships.length === 0) {
+        return groupByRecipient;
+      }
+
+      const authorGroupIds = authorMemberships.map((membership) => membership.group_id);
+
+      const { data: coMembers, error: coMembersError } = await this.supabase
+        .from("group_members")
+        .select("user_id, group_id")
+        .in("group_id", authorGroupIds);
+
+      if (coMembersError) {
+        return groupByRecipient;
+      }
+
+      for (const member of coMembers ?? []) {
+        if (
+          !member.user_id ||
+          !member.group_id ||
+          member.user_id === authorId ||
+          groupByRecipient.has(member.user_id)
+        ) {
+          continue;
+        }
+        groupByRecipient.set(member.user_id, member.group_id);
+      }
+    } catch (error) {
+      logger.error({ error }, "Error resolving shared group for group message deep link");
+    }
+
+    return groupByRecipient;
+  }
+
+  /**
    * Notify group members when someone checks into a tent
    */
   async notifyTentCheckin(

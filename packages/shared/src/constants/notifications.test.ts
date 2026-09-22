@@ -44,6 +44,21 @@ describe("getNotificationRoute for day start", () => {
   });
 });
 
+describe("getNotificationRoute for group messages", () => {
+  it("opens the group's messages screen for the resolved deep link", () => {
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.GROUP_MESSAGE,
+        groupId: "group-1",
+      }),
+    ).toBe("/group-detail/group-1/messages");
+  });
+
+  it("falls back to the groups list when no shared group could be resolved", () => {
+    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.GROUP_MESSAGE })).toBe("/groups");
+  });
+});
+
 describe("getNotificationRoute for group join requests", () => {
   it("opens the group's settings for the creator from a push", () => {
     expect(
