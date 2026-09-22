@@ -33,10 +33,12 @@ vi.mock("expo-file-system/legacy", () => ({
 // Mock expo-image-manipulator.
 // `sourceSize` is what the manipulator reports for the image being compressed,
 // so tests can drive portrait/landscape/small sources; `resize` records the
-// size compressPhoto asks for.
+// size compressPhoto asks for, and `render` counts native renders, which are
+// the expensive part.
 const imageManipulator = vi.hoisted(() => ({
   sourceSize: { width: 3024, height: 4032 },
   resize: vi.fn(),
+  render: vi.fn(),
 }));
 
 vi.mock("expo-image-manipulator", () => ({
@@ -47,12 +49,15 @@ vi.mock("expo-image-manipulator", () => ({
           imageManipulator.resize(size);
           return context;
         }),
-        renderAsync: vi.fn().mockResolvedValue({
-          width: imageManipulator.sourceSize.width,
-          height: imageManipulator.sourceSize.height,
-          saveAsync: vi.fn().mockResolvedValue({
-            uri: "file:///mock/compressed.webp",
-          }),
+        renderAsync: vi.fn(async () => {
+          imageManipulator.render();
+          return {
+            width: imageManipulator.sourceSize.width,
+            height: imageManipulator.sourceSize.height,
+            saveAsync: vi.fn().mockResolvedValue({
+              uri: "file:///mock/compressed.webp",
+            }),
+          };
         }),
       };
       return context;
@@ -167,6 +172,24 @@ describe("Photo Queue", () => {
       await compressPhoto("file:///mock/small.jpg");
 
       expect(imageManipulator.resize).not.toHaveBeenCalled();
+    });
+
+    // renderAsync() is a native image render, so the probe that reads the
+    // source dimensions is the only extra one we should ever pay for.
+    it("renders once when no resize is needed", async () => {
+      imageManipulator.sourceSize = { width: 640, height: 480 };
+
+      await compressPhoto("file:///mock/small.jpg");
+
+      expect(imageManipulator.render).toHaveBeenCalledTimes(1);
+    });
+
+    it("renders twice at most when a resize is needed", async () => {
+      imageManipulator.sourceSize = { width: 3024, height: 4032 };
+
+      await compressPhoto("file:///mock/portrait.jpg");
+
+      expect(imageManipulator.render).toHaveBeenCalledTimes(2);
     });
   });
 
