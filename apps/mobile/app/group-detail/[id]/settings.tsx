@@ -9,7 +9,7 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupMember, WinningCriteria } from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { LogOut, Save, Settings as SettingsIcon, Users } from "lucide-react-native";
+import { LogOut, Save, Settings as SettingsIcon, UserPlus, Users } from "lucide-react-native";
 import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { RefreshControl, ScrollView } from "react-native";
@@ -392,12 +392,24 @@ export default function GroupSettingsScreen() {
 
           {/* Invite Link Section (Creator only) */}
           {isCreator && (
-            <InviteLinkSection
-              groupId={id!}
-              groupName={group.name}
-              inviteToken={group.inviteToken}
-              onTokenUpdated={refetchGroup}
-            />
+            <VStack space="sm">
+              <InviteLinkSection
+                groupId={id!}
+                groupName={group.name}
+                inviteToken={group.inviteToken}
+                onTokenUpdated={refetchGroup}
+              />
+              <Button
+                variant="outline"
+                action="primary"
+                onPress={() => router.push(`/group-detail/${id}/invite`)}
+                accessibilityLabel={t("groups.invitations.invitePeople")}
+                accessibilityHint={t("groups.invitations.invitePeopleHint")}
+              >
+                <UserPlus size={16} color={IconColors.primary} />
+                <ButtonText className="ml-1">{t("groups.invitations.invitePeople")}</ButtonText>
+              </Button>
+            </VStack>
           )}
 
           {/* Members Section */}

@@ -26,6 +26,12 @@ export default function GroupsLayout() {
           title: t("groups.messages.title"),
         }}
       />
+      <Stack.Screen
+        name="[id]/invite"
+        options={{
+          title: t("groups.invitations.invitePeople"),
+        }}
+      />
     </Stack>
   );
 }
