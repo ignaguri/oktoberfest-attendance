@@ -13,6 +13,7 @@
       "ok": "OK",
       "retry": "Retry",
       "loading": "Loading...",
+      "loadMore": "Load more",
       "signIn": "Sign In",
       "signUp": "Sign Up",
       "signOut": "Sign Out",
@@ -468,7 +469,8 @@
         "close": "Close",
         "reactWith": "React with {{emoji}}",
         "tapToReact": "Tap to react",
-        "tapToRemoveReaction": "Tap to remove reaction"
+        "tapToRemoveReaction": "Tap to remove reaction",
+        "photo": "Photo"
       },
       "accessibility": {
         "photoBy": "Photo by {{username}}",
@@ -607,6 +609,7 @@
     "registerOrUpdate": "Register or update your attendance",
     "whenDidYouVisit": "When did you visit the Wiesn?",
     "howManyBeers": "How many 🍻 Maß did you have?",
+    "beerPicture": "Beer picture",
     "selectAmount": "Select amount",
     "whichTents": "Which tents did you visit?",
     "selectToEdit": "Select any attendance to edit it",
@@ -2455,6 +2458,8 @@
     },
     "proximity": {
       "veryClose": "Very close",
+      "distance": "{{meters}} m away",
+      "checkIn": "Check in at {{tent}}",
       "hint": "Tap to view on map and check in",
       "checkInButton": "Check In"
     },
@@ -2895,6 +2900,7 @@
       "tentRemovedFromFestival": "Tent removed from festival",
       "priceUpdated": "Price updated successfully",
       "tentsCopied": "Copied {{count}} tent(s) successfully",
+      "wrappedCacheRegenerated": "Regenerated {{count}} wrapped cache entry(s)",
       "userUpdated": "User updated successfully",
       "userDeleted": "User deleted successfully"
     },

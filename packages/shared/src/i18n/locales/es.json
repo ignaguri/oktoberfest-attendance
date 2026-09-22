@@ -13,6 +13,7 @@
       "ok": "OK",
       "retry": "Reintentar",
       "loading": "Cargando...",
+      "loadMore": "Cargar más",
       "signIn": "Iniciar sesión",
       "signUp": "Registrarse",
       "signOut": "Cerrar sesión",
@@ -468,7 +469,8 @@
         "close": "Cerrar",
         "reactWith": "Reaccionar con {{emoji}}",
         "tapToReact": "Tocar para reaccionar",
-        "tapToRemoveReaction": "Tocar para quitar la reacción"
+        "tapToRemoveReaction": "Tocar para quitar la reacción",
+        "photo": "Foto"
       },
       "accessibility": {
         "photoBy": "Foto de {{username}}",
@@ -607,6 +609,7 @@
     "registerOrUpdate": "Registrá o actualizá tu asistencia",
     "whenDidYouVisit": "¿Cuándo visitaste la Wiesn?",
     "howManyBeers": "¿Cuántas 🍻 Maß tomaste?",
+    "beerPicture": "Foto de cerveza",
     "selectAmount": "Seleccioná cantidad",
     "whichTents": "¿Qué carpas visitaste?",
     "selectToEdit": "Seleccioná cualquier asistencia para editarla",
@@ -2504,6 +2507,8 @@
     },
     "proximity": {
       "veryClose": "Muy cerca",
+      "distance": "a {{meters}} m",
+      "checkIn": "Registrarte en {{tent}}",
       "hint": "Tocá para ver en el mapa y registrarte",
       "checkInButton": "Registrarse"
     },
@@ -2955,6 +2960,7 @@
       "tentRemovedFromFestival": "Carpa eliminada del festival",
       "priceUpdated": "Precio actualizado exitosamente",
       "tentsCopied": "{{count}} carpa(s) copiadas exitosamente",
+      "wrappedCacheRegenerated": "Se regeneraron {{count}} entrada(s) de caché de Wrapped",
       "userUpdated": "Usuario actualizado exitosamente",
       "userDeleted": "Usuario eliminado exitosamente"
     },
