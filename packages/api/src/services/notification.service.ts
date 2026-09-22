@@ -1034,6 +1034,111 @@ export class NotificationService {
   }
 
   /**
+   * Announce that someone has started their festival day — their first drink or
+   * first check-in, whichever landed first.
+   *
+   * The ledger insert is the claim. `ON CONFLICT DO NOTHING ... RETURNING`
+   * hands a row only to the writer that won, so the four endpoints that can
+   * produce a day's first action (POST /consumption, POST /attendance,
+   * /attendance/personal, /attendance/tent-visits) collapse to one
+   * notification, even when the mobile sync queue flushes a backlog and they
+   * arrive at once.
+   *
+   * @returns true when this call claimed the day and sent the notification.
+   *   false otherwise — including on error, so a caller falls back to the
+   *   ordinary tent check-in rather than going silent.
+   */
+  async notifyDayStart(input: {
+    actorId: string;
+    festivalId: string;
+    date: string;
+    kind: "drink" | "checkin";
+    tentName: string | null;
+  }): Promise<boolean> {
+    let adminClient;
+    try {
+      adminClient = createAdminClient();
+    } catch (adminError) {
+      logger.error(
+        { error: adminError },
+        "Admin client unavailable; skipping day-start notification",
+      );
+      return false;
+    }
+
+    try {
+      const { data: claimed, error: claimError } = await adminClient
+        .from("day_start_notifications")
+        .upsert(
+          { actor_id: input.actorId, festival_id: input.festivalId, date: input.date },
+          { onConflict: "actor_id,festival_id,date", ignoreDuplicates: true },
+        )
+        .select("actor_id");
+
+      if (claimError) {
+        logger.error({ error: claimError }, "Error claiming day-start ledger row");
+        return false;
+      }
+
+      // Someone else already started this day for this actor.
+      if (!claimed || claimed.length === 0) {
+        return false;
+      }
+
+      const { data: recipientIds, error: recipientsError } = await adminClient.rpc(
+        "get_day_start_recipients",
+        { p_actor_id: input.actorId, p_festival_id: input.festivalId },
+      );
+
+      if (recipientsError) {
+        logger.error({ error: recipientsError }, "Error resolving day-start recipients");
+        return true;
+      }
+
+      const recipients = (recipientIds ?? []) as string[];
+      const toNotify = await this.filterByPreference(recipients, "day_start_enabled");
+
+      if (!toNotify || toNotify.length === 0) {
+        return true;
+      }
+
+      const { data: actor, error: actorError } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.actorId)
+        .single();
+
+      if (actorError || !actor) {
+        logger.error({ error: actorError }, "Error fetching actor for day-start notification");
+        return true;
+      }
+
+      const actorName = actor.username || actor.full_name || "Someone";
+      const actorAvatar = resolveAvatarUrl(actor.avatar_url);
+
+      await Promise.allSettled(
+        toNotify.map((recipientId) =>
+          this.novu.trigger({
+            workflowId: NOTIFICATION_WORKFLOWS.DAY_START,
+            to: recipientId,
+            payload: {
+              actorName,
+              actorAvatar,
+              kind: input.kind,
+              tentName: input.tentName ?? "",
+            },
+          }),
+        ),
+      );
+
+      return true;
+    } catch (error) {
+      logger.error({ error }, "Error sending day-start notifications");
+      return false;
+    }
+  }
+
+  /**
    * Notify group members when someone checks into a tent
    */
   async notifyTentCheckin(

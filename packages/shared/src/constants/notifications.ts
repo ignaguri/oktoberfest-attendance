@@ -28,6 +28,7 @@ export const NOTIFICATION_WORKFLOWS = {
   FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
   GROUP_JOIN_REQUEST: "group-join-request",
   GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
+  DAY_START: "day-start",
 } as const;
 
 export type NotificationWorkflowId =
@@ -50,6 +51,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   FRIEND_PLAN_OVERLAP: "friend-plan-overlap",
   GROUP_JOIN_REQUEST: "group-join-request",
   GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
+  DAY_START: "day-start",
 } as const;
 
 export type NotificationPushType =
@@ -128,6 +130,9 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
 
       case NOTIFICATION_PUSH_TYPES.FRIEND_PLAN_OVERLAP:
         return payload.date ? buildDayRoute(payload.date, payload.festivalId) : "/attendance";
+
+      case NOTIFICATION_PUSH_TYPES.DAY_START:
+        return "/home";
 
       // The creator reviews requests in the group's settings
       case NOTIFICATION_PUSH_TYPES.GROUP_JOIN_REQUEST:

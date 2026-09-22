@@ -38,6 +38,12 @@ describe("getNotificationRoute for friend plan overlaps", () => {
   });
 });
 
+describe("getNotificationRoute for day start", () => {
+  it("opens home from a push", () => {
+    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.DAY_START })).toBe("/home");
+  });
+});
+
 describe("getNotificationRoute for group join requests", () => {
   it("opens the group's settings for the creator from a push", () => {
     expect(
