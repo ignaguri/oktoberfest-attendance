@@ -140,17 +140,20 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
           drinkCount || 0,
         );
 
-        // If we have a specific drink type, use it with pluralization
-        if (drinkType && drinkCount > 0) {
-          return t(`activityFeed.drank_${drinkType}`, {
-            count: drinkCount,
-          });
-        }
+        const drinkTentName = getActivityDataValue<string | undefined>(
+          activity_data,
+          "tent_name",
+          undefined,
+        );
 
-        // Fall back to showing beers for old data
-        return t("activityFeed.drankBeers", {
-          count: beerCount,
-        });
+        const drankDescription =
+          drinkType && drinkCount > 0
+            ? t(`activityFeed.drank_${drinkType}`, { count: drinkCount })
+            : t("activityFeed.drankBeers", { count: beerCount });
+
+        return drinkTentName
+          ? t("activityFeed.atTent", { activity: drankDescription, tent: drinkTentName })
+          : drankDescription;
       }
 
       case "tent_checkin": {

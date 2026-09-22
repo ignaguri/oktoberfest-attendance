@@ -1365,6 +1365,8 @@
       "groupsDescription": "Get notifications from your groups (check-ins, achievements, etc.)",
       "friendPlans": "Friends' plans",
       "friendPlansDescription": "When a friend is going on a day you've marked",
+      "dayStart": "Friends starting their day",
+      "dayStartDescription": "When a friend or group member has their first drink or check-in of the day",
       "groupActivity": "Group Activity",
       "reminders": "Reminders",
       "remindersDescription": "Reservation reminders and check-in prompts",
@@ -2517,6 +2519,7 @@
     "title": "Notification Settings",
     "preferences": "Preferences",
     "reminders": "Reminders",
+    "dayStart": "Friends Starting Their Day",
     "achievementNotifications": "Achievement Notifications",
     "groupNotifications": "Group Notifications",
     "pushNotifications": "Push Notifications",
@@ -2525,6 +2528,7 @@
       "achievements": "Get notified when you unlock achievements",
       "groups": "Get notifications from your groups (check-ins, achievements, etc.)",
       "reminders": "Reservation reminders and check-in prompts",
+      "dayStart": "When a friend or group member has their first drink or check-in of the day",
       "push": "Receive notifications even when the app is closed"
     },
     "status": {
@@ -2550,6 +2554,7 @@
     "dailyTotal": "Daily Total"
   },
   "activityFeed": {
+    "atTent": "{{activity}} at {{tent}}",
     "drankBeers": "drank {{count}} beer",
     "drankBeers_other": "drank {{count}} beers",
     "drankDrinks": "drank {{count}} drink",

@@ -76,9 +76,18 @@ const getActivityDescription = (activity: ActivityFeedItem, t: TFunction) => {
   const { activity_type, activity_data } = activity;
 
   switch (activity_type) {
-    case "beer_count_update":
+    case "beer_count_update": {
       const beerCount = getActivityDataValue<number>(activity_data, "beer_count", 0);
-      return t("activityFeed.drankBeers", { count: beerCount });
+      const drankDescription = t("activityFeed.drankBeers", { count: beerCount });
+      const drinkTentName = getActivityDataValue<string | undefined>(
+        activity_data,
+        "tent_name",
+        undefined,
+      );
+      return drinkTentName
+        ? t("activityFeed.atTent", { activity: drankDescription, tent: drinkTentName })
+        : drankDescription;
+    }
 
     case "tent_checkin":
       const tentName = getActivityDataValue(activity_data, "tent_name", t("activityFeed.aTent"));
