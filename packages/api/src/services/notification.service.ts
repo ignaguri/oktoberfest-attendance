@@ -927,6 +927,105 @@ export class NotificationService {
   }
 
   /**
+   * Tell someone a group's creator invited them
+   * (respects group_join_enabled; a missing preference row counts as opted in)
+   */
+  async notifyGroupInvitation(input: {
+    inviterId: string;
+    inviteeId: string;
+    groupId: string;
+  }): Promise<void> {
+    try {
+      const recipients = await this.filterByPreference([input.inviteeId], "group_join_enabled");
+      if (!recipients || recipients.length === 0) {
+        return;
+      }
+
+      const { data: group, error: groupError } = await this.supabase
+        .from("groups")
+        .select("name")
+        .eq("id", input.groupId)
+        .single();
+
+      if (groupError || !group) {
+        logger.error({ error: groupError }, "Error fetching group for invitation notification");
+        return;
+      }
+
+      const { data: inviter } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.inviterId)
+        .single();
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.GROUP_INVITATION,
+        to: input.inviteeId,
+        payload: {
+          type: NOTIFICATION_PUSH_TYPES.GROUP_INVITATION,
+          inviterName: inviter?.username || inviter?.full_name || "Someone",
+          inviterAvatar: resolveAvatarUrl(inviter?.avatar_url),
+          groupId: input.groupId,
+          groupName: group.name,
+        },
+      });
+    } catch (error) {
+      logger.error({ error }, "Error sending group invitation notification");
+    }
+  }
+
+  /**
+   * Tell the creator that the person they invited joined
+   * (respects group_join_enabled; a missing preference row counts as opted in)
+   */
+  async notifyGroupInvitationAccepted(input: {
+    inviteeId: string;
+    inviterId: string;
+    groupId: string;
+  }): Promise<void> {
+    try {
+      const recipients = await this.filterByPreference([input.inviterId], "group_join_enabled");
+      if (!recipients || recipients.length === 0) {
+        return;
+      }
+
+      const { data: group, error: groupError } = await this.supabase
+        .from("groups")
+        .select("name")
+        .eq("id", input.groupId)
+        .single();
+
+      if (groupError || !group) {
+        logger.error(
+          { error: groupError },
+          "Error fetching group for invitation accepted notification",
+        );
+        return;
+      }
+
+      const { data: invitee } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.inviteeId)
+        .single();
+
+      await this.novu.trigger({
+        workflowId: NOTIFICATION_WORKFLOWS.GROUP_INVITATION_ACCEPTED,
+        to: input.inviterId,
+        payload: {
+          type: NOTIFICATION_PUSH_TYPES.GROUP_INVITATION_ACCEPTED,
+          inviteeName: invitee?.username || invitee?.full_name || "Someone",
+          inviteeAvatar: resolveAvatarUrl(invitee?.avatar_url),
+          groupId: input.groupId,
+          groupName: group.name,
+        },
+      });
+    } catch (error) {
+      logger.error({ error }, "Error sending group invitation accepted notification");
+    }
+  }
+
+  /**
    * Tell friends and group-mates who marked the same day that the actor is
    * going too.
    *

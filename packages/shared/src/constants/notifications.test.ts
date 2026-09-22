@@ -90,3 +90,38 @@ describe("getNotificationRoute for group join requests", () => {
     );
   });
 });
+
+describe("getNotificationRoute for group invitations", () => {
+  const GROUP_ID = "33333333-3333-4333-8333-333333333333";
+
+  it("sends an invitation to the groups list, never to the group itself", () => {
+    // The recipient is not a member yet, so /group-detail would reject them
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.GROUP_INVITATION,
+        groupId: GROUP_ID,
+        groupName: "Bierfreunde",
+        inviterName: "ana",
+      }),
+    ).toBe("/groups");
+  });
+
+  it("sends an in-app invitation payload to the groups list too", () => {
+    expect(getNotificationRoute({ inviterName: "ana", groupId: GROUP_ID })).toBe("/groups");
+  });
+
+  it("opens the group when an invitation is accepted", () => {
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.GROUP_INVITATION_ACCEPTED,
+        groupId: GROUP_ID,
+      }),
+    ).toBe(`/group-detail/${GROUP_ID}`);
+  });
+
+  it("falls back to the groups list when an acceptance has no group", () => {
+    expect(
+      getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.GROUP_INVITATION_ACCEPTED }),
+    ).toBe("/groups");
+  });
+});

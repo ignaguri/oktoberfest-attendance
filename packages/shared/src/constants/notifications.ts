@@ -30,6 +30,8 @@ export const NOTIFICATION_WORKFLOWS = {
   GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
   DAY_START: "day-start",
   GROUP_MESSAGE: "group-message",
+  GROUP_INVITATION: "group-invitation",
+  GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
 } as const;
 
 export type NotificationWorkflowId =
@@ -54,6 +56,8 @@ export const NOTIFICATION_PUSH_TYPES = {
   GROUP_JOIN_REQUEST_ACCEPTED: "group-join-request-accepted",
   DAY_START: "day-start",
   GROUP_MESSAGE: "group-message",
+  GROUP_INVITATION: "group-invitation",
+  GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
 } as const;
 
 export type NotificationPushType =
@@ -69,6 +73,7 @@ interface NotificationPayload {
   reservationId?: string;
   achievementName?: string;
   senderName?: string;
+  inviterName?: string;
   inviteToken?: string;
   url?: string;
   actorName?: string;
@@ -148,6 +153,14 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
       // to the groups list rather than a broken group-detail route.
       case NOTIFICATION_PUSH_TYPES.GROUP_MESSAGE:
         return payload.groupId ? `/group-detail/${payload.groupId}/messages` : "/groups";
+
+      // The invitee is not a member yet, so this must land on the groups list,
+      // where the pending-invitations section is, and never on /group-detail
+      case NOTIFICATION_PUSH_TYPES.GROUP_INVITATION:
+        return "/groups";
+
+      case NOTIFICATION_PUSH_TYPES.GROUP_INVITATION_ACCEPTED:
+        return payload.groupId ? `/group-detail/${payload.groupId}` : "/groups";
     }
   }
 
@@ -156,6 +169,9 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
   // An in-app overlap notification carries its trigger payload, not a type.
   if (payload.actorName && payload.date) return buildDayRoute(payload.date, payload.festivalId);
   if (payload.senderName && !payload.groupId) return "/friends?tab=requests";
+  // An invitation names its inviter and group. It has to beat the groupId
+  // fallback below, because the invitee cannot open the group yet.
+  if (payload.inviterName && payload.groupId) return "/groups";
   // A join request names its requester and group; the creator reviews it in settings
   if (payload.requesterName && payload.groupId) return `/group-detail/${payload.groupId}/settings`;
   // Before the groupId fallback: a push step's schema is {skip, subject, body},
