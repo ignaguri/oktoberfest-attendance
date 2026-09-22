@@ -40,6 +40,8 @@ const mapApiToDbPreferences = (api: ApiPreferences): NotificationPreferences => 
   daily_reminder_enabled: api.dailyReminderEnabled ?? true,
   // Mobile-only toggle, web never reads it
   friend_plans_enabled: null,
+  // Not yet returned by this API response
+  day_start_enabled: null,
   created_at: api.createdAt,
   updated_at: api.updatedAt,
 });
