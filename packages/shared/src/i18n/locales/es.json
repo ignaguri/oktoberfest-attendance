@@ -3129,6 +3129,7 @@
     "GROUP_INVITATION_PENDING": "Esa persona ya tiene una invitación pendiente.",
     "GROUP_INVITATION_NOT_FOUND": "Esta invitación ya no está disponible.",
     "NOT_INVITATION_RECIPIENT": "Esta invitación no es tuya para responder.",
+    "GROUP_INVITATION_RECEIVED": "Ya te invitaron a este grupo. Respondé la invitación desde tu lista de grupos.",
     "CANNOT_INVITE_SELF": "No podés invitarte a vos mismo.",
     "INVALID_INVITE_TOKEN": "Token de invitación inválido.",
     "CANNOT_REMOVE_SELF": "No podés eliminarte a vos mismo. Usá abandonar grupo en su lugar.",

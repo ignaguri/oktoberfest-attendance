@@ -3069,6 +3069,7 @@
     "GROUP_INVITATION_PENDING": "That person already has a pending invitation.",
     "GROUP_INVITATION_NOT_FOUND": "This invitation is no longer available.",
     "NOT_INVITATION_RECIPIENT": "This invitation isn't yours to answer.",
+    "GROUP_INVITATION_RECEIVED": "You've already been invited to this group. Answer the invitation from your groups list.",
     "CANNOT_INVITE_SELF": "You can't invite yourself.",
     "INVALID_INVITE_TOKEN": "Invalid invite token.",
     "CANNOT_REMOVE_SELF": "You cannot remove yourself. Use leave group instead.",

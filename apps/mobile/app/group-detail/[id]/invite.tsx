@@ -275,19 +275,30 @@ function InviteResultItem({
         </Button>
       )}
 
-      {user.invitationStatus === "invited" && user.invitationId && (
-        <Button
-          variant="outline"
-          action="secondary"
-          size="sm"
-          onPress={handleCancel}
-          isDisabled={busy}
-          accessibilityLabel={t("groups.invitations.cancelInvite")}
-          accessibilityHint={t("groups.invitations.cancelInviteHint", { name: displayName })}
-        >
-          {busy ? <ButtonSpinner /> : <ButtonText>{t("groups.invitations.cancelInvite")}</ButtonText>}
-        </Button>
-      )}
+      {user.invitationStatus === "invited" &&
+        (user.invitationId ? (
+          <Button
+            variant="outline"
+            action="secondary"
+            size="sm"
+            onPress={handleCancel}
+            isDisabled={busy}
+            accessibilityLabel={t("groups.invitations.cancelInvite")}
+            accessibilityHint={t("groups.invitations.cancelInviteHint", { name: displayName })}
+          >
+            {busy ? (
+              <ButtonSpinner />
+            ) : (
+              <ButtonText>{t("groups.invitations.cancelInvite")}</ButtonText>
+            )}
+          </Button>
+        ) : (
+          // Inside the post-decline cooldown: there is no live invitation to
+          // withdraw, and re-inviting would be refused
+          <Text className="text-sm text-typography-400">
+            {t("groups.invitations.invited")}
+          </Text>
+        ))}
 
       {user.invitationStatus === "member" && (
         <Text className="text-sm text-typography-400">{t("groups.invitations.member")}</Text>

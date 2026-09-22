@@ -137,7 +137,21 @@ BEGIN
   VALUES (p_group_id, v_user_id, p_invitee_id)
   RETURNING id INTO v_invitation_id;
 
-  RETURN jsonb_build_object('success', true, 'invitation_id', v_invitation_id);
+  -- Inviting again soon after withdrawing does not notify them again, so a
+  -- cancel/re-invite loop cannot be used to push the same person repeatedly.
+  -- The mirror of request_to_join_group's notify_creator.
+  RETURN jsonb_build_object(
+    'success', true,
+    'invitation_id', v_invitation_id,
+    'notify_invitee', NOT EXISTS (
+      SELECT 1
+      FROM public.group_invitations
+      WHERE group_id = p_group_id
+        AND invitee_id = p_invitee_id
+        AND status = 'cancelled'
+        AND responded_at > now() - interval '24 hours'
+    )
+  );
 EXCEPTION
   WHEN unique_violation THEN
     -- Two concurrent invites: the partial unique index let only one through
@@ -169,12 +183,18 @@ BEGIN
   WHERE i.id = p_invitation_id
   FOR UPDATE OF i;
 
-  IF NOT FOUND OR v_invitation.status <> 'pending' THEN
+  IF NOT FOUND THEN
     RETURN jsonb_build_object('success', false, 'error_code', 'GROUP_INVITATION_NOT_FOUND');
   END IF;
 
+  -- Recipient before status on purpose: the other order lets anyone holding an
+  -- invitation id tell a live invitation from an answered one by the code alone
   IF v_invitation.invitee_id IS DISTINCT FROM v_user_id THEN
     RETURN jsonb_build_object('success', false, 'error_code', 'NOT_INVITATION_RECIPIENT');
+  END IF;
+
+  IF v_invitation.status <> 'pending' THEN
+    RETURN jsonb_build_object('success', false, 'error_code', 'GROUP_INVITATION_NOT_FOUND');
   END IF;
 
   -- They may have joined through the invite link in the meantime
@@ -220,12 +240,18 @@ BEGIN
   WHERE i.id = p_invitation_id
   FOR UPDATE OF i;
 
-  IF NOT FOUND OR v_invitation.status <> 'pending' THEN
+  IF NOT FOUND THEN
     RETURN jsonb_build_object('success', false, 'error_code', 'GROUP_INVITATION_NOT_FOUND');
   END IF;
 
+  -- Recipient before status on purpose: the other order lets anyone holding an
+  -- invitation id tell a live invitation from an answered one by the code alone
   IF v_invitation.invitee_id IS DISTINCT FROM v_user_id THEN
     RETURN jsonb_build_object('success', false, 'error_code', 'NOT_INVITATION_RECIPIENT');
+  END IF;
+
+  IF v_invitation.status <> 'pending' THEN
+    RETURN jsonb_build_object('success', false, 'error_code', 'GROUP_INVITATION_NOT_FOUND');
   END IF;
 
   UPDATE public.group_invitations
@@ -331,6 +357,128 @@ AS $$
   ORDER BY i.created_at ASC;
 $$;
 
+-- ---------------------------------------------------------------------------
+-- resolve_group_invitations_on_join
+--
+-- Someone can join through the invite link, or have a join request approved,
+-- while an invitation to the same group is still open. Without this the row
+-- stays 'pending' forever: both lists hide it for as long as they are a member,
+-- but it reappears the moment they leave, and invite_to_group then refuses a
+-- fresh invitation because of that zombie row.
+--
+-- SECURITY DEFINER because group_invitations carries no write policy at all:
+-- every write goes through the functions in this file.
+-- ---------------------------------------------------------------------------
+CREATE FUNCTION public.resolve_group_invitations_on_join()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE public.group_invitations
+  SET status = 'accepted', responded_at = now()
+  WHERE group_id = NEW.group_id
+    AND invitee_id = NEW.user_id
+    AND status = 'pending';
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER group_members_resolve_invitations
+  AFTER INSERT ON public.group_members
+  FOR EACH ROW
+  EXECUTE FUNCTION public.resolve_group_invitations_on_join();
+
+-- ---------------------------------------------------------------------------
+-- request_to_join_group (replaced)
+--
+-- Unchanged except for the invitation guard: invite_to_group already refuses
+-- when a join request is pending, but the other direction knew nothing about
+-- invitations, so the same pair could end up with one of each and the creator
+-- would see that person in both sections of the group settings screen.
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION public.request_to_join_group(p_group_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id uuid := auth.uid();
+  v_request_id uuid;
+BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN jsonb_build_object('success', false, 'error_code', 'UNAUTHORIZED');
+  END IF;
+
+  -- A group without a creator has nobody to approve the request
+  IF NOT EXISTS (
+    SELECT 1 FROM public.groups WHERE id = p_group_id AND created_by IS NOT NULL
+  ) THEN
+    RETURN jsonb_build_object('success', false, 'error_code', 'GROUP_NOT_FOUND');
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM public.group_members WHERE group_id = p_group_id AND user_id = v_user_id
+  ) THEN
+    RETURN jsonb_build_object('success', false, 'error_code', 'ALREADY_GROUP_MEMBER');
+  END IF;
+
+  -- An invitation to this group is already waiting for them. Answering it is
+  -- the shorter path, and it keeps the pair from holding one pending object in
+  -- each direction. Unlike the decline cooldown this is not a secret: the
+  -- invitation is on their own groups screen already.
+  IF EXISTS (
+    SELECT 1
+    FROM public.group_invitations
+    WHERE group_id = p_group_id
+      AND invitee_id = v_user_id
+      AND status = 'pending'
+  ) THEN
+    RETURN jsonb_build_object('success', false, 'error_code', 'GROUP_INVITATION_RECEIVED');
+  END IF;
+
+  -- A recent decline reports the same code as a pending request, so the
+  -- requester cannot tell they were declined
+  IF EXISTS (
+    SELECT 1
+    FROM public.group_join_requests
+    WHERE group_id = p_group_id
+      AND requester_id = v_user_id
+      AND (
+        status = 'pending'
+        OR (status = 'declined' AND responded_at > now() - interval '7 days')
+      )
+  ) THEN
+    RETURN jsonb_build_object('success', false, 'error_code', 'JOIN_REQUEST_PENDING');
+  END IF;
+
+  INSERT INTO public.group_join_requests (group_id, requester_id)
+  VALUES (p_group_id, v_user_id)
+  RETURNING id INTO v_request_id;
+
+  -- Asking again soon after withdrawing does not notify the creator again
+  RETURN jsonb_build_object(
+    'success', true,
+    'request_id', v_request_id,
+    'notify_creator', NOT EXISTS (
+      SELECT 1
+      FROM public.group_join_requests
+      WHERE group_id = p_group_id
+        AND requester_id = v_user_id
+        AND status = 'cancelled'
+        AND responded_at > now() - interval '24 hours'
+    )
+  );
+EXCEPTION
+  WHEN unique_violation THEN
+    -- Two concurrent requests: the partial unique index let only one through
+    RETURN jsonb_build_object('success', false, 'error_code', 'JOIN_REQUEST_PENDING');
+END;
+$$;
+
 -- Supabase's default privileges grant new functions to anon and authenticated
 -- directly, so REVOKE FROM PUBLIC alone is not enough; both are named here
 REVOKE ALL ON FUNCTION public.invite_to_group(uuid, uuid) FROM PUBLIC, anon;
@@ -344,3 +492,4 @@ GRANT EXECUTE ON FUNCTION public.accept_group_invitation(uuid) TO authenticated,
 GRANT EXECUTE ON FUNCTION public.decline_group_invitation(uuid) TO authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.cancel_group_invitation(uuid) TO authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.list_my_group_invitations() TO authenticated, service_role;
+REVOKE ALL ON FUNCTION public.resolve_group_invitations_on_join() FROM PUBLIC, anon, authenticated;

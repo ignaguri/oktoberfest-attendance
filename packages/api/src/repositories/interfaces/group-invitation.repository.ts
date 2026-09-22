@@ -9,6 +9,8 @@ export type InvitationRpcResult = {
   inviterId?: string;
   inviteeId?: string;
   festivalId?: string | null;
+  /** False when the same person was invited and withdrawn in the last 24 hours */
+  notifyInvitee?: boolean;
 };
 
 export interface IGroupInvitationRepository {

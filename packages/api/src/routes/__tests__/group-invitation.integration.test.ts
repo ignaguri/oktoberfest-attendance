@@ -356,13 +356,14 @@ describe("group invitations (integration)", () => {
     // through the accept endpoint (which would resolve the invitation).
     await admin.from("group_members").insert({ group_id: groupId, user_id: invitee.id });
 
-    const { data: stillPending } = await admin
+    // The group_members trigger resolves the row, so membership is the only
+    // thing left to report. Precedence still has to be right for the rows
+    // written before that trigger existed, which is what this covers.
+    await admin
       .from("group_invitations")
-      .select("status")
+      .update({ status: "pending", responded_at: null })
       .eq("group_id", groupId)
-      .eq("invitee_id", invitee.id)
-      .single();
-    expect(stillPending?.status).toBe("pending");
+      .eq("invitee_id", invitee.id);
 
     const response = await call(
       app,
@@ -437,5 +438,92 @@ describe("group invitations (integration)", () => {
     expect(sent.status).toBe(200);
     const sentBody = (await sent.json()) as { data: Array<{ invitee: { id: string } }> };
     expect(sentBody.data.find((row) => row.invitee.id === invitee.id)).toBeUndefined();
+  });
+  it("resolves a pending invitation when the invitee joins some other way", async () => {
+    // Without this the row stays "pending" forever: both lists hide it while
+    // they are a member, but it comes back the moment they leave and then
+    // blocks a fresh invitation.
+    const { app, creator, invitee, groupId } = await setup();
+    await call(app, creator, "POST", `/groups/${groupId}/invitations`, { inviteeId: invitee.id });
+
+    await admin.from("group_members").insert({ group_id: groupId, user_id: invitee.id });
+
+    const { data: resolved } = await admin
+      .from("group_invitations")
+      .select("status")
+      .eq("group_id", groupId)
+      .eq("invitee_id", invitee.id)
+      .single();
+    expect(resolved?.status).toBe("accepted");
+
+    // Leaving again must not leave a zombie row blocking the next invitation
+    await admin
+      .from("group_members")
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", invitee.id);
+
+    const reinvite = await call(app, creator, "POST", `/groups/${groupId}/invitations`, {
+      inviteeId: invitee.id,
+    });
+    expect(reinvite.status).toBe(200);
+  });
+
+  it("refuses a join request from someone who already holds an invitation", async () => {
+    const { app, creator, invitee, groupId } = await setup();
+    await call(app, creator, "POST", `/groups/${groupId}/invitations`, { inviteeId: invitee.id });
+
+    const request = await call(app, invitee, "POST", `/groups/${groupId}/join-requests`);
+    expect(request.status).toBe(409);
+    expect(await errorCode(request)).toBe("GROUP_INVITATION_RECEIVED");
+  });
+
+  it("does not notify again when an invitation is withdrawn and re-sent", async () => {
+    const { app, creator, invitee, groupId } = await setup();
+    const creatorClient = createTestSupabaseWithAuth(creator.token);
+
+    const first = await creatorClient.rpc("invite_to_group", {
+      p_group_id: groupId,
+      p_invitee_id: invitee.id,
+    });
+    expect(first.data).toMatchObject({ success: true, notify_invitee: true });
+
+    const [invitation] = await incomingFor(app, invitee);
+    await call(app, creator, "DELETE", `/groups/invitations/${invitation.id}`);
+
+    // A cancel/re-invite loop would otherwise push the same person endlessly
+    const second = await creatorClient.rpc("invite_to_group", {
+      p_group_id: groupId,
+      p_invitee_id: invitee.id,
+    });
+    expect(second.data).toMatchObject({ success: true, notify_invitee: false });
+  });
+
+  it("answers the same way for a pending and an answered invitation a stranger holds", async () => {
+    // Checking the status before the recipient would let anyone holding an id
+    // tell a live invitation from an answered one by the error code alone
+    const { app, creator, invitee, outsider, groupId } = await setup();
+    await call(app, creator, "POST", `/groups/${groupId}/invitations`, { inviteeId: invitee.id });
+    const [invitation] = await incomingFor(app, invitee);
+
+    const whilePending = await call(
+      app,
+      outsider,
+      "POST",
+      `/groups/invitations/${invitation.id}/accept`,
+    );
+    expect(whilePending.status).toBe(403);
+    expect(await errorCode(whilePending)).toBe("NOT_INVITATION_RECIPIENT");
+
+    await call(app, invitee, "POST", `/groups/invitations/${invitation.id}/decline`);
+
+    const afterAnswered = await call(
+      app,
+      outsider,
+      "POST",
+      `/groups/invitations/${invitation.id}/accept`,
+    );
+    expect(afterAnswered.status).toBe(403);
+    expect(await errorCode(afterAnswered)).toBe("NOT_INVITATION_RECIPIENT");
   });
 });

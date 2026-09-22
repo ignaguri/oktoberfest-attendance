@@ -41,12 +41,17 @@ function throwForFailure(result: InvitationRpcResult): never {
 export class GroupInvitationService {
   constructor(private repo: IGroupInvitationRepository) {}
 
-  async invite(groupId: string, inviteeId: string): Promise<{ invitationId: string }> {
+  /** `notifyInvitee` is false when this person was invited and withdrawn in the
+   * last 24 hours, so a cancel/re-invite loop cannot push them repeatedly */
+  async invite(
+    groupId: string,
+    inviteeId: string,
+  ): Promise<{ invitationId: string; notifyInvitee: boolean }> {
     const result = await this.repo.invite(groupId, inviteeId);
     if (!result.success || !result.invitationId) {
       throwForFailure(result);
     }
-    return { invitationId: result.invitationId };
+    return { invitationId: result.invitationId, notifyInvitee: result.notifyInvitee !== false };
   }
 
   async accept(invitationId: string): Promise<{

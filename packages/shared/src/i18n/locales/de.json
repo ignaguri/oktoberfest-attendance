@@ -3306,6 +3306,7 @@
     "GROUP_INVITATION_PENDING": "Diese Person hat bereits eine offene Einladung.",
     "GROUP_INVITATION_NOT_FOUND": "Diese Einladung ist nicht mehr verfügbar.",
     "NOT_INVITATION_RECIPIENT": "Diese Einladung kannst du nicht beantworten.",
+    "GROUP_INVITATION_RECEIVED": "Du wurdest bereits in diese Gruppe eingeladen. Beantworte die Einladung in deiner Gruppenliste.",
     "CANNOT_INVITE_SELF": "Du kannst dich nicht selbst einladen.",
     "INVALID_INVITE_TOKEN": "Ungültiges Einladungs-Token.",
     "CANNOT_REMOVE_SELF": "du kannst dich nicht selbst entfernen. Verwende 'Gruppe verlassen'.",

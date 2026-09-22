@@ -224,13 +224,15 @@ app.openapi(inviteRoute, async (c) => {
   const { id } = c.req.valid("param");
   const { inviteeId } = c.req.valid("json");
 
-  await service(supabase).invite(id, inviteeId);
+  const { notifyInvitee } = await service(supabase).invite(id, inviteeId);
 
-  notificationService(supabase)
-    ?.notifyGroupInvitation({ inviterId: user.id, inviteeId, groupId: id })
-    .catch((err) => {
-      logger.error({ err }, "[group-invitation] notification failed");
-    });
+  if (notifyInvitee) {
+    notificationService(supabase)
+      ?.notifyGroupInvitation({ inviterId: user.id, inviteeId, groupId: id })
+      .catch((err) => {
+        logger.error({ err }, "[group-invitation] notification failed");
+      });
+  }
 
   return c.json({ success: true, message: "Invitation sent" }, 200);
 });

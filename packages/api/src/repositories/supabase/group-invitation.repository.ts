@@ -8,6 +8,24 @@ import type { IGroupInvitationRepository, InvitationRpcResult } from "../interfa
 /** Search results are capped the same way friend search is */
 const SEARCH_LIMIT = 20;
 
+/**
+ * Days invite_to_group refuses a re-invite after a decline. Must match the
+ * interval in 20260922120000_group_invitations.sql: the search list reports the
+ * same status for a person inside this window as for one with a live
+ * invitation, so the creator is never offered a button that is going to fail.
+ */
+const DECLINE_COOLDOWN_DAYS = 7;
+
+/**
+ * Strips the wildcards PostgREST understands in an `ilike` value (it maps `*`
+ * to `%`), so a typed term matches literally. Commas, dots and parens are left
+ * alone: they only carry meaning inside an `.or()` filter, and the two separate
+ * `ilike` queries below avoid that syntax entirely.
+ */
+function stripSearchWildcards(term: string): string {
+  return term.replace(/[%_*\\]/g, "");
+}
+
 type RpcPayload = {
   success: boolean;
   error_code?: string;
@@ -16,6 +34,7 @@ type RpcPayload = {
   inviter_id?: string;
   invitee_id?: string;
   festival_id?: string | null;
+  notify_invitee?: boolean;
 };
 
 type IncomingRow = {
@@ -53,6 +72,7 @@ function toResult(data: unknown): InvitationRpcResult {
     inviterId: payload.inviter_id,
     inviteeId: payload.invitee_id,
     festivalId: payload.festival_id,
+    notifyInvitee: payload.notify_invitee,
   };
 }
 
@@ -154,8 +174,8 @@ export class SupabaseGroupInvitationRepository implements IGroupInvitationReposi
 
     // An invitee who already became a member (invite link, or an approved join
     // request) has nothing left to answer, mirroring list_my_group_invitations()'s
-    // exclusion on the invitee's side. The invitation row itself stays "pending"
-    // in that case, since nothing here marks it answered.
+    // exclusion on the invitee's side. The group_members trigger resolves those
+    // rows now, so this only still catches rows written before it existed.
     const inviteeIds = rows.map((row) => row.invitee_id);
     const { data: members, error: membersError } = await this.supabase
       .from("group_members")
@@ -194,15 +214,42 @@ export class SupabaseGroupInvitationRepository implements IGroupInvitationReposi
       return [];
     }
 
-    const { data, error } = await this.supabase
-      .from("profiles")
-      .select("id, username, full_name, avatar_url")
-      .neq("id", userId)
-      .or(`username.ilike.%${trimmed}%,full_name.ilike.%${trimmed}%`)
-      .limit(SEARCH_LIMIT);
+    // Two `ilike` queries rather than one `.or()`: the term would otherwise be
+    // interpolated into PostgREST's filter syntax, where a comma in a name
+    // ("Muller, Anna") splits it into fragments and the whole search 400s.
+    // Same reasoning as admin.repository.ts's user search.
+    const pattern = `%${stripSearchWildcards(trimmed)}%`;
+    const profileColumns = "id, username, full_name, avatar_url";
 
-    if (error) throw new DatabaseError(error.message);
-    if (!data || data.length === 0) return [];
+    const [byUsername, byFullName] = await Promise.all([
+      this.supabase
+        .from("profiles")
+        .select(profileColumns)
+        .neq("id", userId)
+        .ilike("username", pattern)
+        .limit(SEARCH_LIMIT),
+      this.supabase
+        .from("profiles")
+        .select(profileColumns)
+        .neq("id", userId)
+        .ilike("full_name", pattern)
+        .limit(SEARCH_LIMIT),
+    ]);
+
+    if (byUsername.error) throw new DatabaseError(byUsername.error.message);
+    if (byFullName.error) throw new DatabaseError(byFullName.error.message);
+
+    // Username matches first, so the cap keeps the more exact matches when both
+    // queries come back full
+    const byId = new Map<string, (typeof byUsername.data)[number]>();
+    for (const profile of [...(byUsername.data ?? []), ...(byFullName.data ?? [])]) {
+      if (!byId.has(profile.id)) {
+        byId.set(profile.id, profile);
+      }
+    }
+
+    const data = [...byId.values()].slice(0, SEARCH_LIMIT);
+    if (data.length === 0) return [];
 
     const userIds = data.map((profile) => profile.id);
 
@@ -212,9 +259,9 @@ export class SupabaseGroupInvitationRepository implements IGroupInvitationReposi
       this.supabase.from("group_members").select("user_id").eq("group_id", groupId).in("user_id", userIds),
       this.supabase
         .from("group_invitations")
-        .select("id, invitee_id")
+        .select("id, invitee_id, status, responded_at")
         .eq("group_id", groupId)
-        .eq("status", "pending")
+        .in("status", ["pending", "declined"])
         .in("invitee_id", userIds),
       this.supabase
         .from("group_join_requests")
@@ -230,9 +277,28 @@ export class SupabaseGroupInvitationRepository implements IGroupInvitationReposi
 
     const memberIds = new Set((members.data ?? []).map((row) => row.user_id));
     const requesterIds = new Set((joinRequests.data ?? []).map((row) => row.requester_id));
-    const invitationByInvitee = new Map(
-      (invitations.data ?? []).map((row) => [row.invitee_id, row.id]),
-    );
+
+    // A decline inside the cooldown blocks a re-invite just as a live
+    // invitation does, and invite_to_group deliberately reports the same code
+    // for both so the creator is not told they were turned down. The list has
+    // to agree, or the creator gets an Invite button that always fails: these
+    // rows report "invited" with no invitation id, which is what the UIs read
+    // to show the status without offering a withdraw action.
+    const cooldownStart = Date.now() - DECLINE_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;
+    const invitationByInvitee = new Map<string, string | null>();
+    for (const row of invitations.data ?? []) {
+      if (row.status === "pending") {
+        invitationByInvitee.set(row.invitee_id, row.id);
+        continue;
+      }
+      const respondedAt = row.responded_at ? Date.parse(row.responded_at) : NaN;
+      if (Number.isFinite(respondedAt) && respondedAt > cooldownStart) {
+        // A live invitation always wins: it is the row that can be withdrawn
+        if (!invitationByInvitee.has(row.invitee_id)) {
+          invitationByInvitee.set(row.invitee_id, null);
+        }
+      }
+    }
 
     return data.map((profile) => {
       // Membership wins over everything: there is nothing left to do for them
@@ -247,15 +313,14 @@ export class SupabaseGroupInvitationRepository implements IGroupInvitationReposi
         };
       }
 
-      const invitationId = invitationByInvitee.get(profile.id);
-      if (invitationId) {
+      if (invitationByInvitee.has(profile.id)) {
         return {
           id: profile.id,
           username: profile.username,
           fullName: profile.full_name,
           avatarUrl: profile.avatar_url,
           invitationStatus: "invited" as const,
-          invitationId,
+          invitationId: invitationByInvitee.get(profile.id) ?? null,
         };
       }
 

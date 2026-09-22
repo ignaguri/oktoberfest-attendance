@@ -35,11 +35,25 @@ describe("GroupInvitationService", () => {
     service = new GroupInvitationService(repo);
   });
 
-  it("returns the new invitation id", async () => {
+  it("returns the new invitation id, and notifies by default", async () => {
     await expect(service.invite(GROUP_ID, INVITEE_ID)).resolves.toEqual({
       invitationId: INVITATION_ID,
+      notifyInvitee: true,
     });
     expect(repo.invite).toHaveBeenCalledWith(GROUP_ID, INVITEE_ID);
+  });
+
+  it("does not notify when the same person was just invited and withdrawn", async () => {
+    vi.mocked(repo.invite).mockResolvedValue({
+      success: true,
+      invitationId: INVITATION_ID,
+      notifyInvitee: false,
+    });
+
+    await expect(service.invite(GROUP_ID, INVITEE_ID)).resolves.toEqual({
+      invitationId: INVITATION_ID,
+      notifyInvitee: false,
+    });
   });
 
   it.each([

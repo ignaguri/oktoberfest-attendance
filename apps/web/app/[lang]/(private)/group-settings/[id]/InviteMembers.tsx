@@ -47,7 +47,14 @@ export function InviteMembers({ groupId, groupName }: { groupId: string; groupNa
     });
   }, [results]);
 
-  const sentInvitations = (sent as SentGroupInvitation[] | undefined) ?? [];
+  // Someone matched by the search already shows up above with their own
+  // withdraw button, so listing them again here would render them twice
+  const sentInvitations = useMemo(() => {
+    const shown = new Set(users.map((user) => user.id));
+    return ((sent as SentGroupInvitation[] | undefined) ?? []).filter(
+      (invitation) => !shown.has(invitation.invitee.id),
+    );
+  }, [sent, users]);
 
   // Coded API errors set `error.code` to the error code itself, so a specific
   // message (e.g. that person already has a pending invitation) can be shown
@@ -65,23 +72,31 @@ export function InviteMembers({ groupId, groupName }: { groupId: string; groupNa
     return t(fallbackKey);
   };
 
+  // Both hooks are shared by the whole list, so their `loading` flag would
+  // disable every row at once. The row being acted on is tracked here instead.
+  const [busyRowId, setBusyRowId] = useState<string | null>(null);
+
   const handleInvite = async (userId: string) => {
+    setBusyRowId(userId);
     try {
       await invite.mutateAsync(userId);
     } catch (error) {
       toast.error(getErrorMessage(error, "groups.invitations.inviteFailed"));
+    } finally {
+      setBusyRowId(null);
     }
   };
 
-  const handleCancel = async (invitationId: string) => {
+  const handleCancel = async (invitationId: string, rowId: string) => {
+    setBusyRowId(rowId);
     try {
       await cancel.mutateAsync(invitationId);
     } catch (error) {
       toast.error(getErrorMessage(error, "groups.invitations.cancelFailed"));
+    } finally {
+      setBusyRowId(null);
     }
   };
-
-  const isBusy = invite.loading || cancel.loading;
 
   return (
     <div className="mt-4 overflow-hidden bg-white shadow-sm sm:rounded-lg">
@@ -142,23 +157,30 @@ export function InviteMembers({ groupId, groupName }: { groupId: string; groupNa
                       variant="yellow"
                       size="sm"
                       onClick={() => handleInvite(user.id)}
-                      disabled={isBusy}
+                      disabled={busyRowId === user.id}
                     >
                       <UserPlus className="size-4" />
                       {t("groups.invitations.invite")}
                     </Button>
                   )}
 
-                  {user.invitationStatus === "invited" && user.invitationId && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleCancel(user.invitationId!)}
-                      disabled={isBusy}
-                    >
-                      {t("groups.invitations.cancelInvite")}
-                    </Button>
-                  )}
+                  {user.invitationStatus === "invited" &&
+                    (user.invitationId ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleCancel(user.invitationId!, user.id)}
+                        disabled={busyRowId === user.id}
+                      >
+                        {t("groups.invitations.cancelInvite")}
+                      </Button>
+                    ) : (
+                      // Inside the post-decline cooldown: there is no live
+                      // invitation to withdraw, and re-inviting would be refused
+                      <span className="text-muted-foreground text-sm">
+                        {t("groups.invitations.invited")}
+                      </span>
+                    ))}
 
                   {user.invitationStatus === "member" && (
                     <span className="text-muted-foreground text-sm">
@@ -203,8 +225,8 @@ export function InviteMembers({ groupId, groupName }: { groupId: string; groupNa
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleCancel(invitation.id)}
-                        disabled={isBusy}
+                        onClick={() => handleCancel(invitation.id, invitation.invitee.id)}
+                        disabled={busyRowId === invitation.invitee.id}
                       >
                         {t("groups.invitations.cancelInvite")}
                       </Button>
