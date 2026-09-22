@@ -6,7 +6,7 @@ import { Beer, Camera, Clock, MapPin, Medal, Users } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
-import { ImageModal } from "@/app/(private)/groups/[id]/gallery/ImageModal";
+import { ImageModal } from "@/app/[lang]/(private)/groups/[id]/gallery/ImageModal";
 import { AchievementBadge } from "@/components/achievements/AchievementBadge";
 import Avatar from "@/components/Avatar/Avatar";
 import { Badge } from "@/components/ui/badge";

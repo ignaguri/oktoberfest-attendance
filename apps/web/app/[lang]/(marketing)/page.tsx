@@ -7,23 +7,38 @@ import { FestivalCountdownBanner } from "@/components/marketing/FestivalCountdow
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCountdownFestival } from "@/lib/marketing/getCountdownFestival";
+import { marketingOpenGraph } from "@/lib/marketing/openGraph";
+import { seoCopy } from "@/lib/marketing/seoCopy";
+import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  alternates: {
-    canonical: PROD_URL,
-    languages: {
-      en: PROD_URL,
-      de: `${PROD_URL}/de`,
-      es: `${PROD_URL}/es`,
+type Params = { lang: string };
+
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const { lang: langParam } = await params;
+  const lang = toSupportedLanguage(langParam);
+  const copy = seoCopy(lang, "home");
+
+  return {
+    title: copy.title,
+    description: copy.description,
+    openGraph: {
+      ...marketingOpenGraph({ locale: lang, path: "/", ...copy }),
+      type: "website",
     },
-  },
-};
+    alternates: {
+      canonical: marketingUrlAbsolute("/", lang),
+      languages: localeAlternates("/"),
+    },
+  };
+}
 
 // Deliberately takes no searchParams: reading them opts the route out of static
 // prerendering. OAuth `?code=` is redirected to /auth/callback in proxy.ts.
-export default async function LandingPage() {
+export default async function LandingPage({ params }: { params: Promise<Params> }) {
+  const { lang: langParam } = await params;
+  const lang = toSupportedLanguage(langParam);
   const countdownFestival = await getCountdownFestival();
 
   const jsonLd = {
@@ -35,6 +50,7 @@ export default async function LandingPage() {
       "Track your beer festival attendance, compete with friends, and keep memories of every Oktoberfest visit.",
     applicationCategory: "LifestyleApplication",
     operatingSystem: "iOS, Android, Web",
+    inLanguage: lang,
     offers: {
       "@type": "Offer",
       price: "0",

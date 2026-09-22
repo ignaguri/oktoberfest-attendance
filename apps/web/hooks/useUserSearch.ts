@@ -5,7 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { getUserAttendances, getUsers } from "@/app/(private)/admin/actions";
+import { getUserAttendances, getUsers } from "@/app/[lang]/(private)/admin/actions";
 import { searchKeys, type UserSearchFilters } from "@/lib/data/search-query-keys";
 
 // Import the server actions

@@ -14,6 +14,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useGroupName } from "@/hooks/useGroups";
+import { publicPathname } from "@/lib/utils/marketingUrl";
 
 function isUUID(str: string) {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -37,7 +38,10 @@ interface BreadcrumbSegment {
 
 export default function Breadcrumbs() {
   const { t } = useTranslation();
-  const pathname = usePathname();
+  // Strips the internal [lang] segment: while this renders on the server the
+  // path is the rewritten one, and comparing different shapes on each side of
+  // hydration both mismatches and shows the locale as a crumb.
+  const pathname = publicPathname(usePathname());
 
   const breadcrumbs = useMemo(() => {
     // Don't show breadcrumbs on home page

@@ -24,7 +24,8 @@
       "goHome": "Zur Startseite",
       "goBack": "Zurück",
       "tryAgain": "Erneut versuchen",
-      "done": "Fertig"
+      "done": "Fertig",
+      "loadMore": "Mehr laden"
     },
     "action": {
       "cancel": "Abbrechen"
@@ -141,6 +142,11 @@
       "description": "Eine neue Version der App ist verfügbar. Bitte aktualisiere, um die neuesten Funktionen und Verbesserungen zu erhalten.",
       "refresh": "Zum Aktualisieren neu laden",
       "updateNow": "Jetzt aktualisieren"
+    },
+    "share": {
+      "title": "Teilen",
+      "copyLink": "Link kopieren",
+      "copied": "Kopiert!"
     }
   },
   "tabs": {
@@ -463,7 +469,8 @@
         "close": "Schließen",
         "reactWith": "Mit {{emoji}} reagieren",
         "tapToReact": "Zum Reagieren tippen",
-        "tapToRemoveReaction": "Reaktion entfernen"
+        "tapToRemoveReaction": "Reaktion entfernen",
+        "photo": "Foto"
       },
       "accessibility": {
         "photoBy": "Foto von {{username}}",
@@ -476,7 +483,17 @@
       "controlNote": "Steuere, welche Gruppen deinen Standort sehen können in deinen",
       "shareLocation": "Standort teilen",
       "enablePrompt": "Aktiviere die Standortfreigabe, um zu sehen, wo deine Freunde auf dem Festival sind",
-      "privacyNotice": "Dein Standort ist nur für Gruppenmitglieder sichtbar, solange du ihn teilst"
+      "privacyNotice": "Dein Standort ist nur für Gruppenmitglieder sichtbar, solange du ihn teilst",
+      "permissions": {
+        "requesting": "Standortberechtigung wird angefragt...",
+        "denied": "Standortberechtigung verweigert. Bitte aktiviere sie in den Browsereinstellungen.",
+        "checking": "Berechtigung wird geprüft..."
+      },
+      "errors": {
+        "timeout": "Zeitüberschreitung bei der Standortabfrage",
+        "unavailable": "Standort nicht verfügbar",
+        "generic": "Fehler beim Abrufen des Standorts"
+      }
     },
     "members": {
       "title": "Mitglieder",
@@ -747,7 +764,8 @@
     "tent": {
       "selectTents": "Zelte auswählen"
     },
-    "updateAttendance": "Anwesenheit aktualisieren"
+    "updateAttendance": "Anwesenheit aktualisieren",
+    "beerPicture": "Bierfoto"
   },
   "achievements": {
     "pageTitle": "Erfolge",
@@ -1619,9 +1637,12 @@
       "archive": "Archivieren"
     },
     "privacy": {
-      "title": "Privatsphäre-Einstellungen",
-      "locationSharing": "Standortfreigabe",
-      "profileVisibility": "Profil-Sichtbarkeit"
+      "location": {
+        "title": "Standort-Privatsphäre",
+        "description": "Lege fest, wer deinen Standort sehen kann",
+        "shareWithGroups": "Standort mit Gruppen teilen",
+        "shareWithGroupsDescription": "Gruppenmitgliedern erlauben, deinen Live-Standort zu sehen"
+      }
     },
     "photoPrivacy": {
       "title": "Foto-Privatsphäre",
@@ -1781,7 +1802,7 @@
         "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
         "passwordChanged": "Passwort aktualisiert",
         "editProfile": "Namen bearbeiten",
-        "editProfileHint": "Ändert Namen und Benutzernamen dieses Benutzers",
+        "editProfileHint": "Öffnet Namen und Benutzernamen dieses Benutzers zum Bearbeiten",
         "fullName": "Vollständiger Name",
         "username": "Benutzername",
         "noUsername": "Kein Benutzername festgelegt",
@@ -1796,7 +1817,7 @@
         "edit": {
           "title": "Besuch bearbeiten",
           "open": "Bearbeiten",
-          "openHint": "Datum, Biere und Zelte dieses Tages ändern",
+          "openHint": "Öffnet Datum, Biere und Zelte dieses Tages zum Bearbeiten",
           "date": "Datum",
           "beers": "Biere",
           "beersStored": "An diesem Tag sind keine Getränke erfasst, daher ist dies der gespeicherte Wert.",
@@ -1808,7 +1829,8 @@
           "tentsEmpty": "Dieses Fest hat noch keine Zelte",
           "save": "Änderungen speichern",
           "saveError": "Änderungen konnten nicht gespeichert werden",
-          "duplicateDate": "Dieser Nutzer hat an diesem Datum bereits einen Besuch"
+          "duplicateDate": "Dieser Nutzer hat an diesem Datum bereits einen Besuch",
+          "saveHint": "Speichert die Änderungen an diesem Besuch"
         },
         "deleteAttendance": "Besuch löschen",
         "deleteAttendanceHint": "Entfernt den Besuchseintrag dieses Tages",
@@ -1953,19 +1975,124 @@
     },
     "festivals": {
       "title": "Festival-Verwaltung",
-      "create": "Festival erstellen",
-      "edit": "Festival bearbeiten",
-      "delete": "Festival löschen"
+      "newFestival": "Neues Fest",
+      "editFestival": "Fest bearbeiten",
+      "createFestival": "Neues Fest anlegen",
+      "loading": "Feste werden geladen...",
+      "form": {
+        "name": "Festname",
+        "namePlaceholder": "Oktoberfest 2025",
+        "shortName": "Kurzname",
+        "shortNamePlaceholder": "oktoberfest-2025",
+        "type": "Festtyp",
+        "location": "Ort",
+        "locationPlaceholder": "München, Deutschland",
+        "latitude": "Breitengrad",
+        "latitudePlaceholder": "48.1314",
+        "longitude": "Längengrad",
+        "longitudePlaceholder": "11.5498",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "mapUrl": "Karten-URL",
+        "mapUrlPlaceholder": "https://wiesnmap.muenchen.de/",
+        "timezone": "Zeitzone",
+        "timezonePlaceholder": "Europe/Berlin",
+        "status": "Status",
+        "markActive": "Als aktives Fest markieren",
+        "description": "Beschreibung",
+        "descriptionPlaceholder": "Optionale Festbeschreibung..."
+      },
+      "types": {
+        "oktoberfest": "Oktoberfest",
+        "starkbierfest": "Starkbierfest",
+        "fruhlingsfest": "Frühlingsfest",
+        "other": "Sonstiges"
+      },
+      "statuses": {
+        "upcoming": "Bevorstehend",
+        "active": "Aktiv",
+        "ended": "Beendet"
+      },
+      "buttons": {
+        "saving": "Wird gespeichert...",
+        "updateFestival": "Fest aktualisieren",
+        "createFestival": "Fest anlegen",
+        "cancel": "Abbrechen",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      },
+      "badges": {
+        "active": "Aktiv"
+      },
+      "confirmDelete": "Möchtest du dieses Fest wirklich löschen?",
+      "empty": "Keine Feste gefunden. Lege dein erstes Fest an!"
     },
     "tents": {
       "title": "Zelt-Verwaltung",
-      "create": "Zelt erstellen",
-      "edit": "Zelt bearbeiten",
-      "delete": "Zelt löschen"
+      "createNew": "Neues Zelt anlegen",
+      "copyFromFestival": "Von einem anderen Fest kopieren",
+      "selectFestival": "Fest auswählen",
+      "chooseFestival": "Wähle ein Fest",
+      "loading": "Zelte werden geladen...",
+      "stats": {
+        "total": "Zelte gesamt",
+        "customPricing": "Eigene Preise",
+        "avgPrice": "Ø Preis",
+        "categories": "Kategorien"
+      },
+      "form": {
+        "name": "Zeltname",
+        "namePlaceholder": "z. B. Hofbräu Festzelt",
+        "category": "Kategorie",
+        "categoryPlaceholder": "Kategorie auswählen",
+        "latitude": "Breitengrad",
+        "latitudePlaceholder": "48.1314",
+        "longitude": "Längengrad",
+        "longitudePlaceholder": "11.5498",
+        "beerPrice": "Bierpreis (optional)",
+        "beerPricePlaceholder": "Leer lassen für den Standard des Festes"
+      },
+      "categories": {
+        "traditional": "Traditionell",
+        "modern": "Modern",
+        "brewery": "Brauerei",
+        "small": "Klein",
+        "family": "Familienfreundlich"
+      },
+      "dialog": {
+        "createTitle": "Neues Zelt anlegen",
+        "createDescription": "Füge dem ausgewählten Fest ein neues Zelt hinzu",
+        "copyTitle": "Zelte von einem anderen Fest kopieren",
+        "copyDescription": "Wähle die Zelte, die zu diesem Fest kopiert werden sollen",
+        "sourceFestival": "Quellfest",
+        "sourceFestivalPlaceholder": "Fest zum Kopieren auswählen",
+        "selectTentsToCopy": "Zelte zum Kopieren auswählen",
+        "copyTentPrices": "Zeltspezifische Preise mitkopieren"
+      },
+      "buttons": {
+        "creating": "Wird angelegt...",
+        "createTent": "Zelt anlegen",
+        "copying": "Wird kopiert...",
+        "copyTents": "{{count}} Zelt(e) kopieren",
+        "addAll": "Alle hinzufügen ({{count}})",
+        "save": "Speichern",
+        "cancel": "Abbrechen"
+      },
+      "badges": {
+        "default": "Standard"
+      },
+      "empty": {
+        "noTents": "Keine Zelte konfiguriert",
+        "noTentsDescription": "Füge diesem Fest Zelte hinzu, um loszulegen"
+      },
+      "sections": {
+        "tentsIn": "Zelte in {{name}}",
+        "availableTents": "Verfügbare Zelte",
+        "availableTentsDescription": "Zelte, die diesem Fest noch nicht hinzugefügt wurden"
+      }
     },
     "users": {
       "title": "Benutzer-Verwaltung",
-      "search": "Benutzer suchen",
       "form": {
         "emailNote": "Die E-Mail-Adresse kann nicht geändert werden",
         "newPassword": "Neues Passwort (leer lassen, um es beizubehalten)",
@@ -1973,8 +2100,87 @@
         "username": "Benutzername",
         "updateUser": "Benutzer aktualisieren"
       },
-      "makeAdmin": "Zum Admin machen",
-      "removeAdmin": "Admin entfernen"
+      "editUser": "Benutzer bearbeiten",
+      "editUserDescription": "Benutzerdaten aktualisieren",
+      "editAttendances": "Besuche bearbeiten",
+      "editAttendancesDescription": "Besuche des Benutzers verwalten",
+      "attendances": {
+        "title": "Besuche des Benutzers ({{count}})",
+        "titleFor": "Besuche von {{name}}",
+        "headers": {
+          "date": "Datum",
+          "beers": "Biere",
+          "tents": "Zelte"
+        },
+        "loading": "Besuche werden geladen...",
+        "clickToLoad": "Klicken, um Besuche zu laden",
+        "empty": "Keine Besuche für diesen Benutzer gefunden.",
+        "deleteTitle": "Besuch löschen",
+        "deleteConfirm": "Möchtest du diesen Besuch wirklich löschen?",
+        "buttons": {
+          "edit": "Bearbeiten",
+          "delete": "Löschen",
+          "cancel": "Abbrechen"
+        }
+      }
+    },
+    "groups": {
+      "title": "Gruppenliste",
+      "editGroup": "Gruppe bearbeiten",
+      "editGroupDescription": "Gruppendaten aktualisieren und Mitglieder ansehen",
+      "loading": "Gruppendaten werden geladen...",
+      "form": {
+        "name": "Gruppenname",
+        "description": "Beschreibung",
+        "winningCriteria": "Siegkriterium",
+        "winningCriteriaPlaceholder": "Siegkriterium auswählen",
+        "members": "Mitglieder ({{count}})",
+        "membersEmpty": "Noch keine Mitglieder",
+        "inviteLink": "Einladungslink",
+        "inviteLinkPlaceholder": "Neuen Einladungslink erzeugen",
+        "joined": "Beigetreten am {{date}}",
+        "updateGroup": "Gruppe aktualisieren"
+      },
+      "buttons": {
+        "generating": "Wird erzeugt...",
+        "generateInvite": "Neuen Einladungslink erzeugen"
+      }
+    },
+    "cache": {
+      "title": "Cache-Verwaltung",
+      "serviceWorker": {
+        "title": "Service-Worker-Caches",
+        "description": "Die App nutzt Service Worker, um Ressourcen für die Offline-Nutzung zu cachen. Leere diese Caches, um alle Dateien neu herunterzuladen.",
+        "button": "Service-Worker-Caches leeren",
+        "help": "Damit werden alle gecachten Dateien gelöscht, einschließlich Bilder, Skripte und Stylesheets. Die App lädt beim nächsten Start frische Kopien."
+      },
+      "wrappedData": {
+        "title": "Wrapped-Daten-Cache",
+        "description": "Die Wrapped-Funktion berechnet Nutzerstatistiken vorab und speichert sie im Cache. Damit erstellst du den Cache nach Datenänderungen neu.",
+        "form": {
+          "userId": "Benutzer-ID (optional)",
+          "userIdPlaceholder": "Leer lassen, um alle Benutzer neu zu erstellen",
+          "festivalId": "Fest-ID (optional)",
+          "festivalIdPlaceholder": "Leer lassen, um alle Feste neu zu erstellen"
+        },
+        "buttons": {
+          "regenerating": "Wird neu erstellt...",
+          "regenerate": "Wrapped-Cache neu erstellen"
+        },
+        "help": "Damit werden die Statistiken für alle Benutzer neu berechnet. Bei großen Datenmengen kann das mehrere Minuten dauern."
+      }
+    },
+    "images": {
+      "title": "Bilder ohne WebP",
+      "headers": {
+        "image": "Bild",
+        "path": "Pfad",
+        "action": "Aktion"
+      },
+      "buttons": {
+        "converting": "Wird konvertiert...",
+        "convert": "Konvertieren"
+      }
     }
   },
   "joinGroup": {
@@ -2480,7 +2686,9 @@
     "proximity": {
       "veryClose": "Sehr nah",
       "hint": "Tippen, um auf Karte anzuzeigen und einzuchecken",
-      "checkInButton": "Einchecken"
+      "checkInButton": "Einchecken",
+      "distance": "{{meters}} m entfernt",
+      "checkIn": "Bei {{tent}} einchecken"
     },
     "errors": {
       "startFailed": "Freigabe konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
@@ -2931,7 +3139,8 @@
       "priceUpdated": "Preis erfolgreich aktualisiert",
       "tentsCopied": "{{count}} Zelt(e) erfolgreich kopiert",
       "userUpdated": "Benutzer erfolgreich aktualisiert",
-      "userDeleted": "Benutzer erfolgreich gelöscht"
+      "userDeleted": "Benutzer erfolgreich gelöscht",
+      "wrappedCacheRegenerated": "{{count}} Wrapped-Cache-Einträge neu erstellt"
     },
     "error": {
       "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
@@ -3349,6 +3558,20 @@
     "sharedGroups": "Gemeinsame Gruppen"
   },
   "marketing": {
+    "seo": {
+      "home": {
+        "title": "ProstCounter 🍻 - Zähl deine Wiesn-Maß mit Freunden",
+        "description": "Zähle jede Maß, messe dich mit Freunden in Bestenlisten und erlebe deine Wiesn neu. Kostenlos, keine Werbung, für iOS, Android und Web."
+      },
+      "download": {
+        "title": "ProstCounter herunterladen - iOS, Android & Web",
+        "description": "Lade ProstCounter kostenlos für iOS oder Android, oder nutze die Web-App. Zähle dein Bierfest-Erlebnis auf jedem Gerät."
+      },
+      "blogIndex": {
+        "title": "Blog - Wiesn-Guides und Münchner Bierfeste",
+        "description": "Guides, Tipps und Neuigkeiten rund ums Oktoberfest, die Münchner Bierfeste und die ProstCounter-App."
+      }
+    },
     "header": {
       "blog": "Blog",
       "download": "Download",
@@ -3358,17 +3581,17 @@
     "hero": {
       "title1": "Dein Bierfest",
       "title2": "Begleiter-App",
-      "subtitle": "Zähle jeden Masskrug, messe dich mit Freunden in Bestenlisten und erlebe deine Oktoberfest-Erinnerungen neu — alles in einer App.",
+      "subtitle": "Zähle jede Maß, messe dich mit Freunden in Bestenlisten und erlebe deine Oktoberfest-Erinnerungen neu — alles in einer App.",
       "getStarted": "Kostenlos starten",
       "downloadApp": "App herunterladen",
-      "freeForever": "Für immer kostenlos. Verfügbar für iOS, Android & Web."
+      "free": "Kostenlos, keine Werbung. Verfügbar für iOS, Android & Web."
     },
     "features": {
       "sectionTitle": "Alles, was du auf der Wiesn brauchst",
       "sectionSubtitle": "Von Festgängern für Festgänger entwickelt.",
       "trackBeers": {
         "title": "Bier zählen",
-        "description": "Erfasse deinen täglichen Konsum, protokolliere Zeltbesuche, knipse Fotos deiner Masskrüge und erstelle eine Chronik jedes Festtages."
+        "description": "Erfasse deinen täglichen Konsum, protokolliere Zeltbesuche, knipse Fotos deiner Maß und erstelle eine Chronik jedes Festtages."
       },
       "competeWithFriends": {
         "title": "Tritt gegen Freunde an",
@@ -3421,7 +3644,7 @@
     },
     "download": {
       "title": "ProstCounter herunterladen",
-      "subtitle": "Erlebe dein Bierfest auf jedem Gerät. Für immer kostenlos.",
+      "subtitle": "Erlebe dein Bierfest auf jedem Gerät. Kostenlos, keine Werbung.",
       "ios": {
         "description": "iPhone & iPad",
         "action": "Im App Store laden"
@@ -3529,6 +3752,11 @@
       "title": "UI-Komponenten",
       "showcase": "Komponenten-Showcase",
       "openShowcase": "Komponenten-Showcase öffnen"
+    },
+    "database": {
+      "title": "Datenbank-Debug",
+      "clearAll": "Alle Daten löschen",
+      "confirmClear": "Bist du sicher? Damit werden alle lokalen Daten gelöscht."
     }
   },
   "footer": {

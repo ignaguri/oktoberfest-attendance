@@ -21,6 +21,10 @@ const LANDING_PATH = new RegExp(`^/(${LOCALES})?$`);
 /** Localized marketing pages: /de, /es, /de/download, /es/download */
 const LOCALIZED_MARKETING_PATH = new RegExp(`^/(${LOCALES})(/download)?$`);
 
+// Locale prefixing onto the internal `app/[lang]/` routes is a rewrite in
+// next.config.ts, not something this file does. Rewrites run after middleware,
+// so every path test below still sees the public URL.
+
 export async function proxy(request: NextRequest) {
   const requestHost = (request.headers.get("x-forwarded-host") ?? request.headers.get("host"))
     ?.split(",")[0]

@@ -6,7 +6,8 @@ import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import { i18n, useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/lib/i18n/client";
+import { useMarketingLocale } from "@/lib/i18n/MarketingLocaleProvider";
 import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 import { createSupabaseBrowserClient } from "@/utils/supabase/client";
@@ -25,7 +26,7 @@ export function MarketingHeader() {
     });
   }, []);
 
-  const lang = i18n.language;
+  const lang = useMarketingLocale();
   const navLinks = [
     { href: marketingUrl("/blog", lang), label: t("marketing.header.blog") },
     {
