@@ -2,13 +2,13 @@ import { PROD_URL } from "@prostcounter/shared/constants";
 import type { Metadata } from "next";
 
 import { DownloadContent } from "@/components/marketing/DownloadContent";
+import { seoCopy } from "@/lib/marketing/seoCopy";
 
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Download ProstCounter - iOS, Android & Web",
-  description:
-    "Download ProstCounter for free on iOS, Android, or use the web app. Track your beer festival experience on any device.",
+  title: seoCopy("en", "download").title,
+  description: seoCopy("en", "download").description,
   alternates: {
     canonical: `${PROD_URL}/download`,
     languages: {

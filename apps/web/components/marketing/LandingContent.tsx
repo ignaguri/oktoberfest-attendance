@@ -118,8 +118,8 @@ export function LandingContent() {
           </motion.div>
 
           {/* Social proof hint */}
-          <motion.p variants={entrance} className="mt-6 text-sm text-gray-400">
-            {t("marketing.hero.freeForever")}
+          <motion.p variants={entrance} className="mt-6 text-sm text-gray-500">
+            {t("marketing.hero.free")}
           </motion.p>
         </motion.div>
       </section>
@@ -267,11 +267,11 @@ export function LandingContent() {
                   href={marketingUrl(festival.href, lang)}
                   className="group block rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-yellow-300 hover:shadow-md"
                 >
-                  <div className="mb-3 flex items-center gap-2 text-sm font-medium text-yellow-600">
+                  <div className="mb-3 flex items-center gap-2 text-sm font-medium text-yellow-700">
                     <Calendar size={16} />
                     {t(`marketing.festivals.${festival.key}.dates`)}
                   </div>
-                  <h3 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-yellow-600">
+                  <h3 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-yellow-700">
                     {t(`marketing.festivals.${festival.key}.name`)}
                   </h3>
                   <p className="text-sm text-gray-500">
@@ -291,7 +291,7 @@ export function LandingContent() {
           >
             <Link
               href={marketingUrl("/blog/munich-beer-festivals-calendar", lang)}
-              className="text-sm font-medium text-yellow-600 underline decoration-yellow-300 underline-offset-4 hover:text-yellow-700"
+              className="text-sm font-medium text-yellow-700 underline decoration-yellow-400 underline-offset-4 hover:text-yellow-800"
             >
               {t("marketing.festivals.viewCalendar")}
             </Link>
@@ -366,7 +366,7 @@ export function LandingContent() {
               height={120}
               className="mx-auto rounded-lg bg-white p-2"
             />
-            <p className="mt-2 text-xs text-gray-500">{t("marketing.cta.scanToDownload")}</p>
+            <p className="mt-2 text-xs text-gray-400">{t("marketing.cta.scanToDownload")}</p>
           </motion.div>
         </motion.div>
       </section>

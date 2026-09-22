@@ -11,6 +11,7 @@ import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { NON_DEFAULT_LOCALES } from "@/lib/constants";
 import { getCountdownFestival } from "@/lib/marketing/getCountdownFestival";
+import { seoCopy } from "@/lib/marketing/seoCopy";
 
 export const revalidate = 86400;
 
@@ -24,7 +25,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { locale } = await params;
   if (!NON_DEFAULT_LOCALES.includes(locale as SupportedLanguage)) return {};
 
+  const copy = seoCopy(locale as SupportedLanguage, "home");
+
   return {
+    title: copy.title,
+    description: copy.description,
     alternates: {
       canonical: `${PROD_URL}/${locale}`,
       languages: {

@@ -3363,6 +3363,16 @@
     "sharedGroups": "Shared Groups"
   },
   "marketing": {
+    "seo": {
+      "home": {
+        "title": "ProstCounter 🍻 - Track Your Oktoberfest Beers with Friends",
+        "description": "Count every Maß, compete with friends on leaderboards, and relive your Oktoberfest. Free, no ads, on iOS, Android and web."
+      },
+      "download": {
+        "title": "Download ProstCounter - iOS, Android & Web",
+        "description": "Download ProstCounter for free on iOS, Android, or use the web app. Track your beer festival experience on any device."
+      }
+    },
     "header": {
       "blog": "Blog",
       "download": "Download",
@@ -3375,7 +3385,7 @@
       "subtitle": "Track every Masskrug, compete with friends on leaderboards, and relive your Oktoberfest memories — all in one app.",
       "getStarted": "Get Started Free",
       "downloadApp": "Download App",
-      "freeForever": "Free forever. Available on iOS, Android & Web."
+      "free": "Free, no ads. Available on iOS, Android & Web."
     },
     "features": {
       "sectionTitle": "Everything you need at the Wiesn",
@@ -3435,7 +3445,7 @@
     },
     "download": {
       "title": "Download ProstCounter",
-      "subtitle": "Track your beer festival experience on any device. Free forever.",
+      "subtitle": "Track your beer festival experience on any device. Free, no ads.",
       "ios": {
         "description": "iPhone & iPad",
         "action": "Get it on the App Store"

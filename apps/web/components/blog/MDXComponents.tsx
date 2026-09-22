@@ -187,7 +187,7 @@ export function getMdxComponents(locale: SupportedLanguage = "en") {
     ),
     a: ({ children, href, ...props }: React.ComponentProps<"a">) => {
       const linkClass =
-        "font-medium text-yellow-600 underline decoration-yellow-300 underline-offset-2 hover:text-yellow-700";
+        "font-medium text-yellow-700 underline decoration-yellow-400 underline-offset-2 hover:text-yellow-800";
       if (href && href.startsWith("/")) {
         return (
           <Link href={href} className={linkClass}>

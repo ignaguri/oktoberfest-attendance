@@ -3423,6 +3423,16 @@
     "sharedGroups": "Grupos en común"
   },
   "marketing": {
+    "seo": {
+      "home": {
+        "title": "ProstCounter 🍻 - Contá tus cervezas del Oktoberfest",
+        "description": "Contá cada Maß, competí con amigos en clasificaciones y reviví tu Oktoberfest. Gratis, sin anuncios, en iOS, Android y web."
+      },
+      "download": {
+        "title": "Descargar ProstCounter - iOS, Android y Web",
+        "description": "Descargá ProstCounter gratis para iOS o Android, o usá la app web. Registrá tu experiencia cervecera en cualquier dispositivo."
+      }
+    },
     "header": {
       "blog": "Blog",
       "download": "Descargar",
@@ -3435,7 +3445,7 @@
       "subtitle": "Cuenta cada Masskrug, compite con amigos en clasificaciones y revive tus recuerdos del Oktoberfest — todo en una app.",
       "getStarted": "Empieza gratis",
       "downloadApp": "Descargar app",
-      "freeForever": "Gratis para siempre. Disponible en iOS, Android y Web."
+      "free": "Gratis, sin anuncios. Disponible en iOS, Android y Web."
     },
     "features": {
       "sectionTitle": "Todo lo que necesitas en la Wiesn",
@@ -3495,7 +3505,7 @@
     },
     "download": {
       "title": "Descargar ProstCounter",
-      "subtitle": "Registra tu experiencia cervecera en cualquier dispositivo. Gratis para siempre.",
+      "subtitle": "Registra tu experiencia cervecera en cualquier dispositivo. Gratis, sin anuncios.",
       "ios": {
         "description": "iPhone e iPad",
         "action": "Descargar en el App Store"

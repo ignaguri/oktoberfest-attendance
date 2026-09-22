@@ -7,10 +7,13 @@ import { FestivalCountdownBanner } from "@/components/marketing/FestivalCountdow
 import { LandingContent } from "@/components/marketing/LandingContent";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getCountdownFestival } from "@/lib/marketing/getCountdownFestival";
+import { seoCopy } from "@/lib/marketing/seoCopy";
 
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
+  title: seoCopy("en", "home").title,
+  description: seoCopy("en", "home").description,
   alternates: {
     canonical: PROD_URL,
     languages: {

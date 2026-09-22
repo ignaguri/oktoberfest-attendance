@@ -3349,6 +3349,16 @@
     "sharedGroups": "Gemeinsame Gruppen"
   },
   "marketing": {
+    "seo": {
+      "home": {
+        "title": "ProstCounter 🍻 - Zähl deine Wiesn-Maß mit Freunden",
+        "description": "Zähle jede Maß, messe dich mit Freunden in Bestenlisten und erlebe deine Wiesn neu. Kostenlos, keine Werbung, für iOS, Android und Web."
+      },
+      "download": {
+        "title": "ProstCounter herunterladen - iOS, Android & Web",
+        "description": "Lade ProstCounter kostenlos für iOS oder Android, oder nutze die Web-App. Zähle dein Bierfest-Erlebnis auf jedem Gerät."
+      }
+    },
     "header": {
       "blog": "Blog",
       "download": "Download",
@@ -3361,7 +3371,7 @@
       "subtitle": "Zähle jeden Masskrug, messe dich mit Freunden in Bestenlisten und erlebe deine Oktoberfest-Erinnerungen neu — alles in einer App.",
       "getStarted": "Kostenlos starten",
       "downloadApp": "App herunterladen",
-      "freeForever": "Für immer kostenlos. Verfügbar für iOS, Android & Web."
+      "free": "Kostenlos, keine Werbung. Verfügbar für iOS, Android & Web."
     },
     "features": {
       "sectionTitle": "Alles, was du auf der Wiesn brauchst",
@@ -3421,7 +3431,7 @@
     },
     "download": {
       "title": "ProstCounter herunterladen",
-      "subtitle": "Erlebe dein Bierfest auf jedem Gerät. Für immer kostenlos.",
+      "subtitle": "Erlebe dein Bierfest auf jedem Gerät. Kostenlos, keine Werbung.",
       "ios": {
         "description": "iPhone & iPad",
         "action": "Im App Store laden"

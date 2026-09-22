@@ -57,8 +57,8 @@ export function CategoryView({
         <p className="text-gray-500">{emptyText[locale]}</p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post) => (
-            <ArticleCard key={post.slug} post={post} />
+          {posts.map((post, index) => (
+            <ArticleCard key={post.slug} post={post} priority={index === 0} />
           ))}
         </div>
       )}

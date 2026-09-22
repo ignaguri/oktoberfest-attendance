@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { DownloadContent } from "@/components/marketing/DownloadContent";
 import { SyncLocale } from "@/components/marketing/SyncLocale";
 import { NON_DEFAULT_LOCALES } from "@/lib/constants";
+import { seoCopy } from "@/lib/marketing/seoCopy";
 
 export const revalidate = 86400;
 
@@ -19,10 +20,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { locale } = await params;
   if (!NON_DEFAULT_LOCALES.includes(locale as SupportedLanguage)) return {};
 
+  const copy = seoCopy(locale as SupportedLanguage, "download");
+
   return {
-    title: "Download ProstCounter - iOS, Android & Web",
-    description:
-      "Download ProstCounter for free on iOS, Android, or use the web app. Track your beer festival experience on any device.",
+    title: copy.title,
+    description: copy.description,
     alternates: {
       canonical: `${PROD_URL}/${locale}/download`,
       languages: {
