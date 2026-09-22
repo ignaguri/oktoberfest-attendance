@@ -295,3 +295,48 @@ export function usePublicProfile(userId?: string, festivalId?: string) {
     },
   );
 }
+
+/**
+ * The profile page payload. Gated fields arrive empty for a viewer who is
+ * neither a friend nor a group mate; that is RLS, not a client-side filter.
+ */
+export function useProfileDetail(userId?: string, festivalId?: string) {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.profileDetail(userId || "", festivalId),
+    async () => {
+      if (!userId) return null;
+      const response = await apiClient.profile.getProfileDetail(userId, festivalId);
+      return response.profile;
+    },
+    {
+      enabled: !!userId,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 15 * 60 * 1000,
+    },
+  );
+}
+
+/** One festival's days, fetched only once its history row is expanded. */
+export function useProfileFestivalDays(
+  userId?: string,
+  festivalId?: string,
+  options?: { enabled?: boolean },
+) {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.profileDays(userId || "", festivalId || ""),
+    async () => {
+      if (!userId || !festivalId) return null;
+      const response = await apiClient.profile.getProfileDays(userId, festivalId);
+      return response.days;
+    },
+    {
+      enabled: !!userId && !!festivalId && options?.enabled !== false,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 15 * 60 * 1000,
+    },
+  );
+}
