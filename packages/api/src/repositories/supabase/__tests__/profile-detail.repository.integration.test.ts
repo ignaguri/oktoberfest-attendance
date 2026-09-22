@@ -118,4 +118,23 @@ describe("getProfileDetail (Local DB)", () => {
     expect(profile.friendshipStatus).toBe("self");
     expect(profile.history).toHaveLength(1);
   });
+
+  describe("listProfileDays", () => {
+    it("gives a friend the day's drinks and tents", async () => {
+      const days = await repoFor(friend).listProfileDays(owner.id, festival.id);
+
+      expect(days).toHaveLength(1);
+      expect(days[0]).toEqual({
+        date: dayFromToday(-1),
+        totalDrinks: 2,
+        tents: [tent.name],
+      });
+    });
+
+    it("gives a stranger nothing", async () => {
+      const days = await repoFor(stranger).listProfileDays(owner.id, festival.id);
+
+      expect(days).toEqual([]);
+    });
+  });
 });

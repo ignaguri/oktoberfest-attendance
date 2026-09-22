@@ -5,6 +5,7 @@ import type {
   Highlights,
   MissingProfileFields,
   Profile,
+  ProfileDayRow,
   ProfileDetail,
   ProfileHistoryRow,
   ProfileShort,
@@ -14,7 +15,7 @@ import type {
   UpdateProfileInput,
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
-import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
+import { formatDateForDatabase, replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
@@ -378,6 +379,76 @@ export class SupabaseProfileRepository {
     }
 
     return favourite;
+  }
+
+  /**
+   * One row per day the user attended this festival. Gated by the same RLS
+   * policy as the history, so a stranger receives an empty array.
+   *
+   * Tent visits are timestamps but a festival day is a wall-clock day in the
+   * festival's own timezone, so each visit is bucketed with
+   * `formatDateForDatabase` rather than by slicing the ISO string.
+   */
+  async listProfileDays(userId: string, festivalId: string): Promise<ProfileDayRow[]> {
+    const { data: attendanceRows, error } = await this.supabase
+      .from("attendances")
+      .select("id, date")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .order("date", { ascending: false });
+
+    if (error) {
+      throw new DatabaseError(`Failed to list profile days: ${error.message}`);
+    }
+
+    const attendances = (attendanceRows ?? []).flatMap((row) =>
+      row.date ? [{ id: row.id, date: row.date }] : [],
+    );
+    if (attendances.length === 0) {
+      return [];
+    }
+
+    const attendanceIds = attendances.map((attendance) => attendance.id);
+
+    const [festivalResult, consumptionsResult, visitsResult] = await Promise.all([
+      this.supabase.from("festivals").select("timezone").eq("id", festivalId).maybeSingle(),
+      this.supabase.from("consumptions").select("attendance_id").in("attendance_id", attendanceIds),
+      this.supabase
+        .from("tent_visits")
+        .select("visit_date, tents(name)")
+        .eq("user_id", userId)
+        .eq("festival_id", festivalId),
+    ]);
+
+    const timezone = festivalResult.data?.timezone ?? undefined;
+
+    const drinksByAttendance = new Map<string, number>();
+    for (const row of consumptionsResult.data ?? []) {
+      if (!row.attendance_id) {
+        continue;
+      }
+      drinksByAttendance.set(
+        row.attendance_id,
+        (drinksByAttendance.get(row.attendance_id) ?? 0) + 1,
+      );
+    }
+
+    const tentsByDate = new Map<string, Set<string>>();
+    for (const row of visitsResult.data ?? []) {
+      if (!row.tents || !row.visit_date) {
+        continue;
+      }
+      const date = formatDateForDatabase(new Date(row.visit_date), timezone);
+      const tents = tentsByDate.get(date) ?? new Set<string>();
+      tents.add(row.tents.name);
+      tentsByDate.set(date, tents);
+    }
+
+    return attendances.map((attendance) => ({
+      date: attendance.date,
+      totalDrinks: drinksByAttendance.get(attendance.id) ?? 0,
+      tents: [...(tentsByDate.get(attendance.date) ?? [])],
+    }));
   }
 
   async updateProfile(userId: string, input: UpdateProfileInput): Promise<Profile> {
