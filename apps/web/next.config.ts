@@ -32,6 +32,19 @@ const nextConfig: NextConfig = {
     },
     resolveExtensions: [".js", ".jsx", ".ts", ".tsx", ".json", ".mjs", ".cjs"],
   },
+  // The internal `[lang]` shapes are not public URLs, but they do resolve, so
+  // send them to the canonical form rather than letting them fall through to
+  // the auth redirect and look like a login wall. Redirects are matched on the
+  // incoming request only, so these never see the rewrites' output and cannot
+  // loop. /de and /es are left alone: there the prefix is the public URL.
+  async redirects() {
+    return [
+      { source: "/en", destination: "/", permanent: true },
+      { source: "/en/:path*", destination: "/:path*", permanent: true },
+      { source: "/:lang(de|es)/blog", destination: "/blog/:lang", permanent: true },
+      { source: "/:lang(de|es)/blog/:path*", destination: "/blog/:lang/:path*", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
@@ -73,14 +86,48 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    return [
-      {
-        // Scanners only look at /.well-known/security.txt; the file itself is
-        // served by app/api/security.txt/route.ts.
-        source: "/.well-known/security.txt",
-        destination: "/api/security.txt",
-      },
-    ];
+    return {
+      beforeFiles: [
+        {
+          // Scanners only look at /.well-known/security.txt; the file itself is
+          // served by app/api/security.txt/route.ts.
+          source: "/.well-known/security.txt",
+          destination: "/api/security.txt",
+        },
+      ],
+      // Every page lives under app/[lang]/ so the root layout can put the right
+      // language on <html>; nothing above a route param can read one. These map
+      // the unchanged public URLs onto that segment, so no existing link or
+      // indexed page moves. Rewrites run after middleware, so proxy.ts still
+      // matches on the public path.
+      //
+      // afterFiles, not beforeFiles: these patterns are broad enough to swallow
+      // robots.txt, sitemap.xml, the manifest and the icons, which are metadata
+      // routes at the app root rather than pages. Running after the filesystem
+      // lets those resolve first.
+      afterFiles: [
+        // Blog carries the locale one level in (/blog/de/slug), so it gets
+        // pulled to the front and has to match before the generic case.
+        {
+          source: "/blog/:lang(de|es)",
+          destination: "/:lang/blog",
+        },
+        {
+          source: "/blog/:lang(de|es)/:path*",
+          destination: "/:lang/blog/:path*",
+        },
+        // Already-prefixed marketing URLs (/de, /de/download) are their own
+        // internal form, so they are left alone and everything else gets /en.
+        {
+          source: "/:path((?!de$|es$|de/|es/|api/|serwist/).*)",
+          destination: "/en/:path",
+        },
+        {
+          source: "/",
+          destination: "/en",
+        },
+      ],
+    };
   },
   experimental: {
     serverActions: {

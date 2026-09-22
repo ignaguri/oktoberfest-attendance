@@ -347,10 +347,25 @@ export async function compressPhoto(
 ): Promise<{ uri: string; arrayBuffer: ArrayBuffer; mimeType: string }> {
   const opts = { ...DEFAULT_COMPRESS_OPTIONS, ...options };
 
-  // Compress image
+  // Compress image.
+  //
+  // resize() only preserves the aspect ratio when given a single dimension;
+  // passing both stretches the photo into that exact box, which is what turned
+  // every portrait shot into a square. So read the source size first and cap
+  // whichever edge is longer, leaving the other to scale with it. Images
+  // already within maxSize are left alone rather than upscaled, and reuse the
+  // first render instead of paying for a second one that would be a no-op.
   const context = ImageManipulator.manipulate(localUri);
-  context.resize({ width: opts.maxSize, height: opts.maxSize });
-  const image = await context.renderAsync();
+  const source = await context.renderAsync();
+
+  let image = source;
+  if (Math.max(source.width, source.height) > opts.maxSize) {
+    context.resize(
+      source.width >= source.height ? { width: opts.maxSize } : { height: opts.maxSize },
+    );
+    image = await context.renderAsync();
+  }
+
   const result = await image.saveAsync({
     format: SaveFormat.WEBP,
     compress: opts.quality,

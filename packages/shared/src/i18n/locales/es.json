@@ -13,6 +13,7 @@
       "ok": "OK",
       "retry": "Reintentar",
       "loading": "Cargando...",
+      "loadMore": "Cargar más",
       "signIn": "Iniciar sesión",
       "signUp": "Registrarse",
       "signOut": "Cerrar sesión",
@@ -95,8 +96,8 @@
     },
     "offline": {
       "title": "Estás sin conexión",
-      "leaderboardUnavailable": "La tabla de posiciones requiere conexión a internet. Conéctate para ver el ranking.",
-      "achievementsUnavailable": "Los logros requieren conexión a internet. Conéctate para ver tu progreso."
+      "leaderboardUnavailable": "La tabla de posiciones requiere conexión a internet. Conectate para ver el ranking.",
+      "achievementsUnavailable": "Los logros requieren conexión a internet. Conectate para ver tu progreso."
     },
     "empty": {
       "noResults": "No se encontraron resultados",
@@ -157,7 +158,7 @@
   },
   "auth": {
     "captcha": {
-      "updateRequired": "Actualiza la aplicación para continuar.",
+      "updateRequired": "Actualizá la aplicación para continuar.",
       "required": "Completá el captcha para continuar.",
       "failed": "No se pudo completar el captcha. Intentá de nuevo."
     },
@@ -266,7 +267,7 @@
       "action": "Llevar al {{festival}}",
       "pending": "Llevando...",
       "success": "{{name}} está listo para {{festival}}. Tus miembros ya fueron invitados.",
-      "errorNameTaken": "Ya tienes un grupo llamado {{name}} en este festival.",
+      "errorNameTaken": "Ya tenés un grupo llamado {{name}} en este festival.",
       "errorGeneric": "No se pudo llevar el grupo. Por favor, intentá de nuevo."
     },
     "memberCount": "{{count}} miembro",
@@ -468,7 +469,8 @@
         "close": "Cerrar",
         "reactWith": "Reaccionar con {{emoji}}",
         "tapToReact": "Tocar para reaccionar",
-        "tapToRemoveReaction": "Tocar para quitar la reacción"
+        "tapToRemoveReaction": "Tocar para quitar la reacción",
+        "photo": "Foto"
       },
       "accessibility": {
         "photoBy": "Foto de {{username}}",
@@ -607,6 +609,7 @@
     "registerOrUpdate": "Registrá o actualizá tu asistencia",
     "whenDidYouVisit": "¿Cuándo visitaste la Wiesn?",
     "howManyBeers": "¿Cuántas 🍻 Maß tomaste?",
+    "beerPicture": "Foto de cerveza",
     "selectAmount": "Seleccioná cantidad",
     "whichTents": "¿Qué carpas visitaste?",
     "selectToEdit": "Seleccioná cualquier asistencia para editarla",
@@ -1624,7 +1627,7 @@
         "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
         "passwordChanged": "Contraseña actualizada",
         "editProfile": "Editar nombre",
-        "editProfileHint": "Cambia el nombre y el nombre de usuario de este usuario",
+        "editProfileHint": "Abre el nombre y el nombre de usuario de este usuario para editarlos",
         "fullName": "Nombre completo",
         "username": "Nombre de usuario",
         "noUsername": "Sin nombre de usuario",
@@ -1639,17 +1642,18 @@
         "edit": {
           "title": "Editar asistencia",
           "open": "Editar",
-          "openHint": "Cambia la fecha, las cervezas y las carpas de este día",
+          "openHint": "Abre la fecha, las cervezas y las carpas de este día para editarlas",
           "date": "Fecha",
           "beers": "Cervezas",
           "beersStored": "No hay consumiciones registradas este día, así que este es el valor guardado.",
-          "beersDerived_one": "Calculado a partir de {{count}} consumición registrada. Cambia las consumiciones para modificarlo.",
-          "beersDerived_other": "Calculado a partir de {{count}} consumiciones registradas. Cambia las consumiciones para modificarlo.",
-          "beersInvalid": "Introduce un número entero, 0 o más",
+          "beersDerived_one": "Calculado a partir de {{count}} consumición registrada. Cambiá las consumiciones para modificarlo.",
+          "beersDerived_other": "Calculado a partir de {{count}} consumiciones registradas. Cambiá las consumiciones para modificarlo.",
+          "beersInvalid": "Introducí un número entero, 0 o más",
           "tents": "Carpas",
           "tentsLoading": "Cargando carpas...",
           "tentsEmpty": "Este festival todavía no tiene carpas",
           "save": "Guardar cambios",
+        "saveHint": "Guarda los cambios de este registro",
           "saveError": "No se pudieron guardar los cambios",
           "duplicateDate": "Este usuario ya tiene una asistencia en esa fecha"
         },
@@ -1741,10 +1745,10 @@
         "noOtherFestivals": "No hay otro festival del que copiar",
         "priceLabel": "Precio de la cerveza",
         "pricePlaceholder": "16,20",
-        "priceInvalid": "Introduce un precio mayor que cero, o déjalo vacío para ninguno",
+        "priceInvalid": "Introducí un precio mayor que cero, o dejalo vacío para ninguno",
         "priceError": "No se pudo actualizar el precio",
         "priceEditHint": "Editar el precio de la cerveza en este festival",
-        "priceClearHint": "Déjalo vacío para quitar el precio.",
+        "priceClearHint": "Dejalo vacío para quitar el precio.",
         "noPrice": "Sin definir",
         "remove": "Quitar carpa",
         "removeHint": "El festival deja de ofrecer esta carpa",
@@ -2506,6 +2510,8 @@
     },
     "proximity": {
       "veryClose": "Muy cerca",
+      "distance": "a {{meters}} m",
+      "checkIn": "Registrarte en {{tent}}",
       "hint": "Tocá para ver en el mapa y registrarte",
       "checkInButton": "Registrarse"
     },
@@ -2807,8 +2813,8 @@
     "switchedToast": "Cambiado a {{festival}} para mostrar este grupo",
     "switchedToDayToast": "Cambiado a {{festival}} para mostrar este día",
     "otherFestivalGroups": {
-      "hint": "Tienes {{count}} grupo en {{festival}}",
-      "hint_other": "Tienes {{count}} grupos en {{festival}}"
+      "hint": "Tenés {{count}} grupo en {{festival}}",
+      "hint_other": "Tenés {{count}} grupos en {{festival}}"
     }
   },
   "install": {
@@ -2831,7 +2837,7 @@
     },
     "queued": "En cola",
     "willRetry": "La subida se reintentará automáticamente",
-    "failedPermanent": "La subida de la foto falló. Toca para reintentar."
+    "failedPermanent": "La subida de la foto falló. Tocá para reintentar."
   },
   "validation": {
     "required": "Este campo es requerido",
@@ -2960,6 +2966,7 @@
       "tentRemovedFromFestival": "Carpa eliminada del festival",
       "priceUpdated": "Precio actualizado exitosamente",
       "tentsCopied": "{{count}} carpa(s) copiadas exitosamente",
+      "wrappedCacheRegenerated": "Se regeneraron {{count}} entrada(s) de caché de Wrapped",
       "userUpdated": "Usuario actualizado exitosamente",
       "userDeleted": "Usuario eliminado exitosamente"
     },
@@ -3092,7 +3099,7 @@
     "CANNOT_REMOVE_SELF": "No podés eliminarte a vos mismo. Usá abandonar grupo en su lugar.",
     "USER_NOT_GROUP_MEMBER": "El usuario no es miembro de este grupo.",
     "GROUP_ALREADY_CARRIED_OVER": "Este grupo ya está en ese festival.",
-    "GROUP_NAME_TAKEN": "Ya tienes un grupo con este nombre en ese festival.",
+    "GROUP_NAME_TAKEN": "Ya tenés un grupo con este nombre en ese festival.",
     "ATTENDANCE_NOT_FOUND": "Registro de asistencia no encontrado.",
     "DUPLICATE_ATTENDANCE": "Ya tenés una asistencia para esta fecha.",
     "INVALID_DATE": "Fecha inválida.",
@@ -3402,8 +3409,8 @@
       "accepted": "Solicitud aceptada"
     },
     "unfriend": "Eliminar amigo",
-    "unfriendConfirm": "¿Estás seguro de que quieres eliminar a {{name}} como amigo?",
-    "empty": "Aún no tienes amigos. ¡Busca usuarios o revisa las sugerencias!",
+    "unfriendConfirm": "¿Estás seguro de que querés eliminar a {{name}} como amigo?",
+    "empty": "Aún no tenés amigos. ¡Buscá usuarios o revisá las sugerencias!",
     "emptyDescription": "Usa la búsqueda para encontrar personas que conozcas",
     "requestsEmpty": "No hay solicitudes de amistad pendientes",
     "friendsSince": "Amigos desde {{date}}",
@@ -3417,7 +3424,7 @@
     },
     "qr": {
       "title": "Agregar amigo",
-      "description": "Escanea este código QR para agregarme como amigo"
+      "description": "Escaneá este código QR para agregarme como amigo"
     },
     "profileBadge": {
       "friends": "Amigos",
@@ -3428,6 +3435,20 @@
     "sharedGroups": "Grupos en común"
   },
   "marketing": {
+    "seo": {
+      "home": {
+        "title": "ProstCounter 🍻 - Contá tus cervezas del Oktoberfest",
+        "description": "Contá cada Maß, competí con amigos en clasificaciones y reviví tu Oktoberfest. Gratis, sin anuncios, en iOS, Android y web."
+      },
+      "download": {
+        "title": "Descargar ProstCounter - iOS, Android y Web",
+        "description": "Descargá ProstCounter gratis para iOS o Android, o usá la app web. Registrá tu experiencia cervecera en cualquier dispositivo."
+      },
+      "blogIndex": {
+        "title": "Blog - Guías del Oktoberfest y festivales de Múnich",
+        "description": "Guías, consejos y novedades sobre el Oktoberfest, los festivales cerveceros de Múnich y la app ProstCounter."
+      }
+    },
     "header": {
       "blog": "Blog",
       "download": "Descargar",
@@ -3437,37 +3458,37 @@
     "hero": {
       "title1": "La app para tu",
       "title2": "festival cervecero",
-      "subtitle": "Cuenta cada Masskrug, compite con amigos en clasificaciones y revive tus recuerdos del Oktoberfest — todo en una app.",
-      "getStarted": "Empieza gratis",
+      "subtitle": "Contá cada Maß, competí con amigos en clasificaciones y reviví tus recuerdos del Oktoberfest — todo en una app.",
+      "getStarted": "Empezá gratis",
       "downloadApp": "Descargar app",
-      "freeForever": "Gratis para siempre. Disponible en iOS, Android y Web."
+      "free": "Gratis, sin anuncios. Disponible en iOS, Android y Web."
     },
     "features": {
-      "sectionTitle": "Todo lo que necesitas en la Wiesn",
+      "sectionTitle": "Todo lo que necesitás en la Wiesn",
       "sectionSubtitle": "De festivaleros, para festivaleros.",
       "trackBeers": {
-        "title": "Cuenta tus cervezas",
-        "description": "Registra tu consumo diario, apunta tus visitas a carpas, saca fotos de tus Masskrugs y construye la cronología de cada día de festival."
+        "title": "Contá tus cervezas",
+        "description": "Registrá tu consumo diario, apuntá tus visitas a carpas, sacá fotos de tus Maß y construí la cronología de cada día de festival."
       },
       "competeWithFriends": {
-        "title": "Compite con amigos",
-        "description": "Crea grupos, desafía a tu equipo en clasificaciones y descubre quién acumula más días de festival (o cervezas)."
+        "title": "Competí con amigos",
+        "description": "Creá grupos, desafiá a tu equipo en clasificaciones y descubrí quién acumula más días de festival (o cervezas)."
       },
       "liveLocation": {
         "title": "Ubicación en tiempo real",
-        "description": "¿No encuentras a tus amigos en la Wiesn? Comparte tu ubicación en tiempo real entre las carpas para que nadie beba solo."
+        "description": "¿No encontrás a tus amigos en la Wiesn? Compartí tu ubicación en tiempo real entre las carpas para que nadie beba solo."
       },
       "achievements": {
-        "title": "Consigue logros",
-        "description": "Desbloquea más de 40 insignias en distintas categorías — desde hitos de primerizo hasta rachas legendarias y sorpresas ocultas."
+        "title": "Conseguí logros",
+        "description": "Desbloqueá más de 40 insignias en distintas categorías — desde hitos de primerizo hasta rachas legendarias y sorpresas ocultas."
       }
     },
     "appleWatchHighlight": {
       "title": "Ya disponible en Apple Watch",
-      "subtitle": "Registrá cada jarra sin sacar el móvil. Nuestra app complementaria para Apple Watch está pensada para la carpa, el biergarten y todo lo que hay en medio.",
-      "bulletFastLog": "Registrá una jarra en dos toques",
+      "subtitle": "Registrá cada Maß sin sacar el celular. Nuestra app complementaria para Apple Watch está pensada para la carpa, el biergarten y todo lo que hay en medio.",
+      "bulletFastLog": "Registrá una Maß en dos toques",
       "bulletAutoTent": "Detectá la carpa automáticamente por GPS",
-      "bulletGroupActivity": "Mirá las últimas jarras de tu grupo en tiempo real",
+      "bulletGroupActivity": "Mirá las últimas Maß de tu grupo en tiempo real",
       "cta": "Descargar en iOS"
     },
     "festivals": {
@@ -3492,21 +3513,21 @@
     },
     "cta": {
       "title": "¿Listo para el próximo festival?",
-      "subtitle": "Descarga ProstCounter y empieza a registrar tu aventura cervecera hoy.",
+      "subtitle": "Descargá ProstCounter y empezá a registrar tu aventura cervecera hoy.",
       "downloadIos": "Descargar en iOS",
       "downloadAndroid": "Disponible en Google Play",
       "tryWebApp": "Probar la app web",
-      "scanToDownload": "Escanea para descargar en tu móvil"
+      "scanToDownload": "Escaneá para descargar en tu celular"
     },
     "download": {
       "title": "Descargar ProstCounter",
-      "subtitle": "Registra tu experiencia cervecera en cualquier dispositivo. Gratis para siempre.",
+      "subtitle": "Registrá tu experiencia cervecera en cualquier dispositivo. Gratis, sin anuncios.",
       "ios": {
         "description": "iPhone e iPad",
         "action": "Descargar en el App Store"
       },
       "android": {
-        "description": "Móviles y tablets Android",
+        "description": "Celulares y tablets Android",
         "action": "Disponible en Google Play"
       },
       "webApp": {
@@ -3518,11 +3539,11 @@
         "description": "Instalá la app de iOS y la app complementaria estará disponible automáticamente en tu Apple Watch emparejado.",
         "requirements": "Requiere watchOS 10 o posterior"
       },
-      "scanWithPhone": "Escanea con tu móvil",
+      "scanWithPhone": "Escaneá con tu celular",
       "opensAppStore": "El QR abre el App Store — los usuarios de Android tocan el botón de arriba"
     },
     "footer": {
-      "tagline": "Registra tu asistencia a festivales cerveceros y compite con amigos.",
+      "tagline": "Registrá tu asistencia a festivales cerveceros y competí con amigos.",
       "blog": "Blog",
       "download": "Descargar",
       "legal": "Legal",

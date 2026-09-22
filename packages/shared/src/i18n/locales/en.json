@@ -13,6 +13,7 @@
       "ok": "OK",
       "retry": "Retry",
       "loading": "Loading...",
+      "loadMore": "Load more",
       "signIn": "Sign In",
       "signUp": "Sign Up",
       "signOut": "Sign Out",
@@ -468,7 +469,8 @@
         "close": "Close",
         "reactWith": "React with {{emoji}}",
         "tapToReact": "Tap to react",
-        "tapToRemoveReaction": "Tap to remove reaction"
+        "tapToRemoveReaction": "Tap to remove reaction",
+        "photo": "Photo"
       },
       "accessibility": {
         "photoBy": "Photo by {{username}}",
@@ -607,6 +609,7 @@
     "registerOrUpdate": "Register or update your attendance",
     "whenDidYouVisit": "When did you visit the Wiesn?",
     "howManyBeers": "How many 🍻 Maß did you have?",
+    "beerPicture": "Beer picture",
     "selectAmount": "Select amount",
     "whichTents": "Which tents did you visit?",
     "selectToEdit": "Select any attendance to edit it",
@@ -1564,7 +1567,7 @@
         "passwordTooShort": "Password must be at least 8 characters",
         "passwordChanged": "Password updated",
         "editProfile": "Edit name",
-        "editProfileHint": "Change this user's name and username",
+        "editProfileHint": "Opens this user's name and username for editing",
         "fullName": "Full name",
         "username": "Username",
         "noUsername": "No username set",
@@ -1579,7 +1582,7 @@
         "edit": {
           "title": "Edit attendance",
           "open": "Edit",
-          "openHint": "Change this day's date, beers and tents",
+          "openHint": "Opens this day's date, beers and tents for editing",
           "date": "Date",
           "beers": "Beers",
           "beersStored": "No drinks logged on this day, so this is the stored number.",
@@ -1590,6 +1593,7 @@
           "tentsLoading": "Loading tents...",
           "tentsEmpty": "This festival has no tents yet",
           "save": "Save changes",
+        "saveHint": "Saves the changes to this attendance",
           "saveError": "Could not save the changes",
           "duplicateDate": "This user already has an attendance on that date"
         },
@@ -2457,6 +2461,8 @@
     },
     "proximity": {
       "veryClose": "Very close",
+      "distance": "{{meters}} m away",
+      "checkIn": "Check in at {{tent}}",
       "hint": "Tap to view on map and check in",
       "checkInButton": "Check In"
     },
@@ -2900,6 +2906,7 @@
       "tentRemovedFromFestival": "Tent removed from festival",
       "priceUpdated": "Price updated successfully",
       "tentsCopied": "Copied {{count}} tent(s) successfully",
+      "wrappedCacheRegenerated": "Regenerated {{count}} wrapped cache entry(s)",
       "userUpdated": "User updated successfully",
       "userDeleted": "User deleted successfully"
     },
@@ -3368,6 +3375,20 @@
     "sharedGroups": "Shared Groups"
   },
   "marketing": {
+    "seo": {
+      "home": {
+        "title": "ProstCounter 🍻 - Track Your Oktoberfest Beers with Friends",
+        "description": "Count every Maß, compete with friends on leaderboards, and relive your Oktoberfest. Free, no ads, on iOS, Android and web."
+      },
+      "download": {
+        "title": "Download ProstCounter - iOS, Android & Web",
+        "description": "Download ProstCounter for free on iOS, Android, or use the web app. Track your beer festival experience on any device."
+      },
+      "blogIndex": {
+        "title": "Blog - Oktoberfest and Munich Beer Festival Guides",
+        "description": "Guides, tips and news about Oktoberfest, Munich beer festivals, and the ProstCounter app."
+      }
+    },
     "header": {
       "blog": "Blog",
       "download": "Download",
@@ -3377,17 +3398,17 @@
     "hero": {
       "title1": "Your beer festival",
       "title2": "Companion App",
-      "subtitle": "Track every Masskrug, compete with friends on leaderboards, and relive your Oktoberfest memories — all in one app.",
+      "subtitle": "Track every Maß, compete with friends on leaderboards, and relive your Oktoberfest memories — all in one app.",
       "getStarted": "Get Started Free",
       "downloadApp": "Download App",
-      "freeForever": "Free forever. Available on iOS, Android & Web."
+      "free": "Free, no ads. Available on iOS, Android & Web."
     },
     "features": {
       "sectionTitle": "Everything you need at the Wiesn",
       "sectionSubtitle": "Built by festival-goers, for festival-goers.",
       "trackBeers": {
         "title": "Track Your Beers",
-        "description": "Log daily consumption, record tent visits, snap photos of your Masskrugs, and build a timeline of every festival day."
+        "description": "Log daily consumption, record tent visits, snap photos of your Maß, and build a timeline of every festival day."
       },
       "competeWithFriends": {
         "title": "Compete with Friends",
@@ -3404,7 +3425,7 @@
     },
     "appleWatchHighlight": {
       "title": "Now on Apple Watch",
-      "subtitle": "Log every Mass without pulling out your phone. Our Apple Watch companion is built for the tent, the biergarten, and everywhere in between.",
+      "subtitle": "Log every Maß without pulling out your phone. Our Apple Watch companion is built for the tent, the biergarten, and everywhere in between.",
       "bulletFastLog": "Log a drink in two taps",
       "bulletAutoTent": "Auto-detect which tent you're in via GPS",
       "bulletGroupActivity": "See your group's latest beers in real time",
@@ -3440,10 +3461,10 @@
     },
     "download": {
       "title": "Download ProstCounter",
-      "subtitle": "Track your beer festival experience on any device. Free forever.",
+      "subtitle": "Track your beer festival experience on any device. Free, no ads.",
       "ios": {
         "description": "iPhone & iPad",
-        "action": "Download on the App Store"
+        "action": "Get it on the App Store"
       },
       "android": {
         "description": "Android phones & tablets",

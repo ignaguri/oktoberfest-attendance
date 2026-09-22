@@ -1,16 +1,11 @@
 "use client";
 
-import {
-  changeLanguage,
-  getCurrentLanguage,
-  i18n,
-  LANGUAGE_NAMES,
-  SUPPORTED_LANGUAGES,
-} from "@prostcounter/shared/i18n";
+import { changeLanguage, LANGUAGE_NAMES, SUPPORTED_LANGUAGES } from "@prostcounter/shared/i18n";
 import { Globe } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
+import { useMarketingLocale } from "@/lib/i18n/MarketingLocaleProvider";
 import { setLangCookie } from "@/lib/utils/langCookie";
 
 const LOCALE_PATTERN = /^\/(de|es)(\/|$)/;
@@ -48,25 +43,20 @@ function getLocalizedUrl(pathname: string, newLocale: string): string | null {
 }
 
 export function MarketingLanguageSelector() {
-  const [currentLang, setCurrentLang] = useState(getCurrentLanguage);
+  // The URL decides which language a marketing page is in, so the select follows
+  // the route rather than the global i18n state. It used to track the singleton,
+  // which the server renders as English no matter the path.
+  const currentLang = useMarketingLocale();
   const pathname = usePathname();
   const router = useRouter();
-
-  // Sync state if language changes externally (e.g. I18nProvider profile load)
-  useEffect(() => {
-    const handler = (lang: string) => setCurrentLang(lang);
-    i18n.on("languageChanged", handler);
-    return () => {
-      i18n.off("languageChanged", handler);
-    };
-  }, []);
 
   const handleChange = useCallback(
     async (e: React.ChangeEvent<HTMLSelectElement>) => {
       const lang = e.target.value;
+      // Still updated so the preference carries into the app, which is not
+      // locale-routed and does read the singleton.
       await changeLanguage(lang);
       setLangCookie(lang);
-      setCurrentLang(lang);
 
       const newUrl = getLocalizedUrl(pathname, lang);
       if (newUrl && newUrl !== pathname) {

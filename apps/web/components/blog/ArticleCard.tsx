@@ -12,7 +12,7 @@ const minReadMap = {
   es: "min",
 } as const;
 
-export function ArticleCard({ post }: { post: BlogPostMeta }) {
+export function ArticleCard({ post, priority = false }: { post: BlogPostMeta; priority?: boolean }) {
   const href = post.locale === "en" ? `/blog/${post.slug}` : `/blog/${post.locale}/${post.slug}`;
 
   return (
@@ -25,6 +25,7 @@ export function ArticleCard({ post }: { post: BlogPostMeta }) {
             fill
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={priority}
           />
         </div>
         <div className="p-5">
@@ -35,11 +36,11 @@ export function ArticleCard({ post }: { post: BlogPostMeta }) {
               {localizeCategory(post.category, post.locale)}
             </span>
           </div>
-          <h2 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-yellow-600">
+          <h2 className="mb-2 text-lg font-bold text-gray-900 transition-colors group-hover:text-yellow-700">
             {post.title}
           </h2>
           <p className="mb-3 line-clamp-2 text-sm text-gray-500">{post.description}</p>
-          <div className="flex items-center gap-4 text-xs text-gray-400">
+          <div className="flex items-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-1">
               <Calendar size={12} />
               {new Date(post.date).toLocaleDateString(dateLocaleMap[post.locale] || "en-US", {

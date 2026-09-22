@@ -5,13 +5,14 @@ import Image from "next/image";
 import { Link } from "next-view-transitions";
 
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
-import { i18n, useTranslation } from "@/lib/i18n/client";
+import { useTranslation } from "@/lib/i18n/client";
+import { useMarketingLocale } from "@/lib/i18n/MarketingLocaleProvider";
 import { marketingUrl } from "@/lib/utils/marketingUrl";
 import AppLogo from "@/public/android-chrome-512x512.png";
 
 export function MarketingFooter() {
   const { t } = useTranslation();
-  const lang = i18n.language;
+  const lang = useMarketingLocale();
 
   const blogLinks = [
     { href: "/blog/oktoberfest-2026-guide", labelKey: "oktoberfestGuide" },

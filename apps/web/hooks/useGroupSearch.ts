@@ -4,7 +4,7 @@ import type { Tables } from "@prostcounter/db";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { deleteGroup, getGroups, updateGroup } from "@/app/(private)/admin/actions";
+import { deleteGroup, getGroups, updateGroup } from "@/app/[lang]/(private)/admin/actions";
 import { type GroupSearchFilters, searchKeys } from "@/lib/data/search-query-keys";
 
 // Import the server actions

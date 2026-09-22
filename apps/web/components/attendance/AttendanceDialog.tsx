@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
-import DetailedAttendanceForm from "@/app/(private)/attendance/DetailedAttendanceForm";
+import DetailedAttendanceForm from "@/app/[lang]/(private)/attendance/DetailedAttendanceForm";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 
 export function AttendanceDialog() {
