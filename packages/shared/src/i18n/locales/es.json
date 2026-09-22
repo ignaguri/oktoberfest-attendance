@@ -95,8 +95,8 @@
     },
     "offline": {
       "title": "Estás sin conexión",
-      "leaderboardUnavailable": "La tabla de posiciones requiere conexión a internet. Conéctate para ver el ranking.",
-      "achievementsUnavailable": "Los logros requieren conexión a internet. Conéctate para ver tu progreso."
+      "leaderboardUnavailable": "La tabla de posiciones requiere conexión a internet. Conectate para ver el ranking.",
+      "achievementsUnavailable": "Los logros requieren conexión a internet. Conectate para ver tu progreso."
     },
     "empty": {
       "noResults": "No se encontraron resultados",
@@ -157,7 +157,7 @@
   },
   "auth": {
     "captcha": {
-      "updateRequired": "Actualiza la aplicación para continuar.",
+      "updateRequired": "Actualizá la aplicación para continuar.",
       "required": "Completá el captcha para continuar.",
       "failed": "No se pudo completar el captcha. Intentá de nuevo."
     },
@@ -266,7 +266,7 @@
       "action": "Llevar al {{festival}}",
       "pending": "Llevando...",
       "success": "{{name}} está listo para {{festival}}. Tus miembros ya fueron invitados.",
-      "errorNameTaken": "Ya tienes un grupo llamado {{name}} en este festival.",
+      "errorNameTaken": "Ya tenés un grupo llamado {{name}} en este festival.",
       "errorGeneric": "No se pudo llevar el grupo. Por favor, intentá de nuevo."
     },
     "memberCount": "{{count}} miembro",
@@ -1641,9 +1641,9 @@
           "date": "Fecha",
           "beers": "Cervezas",
           "beersStored": "No hay consumiciones registradas este día, así que este es el valor guardado.",
-          "beersDerived_one": "Calculado a partir de {{count}} consumición registrada. Cambia las consumiciones para modificarlo.",
-          "beersDerived_other": "Calculado a partir de {{count}} consumiciones registradas. Cambia las consumiciones para modificarlo.",
-          "beersInvalid": "Introduce un número entero, 0 o más",
+          "beersDerived_one": "Calculado a partir de {{count}} consumición registrada. Cambiá las consumiciones para modificarlo.",
+          "beersDerived_other": "Calculado a partir de {{count}} consumiciones registradas. Cambiá las consumiciones para modificarlo.",
+          "beersInvalid": "Introducí un número entero, 0 o más",
           "tents": "Carpas",
           "tentsLoading": "Cargando carpas...",
           "tentsEmpty": "Este festival todavía no tiene carpas",
@@ -1739,10 +1739,10 @@
         "noOtherFestivals": "No hay otro festival del que copiar",
         "priceLabel": "Precio de la cerveza",
         "pricePlaceholder": "16,20",
-        "priceInvalid": "Introduce un precio mayor que cero, o déjalo vacío para ninguno",
+        "priceInvalid": "Introducí un precio mayor que cero, o dejalo vacío para ninguno",
         "priceError": "No se pudo actualizar el precio",
         "priceEditHint": "Editar el precio de la cerveza en este festival",
-        "priceClearHint": "Déjalo vacío para quitar el precio.",
+        "priceClearHint": "Dejalo vacío para quitar el precio.",
         "noPrice": "Sin definir",
         "remove": "Quitar carpa",
         "removeHint": "El festival deja de ofrecer esta carpa",
@@ -2802,8 +2802,8 @@
     "switchedToast": "Cambiado a {{festival}} para mostrar este grupo",
     "switchedToDayToast": "Cambiado a {{festival}} para mostrar este día",
     "otherFestivalGroups": {
-      "hint": "Tienes {{count}} grupo en {{festival}}",
-      "hint_other": "Tienes {{count}} grupos en {{festival}}"
+      "hint": "Tenés {{count}} grupo en {{festival}}",
+      "hint_other": "Tenés {{count}} grupos en {{festival}}"
     }
   },
   "install": {
@@ -2826,7 +2826,7 @@
     },
     "queued": "En cola",
     "willRetry": "La subida se reintentará automáticamente",
-    "failedPermanent": "La subida de la foto falló. Toca para reintentar."
+    "failedPermanent": "La subida de la foto falló. Tocá para reintentar."
   },
   "validation": {
     "required": "Este campo es requerido",
@@ -3087,7 +3087,7 @@
     "CANNOT_REMOVE_SELF": "No podés eliminarte a vos mismo. Usá abandonar grupo en su lugar.",
     "USER_NOT_GROUP_MEMBER": "El usuario no es miembro de este grupo.",
     "GROUP_ALREADY_CARRIED_OVER": "Este grupo ya está en ese festival.",
-    "GROUP_NAME_TAKEN": "Ya tienes un grupo con este nombre en ese festival.",
+    "GROUP_NAME_TAKEN": "Ya tenés un grupo con este nombre en ese festival.",
     "ATTENDANCE_NOT_FOUND": "Registro de asistencia no encontrado.",
     "DUPLICATE_ATTENDANCE": "Ya tenés una asistencia para esta fecha.",
     "INVALID_DATE": "Fecha inválida.",
@@ -3397,8 +3397,8 @@
       "accepted": "Solicitud aceptada"
     },
     "unfriend": "Eliminar amigo",
-    "unfriendConfirm": "¿Estás seguro de que quieres eliminar a {{name}} como amigo?",
-    "empty": "Aún no tienes amigos. ¡Busca usuarios o revisa las sugerencias!",
+    "unfriendConfirm": "¿Estás seguro de que querés eliminar a {{name}} como amigo?",
+    "empty": "Aún no tenés amigos. ¡Buscá usuarios o revisá las sugerencias!",
     "emptyDescription": "Usa la búsqueda para encontrar personas que conozcas",
     "requestsEmpty": "No hay solicitudes de amistad pendientes",
     "friendsSince": "Amigos desde {{date}}",
@@ -3412,7 +3412,7 @@
     },
     "qr": {
       "title": "Agregar amigo",
-      "description": "Escanea este código QR para agregarme como amigo"
+      "description": "Escaneá este código QR para agregarme como amigo"
     },
     "profileBadge": {
       "friends": "Amigos",
