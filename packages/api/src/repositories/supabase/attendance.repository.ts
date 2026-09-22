@@ -436,6 +436,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
           attendanceId,
           visitedAt: new Date(replayed.visit_date).toISOString(),
           visitDate: storedDate,
+          replayed: true,
         };
       }
     }
@@ -497,6 +498,7 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       attendanceId,
       visitedAt: new Date(tentVisit.visit_date).toISOString(),
       visitDate: date,
+      replayed: false,
     };
   }
 

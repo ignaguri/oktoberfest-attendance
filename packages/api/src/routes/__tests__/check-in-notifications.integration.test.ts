@@ -2,7 +2,7 @@
 //   cd packages/api && npx vitest run --config vitest.integration.config.ts \
 //     src/routes/__tests__/check-in-notifications.integration.test.ts
 import { randomUUID } from "crypto";
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@prostcounter/db";
 
@@ -34,6 +34,10 @@ vi.mock("../../services/notification.service", () => ({
 let admin: SupabaseClient<Database>;
 const createdUserIds: string[] = [];
 const createdFestivalIds: string[] = [];
+const createdGroupIds: string[] = [];
+// Restored in afterAll rather than just re-set, so this file doesn't leak a
+// key into whatever test happens to share the process afterwards.
+const originalNovuApiKey = process.env.NOVU_API_KEY;
 
 function mountRoutes() {
   const app = createTestApp();
@@ -88,17 +92,43 @@ async function anyTentId() {
   return data.id;
 }
 
+// Puts the acting user in a group for the festival, which is the only thing
+// groupIdsForFestival needs to make the tent check-in fallback (as opposed to
+// day-start) actually run. NotificationService itself is mocked, so no other
+// member is needed to observe the call.
+async function putUserInGroup(userId: string, festivalId: string) {
+  const { data: group, error: groupError } = await admin.rpc("create_group_with_member", {
+    p_group_name: `Check-in Test Group ${randomUUID()}`,
+    p_user_id: userId,
+    p_festival_id: festivalId,
+    p_winning_criteria_id: 2,
+  });
+  if (groupError || !group?.[0]) {
+    throw new Error(`Failed to create test group: ${groupError?.message}`);
+  }
+  createdGroupIds.push(group[0].group_id);
+}
+
 describe("check-in notifications reach the endpoints mobile actually calls", () => {
   beforeAll(() => {
     admin = createTestSupabaseAdmin();
   });
 
   afterAll(async () => {
+    if (createdGroupIds.length > 0) {
+      await admin.from("group_members").delete().in("group_id", createdGroupIds);
+      await admin.from("groups").delete().in("id", createdGroupIds);
+    }
     for (const festivalId of createdFestivalIds) {
       await admin.from("festivals").delete().eq("id", festivalId);
     }
     for (const userId of createdUserIds) {
       await admin.auth.admin.deleteUser(userId).catch(() => undefined);
+    }
+    if (originalNovuApiKey === undefined) {
+      delete process.env.NOVU_API_KEY;
+    } else {
+      process.env.NOVU_API_KEY = originalNovuApiKey;
     }
   });
 
@@ -108,14 +138,27 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
     notifyDayStartMock.mockResolvedValue(true);
   });
 
+  afterEach(() => {
+    if (originalNovuApiKey === undefined) {
+      delete process.env.NOVU_API_KEY;
+    } else {
+      process.env.NOVU_API_KEY = originalNovuApiKey;
+    }
+  });
+
   // The regression. Mobile has logged tent visits through this endpoint since
   // it went offline-first in 132f37bd; nothing here ever notified anyone, which
   // is why tent-check-in-notification last fired on 2026-04-09.
-  it("notifies when a tent visit is logged through /attendance/tent-visits", async () => {
+  it("notifies day start and does not also send a tent check-in", async () => {
     const app = mountRoutes();
     const user = await createTestUser();
     const festivalId = await createTestFestival();
     const tentId = await anyTentId();
+    // A real group membership so the single-push rule has a fallback to
+    // wrongly fire if it fails: with it in place, an implementation that
+    // sent both pushes would still pass a test that only asserts
+    // notifyDayStartMock was called.
+    await putUserInGroup(user.id, festivalId);
 
     const response = await app.request("/attendance/tent-visits", {
       method: "POST",
@@ -132,10 +175,13 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
 
     expect(response.status).toBe(201);
     expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+    expect(notifyTentCheckinMock).not.toHaveBeenCalled();
   });
 
   // The single-push rule: once the day is claimed, a check-in is an ordinary
-  // tent check-in and must not also announce the day.
+  // tent check-in and must not also announce the day. The fixture needs a
+  // real group membership, otherwise the fallback branch never runs and this
+  // test would pass even if it had been deleted outright.
   it("falls back to a tent check-in once the day is already claimed", async () => {
     notifyDayStartMock.mockResolvedValue(false);
 
@@ -143,6 +189,7 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
     const user = await createTestUser();
     const festivalId = await createTestFestival();
     const tentId = await anyTentId();
+    await putUserInGroup(user.id, festivalId);
 
     const response = await app.request("/attendance/tent-visits", {
       method: "POST",
@@ -159,10 +206,82 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
 
     expect(response.status).toBe(201);
     expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
-    // No group memberships in this fixture, so the tent check-in is skipped —
-    // what matters is that day-start did not fire twice.
+    expect(notifyDayStartMock).toHaveBeenCalledWith(expect.objectContaining({ kind: "checkin" }));
+    expect(notifyTentCheckinMock).toHaveBeenCalledTimes(1);
+  });
+
+  // A replayed push (same tentVisitId, at-least-once offline sync queue)
+  // inserts nothing on the second call. The original call already made the
+  // single-push decision for this visit; replaying it must not make a
+  // second one of either kind.
+  it("does not send a second notification when a tent visit is replayed", async () => {
+    const app = mountRoutes();
+    const user = await createTestUser();
+    const festivalId = await createTestFestival();
+    const tentId = await anyTentId();
+    await putUserInGroup(user.id, festivalId);
+    const tentVisitId = randomUUID();
+
+    const body = JSON.stringify({
+      festivalId,
+      tentId,
+      visitedAt: new Date("2024-09-21T18:00:00.000Z").toISOString(),
+      tentVisitId,
+    });
+
+    const first = await app.request("/attendance/tent-visits", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body,
+    });
+    expect(first.status).toBe(201);
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+
+    const replay = await app.request("/attendance/tent-visits", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body,
+    });
+    expect(replay.status).toBe(201);
+
+    // Still 1, not 2 — the replay announced nothing.
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+    expect(notifyTentCheckinMock).not.toHaveBeenCalled();
+  });
+
+  // Constraint: the ledger date must come from the repository's
+  // festival-timezone bucketing, never from slicing the incoming UTC
+  // timestamp. 23:30 UTC is already the next day in Europe/Berlin (UTC+2 in
+  // September), so a regression to `visitedAt.slice(0, 10)` would report the
+  // 21st here instead of the 22nd and this assertion would catch it.
+  it("buckets the notified date by festival timezone, not by slicing the UTC timestamp", async () => {
+    const app = mountRoutes();
+    const user = await createTestUser();
+    const festivalId = await createTestFestival();
+    const tentId = await anyTentId();
+
+    const response = await app.request("/attendance/tent-visits", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        festivalId,
+        tentId,
+        visitedAt: new Date("2024-09-21T23:30:00.000Z").toISOString(),
+      }),
+    });
+
+    expect(response.status).toBe(201);
     expect(notifyDayStartMock).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "checkin" }),
+      expect.objectContaining({ date: "2024-09-22" }),
     );
   });
 });

@@ -587,7 +587,7 @@ export interface paths {
         put?: never;
         /**
          * Update personal attendance
-         * @description Updates personal attendance without triggering group notifications. Preserves existing tent visit timestamps.
+         * @description Updates personal attendance. Preserves existing tent visit timestamps. Notifies group members when the update actually adds a tent for the day.
          */
         post: {
             parameters: {
@@ -713,6 +713,7 @@ export interface paths {
                             /** Format: date-time */
                             visitedAt: string;
                             visitDate: string;
+                            replayed: boolean;
                         };
                     };
                 };

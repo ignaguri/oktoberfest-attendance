@@ -5,6 +5,7 @@ import {
   LogConsumptionSchema,
 } from "@prostcounter/shared";
 
+import { tentNamesFor } from "../lib/check-in-notifications";
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import {
@@ -101,16 +102,19 @@ app.openapi(logConsumptionRoute, async (c) => {
 
   // First drink of the day announces the day to friends and group-mates. The
   // ledger inside notifyDayStart makes this a no-op for every later drink.
+  // The key check comes before the tent-name lookup so a Novu-less
+  // environment doesn't pay for a query it will throw away.
   const novuApiKey = process.env.NOVU_API_KEY;
   if (novuApiKey) {
     try {
+      const tentName = data.tentId ? await tentNamesFor(supabase, [data.tentId]) : null;
       const notificationService = new NotificationService(supabase, novuApiKey);
       await notificationService.notifyDayStart({
         actorId: user.id,
         festivalId: data.festivalId,
         date: data.date,
         kind: "drink",
-        tentName: null,
+        tentName,
       });
     } catch (notificationError) {
       logger.error({ error: notificationError }, "Failed to send day-start notification");
