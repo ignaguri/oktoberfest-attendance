@@ -9,8 +9,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
 import type { IFriendRepository } from "../interfaces";
+import { stripSearchWildcards } from "./search-term";
 
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
+
+/** Search results are capped the same way the group invite search is */
+const SEARCH_LIMIT = 20;
 
 export class SupabaseFriendRepository implements IFriendRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -339,16 +343,44 @@ export class SupabaseFriendRepository implements IFriendRepository {
       friendshipId: string | null;
     }[]
   > {
-    const { data, error } = await this.supabase
-      .from("profiles")
-      .select("id, username, full_name, avatar_url")
-      .neq("id", userId)
-      .or(`username.ilike.%${query}%,full_name.ilike.%${query}%`)
-      .limit(20);
+    const trimmed = query.trim();
+    if (trimmed.length === 0) return [];
 
-    if (error) throw new DatabaseError(error.message);
+    // Two `ilike` queries rather than one `.or()`: the term would otherwise be
+    // interpolated into PostgREST's filter syntax, where a comma in a name
+    // ("Muller, Anna") splits it into fragments and the whole search 400s.
+    const pattern = `%${stripSearchWildcards(trimmed)}%`;
+    const profileColumns = "id, username, full_name, avatar_url";
 
-    if (!data || data.length === 0) return [];
+    const [byUsername, byFullName] = await Promise.all([
+      this.supabase
+        .from("profiles")
+        .select(profileColumns)
+        .neq("id", userId)
+        .ilike("username", pattern)
+        .limit(SEARCH_LIMIT),
+      this.supabase
+        .from("profiles")
+        .select(profileColumns)
+        .neq("id", userId)
+        .ilike("full_name", pattern)
+        .limit(SEARCH_LIMIT),
+    ]);
+
+    if (byUsername.error) throw new DatabaseError(byUsername.error.message);
+    if (byFullName.error) throw new DatabaseError(byFullName.error.message);
+
+    // Username matches first, so the cap keeps the more exact matches when both
+    // queries come back full
+    const byId = new Map<string, (typeof byUsername.data)[number]>();
+    for (const profile of [...(byUsername.data ?? []), ...(byFullName.data ?? [])]) {
+      if (!byId.has(profile.id)) {
+        byId.set(profile.id, profile);
+      }
+    }
+
+    const data = [...byId.values()].slice(0, SEARCH_LIMIT);
+    if (data.length === 0) return [];
 
     // Batch-fetch friendship statuses for all results
     const userIds = data.map((p) => p.id);

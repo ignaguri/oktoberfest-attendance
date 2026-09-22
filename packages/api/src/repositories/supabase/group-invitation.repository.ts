@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
 import type { IGroupInvitationRepository, InvitationRpcResult } from "../interfaces";
+import { stripSearchWildcards } from "./search-term";
 
 /** Search results are capped the same way friend search is */
 const SEARCH_LIMIT = 20;
@@ -15,16 +16,6 @@ const SEARCH_LIMIT = 20;
  * invitation, so the creator is never offered a button that is going to fail.
  */
 const DECLINE_COOLDOWN_DAYS = 7;
-
-/**
- * Strips the wildcards PostgREST understands in an `ilike` value (it maps `*`
- * to `%`), so a typed term matches literally. Commas, dots and parens are left
- * alone: they only carry meaning inside an `.or()` filter, and the two separate
- * `ilike` queries below avoid that syntax entirely.
- */
-function stripSearchWildcards(term: string): string {
-  return term.replace(/[%_*\\]/g, "");
-}
 
 type RpcPayload = {
   success: boolean;
