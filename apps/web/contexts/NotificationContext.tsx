@@ -23,6 +23,7 @@ type ApiPreferences = {
   achievementNotificationsEnabled: boolean | null;
   groupNotificationsEnabled: boolean | null;
   dailyReminderEnabled: boolean | null;
+  dayStartEnabled: boolean | null;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -40,8 +41,7 @@ const mapApiToDbPreferences = (api: ApiPreferences): NotificationPreferences => 
   daily_reminder_enabled: api.dailyReminderEnabled ?? true,
   // Mobile-only toggle, web never reads it
   friend_plans_enabled: null,
-  // Not yet returned by this API response
-  day_start_enabled: null,
+  day_start_enabled: api.dayStartEnabled ?? true,
   created_at: api.createdAt,
   updated_at: api.updatedAt,
 });
@@ -60,6 +60,7 @@ interface NotificationContextType {
         | "group_notifications_enabled"
         | "achievement_notifications_enabled"
         | "push_enabled"
+        | "day_start_enabled"
       >
     >,
   ) => Promise<void>;
@@ -292,6 +293,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           | "group_notifications_enabled"
           | "achievement_notifications_enabled"
           | "push_enabled"
+          | "day_start_enabled"
         >
       >,
     ) => {
@@ -306,6 +308,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           remindersEnabled?: boolean;
           groupNotificationsEnabled?: boolean;
           achievementNotificationsEnabled?: boolean;
+          dayStartEnabled?: boolean;
         } = {};
 
         if (updates.push_enabled !== undefined && updates.push_enabled !== null) {
@@ -325,6 +328,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           updates.achievement_notifications_enabled !== null
         ) {
           apiUpdates.achievementNotificationsEnabled = updates.achievement_notifications_enabled;
+        }
+        if (updates.day_start_enabled !== undefined && updates.day_start_enabled !== null) {
+          apiUpdates.dayStartEnabled = updates.day_start_enabled;
         }
 
         await apiClient.notifications.updatePreferences(apiUpdates);
