@@ -8,6 +8,7 @@ import { getTranslations } from "@/lib/i18n/server";
 import CarryOverGroups from "./CarryOverGroups";
 import { CreateGroupForm } from "./CreateGroupForm";
 import { JoinGroupForm } from "./JoinGroupForm";
+import PendingInvitations from "./PendingInvitations";
 
 export default async function GroupsPage() {
   const t = getTranslations();
@@ -20,6 +21,7 @@ export default async function GroupsPage() {
 
       <Suspense fallback={<LoadingSpinner />}>
         <div className="flex flex-col gap-6">
+          <PendingInvitations />
           <CarryOverGroups />
           <section className="card">
             <MyGroups showGroupsLink={false} />
