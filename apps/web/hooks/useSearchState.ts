@@ -24,6 +24,65 @@ export interface UseSearchStateOptions {
   urlParamPrefix?: string;
 }
 
+interface BuildSearchStateUrlOptions {
+  location: { pathname: string; search: string; hash: string };
+  prefix: string;
+  defaults: Pick<SearchState, "limit" | "sortBy" | "sortOrder">;
+}
+
+/**
+ * Writes the hook's own params into the current URL. Params the hook does not
+ * own (e.g. the admin `?tab=`) and the hash (the admin tab) are kept, so two
+ * pages sharing a URL don't wipe each other's state.
+ */
+export function buildSearchStateUrl(
+  state: SearchState,
+  { location, prefix, defaults }: BuildSearchStateUrlOptions,
+): string {
+  // Start from the current URL (read from location, not searchParams, to
+  // avoid a circular effect dependency) minus the params this hook owns
+  const params = new URLSearchParams(location.search);
+  const ownedKeys = ["search", "page", "limit", "sortBy", "sortOrder"].map(
+    (key) => `${prefix}${key}`,
+  );
+  // Snapshot the keys: deleting while iterating the live iterator skips entries
+  for (const key of Array.from(params.keys())) {
+    if (ownedKeys.includes(key) || key.startsWith(`${prefix}filter_`)) {
+      params.delete(key);
+    }
+  }
+
+  if (state.search) {
+    params.set(`${prefix}search`, state.search);
+  }
+
+  if (state.page > 1) {
+    params.set(`${prefix}page`, state.page.toString());
+  }
+
+  if (state.limit !== defaults.limit) {
+    params.set(`${prefix}limit`, state.limit.toString());
+  }
+
+  if (state.sortBy !== defaults.sortBy) {
+    params.set(`${prefix}sortBy`, state.sortBy);
+  }
+
+  if (state.sortOrder !== defaults.sortOrder) {
+    params.set(`${prefix}sortOrder`, state.sortOrder);
+  }
+
+  Object.entries(state.filters).forEach(([key, value]) => {
+    if (value !== "" && value != null) {
+      params.set(`${prefix}filter_${key}`, String(value));
+    }
+  });
+
+  const paramsString = params.toString();
+  const query = paramsString ? `?${paramsString}` : "";
+  return `${location.pathname}${query}${location.hash}`;
+}
+
 export function useSearchState(options: UseSearchStateOptions = {}) {
   const {
     defaultSearch = "",
@@ -78,46 +137,21 @@ export function useSearchState(options: UseSearchStateOptions = {}) {
   // Update URL when state changes
   useEffect(() => {
     if (syncWithUrl) {
-      const params = new URLSearchParams();
-
-      // Build params from state (not from current searchParams to avoid circular dependency)
-      if (state.search) {
-        params.set(`${urlParamPrefix}search`, state.search);
-      }
-
-      if (state.page > 1) {
-        params.set(`${urlParamPrefix}page`, state.page.toString());
-      }
-
-      if (state.limit !== defaultLimit) {
-        params.set(`${urlParamPrefix}limit`, state.limit.toString());
-      }
-
-      if (state.sortBy !== defaultSortBy) {
-        params.set(`${urlParamPrefix}sortBy`, state.sortBy);
-      }
-
-      if (state.sortOrder !== defaultSortOrder) {
-        params.set(`${urlParamPrefix}sortOrder`, state.sortOrder);
-      }
-
-      // Update filter params
-      Object.entries(state.filters).forEach(([key, value]) => {
-        if (value !== "" && value != null) {
-          params.set(`${urlParamPrefix}filter_${key}`, String(value));
-        }
+      const { pathname, search, hash } = window.location;
+      const newUrl = buildSearchStateUrl(state, {
+        location: { pathname, search, hash },
+        prefix: urlParamPrefix,
+        defaults: { limit: defaultLimit, sortBy: defaultSortBy, sortOrder: defaultSortOrder },
       });
-
-      const paramsString = params.toString();
-      const newUrl = paramsString
-        ? `${window.location.pathname}?${paramsString}`
-        : window.location.pathname;
 
       // Only update URL if it's different from what we last set
       // This prevents infinite loops when router.replace triggers searchParams update
       if (newUrl !== lastUrlRef.current) {
         lastUrlRef.current = newUrl;
-        router.replace(newUrl, { scroll: false });
+        // Skip no-op navigations, e.g. on mount when the URL already matches
+        if (newUrl !== `${pathname}${search}${hash}`) {
+          router.replace(newUrl, { scroll: false });
+        }
       }
     }
   }, [state, syncWithUrl, urlParamPrefix, defaultLimit, defaultSortBy, defaultSortOrder, router]);
