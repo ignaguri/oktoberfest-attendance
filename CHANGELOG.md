@@ -1,5 +1,48 @@
 # Changelog
 
+## [0.13.0] - 2026-09-23
+
+### ✨ Features
+
+- invite people to a group by name search (#329)
+- marketing SEO pass, locale routing, and i18n completeness (#326)
+- a real profile page for other users (#331)
+- view a profile picture full size (#330)
+- show tents in the feed, notify on day start (#328)
+- edit attendances, names and groups from the mobile panel (#323)
+- port the admin panel to the Expo app (#321)
+- ask for notifications after friend, plan and group actions (#313)
+- request to join a group (#312)
+- say who you're going with on a day plan (#310)
+- see which friends went on a past festival day (#308)
+- plan festival days and see which friends are going (#307)
+- Oktoberfest 2026 countdown, push reach and opening-day push (#304)
+- offer the live festival and follow group festivals (#303)
+
+### 🐛 Bug Fixes
+
+- stop squashing portrait photos into squares on upload (#327)
+- total spend from what people actually paid (#325)
+- the server decides what a drink costs (#324)
+- document the error body clients actually receive
+- only stamp reservation rows whose notification sent (#322)
+- stop soft-deleted days blocking drink logging (#314)
+- notifications refresh flash, friends badge, disabled tabs (#309)
+- security.txt contact and path, document email domains (#302)
+
+### 📚 Documentation
+
+- add Pomelli brand DNA reference
+- how eas update picks env vars, and a safe OTA recipe (#306)
+
+### 🔧 Maintenance
+
+- publish OTA updates from a manual workflow (#315)
+- 1.8.2 store release with notes and changelog (#311)
+- 1.8.1 store release with notes and changelog (#305)
+- merge graft context layer branch
+- adopt Graft as a local context layer for Claude Code
+
 ## [0.12.0] - 2026-09-09
 
 ### ✨ Features

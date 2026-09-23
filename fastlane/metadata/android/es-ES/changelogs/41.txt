@@ -1,0 +1,3 @@
+- Abre el perfil completo de tus amigos: los grupos que comparten, su carpa favorita y su historial de festivales.
+- Invita gente a un grupo buscando su nombre.
+- Las fotos verticales ya no se aplastan en cuadrados al subirlas. ¡Prost!

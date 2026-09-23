@@ -1,0 +1,3 @@
+- Öffne das volle Profil deiner Freunde: gemeinsame Gruppen, Lieblingszelt und Volksfest-Verlauf.
+- Lade Leute per Namenssuche in eine Gruppe ein.
+- Hochformat-Fotos werden beim Hochladen nicht mehr zu Quadraten gestaucht. Prost!

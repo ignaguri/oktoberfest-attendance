@@ -4,7 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "ProstCounter",
   slug: "prostcounter",
-  version: "1.8.2",
+  version: "1.9.0",
   orientation: "portrait",
   scheme: "prostcounter",
   icon: "./assets/images/logo.png",

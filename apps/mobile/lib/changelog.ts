@@ -1,4 +1,9 @@
 export const changelog: Record<string, string[]> = {
+  "1.9.0": [
+    "Open a friend's full profile: the groups you share, their favourite tent and their festival history",
+    "Invite people to a group by searching for their name",
+    "Portrait photos no longer get squashed into squares when you upload them",
+  ],
   "1.8.2": [
     "Plan the festival days you're going, and who you're going with",
     "See which friends are going each day, and get notified when a friend picks the same day",
