@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  AnalyticsOverviewQuerySchema,
-  AnalyticsRangeQuerySchema,
-  analyticsRangeError,
-} from "./admin-analytics.schema";
+import { AnalyticsRangeQuerySchema, analyticsRangeError } from "./admin-analytics.schema";
 
 describe("analyticsRangeError", () => {
   it("accepts a single day", () => {
@@ -56,25 +52,17 @@ describe("AnalyticsRangeQuerySchema", () => {
       false,
     );
   });
-});
 
-describe("AnalyticsOverviewQuerySchema", () => {
-  it("accepts ios and android", () => {
+  it("accepts an ios or android platform", () => {
     expect(
-      AnalyticsOverviewQuerySchema.parse({ from: "2026-09-01", to: "2026-09-30", platform: "ios" }),
+      AnalyticsRangeQuerySchema.parse({ from: "2026-09-01", to: "2026-09-30", platform: "ios" }),
     ).toEqual({ from: "2026-09-01", to: "2026-09-30", platform: "ios" });
   });
 
   it("rejects web", () => {
     expect(
-      AnalyticsOverviewQuerySchema.safeParse({ from: "2026-09-01", to: "2026-09-30", platform: "web" })
+      AnalyticsRangeQuerySchema.safeParse({ from: "2026-09-01", to: "2026-09-30", platform: "web" })
         .success,
-    ).toBe(false);
-  });
-
-  it("still validates the range", () => {
-    expect(
-      AnalyticsOverviewQuerySchema.safeParse({ from: "2026-09-30", to: "2026-09-01" }).success,
     ).toBe(false);
   });
 });

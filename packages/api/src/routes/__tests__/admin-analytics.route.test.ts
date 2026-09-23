@@ -154,9 +154,39 @@ describe("Admin Analytics Routes - Unit Tests", () => {
 
       expect(await res.json()).toEqual({ activeUsers: 0, features: [] });
     });
+
+    it("forwards the platform filter", async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null });
+
+      await app.request(
+        createAuthRequest("/admin/analytics/features?from=2026-09-01&to=2026-09-30&platform=android"),
+      );
+
+      expect(mockRpc).toHaveBeenCalledWith("analytics_feature_usage", {
+        p_from: "2026-09-01",
+        p_to: "2026-09-30",
+        p_platform: "android",
+      });
+    });
   });
 
   describe("GET /admin/analytics/activation-funnel", () => {
+    it("forwards the platform filter", async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null });
+
+      await app.request(
+        createAuthRequest(
+          "/admin/analytics/activation-funnel?from=2026-09-01&to=2026-09-30&platform=ios",
+        ),
+      );
+
+      expect(mockRpc).toHaveBeenCalledWith("analytics_activation_funnel", {
+        p_from: "2026-09-01",
+        p_to: "2026-09-30",
+        p_platform: "ios",
+      });
+    });
+
     it("returns the steps in order", async () => {
       mockRpc.mockResolvedValue({
         data: [

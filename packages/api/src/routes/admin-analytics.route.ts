@@ -3,7 +3,6 @@ import {
   AnalyticsFeatureUsageResponseSchema,
   AnalyticsFestivalRetentionResponseSchema,
   AnalyticsFunnelResponseSchema,
-  AnalyticsOverviewQuerySchema,
   AnalyticsOverviewResponseSchema,
   AnalyticsRangeQuerySchema,
 } from "@prostcounter/shared";
@@ -43,7 +42,7 @@ const overviewRoute = createRoute({
   tags: ["admin"],
   summary: "Active users per day (admin)",
   description: "Rolling DAU/WAU/MAU per day in the range, from user_active_days.",
-  request: { query: AnalyticsOverviewQuerySchema },
+  request: { query: AnalyticsRangeQuerySchema },
   responses: {
     200: {
       description: "Overview series",
@@ -66,7 +65,8 @@ const featuresRoute = createRoute({
   path: "/admin/analytics/features",
   tags: ["admin"],
   summary: "Feature usage (admin)",
-  description: "Users and actions per feature in the range, from the domain tables.",
+  description:
+    "Users and actions per feature in the range, from the domain tables. With platform, limited to users active on it in the range.",
   request: { query: AnalyticsRangeQuerySchema },
   responses: {
     200: {
@@ -79,9 +79,9 @@ const featuresRoute = createRoute({
 });
 
 app.openapi(featuresRoute, async (c) => {
-  const { from, to } = c.req.valid("query");
+  const { from, to, platform } = c.req.valid("query");
   const repository = new SupabaseAdminAnalyticsRepository();
-  return c.json(await repository.getFeatureUsage(from, to), 200);
+  return c.json(await repository.getFeatureUsage(from, to, platform), 200);
 });
 
 // GET /admin/analytics/activation-funnel
@@ -90,7 +90,8 @@ const activationFunnelRoute = createRoute({
   path: "/admin/analytics/activation-funnel",
   tags: ["admin"],
   summary: "Activation funnel (admin)",
-  description: "Sign-ups in the range, and how many logged an attendance and 5+ days.",
+  description:
+    "Sign-ups in the range, and how many logged an attendance and 5+ days. With platform, limited to sign-ups ever active on it.",
   request: { query: AnalyticsRangeQuerySchema },
   responses: {
     200: {
@@ -103,9 +104,9 @@ const activationFunnelRoute = createRoute({
 });
 
 app.openapi(activationFunnelRoute, async (c) => {
-  const { from, to } = c.req.valid("query");
+  const { from, to, platform } = c.req.valid("query");
   const repository = new SupabaseAdminAnalyticsRepository();
-  return c.json(await repository.getActivationFunnel(from, to), 200);
+  return c.json(await repository.getActivationFunnel(from, to, platform), 200);
 });
 
 // GET /admin/analytics/festival-retention

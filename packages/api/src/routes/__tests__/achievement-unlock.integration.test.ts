@@ -842,26 +842,37 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 
-  it("GET /wrapped/{festivalId} persists the wrapped_viewed unlock without changing the response", async () => {
+  it("GET /wrapped/{festivalId} stamps the first view and persists the wrapped_viewed unlock", async () => {
     const supabaseAdmin = createTestSupabaseAdmin();
     const user = await createTestUser();
     const festival = await createTestFestival(supabaseAdmin);
     const app = mountRoute(wrappedRoutes);
 
-    // wrapped_viewed is read off wrapped_data_cache.first_viewed_at (see
-    // get_achievement_metrics). Nothing in this codebase writes that column
-    // yet, so the cache row is seeded directly here to simulate a prior view;
-    // this test only exercises the evaluate-only wiring on the read path.
+    // A cached but never-viewed Wrapped. wrapped_viewed is read off
+    // wrapped_data_cache.first_viewed_at (see get_achievement_metrics), which
+    // the GET must stamp before evaluating.
     const { error: cacheError } = await supabaseAdmin.from("wrapped_data_cache").insert({
       user_id: user.id,
       festival_id: festival.id,
       wrapped_data: {},
       generated_by: "system",
-      first_viewed_at: new Date().toISOString(),
     });
     if (cacheError) {
       throw new Error(`Failed to seed wrapped_data_cache: ${cacheError.message}`);
     }
+
+    const readFirstViewedAt = async () => {
+      const { data, error } = await supabaseAdmin
+        .from("wrapped_views")
+        .select("first_viewed_at")
+        .eq("user_id", user.id)
+        .eq("festival_id", festival.id)
+        .maybeSingle();
+      if (error) {
+        throw new Error(`Failed to read wrapped_views: ${error.message}`);
+      }
+      return data?.first_viewed_at ?? null;
+    };
 
     const response = await app.request(`/wrapped/${festival.id}`, {
       method: "GET",
@@ -871,7 +882,20 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     const json = await response.json();
     expect(json).not.toHaveProperty("unlocked");
 
+    // The unlock fires off the cache stamp, and its trigger then deletes the
+    // cache row, so the durable record of the view is wrapped_views
     await expectUnlockPersisted(supabaseAdmin, user.id, "wrapped_viewed");
+
+    const firstViewedAt = await readFirstViewedAt();
+    expect(firstViewedAt).not.toBeNull();
+
+    // A later view keeps the original timestamp
+    const secondResponse = await app.request(`/wrapped/${festival.id}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${user.token}` },
+    });
+    expect(secondResponse.status).toBe(200);
+    expect(await readFirstViewedAt()).toBe(firstViewedAt);
 
     await supabaseAdmin
       .from("wrapped_data_cache")

@@ -29,6 +29,8 @@ export class WrappedService {
     const cached = await this.wrappedRepo.getCached(userId, festivalId);
 
     if (cached) {
+      // Returning it here is the user seeing it
+      await this.wrappedRepo.markViewed(userId, festivalId);
       return { wrapped: cached, cached: true };
     }
 

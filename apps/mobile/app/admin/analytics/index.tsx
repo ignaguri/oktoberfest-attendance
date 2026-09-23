@@ -40,8 +40,8 @@ export default function AdminAnalyticsScreen() {
   const range = useMemo(() => resolveAnalyticsRange(rangeKey, festivals), [rangeKey, festivals]);
 
   const overview = useAdminAnalyticsOverview({ ...range, platform });
-  const features = useAdminAnalyticsFeatures(range);
-  const funnel = useAdminAnalyticsActivationFunnel(range);
+  const features = useAdminAnalyticsFeatures({ ...range, platform });
+  const funnel = useAdminAnalyticsActivationFunnel({ ...range, platform });
   const retention = useAdminAnalyticsFestivalRetention();
 
   const empty = t("admin.analytics.empty");

@@ -1,5 +1,6 @@
 import { useAdminAnalyticsFeatures } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AnalyticsPlatform } from "@prostcounter/shared/schemas";
 import { formatPercent, withFeatureReach } from "@prostcounter/shared/utils";
 
 import { Text } from "@/components/ui/text";
@@ -11,11 +12,12 @@ import { SectionState } from "./section-state";
 interface FeatureUsageSectionProps {
   from: string;
   to: string;
+  platform?: AnalyticsPlatform;
 }
 
-export function FeatureUsageSection({ from, to }: FeatureUsageSectionProps) {
+export function FeatureUsageSection({ from, to, platform }: FeatureUsageSectionProps) {
   const { t } = useTranslation();
-  const { data, loading, error, refetch } = useAdminAnalyticsFeatures({ from, to });
+  const { data, loading, error, refetch } = useAdminAnalyticsFeatures({ from, to, platform });
 
   const activeUsers = data?.activeUsers ?? 0;
   const rows = withFeatureReach(data?.features ?? [], activeUsers);

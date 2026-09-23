@@ -40,8 +40,8 @@ export default function AdminAnalyticsSectionScreen() {
           </Text>
         )}
         {section === "overview" && <OverviewSection from={from} to={to} platform={platform} />}
-        {section === "features" && <FeatureUsageSection from={from} to={to} />}
-        {section === "funnel" && <ActivationFunnelSection from={from} to={to} />}
+        {section === "features" && <FeatureUsageSection from={from} to={to} platform={platform} />}
+        {section === "funnel" && <ActivationFunnelSection from={from} to={to} platform={platform} />}
         {section === "retention" && <FestivalRetentionSection />}
       </VStack>
     </ScrollView>

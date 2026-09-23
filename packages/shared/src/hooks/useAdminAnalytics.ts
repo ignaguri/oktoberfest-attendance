@@ -11,7 +11,6 @@ import type {
   AnalyticsFeatureUsageResponse,
   AnalyticsFestivalRetentionResponse,
   AnalyticsFunnelResponse,
-  AnalyticsOverviewQuery,
   AnalyticsOverviewResponse,
   AnalyticsRangeQuery,
 } from "../schemas/admin-analytics.schema";
@@ -26,7 +25,7 @@ const ANALYTICS_QUERY_OPTIONS = {
   gcTime: ANALYTICS_GC_TIME_MS,
 };
 
-export function useAdminAnalyticsOverview(filters: AnalyticsOverviewQuery) {
+export function useAdminAnalyticsOverview(filters: AnalyticsRangeQuery) {
   const apiClient = useApiClient();
   return useQuery<AnalyticsOverviewResponse>(
     QueryKeys.adminAnalyticsOverview(filters.from, filters.to, filters.platform),
@@ -35,20 +34,20 @@ export function useAdminAnalyticsOverview(filters: AnalyticsOverviewQuery) {
   );
 }
 
-export function useAdminAnalyticsFeatures(range: AnalyticsRangeQuery) {
+export function useAdminAnalyticsFeatures(filters: AnalyticsRangeQuery) {
   const apiClient = useApiClient();
   return useQuery<AnalyticsFeatureUsageResponse>(
-    QueryKeys.adminAnalyticsFeatures(range.from, range.to),
-    () => apiClient.admin.analytics.features(range),
+    QueryKeys.adminAnalyticsFeatures(filters.from, filters.to, filters.platform),
+    () => apiClient.admin.analytics.features(filters),
     ANALYTICS_QUERY_OPTIONS,
   );
 }
 
-export function useAdminAnalyticsActivationFunnel(range: AnalyticsRangeQuery) {
+export function useAdminAnalyticsActivationFunnel(filters: AnalyticsRangeQuery) {
   const apiClient = useApiClient();
   return useQuery<AnalyticsFunnelResponse>(
-    QueryKeys.adminAnalyticsActivationFunnel(range.from, range.to),
-    () => apiClient.admin.analytics.activationFunnel(range),
+    QueryKeys.adminAnalyticsActivationFunnel(filters.from, filters.to, filters.platform),
+    () => apiClient.admin.analytics.activationFunnel(filters),
     ANALYTICS_QUERY_OPTIONS,
   );
 }

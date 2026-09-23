@@ -23,7 +23,6 @@ import type {
   AnalyticsFeatureUsageResponse,
   AnalyticsFestivalRetentionResponse,
   AnalyticsFunnelResponse,
-  AnalyticsOverviewQuery,
   AnalyticsOverviewResponse,
   AnalyticsRangeQuery,
   CopyAdminFestivalTentsInput,
@@ -2790,7 +2789,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
      */
     admin: {
       analytics: {
-        async overview(query: AnalyticsOverviewQuery): Promise<AnalyticsOverviewResponse> {
+        async overview(query: AnalyticsRangeQuery): Promise<AnalyticsOverviewResponse> {
           const headers = await getAuthHeaders();
           const params = new URLSearchParams({ from: query.from, to: query.to });
           if (query.platform) {
@@ -2810,6 +2809,9 @@ export function createTypedApiClient(config: ApiClientConfig) {
         async features(query: AnalyticsRangeQuery): Promise<AnalyticsFeatureUsageResponse> {
           const headers = await getAuthHeaders();
           const params = new URLSearchParams({ from: query.from, to: query.to });
+          if (query.platform) {
+            params.set("platform", query.platform);
+          }
           const response = await fetchWithLogging(
             "GET",
             `${baseUrl}/v1/admin/analytics/features?${params}`,
@@ -2824,6 +2826,9 @@ export function createTypedApiClient(config: ApiClientConfig) {
         async activationFunnel(query: AnalyticsRangeQuery): Promise<AnalyticsFunnelResponse> {
           const headers = await getAuthHeaders();
           const params = new URLSearchParams({ from: query.from, to: query.to });
+          if (query.platform) {
+            params.set("platform", query.platform);
+          }
           const response = await fetchWithLogging(
             "GET",
             `${baseUrl}/v1/admin/analytics/activation-funnel?${params}`,

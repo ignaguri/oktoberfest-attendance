@@ -69,17 +69,8 @@ export const ANALYTICS_PLATFORMS = ["ios", "android"] as const;
 export const AnalyticsPlatformSchema = z.enum(ANALYTICS_PLATFORMS);
 export type AnalyticsPlatform = z.infer<typeof AnalyticsPlatformSchema>;
 
+/** Shared by overview, features and funnel. No platform means all platforms. */
 export const AnalyticsRangeQuerySchema = z
-  .object({ from: IsoDateSchema, to: IsoDateSchema })
-  .superRefine((value, ctx) => {
-    const message = analyticsRangeError(value.from, value.to);
-    if (message) {
-      ctx.addIssue({ code: "custom", message, path: ["from"] });
-    }
-  });
-export type AnalyticsRangeQuery = z.infer<typeof AnalyticsRangeQuerySchema>;
-
-export const AnalyticsOverviewQuerySchema = z
   .object({
     from: IsoDateSchema,
     to: IsoDateSchema,
@@ -91,7 +82,7 @@ export const AnalyticsOverviewQuerySchema = z
       ctx.addIssue({ code: "custom", message, path: ["from"] });
     }
   });
-export type AnalyticsOverviewQuery = z.infer<typeof AnalyticsOverviewQuerySchema>;
+export type AnalyticsRangeQuery = z.infer<typeof AnalyticsRangeQuerySchema>;
 
 // =============================================================================
 // Overview

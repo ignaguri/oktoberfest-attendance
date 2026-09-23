@@ -2,6 +2,7 @@
 
 import { useAdminAnalyticsActivationFunnel } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AnalyticsPlatform } from "@prostcounter/shared/schemas";
 import { formatPercent, funnelConversion } from "@prostcounter/shared/utils";
 
 import AnalyticsSectionCard from "./AnalyticsSectionCard";
@@ -9,11 +10,12 @@ import AnalyticsSectionCard from "./AnalyticsSectionCard";
 interface ActivationFunnelSectionProps {
   from: string;
   to: string;
+  platform?: AnalyticsPlatform;
 }
 
-export default function ActivationFunnelSection({ from, to }: ActivationFunnelSectionProps) {
+export default function ActivationFunnelSection({ from, to, platform }: ActivationFunnelSectionProps) {
   const { t } = useTranslation();
-  const { data, loading, error, refetch } = useAdminAnalyticsActivationFunnel({ from, to });
+  const { data, loading, error, refetch } = useAdminAnalyticsActivationFunnel({ from, to, platform });
 
   const steps = funnelConversion(data?.steps ?? []);
 

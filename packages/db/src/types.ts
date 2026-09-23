@@ -2027,6 +2027,32 @@ export type Database = {
           },
         ]
       }
+      wrapped_views: {
+        Row: {
+          festival_id: string
+          first_viewed_at: string
+          user_id: string
+        }
+        Insert: {
+          festival_id: string
+          first_viewed_at?: string
+          user_id: string
+        }
+        Update: {
+          festival_id?: string
+          first_viewed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wrapped_views_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       activity_feed: {
@@ -2240,14 +2266,14 @@ export type Database = {
         }[]
       }
       analytics_activation_funnel: {
-        Args: { p_from: string; p_to: string }
+        Args: { p_from: string; p_platform?: string; p_to: string }
         Returns: {
           step: string
           users: number
         }[]
       }
       analytics_feature_usage: {
-        Args: { p_from: string; p_to: string }
+        Args: { p_from: string; p_platform?: string; p_to: string }
         Returns: {
           active_users: number
           events: number

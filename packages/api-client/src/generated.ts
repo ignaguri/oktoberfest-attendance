@@ -11759,13 +11759,14 @@ export interface paths {
         };
         /**
          * Feature usage (admin)
-         * @description Users and actions per feature in the range, from the domain tables.
+         * @description Users and actions per feature in the range, from the domain tables. With platform, limited to users active on it in the range.
          */
         get: {
             parameters: {
                 query: {
                     from: string;
                     to: string;
+                    platform?: "ios" | "android";
                 };
                 header?: never;
                 path?: never;
@@ -11836,13 +11837,14 @@ export interface paths {
         };
         /**
          * Activation funnel (admin)
-         * @description Sign-ups in the range, and how many logged an attendance and 5+ days.
+         * @description Sign-ups in the range, and how many logged an attendance and 5+ days. With platform, limited to sign-ups ever active on it.
          */
         get: {
             parameters: {
                 query: {
                     from: string;
                     to: string;
+                    platform?: "ios" | "android";
                 };
                 header?: never;
                 path?: never;

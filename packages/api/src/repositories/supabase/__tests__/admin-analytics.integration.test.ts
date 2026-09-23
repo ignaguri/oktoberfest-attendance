@@ -67,10 +67,11 @@ async function createFestival(startDate: string, endDate: string): Promise<strin
 
 type FunnelCounts = Record<string, number>;
 
-async function funnelFor(day: string): Promise<FunnelCounts> {
+async function funnelFor(day: string, platform?: "ios" | "android"): Promise<FunnelCounts> {
   const { data, error } = await admin.rpc("analytics_activation_funnel", {
     p_from: day,
     p_to: day,
+    ...(platform ? { p_platform: platform } : {}),
   });
   if (error || !data) {
     throw new Error(`analytics_activation_funnel failed: ${error?.message ?? "no data"}`);
@@ -81,6 +82,8 @@ async function funnelFor(day: string): Promise<FunnelCounts> {
 const today = new Date().toISOString().slice(0, 10);
 
 let baselineFunnel: FunnelCounts;
+let baselineIosFunnel: FunnelCounts;
+let baselineAndroidFunnel: FunnelCounts;
 let realA: SeedUser;
 let festivalOne: string;
 let festivalTwo: string;
@@ -95,6 +98,8 @@ describe("analytics metric functions", () => {
     }
 
     baselineFunnel = await funnelFor(today);
+    baselineIosFunnel = await funnelFor(today, "ios");
+    baselineAndroidFunnel = await funnelFor(today, "android");
 
     realA = await signUp(`analytics-a-${tag()}@integration-test.com`);
     const realB = await signUp(`analytics-b-${tag()}@integration-test.com`);
@@ -159,6 +164,15 @@ describe("analytics metric functions", () => {
     if (activeDayError) {
       throw new Error(`Failed to seed active days: ${activeDayError.message}`);
     }
+
+    // Removed with the festivals (ON DELETE CASCADE)
+    const { error: wrappedViewError } = await admin.from("wrapped_views").insert([
+      { user_id: realA.id, festival_id: festivalOne, first_viewed_at: "1950-01-11T12:00:00Z" },
+      { user_id: seedAccount.id, festival_id: festivalOne, first_viewed_at: "1950-01-11T12:00:00Z" },
+    ]);
+    if (wrappedViewError) {
+      throw new Error(`Failed to seed wrapped views: ${wrappedViewError.message}`);
+    }
   });
 
   afterAll(async () => {
@@ -220,11 +234,43 @@ describe("analytics metric functions", () => {
     expect(new Set(rows.map((row) => row.feature))).toEqual(new Set(ANALYTICS_FEATURES));
     expect(rows).toHaveLength(ANALYTICS_FEATURES.length);
     expect(rows[0]).toEqual({ feature: "attendance", users: 3, events: 5, active_users: 2 });
+    expect(rows.find((row) => row.feature === "wrapped")).toEqual({
+      feature: "wrapped",
+      users: 1,
+      events: 1,
+      active_users: 2,
+    });
     expect(
       rows
-        .filter((row) => row.feature !== "attendance")
+        .filter((row) => row.feature !== "attendance" && row.feature !== "wrapped")
         .every((row) => row.users === 0 && row.events === 0 && row.active_users === 2),
     ).toBe(true);
+  });
+
+  it("limits feature usage and its reach base to users active on the platform", async () => {
+    const usageOn = async (platform: "ios" | "android") => {
+      const { data, error } = await admin.rpc("analytics_feature_usage", {
+        p_from: "1950-01-10",
+        p_to: "1950-01-12",
+        p_platform: platform,
+      });
+      expect(error).toBeNull();
+      return Object.fromEntries((data ?? []).map((row) => [row.feature, row]));
+    };
+
+    // realB is the only real user active on iOS in the range; realA on Android
+    const ios = await usageOn("ios");
+    expect(ios.attendance).toEqual({ feature: "attendance", users: 1, events: 2, active_users: 1 });
+    expect(ios.wrapped).toMatchObject({ users: 0, active_users: 1 });
+
+    const android = await usageOn("android");
+    expect(android.attendance).toEqual({
+      feature: "attendance",
+      users: 1,
+      events: 2,
+      active_users: 1,
+    });
+    expect(android.wrapped).toMatchObject({ users: 1, active_users: 1 });
   });
 
   it("computes festival-to-festival retention, pending when the next one has not started", async () => {
@@ -278,6 +324,26 @@ describe("analytics metric functions", () => {
       logged_attendance: after.logged_attendance - baselineFunnel.logged_attendance,
       five_days: after.five_days - baselineFunnel.five_days,
     }).toEqual({ signed_up: 4, logged_attendance: 4, five_days: 1 });
+  });
+
+  it("limits the funnel cohort to sign-ups ever active on the platform", async () => {
+    const delta = (after: FunnelCounts, before: FunnelCounts) => ({
+      signed_up: after.signed_up - before.signed_up,
+      logged_attendance: after.logged_attendance - before.logged_attendance,
+      five_days: after.five_days - before.five_days,
+    });
+
+    // realB (iOS) has 5 attendance days; realA (Android) has 4
+    expect(delta(await funnelFor(today, "ios"), baselineIosFunnel)).toEqual({
+      signed_up: 1,
+      logged_attendance: 1,
+      five_days: 1,
+    });
+    expect(delta(await funnelFor(today, "android"), baselineAndroidFunnel)).toEqual({
+      signed_up: 1,
+      logged_attendance: 1,
+      five_days: 0,
+    });
   });
 
   it("denies every metric function to signed-in users and anon", async () => {

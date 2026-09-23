@@ -46,10 +46,15 @@ export class SupabaseAdminAnalyticsRepository {
     };
   }
 
-  async getFeatureUsage(from: string, to: string): Promise<AnalyticsFeatureUsageResponse> {
+  async getFeatureUsage(
+    from: string,
+    to: string,
+    platform?: AnalyticsPlatform,
+  ): Promise<AnalyticsFeatureUsageResponse> {
     const { data, error } = await this.client.rpc("analytics_feature_usage", {
       p_from: from,
       p_to: to,
+      ...(platform ? { p_platform: platform } : {}),
     });
     if (error) {
       throw new Error(`analytics_feature_usage failed: ${error.message}`);
@@ -67,10 +72,15 @@ export class SupabaseAdminAnalyticsRepository {
     };
   }
 
-  async getActivationFunnel(from: string, to: string): Promise<AnalyticsFunnelResponse> {
+  async getActivationFunnel(
+    from: string,
+    to: string,
+    platform?: AnalyticsPlatform,
+  ): Promise<AnalyticsFunnelResponse> {
     const { data, error } = await this.client.rpc("analytics_activation_funnel", {
       p_from: from,
       p_to: to,
+      ...(platform ? { p_platform: platform } : {}),
     });
     if (error) {
       throw new Error(`analytics_activation_funnel failed: ${error.message}`);

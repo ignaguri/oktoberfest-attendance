@@ -100,8 +100,8 @@ export default function AnalyticsDashboard() {
       </div>
 
       <OverviewSection from={range.from} to={range.to} platform={platform} />
-      <FeatureUsageSection from={range.from} to={range.to} />
-      <ActivationFunnelSection from={range.from} to={range.to} />
+      <FeatureUsageSection from={range.from} to={range.to} platform={platform} />
+      <ActivationFunnelSection from={range.from} to={range.to} platform={platform} />
       <FestivalRetentionSection />
     </div>
   );

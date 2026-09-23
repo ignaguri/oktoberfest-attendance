@@ -19364,7 +19364,7 @@
           "admin"
         ],
         "summary": "Feature usage (admin)",
-        "description": "Users and actions per feature in the range, from the domain tables.",
+        "description": "Users and actions per feature in the range, from the domain tables. With platform, limited to users active on it in the range.",
         "security": [
           {
             "bearerAuth": []
@@ -19387,6 +19387,18 @@
             },
             "required": true,
             "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ios",
+                "android"
+              ]
+            },
+            "required": false,
+            "name": "platform",
             "in": "query"
           }
         ],
@@ -19485,7 +19497,7 @@
           "admin"
         ],
         "summary": "Activation funnel (admin)",
-        "description": "Sign-ups in the range, and how many logged an attendance and 5+ days.",
+        "description": "Sign-ups in the range, and how many logged an attendance and 5+ days. With platform, limited to sign-ups ever active on it.",
         "security": [
           {
             "bearerAuth": []
@@ -19508,6 +19520,18 @@
             },
             "required": true,
             "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ios",
+                "android"
+              ]
+            },
+            "required": false,
+            "name": "platform",
             "in": "query"
           }
         ],

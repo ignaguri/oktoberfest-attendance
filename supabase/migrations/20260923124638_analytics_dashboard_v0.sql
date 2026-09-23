@@ -1,8 +1,9 @@
 -- Analytics dashboard v0: the analytics schema, the real-user filter, and the
 -- admin metric functions that need only domain tables (no events exist yet).
 --
--- Access model: nothing here is reachable by anon or authenticated. The metric
--- functions are SECURITY DEFINER, executable by service_role only, and called
+-- Access model: apart from public.wrapped_views (users record and read their
+-- own rows, under RLS), nothing here is reachable by anon or authenticated.
+-- The metric functions are SECURITY DEFINER, executable by service_role only, and called
 -- by the API's /v1/admin/analytics/* routes (behind requireAdmin) through the
 -- service-role client. They live in public only because PostgREST exposes
 -- public and not analytics.
@@ -18,6 +19,34 @@ REVOKE ALL ON SCHEMA analytics FROM PUBLIC, anon, authenticated;
 GRANT USAGE ON SCHEMA analytics TO service_role;
 COMMENT ON SCHEMA analytics IS
   'Product analytics for the admin dashboard and ad-hoc SQL. Start from analytics.real_users: every metric excludes unconfirmed (bot) signups, super admins and @example.com seed accounts.';
+
+-- ---------------------------------------------------------------------------
+-- wrapped_views
+-- ---------------------------------------------------------------------------
+-- wrapped_data_cache.first_viewed_at can't record views: triggers on
+-- attendances, tent_visits and user_achievements delete the cache row, and the
+-- wrapped_viewed unlock a first view triggers is one of them. This table is
+-- written once per user and festival and nothing invalidates it.
+CREATE TABLE IF NOT EXISTS public.wrapped_views (
+  user_id uuid NOT NULL REFERENCES auth.users (id) ON DELETE CASCADE,
+  festival_id uuid NOT NULL REFERENCES public.festivals (id) ON DELETE CASCADE,
+  first_viewed_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, festival_id)
+);
+
+ALTER TABLE public.wrapped_views ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON public.wrapped_views FROM PUBLIC, anon, authenticated;
+GRANT SELECT, INSERT ON public.wrapped_views TO authenticated;
+GRANT ALL ON public.wrapped_views TO service_role;
+
+CREATE POLICY "Users can view own wrapped views" ON public.wrapped_views
+  FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can record own wrapped views" ON public.wrapped_views
+  FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
+
+COMMENT ON TABLE public.wrapped_views IS
+  'First time each user saw their Wrapped for a festival. Insert-only from GET /wrapped/{festivalId}; source for the wrapped row in analytics_feature_usage.';
 
 -- ---------------------------------------------------------------------------
 -- real_users
@@ -147,7 +176,8 @@ COMMENT ON FUNCTION public.analytics_overview(date, date, text) IS
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.analytics_feature_usage(
   p_from date,
-  p_to date
+  p_to date,
+  p_platform text DEFAULT NULL
 ) RETURNS TABLE (feature text, users integer, events integer, active_users integer)
 LANGUAGE sql
 STABLE
@@ -189,13 +219,23 @@ AS $$
     SELECT 'location_sharing', ls.user_id
       FROM public.location_sessions ls WHERE ls.started_at::date BETWEEN p_from AND p_to
     UNION ALL
-    SELECT 'wrapped', w.user_id
-      FROM public.wrapped_data_cache w WHERE w.first_viewed_at::date BETWEEN p_from AND p_to
+    SELECT 'wrapped', wv.user_id
+      FROM public.wrapped_views wv WHERE wv.first_viewed_at::date BETWEEN p_from AND p_to
+  ),
+  -- Real users active in the range, on p_platform when given: the reach
+  -- denominator, and the population whose feature usage counts
+  active_users AS (
+    SELECT DISTINCT uad.user_id
+    FROM public.user_active_days uad
+    JOIN analytics.real_users ru ON ru.user_id = uad.user_id
+    WHERE uad.day BETWEEN p_from AND p_to
+      AND (p_platform IS NULL OR uad.platform = p_platform)
   ),
   real_usage AS (
     SELECT u.feature, u.user_id
     FROM usage u
     JOIN analytics.real_users ru ON ru.user_id = u.user_id
+    WHERE p_platform IS NULL OR u.user_id IN (SELECT au.user_id FROM active_users au)
   ),
   features (feature) AS (
     VALUES ('attendance'), ('drinks'), ('photos'), ('group_joins'), ('group_messages'),
@@ -203,10 +243,7 @@ AS $$
            ('friend_requests'), ('location_sharing'), ('wrapped')
   ),
   active AS (
-    SELECT count(DISTINCT uad.user_id)::integer AS n
-    FROM public.user_active_days uad
-    JOIN analytics.real_users ru ON ru.user_id = uad.user_id
-    WHERE uad.day BETWEEN p_from AND p_to
+    SELECT count(*)::integer AS n FROM active_users
   )
   SELECT
     f.feature,
@@ -219,18 +256,19 @@ AS $$
   ORDER BY users DESC, f.feature ASC;
 $$;
 
-REVOKE ALL ON FUNCTION public.analytics_feature_usage(date, date) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.analytics_feature_usage(date, date) TO service_role;
+REVOKE ALL ON FUNCTION public.analytics_feature_usage(date, date, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.analytics_feature_usage(date, date, text) TO service_role;
 
-COMMENT ON FUNCTION public.analytics_feature_usage(date, date) IS
-  'Admin dashboard: per feature, distinct real users and row count of that feature''s domain table within [p_from, p_to]. active_users (same on every row) is distinct real users in user_active_days for the range, the denominator for reach. Feature names mirror ANALYTICS_FEATURES in packages/shared. service_role only.';
+COMMENT ON FUNCTION public.analytics_feature_usage(date, date, text) IS
+  'Admin dashboard: per feature, distinct real users and row count of that feature''s domain table within [p_from, p_to]. active_users (same on every row) is distinct real users in user_active_days for the range, the denominator for reach. p_platform (ios or android) limits both to users active on that platform in the range; each user-day counts under the last platform seen that day. Feature names mirror ANALYTICS_FEATURES in packages/shared. service_role only.';
 
 -- ---------------------------------------------------------------------------
 -- analytics_activation_funnel
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION public.analytics_activation_funnel(
   p_from date,
-  p_to date
+  p_to date,
+  p_platform text DEFAULT NULL
 ) RETURNS TABLE (step text, users integer)
 LANGUAGE sql
 STABLE
@@ -241,6 +279,13 @@ AS $$
     SELECT ru.user_id
     FROM analytics.real_users ru
     WHERE ru.signed_up_at::date BETWEEN p_from AND p_to
+      AND (
+        p_platform IS NULL
+        OR EXISTS (
+          SELECT 1 FROM public.user_active_days uad
+          WHERE uad.user_id = ru.user_id AND uad.platform = p_platform
+        )
+      )
   ),
   attendance_days AS (
     SELECT a.user_id, count(DISTINCT a.date) AS days
@@ -258,11 +303,11 @@ AS $$
   SELECT s.step, s.users FROM steps s ORDER BY s.ord;
 $$;
 
-REVOKE ALL ON FUNCTION public.analytics_activation_funnel(date, date) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.analytics_activation_funnel(date, date) TO service_role;
+REVOKE ALL ON FUNCTION public.analytics_activation_funnel(date, date, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.analytics_activation_funnel(date, date, text) TO service_role;
 
-COMMENT ON FUNCTION public.analytics_activation_funnel(date, date) IS
-  'Admin dashboard: real users who signed up in [p_from, p_to], how many of them ever logged an attendance, and how many logged 5+ distinct days. Later steps are not limited to the range. service_role only.';
+COMMENT ON FUNCTION public.analytics_activation_funnel(date, date, text) IS
+  'Admin dashboard: real users who signed up in [p_from, p_to], how many of them ever logged an attendance, and how many logged 5+ distinct days. Later steps are not limited to the range. No signup platform is recorded, so p_platform (ios or android) limits the cohort to users ever active on that platform. service_role only.';
 
 -- ---------------------------------------------------------------------------
 -- analytics_festival_retention
