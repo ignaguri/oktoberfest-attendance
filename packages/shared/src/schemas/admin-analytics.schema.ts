@@ -47,6 +47,14 @@ export function analyticsRangeError(from: string, to: string): string | null {
   if (Number.isNaN(fromMs) || Number.isNaN(toMs)) {
     return "Invalid date";
   }
+  // Date.parse rolls calendar-invalid dates over (e.g. 2026-02-30 -> 2026-03-02)
+  // instead of returning NaN, so round-trip through ISO and compare.
+  if (
+    new Date(fromMs).toISOString().slice(0, 10) !== from ||
+    new Date(toMs).toISOString().slice(0, 10) !== to
+  ) {
+    return "Invalid date";
+  }
   if (fromMs > toMs) {
     return "`from` must not be after `to`";
   }
@@ -147,7 +155,14 @@ export const AnalyticsFestivalRetentionRowSchema = z.object({
   festivalName: z.string(),
   startDate: IsoDateSchema,
   attendees: z.number().int(),
-  /** Null while the next festival has not started (or there is none). */
+  /**
+   * Null while the next festival has not started (or there is none). This
+   * schema is the source of truth for the nullability: `packages/db/src/types.ts`
+   * has a matching hand-edited `returned_next: number | null` for
+   * `analytics_festival_retention` that a future `pnpm sup:db:types` run will
+   * overwrite, so keep this field nullable here even if that regeneration
+   * ever drops the `| null`.
+   */
   returnedNext: z.number().int().nullable(),
   returnedAny: z.number().int(),
 });

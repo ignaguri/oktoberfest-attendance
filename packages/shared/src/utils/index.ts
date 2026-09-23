@@ -83,6 +83,7 @@ export {
   resolveAnalyticsRange,
   retentionRates,
   summarizeOverview,
+  visibleFestivalRetentionRows,
   withFeatureReach,
 } from "./analytics-metrics";
 export type {

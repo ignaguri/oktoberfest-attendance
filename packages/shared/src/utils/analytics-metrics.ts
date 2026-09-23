@@ -63,7 +63,9 @@ export function resolveAnalyticsRange(
     const festivalId = rangeKey.slice(FESTIVAL_RANGE_PREFIX.length);
     const festival = festivals?.find((candidate) => candidate.id === festivalId);
     if (festival) {
-      return { from: festival.startDate, to: festival.endDate };
+      const todayIso = today.toISOString().slice(0, 10);
+      const isOngoing = festival.startDate <= todayIso && festival.endDate > todayIso;
+      return { from: festival.startDate, to: isOngoing ? todayIso : festival.endDate };
     }
   }
   const preset =
@@ -124,6 +126,17 @@ export function funnelConversion(steps: readonly AnalyticsFunnelStep[]): FunnelS
       fromPrevious: index > 0 && previousUsers > 0 ? step.users / previousUsers : null,
     };
   });
+}
+
+/**
+ * Drops festivals nobody has attended yet (e.g. an upcoming festival) so
+ * retention tables never render a row of zeros; callers keep their own empty
+ * state for when nothing remains.
+ */
+export function visibleFestivalRetentionRows(
+  rows: readonly AnalyticsFestivalRetentionRow[],
+): AnalyticsFestivalRetentionRow[] {
+  return rows.filter((row) => row.attendees > 0);
 }
 
 export function retentionRates(row: AnalyticsFestivalRetentionRow): {

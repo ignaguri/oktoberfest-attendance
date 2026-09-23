@@ -22,6 +22,15 @@ describe("analyticsRangeError", () => {
   it("rejects from after to", () => {
     expect(analyticsRangeError("2026-09-02", "2026-09-01")).toMatch(/after/);
   });
+
+  it("rejects a calendar-invalid `from` date instead of rolling it over", () => {
+    // Date.parse rolls 2026-02-30 over to 2026-03-02 instead of NaN.
+    expect(analyticsRangeError("2026-02-30", "2026-09-01")).toMatch(/Invalid date/);
+  });
+
+  it("rejects a calendar-invalid `to` date instead of rolling it over", () => {
+    expect(analyticsRangeError("2026-09-01", "2026-02-30")).toMatch(/Invalid date/);
+  });
 });
 
 describe("AnalyticsRangeQuerySchema", () => {

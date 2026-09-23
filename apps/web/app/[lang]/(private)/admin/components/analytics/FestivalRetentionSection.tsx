@@ -2,7 +2,11 @@
 
 import { useAdminAnalyticsFestivalRetention } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { formatPercent, retentionRates } from "@prostcounter/shared/utils";
+import {
+  formatPercent,
+  retentionRates,
+  visibleFestivalRetentionRows,
+} from "@prostcounter/shared/utils";
 
 import {
   Table,
@@ -19,7 +23,7 @@ export default function FestivalRetentionSection() {
   const { t } = useTranslation();
   const { data, loading, error, refetch } = useAdminAnalyticsFestivalRetention();
 
-  const festivals = data?.festivals ?? [];
+  const festivals = visibleFestivalRetentionRows(data?.festivals ?? []);
 
   return (
     <AnalyticsSectionCard
@@ -27,7 +31,7 @@ export default function FestivalRetentionSection() {
       description={t("admin.analytics.retention.hint")}
       isLoading={loading}
       error={error}
-      isEmpty={festivals.every((festival) => festival.attendees === 0)}
+      isEmpty={festivals.length === 0}
       onRetry={() => {
         void refetch();
       }}
