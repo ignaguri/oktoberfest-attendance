@@ -19237,6 +19237,448 @@
           }
         }
       }
+    },
+    "/v1/admin/analytics/overview": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Active users per day (admin)",
+        "description": "Rolling DAU/WAU/MAU per day in the range, from user_active_days.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ios",
+                "android"
+              ]
+            },
+            "required": false,
+            "name": "platform",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Overview series",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "series": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "day": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "dau": {
+                            "type": "integer"
+                          },
+                          "wau": {
+                            "type": "integer"
+                          },
+                          "mau": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "day",
+                          "dau",
+                          "wau",
+                          "mau"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "series"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/analytics/features": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Feature usage (admin)",
+        "description": "Users and actions per feature in the range, from the domain tables.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feature usage",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "activeUsers": {
+                      "type": "integer"
+                    },
+                    "features": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "feature": {
+                            "type": "string",
+                            "enum": [
+                              "attendance",
+                              "drinks",
+                              "photos",
+                              "group_joins",
+                              "group_messages",
+                              "photo_reactions",
+                              "photo_comments",
+                              "day_plans",
+                              "crowd_reports",
+                              "friend_requests",
+                              "location_sharing",
+                              "wrapped"
+                            ]
+                          },
+                          "users": {
+                            "type": "integer"
+                          },
+                          "events": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "feature",
+                          "users",
+                          "events"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "activeUsers",
+                    "features"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/analytics/activation-funnel": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Activation funnel (admin)",
+        "description": "Sign-ups in the range, and how many logged an attendance and 5+ days.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "to",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Funnel steps",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "steps": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "step": {
+                            "type": "string",
+                            "enum": [
+                              "signed_up",
+                              "logged_attendance",
+                              "five_days"
+                            ]
+                          },
+                          "users": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "step",
+                          "users"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "steps"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/analytics/festival-retention": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Festival retention (admin)",
+        "description": "Per festival: attendees and how many came back, newest first.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Festival retention",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "festivals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "festivalId": {
+                            "type": "string"
+                          },
+                          "festivalName": {
+                            "type": "string"
+                          },
+                          "startDate": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "attendees": {
+                            "type": "integer"
+                          },
+                          "returnedNext": {
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "returnedAny": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "festivalId",
+                          "festivalName",
+                          "startDate",
+                          "attendees",
+                          "returnedNext",
+                          "returnedAny"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "festivals"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }
