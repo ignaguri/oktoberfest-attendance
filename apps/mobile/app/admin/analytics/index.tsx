@@ -46,7 +46,8 @@ export default function AdminAnalyticsScreen() {
 
   const empty = t("admin.analytics.empty");
 
-  const summary = summarizeOverview(overview.data?.series ?? []);
+  const overviewSeries = overview.data?.series ?? [];
+  const summary = summarizeOverview(overviewSeries);
   const topFeature = features.data?.features.find((row) => row.users > 0);
   const attendanceStep = funnelConversion(funnel.data?.steps ?? []).find(
     (step) => step.step === "logged_attendance",
@@ -56,10 +57,9 @@ export default function AdminAnalyticsScreen() {
   );
 
   const headlines: Record<AnalyticsSection, string> = {
-    overview:
-      summary.mau > 0
-        ? t("admin.analytics.overview.headline", { dau: summary.dau, mau: summary.mau })
-        : empty,
+    overview: !overviewSeries.every((point) => point.mau === 0)
+      ? t("admin.analytics.overview.headline", { dau: summary.dau, mau: summary.mau })
+      : empty,
     features: topFeature
       ? t("admin.analytics.features.headline", {
           feature: t(`admin.analytics.features.names.${topFeature.feature}`),
