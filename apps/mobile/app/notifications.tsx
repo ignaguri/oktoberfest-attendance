@@ -1,28 +1,19 @@
 import type { Notification } from "@novu/js";
-import { getNotificationRoute } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Stack, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import { useCallback } from "react";
 import { View } from "react-native";
 
 import { NotificationInbox } from "@/components/notifications/NotificationInbox";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
+import { navigateToNotificationRoute } from "@/lib/notifications/handlers";
 
 export default function NotificationsScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
 
-  const handleNotificationPress = useCallback(
-    (notification: Notification) => {
-      const payload = notification.data ?? {};
-      const route = getNotificationRoute(payload);
-
-      if (route) {
-        router.push(route as never);
-      }
-    },
-    [router],
-  );
+  const handleNotificationPress = useCallback((notification: Notification) => {
+    navigateToNotificationRoute(notification.data ?? {});
+  }, []);
 
   return (
     <View className="flex-1 bg-background-50">
