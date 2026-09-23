@@ -102,11 +102,9 @@ cssInterop(PrimitiveIcon, {
 
 const actionsheetStyle = tva({ base: "h-full w-full web:pointer-events-none" });
 
-const CONTENT_BOTTOM_PADDING = 20;
-
 const actionsheetContentStyle = tva({
-  // Bottom padding is set in ActionsheetContent, since it needs the safe area inset
-  base: "items-center rounded-tl-3xl rounded-tr-3xl border border-b-0 border-outline-100 bg-background-0 p-5 pt-2 shadow-hard-5 web:pointer-events-auto web:select-none",
+  // pb-5 is the base bottom padding; ActionsheetContent adds the safe area inset below it
+  base: "items-center rounded-tl-3xl rounded-tr-3xl border border-b-0 border-outline-100 bg-background-0 p-5 pb-5 pt-2 shadow-hard-5 web:pointer-events-auto web:select-none",
 });
 
 const actionsheetItemStyle = tva({
@@ -297,7 +295,7 @@ const Actionsheet = React.forwardRef<React.ComponentRef<typeof UIActionsheet>, I
 const ActionsheetContent = React.forwardRef<
   React.ComponentRef<typeof UIActionsheet.Content>,
   IActionsheetContentProps
->(function ActionsheetContent({ className, style, ...props }, ref) {
+>(function ActionsheetContent({ className, children, ...props }, ref) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -305,11 +303,14 @@ const ActionsheetContent = React.forwardRef<
       className={actionsheetContentStyle({
         class: className,
       })}
-      // Android draws edge-to-edge, so without the inset the nav bar covers the sheet's buttons
-      style={[{ paddingBottom: CONTENT_BOTTOM_PADDING + insets.bottom }, style]}
       ref={ref}
       {...props}
-    />
+    >
+      {children}
+      {/* Android draws edge-to-edge, so without the inset the nav bar covers the sheet's buttons.
+          A spacer rather than paddingBottom, so a pb-* className still sets the base padding. */}
+      <View style={{ height: insets.bottom }} />
+    </UIActionsheet.Content>
   );
 });
 
