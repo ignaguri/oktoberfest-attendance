@@ -7,6 +7,7 @@ import { startTransition, useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "@/lib/i18n/client";
 
+import AnalyticsDashboard from "./components/analytics/AnalyticsDashboard";
 import CacheManagement from "./components/CacheManagement";
 import FestivalManagement from "./components/FestivalManagement";
 import GroupList from "./components/GroupList";
@@ -15,7 +16,16 @@ import LocationSessionManagement from "./components/LocationSessionManagement";
 import TentManagement from "./components/TentManagement";
 import UserList from "./components/UserList";
 
-const tabValues = ["users", "groups", "festivals", "tents", "cache", "images", "location"];
+const tabValues = [
+  "users",
+  "groups",
+  "festivals",
+  "tents",
+  "cache",
+  "images",
+  "location",
+  "analytics",
+];
 
 export default function AdminPage() {
   const { t } = useTranslation();
@@ -59,6 +69,7 @@ export default function AdminPage() {
           <TabsTrigger value="cache">{t("admin.tabs.cache")}</TabsTrigger>
           <TabsTrigger value="images">{t("admin.tabs.imageConversion")}</TabsTrigger>
           <TabsTrigger value="location">{t("admin.tabs.location")}</TabsTrigger>
+          <TabsTrigger value="analytics">{t("admin.tabs.analytics")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -87,6 +98,10 @@ export default function AdminPage() {
 
         <TabsContent value="location">
           <LocationSessionManagement />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <AnalyticsDashboard />
         </TabsContent>
       </Tabs>
     </div>
