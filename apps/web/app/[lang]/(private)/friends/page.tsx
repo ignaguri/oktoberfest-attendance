@@ -2,7 +2,7 @@
 
 import { useFriendRequestCount } from "@prostcounter/shared/hooks";
 import { Users } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { FriendRequests } from "@/components/friends/FriendRequests";
 import { FriendsList } from "@/components/friends/FriendsList";
@@ -16,6 +16,16 @@ export default function FriendsPage() {
   const { t } = useTranslation();
   const { data: requestCount } = useFriendRequestCount();
   const [activeTab, setActiveTab] = useState("friends");
+
+  // Open on requests when some are waiting. Once only, so answering the last
+  // one does not yank the user onto the other tab.
+  const hasAutoOpenedRequests = useRef(false);
+  useEffect(() => {
+    if (requestCount != null && requestCount > 0 && !hasAutoOpenedRequests.current) {
+      hasAutoOpenedRequests.current = true;
+      setActiveTab("requests");
+    }
+  }, [requestCount]);
 
   // Search results can surface someone whose request is already waiting. There
   // is nowhere to accept it from the dropdown, so send the user to the tab

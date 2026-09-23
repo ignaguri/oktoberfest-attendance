@@ -10,6 +10,7 @@ import { Platform, Pressable, RefreshControl, ScrollView, View } from "react-nat
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CrowdReportPrompt, CrowdStatusSummary } from "@/components/crowd";
+import { FriendRequestsBanner } from "@/components/friends/friend-requests-banner";
 import { LocationSharingToggle, TentProximityBanner } from "@/components/location";
 import { FestivalAlertCard } from "@/components/notifications/festival-alert-card";
 import { AppHeader } from "@/components/shared/app-header";
@@ -171,6 +172,7 @@ export default function HomeScreen() {
       await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
       await queryClient.invalidateQueries({ queryKey: ["crowd-status"] });
       await queryClient.invalidateQueries({ queryKey: ["message-feed"] });
+      await queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
     }
@@ -214,6 +216,9 @@ export default function HomeScreen() {
           <TutorialTarget stepId="festival-status">
             <FestivalStatus />
           </TutorialTarget>
+
+          {/* Pending friend requests, answerable without leaving Home */}
+          <FriendRequestsBanner />
 
           {/* Notification nudge before and during the festival */}
           <FestivalAlertCard />

@@ -16,7 +16,7 @@ import type { Friend, FriendRequest, FriendSuggestion } from "@prostcounter/shar
 import { getInitials } from "@prostcounter/ui";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Search, UserPlus, Users, UserX } from "lucide-react-native";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, RefreshControl, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -54,12 +54,13 @@ export default function FriendsScreen() {
   const { tab } = useLocalSearchParams<{ tab?: string }>();
   const [activeTab, setActiveTab] = useState<TabType>(tab === "requests" ? "requests" : "friends");
 
-  // Sync tab state when URL param changes (e.g. navigating back with different tab)
+  // Sync tab state when URL param changes (e.g. navigating back with different tab).
+  // Keyed on the param only, so the user can still switch tabs while it is set.
   useEffect(() => {
-    if (tab === "requests" && activeTab !== "requests") {
+    if (tab === "requests") {
       setActiveTab("requests");
     }
-  }, [tab, activeTab]);
+  }, [tab]);
 
   // Alert dialog for unfriend confirmation
   const { dialog, showDialog, closeDialog } = useAlertDialog();
@@ -135,7 +136,7 @@ export default function FriendsScreen() {
 
   const handleDeclineRequest = useCallback(
     (requestId: string) => {
-      declineRequest.mutate(requestId);
+      declineRequest.mutate(requestId).catch(() => {});
     },
     [declineRequest],
   );
@@ -164,6 +165,16 @@ export default function FriendsScreen() {
 
   // Derived values
   const pendingCount = requestCount ?? 0;
+
+  // Open on requests when some are waiting. Once only, so answering the last
+  // one does not yank the user onto the other tab.
+  const hasAutoOpenedRequests = useRef(false);
+  useEffect(() => {
+    if (pendingCount > 0 && !hasAutoOpenedRequests.current) {
+      hasAutoOpenedRequests.current = true;
+      setActiveTab("requests");
+    }
+  }, [pendingCount]);
 
   const isMyFriendsLoading = friendsLoading || suggestionsLoading;
   const isRequestsLoading = incomingLoading || outgoingLoading;

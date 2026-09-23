@@ -3500,7 +3500,13 @@
       "acceptRequest": "Accept Request",
       "addFriend": "Add Friend"
     },
-    "sharedGroups": "Shared Groups"
+    "sharedGroups": "Shared Groups",
+    "entryHint": "Opens your friends and friend requests",
+    "homeBanner": {
+      "title_one": "{{count}} friend request",
+      "title_other": "{{count}} friend requests",
+      "seeAll": "See all"
+    }
   },
   "marketing": {
     "seo": {

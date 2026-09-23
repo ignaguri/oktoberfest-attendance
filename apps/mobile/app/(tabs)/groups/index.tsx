@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import { RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
+import { FriendsEntryCard } from "@/components/friends/friends-entry-card";
 import { CarryOverGroups } from "@/components/groups/carry-over-groups";
 import { CreateGroupSheet } from "@/components/groups/create-group-sheet";
 import { EmptyGroupsState } from "@/components/groups/empty-groups-state";
@@ -151,6 +152,11 @@ export default function GroupsScreen() {
         className="flex-1 bg-background-50"
         refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
       >
+        {/* Friends are social too, and this tab is where people look for them */}
+        <VStack className="p-4 pb-0">
+          <FriendsEntryCard />
+        </VStack>
+
         {/* Outside the hasGroups branch for the same reason CarryOverGroups is:
             someone with no groups yet is exactly who has a pending invitation.
             Spacing lives inside the component so nothing is left behind when it
