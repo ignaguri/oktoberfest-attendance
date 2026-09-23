@@ -95,8 +95,7 @@ export function FriendMap({
             },
             title: member.fullName || member.username || "Friend",
             systemImage: "person.fill",
-            tintColor:
-              selectedFriendId === member.userId ? Colors.primary[700] : Colors.primary[500],
+            tintColor: selectedFriendId === member.userId ? Colors.sky[800] : Colors.sky[600],
           });
         }
       });
