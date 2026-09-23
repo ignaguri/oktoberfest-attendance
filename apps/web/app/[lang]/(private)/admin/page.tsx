@@ -45,7 +45,15 @@ export default function AdminPage() {
         });
         // Swap ?tab= for the hash without navigating. A router.push to the
         // same URL yields new searchParams, re-running this effect forever.
-        window.history.replaceState(null, "", `${window.location.pathname}#${tab}`);
+        // Other params (e.g. a user search) stay.
+        const params = new URLSearchParams(window.location.search);
+        params.delete("tab");
+        const query = params.toString();
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${query ? `?${query}` : ""}#${tab}`,
+        );
       }
     }
   }, [searchParams]);
