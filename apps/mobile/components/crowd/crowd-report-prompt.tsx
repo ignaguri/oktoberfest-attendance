@@ -1,7 +1,6 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Users, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   Actionsheet,
@@ -40,7 +39,6 @@ interface CrowdReportPromptProps {
  */
 export function CrowdReportPrompt({ isOpen, onClose, tents, festivalId }: CrowdReportPromptProps) {
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const [selectedTent, setSelectedTent] = useState<TentInfo | null>(null);
 
   // If only one tent, go directly to report sheet
@@ -83,11 +81,7 @@ export function CrowdReportPrompt({ isOpen, onClose, tents, festivalId }: CrowdR
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
 
-          <VStack
-            space="lg"
-            className="w-full px-2 pb-2"
-            style={{ paddingBottom: Math.max(insets.bottom, 16) }}
-          >
+          <VStack space="lg" className="w-full px-2 pb-2">
             {/* Header */}
             <HStack className="w-full items-center justify-between">
               <HStack space="sm" className="items-center">
