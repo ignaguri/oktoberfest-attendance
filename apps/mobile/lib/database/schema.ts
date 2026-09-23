@@ -115,7 +115,7 @@ export type MutableTable =
 // Constants
 // =============================================================================
 
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 export const DATABASE_NAME = "prostcounter.db";
 
 // =============================================================================
@@ -322,8 +322,8 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
       name TEXT NOT NULL,
       description TEXT NOT NULL,
       icon TEXT NOT NULL,
-      category TEXT NOT NULL CHECK (category IN ('consumption', 'attendance', 'explorer', 'social', 'competitive', 'special')),
-      rarity TEXT DEFAULT 'common' CHECK (rarity IN ('common', 'rare', 'epic', 'legendary')),
+      category TEXT NOT NULL,
+      rarity TEXT DEFAULT 'common',
       points INTEGER DEFAULT 0,
       conditions TEXT DEFAULT '{}',
       is_active INTEGER DEFAULT 1,

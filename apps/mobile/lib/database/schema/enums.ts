@@ -30,7 +30,9 @@ export type AchievementCategory =
   | "explorer"
   | "social"
   | "competitive"
-  | "special";
+  | "special"
+  | "drinking"
+  | "dedication";
 
 export const ACHIEVEMENT_CATEGORIES = [
   "consumption",
@@ -39,6 +41,8 @@ export const ACHIEVEMENT_CATEGORIES = [
   "social",
   "competitive",
   "special",
+  "drinking",
+  "dedication",
 ] as const;
 
 export type AchievementRarity = "common" | "rare" | "epic" | "legendary";

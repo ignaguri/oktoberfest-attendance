@@ -86,7 +86,83 @@ const MIGRATIONS: MigrationFn[] = [
   async (db) => {
     await dropIndexIfExists(db, "tent_visits_user_tent_festival_date");
   },
+
+  // v3 -> v4: Drop the category CHECK that pre-Drizzle databases still carry.
+  async (db) => {
+    await rebuildLegacyAchievementsTable(db);
+  },
 ];
+
+/**
+ * Rebuilds `achievements` without the CHECK constraints of the legacy DDL.
+ *
+ * Databases created before the Drizzle migration (builds up to #177) got their
+ * tables from CREATE_TABLES_SQL, whose category CHECK predates the server's
+ * `drinking` and `dedication` values. Every achievements pull on those devices
+ * dies on the first such row. Drizzle's migration 0000 never ran there, since
+ * the legacy path had already stamped user_version, so the old table is still
+ * in place. Databases created by Drizzle have no CHECK and are left alone.
+ *
+ * SQLite cannot drop a constraint in place, so this is the create-copy-drop-
+ * rename procedure. It runs inside the migration transaction, where
+ * `foreign_keys = OFF` is a no-op, and `defer_foreign_keys` does not help
+ * either: the drop counts every user_achievements row as a violation and rows
+ * copied into the new table never pay that count back. So the child rows are
+ * set aside while the parent is rebuilt, then restored against the new table.
+ */
+export async function rebuildLegacyAchievementsTable(
+  db: Pick<SQLite.SQLiteDatabase, "execAsync" | "getFirstAsync">,
+): Promise<void> {
+  const table = await db.getFirstAsync<{ sql: string }>(
+    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'achievements'",
+  );
+  if (!table || !/\bCHECK\b/i.test(table.sql)) {
+    logger.debug("achievements has no legacy CHECK, skipping rebuild");
+    return;
+  }
+
+  await db.execAsync(
+    "CREATE TEMP TABLE user_achievements_stash AS SELECT * FROM user_achievements",
+  );
+  await db.execAsync("DELETE FROM user_achievements");
+
+  // Same shape as the table in Drizzle migration 0000.
+  await db.execAsync(`
+    CREATE TABLE achievements_new (
+      id TEXT PRIMARY KEY NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL,
+      icon TEXT NOT NULL,
+      category TEXT NOT NULL,
+      rarity TEXT DEFAULT 'common',
+      points INTEGER DEFAULT 0,
+      conditions TEXT DEFAULT '{}',
+      is_active INTEGER DEFAULT 1,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      _synced_at TEXT,
+      _deleted INTEGER DEFAULT 0 NOT NULL,
+      _dirty INTEGER DEFAULT 0 NOT NULL
+    )
+  `);
+  await db.execAsync(`
+    INSERT INTO achievements_new (
+      id, name, description, icon, category, rarity, points, conditions,
+      is_active, created_at, updated_at, _synced_at, _deleted, _dirty
+    )
+    SELECT
+      id, name, description, icon, category, rarity, points, conditions,
+      is_active, created_at, updated_at, _synced_at,
+      COALESCE(_deleted, 0), COALESCE(_dirty, 0)
+    FROM achievements
+  `);
+  await db.execAsync("DROP TABLE achievements");
+  await db.execAsync("ALTER TABLE achievements_new RENAME TO achievements");
+
+  await db.execAsync("INSERT INTO user_achievements SELECT * FROM user_achievements_stash");
+  await db.execAsync("DROP TABLE user_achievements_stash");
+  logger.info("Rebuilt achievements without legacy CHECK constraints");
+}
 
 /**
  * Runs all pending migrations.
