@@ -1,5 +1,6 @@
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { randomUUID } from "crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -24,6 +25,7 @@ import {
   createTestSupabaseAdmin,
   createTestSupabaseWithAuth,
 } from "../../../__tests__/helpers/test-supabase";
+import { NotFoundError } from "../../../middleware/error";
 import { SupabaseProfileRepository } from "../profile.repository";
 
 /**
@@ -135,6 +137,16 @@ describe("getProfileDetail (Local DB)", () => {
     const profile = await repoFor(groupMate).getProfileDetail(owner.id, undefined, groupMate.id);
 
     expect(profile.sharedGroups).toEqual([]);
+  });
+
+  // The route used to wrap this call in a catch-all that reported every
+  // failure as a 404, so the error type is the contract now.
+  it("throws NotFoundError for a user that does not exist", async () => {
+    const missingUserId = randomUUID();
+
+    await expect(
+      repoFor(friend).getProfileDetail(missingUserId, festival.id, friend.id),
+    ).rejects.toBeInstanceOf(NotFoundError);
   });
 
   it("marks the owner's own profile as self", async () => {

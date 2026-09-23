@@ -113,7 +113,6 @@ export function UserProfileModal({
                 {/* Large Avatar - opens full size when there is a picture to show */}
                 <Pressable
                   onPress={fullSizeAvatarUrl ? () => setIsAvatarViewerOpen(true) : undefined}
-                  disabled={!fullSizeAvatarUrl}
                   accessibilityRole={fullSizeAvatarUrl ? "button" : undefined}
                   accessibilityLabel={fullSizeAvatarUrl ? t("profile.avatar.viewFullSize") : undefined}
                   accessibilityHint={

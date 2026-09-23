@@ -94,6 +94,8 @@ export function useSendFriendRequest() {
         // straight back to "Add friend" once the mutation settles.
         invalidateQueries(QueryKeys.friendSearchAll());
         invalidateQueries(["public-profile", addresseeId] as const);
+        invalidateQueries(QueryKeys.profileDetailAll());
+        invalidateQueries(QueryKeys.profileDaysAll());
       },
     },
   );
@@ -117,6 +119,8 @@ export function useAcceptFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestCount());
         invalidateQueries(QueryKeys.friendSuggestions());
         invalidateQueries(["public-profile"] as const);
+        invalidateQueries(QueryKeys.profileDetailAll());
+        invalidateQueries(QueryKeys.profileDaysAll());
         invalidateQueries(QueryKeys.pendingUnlocks());
       },
     },
@@ -140,6 +144,8 @@ export function useDeclineFriendRequest() {
         invalidateQueries(QueryKeys.friendRequestCount());
         invalidateQueries(QueryKeys.friendSearchAll());
         invalidateQueries(QueryKeys.friendshipStatusAll());
+        invalidateQueries(QueryKeys.profileDetailAll());
+        invalidateQueries(QueryKeys.profileDaysAll());
       },
     },
   );
@@ -165,6 +171,8 @@ export function useCancelFriendRequest() {
         // the other user has to go by prefix. Left stale it still reads
         // pending_sent with a friendship id the server has already deleted.
         invalidateQueries(QueryKeys.friendshipStatusAll());
+        invalidateQueries(QueryKeys.profileDetailAll());
+        invalidateQueries(QueryKeys.profileDaysAll());
       },
     },
   );
@@ -186,6 +194,8 @@ export function useUnfriend() {
         invalidateQueries(QueryKeys.friends());
         invalidateQueries(QueryKeys.friendSuggestions());
         invalidateQueries(QueryKeys.friendshipStatus(userId));
+        invalidateQueries(QueryKeys.profileDetailAll());
+        invalidateQueries(QueryKeys.profileDaysAll());
       },
     },
   );

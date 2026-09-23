@@ -162,12 +162,12 @@ app.openapi(getProfileDetailRoute, async (c) => {
 
   const profileRepo = new SupabaseProfileRepository(supabase);
 
-  try {
-    const profile = await profileRepo.getProfileDetail(userId, festivalId, user?.id);
-    return c.json({ profile }, 200);
-  } catch {
-    throw new NotFoundError("User not found");
-  }
+  // No catch-all: getProfileDetail throws NotFoundError when the profile is
+  // missing and DatabaseError when a read fails, so a transient database
+  // problem surfaces as a 500 instead of "User not found".
+  const profile = await profileRepo.getProfileDetail(userId, festivalId, user?.id);
+
+  return c.json({ profile }, 200);
 });
 
 // GET /profiles/:userId/festivals/:festivalId/days - Lazy day breakdown

@@ -21,6 +21,7 @@ import { AvatarViewerModal } from "@/components/shared/avatar-viewer-modal";
 import { MobileFriendshipBadge } from "@/components/shared/user-profile-modal";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { ScrollView } from "@/components/ui/scroll-view";
@@ -47,6 +48,7 @@ function FestivalHistoryRow({ row, userId }: { row: ProfileHistoryRow; userId: s
         accessibilityRole="button"
         accessibilityLabel={row.festivalName}
         accessibilityHint={t("profile.page.historyRowHint")}
+        accessibilityState={{ expanded: isExpanded }}
       >
         <HStack className="items-center justify-between">
           <VStack space="xs" className="flex-1">
@@ -96,12 +98,24 @@ export default function UserProfileScreen() {
   // See the note in FestivalHistoryRow: the shared hooks return `any`.
   const profile: ProfileDetail | null = profileQuery.data;
   const loading: boolean = profileQuery.loading;
+  // `data` is null on failure too, so without this a 500 would read as
+  // "profile not found".
+  const error: Error | null = profileQuery.error;
+  const refetch: () => void = profileQuery.refetch;
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
 
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
         <Spinner size="large" color={Colors.primary[500]} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 items-center justify-center p-8">
+        <ErrorState error={error} onRetry={refetch} />
       </View>
     );
   }
@@ -124,7 +138,6 @@ export default function UserProfileScreen() {
           <VStack space="sm" className="items-center">
             <Pressable
               onPress={fullSizeAvatarUrl ? () => setIsAvatarViewerOpen(true) : undefined}
-              disabled={!fullSizeAvatarUrl}
               accessibilityRole={fullSizeAvatarUrl ? "button" : undefined}
               accessibilityLabel={fullSizeAvatarUrl ? t("profile.avatar.viewFullSize") : undefined}
               accessibilityHint={

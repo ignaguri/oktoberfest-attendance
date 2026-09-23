@@ -19,7 +19,13 @@ import { formatDateForDatabase, replaceLocalhostInUrl } from "@prostcounter/shar
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError, DatabaseError } from "../../middleware/error";
+import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
+
+/**
+ * PostgREST caps a response at `max_rows`, which is 1000 in
+ * supabase/config.toml. Reads that must be complete page at that size.
+ */
+const PAGE_SIZE = 1000;
 
 export class SupabaseProfileRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -169,8 +175,10 @@ export class SupabaseProfileRepository {
       .eq("id", userId)
       .single();
 
+    // Typed on purpose: the route used to wrap this call in a catch-all that
+    // turned every failure, including a transient database error, into a 404.
     if (error || !data) {
-      throw new Error(`Profile not found: ${error?.message}`);
+      throw new NotFoundError("User not found");
     }
 
     const [stats, relationship, sharedGroups, history, favouriteTent] = await Promise.all([
@@ -305,20 +313,34 @@ export class SupabaseProfileRepository {
    * stranger every festival the user ever attended.
    */
   private async fetchAttendanceHistory(userId: string): Promise<ProfileHistoryRow[]> {
-    const { data: attendanceRows, error } = await this.supabase
-      .from("attendances")
-      .select("festival_id")
-      .eq("user_id", userId);
+    // Read in pages: PostgREST truncates at `max_rows` (1000, see
+    // supabase/config.toml), which would silently drop festivals from a history
+    // this endpoint promises in full.
+    const festivalIdSet = new Set<string>();
+    for (let offset = 0; ; offset += PAGE_SIZE) {
+      const { data, error } = await this.supabase
+        .from("attendances")
+        .select("festival_id")
+        .eq("user_id", userId)
+        .range(offset, offset + PAGE_SIZE - 1);
 
-    if (error) {
-      throw new DatabaseError(`Failed to list attendance history: ${error.message}`);
+      if (error) {
+        throw new DatabaseError(`Failed to list attendance history: ${error.message}`);
+      }
+
+      const rows = data ?? [];
+      for (const row of rows) {
+        if (row.festival_id) {
+          festivalIdSet.add(row.festival_id);
+        }
+      }
+
+      if (rows.length < PAGE_SIZE) {
+        break;
+      }
     }
 
-    const festivalIds = [
-      ...new Set(
-        (attendanceRows ?? []).flatMap((row) => (row.festival_id ? [row.festival_id] : [])),
-      ),
-    ];
+    const festivalIds = [...festivalIdSet];
     if (festivalIds.length === 0) {
       return [];
     }
@@ -364,20 +386,33 @@ export class SupabaseProfileRepository {
     userId: string,
     festivalId?: string,
   ): Promise<ProfileDetail["favouriteTent"]> {
-    let query = this.supabase.from("tent_visits").select("tents(name)").eq("user_id", userId);
-
-    if (festivalId) {
-      query = query.eq("festival_id", festivalId);
-    }
-
-    const { data } = await query;
-
+    // Paged for the same reason as the history: a truncated read would count
+    // only the first page and could name the wrong tent as the favourite.
     const visitsByTent = new Map<string, number>();
-    for (const row of data ?? []) {
-      if (!row.tents) {
-        continue;
+    for (let offset = 0; ; offset += PAGE_SIZE) {
+      let query = this.supabase.from("tent_visits").select("tents(name)").eq("user_id", userId);
+
+      if (festivalId) {
+        query = query.eq("festival_id", festivalId);
       }
-      visitsByTent.set(row.tents.name, (visitsByTent.get(row.tents.name) ?? 0) + 1);
+
+      const { data, error } = await query.range(offset, offset + PAGE_SIZE - 1);
+
+      if (error) {
+        throw new DatabaseError(`Failed to list tent visits: ${error.message}`);
+      }
+
+      const rows = data ?? [];
+      for (const row of rows) {
+        if (!row.tents) {
+          continue;
+        }
+        visitsByTent.set(row.tents.name, (visitsByTent.get(row.tents.name) ?? 0) + 1);
+      }
+
+      if (rows.length < PAGE_SIZE) {
+        break;
+      }
     }
 
     let favourite: { name: string; visits: number } | null = null;
@@ -428,6 +463,18 @@ export class SupabaseProfileRepository {
         .eq("user_id", userId)
         .eq("festival_id", festivalId),
     ]);
+
+    // All three are load-bearing: a discarded error here would report zero
+    // drinks or no tents with a 200, making the expanded history quietly wrong.
+    if (festivalResult.error) {
+      throw new DatabaseError(`Failed to fetch festival: ${festivalResult.error.message}`);
+    }
+    if (consumptionsResult.error) {
+      throw new DatabaseError(`Failed to list consumptions: ${consumptionsResult.error.message}`);
+    }
+    if (visitsResult.error) {
+      throw new DatabaseError(`Failed to list tent visits: ${visitsResult.error.message}`);
+    }
 
     const timezone = festivalResult.data?.timezone ?? undefined;
 

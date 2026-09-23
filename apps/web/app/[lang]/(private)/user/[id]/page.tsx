@@ -21,6 +21,7 @@ import { useState } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AvatarViewerDialog } from "@/components/ui/avatar-viewer-dialog";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FriendshipBadge } from "@/components/ui/profile-preview";
 import { useTranslation } from "@/lib/i18n/client";
@@ -86,12 +87,27 @@ export default function UserProfilePage() {
   // See the note in FestivalHistoryRow: the shared hooks return `any`.
   const profile: ProfileDetail | null = profileQuery.data;
   const loading: boolean = profileQuery.loading;
+  // `data` is null on failure too, so without this a 500 would read as
+  // "profile not found".
+  const error: Error | null = profileQuery.error;
+  const refetch: () => void = profileQuery.refetch;
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
 
   if (loading) {
     return (
       <div className="container mx-auto flex justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto space-y-4 py-12 text-center">
+        <p className="text-gray-600">{t("common.status.error")}</p>
+        <Button variant="outline" onClick={() => refetch()}>
+          {t("common.actions.retry")}
+        </Button>
       </div>
     );
   }
