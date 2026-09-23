@@ -269,15 +269,9 @@ describe("Profile Routes - GET /profiles/:userId (Public Profile)", () => {
         createMockChain(mockSupabaseSuccess(mockProfileRow)),
       );
 
-      // 2. Festival stats query
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain(
-          mockSupabaseSuccess({
-            days_attended: 5,
-            total_beers: 20,
-            avg_beers: 4.0,
-          }),
-        ),
+      // 2. Festival stats RPC
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce(
+        mockSupabaseSuccess([{ days_attended: 5, total_beers: 20, avg_beers: 4.0 }]) as never,
       );
 
       // 3. Friendship query

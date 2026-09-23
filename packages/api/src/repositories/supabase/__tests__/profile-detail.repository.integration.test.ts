@@ -99,6 +99,21 @@ describe("getProfileDetail (Local DB)", () => {
     expect(profile.friendsSince).toBeNull();
   });
 
+  // The global leaderboard already shows everyone's festival totals, so a
+  // stranger gets them too. They used to read the right days next to zero
+  // drinks, because RLS emptied the consumptions under the stats view.
+  it("gives a stranger the real festival stats", async () => {
+    const profile = await repoFor(stranger).getProfileDetail(owner.id, festival.id, stranger.id);
+
+    expect(profile.stats).toEqual({ daysAttended: 1, totalBeers: 2, avgBeers: 2 });
+  });
+
+  it("gives a stranger the real stats in the public profile", async () => {
+    const profile = await repoFor(stranger).getPublicProfile(owner.id, festival.id, stranger.id);
+
+    expect(profile.stats).toEqual({ daysAttended: 1, totalBeers: 2, avgBeers: 2 });
+  });
+
   it("gives a friend the history and the favourite tent", async () => {
     const profile = await repoFor(friend).getProfileDetail(owner.id, festival.id, friend.id);
 

@@ -79,27 +79,9 @@ export class SupabaseProfileRepository {
       throw new Error(`Profile not found: ${error?.message}`);
     }
 
-    let stats: PublicProfile["stats"] = null;
+    const stats: PublicProfile["stats"] = await this.fetchFestivalStats(userId, festivalId);
     let friendshipStatus: PublicProfile["friendshipStatus"] = null;
     let sharedGroups: PublicProfile["sharedGroups"] = null;
-
-    // Fetch festival stats from user_festival_stats view if festivalId is provided
-    if (festivalId) {
-      const { data: statsData } = await this.supabase
-        .from("user_festival_stats")
-        .select("days_attended, total_beers, avg_beers")
-        .eq("user_id", userId)
-        .eq("festival_id", festivalId)
-        .maybeSingle();
-
-      if (statsData) {
-        stats = {
-          daysAttended: Number(statsData.days_attended) || 0,
-          totalBeers: Number(statsData.total_beers) || 0,
-          avgBeers: Number(statsData.avg_beers) || 0,
-        };
-      }
-    }
 
     // Friendship status and shared groups (skip if viewing own profile)
     if (currentUserId && currentUserId !== userId) {
@@ -211,13 +193,15 @@ export class SupabaseProfileRepository {
       return null;
     }
 
-    const { data } = await this.supabase
-      .from("user_festival_stats")
-      .select("days_attended, total_beers, avg_beers")
-      .eq("user_id", userId)
-      .eq("festival_id", festivalId)
-      .maybeSingle();
+    // An RPC, not the user_festival_stats view: the view counts every day but
+    // reads drinks under the viewer's RLS, so a stranger got the real days
+    // next to zero drinks. These totals are public on the global leaderboard.
+    const { data: rows } = await this.supabase.rpc("get_profile_festival_stats", {
+      p_user_id: userId,
+      p_festival_id: festivalId,
+    });
 
+    const data = rows?.[0];
     if (!data) {
       return null;
     }
