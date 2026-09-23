@@ -54,7 +54,7 @@ export default function FestivalRetentionSection() {
             const rates = retentionRates(festival);
             return (
               <TableRow key={festival.festivalId}>
-                <TableCell>{festival.festivalName}</TableCell>
+                <TableCell className="text-left">{festival.festivalName}</TableCell>
                 <TableCell className="text-right">{festival.attendees}</TableCell>
                 <TableCell className="text-right">
                   {festival.returnedNext === null ? (

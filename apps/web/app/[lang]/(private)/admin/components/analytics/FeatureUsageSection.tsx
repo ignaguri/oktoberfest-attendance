@@ -32,7 +32,9 @@ export default function FeatureUsageSection({ from, to }: FeatureUsageSectionPro
   return (
     <AnalyticsSectionCard
       title={t("admin.analytics.sections.features")}
-      description={t("admin.analytics.features.activeUsers", { count: activeUsers })}
+      description={
+        data ? t("admin.analytics.features.activeUsers", { count: activeUsers }) : undefined
+      }
       isLoading={loading}
       error={error}
       isEmpty={rows.every((row) => row.users === 0)}
