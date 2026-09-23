@@ -1,5 +1,3 @@
 - Open a friend's full profile: the groups you share, their favourite tent and their festival history.
-- Invite people to a group by searching for their name, or ask to join a group yourself.
-- Tap a profile picture to see it full size.
-- See which tent your friends are in right in the activity feed.
-- Portrait photos no longer get squashed on upload. Prost!
+- Invite people to a group by searching for their name.
+- Portrait photos no longer get squashed into squares when you upload them. Prost!

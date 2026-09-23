@@ -1,5 +1,3 @@
 - Öffne das volle Profil deiner Freunde: gemeinsame Gruppen, Lieblingszelt und Volksfest-Verlauf.
-- Lade Leute per Namenssuche in eine Gruppe ein oder frag selbst an, einer Gruppe beizutreten.
-- Tippe auf ein Profilbild, um es in voller Größe zu sehen.
-- Sieh im Aktivitätsfeed, in welchem Zelt deine Freunde sind.
-- Hochformat-Fotos werden beim Hochladen nicht mehr gestaucht. Prost!
+- Lade Leute per Namenssuche in eine Gruppe ein.
+- Hochformat-Fotos werden beim Hochladen nicht mehr zu Quadraten gestaucht. Prost!
