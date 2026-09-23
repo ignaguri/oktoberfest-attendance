@@ -20,6 +20,7 @@ import {
   View,
   VirtualizedList,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type IAnimatedPressableProps = React.ComponentProps<typeof Pressable> &
   MotionComponentProps<typeof Pressable, ViewStyle, unknown, unknown, unknown>;
@@ -95,7 +96,7 @@ cssInterop(PrimitiveIcon, {
 const actionsheetStyle = tva({ base: "h-full w-full web:pointer-events-none" });
 
 const actionsheetContentStyle = tva({
-  base: "pb-safe items-center rounded-tl-3xl rounded-tr-3xl bg-background-0 p-2 shadow-lg web:pointer-events-auto web:select-none",
+  base: "items-center rounded-tl-3xl rounded-tr-3xl bg-background-0 p-2 shadow-lg web:pointer-events-auto web:select-none",
 });
 
 const actionsheetItemStyle = tva({
@@ -297,7 +298,9 @@ const Actionsheet = React.forwardRef<React.ComponentRef<typeof UIActionsheet>, I
 const ActionsheetContent = React.forwardRef<
   React.ComponentRef<typeof UIActionsheet.Content>,
   IActionsheetContentProps & { className?: string }
->(function ActionsheetContent({ className, ...props }, ref) {
+>(function ActionsheetContent({ className, children, ...props }, ref) {
+  const insets = useSafeAreaInsets();
+
   return (
     <UIActionsheet.Content
       className={actionsheetContentStyle({
@@ -305,7 +308,12 @@ const ActionsheetContent = React.forwardRef<
       })}
       ref={ref}
       {...props}
-    />
+    >
+      {children}
+      {/* Android draws edge-to-edge, so without the inset the nav bar covers the last options.
+          A spacer rather than paddingBottom, so a pb-* className still sets the base padding. */}
+      <View style={{ height: insets.bottom }} />
+    </UIActionsheet.Content>
   );
 });
 

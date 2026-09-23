@@ -5,7 +5,6 @@ import { X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Platform,
   SectionList,
   type SectionListData,
   type SectionListRenderItemInfo,
@@ -76,9 +75,8 @@ export function TentSelectorSheet({
   const { tents, isLoading, error } = useAdaptedTents(festivalId);
   const { crowdStatuses } = useTentCrowdStatus(festivalId);
   const insets = useSafeAreaInsets();
+  // Both platforms draw the keyboard over the sheet (Android is edge-to-edge, so no window resize)
   const { keyboardHeight } = useKeyboardHeight();
-  // Android resizes the window for the keyboard; iOS draws it over the sheet.
-  const iosKeyboardHeight = Platform.OS === "ios" ? keyboardHeight : 0;
 
   // Create a map of tentId -> crowd status for quick lookup
   const crowdMap = useMemo(() => {
@@ -233,12 +231,7 @@ export function TentSelectorSheet({
 
         {/* Footer (multi-select only) */}
         {mode === "multi" && (
-          <HStack
-            className="w-full gap-3 pt-3"
-            style={{
-              paddingBottom: iosKeyboardHeight > 0 ? 8 : Math.max(insets.bottom, 16) + 8,
-            }}
-          >
+          <HStack className="w-full gap-3 pb-2 pt-3">
             <Button
               variant="outline"
               action="secondary"
@@ -258,8 +251,11 @@ export function TentSelectorSheet({
           </HStack>
         )}
 
-        {/* The sheet sits on its measured height, so growing it lifts the list over the keyboard */}
-        {iosKeyboardHeight > 0 && <View style={{ height: iosKeyboardHeight }} />}
+        {/* The sheet sits on its measured height, so growing it lifts the list over the keyboard.
+            The content already pads for the bottom inset, which the keyboard covers. */}
+        {keyboardHeight > 0 && (
+          <View style={{ height: Math.max(keyboardHeight - insets.bottom, 0) }} />
+        )}
       </ActionsheetContent>
     </Actionsheet>
   );

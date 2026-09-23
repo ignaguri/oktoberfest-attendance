@@ -22,7 +22,6 @@ import {
 } from "lucide-react-native";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RadlerIcon } from "@/components/icons/radler-icon";
 import { type ImageSource, ImageSourcePicker } from "@/components/image-source-picker";
@@ -145,7 +144,6 @@ export function QuickAttendanceSheet({
   const { calculatePricePaid } = useTipCalculation();
   const { getDrinkPriceCents } = useDrinkPrice();
   const toast = useToast();
-  const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
   const festivalId = currentFestival?.id;
   const { setPendingCrowdReport } = useQuickAttendance();
@@ -457,16 +455,12 @@ export function QuickAttendanceSheet({
     <>
       <Actionsheet isOpen={isOpen} onClose={onClose}>
         <ActionsheetBackdrop />
-        <ActionsheetContent className="pb-safe">
+        <ActionsheetContent>
           <ActionsheetDragIndicatorWrapper>
             <ActionsheetDragIndicator />
           </ActionsheetDragIndicatorWrapper>
 
-          <VStack
-            space="lg"
-            className="w-full px-2"
-            style={{ paddingBottom: Math.max(insets.bottom, 16) }}
-          >
+          <VStack space="lg" className="w-full px-2">
             {/* Header */}
             <VStack space="xs">
               <HStack className="items-center justify-between">

@@ -5,7 +5,6 @@ import { cn } from "@prostcounter/ui";
 import { CircleAlert, Send, X } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   Actionsheet,
@@ -60,7 +59,6 @@ export function CrowdReportSheet({
   festivalId,
 }: CrowdReportSheetProps) {
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const [selectedLevel, setSelectedLevel] = useState<CrowdLevel | null>(null);
   const [waitTimeMinutes, setWaitTimeMinutes] = useState<number | undefined>(undefined);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -123,11 +121,7 @@ export function CrowdReportSheet({
           <ActionsheetDragIndicator />
         </ActionsheetDragIndicatorWrapper>
 
-        <VStack
-          space="lg"
-          className="w-full px-2 pb-2"
-          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
-        >
+        <VStack space="lg" className="w-full px-2 pb-2">
           {/* Header */}
           <HStack className="w-full items-center justify-between">
             <VStack>
