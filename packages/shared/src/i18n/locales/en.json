@@ -2031,7 +2031,8 @@
         "events": "Actions",
         "reach": "Reach",
         "dead": "Barely used",
-        "activeUsers": "{{count}} active users in this range",
+        "activeUsers_one": "{{count}} active user in this range",
+        "activeUsers_other": "{{count}} active users in this range",
         "headline": "Most used: {{feature}}",
         "names": {
           "attendance": "Attendance logging",

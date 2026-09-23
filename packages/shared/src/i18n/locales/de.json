@@ -2268,7 +2268,8 @@
         "events": "Aktionen",
         "reach": "Reichweite",
         "dead": "Kaum genutzt",
-        "activeUsers": "{{count}} aktive Nutzer in diesem Zeitraum",
+        "activeUsers_one": "{{count}} aktiver Nutzer in diesem Zeitraum",
+        "activeUsers_other": "{{count}} aktive Nutzer in diesem Zeitraum",
         "headline": "Meistgenutzt: {{feature}}",
         "names": {
           "attendance": "Besuche eintragen",

@@ -2091,7 +2091,8 @@
         "events": "Acciones",
         "reach": "Alcance",
         "dead": "Casi sin uso",
-        "activeUsers": "{{count}} usuarios activos en este período",
+        "activeUsers_one": "{{count}} usuario activo en este período",
+        "activeUsers_other": "{{count}} usuarios activos en este período",
         "headline": "Más usada: {{feature}}",
         "names": {
           "attendance": "Registro de asistencia",
