@@ -96,7 +96,7 @@ interface RequestCardProps {
   };
 }
 
-function IncomingRequestCard({ request }: RequestCardProps) {
+export function IncomingRequestCard({ request }: RequestCardProps) {
   const { t } = useTranslation();
   const accept = useAcceptFriendRequest();
   const decline = useDeclineFriendRequest();

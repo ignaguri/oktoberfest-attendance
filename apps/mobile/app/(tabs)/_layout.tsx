@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useFriendRequestCount } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
@@ -20,6 +21,7 @@ function TabsLayoutContent() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const { isOpen, closeSheet, preselectedTentId, preselectedTentName } = useQuickAttendance();
+  const { data: friendRequestCount } = useFriendRequestCount();
 
   // Check if we're within festival dates
   const isFestivalActive = useMemo(() => {
@@ -63,6 +65,10 @@ function TabsLayoutContent() {
             sf={{ default: "person.2", selected: "person.2.fill" }}
             src={<NativeTabs.Trigger.VectorIcon family={Ionicons} name="people" />}
           />
+          {/* Friends live in this tab, so pending requests are badged here */}
+          <NativeTabs.Trigger.Badge hidden={!friendRequestCount}>
+            {String(friendRequestCount ?? "")}
+          </NativeTabs.Trigger.Badge>
         </NativeTabs.Trigger>
 
         {/* Leaderboard tab */}

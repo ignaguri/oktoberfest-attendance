@@ -3688,7 +3688,13 @@
       "acceptRequest": "Anfrage annehmen",
       "addFriend": "Freund hinzufügen"
     },
-    "sharedGroups": "Gemeinsame Gruppen"
+    "sharedGroups": "Gemeinsame Gruppen",
+    "entryHint": "Öffnet deine Freunde und Freundschaftsanfragen",
+    "homeBanner": {
+      "title_one": "{{count}} Freundschaftsanfrage",
+      "title_other": "{{count}} Freundschaftsanfragen",
+      "seeAll": "Alle anzeigen"
+    }
   },
   "marketing": {
     "seo": {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useFriendRequestCount } from "@prostcounter/shared/hooks";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { parseISO } from "date-fns";
@@ -52,6 +53,8 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { data: friendRequestCount } = useFriendRequestCount();
+  const hasPendingFriendRequests = friendRequestCount != null && friendRequestCount > 0;
 
   const handleSignOut = async () => {
     // The logout redirect is a client navigation that keeps the query cache, and
@@ -106,6 +109,14 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
           <Link href={item.href} className="flex items-center gap-2">
             {item.icon}
             {item.label}
+            {item.id === "friends" && hasPendingFriendRequests && (
+              <Badge
+                variant="default"
+                className="ml-auto h-5 min-w-5 justify-center rounded-full px-1.5 text-xs"
+              >
+                {friendRequestCount}
+              </Badge>
+            )}
           </Link>
         </DropdownMenuItem>
       );
@@ -199,14 +210,24 @@ export function UserMenu({ profileData, className }: UserMenuProps) {
             variant="ghost"
             className={cn("flex h-auto items-center gap-2 p-2 hover:bg-gray-700", className)}
           >
-            <Avatar
-              url={profileData.avatar_url}
-              fallback={{
-                username: profileData.username,
-                full_name: profileData.full_name,
-                email: profileData.email || "no.name@user.com",
-              }}
-            />
+            <span className="relative">
+              <Avatar
+                url={profileData.avatar_url}
+                fallback={{
+                  username: profileData.username,
+                  full_name: profileData.full_name,
+                  email: profileData.email || "no.name@user.com",
+                }}
+              />
+              {/* The menu hides the friends link, so pending requests surface here */}
+              {hasPendingFriendRequests && (
+                <span className="absolute -top-0.5 -right-0.5 size-3 rounded-full bg-red-500 ring-2 ring-gray-800">
+                  <span className="sr-only">
+                    {t("friends.requestsCount", { count: friendRequestCount })}
+                  </span>
+                </span>
+              )}
+            </span>
             <div className="hidden flex-col items-start text-left sm:flex">
               <span className="text-sm font-medium text-white">
                 {profileData.full_name || profileData.username || "User"}

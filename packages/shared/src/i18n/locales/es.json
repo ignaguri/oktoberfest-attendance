@@ -3560,7 +3560,13 @@
       "acceptRequest": "Aceptar solicitud",
       "addFriend": "Añadir amigo"
     },
-    "sharedGroups": "Grupos en común"
+    "sharedGroups": "Grupos en común",
+    "entryHint": "Abre tus amigos y solicitudes de amistad",
+    "homeBanner": {
+      "title_one": "{{count}} solicitud de amistad",
+      "title_other": "{{count}} solicitudes de amistad",
+      "seeAll": "Ver todas"
+    }
   },
   "marketing": {
     "seo": {
