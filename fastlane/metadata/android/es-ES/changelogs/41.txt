@@ -1,0 +1,5 @@
+- Abre el perfil completo de tus amigos: los grupos que comparten, su carpa favorita y su historial de festivales.
+- Invita gente a un grupo buscando su nombre, o pide unirte a un grupo tú mismo.
+- Toca una foto de perfil para verla en tamaño completo.
+- Mira en el feed de actividad en qué carpa están tus amigos.
+- Las fotos verticales ya no se aplastan al subirlas. ¡Prost!

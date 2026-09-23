@@ -1,4 +1,12 @@
 export const changelog: Record<string, string[]> = {
+  "1.5.0": [
+    "👤 Open a friend's full profile: the groups you share, their favourite tent and their festival history",
+    "🔍 Invite people to a group by searching for their name",
+    "🙋 Ask to join a group, and the group creator accepts or declines",
+    "🖼️ Click a profile picture to see it full size",
+    "🎪 See which tent your friends are in right in the activity feed",
+    "⏳ Oktoberfest 2026 countdown, and a prompt to switch to the festival that's live",
+  ],
   "1.4.0": [
     "🏅 New achievement badge artwork, and a detail sheet that explains how to unlock each one",
   ],
