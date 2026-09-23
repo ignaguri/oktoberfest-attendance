@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import type { LucideIcon } from "lucide-react-native";
 import {
   CalendarDays,
+  ChartColumn,
   ChevronRight,
   Database,
   MapPin,
@@ -28,6 +29,11 @@ import { IconColors } from "@/lib/constants/colors";
  * lands; image conversion stays web-only (a server-side maintenance chore).
  */
 const SECTIONS = [
+  {
+    key: "analytics" as const,
+    href: "/admin/analytics" as const,
+    Icon: ChartColumn,
+  },
   {
     key: "users" as const,
     href: "/admin/users" as const,
