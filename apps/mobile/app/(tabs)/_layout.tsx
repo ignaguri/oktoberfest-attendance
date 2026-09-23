@@ -65,9 +65,11 @@ function TabsLayoutContent() {
             sf={{ default: "person.2", selected: "person.2.fill" }}
             src={<NativeTabs.Trigger.VectorIcon family={Ionicons} name="people" />}
           />
-          {/* Friends live in this tab, so pending requests are badged here */}
+          {/* Friends live in this tab, so pending requests are badged here.
+              No children when there is nothing to count: expo-router ignores
+              `hidden` whenever children are set, so "0" would show. */}
           <NativeTabs.Trigger.Badge hidden={!friendRequestCount}>
-            {String(friendRequestCount ?? "")}
+            {friendRequestCount ? String(friendRequestCount) : undefined}
           </NativeTabs.Trigger.Badge>
         </NativeTabs.Trigger>
 
