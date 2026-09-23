@@ -19,6 +19,7 @@ export * from "./photo.schema";
 export * from "./photo-social.schema";
 export * from "./calendar.schema";
 export * from "./profile.schema";
+export * from "./profile-detail.schema";
 export * from "./activity-feed.schema";
 export * from "./group-message.schema";
 export * from "./pricing.schema";

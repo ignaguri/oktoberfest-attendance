@@ -5,17 +5,27 @@ import type {
   Highlights,
   MissingProfileFields,
   Profile,
+  ProfileDayRow,
+  ProfileDetail,
+  ProfileHistoryRow,
   ProfileShort,
+  ProfileSharedGroup,
   PublicProfile,
   TutorialStatus,
   UpdateProfileInput,
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
-import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
+import { formatDateForDatabase, replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError } from "../../middleware/error";
+import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
+
+/**
+ * PostgREST caps a response at `max_rows`, which is 1000 in
+ * supabase/config.toml. Reads that must be complete page at that size.
+ */
+const PAGE_SIZE = 1000;
 
 export class SupabaseProfileRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -144,6 +154,357 @@ export class SupabaseProfileRepository {
       friendshipStatus,
       sharedGroups,
     };
+  }
+
+  /**
+   * The profile page in one payload.
+   *
+   * Every gated read here runs on the viewer's JWT-scoped client, so the
+   * `own OR shared-group OR is_friend()` policy on attendances and tent_visits
+   * is what empties `history` and `favouriteTent` for a stranger. There is
+   * deliberately no permission check in this method.
+   */
+  async getProfileDetail(
+    userId: string,
+    festivalId?: string,
+    currentUserId?: string,
+  ): Promise<ProfileDetail> {
+    const { data, error } = await this.supabase
+      .from("profiles")
+      .select("id, username, full_name, avatar_url")
+      .eq("id", userId)
+      .single();
+
+    // Typed on purpose: the route used to wrap this call in a catch-all that
+    // turned every failure, including a transient database error, into a 404.
+    if (error || !data) {
+      throw new NotFoundError("User not found");
+    }
+
+    const [stats, relationship, sharedGroups, history, favouriteTent] = await Promise.all([
+      this.fetchFestivalStats(userId, festivalId),
+      this.fetchRelationship(userId, currentUserId),
+      this.fetchSharedGroups(userId, currentUserId, festivalId),
+      this.fetchAttendanceHistory(userId),
+      this.fetchFavouriteTent(userId, festivalId),
+    ]);
+
+    return {
+      id: data.id,
+      username: data.username,
+      fullName: data.full_name,
+      avatarUrl: data.avatar_url,
+      stats,
+      friendshipStatus: relationship.friendshipStatus,
+      friendsSince: relationship.friendsSince,
+      sharedGroups,
+      favouriteTent,
+      history,
+    };
+  }
+
+  private async fetchFestivalStats(
+    userId: string,
+    festivalId?: string,
+  ): Promise<ProfileDetail["stats"]> {
+    if (!festivalId) {
+      return null;
+    }
+
+    const { data } = await this.supabase
+      .from("user_festival_stats")
+      .select("days_attended, total_beers, avg_beers")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .maybeSingle();
+
+    if (!data) {
+      return null;
+    }
+
+    return {
+      daysAttended: Number(data.days_attended) || 0,
+      totalBeers: Number(data.total_beers) || 0,
+      avgBeers: Number(data.avg_beers) || 0,
+    };
+  }
+
+  private async fetchRelationship(
+    userId: string,
+    currentUserId?: string,
+  ): Promise<{
+    friendshipStatus: ProfileDetail["friendshipStatus"];
+    friendsSince: string | null;
+  }> {
+    if (!currentUserId) {
+      return { friendshipStatus: null, friendsSince: null };
+    }
+    if (currentUserId === userId) {
+      return { friendshipStatus: "self", friendsSince: null };
+    }
+
+    const { data: friendship } = await this.supabase
+      .from("friendships")
+      .select("requester_id, status, updated_at")
+      .or(
+        `and(requester_id.eq.${currentUserId},addressee_id.eq.${userId}),and(requester_id.eq.${userId},addressee_id.eq.${currentUserId})`,
+      )
+      .limit(1)
+      .maybeSingle();
+
+    if (!friendship) {
+      return { friendshipStatus: "none", friendsSince: null };
+    }
+    if (friendship.status === "accepted") {
+      return { friendshipStatus: "friends", friendsSince: friendship.updated_at };
+    }
+    if (friendship.status === "pending") {
+      return {
+        friendshipStatus:
+          friendship.requester_id === currentUserId ? "pending_sent" : "pending_received",
+        friendsSince: null,
+      };
+    }
+
+    return { friendshipStatus: "none", friendsSince: null };
+  }
+
+  /**
+   * Groups both people belong to, in one festival.
+   *
+   * Scoped to the festival for the same reason the stats are: carrying a group
+   * over to a new festival keeps its name, so an unscoped list shows the same
+   * name several times with nothing to tell the entries apart.
+   */
+  private async fetchSharedGroups(
+    userId: string,
+    currentUserId?: string,
+    festivalId?: string,
+  ): Promise<ProfileSharedGroup[]> {
+    if (!currentUserId || currentUserId === userId || !festivalId) {
+      return [];
+    }
+
+    const { data: myGroups } = await this.supabase
+      .from("group_members")
+      .select("group_id")
+      .eq("user_id", currentUserId);
+
+    const myGroupIds = (myGroups ?? []).map((row) => row.group_id);
+    if (myGroupIds.length === 0) {
+      return [];
+    }
+
+    const { data: shared } = await this.supabase
+      .from("group_members")
+      .select("group_id, groups!inner(id, name, festival_id)")
+      .eq("user_id", userId)
+      .in("group_id", myGroupIds)
+      .eq("groups.festival_id", festivalId);
+
+    return (shared ?? []).flatMap((row) =>
+      row.groups ? [{ id: row.groups.id, name: row.groups.name }] : [],
+    );
+  }
+
+  /**
+   * The festival list comes from `attendances`, never from `user_festival_stats`.
+   * That view is not security_invoker, so reading the list from it would hand a
+   * stranger every festival the user ever attended.
+   */
+  private async fetchAttendanceHistory(userId: string): Promise<ProfileHistoryRow[]> {
+    // Read in pages: PostgREST truncates at `max_rows` (1000, see
+    // supabase/config.toml), which would silently drop festivals from a history
+    // this endpoint promises in full.
+    const festivalIdSet = new Set<string>();
+    for (let offset = 0; ; offset += PAGE_SIZE) {
+      const { data, error } = await this.supabase
+        .from("attendances")
+        .select("festival_id")
+        .eq("user_id", userId)
+        .range(offset, offset + PAGE_SIZE - 1);
+
+      if (error) {
+        throw new DatabaseError(`Failed to list attendance history: ${error.message}`);
+      }
+
+      const rows = data ?? [];
+      for (const row of rows) {
+        if (row.festival_id) {
+          festivalIdSet.add(row.festival_id);
+        }
+      }
+
+      if (rows.length < PAGE_SIZE) {
+        break;
+      }
+    }
+
+    const festivalIds = [...festivalIdSet];
+    if (festivalIds.length === 0) {
+      return [];
+    }
+
+    const [statsResult, festivalsResult] = await Promise.all([
+      this.supabase
+        .from("user_festival_stats")
+        .select("festival_id, days_attended, total_beers, avg_beers")
+        .eq("user_id", userId)
+        .in("festival_id", festivalIds),
+      this.supabase.from("festivals").select("id, name, start_date").in("id", festivalIds),
+    ]);
+
+    const festivals = new Map(
+      (festivalsResult.data ?? []).map((row) => [
+        row.id,
+        { name: row.name, startDate: row.start_date },
+      ]),
+    );
+
+    return (statsResult.data ?? [])
+      .flatMap((row) => {
+        const festival = row.festival_id ? festivals.get(row.festival_id) : undefined;
+        if (!row.festival_id || !festival) {
+          return [];
+        }
+        return [
+          {
+            festivalId: row.festival_id,
+            festivalName: festival.name,
+            daysAttended: Number(row.days_attended) || 0,
+            totalBeers: Number(row.total_beers) || 0,
+            avgBeers: Number(row.avg_beers) || 0,
+            startDate: festival.startDate,
+          },
+        ];
+      })
+      .sort((a, b) => b.startDate.localeCompare(a.startDate))
+      .map(({ startDate: _startDate, ...row }) => row);
+  }
+
+  private async fetchFavouriteTent(
+    userId: string,
+    festivalId?: string,
+  ): Promise<ProfileDetail["favouriteTent"]> {
+    // Paged for the same reason as the history: a truncated read would count
+    // only the first page and could name the wrong tent as the favourite.
+    const visitsByTent = new Map<string, number>();
+    for (let offset = 0; ; offset += PAGE_SIZE) {
+      let query = this.supabase.from("tent_visits").select("tents(name)").eq("user_id", userId);
+
+      if (festivalId) {
+        query = query.eq("festival_id", festivalId);
+      }
+
+      const { data, error } = await query.range(offset, offset + PAGE_SIZE - 1);
+
+      if (error) {
+        throw new DatabaseError(`Failed to list tent visits: ${error.message}`);
+      }
+
+      const rows = data ?? [];
+      for (const row of rows) {
+        if (!row.tents) {
+          continue;
+        }
+        visitsByTent.set(row.tents.name, (visitsByTent.get(row.tents.name) ?? 0) + 1);
+      }
+
+      if (rows.length < PAGE_SIZE) {
+        break;
+      }
+    }
+
+    let favourite: { name: string; visits: number } | null = null;
+    for (const [name, visits] of visitsByTent) {
+      if (!favourite || visits > favourite.visits) {
+        favourite = { name, visits };
+      }
+    }
+
+    return favourite;
+  }
+
+  /**
+   * One row per day the user attended this festival. Gated by the same RLS
+   * policy as the history, so a stranger receives an empty array.
+   *
+   * Tent visits are timestamps but a festival day is a wall-clock day in the
+   * festival's own timezone, so each visit is bucketed with
+   * `formatDateForDatabase` rather than by slicing the ISO string.
+   */
+  async listProfileDays(userId: string, festivalId: string): Promise<ProfileDayRow[]> {
+    const { data: attendanceRows, error } = await this.supabase
+      .from("attendances")
+      .select("id, date")
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .order("date", { ascending: false });
+
+    if (error) {
+      throw new DatabaseError(`Failed to list profile days: ${error.message}`);
+    }
+
+    const attendances = (attendanceRows ?? []).flatMap((row) =>
+      row.date ? [{ id: row.id, date: row.date }] : [],
+    );
+    if (attendances.length === 0) {
+      return [];
+    }
+
+    const attendanceIds = attendances.map((attendance) => attendance.id);
+
+    const [festivalResult, consumptionsResult, visitsResult] = await Promise.all([
+      this.supabase.from("festivals").select("timezone").eq("id", festivalId).maybeSingle(),
+      this.supabase.from("consumptions").select("attendance_id").in("attendance_id", attendanceIds),
+      this.supabase
+        .from("tent_visits")
+        .select("visit_date, tents(name)")
+        .eq("user_id", userId)
+        .eq("festival_id", festivalId),
+    ]);
+
+    // All three are load-bearing: a discarded error here would report zero
+    // drinks or no tents with a 200, making the expanded history quietly wrong.
+    if (festivalResult.error) {
+      throw new DatabaseError(`Failed to fetch festival: ${festivalResult.error.message}`);
+    }
+    if (consumptionsResult.error) {
+      throw new DatabaseError(`Failed to list consumptions: ${consumptionsResult.error.message}`);
+    }
+    if (visitsResult.error) {
+      throw new DatabaseError(`Failed to list tent visits: ${visitsResult.error.message}`);
+    }
+
+    const timezone = festivalResult.data?.timezone ?? undefined;
+
+    const drinksByAttendance = new Map<string, number>();
+    for (const row of consumptionsResult.data ?? []) {
+      if (!row.attendance_id) {
+        continue;
+      }
+      drinksByAttendance.set(
+        row.attendance_id,
+        (drinksByAttendance.get(row.attendance_id) ?? 0) + 1,
+      );
+    }
+
+    const tentsByDate = new Map<string, Set<string>>();
+    for (const row of visitsResult.data ?? []) {
+      if (!row.tents || !row.visit_date) {
+        continue;
+      }
+      const date = formatDateForDatabase(new Date(row.visit_date), timezone);
+      const tents = tentsByDate.get(date) ?? new Set<string>();
+      tents.add(row.tents.name);
+      tentsByDate.set(date, tents);
+    }
+
+    return attendances.map((attendance) => ({
+      date: attendance.date,
+      totalDrinks: drinksByAttendance.get(attendance.id) ?? 0,
+      tents: [...(tentsByDate.get(attendance.date) ?? [])],
+    }));
   }
 
   async updateProfile(userId: string, input: UpdateProfileInput): Promise<Profile> {

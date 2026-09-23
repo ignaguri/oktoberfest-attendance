@@ -1344,6 +1344,24 @@
       "fullSizeClose": "Close",
       "fullSizeCloseHint": "Tap to close the full size picture"
     },
+    "page": {
+      "title": "Profile",
+      "viewFullProfile": "View full profile",
+      "viewFullProfileHint": "Tap to open the full profile",
+      "sharedGroups": "Groups you share",
+      "sharedGroupHint": "Tap to open the group",
+      "favouriteTent": "Favourite tent",
+      "favouriteTentVisits_one": "{{count}} visit",
+      "favouriteTentVisits_other": "{{count}} visits",
+      "history": "Festival history",
+      "historyRowHint": "Tap to see the days",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "drinks_one": "{{count}} drink",
+      "drinks_other": "{{count}} drinks",
+      "noHistory": "Nothing to show here yet.",
+      "notFound": "This profile could not be found."
+    },
     "biometric": {
       "label": "Biometric Login",
       "description": "Quick sign-in with biometrics"
@@ -2259,7 +2277,8 @@
         "beers_one": "{{count}} beer",
         "tents": "{{count}} tents",
         "tents_one": "{{count}} tent",
-        "days": "{{count}} days",
+        "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
         "days_one": "{{count}} day",
         "across": "across {{days}} of fun at {{festival}}"
       }

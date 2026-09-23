@@ -7,6 +7,7 @@ import {
   useSendFriendRequest,
 } from "@prostcounter/shared/hooks";
 import { Beer, Calendar, Check, Clock, Loader2, TrendingUp, UserPlus, Users } from "lucide-react";
+import { Link } from "next-view-transitions";
 import { useCallback, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -164,6 +165,16 @@ export function ProfilePreview({
                         </span>
                       </div>
                     )}
+
+                  {userId && (
+                    <Link
+                      href={`/user/${userId}`}
+                      onClick={() => setIsOpen(false)}
+                      className="text-sm text-yellow-700 underline-offset-2 hover:underline"
+                    >
+                      {t("profile.page.viewFullProfile")}
+                    </Link>
+                  )}
                 </div>
               )}
             </CardHeader>
@@ -183,7 +194,7 @@ export function ProfilePreview({
   );
 }
 
-function FriendshipBadge({
+export function FriendshipBadge({
   status,
   userId,
 }: {

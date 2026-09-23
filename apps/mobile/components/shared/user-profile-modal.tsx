@@ -5,6 +5,7 @@ import {
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { getInitials } from "@prostcounter/ui";
+import { useRouter } from "expo-router";
 import { Beer, Calendar, Check, Clock, TrendingUp, UserPlus, Users, X } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { useCallback, useState } from "react";
@@ -81,6 +82,7 @@ export function UserProfileModal({
   userId,
 }: UserProfileModalProps) {
   const { t } = useTranslation();
+  const router = useRouter();
   const [isAvatarViewerOpen, setIsAvatarViewerOpen] = useState(false);
 
   const modalTitle = title || t("activityFeed.userProfile");
@@ -111,7 +113,6 @@ export function UserProfileModal({
                 {/* Large Avatar - opens full size when there is a picture to show */}
                 <Pressable
                   onPress={fullSizeAvatarUrl ? () => setIsAvatarViewerOpen(true) : undefined}
-                  disabled={!fullSizeAvatarUrl}
                   accessibilityRole={fullSizeAvatarUrl ? "button" : undefined}
                   accessibilityLabel={fullSizeAvatarUrl ? t("profile.avatar.viewFullSize") : undefined}
                   accessibilityHint={
@@ -199,6 +200,22 @@ export function UserProfileModal({
                       </Text>
                     </HStack>
                   )}
+
+                {userId && (
+                  <Button
+                    variant="outline"
+                    action="secondary"
+                    size="sm"
+                    onPress={() => {
+                      onClose();
+                      router.push(`/user/${userId}`);
+                    }}
+                    accessibilityLabel={t("profile.page.viewFullProfile")}
+                    accessibilityHint={t("profile.page.viewFullProfileHint")}
+                  >
+                    <ButtonText>{t("profile.page.viewFullProfile")}</ButtonText>
+                  </Button>
+                )}
               </VStack>
             ) : (
               <VStack className="items-center py-4">
@@ -221,7 +238,7 @@ export function UserProfileModal({
   );
 }
 
-function MobileFriendshipBadge({
+export function MobileFriendshipBadge({
   status,
   userId,
 }: {

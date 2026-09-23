@@ -70,6 +70,8 @@ import type {
   MarkUnlocksSeenResponse,
   MissingProfileFields,
   Profile,
+  ProfileDayRow,
+  ProfileDetail,
   ProfileShort,
   PublicProfile,
   SearchUsersResponse,
@@ -1285,6 +1287,40 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to fetch public profile");
         }
         return parseJsonResponse<{ profile: PublicProfile }>(response);
+      },
+
+      async getProfileDetail(
+        userId: string,
+        festivalId?: string,
+      ): Promise<{ profile: ProfileDetail }> {
+        const headers = await getAuthHeaders();
+        const params = new URLSearchParams();
+        if (festivalId) {
+          params.append("festivalId", festivalId);
+        }
+        const queryString = params.toString();
+        const url = `${baseUrl}/v1/profiles/${userId}/detail${queryString ? `?${queryString}` : ""}`;
+        const response = await fetchWithLogging("GET", url, { headers });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch profile detail");
+        }
+        return parseJsonResponse<{ profile: ProfileDetail }>(response);
+      },
+
+      async getProfileDays(
+        userId: string,
+        festivalId: string,
+      ): Promise<{ days: ProfileDayRow[] }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/profiles/${userId}/festivals/${festivalId}/days`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch profile days");
+        }
+        return parseJsonResponse<{ days: ProfileDayRow[] }>(response);
       },
     },
 

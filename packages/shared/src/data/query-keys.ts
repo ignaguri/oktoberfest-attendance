@@ -109,6 +109,15 @@ export class QueryKeys {
   static highlights = (festivalId: string) => ["highlights", festivalId] as const;
   static publicProfile = (userId: string, festivalId?: string) =>
     ["public-profile", userId, festivalId ?? "no-festival"] as const;
+  static profileDetail = (userId: string, festivalId?: string) =>
+    ["profile-detail", userId, festivalId ?? "no-festival"] as const;
+  static profileDays = (userId: string, festivalId: string) =>
+    ["profile-days", userId, festivalId] as const;
+  // Friendship decides what these two carry, so a change in either direction has
+  // to drop every cached copy: they hold history and tent visits that the viewer
+  // may no longer be allowed to see.
+  static profileDetailAll = () => ["profile-detail"] as const;
+  static profileDaysAll = () => ["profile-days"] as const;
 
   // Photo social queries
   static photoReactions = (photoId: string, groupId: string) =>
