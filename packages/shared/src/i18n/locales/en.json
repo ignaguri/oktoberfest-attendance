@@ -1671,7 +1671,8 @@
         "users": "Find and manage user accounts",
         "location": "Active location sharing sessions",
         "tents": "Create and edit the tent catalogue",
-        "cache": "Regenerate cached Wrapped data"
+        "cache": "Regenerate cached Wrapped data",
+        "analytics": "Usage, features and retention"
       },
       "cache": {
         "description": "Wrapped statistics are calculated once and cached. Regenerating refreshes an existing entry; it cannot create one for someone who has never opened their Wrapped.",
@@ -1767,7 +1768,8 @@
       "tents": "Tents",
       "cache": "Cache Management",
       "imageConversion": "Image Conversion",
-      "location": "Location"
+      "location": "Location",
+      "analytics": "Analytics"
     },
     "location": {
       "title": "Location Sessions",
@@ -1999,6 +2001,71 @@
       "buttons": {
         "converting": "Converting...",
         "convert": "Convert"
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "loadError": "Could not load analytics",
+      "empty": "No data for this range yet",
+      "retry": "Retry",
+      "filters": { "range": "Time range", "platform": "Platform", "festivals": "Festivals" },
+      "ranges": { "7d": "Last 7 days", "30d": "Last 30 days", "90d": "Last 90 days", "365d": "Last 365 days" },
+      "platforms": { "all": "All platforms", "ios": "iOS", "android": "Android" },
+      "sections": {
+        "overview": "Overview",
+        "features": "Features",
+        "funnel": "Activation funnel",
+        "retention": "Festival retention"
+      },
+      "overview": {
+        "dau": "Daily active",
+        "wau": "Weekly active",
+        "mau": "Monthly active",
+        "stickiness": "Stickiness (DAU/MAU)",
+        "chartTitle": "Active users per day",
+        "headline": "{{dau}} daily · {{mau}} monthly active"
+      },
+      "features": {
+        "feature": "Feature",
+        "users": "Users",
+        "events": "Actions",
+        "reach": "Reach",
+        "dead": "Barely used",
+        "activeUsers": "{{count}} active users in this range",
+        "headline": "Most used: {{feature}}",
+        "names": {
+          "attendance": "Attendance logging",
+          "drinks": "Drinks",
+          "photos": "Photos",
+          "group_joins": "Group joins",
+          "group_messages": "Group messages",
+          "photo_reactions": "Photo reactions",
+          "photo_comments": "Photo comments",
+          "day_plans": "Day plans",
+          "crowd_reports": "Crowd reports",
+          "friend_requests": "Friend requests",
+          "location_sharing": "Location sharing",
+          "wrapped": "Wrapped views"
+        }
+      },
+      "funnel": {
+        "hint": "Users who signed up in this range",
+        "ofSignups": "{{percent}} of sign-ups",
+        "headline": "{{percent}} of sign-ups logged an attendance",
+        "steps": {
+          "signed_up": "Signed up",
+          "logged_attendance": "Logged an attendance",
+          "five_days": "Logged 5+ days"
+        }
+      },
+      "retention": {
+        "hint": "All festivals, regardless of the time range",
+        "festival": "Festival",
+        "attendees": "Attendees",
+        "returnedNext": "Came to the next one",
+        "returnedAny": "Came back later",
+        "pending": "Next festival has not started",
+        "headline": "{{percent}} came back after {{festival}}"
       }
     }
   },
