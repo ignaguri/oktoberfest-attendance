@@ -2417,6 +2417,14 @@ export type Database = {
           tent_name: string
         }[]
       }
+      get_profile_festival_stats: {
+        Args: { p_festival_id: string; p_user_id: string }
+        Returns: {
+          avg_beers: number
+          days_attended: number
+          total_beers: number
+        }[]
+      }
       get_user_all_group_photo_settings: {
         Args: { p_user_id: string }
         Returns: {
