@@ -5,6 +5,7 @@ import { X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   SectionList,
   type SectionListData,
   type SectionListRenderItemInfo,
@@ -25,6 +26,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 import { IconColors } from "@/lib/constants/colors";
 import { useAdaptedTents } from "@/lib/database/adapted-hooks";
 
@@ -74,6 +76,9 @@ export function TentSelectorSheet({
   const { tents, isLoading, error } = useAdaptedTents(festivalId);
   const { crowdStatuses } = useTentCrowdStatus(festivalId);
   const insets = useSafeAreaInsets();
+  const { keyboardHeight } = useKeyboardHeight();
+  // Android resizes the window for the keyboard; iOS draws it over the sheet.
+  const iosKeyboardHeight = Platform.OS === "ios" ? keyboardHeight : 0;
 
   // Create a map of tentId -> crowd status for quick lookup
   const crowdMap = useMemo(() => {
@@ -213,7 +218,7 @@ export function TentSelectorSheet({
             </Text>
           </VStack>
         ) : (
-          <View style={{ width: "100%", maxHeight: 340 }}>
+          <View style={{ width: "100%", maxHeight: 340, flexShrink: 1 }}>
             <SectionList<TentOption, SectionData>
               sections={filteredSections}
               renderItem={renderItem}
@@ -230,7 +235,9 @@ export function TentSelectorSheet({
         {mode === "multi" && (
           <HStack
             className="w-full gap-3 pt-3"
-            style={{ paddingBottom: Math.max(insets.bottom, 16) + 8 }}
+            style={{
+              paddingBottom: iosKeyboardHeight > 0 ? 8 : Math.max(insets.bottom, 16) + 8,
+            }}
           >
             <Button
               variant="outline"
@@ -250,6 +257,9 @@ export function TentSelectorSheet({
             </Button>
           </HStack>
         )}
+
+        {/* The sheet sits on its measured height, so growing it lifts the list over the keyboard */}
+        {iosKeyboardHeight > 0 && <View style={{ height: iosKeyboardHeight }} />}
       </ActionsheetContent>
     </Actionsheet>
   );
