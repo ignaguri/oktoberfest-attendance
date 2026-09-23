@@ -29,3 +29,133 @@ export const ANALYTICS_FEATURES = [
 
 export const AnalyticsFeatureSchema = z.enum(ANALYTICS_FEATURES);
 export type AnalyticsFeature = z.infer<typeof AnalyticsFeatureSchema>;
+
+/** Longest span a metric query may cover, matching the spec's raw retention. */
+export const ANALYTICS_MAX_RANGE_DAYS = 400;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const IsoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Expected YYYY-MM-DD");
+
+/**
+ * Why an inclusive [from, to] range is unacceptable, or null when it is fine.
+ * Both bounds are YYYY-MM-DD and read as UTC days.
+ */
+export function analyticsRangeError(from: string, to: string): string | null {
+  const fromMs = Date.parse(`${from}T00:00:00Z`);
+  const toMs = Date.parse(`${to}T00:00:00Z`);
+  if (Number.isNaN(fromMs) || Number.isNaN(toMs)) {
+    return "Invalid date";
+  }
+  if (fromMs > toMs) {
+    return "`from` must not be after `to`";
+  }
+  const days = Math.round((toMs - fromMs) / DAY_MS) + 1;
+  if (days > ANALYTICS_MAX_RANGE_DAYS) {
+    return `Range must not exceed ${ANALYTICS_MAX_RANGE_DAYS} days`;
+  }
+  return null;
+}
+
+export const ANALYTICS_PLATFORMS = ["ios", "android"] as const;
+export const AnalyticsPlatformSchema = z.enum(ANALYTICS_PLATFORMS);
+export type AnalyticsPlatform = z.infer<typeof AnalyticsPlatformSchema>;
+
+export const AnalyticsRangeQuerySchema = z
+  .object({ from: IsoDateSchema, to: IsoDateSchema })
+  .superRefine((value, ctx) => {
+    const message = analyticsRangeError(value.from, value.to);
+    if (message) {
+      ctx.addIssue({ code: "custom", message, path: ["from"] });
+    }
+  });
+export type AnalyticsRangeQuery = z.infer<typeof AnalyticsRangeQuerySchema>;
+
+export const AnalyticsOverviewQuerySchema = z
+  .object({
+    from: IsoDateSchema,
+    to: IsoDateSchema,
+    platform: AnalyticsPlatformSchema.optional(),
+  })
+  .superRefine((value, ctx) => {
+    const message = analyticsRangeError(value.from, value.to);
+    if (message) {
+      ctx.addIssue({ code: "custom", message, path: ["from"] });
+    }
+  });
+export type AnalyticsOverviewQuery = z.infer<typeof AnalyticsOverviewQuerySchema>;
+
+// =============================================================================
+// Overview
+// =============================================================================
+
+export const AnalyticsOverviewPointSchema = z.object({
+  day: IsoDateSchema,
+  dau: z.number().int(),
+  wau: z.number().int(),
+  mau: z.number().int(),
+});
+export type AnalyticsOverviewPoint = z.infer<typeof AnalyticsOverviewPointSchema>;
+
+export const AnalyticsOverviewResponseSchema = z.object({
+  series: z.array(AnalyticsOverviewPointSchema),
+});
+export type AnalyticsOverviewResponse = z.infer<typeof AnalyticsOverviewResponseSchema>;
+
+// =============================================================================
+// Feature usage
+// =============================================================================
+
+export const AnalyticsFeatureUsageRowSchema = z.object({
+  feature: AnalyticsFeatureSchema,
+  users: z.number().int(),
+  events: z.number().int(),
+});
+export type AnalyticsFeatureUsageRow = z.infer<typeof AnalyticsFeatureUsageRowSchema>;
+
+export const AnalyticsFeatureUsageResponseSchema = z.object({
+  activeUsers: z.number().int(),
+  features: z.array(AnalyticsFeatureUsageRowSchema),
+});
+export type AnalyticsFeatureUsageResponse = z.infer<typeof AnalyticsFeatureUsageResponseSchema>;
+
+// =============================================================================
+// Activation funnel
+// =============================================================================
+
+export const ANALYTICS_FUNNEL_STEPS = ["signed_up", "logged_attendance", "five_days"] as const;
+export const AnalyticsFunnelStepNameSchema = z.enum(ANALYTICS_FUNNEL_STEPS);
+export type AnalyticsFunnelStepName = z.infer<typeof AnalyticsFunnelStepNameSchema>;
+
+export const AnalyticsFunnelStepSchema = z.object({
+  step: AnalyticsFunnelStepNameSchema,
+  users: z.number().int(),
+});
+export type AnalyticsFunnelStep = z.infer<typeof AnalyticsFunnelStepSchema>;
+
+export const AnalyticsFunnelResponseSchema = z.object({
+  steps: z.array(AnalyticsFunnelStepSchema),
+});
+export type AnalyticsFunnelResponse = z.infer<typeof AnalyticsFunnelResponseSchema>;
+
+// =============================================================================
+// Festival retention
+// =============================================================================
+
+export const AnalyticsFestivalRetentionRowSchema = z.object({
+  festivalId: z.string(),
+  festivalName: z.string(),
+  startDate: IsoDateSchema,
+  attendees: z.number().int(),
+  /** Null while the next festival has not started (or there is none). */
+  returnedNext: z.number().int().nullable(),
+  returnedAny: z.number().int(),
+});
+export type AnalyticsFestivalRetentionRow = z.infer<typeof AnalyticsFestivalRetentionRowSchema>;
+
+export const AnalyticsFestivalRetentionResponseSchema = z.object({
+  festivals: z.array(AnalyticsFestivalRetentionRowSchema),
+});
+export type AnalyticsFestivalRetentionResponse = z.infer<
+  typeof AnalyticsFestivalRetentionResponseSchema
+>;
