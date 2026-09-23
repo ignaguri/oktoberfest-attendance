@@ -827,6 +827,79 @@ export type Database = {
           },
         ]
       }
+      group_invitations: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          invitee_id: string
+          inviter_id: string
+          responded_at: string | null
+          status: Database["public"]["Enums"]["group_invitation_status"]
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          invitee_id: string
+          inviter_id: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["group_invitation_status"]
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          invitee_id?: string
+          inviter_id?: string
+          responded_at?: string | null
+          status?: Database["public"]["Enums"]["group_invitation_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_invitations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_invitations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["group_id"]
+          },
+          {
+            foreignKeyName: "group_invitations_invitee_id_fkey"
+            columns: ["invitee_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "group_invitations_invitee_id_fkey"
+            columns: ["invitee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_invitations_inviter_id_fkey"
+            columns: ["inviter_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "group_invitations_inviter_id_fkey"
+            columns: ["inviter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_join_requests: {
         Row: {
           created_at: string
@@ -2139,6 +2212,10 @@ export type Database = {
         Args: { p_friendship_id: string; p_user_id: string }
         Returns: Json
       }
+      accept_group_invitation: {
+        Args: { p_invitation_id: string }
+        Returns: Json
+      }
       accept_join_request: { Args: { p_request_id: string }; Returns: Json }
       add_beer_picture: {
         Args: {
@@ -2165,6 +2242,10 @@ export type Database = {
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }
         Returns: number
+      }
+      cancel_group_invitation: {
+        Args: { p_invitation_id: string }
+        Returns: Json
       }
       cancel_join_request: { Args: { p_group_id: string }; Returns: Json }
       check_notification_rate_limit: {
@@ -2201,6 +2282,10 @@ export type Database = {
       }
       decline_friend_request: {
         Args: { p_friendship_id: string; p_user_id: string }
+        Returns: Json
+      }
+      decline_group_invitation: {
+        Args: { p_invitation_id: string }
         Returns: Json
       }
       decline_join_request: { Args: { p_request_id: string }; Returns: Json }
@@ -2399,6 +2484,10 @@ export type Database = {
         Args: { p_festival_id?: string; p_user_id: string }
         Returns: number
       }
+      invite_to_group: {
+        Args: { p_group_id: string; p_invitee_id: string }
+        Returns: Json
+      }
       is_friend: { Args: { user1: string; user2: string }; Returns: boolean }
       is_group_member: {
         Args: { group_id: string; user_id: string }
@@ -2417,6 +2506,20 @@ export type Database = {
       join_group_with_token: {
         Args: { p_token: string; p_user_id: string }
         Returns: Json
+      }
+      list_my_group_invitations: {
+        Args: never
+        Returns: {
+          created_at: string
+          festival_id: string
+          group_id: string
+          group_name: string
+          id: string
+          inviter_avatar_url: string
+          inviter_full_name: string
+          inviter_id: string
+          inviter_username: string
+        }[]
       }
       record_notification_rate_limit: {
         Args: {
@@ -2555,6 +2658,7 @@ export type Database = {
         | "fruehlingsfest"
         | "other"
       friendship_status: "pending" | "accepted" | "declined"
+      group_invitation_status: "pending" | "accepted" | "declined" | "cancelled"
       group_join_request_status:
         | "pending"
         | "accepted"
@@ -2729,6 +2833,7 @@ export const Constants = {
         "other",
       ],
       friendship_status: ["pending", "accepted", "declined"],
+      group_invitation_status: ["pending", "accepted", "declined", "cancelled"],
       group_join_request_status: [
         "pending",
         "accepted",

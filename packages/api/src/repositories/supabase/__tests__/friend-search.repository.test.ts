@@ -22,11 +22,14 @@ const FRIENDSHIPS = [
   { id: INCOMING_FRIENDSHIP, requester_id: REQUESTER, addressee_id: ME, status: "pending" },
 ];
 
+type StubCall = { table: string; method: string; args: unknown[] };
+
 /**
- * searchUsers runs two queries and joins them in memory, so the fake only has
- * to hand back a row set per table and stay chainable in between.
+ * searchUsers runs three queries and joins them in memory, so the fake only has
+ * to hand back a row set per table and stay chainable in between. Calls are
+ * recorded so a test can assert how the search term was passed.
  */
-function createSupabaseStub() {
+function createSupabaseStub(calls: StubCall[] = []) {
   const results: Record<string, unknown[]> = {
     profiles: PROFILES,
     friendships: FRIENDSHIPS,
@@ -35,8 +38,11 @@ function createSupabaseStub() {
   return {
     from(table: string) {
       const builder: Record<string, unknown> = {};
-      for (const method of ["select", "neq", "or", "limit", "eq", "in"]) {
-        builder[method] = () => builder;
+      for (const method of ["select", "neq", "or", "ilike", "limit", "eq", "in"]) {
+        builder[method] = (...args: unknown[]) => {
+          calls.push({ table, method, args });
+          return builder;
+        };
       }
       builder.then = (resolve: (value: unknown) => unknown) =>
         Promise.resolve({ data: results[table] ?? [], error: null }).then(resolve);
@@ -80,5 +86,37 @@ describe("SupabaseFriendRepository.searchUsers", () => {
       friendshipStatus: "none",
       friendshipId: null,
     });
+  });
+
+  it("passes the search term as two ilike values rather than an or() filter", async () => {
+    const calls: StubCall[] = [];
+    const repo = new SupabaseFriendRepository(createSupabaseStub(calls));
+
+    // A comma would split a PostgREST or() filter into malformed fragments
+    await repo.searchUsers(ME, "Muller, Anna");
+
+    const profileCalls = calls.filter((call) => call.table === "profiles");
+    expect(profileCalls.some((call) => call.method === "or")).toBe(false);
+    expect(profileCalls.filter((call) => call.method === "ilike").map((call) => call.args)).toEqual([
+      ["username", "%Muller, Anna%"],
+      ["full_name", "%Muller, Anna%"],
+    ]);
+  });
+
+  it("strips wildcards so a term matches literally", async () => {
+    const calls: StubCall[] = [];
+    const repo = new SupabaseFriendRepository(createSupabaseStub(calls));
+
+    await repo.searchUsers(ME, "a%_*b");
+
+    expect(calls.find((call) => call.method === "ilike")?.args).toEqual(["username", "%ab%"]);
+  });
+
+  it("returns nothing for a blank query without touching the database", async () => {
+    const calls: StubCall[] = [];
+    const repo = new SupabaseFriendRepository(createSupabaseStub(calls));
+
+    await expect(repo.searchUsers(ME, "   ")).resolves.toEqual([]);
+    expect(calls).toHaveLength(0);
   });
 });

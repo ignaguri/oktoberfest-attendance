@@ -42,3 +42,16 @@ describe("QueryKeys.friendSearchAll", () => {
     }
   });
 });
+
+describe("QueryKeys.invitableUsersAll", () => {
+  const GROUP = "33333333-3333-4333-8333-333333333333";
+
+  it("is a prefix of every invitableUsers key", () => {
+    const prefix = QueryKeys.invitableUsersAll(GROUP);
+
+    for (const query of ["", "a", "ignaguri", "Celina Inés"]) {
+      const key = QueryKeys.invitableUsers(GROUP, query);
+      expect(key.slice(0, prefix.length)).toEqual([...prefix]);
+    }
+  });
+});

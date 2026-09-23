@@ -18,6 +18,7 @@ import festivalRoute from "./routes/festival.route";
 import friendRoute from "./routes/friend.route";
 import friendsWentRoute from "./routes/friends-went.route";
 import groupRoute from "./routes/group.route";
+import groupInvitationRoute from "./routes/group-invitation.route";
 import groupJoinRequestRoute from "./routes/group-join-request.route";
 import groupMessageRoute from "./routes/group-message.route";
 import leaderboardRoute from "./routes/leaderboard.route";
@@ -71,6 +72,8 @@ apiV1.route("/", tentRoute);
 apiV1.route("/", friendRoute);
 // Before groupRoute: its GET /groups/{id} would swallow /groups/join-requests/incoming
 apiV1.route("/", groupJoinRequestRoute);
+// Same reason: /groups/invitations/incoming must not be read as a group id
+apiV1.route("/", groupInvitationRoute);
 apiV1.route("/", groupRoute);
 apiV1.route("/", groupMessageRoute);
 apiV1.route("/", leaderboardRoute);

@@ -20,6 +20,8 @@ function throwForFailure(result: JoinRequestRpcResult): never {
       throw new ConflictError(ErrorCodes.ALREADY_GROUP_MEMBER);
     case "JOIN_REQUEST_PENDING":
       throw new ConflictError(ErrorCodes.JOIN_REQUEST_PENDING);
+    case "GROUP_INVITATION_RECEIVED":
+      throw new ConflictError(ErrorCodes.GROUP_INVITATION_RECEIVED);
     case "JOIN_REQUEST_NOT_FOUND":
       throw new NotFoundError(ErrorCodes.JOIN_REQUEST_NOT_FOUND);
     case "NOT_GROUP_CREATOR":
