@@ -9,7 +9,7 @@ import { ApiClientProvider } from "@prostcounter/shared/data";
 import { UnlockQueueProvider } from "@prostcounter/shared/hooks";
 import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack, usePathname, useRootNavigationState, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowUpCircle, Download } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
@@ -57,9 +57,9 @@ import { LocationProvider } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
 import {
-  checkInitialNotification,
   configureNotificationHandler,
   setupNotificationListeners,
+  useNotificationResponseNavigation,
 } from "@/lib/notifications/handlers";
 import {
   NotificationProvider,
@@ -119,6 +119,28 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
   }, [isAuthenticated, isLoading, segments, router]);
 
   return <>{children}</>;
+}
+
+// Navigates on notification taps once the router has settled. "/" is only
+// ever the (tabs) index Redirect, and the auth group is about to be replaced by
+// NavigationGuard, so routing from either would be clobbered right after.
+function NotificationResponseHandler() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const segments = useSegments();
+  const pathname = usePathname();
+  const rootNavigationState = useRootNavigationState();
+
+  const canNavigate =
+    Platform.OS !== "web" &&
+    !!rootNavigationState?.key &&
+    !isLoading &&
+    isAuthenticated &&
+    segments[0] !== "(auth)" &&
+    pathname !== "/";
+
+  useNotificationResponseNavigation(canNavigate);
+
+  return null;
 }
 
 // Bridge component to connect OfflineDataProvider with Auth and Festival contexts
@@ -415,13 +437,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (Platform.OS === "web") return;
 
-    // Setup listeners for notification interactions
-    const cleanup = setupNotificationListeners();
-
-    // Check if app was opened from a notification (cold start)
-    checkInitialNotification();
-
-    return cleanup;
+    return setupNotificationListeners();
   }, []);
 
   if (!isReady) {
@@ -452,6 +468,7 @@ export default function RootLayout() {
                                       <NavigationGuard>
                                         <BackgroundSyncHandler />
                                         <SentryUserContextHandler />
+                                        <NotificationResponseHandler />
                                         <WatchBridge />
                                         <NovuAutoSubscriber />
                                         <NotificationPromptHandler />
