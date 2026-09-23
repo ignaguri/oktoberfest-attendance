@@ -63,6 +63,7 @@ export const Colors = {
   // Sky colors (for friends going)
   sky: {
     600: "#0284C7", // sky-600 - friends chip icon
+    800: "#075985", // sky-800 - selected friend marker
   },
 } as const;
 
