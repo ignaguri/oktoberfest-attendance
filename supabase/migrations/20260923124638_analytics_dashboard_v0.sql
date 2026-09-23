@@ -140,7 +140,7 @@ REVOKE ALL ON FUNCTION public.analytics_overview(date, date, text) FROM PUBLIC, 
 GRANT EXECUTE ON FUNCTION public.analytics_overview(date, date, text) TO service_role;
 
 COMMENT ON FUNCTION public.analytics_overview(date, date, text) IS
-  'Admin dashboard: one row per day in [p_from, p_to] with rolling 1/7/30-day distinct real users from user_active_days (a row there = the user made an authenticated API request that day). p_platform filters to ios or android. service_role only.';
+  'Admin dashboard: one row per day in [p_from, p_to] with rolling 1/7/30-day distinct real users from user_active_days (a row there = the user made an authenticated API request that day). p_platform filters to ios or android; each user-day counts under the last platform seen that day, so multi-device users undercount per platform. service_role only.';
 
 -- ---------------------------------------------------------------------------
 -- analytics_feature_usage
