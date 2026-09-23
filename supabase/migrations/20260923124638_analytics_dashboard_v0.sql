@@ -71,7 +71,8 @@ flags AS (
       SELECT 1
       FROM attendees later
       JOIN public.festivals lf ON lf.id = later.festival_id
-      WHERE later.user_id = att.user_id AND lf.start_date > o.start_date
+      WHERE later.user_id = att.user_id
+        AND (lf.start_date, lf.id) > (o.start_date, o.id)
     ) AS came_later
   FROM ordered o
   JOIN attendees att ON att.festival_id = o.id

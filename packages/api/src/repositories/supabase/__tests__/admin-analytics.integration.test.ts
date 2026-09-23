@@ -85,6 +85,8 @@ let realA: SeedUser;
 let festivalOne: string;
 let festivalTwo: string;
 let futureOne: string;
+let tieEarlier: string;
+let tieLater: string;
 
 describe("analytics metric functions", () => {
   beforeAll(async () => {
@@ -97,6 +99,7 @@ describe("analytics metric functions", () => {
     realA = await signUp(`analytics-a-${tag()}@integration-test.com`);
     const realB = await signUp(`analytics-b-${tag()}@integration-test.com`);
     const realC = await signUp(`analytics-c-${tag()}@integration-test.com`);
+    const realD = await signUp(`analytics-d-${tag()}@integration-test.com`);
     const seedAccount = await signUp(`analytics-seed-${tag()}@example.com`);
     const superAdmin = await signUp(`analytics-admin-${tag()}@integration-test.com`);
 
@@ -113,6 +116,17 @@ describe("analytics metric functions", () => {
     futureOne = await createFestival("2998-01-01", "2998-01-03");
     await createFestival("2999-01-01", "2999-01-03");
 
+    // Two festivals sharing a start_date, to pin the tie-break bug: `next` is
+    // chosen with ORDER BY (start_date, id), so `came_later`/returned_any must
+    // use the same tuple ordering, not a strict start_date comparison, or a
+    // real "next" attendee is counted in returned_next but not returned_any.
+    const tieDate = "1951-01-01";
+    const [tieFestivalA, tieFestivalB] = await Promise.all([
+      createFestival(tieDate, tieDate),
+      createFestival(tieDate, tieDate),
+    ]);
+    [tieEarlier, tieLater] = [tieFestivalA, tieFestivalB].sort();
+
     const attendances = [
       { user_id: realA.id, festival_id: festivalOne, date: "1950-01-10" },
       { user_id: realA.id, festival_id: festivalOne, date: "1950-01-11" },
@@ -124,6 +138,8 @@ describe("analytics metric functions", () => {
       { user_id: realB.id, festival_id: festivalTwo, date: "1950-02-11" },
       { user_id: realB.id, festival_id: festivalTwo, date: "1950-02-12" },
       { user_id: realC.id, festival_id: festivalOne, date: "1950-01-10" },
+      { user_id: realD.id, festival_id: tieEarlier, date: tieDate },
+      { user_id: realD.id, festival_id: tieLater, date: tieDate },
       { user_id: seedAccount.id, festival_id: festivalOne, date: "1950-01-10" },
       { user_id: superAdmin.id, festival_id: festivalOne, date: "1950-01-10" },
     ].map((row) => ({ ...row, beer_count: 1 }));
@@ -232,6 +248,21 @@ describe("analytics metric functions", () => {
     });
   });
 
+  it("keeps returned_next <= returned_any when two festivals tie on start_date", async () => {
+    const { data, error } = await admin.rpc("analytics_festival_retention");
+
+    expect(error).toBeNull();
+    const rows = data ?? [];
+    // The attendee of tieEarlier also attends tieLater, which is both "the
+    // next festival" (id tie-break) and "a later festival", so both counts
+    // must agree; before the fix returned_next (1) > returned_any (0).
+    expect(rows.find((row) => row.festival_id === tieEarlier)).toMatchObject({
+      attendees: 1,
+      returned_next: 1,
+      returned_any: 1,
+    });
+  });
+
   it("orders festival retention newest first", async () => {
     const { data } = await admin.rpc("analytics_festival_retention");
     const startDates = (data ?? []).map((row) => row.start_date);
@@ -246,7 +277,7 @@ describe("analytics metric functions", () => {
       signed_up: after.signed_up - baselineFunnel.signed_up,
       logged_attendance: after.logged_attendance - baselineFunnel.logged_attendance,
       five_days: after.five_days - baselineFunnel.five_days,
-    }).toEqual({ signed_up: 3, logged_attendance: 3, five_days: 1 });
+    }).toEqual({ signed_up: 4, logged_attendance: 4, five_days: 1 });
   });
 
   it("denies every metric function to signed-in users and anon", async () => {
