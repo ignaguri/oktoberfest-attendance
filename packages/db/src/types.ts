@@ -2239,6 +2239,42 @@ export type Database = {
           tents_changed: boolean
         }[]
       }
+      analytics_activation_funnel: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          step: string
+          users: number
+        }[]
+      }
+      analytics_feature_usage: {
+        Args: { p_from: string; p_to: string }
+        Returns: {
+          active_users: number
+          events: number
+          feature: string
+          users: number
+        }[]
+      }
+      analytics_festival_retention: {
+        Args: never
+        Returns: {
+          attendees: number
+          festival_id: string
+          festival_name: string
+          returned_any: number
+          returned_next: number | null
+          start_date: string
+        }[]
+      }
+      analytics_overview: {
+        Args: { p_from: string; p_platform?: string; p_to: string }
+        Returns: {
+          dau: number
+          day: string
+          mau: number
+          wau: number
+        }[]
+      }
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }
         Returns: number
