@@ -102,6 +102,13 @@ export default function AdminLayout() {
         }}
       />
       <Stack.Screen
+        name="analytics/index"
+        options={{
+          title: t("admin.analytics.title"),
+        }}
+      />
+      <Stack.Screen name="analytics/[section]" />
+      <Stack.Screen
         name="cache"
         options={{
           title: t("admin.tabs.cache"),

@@ -1908,7 +1908,8 @@
         "users": "Benutzerkonten suchen und verwalten",
         "location": "Aktive Standortfreigaben",
         "tents": "Zeltkatalog erstellen und bearbeiten",
-        "cache": "Zwischengespeicherte Wrapped-Daten neu berechnen"
+        "cache": "Zwischengespeicherte Wrapped-Daten neu berechnen",
+        "analytics": "Nutzung, Funktionen und Wiederkehr"
       },
       "cache": {
         "description": "Wrapped-Statistiken werden einmal berechnet und zwischengespeichert. Eine Neuberechnung aktualisiert einen vorhandenen Eintrag; sie kann keinen für jemanden anlegen, der sein Wrapped nie geöffnet hat.",
@@ -2004,7 +2005,8 @@
       "tents": "Zelte",
       "cache": "Cache-Verwaltung",
       "imageConversion": "Bildkonvertierung",
-      "location": "Standort"
+      "location": "Standort",
+      "analytics": "Analytics"
     },
     "location": {
       "title": "Standort-Sitzungen",
@@ -2236,6 +2238,72 @@
       "buttons": {
         "converting": "Wird konvertiert...",
         "convert": "Konvertieren"
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "loadError": "Analytics konnten nicht geladen werden",
+      "empty": "Für diesen Zeitraum gibt es noch keine Daten",
+      "retry": "Erneut versuchen",
+      "filters": { "range": "Zeitraum", "platform": "Plattform", "festivals": "Feste" },
+      "ranges": { "7d": "Letzte 7 Tage", "30d": "Letzte 30 Tage", "90d": "Letzte 90 Tage", "365d": "Letzte 365 Tage" },
+      "platforms": { "all": "Alle Plattformen", "ios": "iOS", "android": "Android" },
+      "sections": {
+        "overview": "Überblick",
+        "features": "Funktionen",
+        "funnel": "Aktivierungs-Funnel",
+        "retention": "Wiederkehr pro Fest"
+      },
+      "overview": {
+        "dau": "Täglich aktiv",
+        "wau": "Wöchentlich aktiv",
+        "mau": "Monatlich aktiv",
+        "stickiness": "Stickiness (DAU/MAU)",
+        "chartTitle": "Aktive Nutzer pro Tag",
+        "headline": "{{dau}} täglich · {{mau}} monatlich aktiv"
+      },
+      "features": {
+        "feature": "Funktion",
+        "users": "Nutzer",
+        "events": "Aktionen",
+        "reach": "Reichweite",
+        "dead": "Kaum genutzt",
+        "activeUsers_one": "{{count}} aktiver Nutzer in diesem Zeitraum",
+        "activeUsers_other": "{{count}} aktive Nutzer in diesem Zeitraum",
+        "headline": "Meistgenutzt: {{feature}}",
+        "names": {
+          "attendance": "Besuche eintragen",
+          "drinks": "Getränke",
+          "photos": "Fotos",
+          "group_joins": "Gruppenbeitritte",
+          "group_messages": "Gruppennachrichten",
+          "photo_reactions": "Foto-Reaktionen",
+          "photo_comments": "Foto-Kommentare",
+          "day_plans": "Tagespläne",
+          "crowd_reports": "Andrang-Meldungen",
+          "friend_requests": "Freundschaftsanfragen",
+          "location_sharing": "Standortfreigabe",
+          "wrapped": "Wrapped-Aufrufe"
+        }
+      },
+      "funnel": {
+        "hint": "Nutzer, die sich in diesem Zeitraum registriert haben",
+        "ofSignups": "{{percent}} der Registrierungen",
+        "headline": "{{percent}} der Registrierungen haben einen Besuch eingetragen",
+        "steps": {
+          "signed_up": "Registriert",
+          "logged_attendance": "Einen Besuch eingetragen",
+          "five_days": "5+ Tage eingetragen"
+        }
+      },
+      "retention": {
+        "hint": "Alle Feste, unabhängig vom Zeitraum",
+        "festival": "Fest",
+        "attendees": "Besucher",
+        "returnedNext": "Beim nächsten dabei",
+        "returnedAny": "Später wiedergekommen",
+        "pending": "Das nächste Fest hat noch nicht begonnen",
+        "headline": "{{percent}} kamen nach {{festival}} wieder"
       }
     }
   },

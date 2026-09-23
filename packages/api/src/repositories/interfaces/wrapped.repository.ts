@@ -18,6 +18,14 @@ export interface IWrappedRepository {
   getCached(userId: string, festivalId: string): Promise<WrappedData | null>;
 
   /**
+   * Record the user's first view of their wrapped (no-op on later views).
+   * Feeds the wrapped_viewed achievement and admin feature analytics.
+   * @param userId - User ID
+   * @param festivalId - Festival ID
+   */
+  markViewed(userId: string, festivalId: string): Promise<void>;
+
+  /**
    * Generate wrapped data for a user and festival
    * @param userId - User ID
    * @param festivalId - Festival ID

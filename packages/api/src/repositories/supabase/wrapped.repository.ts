@@ -38,6 +38,33 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     return this.mapToWrappedData(data as any, userId, festivalId);
   }
 
+  async markViewed(userId: string, festivalId: string): Promise<void> {
+    // The cache stamp is what get_achievement_metrics reads for wrapped_viewed.
+    // Cache invalidation deletes that row, so the durable record for analytics
+    // is wrapped_views.
+    const { error: cacheError } = await this.supabase
+      .from("wrapped_data_cache")
+      .update({ first_viewed_at: new Date().toISOString() })
+      .eq("user_id", userId)
+      .eq("festival_id", festivalId)
+      .is("first_viewed_at", null);
+
+    if (cacheError) {
+      throw new DatabaseError(`Failed to mark wrapped as viewed: ${cacheError.message}`);
+    }
+
+    const { error: viewError } = await this.supabase
+      .from("wrapped_views")
+      .upsert(
+        { user_id: userId, festival_id: festivalId },
+        { onConflict: "user_id,festival_id", ignoreDuplicates: true },
+      );
+
+    if (viewError) {
+      throw new DatabaseError(`Failed to record wrapped view: ${viewError.message}`);
+    }
+  }
+
   async generate(userId: string, festivalId: string, force = false): Promise<WrappedData> {
     // If force regeneration, invalidate cache first
     if (force) {

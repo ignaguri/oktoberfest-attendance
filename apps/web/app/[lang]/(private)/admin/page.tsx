@@ -1,12 +1,12 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useTransitionRouter } from "next-view-transitions";
 import { startTransition, useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslation } from "@/lib/i18n/client";
 
+import AnalyticsDashboard from "./components/analytics/AnalyticsDashboard";
 import CacheManagement from "./components/CacheManagement";
 import FestivalManagement from "./components/FestivalManagement";
 import GroupList from "./components/GroupList";
@@ -15,13 +15,21 @@ import LocationSessionManagement from "./components/LocationSessionManagement";
 import TentManagement from "./components/TentManagement";
 import UserList from "./components/UserList";
 
-const tabValues = ["users", "groups", "festivals", "tents", "cache", "images", "location"];
+const tabValues = [
+  "users",
+  "groups",
+  "festivals",
+  "tents",
+  "cache",
+  "images",
+  "location",
+  "analytics",
+];
 
 export default function AdminPage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("users");
   const searchParams = useSearchParams();
-  const router = useTransitionRouter();
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -35,11 +43,20 @@ export default function AdminPage() {
         startTransition(() => {
           setActiveTab(tab);
         });
-        // Update URL hash if tab is set via query parameter
-        router.push(`/admin?tab=${tab}`);
+        // Swap ?tab= for the hash without navigating. A router.push to the
+        // same URL yields new searchParams, re-running this effect forever.
+        // Other params (e.g. a user search) stay.
+        const params = new URLSearchParams(window.location.search);
+        params.delete("tab");
+        const query = params.toString();
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}${query ? `?${query}` : ""}#${tab}`,
+        );
       }
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -59,6 +76,7 @@ export default function AdminPage() {
           <TabsTrigger value="cache">{t("admin.tabs.cache")}</TabsTrigger>
           <TabsTrigger value="images">{t("admin.tabs.imageConversion")}</TabsTrigger>
           <TabsTrigger value="location">{t("admin.tabs.location")}</TabsTrigger>
+          <TabsTrigger value="analytics">{t("admin.tabs.analytics")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -87,6 +105,10 @@ export default function AdminPage() {
 
         <TabsContent value="location">
           <LocationSessionManagement />
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <AnalyticsDashboard />
         </TabsContent>
       </Tabs>
     </div>

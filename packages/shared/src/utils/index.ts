@@ -69,3 +69,26 @@ export {
 
 // Tent visit helpers
 export { getCurrentTentId } from "./tent-visits";
+
+// Admin analytics helpers
+export {
+  ANALYTICS_RANGE_PRESETS,
+  DEAD_FEATURE_REACH,
+  DEFAULT_ANALYTICS_RANGE_PRESET,
+  FESTIVAL_RANGE_PREFIX,
+  festivalRangeKey,
+  formatPercent,
+  funnelConversion,
+  rangeForPreset,
+  resolveAnalyticsRange,
+  retentionRates,
+  summarizeOverview,
+  visibleFestivalRetentionRows,
+  withFeatureReach,
+} from "./analytics-metrics";
+export type {
+  AnalyticsRangePreset,
+  FeatureReachRow,
+  FunnelStepConversion,
+  OverviewSummary,
+} from "./analytics-metrics";

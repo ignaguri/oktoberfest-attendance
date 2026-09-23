@@ -200,6 +200,14 @@ export class QueryKeys {
   /** Prefix covering every cached session list, for invalidation after a mutation. */
   static adminLocationSessionsAll = () => ["admin", "location-sessions"] as const;
   static adminWrappedCache = () => ["admin", "wrapped-cache"] as const;
+  static adminAnalyticsOverview = (from: string, to: string, platform?: string) =>
+    ["admin", "analytics", "overview", from, to, platform ?? null] as const;
+  static adminAnalyticsFeatures = (from: string, to: string, platform?: string) =>
+    ["admin", "analytics", "features", from, to, platform ?? null] as const;
+  static adminAnalyticsActivationFunnel = (from: string, to: string, platform?: string) =>
+    ["admin", "analytics", "activation-funnel", from, to, platform ?? null] as const;
+  static adminAnalyticsFestivalRetention = () =>
+    ["admin", "analytics", "festival-retention"] as const;
 
   // Miscellaneous
   static winningCriterias = () => ["winning-criterias"] as const;
