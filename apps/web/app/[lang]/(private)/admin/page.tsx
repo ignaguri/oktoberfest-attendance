@@ -1,7 +1,6 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useTransitionRouter } from "next-view-transitions";
 import { startTransition, useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,7 +30,6 @@ export default function AdminPage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("users");
   const searchParams = useSearchParams();
-  const router = useTransitionRouter();
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -45,11 +43,12 @@ export default function AdminPage() {
         startTransition(() => {
           setActiveTab(tab);
         });
-        // Update URL hash if tab is set via query parameter
-        router.push(`/admin?tab=${tab}`);
+        // Swap ?tab= for the hash without navigating. A router.push to the
+        // same URL yields new searchParams, re-running this effect forever.
+        window.history.replaceState(null, "", `${window.location.pathname}#${tab}`);
       }
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
