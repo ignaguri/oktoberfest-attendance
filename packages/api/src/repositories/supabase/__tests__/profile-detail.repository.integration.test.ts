@@ -23,6 +23,7 @@ import {
 } from "../../../__tests__/helpers/friends-went-fixtures";
 import {
   createTestSupabaseAdmin,
+  createTestSupabaseAnon,
   createTestSupabaseWithAuth,
 } from "../../../__tests__/helpers/test-supabase";
 import { NotFoundError } from "../../../middleware/error";
@@ -112,6 +113,19 @@ describe("getProfileDetail (Local DB)", () => {
     const profile = await repoFor(stranger).getPublicProfile(owner.id, festival.id, stranger.id);
 
     expect(profile.stats).toEqual({ daysAttended: 1, totalBeers: 2, avgBeers: 2 });
+  });
+
+  it("keeps the stats function away from anonymous clients", async () => {
+    // SECURITY DEFINER, and Supabase's default privileges grant new functions
+    // to anon at creation, so this is the assertion that the migration's
+    // explicit REVOKE stuck.
+    const { error } = await createTestSupabaseAnon().rpc("get_profile_festival_stats", {
+      p_user_id: owner.id,
+      p_festival_id: festival.id,
+    });
+
+    expect(error).not.toBeNull();
+    expect(`${error?.message} ${error?.code}`).toMatch(/permission denied|PGRST202|42501/i);
   });
 
   it("gives a friend the history and the favourite tent", async () => {
