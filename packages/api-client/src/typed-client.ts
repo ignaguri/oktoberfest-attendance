@@ -20,6 +20,12 @@ import type {
   AdminUser,
   AdminUserGroup,
   AdminWrappedCacheEntry,
+  AnalyticsFeatureUsageResponse,
+  AnalyticsFestivalRetentionResponse,
+  AnalyticsFunnelResponse,
+  AnalyticsOverviewQuery,
+  AnalyticsOverviewResponse,
+  AnalyticsRangeQuery,
   CopyAdminFestivalTentsInput,
   AttendanceByDate,
   CarryOverCandidatesResponse,
@@ -2783,6 +2789,66 @@ export function createTypedApiClient(config: ApiClientConfig) {
      * caller gets a 403 ApiError rather than an empty result.
      */
     admin: {
+      analytics: {
+        async overview(query: AnalyticsOverviewQuery): Promise<AnalyticsOverviewResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ from: query.from, to: query.to });
+          if (query.platform) {
+            params.set("platform", query.platform);
+          }
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/overview?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch analytics overview");
+          }
+          return parseJsonResponse<AnalyticsOverviewResponse>(response);
+        },
+
+        async features(query: AnalyticsRangeQuery): Promise<AnalyticsFeatureUsageResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ from: query.from, to: query.to });
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/features?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch feature usage");
+          }
+          return parseJsonResponse<AnalyticsFeatureUsageResponse>(response);
+        },
+
+        async activationFunnel(query: AnalyticsRangeQuery): Promise<AnalyticsFunnelResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ from: query.from, to: query.to });
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/activation-funnel?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch activation funnel");
+          }
+          return parseJsonResponse<AnalyticsFunnelResponse>(response);
+        },
+
+        async festivalRetention(): Promise<AnalyticsFestivalRetentionResponse> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/festival-retention`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch festival retention");
+          }
+          return parseJsonResponse<AnalyticsFestivalRetentionResponse>(response);
+        },
+      },
+
       users: {
         async list(query?: {
           search?: string;

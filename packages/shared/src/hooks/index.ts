@@ -261,4 +261,10 @@ export {
   useUpdateAdminUserAuth,
   useUpdateAdminUserProfile,
 } from "./useAdminUsers";
+export {
+  useAdminAnalyticsActivationFunnel,
+  useAdminAnalyticsFeatures,
+  useAdminAnalyticsFestivalRetention,
+  useAdminAnalyticsOverview,
+} from "./useAdminAnalytics";
 export { useAdminWrappedCache, useRegenerateWrappedCache } from "./useAdminWrappedCache";
