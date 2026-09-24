@@ -4,11 +4,11 @@
  */
 
 import { TZDate } from "@date-fns/tz";
-import { format, type Locale } from "date-fns";
+import { type FormatDistanceToken, format, type Locale } from "date-fns";
 import { de, enUS, es } from "date-fns/locale";
 
 import { TIMEZONE } from "../constants/app";
-import { getCurrentLanguage } from "../i18n/core";
+import { getCurrentLanguage, i18n } from "../i18n/core";
 
 /**
  * Map of supported language codes to date-fns locales
@@ -206,30 +206,37 @@ export function formatRelativeTime(
     }
   }
 
-  // Fallback for runtimes without Intl.RelativeTimeFormat (e.g. Hermes)
-  const withDirection = (amount: string) => {
-    return diffInSeconds < 0 ? `in ${amount}` : `${amount} ago`;
-  };
+  // Fallback for runtimes without Intl.RelativeTimeFormat (e.g. Hermes), which
+  // is the normal path on device. date-fns locale tokens phrase the amount in the
+  // UI language without needing Intl at all.
+  const language = locale ?? getCurrentLanguage();
 
   if (distanceInSeconds < 60) {
     // A server timestamp routinely lands a few seconds ahead of the device
     // clock. That is "just now", not a wait, and it is the common case here:
     // these strings mostly date freshly created rows.
     if (distanceInSeconds <= 1 || (diffInSeconds < 0 && distanceInSeconds < CLOCK_SKEW_SECONDS)) {
-      return "just now";
+      return i18n.t("common.time.justNow", { lng: language }).toLocaleLowerCase(language);
     }
-    return withDirection(`${distanceInSeconds}s`);
+  }
+
+  const dateLocale = localeMap[language] || enUS;
+  const phrase = (token: FormatDistanceToken, amount: number) =>
+    dateLocale.formatDistance(token, amount, {
+      addSuffix: true,
+      // Positive reads as "in X", negative as "X ago".
+      comparison: diffInSeconds < 0 ? 1 : -1,
+    });
+
+  if (distanceInSeconds < 60) {
+    return phrase("xSeconds", distanceInSeconds);
   } else if (distanceInSeconds < 3600) {
-    const mins = Math.floor(distanceInSeconds / 60);
-    return withDirection(mins === 1 ? "1 min" : `${mins} min`);
+    return phrase("xMinutes", Math.floor(distanceInSeconds / 60));
   } else if (distanceInSeconds < 86400) {
-    const hours = Math.floor(distanceInSeconds / 3600);
-    return withDirection(hours === 1 ? "1 hour" : `${hours} hours`);
+    return phrase("xHours", Math.floor(distanceInSeconds / 3600));
   } else if (distanceInSeconds < 604800) {
-    const days = Math.floor(distanceInSeconds / 86400);
-    return withDirection(days === 1 ? "1 day" : `${days} days`);
+    return phrase("xDays", Math.floor(distanceInSeconds / 86400));
   } else {
-    const weeks = Math.floor(distanceInSeconds / 604800);
-    return withDirection(weeks === 1 ? "1 week" : `${weeks} weeks`);
+    return phrase("xWeeks", Math.floor(distanceInSeconds / 604800));
   }
 }

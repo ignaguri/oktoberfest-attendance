@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { initI18n } from "../i18n/core";
 import {
   atZonedTime,
   formatRelativeTime,
@@ -77,6 +78,9 @@ describe("formatRelativeTime", () => {
 
   describe("without Intl.RelativeTimeFormat (Hermes)", () => {
     beforeEach(() => {
+      // The "just now" string comes from the translations; the app initializes
+      // i18n before anything renders.
+      initI18n();
       // Object.create rather than a spread: Intl's members are non-enumerable,
       // so spreading it yields {} and takes DateTimeFormat down with it.
       vi.stubGlobal("Intl", Object.create(Intl, { RelativeTimeFormat: { value: undefined } }));
@@ -101,7 +105,27 @@ describe("formatRelativeTime", () => {
     });
 
     it("still reports a genuine short wait", () => {
-      expect(formatRelativeTime(secondsFromNow(31), KIRITIMATI, "en")).toBe("in 31s");
+      expect(formatRelativeTime(secondsFromNow(31), KIRITIMATI, "en")).toBe("in 31 seconds");
+    });
+
+    // The fallback is the normal path on device, so it has to speak the UI language.
+    it("localizes elapsed time", () => {
+      expect(formatRelativeTime(secondsFromNow(-7260), KIRITIMATI, "de")).toBe("vor 2 Stunden");
+      expect(formatRelativeTime(secondsFromNow(-7260), KIRITIMATI, "es")).toBe("hace 2 horas");
+    });
+
+    it("localizes a wait", () => {
+      expect(formatRelativeTime(secondsFromNow(7260), KIRITIMATI, "de")).toBe("in 2 Stunden");
+    });
+
+    it("localizes 'just now'", () => {
+      expect(formatRelativeTime(secondsFromNow(3), KIRITIMATI, "de")).toBe("gerade eben");
+    });
+
+    it("counts in weeks past seven days", () => {
+      expect(formatRelativeTime(secondsFromNow(-15 * 86400), KIRITIMATI, "en")).toBe(
+        "2 weeks ago",
+      );
     });
   });
 });
