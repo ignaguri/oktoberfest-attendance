@@ -3,6 +3,7 @@ import { formatDateForDatabase } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
 
+import { deleteTestUsersAndFestivals } from "./test-cleanup";
 import { createTestSupabaseAnon } from "./test-supabase";
 
 /** Festival timezone every day-plan fixture uses. */
@@ -142,22 +143,16 @@ export async function cleanupDayPlanFixtures(
   if (festivalIds.length > 0) {
     await admin.from("day_plan_overlap_notifications").delete().in("festival_id", festivalIds);
     await admin.from("day_plans").delete().in("festival_id", festivalIds);
-
-    const { data: groups } = await admin.from("groups").select("id").in("festival_id", festivalIds);
-    const groupIds = (groups ?? []).map((group) => group.id);
-
-    if (groupIds.length > 0) {
-      await admin.from("group_members").delete().in("group_id", groupIds);
-      await admin.from("groups").delete().in("id", groupIds);
-    }
-
-    await admin.from("festivals").delete().in("id", festivalIds);
   }
 
   if (userIds.length > 0) {
     await admin.from("friendships").delete().in("requester_id", userIds);
   }
 
+  // Also deletes the users: createTestUser signs them up, and nothing else did
+  await deleteTestUsersAndFestivals(admin, { userIds, festivalIds });
+
+  // Last, since day plans and visits referencing a tent are gone by now
   if (tentIds.length > 0) {
     await admin.from("tents").delete().in("id", tentIds);
   }

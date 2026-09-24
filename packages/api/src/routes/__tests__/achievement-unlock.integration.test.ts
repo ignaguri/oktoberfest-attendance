@@ -2,10 +2,11 @@
 // Run with: pnpm --filter=@prostcounter/api test -- --run achievement-unlock.integration
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { randomUUID } from "crypto";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 import { ACHIEVEMENT_METRIC_KEYS } from "@prostcounter/shared/achievements";
 
+import { deleteTestUsersAndFestivals } from "../../__tests__/helpers/test-cleanup";
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
@@ -23,6 +24,18 @@ import photoRoutes from "../photo.route";
 import photoSocialRoutes from "../photo-social.route";
 import profileRoutes from "../profile.route";
 import wrappedRoutes from "../wrapped.route";
+
+// Tracked where they are created and deleted once in afterAll, so a test that
+// fails before its own inline cleanup doesn't leave its user and festival behind
+const createdUserIds: string[] = [];
+const createdFestivalIds: string[] = [];
+
+afterAll(async () => {
+  await deleteTestUsersAndFestivals(createTestSupabaseAdmin(), {
+    userIds: createdUserIds,
+    festivalIds: createdFestivalIds,
+  });
+});
 
 async function getTarget(supabaseAdmin: ReturnType<typeof createTestSupabaseAdmin>) {
   const { data: rows } = await supabaseAdmin
@@ -51,6 +64,7 @@ async function createTestUser() {
   if (error || !data.user || !data.session) {
     throw new Error(`Failed to create test user: ${error?.message ?? "unknown error"}`);
   }
+  createdUserIds.push(data.user.id);
   return { id: data.user.id, token: data.session.access_token };
 }
 
@@ -76,6 +90,7 @@ async function createTestFestival(supabaseAdmin: ReturnType<typeof createTestSup
   if (error || !festival) {
     throw new Error(`Failed to create test festival: ${error?.message}`);
   }
+  createdFestivalIds.push(festival.id);
   return festival;
 }
 
@@ -193,6 +208,7 @@ describe("achievement unlocking against a real database", () => {
     if (festivalError || !festival) {
       throw new Error(`Failed to create test festival: ${festivalError?.message}`);
     }
+    createdFestivalIds.push(festival.id);
 
     const { data: attendance, error: attendanceError } = await supabaseAdmin
       .from("attendances")
