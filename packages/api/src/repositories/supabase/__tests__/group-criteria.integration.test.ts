@@ -13,10 +13,11 @@ import {
 let admin: SupabaseClient<Database>;
 let festivalId: string;
 let groupId: string;
-const users: Record<"ana" | "ben" | "cleo", string> = {
+const users: Record<"ana" | "ben" | "cleo" | "dan", string> = {
   ana: "",
   ben: "",
   cleo: "",
+  dan: "",
 };
 
 async function createUser(label: string): Promise<string> {
@@ -113,6 +114,7 @@ describe("group criteria: tents visited and longest streak", () => {
     users.ana = await createUser("ana");
     users.ben = await createUser("ben");
     users.cleo = await createUser("cleo");
+    users.dan = await createUser("dan");
 
     const { data: group, error: groupError } = await admin
       .from("groups")
@@ -151,6 +153,7 @@ describe("group criteria: tents visited and longest streak", () => {
     await visitTents(users.ben, 2);
     // cleo: one day, no tent visits → tents 0, streak 1
     await attend(users.cleo, ["2026-09-22"], 1);
+    // dan: joined, never went → last everywhere, left out of the standings
   });
 
   it("returns tents and streak per member, zero when missing", async () => {
@@ -172,12 +175,12 @@ describe("group criteria: tents visited and longest streak", () => {
 
   it("orders by tents, breaking ties on total beers", async () => {
     const rows = await leaderboard(4);
-    expect(rows.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.cleo]);
+    expect(rows.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.cleo, users.dan]);
   });
 
   it("orders by longest streak", async () => {
     const rows = await leaderboard(5);
-    expect(rows.map((row) => row.user_id)).toEqual([users.ana, users.ben, users.cleo]);
+    expect(rows.map((row) => row.user_id)).toEqual([users.ana, users.ben, users.cleo, users.dan]);
   });
 
   it("ranks the final standings by the group's criterion", async () => {
@@ -192,5 +195,33 @@ describe("group criteria: tents visited and longest streak", () => {
       .order("rank");
     expect(data?.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.cleo]);
     expect(data?.[0]?.criteria_id).toBe(4);
+  });
+
+  it("gives each member their real group position in Wrapped", async () => {
+    const positions: Record<string, unknown> = {};
+    for (const [label, userId] of Object.entries(users)) {
+      const { data, error } = await admin.rpc("get_wrapped_data", {
+        p_user_id: userId,
+        p_festival_id: festivalId,
+      });
+      expect(error).toBeNull();
+      const social = (data as { social_stats: { top_3_rankings: { position: number }[] } })
+        .social_stats;
+      positions[label] = social.top_3_rankings.map((ranking) => ranking.position);
+    }
+    expect(positions).toEqual({ ben: [1], ana: [2], cleo: [3], dan: [] });
+  });
+
+  it("only lists groups where the member is top 3 in Highlights", async () => {
+    const topGroups: Record<string, number> = {};
+    for (const [label, userId] of Object.entries(users)) {
+      const { data, error } = await admin.rpc("get_user_festival_stats_with_positions", {
+        p_user_id: userId,
+        p_festival_id: festivalId,
+      });
+      expect(error).toBeNull();
+      topGroups[label] = ((data?.[0]?.top_positions ?? []) as unknown[]).length;
+    }
+    expect(topGroups).toEqual({ ana: 1, ben: 1, cleo: 1, dan: 0 });
   });
 });
