@@ -1,7 +1,7 @@
+import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
 import { isAfter, parseISO, startOfDay } from "date-fns";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
@@ -72,12 +72,14 @@ export default function HomeScreen() {
   const [showCrowdPrompt, setShowCrowdPrompt] = useState(false);
   const [crowdPromptTents, setCrowdPromptTents] = useState<{ id: string; name: string }[]>([]);
 
-  // Today's date for querying attendance (recalculated on screen focus to handle midnight rollover)
-  const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  // Today's date for querying attendance, in the festival's timezone like the
+  // server's day grouping (recalculated on screen focus to handle midnight rollover)
+  const festivalTimezone = currentFestival?.timezone ?? undefined;
+  const [today, setToday] = useState(() => formatDateForDatabase(new Date(), festivalTimezone));
   useFocusEffect(
     useCallback(() => {
-      setToday(format(new Date(), "yyyy-MM-dd"));
-    }, []),
+      setToday(formatDateForDatabase(new Date(), festivalTimezone));
+    }, [festivalTimezone]),
   );
   const festivalId = currentFestival?.id || "";
 
