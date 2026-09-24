@@ -233,6 +233,7 @@ recent_reservations AS (
     AND dp.status NOT IN ('cancelled', 'expired')
     AND dp.user_id <> auth.uid()
     AND dp.feed_at > (now() - '48:00:00'::interval)
+    AND dp.date >= (now() AT TIME ZONE f.timezone)::date
 ),
 all_activities AS (
   SELECT * FROM recent_consumptions

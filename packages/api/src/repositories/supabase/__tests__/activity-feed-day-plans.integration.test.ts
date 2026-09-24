@@ -166,11 +166,12 @@ describe("activity_feed day plans and reservations (Local DB)", () => {
     expect(await feedSeenBy(friend, festival.id)).toHaveLength(1);
   });
 
-  it("shows a pending reservation with its tent and timezone, and hides a cancelled one", async () => {
+  it("shows a pending reservation with its tent and timezone, hiding cancelled and past ones", async () => {
     const festival = await newFestival();
     const pendingDate = dayFromToday(4);
     await insertPlan(festival.id, reservation(pendingDate));
     await insertPlan(festival.id, { ...reservation(dayFromToday(5)), status: "cancelled" });
+    await insertPlan(festival.id, reservation(dayFromToday(-1)));
 
     const feed = await feedSeenBy(friend, festival.id);
 
