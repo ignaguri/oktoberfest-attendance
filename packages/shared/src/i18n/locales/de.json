@@ -3459,7 +3459,6 @@
     "INVALID_FILE_TYPE": "Ungültiger Dateityp.",
     "FILE_TOO_LARGE": "Dateigröße überschreitet maximales Limit.",
     "FILE_NAME_TOO_LONG": "Dateiname zu lang (max. 255 Zeichen).",
-    "CAPTION_TOO_LONG": "Bildunterschrift zu lang (max. 500 Zeichen).",
     "ACHIEVEMENT_NOT_FOUND": "Erfolg nicht gefunden.",
     "LOCATION_SESSION_NOT_FOUND": "Standort-Sitzung nicht gefunden.",
     "LOCATION_SESSION_EXPIRED": "Standort-Sitzung ist abgelaufen.",

@@ -5,26 +5,12 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError } from "../../middleware/error";
 import type { INotificationRepository } from "../interfaces/notification.repository";
 
 export class SupabaseNotificationRepository implements INotificationRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
-
-  async registerFCMToken(userId: string, token: string): Promise<void> {
-    // TODO: Implement FCM token storage once fcm_tokens table is added to schema
-    // For now, FCM tokens are stored client-side
-    // Future schema: CREATE TABLE fcm_tokens (id, user_id, token, last_used_at, is_active)
-    logger.debug(
-      {
-        userId,
-        tokenPrefix: token.substring(0, 20),
-      },
-      "FCM token registration",
-    );
-  }
 
   async getPreferences(userId: string): Promise<NotificationPreferences | null> {
     const { data, error } = await this.supabase
@@ -101,23 +87,6 @@ export class SupabaseNotificationRepository implements INotificationRepository {
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };
-  }
-
-  async getFCMTokens(_userId: string): Promise<string[]> {
-    // TODO: Implement once fcm_tokens table is added
-    // For now, return empty array
-    return [];
-  }
-
-  async removeFCMToken(userId: string, token: string): Promise<void> {
-    // TODO: Implement once fcm_tokens table is added
-    logger.debug(
-      {
-        userId,
-        tokenPrefix: token.substring(0, 20),
-      },
-      "FCM token removal",
-    );
   }
 
   async canSendNotification(userId: string, notificationType: string): Promise<boolean> {

@@ -23,7 +23,6 @@ export class ReservationService {
    * 1. Validate reservation time (must be in future)
    * 2. Validate end time > start time
    * 3. Create reservation
-   * 4. TODO: Schedule reminder notification
    *
    * @param userId - User ID creating the reservation
    * @param data - Reservation data
@@ -48,11 +47,6 @@ export class ReservationService {
 
     // Create reservation
     const reservation = await this.reservationRepo.create(userId, data);
-
-    // TODO: Schedule reminder notification
-    // if (reservation.reminderOffsetMinutes > 0) {
-    //   await this.scheduleReminder(reservation);
-    // }
 
     return reservation;
   }

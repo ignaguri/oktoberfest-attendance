@@ -18,33 +18,6 @@ export const DrinkTypePriceSchema = z.object({
 export type DrinkTypePrice = z.infer<typeof DrinkTypePriceSchema>;
 
 /**
- * Price source - indicates where the price came from
- */
-export const PriceSourceSchema = z.enum(["tent", "festival", "default"]);
-export type PriceSource = z.infer<typeof PriceSourceSchema>;
-
-/**
- * Request to get price for a drink type
- */
-export const GetDrinkPriceQuerySchema = z.object({
-  festivalId: z.uuid(),
-  tentId: z.uuid().optional(),
-  drinkType: DrinkTypeSchema.default("beer"),
-});
-
-export type GetDrinkPriceQuery = z.infer<typeof GetDrinkPriceQuerySchema>;
-
-/**
- * Response with resolved price
- */
-export const GetDrinkPriceResponseSchema = z.object({
-  priceCents: z.number().int(),
-  source: PriceSourceSchema,
-});
-
-export type GetDrinkPriceResponse = z.infer<typeof GetDrinkPriceResponseSchema>;
-
-/**
  * All prices for a festival (keyed by drink type)
  */
 export const FestivalPricesSchema = z.object({

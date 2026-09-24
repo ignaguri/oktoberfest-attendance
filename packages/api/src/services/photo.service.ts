@@ -129,27 +129,6 @@ export class PhotoService {
    */
   async deletePhoto(pictureId: string, userId: string): Promise<void> {
     await this.photoRepo.delete(pictureId, userId);
-
-    // TODO: Invalidate wrapped cache if this affects stats
-    // await this.wrappedService.invalidateCache(userId);
-  }
-
-  /**
-   * Update photo caption
-   * Note: Current schema doesn't support captions yet
-   *
-   * @param pictureId - Picture ID
-   * @param userId - User ID (for authorization)
-   * @param caption - New caption text
-   * @returns Updated picture
-   */
-  async updateCaption(pictureId: string, userId: string, caption: string): Promise<BeerPicture> {
-    // Validate caption length
-    if (caption.length > 500) {
-      throw new ValidationError(ErrorCodes.CAPTION_TOO_LONG);
-    }
-
-    return this.photoRepo.updateCaption(pictureId, userId, caption);
   }
 
   // ===== Photo Privacy Settings =====
