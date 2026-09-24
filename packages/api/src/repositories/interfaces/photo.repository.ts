@@ -66,15 +66,6 @@ export interface IPhotoRepository {
    */
   deleteByAttendanceId(attendanceId: string, userId: string): Promise<void>;
 
-  /**
-   * Update photo caption
-   * @param pictureId - Picture ID
-   * @param userId - User ID (for authorization)
-   * @param caption - New caption text
-   * @returns Updated picture
-   */
-  updateCaption(pictureId: string, userId: string, caption: string): Promise<BeerPicture>;
-
   // ===== Photo Privacy Settings =====
 
   /**

@@ -63,7 +63,6 @@ export function getCurrentLanguage(): string {
 
 /**
  * Supported languages
- * TODO: Add more languages when translations are available (fr, pt, it)
  */
 export const SUPPORTED_LANGUAGES = ["en", "de", "es"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];

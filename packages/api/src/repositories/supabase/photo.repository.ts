@@ -242,13 +242,6 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     }
   }
 
-  async updateCaption(_pictureId: string, _userId: string, _caption: string): Promise<BeerPicture> {
-    // Note: Current schema doesn't have caption field
-    // This is a stub for future enhancement
-    // TODO: Add caption field to beer_pictures table
-    throw new DatabaseError("Caption feature not yet implemented - schema needs update");
-  }
-
   private mapToBeerPicture(data: any): BeerPicture {
     // Store only the path, client utilities will construct the full URL
     return {

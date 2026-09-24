@@ -21,9 +21,7 @@ export class ConsumptionService {
    * 1. Get or create attendance for the date
    * 2. Determine pricing (tent override -> festival default -> fallback)
    * 3. Add consumption record
-   * 4. TODO: Evaluate achievements (async)
-   * 5. TODO: Send tent check-in notification to groups
-   * 6. Return attendance with updated totals
+   * 4. Return attendance with updated totals
    */
   async logConsumption(userId: string, data: LogConsumptionInput): Promise<AttendanceWithTotals> {
     const { festivalId, date, ...consumptionData } = data;
@@ -49,14 +47,6 @@ export class ConsumptionService {
     if (!updatedAttendance) {
       throw new Error("Failed to fetch updated attendance");
     }
-
-    // TODO Phase 4 Priority 3: Trigger achievement evaluation asynchronously
-    // this.achievementService.evaluateAsync(userId, festivalId);
-
-    // TODO Phase 4 Priority 3: Send tent check-in notification
-    // if (consumptionData.tentId) {
-    //   this.notificationService.notifyTentCheckIn(userId, festivalId, consumptionData.tentId);
-    // }
 
     return updatedAttendance;
   }

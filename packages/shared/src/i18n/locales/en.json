@@ -3222,7 +3222,6 @@
     "INVALID_FILE_TYPE": "Invalid file type.",
     "FILE_TOO_LARGE": "File size exceeds maximum limit.",
     "FILE_NAME_TOO_LONG": "File name too long (max 255 characters).",
-    "CAPTION_TOO_LONG": "Caption too long (max 500 characters).",
     "ACHIEVEMENT_NOT_FOUND": "Achievement not found.",
     "LOCATION_SESSION_NOT_FOUND": "Location session not found.",
     "LOCATION_SESSION_EXPIRED": "Location session has expired.",

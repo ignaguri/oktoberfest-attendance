@@ -251,8 +251,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
   });
 
   describe("GET /groups/:id/leaderboard", () => {
-    // TODO: Fix mock chain setup - third .from() call returns null instead of mocked data
-    it.skip("should get group leaderboard for members", async () => {
+    it("should get group leaderboard for members", async () => {
       const groupId = "923e4567-e89b-12d3-a456-426614174000";
 
       // Mock findById - group exists (from GroupRepository)
@@ -309,6 +308,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
       // Set up all mocks in sequence
       vi.mocked(mockSupabase.from)
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroup)))
+        .mockReturnValueOnce(createMockChain({ data: null, error: null, count: 2 }))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockMember)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupData)));
 
@@ -346,8 +346,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
       });
     });
 
-    // TODO: Fix mock chain setup - third .from() call returns null instead of mocked data
-    it.skip("should support optional sort parameter", async () => {
+    it("should support optional sort parameter", async () => {
       const groupId = "923e4567-e89b-12d3-a456-426614174000";
 
       // Mock findById
@@ -395,6 +394,7 @@ describe("Leaderboard Routes - Unit Tests", () => {
       // Set up all mocks in sequence
       vi.mocked(mockSupabase.from)
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroup)))
+        .mockReturnValueOnce(createMockChain({ data: null, error: null, count: 2 }))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockMember)))
         .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupData)));
 
