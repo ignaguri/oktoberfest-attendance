@@ -25,6 +25,9 @@ export interface FeedbackNotifier {
 export const FEEDBACK_EMAIL_FROM = "ProstCounter Feedback <feedback@notify.prostcounter.fun>";
 
 const RESEND_EMAILS_URL = "https://api.resend.com/emails";
+
+/** submit awaits the send, so a hung Resend must not hang the request. */
+export const FEEDBACK_EMAIL_TIMEOUT_MS = 5000;
 const SUBJECT_PREVIEW_LENGTH = 60;
 
 /** Every bug and idea; a day rating only when it came with text. */
@@ -90,9 +93,13 @@ export function createResendFeedbackNotifier(
 
       const { subject, text } = buildFeedbackEmail(payload);
 
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), FEEDBACK_EMAIL_TIMEOUT_MS);
+
       try {
         const response = await fetchImpl(RESEND_EMAILS_URL, {
           method: "POST",
+          signal: controller.signal,
           headers: {
             Authorization: `Bearer ${env.RESEND_API_KEY}`,
             "Content-Type": "application/json",
@@ -116,6 +123,8 @@ export function createResendFeedbackNotifier(
           { feedbackId: payload.id, error: error instanceof Error ? error.message : String(error) },
           "Feedback email request failed",
         );
+      } finally {
+        clearTimeout(timeoutId);
       }
     },
   };
