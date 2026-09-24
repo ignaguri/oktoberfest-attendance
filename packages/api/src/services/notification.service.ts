@@ -19,7 +19,8 @@ import { SupabaseAttendanceRepository } from "../repositories/supabase/attendanc
 import { createAdminClient } from "../utils/admin-client";
 import { buildOverlapBody, formatOverlapDayLabel } from "./plan-overlap-copy";
 
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+// Yesterday still counts as the day starting until 01:00 festival-time.
+const DAY_START_GRACE_MS = 60 * 60 * 1000;
 
 type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
@@ -1197,29 +1198,31 @@ export class NotificationService {
     }
 
     try {
-      // Both clients let a user backfill a past date. Claiming the ledger for
-      // anything older than yesterday would announce a day that isn't
-      // starting, so bound the claim to today-or-yesterday in the festival's
-      // own timezone rather than the server's. Yesterday (not just today) is
-      // deliberate: a visit near midnight festival-time can have its
-      // offline-queue push land after the server has already rolled to the
-      // next day.
+      // Both clients let a user backfill a past date, and claiming the ledger
+      // for one would announce a day that isn't starting. So only today
+      // counts, in the festival's own timezone rather than the server's, with
+      // yesterday allowed until 01:00: a visit near midnight can have its
+      // offline-queue push land after the day has rolled over. Checking the
+      // date an hour ago gives exactly that grace window.
       const attendanceRepo = new SupabaseAttendanceRepository(this.supabase);
       const timezone = await attendanceRepo.getFestivalTimezone(input.festivalId);
       const now = new Date();
       const todayInTz = formatDateForDatabase(now, timezone);
-      const yesterdayInTz = formatDateForDatabase(new Date(now.getTime() - ONE_DAY_MS), timezone);
+      const graceDateInTz = formatDateForDatabase(
+        new Date(now.getTime() - DAY_START_GRACE_MS),
+        timezone,
+      );
 
-      if (input.date !== todayInTz && input.date !== yesterdayInTz) {
+      if (input.date !== todayInTz && input.date !== graceDateInTz) {
         logger.warn(
           {
             actorId: input.actorId,
             festivalId: input.festivalId,
             date: input.date,
             todayInTz,
-            yesterdayInTz,
+            graceDateInTz,
           },
-          "Day-start date outside today/yesterday window; skipping claim",
+          "Day-start date outside today (plus 01:00 grace) window; skipping claim",
         );
         return false;
       }
