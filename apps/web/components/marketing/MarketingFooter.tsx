@@ -2,6 +2,7 @@
 
 import { Beer } from "lucide-react";
 import Image from "next/image";
+import { CONTACT_EMAIL } from "@prostcounter/shared/constants";
 import { Link } from "next-view-transitions";
 
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
@@ -27,9 +28,13 @@ export function MarketingFooter() {
   const legalLinks = [
     { href: "/privacy", labelKey: "privacyPolicy" as const },
     { href: "/child-safety", labelKey: "childSafety" as const },
-    { href: "/r/bugs", labelKey: "reportBug" as const, external: true },
     {
-      href: "/r/feedback",
+      href: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("ProstCounter: bug report")}`,
+      labelKey: "reportBug" as const,
+      external: true,
+    },
+    {
+      href: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("ProstCounter: feature request")}`,
       labelKey: "requestFeature" as const,
       external: true,
     },
