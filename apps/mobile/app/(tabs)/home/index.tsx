@@ -195,7 +195,12 @@ export default function HomeScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background-50" edges={["top"]}>
       {/* Tent Proximity Banner - shows at top when near a tent (active festival only) */}
-      {isFestivalActive && Platform.OS !== "web" && <TentProximityBanner threshold={50} />}
+      {isFestivalActive && Platform.OS !== "web" && (
+        <TentProximityBanner
+          threshold={50}
+          hasCheckedIn={(todayAttendance?.tentIds.length ?? 0) > 0}
+        />
+      )}
 
       <ScrollView
         className="flex-1"
