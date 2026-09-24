@@ -2,7 +2,7 @@
 
 import { useFestival } from "@prostcounter/shared/contexts";
 import { Eye, EyeOff } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Switch } from "@/components/ui/switch";
@@ -17,7 +17,7 @@ interface GroupPhotoSetting {
 
 export function PhotoPrivacySettings() {
   const { t } = useTranslation();
-  const { currentFestival, isLoading: isFestivalLoading } = useFestival();
+  const { currentFestival } = useFestival();
   const festivalId = currentFestival?.id;
   const festivalName = currentFestival?.name ?? "";
   const [globalSettings, setGlobalSettings] = useState<{
@@ -29,22 +29,31 @@ export function PhotoPrivacySettings() {
   const [isLoading, setIsLoading] = useState(true);
   const [savingGlobal, setSavingGlobal] = useState(false);
   const [savingGroups, setSavingGroups] = useState<Set<string>>(new Set());
+  // Only the latest request may write state, so a slow response for the
+  // previous festival can't overwrite the current one
+  const latestRequestIdRef = useRef(0);
 
   useEffect(() => {
-    // Wait for the festival so an unscoped request can't land after the scoped one
-    if (isFestivalLoading) {
+    // The festival context finishes loading before it commits a selection, so
+    // wait for an actual festival rather than listing every group
+    if (!festivalId) {
       return;
     }
-    loadSettings();
+    loadSettings(festivalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [festivalId, isFestivalLoading]);
+  }, [festivalId]);
 
-  const loadSettings = async () => {
+  const loadSettings = async (selectedFestivalId: string) => {
+    const requestId = ++latestRequestIdRef.current;
     try {
       const [globalData, groupData] = await Promise.all([
         apiClient.photos.getGlobalSettings(),
-        apiClient.photos.getAllGroupSettings({ festivalId }),
+        apiClient.photos.getAllGroupSettings({ festivalId: selectedFestivalId }),
       ]);
+
+      if (requestId !== latestRequestIdRef.current) {
+        return;
+      }
 
       setGlobalSettings({
         hide_photos_from_all_groups: globalData.hidePhotosFromAllGroups,
@@ -59,11 +68,15 @@ export function PhotoPrivacySettings() {
         })),
       );
     } catch {
-      toast.error(t("common.status.error"), {
-        description: t("photo.privacy.loadError"),
-      });
+      if (requestId === latestRequestIdRef.current) {
+        toast.error(t("common.status.error"), {
+          description: t("photo.privacy.loadError"),
+        });
+      }
     } finally {
-      setIsLoading(false);
+      if (requestId === latestRequestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 

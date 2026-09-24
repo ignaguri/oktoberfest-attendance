@@ -7824,11 +7824,13 @@ export interface paths {
         };
         /**
          * Get all group photo privacy settings
-         * @description Returns user's photo visibility settings for all groups
+         * @description Returns user's photo visibility settings for all groups, optionally limited to one festival
          */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    festivalId?: string;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;

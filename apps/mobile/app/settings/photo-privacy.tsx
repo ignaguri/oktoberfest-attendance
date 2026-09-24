@@ -1,7 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { cn } from "@prostcounter/ui";
 import { Eye, EyeOff, Info, Users } from "lucide-react-native";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Alert, RefreshControl, ScrollView, View } from "react-native";
 
@@ -24,7 +24,7 @@ interface PhotoPrivacySettings {
 
 export default function PhotoPrivacyScreen() {
   const { t } = useTranslation();
-  const { currentFestival, isLoading: isFestivalLoading } = useFestival();
+  const { currentFestival } = useFestival();
   const festivalId = currentFestival?.id;
   const festivalName = currentFestival?.name ?? "";
 
@@ -35,8 +35,17 @@ export default function PhotoPrivacyScreen() {
     hidePhotosFromAllGroups: false,
     groups: [],
   });
+  // Only the latest request may write state, so a slow response for the
+  // previous festival can't overwrite the current one
+  const latestRequestIdRef = useRef(0);
 
   const fetchSettings = useCallback(async () => {
+    // The festival context finishes loading before it commits a selection, so
+    // wait for an actual festival rather than listing every group
+    if (!festivalId) {
+      return;
+    }
+    const requestId = ++latestRequestIdRef.current;
     try {
       // Fetch global setting and group settings
       const [globalResponse, groupsResponse] = await Promise.all([
@@ -44,6 +53,9 @@ export default function PhotoPrivacyScreen() {
         apiClient.photos.getAllGroupSettings({ festivalId }).catch(() => ({ settings: [] })),
       ]);
 
+      if (requestId !== latestRequestIdRef.current) {
+        return;
+      }
       setSettings({
         hidePhotosFromAllGroups: globalResponse.hidePhotosFromAllGroups ?? false,
         groups: groupsResponse.settings ?? [],
@@ -51,23 +63,24 @@ export default function PhotoPrivacyScreen() {
     } catch (error) {
       logger.error("Error fetching photo privacy settings:", error);
     } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
+      if (requestId === latestRequestIdRef.current) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
     }
   }, [festivalId]);
 
   useEffect(() => {
-    // Wait for the festival so an unscoped request can't land after the scoped one
-    if (isFestivalLoading) {
-      return;
-    }
-    fetchSettings();
-  }, [fetchSettings, isFestivalLoading]);
-
-  const onRefresh = useCallback(() => {
-    setIsRefreshing(true);
     fetchSettings();
   }, [fetchSettings]);
+
+  const onRefresh = useCallback(() => {
+    if (!festivalId) {
+      return;
+    }
+    setIsRefreshing(true);
+    fetchSettings();
+  }, [fetchSettings, festivalId]);
 
   const handleGlobalToggle = async (value: boolean) => {
     const previousValue = settings.hidePhotosFromAllGroups;
