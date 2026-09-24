@@ -25,6 +25,7 @@ export * from "./activity-feed.schema";
 export * from "./group-message.schema";
 export * from "./pricing.schema";
 export * from "./crowd-report.schema";
+export * from "./feedback.schema";
 export * from "./friend.schema";
 export * from "./admin.schema";
 export * from "./admin-analytics.schema";

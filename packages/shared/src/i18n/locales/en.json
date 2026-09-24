@@ -1672,7 +1672,8 @@
         "location": "Active location sharing sessions",
         "tents": "Create and edit the tent catalogue",
         "cache": "Regenerate cached Wrapped data",
-        "analytics": "Usage, features and retention"
+        "analytics": "Usage, features and retention",
+        "feedback": "Ratings, bug reports and ideas from users"
       },
       "cache": {
         "description": "Wrapped statistics are calculated once and cached. Regenerating refreshes an existing entry; it cannot create one for someone who has never opened their Wrapped.",
@@ -1769,7 +1770,8 @@
       "cache": "Cache Management",
       "imageConversion": "Image Conversion",
       "location": "Location",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "feedback": "Feedback"
     },
     "location": {
       "title": "Location Sessions",
@@ -2068,6 +2070,23 @@
         "pending": "Next festival has not started",
         "headline": "{{percent}} came back after {{festival}}"
       }
+    },
+    "feedback": {
+      "filters": {
+        "all": "All",
+        "day": "Days",
+        "bug": "Bugs",
+        "idea": "Ideas"
+      },
+      "kinds": {
+        "day": "Day",
+        "bug": "Bug",
+        "idea": "Idea"
+      },
+      "empty": "No feedback yet.",
+      "loading": "Loading feedback…",
+      "noMessage": "(no message)",
+      "error": "Couldn’t load feedback."
     }
   },
   "joinGroup": {
@@ -3207,7 +3226,9 @@
     "PROFILE_NOT_FOUND": "Profile not found.",
     "USERNAME_TAKEN": "This username is already taken.",
     "WRAPPED_NOT_FOUND": "Wrapped data not found.",
-    "WRAPPED_NOT_READY": "Your wrapped isn't ready yet."
+    "WRAPPED_NOT_READY": "Your wrapped isn't ready yet.",
+    "FEEDBACK_RATE_LIMITED": "You’ve sent a lot of feedback today. Please try again tomorrow.",
+    "FEEDBACK_DAY_NOT_LOGGED": "There are no drinks logged for that day."
   },
   "offline": {
     "status": {
@@ -3685,6 +3706,47 @@
         "text": "If you have any child safety concerns or need to report an issue, please contact our designated child safety point of contact:",
         "boxTitle": "ProstCounter — Child Safety Contact"
       }
+    }
+  },
+  "feedback": {
+    "day": {
+      "title": "How was yesterday?",
+      "subtitle": "{{festival}} · {{date}}",
+      "description": "One tap is enough. The text is optional.",
+      "facesLabel": "How was your day?",
+      "textLabel": "What would’ve made the app better today?",
+      "textPlaceholder": "Optional",
+      "notNow": "Not now"
+    },
+    "faces": {
+      "terrible": "Terrible",
+      "bad": "Bad",
+      "okay": "Okay",
+      "good": "Good",
+      "amazing": "Amazing"
+    },
+    "bug": {
+      "title": "Report a bug",
+      "description": "Tell us what went wrong.",
+      "label": "What went wrong?",
+      "placeholder": "What did you do, and what happened?",
+      "contextNote": "We’ll attach your app version and device automatically."
+    },
+    "idea": {
+      "title": "Request a feature",
+      "description": "Tell us what would make ProstCounter better.",
+      "label": "What would you like to see?",
+      "placeholder": "Describe your idea"
+    },
+    "send": "Send",
+    "sending": "Sending…",
+    "thanks": "Thanks for the feedback!",
+    "error": "Couldn’t send your feedback. Please try again.",
+    "sendHint": "Sends your feedback to the ProstCounter team",
+    "validation": {
+      "required": "Please write a few words.",
+      "ratingRequired": "Pick a face first.",
+      "tooLong": "Keep it under 2000 characters."
     }
   }
 }

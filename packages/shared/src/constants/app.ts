@@ -6,6 +6,9 @@
 export const PROD_URL = "https://prostcounter.fun";
 export const DEV_URL = "http://localhost:3008";
 
+/** Public contact inbox, shown on the privacy page and used for signed-out feedback links. */
+export const CONTACT_EMAIL = "prostcounter@gmail.com";
+
 // Environment detection
 export const IS_PROD = process.env.NODE_ENV === "production";
 

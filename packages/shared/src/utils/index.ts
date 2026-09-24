@@ -16,6 +16,14 @@ export {
   zonedTimeOnDay,
 } from "./date-utils";
 
+// Launch popup coordination
+export {
+  claimLaunchPopupSlot,
+  isLaunchPopupSlotClaimed,
+  releaseLaunchPopupSlot,
+  resetLaunchPopupSlotForTests,
+} from "./launch-popup-slot";
+
 // Pricing utilities
 export type { TipMode } from "./pricing";
 export {
