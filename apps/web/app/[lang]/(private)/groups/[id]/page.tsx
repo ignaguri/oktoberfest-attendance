@@ -106,6 +106,8 @@ export default function GroupPage() {
           daysAttended: number;
           totalBeers: number;
           avgBeers: number;
+          tentsVisited: number;
+          longestStreak: number;
         },
         index: number,
       ) => ({
@@ -116,6 +118,8 @@ export default function GroupPage() {
         daysAttended: entry.daysAttended,
         totalBeers: entry.totalBeers,
         avgBeers: entry.avgBeers,
+        tentsVisited: entry.tentsVisited,
+        longestStreak: entry.longestStreak,
         position: index + 1,
       }),
     ) || [];
