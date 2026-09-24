@@ -33,6 +33,7 @@ a bulletin cannot hurt password-reset delivery.
 | `team@account.prostcounter.fun` ("ProstCounter") | Supabase Auth SMTP settings (`smtp_admin_email`, host `smtp.resend.com`) | All auth mail |
 | `ignacio@account.prostcounter.fun` | Resend broadcast | August 2026 bulletin only. Legacy, do not reuse |
 | `hello@notify.prostcounter.fun` (suggested) | Resend broadcast | Future bulletins and marketing |
+| `feedback@notify.prostcounter.fun` ("ProstCounter Feedback") | `packages/api/src/lib/feedback-email.ts` | In-app feedback notifications to the admin inbox (`FEEDBACK_NOTIFY_EMAIL`), Reply-To set to the user |
 
 Any local part works on a verified domain, so a new address like
 `no-reply@notify.prostcounter.fun` needs no DNS or Resend change.
@@ -43,8 +44,10 @@ Any local part works on a verified domain, so a new address like
   only email integration is Novu's unused built-in demo provider. If a workflow
   ever gets an email step, add a Resend integration in Novu and send from
   `notify.`, never `account.`.
-- The app code has no direct Resend calls. Auth mail is sent by Supabase over
-  SMTP, broadcasts are sent from the Resend dashboard or MCP.
+- The app code makes one direct Resend call: the feedback notification in
+  `packages/api/src/lib/feedback-email.ts` (REST API, `RESEND_API_KEY`, plain
+  text, from `notify.`). Auth mail is sent by Supabase over SMTP, broadcasts are
+  sent from the Resend dashboard or MCP.
 
 ## Rules
 
