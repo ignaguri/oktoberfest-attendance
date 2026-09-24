@@ -29,10 +29,10 @@ export default function PrivacyPolicy() {
             <br />
             Email:{" "}
             <a
-              href="mailto:pepe.grillo.parlante@gmail.com"
+              href="mailto:prostcounter@gmail.com"
               className="text-blue-600 hover:underline"
             >
-              pepe.grillo.parlante@gmail.com
+              prostcounter@gmail.com
             </a>
           </p>
         </section>
@@ -246,10 +246,10 @@ export default function PrivacyPolicy() {
             If you need assistance with account deletion or have questions about this process,
             please contact us at{" "}
             <a
-              href="mailto:pepe.grillo.parlante@gmail.com"
+              href="mailto:prostcounter@gmail.com"
               className="text-blue-600 hover:underline"
             >
-              pepe.grillo.parlante@gmail.com
+              prostcounter@gmail.com
             </a>
           </p>
         </section>
@@ -283,10 +283,10 @@ export default function PrivacyPolicy() {
           <p className="mt-4">
             To exercise these rights, please contact us at{" "}
             <a
-              href="mailto:pepe.grillo.parlante@gmail.com"
+              href="mailto:prostcounter@gmail.com"
               className="text-blue-600 hover:underline"
             >
-              pepe.grillo.parlante@gmail.com
+              prostcounter@gmail.com
             </a>
           </p>
         </section>
@@ -347,10 +347,10 @@ export default function PrivacyPolicy() {
             <p>
               Email:{" "}
               <a
-                href="mailto:pepe.grillo.parlante@gmail.com"
+                href="mailto:prostcounter@gmail.com"
                 className="text-blue-600 hover:underline"
               >
-                pepe.grillo.parlante@gmail.com
+                prostcounter@gmail.com
               </a>
             </p>
           </div>

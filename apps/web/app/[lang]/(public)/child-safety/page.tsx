@@ -48,10 +48,10 @@ export default function ChildSafetyStandards() {
           <p className="mt-4">
             {t("marketing.childSafety.reporting.emailText")}{" "}
             <a
-              href="mailto:pepe.grillo.parlante@gmail.com"
+              href="mailto:prostcounter@gmail.com"
               className="text-blue-600 hover:underline"
             >
-              pepe.grillo.parlante@gmail.com
+              prostcounter@gmail.com
             </a>
             .
           </p>
@@ -97,10 +97,10 @@ export default function ChildSafetyStandards() {
             <p>
               Email:{" "}
               <a
-                href="mailto:pepe.grillo.parlante@gmail.com"
+                href="mailto:prostcounter@gmail.com"
                 className="text-blue-600 hover:underline"
               >
-                pepe.grillo.parlante@gmail.com
+                prostcounter@gmail.com
               </a>
             </p>
           </div>
