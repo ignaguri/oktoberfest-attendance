@@ -611,6 +611,116 @@ export type Database = {
           },
         ]
       }
+      feedback: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          day: string | null
+          festival_id: string | null
+          id: string
+          kind: string
+          locale: string | null
+          message: string | null
+          platform: string | null
+          rating: number | null
+          user_id: string
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          day?: string | null
+          festival_id?: string | null
+          id?: string
+          kind: string
+          locale?: string | null
+          message?: string | null
+          platform?: string | null
+          rating?: number | null
+          user_id: string
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          day?: string | null
+          festival_id?: string | null
+          id?: string
+          kind?: string
+          locale?: string | null
+          message?: string | null
+          platform?: string | null
+          rating?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "feedback_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback_prompts: {
+        Row: {
+          created_at: string
+          day: string
+          festival_id: string
+          outcome: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          day: string
+          festival_id: string
+          outcome: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          festival_id?: string
+          outcome?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_prompts_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedback_prompts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "feedback_prompts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       festival_group_standings: {
         Row: {
           computed_at: string
