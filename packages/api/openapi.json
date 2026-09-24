@@ -15476,7 +15476,9 @@
                               "tent_checkin",
                               "photo_upload",
                               "group_join",
-                              "achievement_unlock"
+                              "achievement_unlock",
+                              "day_plan",
+                              "tent_reservation"
                             ]
                           },
                           "activity_data": {

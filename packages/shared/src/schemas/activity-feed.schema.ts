@@ -9,6 +9,8 @@ export const ActivityTypeSchema = z.enum([
   "photo_upload",
   "group_join",
   "achievement_unlock",
+  "day_plan",
+  "tent_reservation",
 ]);
 
 export type ActivityType = z.infer<typeof ActivityTypeSchema>;

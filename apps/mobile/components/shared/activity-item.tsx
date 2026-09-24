@@ -1,8 +1,20 @@
-import { formatRelativeTime } from "@prostcounter/shared";
+import { formatLocalized, formatRelativeTime, formatTimeInTimezone } from "@prostcounter/shared";
 import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
 import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Award, Beer, BeerOff, Camera, CupSoda, MapPin, Users, Wine } from "lucide-react-native";
+import { parseISO } from "date-fns";
+import {
+  Award,
+  Beer,
+  BeerOff,
+  CalendarClock,
+  Camera,
+  CupSoda,
+  Footprints,
+  MapPin,
+  Users,
+  Wine,
+} from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import { Image } from "react-native";
 
@@ -67,6 +79,10 @@ function getActivityIcon(
       return <Users size={16} color={IconColors.primary} />;
     case "achievement_unlock":
       return <Award size={16} color={IconColors.primary} />;
+    case "day_plan":
+      return <Footprints size={16} color={IconColors.plan} />;
+    case "tent_reservation":
+      return <CalendarClock size={16} color={IconColors.reservation} />;
     default:
       return <Beer size={16} color={IconColors.muted} />;
   }
@@ -190,6 +206,38 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
               name: translatedName,
             })
           : t("activityFeed.unlockedAchievement");
+      }
+
+      case "day_plan": {
+        const planDates = getActivityDataValue<string[]>(activity_data, "dates", []);
+        const dates = planDates.map((date) => formatLocalized(parseISO(date), "EEE d")).join(", ");
+        const companionNames = getActivityDataValue<string[]>(activity_data, "companions", []);
+        const includesViewer = getActivityDataValue(activity_data, "includes_viewer", false);
+        const companions = [
+          ...(includesViewer ? [t("attendance.planner.companionYou")] : []),
+          ...companionNames,
+        ].join(", ");
+
+        return companions
+          ? t("activityFeed.plannedDaysWith", { count: planDates.length, dates, companions })
+          : t("activityFeed.plannedDays", { count: planDates.length, dates });
+      }
+
+      case "tent_reservation": {
+        const tentName = getActivityDataValue(activity_data, "tent_name", t("activityFeed.aTent"));
+        const date = getActivityDataValue(activity_data, "date", "");
+        const startAt = getActivityDataValue(activity_data, "start_at", "");
+        const timezone = getActivityDataValue<string | undefined>(
+          activity_data,
+          "timezone",
+          undefined,
+        );
+
+        return t("activityFeed.reservedTent", {
+          tent: tentName,
+          date: formatLocalized(parseISO(date), "EEE d"),
+          time: formatTimeInTimezone(parseISO(startAt), timezone),
+        });
       }
 
       default:

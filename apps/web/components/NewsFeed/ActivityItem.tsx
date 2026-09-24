@@ -1,8 +1,11 @@
 "use client";
 
 import type { AchievementRarity } from "@prostcounter/shared/schemas";
+import { formatLocalized, formatTimeInTimezone } from "@prostcounter/shared/utils";
+import { cn } from "@prostcounter/ui";
+import { parseISO } from "date-fns";
 import type { TFunction } from "i18next";
-import { Beer, Camera, Clock, MapPin, Medal, Users } from "lucide-react";
+import { Beer, CalendarClock, Camera, Clock, Footprints, MapPin, Medal, Users } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
@@ -67,6 +70,10 @@ const getActivityIcon = (type: ActivityFeedItem["activity_type"]) => {
       return <Users className="size-4" />;
     case "achievement_unlock":
       return <Medal className="size-4" />;
+    case "day_plan":
+      return <Footprints className="size-4" />;
+    case "tent_reservation":
+      return <CalendarClock className="size-4" />;
     default:
       return <Clock className="size-4" />;
   }
@@ -119,6 +126,42 @@ const getActivityDescription = (activity: ActivityFeedItem, t: TFunction) => {
             rarity: t(`achievements.rarity.${rarity}`),
           })
         : t("activityFeed.unlockedAchievement");
+
+    case "day_plan": {
+      const planDates = getActivityDataValue<string[]>(activity_data, "dates", []);
+      const dates = planDates.map((date) => formatLocalized(parseISO(date), "EEE d")).join(", ");
+      const companionNames = getActivityDataValue<string[]>(activity_data, "companions", []);
+      const includesViewer = getActivityDataValue(activity_data, "includes_viewer", false);
+      const companions = [
+        ...(includesViewer ? [t("attendance.planner.companionYou")] : []),
+        ...companionNames,
+      ].join(", ");
+
+      return companions
+        ? t("activityFeed.plannedDaysWith", { count: planDates.length, dates, companions })
+        : t("activityFeed.plannedDays", { count: planDates.length, dates });
+    }
+
+    case "tent_reservation": {
+      const reservedTentName = getActivityDataValue(
+        activity_data,
+        "tent_name",
+        t("activityFeed.aTent"),
+      );
+      const date = getActivityDataValue(activity_data, "date", "");
+      const startAt = getActivityDataValue(activity_data, "start_at", "");
+      const timezone = getActivityDataValue<string | undefined>(
+        activity_data,
+        "timezone",
+        undefined,
+      );
+
+      return t("activityFeed.reservedTent", {
+        tent: reservedTentName,
+        date: formatLocalized(parseISO(date), "EEE d"),
+        time: formatTimeInTimezone(parseISO(startAt), timezone),
+      });
+    }
 
     default:
       return t("activityFeed.hadActivity");
@@ -187,7 +230,15 @@ export const ActivityItem = ({ activity }: ActivityItemProps) => {
             <span className="truncate text-sm font-medium transition-colors hover:text-yellow-600">
               {displayName}
             </span>
-            <span className="text-yellow-600">{getActivityIcon(activity_type)}</span>
+            <span
+              className={cn(
+                activity_type === "day_plan" || activity_type === "tent_reservation"
+                  ? "text-teal-600"
+                  : "text-yellow-600",
+              )}
+            >
+              {getActivityIcon(activity_type)}
+            </span>
           </div>
           <span className="text-muted-foreground text-xs">{timeAgo}</span>
         </div>
