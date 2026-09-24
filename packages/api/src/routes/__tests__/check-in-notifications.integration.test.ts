@@ -10,6 +10,7 @@ import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
 } from "../../__tests__/helpers/test-supabase";
+import { deleteTestUsersAndFestivals } from "../../__tests__/helpers/test-cleanup";
 import { createTestApp } from "../../__tests__/helpers/test-server";
 import { authMiddleware } from "../../middleware/auth";
 import attendanceRoutes from "../attendance.route";
@@ -28,14 +29,9 @@ vi.mock("../../services/notification.service", () => ({
   },
 }));
 
-// Created lazily in beforeAll, not at module scope: setup.ts loads the local
-// Supabase env vars from .env.test/.env.local inside a beforeAll hook, which
-// runs after this file's top-level code, so building the admin client at
-// import time reads env vars before they exist.
 let admin: SupabaseClient<Database>;
 const createdUserIds: string[] = [];
 const createdFestivalIds: string[] = [];
-const createdGroupIds: string[] = [];
 // Restored in afterAll rather than just re-set, so this file doesn't leak a
 // key into whatever test happens to share the process afterwards.
 const originalNovuApiKey = process.env.NOVU_API_KEY;
@@ -114,7 +110,6 @@ async function putUserInGroup(userId: string, festivalId: string) {
   if (groupError || !group?.[0]) {
     throw new Error(`Failed to create test group: ${groupError?.message}`);
   }
-  createdGroupIds.push(group[0].group_id);
 }
 
 // A confirmed tent reservation, the minimum row day_plans_reservation_fields
@@ -149,16 +144,11 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
   });
 
   afterAll(async () => {
-    if (createdGroupIds.length > 0) {
-      await admin.from("group_members").delete().in("group_id", createdGroupIds);
-      await admin.from("groups").delete().in("id", createdGroupIds);
-    }
-    for (const festivalId of createdFestivalIds) {
-      await admin.from("festivals").delete().eq("id", festivalId);
-    }
-    for (const userId of createdUserIds) {
-      await admin.auth.admin.deleteUser(userId).catch(() => undefined);
-    }
+    // Groups go with their festival
+    await deleteTestUsersAndFestivals(admin, {
+      userIds: createdUserIds,
+      festivalIds: createdFestivalIds,
+    });
     if (originalNovuApiKey === undefined) {
       delete process.env.NOVU_API_KEY;
     } else {
