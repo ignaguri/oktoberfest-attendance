@@ -3,8 +3,9 @@
 import { randomUUID } from "crypto";
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { deleteTestUsersAndFestivals } from "../../../__tests__/helpers/test-cleanup";
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
@@ -157,6 +158,13 @@ describe("group criteria: tents visited and longest streak", () => {
     await visitTents(users.dan, 1);
   });
 
+  afterAll(async () => {
+    await deleteTestUsersAndFestivals(admin, {
+      userIds: Object.values(users).filter(Boolean),
+      festivalIds: [festivalId].filter(Boolean),
+    });
+  });
+
   it("returns tents and streak per member, zero when missing", async () => {
     const rows = await leaderboard(4);
     const byUser = new Map(rows.map((row) => [row.user_id, row]));
@@ -194,12 +202,7 @@ describe("group criteria: tents visited and longest streak", () => {
       .select("user_id, rank, criteria_id")
       .eq("group_id", groupId)
       .order("rank");
-    expect(data?.map((row) => row.user_id)).toEqual([
-      users.ben,
-      users.ana,
-      users.dan,
-      users.cleo,
-    ]);
+    expect(data?.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.dan, users.cleo]);
     expect(data?.[0]?.criteria_id).toBe(4);
   });
 

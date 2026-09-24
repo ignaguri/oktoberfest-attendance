@@ -28,6 +28,10 @@ BEGIN
 END;
 $$;
 
+-- Only ever runs as a trigger; EXECUTE is checked when the trigger is created,
+-- not when it fires, so no role needs it.
+REVOKE EXECUTE ON FUNCTION public.trigger_beer_picture_cache_invalidation() FROM PUBLIC, anon, authenticated;
+
 DROP TRIGGER IF EXISTS tr_beer_pictures_wrapped_cache_invalidation ON public.beer_pictures;
 
 CREATE TRIGGER tr_beer_pictures_wrapped_cache_invalidation

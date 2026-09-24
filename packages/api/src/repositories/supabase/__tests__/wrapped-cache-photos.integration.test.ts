@@ -3,8 +3,9 @@
 import { randomUUID } from "crypto";
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
+import { deleteTestUsersAndFestivals } from "../../../__tests__/helpers/test-cleanup";
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
@@ -79,6 +80,13 @@ describe("Wrapped cache and photos", () => {
       throw new Error(`attendance insert failed: ${attendanceError?.message}`);
     }
     attendanceId = attendance.id;
+  });
+
+  afterAll(async () => {
+    await deleteTestUsersAndFestivals(admin, {
+      userIds: [userId].filter(Boolean),
+      festivalIds: [festivalId].filter(Boolean),
+    });
   });
 
   it("drops the cached Wrapped when a photo is added", async () => {

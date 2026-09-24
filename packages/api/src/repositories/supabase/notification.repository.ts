@@ -5,7 +5,6 @@ import type {
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError } from "../../middleware/error";
 import type { INotificationRepository } from "../interfaces/notification.repository";
