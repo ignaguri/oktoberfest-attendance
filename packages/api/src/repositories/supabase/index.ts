@@ -6,6 +6,7 @@ export * from "./calendar.repository";
 export * from "./consumption.repository";
 export * from "./crowd-report.repository";
 export * from "./day-plan.repository";
+export * from "./feedback.repository";
 export * from "./festival.repository";
 export * from "./friend.repository";
 export * from "./friends-went.repository";

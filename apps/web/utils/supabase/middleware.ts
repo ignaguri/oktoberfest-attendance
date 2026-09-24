@@ -95,7 +95,8 @@ export async function updateSession(request: NextRequest) {
       url.searchParams.delete("token");
       url.searchParams.set("redirect", request.nextUrl.pathname + "?token=" + token);
     } else {
-      url.searchParams.set("redirect", request.nextUrl.pathname);
+      // The query survives so links like /home?feedback=bug still work after sign-in.
+      url.searchParams.set("redirect", request.nextUrl.pathname + request.nextUrl.search);
     }
     return NextResponse.redirect(url);
   }

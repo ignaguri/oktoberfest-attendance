@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
       // Use a dummy base to parse the path
       const parsed = new URL(redirectUrl, "http://localhost");
       if (validRedirects.includes(parsed.pathname)) {
-        finalRedirect = parsed.pathname;
+        finalRedirect = parsed.pathname + parsed.search;
       }
     }
   } catch {

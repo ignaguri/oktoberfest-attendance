@@ -5,8 +5,9 @@ import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import type { LucideIcon } from "lucide-react-native";
 import { Bug, ChevronRight, Lightbulb, Share2, Shield, Sparkles, Star } from "lucide-react-native";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
+import { FeedbackSheet } from "@/components/feedback/feedback-sheet";
 import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -22,16 +23,6 @@ const LINKS = [
     key: "privacy" as const,
     url: `${PROD_URL}/privacy`,
     Icon: Shield,
-  },
-  {
-    key: "reportBug" as const,
-    url: "https://prostcounter.canny.io/bugs",
-    Icon: Bug,
-  },
-  {
-    key: "requestFeature" as const,
-    url: "https://prostcounter.canny.io/feature-requests",
-    Icon: Lightbulb,
   },
 ] satisfies { key: string; url: string; Icon: LucideIcon }[];
 
@@ -102,6 +93,7 @@ export function AboutSection() {
   const router = useRouter();
   const { requestReviewManually } = useRatePrompt();
   const shareApp = useShareApp();
+  const [feedbackKind, setFeedbackKind] = useState<"bug" | "idea" | null>(null);
 
   return (
     <Card size="md" variant="elevated">
@@ -124,6 +116,19 @@ export function AboutSection() {
         />
         <ActionRow label={t("profile.about.shareApp")} Icon={Share2} onPress={shareApp} bordered />
 
+        <ActionRow
+          label={t("profile.about.reportBug")}
+          Icon={Bug}
+          onPress={() => setFeedbackKind("bug")}
+          bordered
+        />
+        <ActionRow
+          label={t("profile.about.requestFeature")}
+          Icon={Lightbulb}
+          onPress={() => setFeedbackKind("idea")}
+          bordered
+        />
+
         {LINKS.map((link, index) => (
           <LinkRow
             key={link.key}
@@ -134,6 +139,12 @@ export function AboutSection() {
           />
         ))}
       </VStack>
+
+      <FeedbackSheet
+        isOpen={feedbackKind !== null}
+        mode={{ kind: feedbackKind ?? "bug" }}
+        onClose={() => setFeedbackKind(null)}
+      />
     </Card>
   );
 }

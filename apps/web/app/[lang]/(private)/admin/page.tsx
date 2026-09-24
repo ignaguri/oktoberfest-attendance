@@ -8,6 +8,7 @@ import { useTranslation } from "@/lib/i18n/client";
 
 import AnalyticsDashboard from "./components/analytics/AnalyticsDashboard";
 import CacheManagement from "./components/CacheManagement";
+import FeedbackList from "./components/FeedbackList";
 import FestivalManagement from "./components/FestivalManagement";
 import GroupList from "./components/GroupList";
 import ImageConversion from "./components/ImageConversion";
@@ -24,6 +25,7 @@ const tabValues = [
   "images",
   "location",
   "analytics",
+  "feedback",
 ];
 
 export default function AdminPage() {
@@ -77,6 +79,7 @@ export default function AdminPage() {
           <TabsTrigger value="images">{t("admin.tabs.imageConversion")}</TabsTrigger>
           <TabsTrigger value="location">{t("admin.tabs.location")}</TabsTrigger>
           <TabsTrigger value="analytics">{t("admin.tabs.analytics")}</TabsTrigger>
+          <TabsTrigger value="feedback">{t("admin.tabs.feedback")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -109,6 +112,10 @@ export default function AdminPage() {
 
         <TabsContent value="analytics">
           <AnalyticsDashboard />
+        </TabsContent>
+
+        <TabsContent value="feedback">
+          <FeedbackList />
         </TabsContent>
       </Tabs>
     </div>

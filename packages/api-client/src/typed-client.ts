@@ -37,6 +37,9 @@ import type {
   DeleteAttendanceResponse,
   DeleteDayPlanResponse,
   DeleteGroupMessageResponse,
+  DismissDayFeedbackPromptBody,
+  DismissDayFeedbackPromptResponse,
+  FeedbackKind,
   FestivalTent,
   FriendActionResponse,
   FriendRequestCountResponse,
@@ -45,6 +48,7 @@ import type {
   GetAchievementsWithProgressResponse,
   GetCalendarEventsResponse,
   GetCrowdStatusResponse,
+  GetDayFeedbackPromptResponse,
   GetFestivalResponse,
   GetCompanionOptionsResponse,
   GetFriendsGoingResponse,
@@ -60,6 +64,7 @@ import type {
   Highlights,
   LeaderboardResponse,
   ListAchievementsResponse,
+  ListAdminFeedbackResponse,
   ListAdminUsersResponse,
   ListAttendancesResponse,
   ListAvailableAchievementsResponse,
@@ -84,6 +89,8 @@ import type {
   PublicProfile,
   SearchUsersResponse,
   SubmitCrowdReportResponse,
+  SubmitFeedbackBody,
+  SubmitFeedbackResponse,
   TutorialStatus,
   UpdateAdminAttendanceInput,
   UpdateAdminFestivalInput,
@@ -1165,6 +1172,50 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to submit crowd report");
         }
         return parseJsonResponse<SubmitCrowdReportResponse>(response);
+      },
+    },
+
+    /**
+     * Feedback API: the day prompt, bug reports and ideas
+     */
+    feedback: {
+      async getDayPrompt(): Promise<GetDayFeedbackPromptResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("GET", `${baseUrl}/v1/feedback/prompt`, {
+          headers,
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch the feedback prompt");
+        }
+        return parseJsonResponse<GetDayFeedbackPromptResponse>(response);
+      },
+
+      async submit(body: SubmitFeedbackBody): Promise<SubmitFeedbackResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("POST", `${baseUrl}/v1/feedback`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to send feedback");
+        }
+        return parseJsonResponse<SubmitFeedbackResponse>(response);
+      },
+
+      async dismissDayPrompt(
+        body: DismissDayFeedbackPromptBody,
+      ): Promise<DismissDayFeedbackPromptResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("POST", `${baseUrl}/v1/feedback/prompt/dismiss`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(body),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to dismiss the feedback prompt");
+        }
+        return parseJsonResponse<DismissDayFeedbackPromptResponse>(response);
       },
     },
 
@@ -2788,6 +2839,28 @@ export function createTypedApiClient(config: ApiClientConfig) {
      * caller gets a 403 ApiError rather than an empty result.
      */
     admin: {
+      feedback: {
+        async list(query?: { kind?: FeedbackKind; limit?: number }): Promise<ListAdminFeedbackResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query?.kind) {
+            params.set("kind", query.kind);
+          }
+          if (query?.limit !== undefined) {
+            params.set("limit", String(query.limit));
+          }
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/feedback?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch feedback");
+          }
+          return parseJsonResponse<ListAdminFeedbackResponse>(response);
+        },
+      },
+
       analytics: {
         async overview(query: AnalyticsRangeQuery): Promise<AnalyticsOverviewResponse> {
           const headers = await getAuthHeaders();

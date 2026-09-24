@@ -1732,7 +1732,8 @@
         "location": "Sesiones activas de ubicación compartida",
         "tents": "Crear y editar el catálogo de carpas",
         "cache": "Regenerar los datos de Wrapped en caché",
-        "analytics": "Uso, funciones y retención"
+        "analytics": "Uso, funciones y retención",
+        "feedback": "Valoraciones, errores e ideas de los usuarios"
       },
       "cache": {
         "description": "Las estadísticas de Wrapped se calculan una vez y se guardan en caché. Regenerar actualiza una entrada existente; no puede crear una para alguien que nunca abrió su Wrapped.",
@@ -1829,7 +1830,8 @@
       "cache": "Gestión de caché",
       "imageConversion": "Conversión de imágenes",
       "location": "Ubicación",
-      "analytics": "Analíticas"
+      "analytics": "Analíticas",
+      "feedback": "Comentarios"
     },
     "location": {
       "title": "Sesiones de ubicación",
@@ -2128,6 +2130,23 @@
         "pending": "El siguiente festival todavía no empezó",
         "headline": "{{percent}} volvió después de {{festival}}"
       }
+    },
+    "feedback": {
+      "filters": {
+        "all": "Todo",
+        "day": "Días",
+        "bug": "Errores",
+        "idea": "Ideas"
+      },
+      "kinds": {
+        "day": "Día",
+        "bug": "Error",
+        "idea": "Idea"
+      },
+      "empty": "Todavía no hay comentarios.",
+      "loading": "Cargando comentarios…",
+      "noMessage": "(sin mensaje)",
+      "error": "No se pudieron cargar los comentarios."
     }
   },
   "joinGroup": {
@@ -3267,7 +3286,9 @@
     "PROFILE_NOT_FOUND": "Perfil no encontrado.",
     "USERNAME_TAKEN": "Este nombre de usuario ya está en uso.",
     "WRAPPED_NOT_FOUND": "Datos del resumen no encontrados.",
-    "WRAPPED_NOT_READY": "Tu resumen todavía no está listo."
+    "WRAPPED_NOT_READY": "Tu resumen todavía no está listo.",
+    "FEEDBACK_RATE_LIMITED": "Hoy ya enviaste muchos comentarios. Volvé a intentar mañana.",
+    "FEEDBACK_DAY_NOT_LOGGED": "No hay bebidas registradas para ese día."
   },
   "offline": {
     "status": {
@@ -3745,6 +3766,47 @@
         "text": "Si tiene alguna preocupación sobre la seguridad infantil o necesita reportar un problema, comuníquese con nuestro punto de contacto designado para protección infantil:",
         "boxTitle": "ProstCounter — Contacto de protección infantil"
       }
+    }
+  },
+  "feedback": {
+    "day": {
+      "title": "¿Cómo estuvo ayer?",
+      "subtitle": "{{festival}} · {{date}}",
+      "description": "Con un toque basta. El texto es opcional.",
+      "facesLabel": "¿Cómo estuvo tu día?",
+      "textLabel": "¿Qué habría hecho mejor la app hoy?",
+      "textPlaceholder": "Opcional",
+      "notNow": "Ahora no"
+    },
+    "faces": {
+      "terrible": "Horrible",
+      "bad": "Mal",
+      "okay": "Normal",
+      "good": "Bien",
+      "amazing": "Genial"
+    },
+    "bug": {
+      "title": "Reportar un error",
+      "description": "Contanos qué salió mal.",
+      "label": "¿Qué salió mal?",
+      "placeholder": "¿Qué hiciste y qué pasó?",
+      "contextNote": "Adjuntamos automáticamente la versión de la app y tu dispositivo."
+    },
+    "idea": {
+      "title": "Sugerir una función",
+      "description": "Contanos qué haría mejor a ProstCounter.",
+      "label": "¿Qué te gustaría ver?",
+      "placeholder": "Describí tu idea"
+    },
+    "send": "Enviar",
+    "sending": "Enviando…",
+    "thanks": "¡Gracias por tus comentarios!",
+    "error": "No se pudieron enviar tus comentarios. Intentá de nuevo.",
+    "sendHint": "Enviá tus comentarios al equipo de ProstCounter",
+    "validation": {
+      "required": "Escribí unas palabras, por favor.",
+      "ratingRequired": "Elegí primero una cara.",
+      "tooLong": "Máximo 2000 caracteres."
     }
   }
 }

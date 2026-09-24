@@ -54,6 +54,12 @@ export default function AdminLayout() {
         }}
       />
       <Stack.Screen
+        name="feedback"
+        options={{
+          title: t("admin.tabs.feedback"),
+        }}
+      />
+      <Stack.Screen
         name="user/[id]"
         options={{
           title: t("admin.mobile.userDetail.title"),

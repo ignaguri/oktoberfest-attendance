@@ -208,6 +208,12 @@ export {
 
 // Crowd report hooks
 export { useSubmitCrowdReport, useTentCrowdReports, useTentCrowdStatus } from "./useCrowdReports";
+export {
+  useAdminFeedback,
+  useDayFeedbackPrompt,
+  useDismissDayFeedbackPrompt,
+  useSubmitFeedback,
+} from "./useFeedback";
 
 // Wrapped hooks
 export {

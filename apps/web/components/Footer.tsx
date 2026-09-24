@@ -1,13 +1,19 @@
 "use client";
 
+import { CONTACT_EMAIL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Beer, Heart } from "lucide-react";
 import { Link } from "next-view-transitions";
+import { useState } from "react";
 
+import { FeedbackDialog } from "@/components/Feedback/FeedbackDialog";
 import { Separator } from "@/components/ui/separator";
 
 const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const { t } = useTranslation();
+  const [feedbackKind, setFeedbackKind] = useState<"bug" | "idea" | null>(null);
+  const mailtoHref = (subject: string) =>
+    `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`ProstCounter: ${subject}`)}`;
   return (
     <footer className="mx-2">
       <Separator className="my-4" decorative />
@@ -44,29 +50,39 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
           )}
 
           <div className="flex flex-wrap items-center gap-2 text-gray-500">
-            <Link
-              href="/r/bugs"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t("footer.reportBug")}
-              className="underline"
-            >
-              {t("footer.reportBug")}
-            </Link>
+            {isLoggedIn ? (
+              <button
+                type="button"
+                onClick={() => setFeedbackKind("bug")}
+                aria-label={t("footer.reportBug")}
+                className="underline"
+              >
+                {t("footer.reportBug")}
+              </button>
+            ) : (
+              <a href={mailtoHref(t("feedback.bug.title"))} className="underline">
+                {t("footer.reportBug")}
+              </a>
+            )}
 
             <span className="text-gray-400" aria-hidden>
               ·
             </span>
 
-            <Link
-              href="/r/feedback"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t("footer.requestFeature")}
-              className="underline"
-            >
-              {t("footer.requestFeature")}
-            </Link>
+            {isLoggedIn ? (
+              <button
+                type="button"
+                onClick={() => setFeedbackKind("idea")}
+                aria-label={t("footer.requestFeature")}
+                className="underline"
+              >
+                {t("footer.requestFeature")}
+              </button>
+            ) : (
+              <a href={mailtoHref(t("feedback.idea.title"))} className="underline">
+                {t("footer.requestFeature")}
+              </a>
+            )}
 
             <span className="text-gray-400" aria-hidden>
               ·
@@ -78,6 +94,13 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
           </div>
         </div>
       </div>
+      {isLoggedIn && (
+        <FeedbackDialog
+          open={feedbackKind !== null}
+          mode={{ kind: feedbackKind ?? "bug" }}
+          onClose={() => setFeedbackKind(null)}
+        />
+      )}
     </footer>
   );
 };

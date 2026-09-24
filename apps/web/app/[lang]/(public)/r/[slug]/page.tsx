@@ -4,8 +4,8 @@ import RedirectTracker from "./RedirectTracker";
 
 // Predefined redirect mappings
 const REDIRECTS = {
-  bugs: "https://prostcounter.canny.io/bugs",
-  feedback: "https://prostcounter.canny.io/feature-requests",
+  bugs: "/home?feedback=bug",
+  feedback: "/home?feedback=idea",
   donate: "https://www.paypal.me/ignacioguri",
   github: "https://github.com/ignaguri",
 } as const;

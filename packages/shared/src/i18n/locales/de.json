@@ -1909,7 +1909,8 @@
         "location": "Aktive Standortfreigaben",
         "tents": "Zeltkatalog erstellen und bearbeiten",
         "cache": "Zwischengespeicherte Wrapped-Daten neu berechnen",
-        "analytics": "Nutzung, Funktionen und Wiederkehr"
+        "analytics": "Nutzung, Funktionen und Wiederkehr",
+        "feedback": "Bewertungen, Fehlermeldungen und Ideen"
       },
       "cache": {
         "description": "Wrapped-Statistiken werden einmal berechnet und zwischengespeichert. Eine Neuberechnung aktualisiert einen vorhandenen Eintrag; sie kann keinen für jemanden anlegen, der sein Wrapped nie geöffnet hat.",
@@ -2006,7 +2007,8 @@
       "cache": "Cache-Verwaltung",
       "imageConversion": "Bildkonvertierung",
       "location": "Standort",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "feedback": "Feedback"
     },
     "location": {
       "title": "Standort-Sitzungen",
@@ -2305,6 +2307,23 @@
         "pending": "Das nächste Fest hat noch nicht begonnen",
         "headline": "{{percent}} kamen nach {{festival}} wieder"
       }
+    },
+    "feedback": {
+      "filters": {
+        "all": "Alle",
+        "day": "Tage",
+        "bug": "Fehler",
+        "idea": "Ideen"
+      },
+      "kinds": {
+        "day": "Tag",
+        "bug": "Fehler",
+        "idea": "Idee"
+      },
+      "empty": "Noch kein Feedback.",
+      "loading": "Feedback wird geladen…",
+      "noMessage": "(keine Nachricht)",
+      "error": "Feedback konnte nicht geladen werden."
     }
   },
   "joinGroup": {
@@ -3444,7 +3463,9 @@
     "PROFILE_NOT_FOUND": "Profil nicht gefunden.",
     "USERNAME_TAKEN": "Dieser Benutzername ist bereits vergeben.",
     "WRAPPED_NOT_FOUND": "Rückblick-Daten nicht gefunden.",
-    "WRAPPED_NOT_READY": "dein Rückblick ist noch nicht bereit."
+    "WRAPPED_NOT_READY": "dein Rückblick ist noch nicht bereit.",
+    "FEEDBACK_RATE_LIMITED": "Du hast heute schon viel Feedback geschickt. Versuch es morgen wieder.",
+    "FEEDBACK_DAY_NOT_LOGGED": "Für diesen Tag sind keine Getränke eingetragen."
   },
   "offline": {
     "status": {
@@ -3922,6 +3943,47 @@
       "competeWithFriends": "In Gruppen gegen Freunde antreten",
       "earnAchievements": "Erfolge sammeln",
       "viewStatistics": "Statistiken und Bestenlisten ansehen"
+    }
+  },
+  "feedback": {
+    "day": {
+      "title": "Wie war’s gestern?",
+      "subtitle": "{{festival}} · {{date}}",
+      "description": "Ein Tipp reicht. Der Text ist optional.",
+      "facesLabel": "Wie war dein Tag?",
+      "textLabel": "Was hätte die App heute besser gemacht?",
+      "textPlaceholder": "Optional",
+      "notNow": "Jetzt nicht"
+    },
+    "faces": {
+      "terrible": "Furchtbar",
+      "bad": "Schlecht",
+      "okay": "Okay",
+      "good": "Gut",
+      "amazing": "Großartig"
+    },
+    "bug": {
+      "title": "Fehler melden",
+      "description": "Erzähl uns, was schiefgelaufen ist.",
+      "label": "Was ist schiefgelaufen?",
+      "placeholder": "Was hast du gemacht und was ist passiert?",
+      "contextNote": "App-Version und Gerät hängen wir automatisch an."
+    },
+    "idea": {
+      "title": "Funktion vorschlagen",
+      "description": "Erzähl uns, was ProstCounter besser machen würde.",
+      "label": "Was würdest du dir wünschen?",
+      "placeholder": "Beschreibe deine Idee"
+    },
+    "send": "Senden",
+    "sending": "Wird gesendet…",
+    "thanks": "Danke für dein Feedback!",
+    "error": "Dein Feedback konnte nicht gesendet werden. Bitte versuch es noch einmal.",
+    "sendHint": "Schickt dein Feedback an das ProstCounter-Team",
+    "validation": {
+      "required": "Bitte schreib ein paar Worte.",
+      "ratingRequired": "Wähl zuerst ein Gesicht.",
+      "tooLong": "Maximal 2000 Zeichen."
     }
   }
 }
