@@ -3,9 +3,35 @@ import { z } from "zod";
 /**
  * Group winning criteria enum
  */
-export const WinningCriteriaSchema = z.enum(["days_attended", "total_beers", "avg_beers"]);
+export const WinningCriteriaSchema = z.enum([
+  "days_attended",
+  "total_beers",
+  "avg_beers",
+  "tents_visited",
+  "longest_streak",
+]);
 
 export type WinningCriteria = z.infer<typeof WinningCriteriaSchema>;
+
+/** Row ids in the `winning_criteria` table. */
+export const WINNING_CRITERIA_IDS: Record<WinningCriteria, number> = {
+  days_attended: 1,
+  total_beers: 2,
+  avg_beers: 3,
+  tents_visited: 4,
+  longest_streak: 5,
+};
+
+export function winningCriteriaFromId(id: number): WinningCriteria | undefined {
+  return (Object.keys(WINNING_CRITERIA_IDS) as WinningCriteria[]).find(
+    (criteria) => WINNING_CRITERIA_IDS[criteria] === id,
+  );
+}
+
+/** The global leaderboard only sorts by these; tents and streak are group-only. */
+export const GLOBAL_LEADERBOARD_CRITERIA = ["days_attended", "total_beers", "avg_beers"] as const;
+
+export type GlobalLeaderboardCriteria = (typeof GLOBAL_LEADERBOARD_CRITERIA)[number];
 
 /**
  * Group schema
@@ -53,7 +79,7 @@ export type CreateGroupInput = z.infer<typeof CreateGroupSchema>;
  */
 export const UpdateGroupSchema = z.object({
   name: z.string().min(1).max(100, "Group name must be 100 characters or less").optional(),
-  winningCriteriaId: z.number().int().min(1).max(3).optional(),
+  winningCriteriaId: z.number().int().min(1).max(5).optional(),
   description: z.string().max(500).nullable().optional(),
 });
 

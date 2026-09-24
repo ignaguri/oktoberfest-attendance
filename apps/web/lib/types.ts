@@ -41,12 +41,16 @@ export enum WinningCriteria {
   days_attended = "days_attended",
   total_beers = "total_beers",
   avg_beers = "avg_beers",
+  tents_visited = "tents_visited",
+  longest_streak = "longest_streak",
 }
 
 export const WinningCriteriaValues = {
   days_attended: WinningCriteria.days_attended,
   total_beers: WinningCriteria.total_beers,
   avg_beers: WinningCriteria.avg_beers,
+  tents_visited: WinningCriteria.tents_visited,
+  longest_streak: WinningCriteria.longest_streak,
 } as const;
 
 export interface GalleryImage {

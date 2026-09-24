@@ -7,7 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Crown } from "lucide-react";
+import { Crown, Flame, Tent } from "lucide-react";
 import { useState } from "react";
 
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
@@ -34,6 +34,8 @@ type LeaderboardEntry = {
   daysAttended: number;
   totalBeers: number;
   avgBeers: number;
+  tentsVisited: number;
+  longestStreak: number;
   position: number;
   groupCount?: number;
 };
@@ -144,6 +146,25 @@ export const Leaderboard = ({
       cell: ({ row }) => row.original.avgBeers?.toFixed(2),
     },
   ];
+
+  if (winningCriteria === "tents_visited" || winningCriteria === "longest_streak") {
+    const isTents = winningCriteria === "tents_visited";
+    columns.push({
+      accessorKey: isTents ? "tentsVisited" : "longestStreak",
+      header: ({ column }) => (
+        <DataTableColumnHeader
+          column={column}
+          title={
+            <div className="flex items-center gap-1">
+              <Crown className="text-yellow-500" size={16} />
+              {isTents ? <Tent size={16} /> : <Flame size={16} />}
+              <span>{t(isTents ? "leaderboard.tents" : "leaderboard.streak")}</span>
+            </div>
+          }
+        />
+      ),
+    });
+  }
 
   if (showGroupCount) {
     columns.push({

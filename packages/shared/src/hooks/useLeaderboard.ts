@@ -5,13 +5,11 @@
  */
 
 import { useApiClient, useQuery, QueryKeys } from "../data";
-
-// Map winning criteria IDs to API enum values
-const CRITERIA_ID_TO_SORT_BY: Record<number, "days_attended" | "total_beers" | "avg_beers"> = {
-  1: "days_attended",
-  2: "total_beers",
-  3: "avg_beers",
-};
+import {
+  GLOBAL_LEADERBOARD_CRITERIA,
+  type GlobalLeaderboardCriteria,
+  winningCriteriaFromId,
+} from "../schemas/group.schema";
 
 /**
  * Hook to fetch global leaderboard data
@@ -22,7 +20,12 @@ export function useGlobalLeaderboard(criteriaId: number, festivalId?: string) {
   return useQuery(
     QueryKeys.globalLeaderboard(criteriaId, festivalId || ""),
     async () => {
-      const sortBy = CRITERIA_ID_TO_SORT_BY[criteriaId] || "total_beers";
+      const criteria = winningCriteriaFromId(criteriaId);
+      const sortBy: GlobalLeaderboardCriteria = GLOBAL_LEADERBOARD_CRITERIA.includes(
+        criteria as GlobalLeaderboardCriteria,
+      )
+        ? (criteria as GlobalLeaderboardCriteria)
+        : "total_beers";
       const response = await apiClient.leaderboard.global({
         festivalId,
         sortBy,

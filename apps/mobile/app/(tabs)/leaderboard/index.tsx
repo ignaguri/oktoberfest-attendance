@@ -1,6 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useGlobalLeaderboard } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { WINNING_CRITERIA_IDS } from "@prostcounter/shared/schemas";
 import type { WinningCriteria } from "@prostcounter/shared/schemas";
 import { useRouter } from "expo-router";
 import { Award, ChevronRight, Trophy } from "lucide-react-native";
@@ -20,13 +21,6 @@ import { VStack } from "@/components/ui/vstack";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
-
-// Map WinningCriteria to API criteria IDs
-const CRITERIA_TO_ID: Record<WinningCriteria, number> = {
-  days_attended: 1,
-  total_beers: 2,
-  avg_beers: 3,
-};
 
 /**
  * Global Leaderboard screen
@@ -55,7 +49,7 @@ export default function LeaderboardScreen() {
     error,
     refetch,
     isRefetching = false,
-  } = useGlobalLeaderboard(CRITERIA_TO_ID[sortBy], currentFestival?.id);
+  } = useGlobalLeaderboard(WINNING_CRITERIA_IDS[sortBy], currentFestival?.id);
 
   // Ensure entries is always an array (data can be null)
   const entries = data ?? [];

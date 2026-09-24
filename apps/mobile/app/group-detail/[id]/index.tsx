@@ -6,6 +6,7 @@ import {
   useIncomingJoinRequests,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { WINNING_CRITERIA_IDS } from "@prostcounter/shared/schemas";
 import type {
   GroupJoinRequest,
   LeaderboardEntry,
@@ -64,17 +65,12 @@ import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
 import { logger } from "@/lib/logger";
 
-// Map winning criteria to numeric ID for the leaderboard hook
-const CRITERIA_TO_ID: Record<WinningCriteria, number> = {
-  days_attended: 1,
-  total_beers: 2,
-  avg_beers: 3,
-};
-
 const CRITERIA_LABELS: Record<WinningCriteria, string> = {
   days_attended: "groups.criteria.daysAttended",
   total_beers: "groups.criteria.totalBeers",
   avg_beers: "groups.criteria.avgBeers",
+  tents_visited: "groups.criteria.tentsVisited",
+  longest_streak: "groups.criteria.longestStreak",
 };
 
 export default function GroupDetailScreen() {
@@ -101,7 +97,7 @@ export default function GroupDetailScreen() {
   useGroupFestivalSync(group?.id, group?.festivalId);
 
   // Fetch leaderboard
-  const criteriaId = group ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria] : 0;
+  const criteriaId = group ? WINNING_CRITERIA_IDS[group.winningCriteria as WinningCriteria] : 0;
   const {
     data: leaderboardData,
     loading: isLoadingLeaderboard,

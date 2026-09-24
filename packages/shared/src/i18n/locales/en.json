@@ -465,12 +465,16 @@
     "winningCriteria": {
       "days_attended": "Most Days Attended",
       "total_beers": "Most Beers Drank",
-      "avg_beers": "Best Average Beers per Day"
+      "avg_beers": "Best Average Beers per Day",
+      "tents_visited": "Most Tents Visited",
+      "longest_streak": "Longest Streak"
     },
     "criteria": {
       "daysAttended": "Most Days Attended",
       "totalBeers": "Most Beers Drank",
-      "avgBeers": "Best Average Beers per Day"
+      "avgBeers": "Best Average Beers per Day",
+      "tentsVisited": "Most Tents Visited",
+      "longestStreak": "Longest Streak"
     },
     "gallery": {
       "title": "Group Gallery",
@@ -1263,6 +1267,8 @@
     "beers": "Beers",
     "drinks": "Drinks",
     "average": "Avg",
+    "tents": "Tents",
+    "streak": "Streak",
     "yourPosition": "Your Position",
     "notRanked": "Not ranked yet",
     "viewAll": "View All",

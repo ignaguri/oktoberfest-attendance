@@ -14,6 +14,7 @@ import {
   useQuery,
   useSetQueryData,
 } from "../data";
+import type { WinningCriteria } from "../schemas/group.schema";
 
 /**
  * Hook to fetch user's groups for a festival
@@ -90,7 +91,7 @@ export function useCreateGroup() {
     async (formData: {
       groupName: string;
       festivalId: string;
-      winningCriteria?: "days_attended" | "total_beers" | "avg_beers";
+      winningCriteria?: WinningCriteria;
     }) => {
       // Transform old schema to new API schema
       const response = await apiClient.groups.create({
@@ -238,7 +239,7 @@ type GroupCacheData = {
   name: string;
   description?: string | null;
   festivalId: string;
-  winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+  winningCriteria: WinningCriteria;
   inviteToken: string;
   createdBy: string;
   createdAt: string;

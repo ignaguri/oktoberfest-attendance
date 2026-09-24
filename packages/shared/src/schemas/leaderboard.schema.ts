@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { GLOBAL_LEADERBOARD_CRITERIA, WinningCriteriaSchema } from "./group.schema";
+
 /**
  * Leaderboard entry
  */
@@ -11,6 +13,8 @@ export const LeaderboardEntrySchema = z.object({
   daysAttended: z.number().int(),
   totalBeers: z.number(),
   avgBeers: z.number(),
+  tentsVisited: z.number().int(),
+  longestStreak: z.number().int(),
   position: z.number().int(),
   groupCount: z.number().int().optional(),
 });
@@ -23,7 +27,7 @@ export type LeaderboardEntry = z.infer<typeof LeaderboardEntrySchema>;
  */
 export const GlobalLeaderboardQuerySchema = z.object({
   festivalId: z.uuid({ error: "Invalid festival ID" }),
-  sortBy: z.enum(["days_attended", "total_beers", "avg_beers"]).default("total_beers"),
+  sortBy: z.enum(GLOBAL_LEADERBOARD_CRITERIA).default("total_beers"),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -35,7 +39,7 @@ export type GlobalLeaderboardQuery = z.infer<typeof GlobalLeaderboardQuerySchema
  * GET /api/v1/groups/:id/leaderboard
  */
 export const GroupLeaderboardQuerySchema = z.object({
-  sortBy: z.enum(["days_attended", "total_beers", "avg_beers"]).optional(),
+  sortBy: WinningCriteriaSchema.optional(),
 });
 
 export type GroupLeaderboardQuery = z.infer<typeof GroupLeaderboardQuerySchema>;

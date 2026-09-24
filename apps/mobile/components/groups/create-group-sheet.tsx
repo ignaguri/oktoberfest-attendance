@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCreateGroup } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { WinningCriteriaSchema } from "@prostcounter/shared/schemas";
 import { X } from "lucide-react-native";
 import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -41,7 +42,7 @@ const CreateGroupFormSchema = z.object({
     .string()
     .min(1, "Group name is required")
     .max(100, "Group name must be 100 characters or less"),
-  winningCriteria: z.enum(["days_attended", "total_beers", "avg_beers"]),
+  winningCriteria: WinningCriteriaSchema,
 });
 
 type CreateGroupFormData = z.infer<typeof CreateGroupFormSchema>;
@@ -68,6 +69,16 @@ const WINNING_CRITERIA_OPTIONS = [
     value: "avg_beers",
     label: "groups.criteria.avgBeers",
     defaultLabel: "Avg Beers per Day",
+  },
+  {
+    value: "tents_visited",
+    label: "groups.criteria.tentsVisited",
+    defaultLabel: "Most Tents Visited",
+  },
+  {
+    value: "longest_streak",
+    label: "groups.criteria.longestStreak",
+    defaultLabel: "Longest Streak",
   },
 ] as const;
 

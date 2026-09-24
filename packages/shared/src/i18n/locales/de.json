@@ -465,12 +465,16 @@
     "winningCriteria": {
       "days_attended": "Meiste Tage besucht",
       "total_beers": "Meiste Biere getrunken",
-      "avg_beers": "Bester Durchschnitt pro Tag"
+      "avg_beers": "Bester Durchschnitt pro Tag",
+      "tents_visited": "Meiste Zelte besucht",
+      "longest_streak": "Längste Serie"
     },
     "criteria": {
       "daysAttended": "Meiste Tage besucht",
       "totalBeers": "Meiste Biere getrunken",
-      "avgBeers": "Bester Durchschnitt pro Tag"
+      "avgBeers": "Bester Durchschnitt pro Tag",
+      "tentsVisited": "Meiste Zelte besucht",
+      "longestStreak": "Längste Serie"
     },
     "gallery": {
       "title": "Gruppengalerie",
@@ -1500,6 +1504,8 @@
     "beers": "Mass",
     "drinks": "Getränke",
     "average": "Ø",
+    "tents": "Zelte",
+    "streak": "Serie",
     "yourPosition": "deine Position",
     "notRanked": "Noch nicht platziert",
     "viewAll": "Alle anzeigen",

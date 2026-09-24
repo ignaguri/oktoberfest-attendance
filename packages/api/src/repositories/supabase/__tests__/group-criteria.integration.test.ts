@@ -48,9 +48,7 @@ async function attend(userId: string, dates: string[], beersPerDay: number) {
       recorded_at: `${date}T12:00:00Z`,
     }));
     if (rows.length > 0) {
-      const { error: drinkError } = await admin
-        .from("consumptions")
-        .insert(rows);
+      const { error: drinkError } = await admin.from("consumptions").insert(rows);
       if (drinkError) {
         throw new Error(`consumption insert failed: ${drinkError.message}`);
       }
@@ -59,10 +57,7 @@ async function attend(userId: string, dates: string[], beersPerDay: number) {
 }
 
 async function visitTents(userId: string, count: number) {
-  const { data: tents, error } = await admin
-    .from("tents")
-    .select("id")
-    .limit(count);
+  const { data: tents, error } = await admin.from("tents").select("id").limit(count);
   if (error || !tents || tents.length < count) {
     throw new Error(`need ${count} tents in the local DB: ${error?.message}`);
   }
@@ -134,14 +129,12 @@ describe("group criteria: tents visited and longest streak", () => {
       throw new Error(`group insert failed: ${groupError?.message}`);
     }
     groupId = group.id;
-    const { error: memberError } = await admin
-      .from("group_members")
-      .insert(
-        Object.values(users).map((userId) => ({
-          group_id: groupId,
-          user_id: userId,
-        })),
-      );
+    const { error: memberError } = await admin.from("group_members").insert(
+      Object.values(users).map((userId) => ({
+        group_id: groupId,
+        user_id: userId,
+      })),
+    );
     if (memberError) {
       throw new Error(`member insert failed: ${memberError.message}`);
     }
@@ -179,20 +172,12 @@ describe("group criteria: tents visited and longest streak", () => {
 
   it("orders by tents, breaking ties on total beers", async () => {
     const rows = await leaderboard(4);
-    expect(rows.map((row) => row.user_id)).toEqual([
-      users.ben,
-      users.ana,
-      users.cleo,
-    ]);
+    expect(rows.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.cleo]);
   });
 
   it("orders by longest streak", async () => {
     const rows = await leaderboard(5);
-    expect(rows.map((row) => row.user_id)).toEqual([
-      users.ana,
-      users.ben,
-      users.cleo,
-    ]);
+    expect(rows.map((row) => row.user_id)).toEqual([users.ana, users.ben, users.cleo]);
   });
 
   it("ranks the final standings by the group's criterion", async () => {
@@ -205,11 +190,7 @@ describe("group criteria: tents visited and longest streak", () => {
       .select("user_id, rank, criteria_id")
       .eq("group_id", groupId)
       .order("rank");
-    expect(data?.map((row) => row.user_id)).toEqual([
-      users.ben,
-      users.ana,
-      users.cleo,
-    ]);
+    expect(data?.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.cleo]);
     expect(data?.[0]?.criteria_id).toBe(4);
   });
 });
