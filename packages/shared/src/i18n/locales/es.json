@@ -3287,7 +3287,7 @@
     "USERNAME_TAKEN": "Este nombre de usuario ya está en uso.",
     "WRAPPED_NOT_FOUND": "Datos del resumen no encontrados.",
     "WRAPPED_NOT_READY": "Tu resumen todavía no está listo.",
-    "FEEDBACK_RATE_LIMITED": "Hoy ya enviaste muchos comentarios. Vuelve a intentarlo mañana.",
+    "FEEDBACK_RATE_LIMITED": "Hoy ya enviaste muchos comentarios. Volvé a intentar mañana.",
     "FEEDBACK_DAY_NOT_LOGGED": "No hay bebidas registradas para ese día."
   },
   "offline": {
@@ -3770,10 +3770,10 @@
   },
   "feedback": {
     "day": {
-      "title": "¿Qué tal ayer?",
+      "title": "¿Cómo estuvo ayer?",
       "subtitle": "{{festival}} · {{date}}",
       "description": "Con un toque basta. El texto es opcional.",
-      "facesLabel": "¿Qué tal tu día?",
+      "facesLabel": "¿Cómo estuvo tu día?",
       "textLabel": "¿Qué habría hecho mejor la app hoy?",
       "textPlaceholder": "Opcional",
       "notNow": "Ahora no"
@@ -3787,25 +3787,25 @@
     },
     "bug": {
       "title": "Reportar un error",
-      "description": "Cuéntanos qué salió mal.",
+      "description": "Contanos qué salió mal.",
       "label": "¿Qué salió mal?",
       "placeholder": "¿Qué hiciste y qué pasó?",
       "contextNote": "Adjuntamos automáticamente la versión de la app y tu dispositivo."
     },
     "idea": {
       "title": "Sugerir una función",
-      "description": "Cuéntanos qué haría mejor a ProstCounter.",
+      "description": "Contanos qué haría mejor a ProstCounter.",
       "label": "¿Qué te gustaría ver?",
-      "placeholder": "Describe tu idea"
+      "placeholder": "Describí tu idea"
     },
     "send": "Enviar",
     "sending": "Enviando…",
     "thanks": "¡Gracias por tus comentarios!",
-    "error": "No se pudieron enviar tus comentarios. Inténtalo de nuevo.",
-    "sendHint": "Envía tus comentarios al equipo de ProstCounter",
+    "error": "No se pudieron enviar tus comentarios. Intentá de nuevo.",
+    "sendHint": "Enviá tus comentarios al equipo de ProstCounter",
     "validation": {
-      "required": "Escribe unas palabras, por favor.",
-      "ratingRequired": "Elige primero una cara.",
+      "required": "Escribí unas palabras, por favor.",
+      "ratingRequired": "Elegí primero una cara.",
       "tooLong": "Máximo 2000 caracteres."
     }
   }
