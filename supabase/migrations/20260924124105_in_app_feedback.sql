@@ -71,6 +71,9 @@ LANGUAGE plpgsql
 SET search_path = ''
 AS $$
 BEGIN
+  -- A backdated created_at would drop the row out of the window below
+  NEW.created_at := now();
+
   PERFORM pg_advisory_xact_lock(hashtextextended('feedback_rate_limit:' || NEW.user_id::text, 0));
 
   IF (
