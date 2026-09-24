@@ -1,3 +1,4 @@
+import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTipCalculation } from "@prostcounter/shared/hooks";
 
@@ -7,7 +8,6 @@ import type { DrinkType } from "@prostcounter/shared/schemas";
 import { getCurrentTentId } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import { useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
 import * as Haptics from "expo-haptics";
 import {
   Beer,
@@ -148,13 +148,15 @@ export function QuickAttendanceSheet({
   const festivalId = currentFestival?.id;
   const { setPendingCrowdReport } = useQuickAttendance();
 
-  // Get today's date (recalculated each time sheet opens to handle midnight rollover)
-  const [today, setToday] = useState(() => format(new Date(), "yyyy-MM-dd"));
+  // Get today's date in the festival's timezone, which is how the server groups
+  // visits into days (recalculated each time sheet opens to handle midnight rollover)
+  const festivalTimezone = currentFestival?.timezone ?? undefined;
+  const [today, setToday] = useState(() => formatDateForDatabase(new Date(), festivalTimezone));
   useEffect(() => {
     if (isOpen) {
-      setToday(format(new Date(), "yyyy-MM-dd"));
+      setToday(formatDateForDatabase(new Date(), festivalTimezone));
     }
-  }, [isOpen]);
+  }, [isOpen, festivalTimezone]);
 
   // Fetch today's attendance (offline-first, for tent preselection)
   const { data: attendance, refetch: refetchAttendance } = useAdaptedAttendanceByDate(
