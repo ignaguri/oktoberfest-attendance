@@ -4,8 +4,12 @@
 
 import type {
   DismissDayFeedbackPromptBody,
+  DismissDayFeedbackPromptResponse,
   FeedbackKind,
+  GetDayFeedbackPromptResponse,
+  ListAdminFeedbackResponse,
   SubmitFeedbackBody,
+  SubmitFeedbackResponse,
 } from "../schemas/feedback.schema";
 import { QueryKeys, useApiClient, useInvalidateQueries, useMutation, useQuery } from "../data";
 
@@ -21,7 +25,7 @@ export function useDayFeedbackPrompt({ enabled }: { enabled: boolean }) {
   const query = useQuery(
     QueryKeys.dayFeedbackPrompt(),
     async () => {
-      const response = await apiClient.feedback.getDayPrompt();
+      const response: GetDayFeedbackPromptResponse = await apiClient.feedback.getDayPrompt();
       return response.prompt;
     },
     {
@@ -42,12 +46,16 @@ export function useSubmitFeedback() {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
 
-  return useMutation(async (body: SubmitFeedbackBody) => apiClient.feedback.submit(body), {
-    onSuccess: () => {
-      invalidateQueries(QueryKeys.dayFeedbackPrompt());
-      invalidateQueries(QueryKeys.adminFeedbackAll());
+  return useMutation(
+    async (body: SubmitFeedbackBody): Promise<SubmitFeedbackResponse> =>
+      apiClient.feedback.submit(body),
+    {
+      onSuccess: () => {
+        invalidateQueries(QueryKeys.dayFeedbackPrompt());
+        invalidateQueries(QueryKeys.adminFeedbackAll());
+      },
     },
-  });
+  );
 }
 
 export function useDismissDayFeedbackPrompt() {
@@ -55,7 +63,8 @@ export function useDismissDayFeedbackPrompt() {
   const invalidateQueries = useInvalidateQueries();
 
   return useMutation(
-    async (body: DismissDayFeedbackPromptBody) => apiClient.feedback.dismissDayPrompt(body),
+    async (body: DismissDayFeedbackPromptBody): Promise<DismissDayFeedbackPromptResponse> =>
+      apiClient.feedback.dismissDayPrompt(body),
     {
       onSuccess: () => {
         invalidateQueries(QueryKeys.dayFeedbackPrompt());
@@ -71,7 +80,7 @@ export function useAdminFeedback(kind?: FeedbackKind) {
   const query = useQuery(
     QueryKeys.adminFeedback(kind),
     async () => {
-      const response = await apiClient.admin.feedback.list({ kind });
+      const response: ListAdminFeedbackResponse = await apiClient.admin.feedback.list({ kind });
       return response.items;
     },
     {

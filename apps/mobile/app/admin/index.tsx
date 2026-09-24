@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Database,
   MapPin,
+  MessageSquare,
   Tent,
   Users,
   UsersRound,
@@ -63,6 +64,11 @@ const SECTIONS = [
     key: "cache" as const,
     href: "/admin/cache" as const,
     Icon: Database,
+  },
+  {
+    key: "feedback" as const,
+    href: "/admin/feedback" as const,
+    Icon: MessageSquare,
   },
 ] satisfies { key: string; href: string; Icon: LucideIcon }[];
 
