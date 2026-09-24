@@ -153,7 +153,8 @@ describe("group criteria: tents visited and longest streak", () => {
     await visitTents(users.ben, 2);
     // cleo: one day, no tent visits → tents 0, streak 1
     await attend(users.cleo, ["2026-09-22"], 1);
-    // dan: joined, never went → last everywhere, left out of the standings
+    // dan: no attendance, one tent visit → ahead of cleo on tents, last on streak
+    await visitTents(users.dan, 1);
   });
 
   it("returns tents and streak per member, zero when missing", async () => {
@@ -175,7 +176,7 @@ describe("group criteria: tents visited and longest streak", () => {
 
   it("orders by tents, breaking ties on total beers", async () => {
     const rows = await leaderboard(4);
-    expect(rows.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.cleo, users.dan]);
+    expect(rows.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.dan, users.cleo]);
   });
 
   it("orders by longest streak", async () => {
@@ -193,7 +194,12 @@ describe("group criteria: tents visited and longest streak", () => {
       .select("user_id, rank, criteria_id")
       .eq("group_id", groupId)
       .order("rank");
-    expect(data?.map((row) => row.user_id)).toEqual([users.ben, users.ana, users.cleo]);
+    expect(data?.map((row) => row.user_id)).toEqual([
+      users.ben,
+      users.ana,
+      users.dan,
+      users.cleo,
+    ]);
     expect(data?.[0]?.criteria_id).toBe(4);
   });
 
@@ -209,19 +215,23 @@ describe("group criteria: tents visited and longest streak", () => {
         .social_stats;
       positions[label] = social.top_3_rankings.map((ranking) => ranking.position);
     }
-    expect(positions).toEqual({ ben: [1], ana: [2], cleo: [3], dan: [] });
+    expect(positions).toEqual({ ben: [1], ana: [2], dan: [3], cleo: [] });
   });
 
-  it("only lists groups where the member is top 3 in Highlights", async () => {
-    const topGroups: Record<string, number> = {};
+  it("only lists groups where the member is top 3 in Highlights, with the rank", async () => {
+    const topGroups: Record<string, unknown> = {};
     for (const [label, userId] of Object.entries(users)) {
       const { data, error } = await admin.rpc("get_user_festival_stats_with_positions", {
         p_user_id: userId,
         p_festival_id: festivalId,
       });
       expect(error).toBeNull();
-      topGroups[label] = ((data?.[0]?.top_positions ?? []) as unknown[]).length;
+      const topPositions = (data?.[0]?.top_positions ?? []) as {
+        position: number;
+        total_members: number;
+      }[];
+      topGroups[label] = topPositions.map((top) => [top.position, top.total_members]);
     }
-    expect(topGroups).toEqual({ ana: 1, ben: 1, cleo: 1, dan: 0 });
+    expect(topGroups).toEqual({ ben: [[1, 4]], ana: [[2, 4]], dan: [[3, 4]], cleo: [] });
   });
 });

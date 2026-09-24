@@ -170,7 +170,8 @@ BEGIN
       count(*) OVER (),
       v_group.winning_criteria_id
     FROM get_group_leaderboard(v_group.id, v_group.winning_criteria_id) lb
-    WHERE lb.total_beers > 0 OR lb.days_attended > 0
+    -- A tent visit has no attendance FK, so it counts as activity on its own
+    WHERE lb.total_beers > 0 OR lb.days_attended > 0 OR lb.tents_visited > 0
     ON CONFLICT (festival_id, group_id, user_id) DO NOTHING;
   END LOOP;
 

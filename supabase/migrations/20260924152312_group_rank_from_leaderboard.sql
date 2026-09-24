@@ -36,7 +36,8 @@ BEGIN
     SELECT
       g.id AS group_id,
       g.name AS group_name,
-      member_rank.position AS user_rank
+      member_rank.position AS user_rank,
+      (SELECT COUNT(*) FROM group_members m WHERE m.group_id = g.id) AS total_members
     FROM groups g
     JOIN group_members gm ON gm.group_id = g.id AND gm.user_id = p_user_id
     CROSS JOIN LATERAL (
@@ -55,7 +56,9 @@ BEGIN
       jsonb_agg(
         jsonb_build_object(
           'group_id', group_id,
-          'group_name', group_name
+          'group_name', group_name,
+          'position', user_rank,
+          'total_members', total_members
         )
       ) FILTER (WHERE user_rank <= 3),
       '[]'::jsonb
