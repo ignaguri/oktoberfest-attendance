@@ -119,6 +119,12 @@ function mapWinningCriteria(value: string | number): WinningCriteria {
     case "3":
     case "avg_beers":
       return "avg_beers";
+    case "4":
+    case "tents_visited":
+      return "tents_visited";
+    case "5":
+    case "longest_streak":
+      return "longest_streak";
     default:
       return "total_beers";
   }

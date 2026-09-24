@@ -2,6 +2,7 @@
 
 import { useFestival } from "@prostcounter/shared/contexts";
 import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
+import { GLOBAL_LEADERBOARD_CRITERIA } from "@prostcounter/shared/schemas";
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -34,14 +35,23 @@ export default function GlobalLeaderboardClient() {
     error: leaderboardError,
   } = useGlobalLeaderboard(winningCriteriaId, currentFestival?.id);
 
+  // Tents and streak are group-only criteria
+  const globalCriterias = useMemo(
+    () =>
+      (winningCriterias ?? []).filter((criteria: WinningCriteriaOption) =>
+        (GLOBAL_LEADERBOARD_CRITERIA as readonly string[]).includes(criteria.name),
+      ),
+    [winningCriterias],
+  );
+
   // Initialize winning criteria ID when data loads
   useEffect(() => {
-    if (winningCriterias && winningCriterias.length > 0 && winningCriteriaId === 1) {
+    if (globalCriterias.length > 0 && winningCriteriaId === 1) {
       startTransition(() => {
-        setWinningCriteriaId(winningCriterias[0].id);
+        setWinningCriteriaId(globalCriterias[0].id);
       });
     }
-  }, [winningCriterias, winningCriteriaId]);
+  }, [globalCriterias, winningCriteriaId]);
 
   // Handle errors with toast notifications
   useEffect(() => {
@@ -58,14 +68,14 @@ export default function GlobalLeaderboardClient() {
 
   const criteriaOptions = useMemo(
     () =>
-      winningCriterias?.map((criteria: WinningCriteriaOption) => ({
+      globalCriterias.map((criteria: WinningCriteriaOption) => ({
         value: criteria.id.toString(),
         label: t(`groups.winningCriteria.${criteria.name}`),
-      })) || [],
-    [winningCriterias, t],
+      })),
+    [globalCriterias, t],
   );
 
-  const selectedCriteria = winningCriterias?.find(
+  const selectedCriteria = globalCriterias.find(
     (c: WinningCriteriaOption) => c.id === winningCriteriaId,
   );
 
@@ -94,7 +104,7 @@ export default function GlobalLeaderboardClient() {
           onSelect={(option) => {
             const newCriteriaId = Number(option.value);
             setWinningCriteriaId(newCriteriaId);
-            const criteria = winningCriterias?.find(
+            const criteria = globalCriterias.find(
               (c: WinningCriteriaOption) => c.id === newCriteriaId,
             );
             if (criteria) {

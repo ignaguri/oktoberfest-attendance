@@ -2907,7 +2907,7 @@ export interface paths {
                                 /** Format: uuid */
                                 festivalId: string;
                                 /** @enum {string} */
-                                winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                                winningCriteria: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                                 inviteToken: string;
                                 /** Format: uuid */
                                 createdBy: string;
@@ -2956,7 +2956,7 @@ export interface paths {
                          * @default total_beers
                          * @enum {string}
                          */
-                        winningCriteria?: "days_attended" | "total_beers" | "avg_beers";
+                        winningCriteria?: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                     };
                 };
             };
@@ -2975,7 +2975,7 @@ export interface paths {
                             /** Format: uuid */
                             festivalId: string;
                             /** @enum {string} */
-                            winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                            winningCriteria: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                             inviteToken: string;
                             /** Format: uuid */
                             createdBy: string;
@@ -3101,7 +3101,7 @@ export interface paths {
                                 groupId: string;
                                 name: string;
                                 /** @enum {string} */
-                                winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                                winningCriteria: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                                 memberCount: number;
                                 /** Format: uuid */
                                 sourceFestivalId: string;
@@ -3165,7 +3165,7 @@ export interface paths {
                             /** Format: uuid */
                             festivalId: string;
                             /** @enum {string} */
-                            winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                            winningCriteria: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                             inviteToken: string;
                             /** Format: uuid */
                             createdBy: string;
@@ -3246,7 +3246,7 @@ export interface paths {
                             /** Format: uuid */
                             festivalId: string;
                             /** @enum {string} */
-                            winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                            winningCriteria: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                             inviteToken: string;
                             /** Format: uuid */
                             createdBy: string;
@@ -3718,7 +3718,7 @@ export interface paths {
                             /** Format: uuid */
                             festivalId: string;
                             /** @enum {string} */
-                            winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                            winningCriteria: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                             inviteToken: string;
                             /** Format: uuid */
                             createdBy: string;
@@ -3905,7 +3905,7 @@ export interface paths {
                                 /** Format: uuid */
                                 festivalId: string;
                                 /** @enum {string} */
-                                winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+                                winningCriteria: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                                 inviteToken: string;
                                 /** Format: uuid */
                                 createdBy: string;
@@ -4440,6 +4440,8 @@ export interface paths {
                                 daysAttended: number;
                                 totalBeers: number;
                                 avgBeers: number;
+                                tentsVisited: number;
+                                longestStreak: number;
                                 position: number;
                                 groupCount?: number;
                             }[];
@@ -4482,7 +4484,7 @@ export interface paths {
         get: {
             parameters: {
                 query?: {
-                    sortBy?: "days_attended" | "total_beers" | "avg_beers";
+                    sortBy?: "days_attended" | "total_beers" | "avg_beers" | "tents_visited" | "longest_streak";
                 };
                 header?: never;
                 path: {
@@ -4509,6 +4511,8 @@ export interface paths {
                                 daysAttended: number;
                                 totalBeers: number;
                                 avgBeers: number;
+                                tentsVisited: number;
+                                longestStreak: number;
                                 position: number;
                                 groupCount?: number;
                             }[];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFestival, useSyncFestivalWithGroup } from "@prostcounter/shared/contexts";
+import { WINNING_CRITERIA_IDS } from "@prostcounter/shared/schemas";
 import { CalendarDays, Images, MessageSquare } from "lucide-react";
 import { useParams } from "next/navigation";
 import { Link } from "next-view-transitions";
@@ -16,13 +17,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import type { WinningCriteria } from "@/lib/types";
 
 import { JoinGroupForm } from "../JoinGroupForm";
-
-// Map winning criteria to numeric ID for the leaderboard hook
-const CRITERIA_TO_ID: Record<WinningCriteria, number> = {
-  days_attended: 1,
-  total_beers: 2,
-  avg_beers: 3,
-};
 
 export default function GroupPage() {
   const { t } = useTranslation();
@@ -51,7 +45,7 @@ export default function GroupPage() {
   const inviteToken = group?.inviteToken ?? null;
 
   // Fetch leaderboard
-  const criteriaId = group ? CRITERIA_TO_ID[group.winningCriteria as WinningCriteria] : 0;
+  const criteriaId = group ? WINNING_CRITERIA_IDS[group.winningCriteria as WinningCriteria] : 0;
   const { data: leaderboardData, loading: isLoadingLeaderboard } = useGroupLeaderboard(
     groupId,
     criteriaId,
@@ -112,6 +106,8 @@ export default function GroupPage() {
           daysAttended: number;
           totalBeers: number;
           avgBeers: number;
+          tentsVisited: number;
+          longestStreak: number;
         },
         index: number,
       ) => ({
@@ -122,6 +118,8 @@ export default function GroupPage() {
         daysAttended: entry.daysAttended,
         totalBeers: entry.totalBeers,
         avgBeers: entry.avgBeers,
+        tentsVisited: entry.tentsVisited,
+        longestStreak: entry.longestStreak,
         position: index + 1,
       }),
     ) || [];

@@ -8,7 +8,9 @@ import {
   Calendar,
   ChevronDown,
   ChevronUp,
+  Flame,
   Medal,
+  Tent,
   TrendingUp,
   Trophy,
 } from "lucide-react-native";
@@ -55,6 +57,8 @@ const COLUMN_CONFIG: Record<WinningCriteria, { icon: typeof Calendar; label: str
   days_attended: { icon: Calendar, label: "Days" },
   total_beers: { icon: Beer, label: "Beers" },
   avg_beers: { icon: TrendingUp, label: "Avg" },
+  tents_visited: { icon: Tent, label: "Tents" },
+  longest_streak: { icon: Flame, label: "Streak" },
 };
 
 /**
@@ -113,6 +117,8 @@ const CRITERIA_TO_FIELD: Record<WinningCriteria, keyof LeaderboardEntry> = {
   days_attended: "daysAttended",
   total_beers: "totalBeers",
   avg_beers: "avgBeers",
+  tents_visited: "tentsVisited",
+  longest_streak: "longestStreak",
 };
 
 export function Leaderboard({
@@ -160,6 +166,12 @@ export function Leaderboard({
 
   // Use activeSortColumn if provided, otherwise fall back to winningCriteria
   const currentSortColumn = activeSortColumn || winningCriteria;
+
+  // Only groups competing on tents or streak get the extra column
+  const extraColumn: WinningCriteria | null =
+    winningCriteria === "tents_visited" || winningCriteria === "longest_streak"
+      ? winningCriteria
+      : null;
 
   const handleSortPress = useCallback(
     (criteria: WinningCriteria) => {
@@ -228,6 +240,16 @@ export function Leaderboard({
             onPress={() => handleSortPress("avg_beers")}
             width="w-12"
           />
+          {extraColumn && (
+            <SortableHeader
+              criteria={extraColumn}
+              isActive={currentSortColumn === extraColumn}
+              sortable={sortable}
+              sortOrder={sortOrder}
+              onPress={() => handleSortPress(extraColumn)}
+              width="w-12"
+            />
+          )}
         </HStack>
 
         {/* Data Rows */}
@@ -337,6 +359,20 @@ export function Leaderboard({
                   >
                     {typeof entry.avgBeers === "number" ? entry.avgBeers.toFixed(1) : "0.0"}
                   </Text>
+                  {extraColumn && (
+                    <Text
+                      className={cn(
+                        "w-12 text-center text-sm font-semibold",
+                        currentSortColumn === extraColumn
+                          ? "text-primary-700"
+                          : "text-typography-800",
+                      )}
+                    >
+                      {(extraColumn === "tents_visited"
+                        ? entry.tentsVisited
+                        : entry.longestStreak) ?? 0}
+                    </Text>
+                  )}
                 </HStack>
               </Pressable>
             );

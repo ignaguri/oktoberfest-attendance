@@ -4512,7 +4512,9 @@
                     "enum": [
                       "days_attended",
                       "total_beers",
-                      "avg_beers"
+                      "avg_beers",
+                      "tents_visited",
+                      "longest_streak"
                     ],
                     "default": "total_beers"
                   }
@@ -4553,7 +4555,9 @@
                       "enum": [
                         "days_attended",
                         "total_beers",
-                        "avg_beers"
+                        "avg_beers",
+                        "tents_visited",
+                        "longest_streak"
                       ]
                     },
                     "inviteToken": {
@@ -4658,7 +4662,9 @@
                             "enum": [
                               "days_attended",
                               "total_beers",
-                              "avg_beers"
+                              "avg_beers",
+                              "tents_visited",
+                              "longest_streak"
                             ]
                           },
                           "inviteToken": {
@@ -4873,7 +4879,9 @@
                             "enum": [
                               "days_attended",
                               "total_beers",
-                              "avg_beers"
+                              "avg_beers",
+                              "tents_visited",
+                              "longest_streak"
                             ]
                           },
                           "memberCount": {
@@ -4969,7 +4977,9 @@
                       "enum": [
                         "days_attended",
                         "total_beers",
-                        "avg_beers"
+                        "avg_beers",
+                        "tents_visited",
+                        "longest_streak"
                       ]
                     },
                     "inviteToken": {
@@ -5082,7 +5092,7 @@
                   "winningCriteriaId": {
                     "type": "integer",
                     "minimum": 1,
-                    "maximum": 3
+                    "maximum": 5
                   },
                   "description": {
                     "type": "string",
@@ -5122,7 +5132,9 @@
                       "enum": [
                         "days_attended",
                         "total_beers",
-                        "avg_beers"
+                        "avg_beers",
+                        "tents_visited",
+                        "longest_streak"
                       ]
                     },
                     "inviteToken": {
@@ -5718,7 +5730,9 @@
                       "enum": [
                         "days_attended",
                         "total_beers",
-                        "avg_beers"
+                        "avg_beers",
+                        "tents_visited",
+                        "longest_streak"
                       ]
                     },
                     "inviteToken": {
@@ -5991,7 +6005,9 @@
                           "enum": [
                             "days_attended",
                             "total_beers",
-                            "avg_beers"
+                            "avg_beers",
+                            "tents_visited",
+                            "longest_streak"
                           ]
                         },
                         "inviteToken": {
@@ -6911,6 +6927,12 @@
                           "avgBeers": {
                             "type": "number"
                           },
+                          "tentsVisited": {
+                            "type": "integer"
+                          },
+                          "longestStreak": {
+                            "type": "integer"
+                          },
                           "position": {
                             "type": "integer"
                           },
@@ -6926,6 +6948,8 @@
                           "daysAttended",
                           "totalBeers",
                           "avgBeers",
+                          "tentsVisited",
+                          "longestStreak",
                           "position"
                         ]
                       }
@@ -6991,7 +7015,9 @@
               "enum": [
                 "days_attended",
                 "total_beers",
-                "avg_beers"
+                "avg_beers",
+                "tents_visited",
+                "longest_streak"
               ]
             },
             "required": false,
@@ -7037,6 +7063,12 @@
                           "avgBeers": {
                             "type": "number"
                           },
+                          "tentsVisited": {
+                            "type": "integer"
+                          },
+                          "longestStreak": {
+                            "type": "integer"
+                          },
                           "position": {
                             "type": "integer"
                           },
@@ -7052,6 +7084,8 @@
                           "daysAttended",
                           "totalBeers",
                           "avgBeers",
+                          "tentsVisited",
+                          "longestStreak",
                           "position"
                         ]
                       }

@@ -10,7 +10,9 @@ import type {
   SearchGroupResult,
   SearchGroupsQuery,
   UpdateGroupInput,
+  WinningCriteria,
 } from "@prostcounter/shared";
+import { WINNING_CRITERIA_IDS, winningCriteriaFromId } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -18,26 +20,12 @@ import { PgErrorCode } from "../../lib/postgres-errors";
 import { ConflictError, DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
 import type { IGroupRepository } from "../interfaces";
 
-// Mapping between winning criteria strings and database IDs
-const WINNING_CRITERIA_MAP: Record<string, number> = {
-  days_attended: 1,
-  total_beers: 2,
-  avg_beers: 3,
-};
-
-const WINNING_CRITERIA_REVERSE_MAP: Record<number, "days_attended" | "total_beers" | "avg_beers"> =
-  {
-    1: "days_attended",
-    2: "total_beers",
-    3: "avg_beers",
-  };
-
 export class SupabaseGroupRepository implements IGroupRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
   async create(userId: string, data: CreateGroupInput): Promise<Group> {
     // Map winning criteria string to ID
-    const winningCriteriaId = WINNING_CRITERIA_MAP[data.winningCriteria];
+    const winningCriteriaId = WINNING_CRITERIA_IDS[data.winningCriteria];
     if (!winningCriteriaId) {
       throw new DatabaseError(`Invalid winning criteria: ${data.winningCriteria}`);
     }
@@ -65,7 +53,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       id: group.group_id,
       name: group.group_name,
       festivalId: group.festival_id,
-      winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
+      winningCriteria: winningCriteriaFromId(group.winning_criteria_id) ?? "total_beers",
       inviteToken: group.invite_token,
       createdBy: group.created_by,
       createdAt: group.created_at,
@@ -555,7 +543,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
     return newestPerName.map((group) => ({
       groupId: group.id,
       name: group.name,
-      winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
+      winningCriteria: winningCriteriaFromId(group.winning_criteria_id) ?? "total_beers",
       memberCount: memberCounts.get(group.id) ?? 0,
       sourceFestivalId: group.festival_id,
       sourceFestivalName: group.festivals?.name || "",
@@ -586,7 +574,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
-    const winningCriteriaId = WINNING_CRITERIA_MAP[source.winningCriteria];
+    const winningCriteriaId = WINNING_CRITERIA_IDS[source.winningCriteria];
     if (!winningCriteriaId) {
       throw new DatabaseError(`Invalid winning criteria: ${source.winningCriteria}`);
     }
@@ -631,7 +619,7 @@ export class SupabaseGroupRepository implements IGroupRepository {
       id: group.group_id,
       name: group.group_name,
       festivalId: group.festival_id,
-      winningCriteria: WINNING_CRITERIA_REVERSE_MAP[group.winning_criteria_id] || "total_beers",
+      winningCriteria: winningCriteriaFromId(group.winning_criteria_id) ?? "total_beers",
       inviteToken: group.invite_token,
       createdBy: group.created_by,
       carriedOverFrom: group.carried_over_from,
@@ -662,11 +650,11 @@ export class SupabaseGroupRepository implements IGroupRepository {
 
   private mapToGroup(data: any): Group {
     // Extract winning criteria name from joined table or use reverse map
-    let winningCriteria: "days_attended" | "total_beers" | "avg_beers";
+    let winningCriteria: WinningCriteria;
     if (data.winning_criteria && typeof data.winning_criteria === "object") {
-      winningCriteria = data.winning_criteria.name as "days_attended" | "total_beers" | "avg_beers";
+      winningCriteria = data.winning_criteria.name as WinningCriteria;
     } else if (data.winning_criteria_id) {
-      winningCriteria = WINNING_CRITERIA_REVERSE_MAP[data.winning_criteria_id] || "total_beers";
+      winningCriteria = winningCriteriaFromId(data.winning_criteria_id) ?? "total_beers";
     } else {
       winningCriteria = "total_beers"; // Fallback
     }

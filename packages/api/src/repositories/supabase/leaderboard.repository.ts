@@ -5,17 +5,11 @@ import type {
   LeaderboardEntry,
   WinningCriteriaOption,
 } from "@prostcounter/shared";
+import { WINNING_CRITERIA_IDS } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";
 import type { ILeaderboardRepository } from "../interfaces";
-
-// Mapping between winning criteria strings and database IDs
-const WINNING_CRITERIA_MAP: Record<string, number> = {
-  days_attended: 1,
-  total_beers: 2,
-  avg_beers: 3,
-};
 
 export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -26,7 +20,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     const { festivalId, sortBy, limit, offset } = query;
 
     // Map winning criteria string to ID
-    const winningCriteriaId = WINNING_CRITERIA_MAP[sortBy] || 2; // Default to total_beers
+    const winningCriteriaId = WINNING_CRITERIA_IDS[sortBy] || 2; // Default to total_beers
 
     // Call database function for global leaderboard
     // Note: Function doesn't support pagination, we'll handle it client-side
@@ -67,7 +61,7 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
     // Use query sortBy if provided, otherwise use group's winning criteria
     let winningCriteriaId = group.winning_criteria_id;
     if (query?.sortBy) {
-      winningCriteriaId = WINNING_CRITERIA_MAP[query.sortBy] || group.winning_criteria_id;
+      winningCriteriaId = WINNING_CRITERIA_IDS[query.sortBy] || group.winning_criteria_id;
     }
 
     // Call database function for group leaderboard
@@ -108,6 +102,8 @@ export class SupabaseLeaderboardRepository implements ILeaderboardRepository {
       daysAttended: data.days_attended || 0,
       totalBeers: parseFloat(data.total_beers || "0"),
       avgBeers: parseFloat(data.avg_beers || "0"),
+      tentsVisited: Number(data.tents_visited ?? 0),
+      longestStreak: Number(data.longest_streak ?? 0),
       position: data.position || 0,
       groupCount: data.group_count || 0,
     };

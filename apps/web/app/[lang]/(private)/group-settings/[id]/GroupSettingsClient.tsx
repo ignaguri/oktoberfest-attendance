@@ -5,7 +5,8 @@
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import type { GroupSettingsForm } from "@prostcounter/shared/schemas";
-import type { WinningCriteriaOption } from "@prostcounter/shared/schemas";
+import type { WinningCriteria, WinningCriteriaOption } from "@prostcounter/shared/schemas";
+import { WINNING_CRITERIA_IDS } from "@prostcounter/shared/schemas";
 import { GroupSettingsFormSchema } from "@prostcounter/shared/schemas";
 import { Check, Copy, Link } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -35,9 +36,6 @@ import { useTranslation } from "@/lib/i18n/client";
 import { InviteMembers } from "./InviteMembers";
 import { JoinRequests } from "./JoinRequests";
 
-// Winning criteria as string literals (matching API response)
-type WinningCriteriaString = "days_attended" | "total_beers" | "avg_beers";
-
 // Type matching the API response for group data
 type GroupData = {
   id: string;
@@ -45,16 +43,9 @@ type GroupData = {
   description: string | null;
   created_by: string;
   festival_id: string;
-  winning_criteria: WinningCriteriaString;
+  winning_criteria: WinningCriteria;
   invite_token: string;
   created_at: string;
-};
-
-// Map winning criteria string to ID
-const WINNING_CRITERIA_TO_ID: Record<WinningCriteriaString, number> = {
-  days_attended: 1,
-  total_beers: 2,
-  avg_beers: 3,
 };
 
 type Props = {
@@ -92,7 +83,7 @@ export default function GroupSettingsClient({ group, members }: Props) {
     defaultValues: {
       name: group.name,
       description: group.description || "",
-      winning_criteria_id: WINNING_CRITERIA_TO_ID[group.winning_criteria] || 2,
+      winning_criteria_id: WINNING_CRITERIA_IDS[group.winning_criteria] || 2,
     },
   });
 

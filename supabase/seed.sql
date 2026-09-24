@@ -112,7 +112,9 @@ INSERT INTO festivals (
 INSERT INTO winning_criteria (id, name) VALUES
   (1, 'days_attended'),
   (2, 'total_beers'),
-  (3, 'avg_beers')
+  (3, 'avg_beers'),
+  (4, 'tents_visited'),
+  (5, 'longest_streak')
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================

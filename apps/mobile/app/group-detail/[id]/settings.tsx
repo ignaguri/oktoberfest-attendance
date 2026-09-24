@@ -7,7 +7,8 @@ import {
   useUpdateGroup,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { GroupMember, WinningCriteria } from "@prostcounter/shared/schemas";
+import { WINNING_CRITERIA_IDS, WinningCriteriaSchema } from "@prostcounter/shared/schemas";
+import type { GroupMember } from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { LogOut, Save, Settings as SettingsIcon, UserPlus, Users } from "lucide-react-native";
 import { useCallback } from "react";
@@ -63,7 +64,7 @@ const UpdateGroupFormSchema = z.object({
     .min(1, "Group name is required")
     .max(100, "Group name must be 100 characters or less"),
   description: z.string().max(500).optional().nullable(),
-  winningCriteria: z.enum(["days_attended", "total_beers", "avg_beers"]),
+  winningCriteria: WinningCriteriaSchema,
 });
 
 type UpdateGroupFormData = z.infer<typeof UpdateGroupFormSchema>;
@@ -84,14 +85,17 @@ const WINNING_CRITERIA_OPTIONS = [
     label: "groups.criteria.avgBeers",
     defaultLabel: "Avg Beers per Day",
   },
+  {
+    value: "tents_visited",
+    label: "groups.criteria.tentsVisited",
+    defaultLabel: "Most Tents Visited",
+  },
+  {
+    value: "longest_streak",
+    label: "groups.criteria.longestStreak",
+    defaultLabel: "Longest Streak",
+  },
 ] as const;
-
-// Map criteria string to ID for API
-const CRITERIA_TO_ID: Record<WinningCriteria, number> = {
-  days_attended: 1,
-  total_beers: 2,
-  avg_beers: 3,
-};
 
 export default function GroupSettingsScreen() {
   const { t } = useTranslation();
@@ -156,7 +160,7 @@ export default function GroupSettingsScreen() {
           updates: {
             name: data.name,
             description: data.description || null,
-            winningCriteriaId: CRITERIA_TO_ID[data.winningCriteria],
+            winningCriteriaId: WINNING_CRITERIA_IDS[data.winningCriteria],
           },
         });
         refetchGroup();

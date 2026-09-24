@@ -465,12 +465,16 @@
     "winningCriteria": {
       "days_attended": "Más días asistidos",
       "total_beers": "Más cervezas tomadas",
-      "avg_beers": "Mejor promedio de cervezas por día"
+      "avg_beers": "Mejor promedio de cervezas por día",
+      "tents_visited": "Más carpas visitadas",
+      "longest_streak": "Racha más larga"
     },
     "criteria": {
       "daysAttended": "Más días asistidos",
       "totalBeers": "Más cervezas tomadas",
-      "avgBeers": "Mejor promedio de cervezas por día"
+      "avgBeers": "Mejor promedio de cervezas por día",
+      "tentsVisited": "Más carpas visitadas",
+      "longestStreak": "Racha más larga"
     },
     "gallery": {
       "title": "Galería del grupo",
@@ -1323,6 +1327,8 @@
     "beers": "Cervezas",
     "drinks": "Bebidas",
     "average": "Promedio",
+    "tents": "Carpas",
+    "streak": "Racha",
     "yourPosition": "Tu posición",
     "notRanked": "Todavía no estás rankeado",
     "viewAll": "Ver todo",
