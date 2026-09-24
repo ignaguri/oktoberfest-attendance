@@ -56,10 +56,12 @@ export interface IFeedbackRepository {
     day: string,
     outcome: FeedbackPromptOutcome,
   ): Promise<void>;
-  /** "duplicate" when a rating for that user, festival and day already exists. */
-  insertFeedback(row: FeedbackInsert): Promise<"inserted" | "duplicate">;
+  /**
+   * "duplicate" when a rating for that user, festival and day already exists;
+   * "rate_limited" when the database trigger refuses a bug or idea past the cap.
+   */
+  insertFeedback(row: FeedbackInsert): Promise<"inserted" | "duplicate" | "rate_limited">;
   findDayFeedbackId(userId: string, festivalId: string, day: string): Promise<string | null>;
-  countSubmissionsSince(userId: string, kinds: FeedbackKind[], sinceIso: string): Promise<number>;
   getSubmitter(userId: string): Promise<FeedbackSubmitter>;
   getFestivalName(festivalId: string): Promise<string | null>;
   listForAdmin(query: { kind?: FeedbackKind; limit: number }): Promise<AdminFeedbackItem[]>;

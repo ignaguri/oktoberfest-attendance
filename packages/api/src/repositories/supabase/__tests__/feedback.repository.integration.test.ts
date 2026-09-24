@@ -129,11 +129,13 @@ describe("SupabaseFeedbackRepository", () => {
     expect(await userRepo.findDayFeedbackId(userId, festivalId, DRINK_DAY)).toBe(firstId);
   });
 
-  it("counts recent text submissions", async () => {
-    await userRepo.insertFeedback({
+  // The limit lives in a trigger so it holds for parallel requests and for
+  // inserts that skip the API; each accepted row also emails the admin.
+  it("stops a user at 10 bug reports and ideas per 24 hours", async () => {
+    const textRow = (kind: "bug" | "idea") => ({
       id: randomUUID(),
       userId,
-      kind: "bug",
+      kind,
       rating: null,
       message: "Broken",
       festivalId: null,
@@ -142,8 +144,16 @@ describe("SupabaseFeedbackRepository", () => {
       appVersion: null,
       locale: null,
     });
-    const since = new Date(Date.now() - 60_000).toISOString();
-    expect(await userRepo.countSubmissionsSince(userId, ["bug", "idea"], since)).toBe(1);
+
+    const burst = await Promise.all(
+      Array.from({ length: 12 }, (_, index) =>
+        userRepo.insertFeedback(textRow(index % 2 === 0 ? "bug" : "idea")),
+      ),
+    );
+
+    expect(burst.filter((outcome) => outcome === "inserted")).toHaveLength(10);
+    expect(burst.filter((outcome) => outcome === "rate_limited")).toHaveLength(2);
+    expect(await userRepo.insertFeedback(textRow("bug"))).toBe("rate_limited");
   });
 
   it("keeps the first prompt outcome for a day", async () => {

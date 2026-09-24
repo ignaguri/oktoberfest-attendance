@@ -14,6 +14,8 @@ import type {
 } from "../interfaces";
 
 const UNIQUE_VIOLATION = "23505";
+/** Raised by the feedback_rate_limit trigger once a user hits the bug and idea cap. */
+const FEEDBACK_RATE_LIMIT = "FB429";
 
 /** PostgREST returns a to-one embed as an object, but the generated types allow an array. */
 function firstOf<T>(value: T | T[] | null | undefined): T | null {
@@ -133,7 +135,7 @@ export class SupabaseFeedbackRepository implements IFeedbackRepository {
     }
   }
 
-  async insertFeedback(row: FeedbackInsert): Promise<"inserted" | "duplicate"> {
+  async insertFeedback(row: FeedbackInsert): Promise<"inserted" | "duplicate" | "rate_limited"> {
     const { error } = await this.supabase.from("feedback").insert({
       id: row.id,
       user_id: row.userId,
@@ -149,6 +151,9 @@ export class SupabaseFeedbackRepository implements IFeedbackRepository {
     if (error) {
       if (error.code === UNIQUE_VIOLATION) {
         return "duplicate";
+      }
+      if (error.code === FEEDBACK_RATE_LIMIT) {
+        return "rate_limited";
       }
       throw new DatabaseError(`Failed to store feedback: ${error.message}`);
     }
@@ -168,23 +173,6 @@ export class SupabaseFeedbackRepository implements IFeedbackRepository {
       throw new DatabaseError(`Failed to read day feedback: ${error.message}`);
     }
     return data?.id ?? null;
-  }
-
-  async countSubmissionsSince(
-    userId: string,
-    kinds: FeedbackKind[],
-    sinceIso: string,
-  ): Promise<number> {
-    const { count, error } = await this.supabase
-      .from("feedback")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .in("kind", kinds)
-      .gte("created_at", sinceIso);
-    if (error) {
-      throw new DatabaseError(`Failed to count feedback: ${error.message}`);
-    }
-    return count ?? 0;
   }
 
   async getSubmitter(userId: string): Promise<FeedbackSubmitter> {

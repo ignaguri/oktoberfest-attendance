@@ -8,7 +8,7 @@ import type {
   LoggedDay,
   PromptRecord,
 } from "../../repositories/interfaces";
-import { FeedbackService, TEXT_FEEDBACK_DAILY_LIMIT } from "../feedback.service";
+import { FeedbackService } from "../feedback.service";
 
 const USER_ID = "11111111-1111-4111-8111-111111111111";
 const FESTIVAL_ID = "22222222-2222-4222-8222-222222222222";
@@ -32,7 +32,6 @@ function fakeRepo(overrides: Partial<IFeedbackRepository> = {}): IFeedbackReposi
     recordPrompt: vi.fn().mockResolvedValue(undefined),
     insertFeedback: vi.fn().mockResolvedValue("inserted"),
     findDayFeedbackId: vi.fn().mockResolvedValue(null),
-    countSubmissionsSince: vi.fn().mockResolvedValue(0),
     getSubmitter: vi.fn().mockResolvedValue({ username: "sepp", preferredLanguage: "de" }),
     getFestivalName: vi.fn().mockResolvedValue("Oktoberfest 2026"),
     listForAdmin: vi.fn().mockResolvedValue([]),
@@ -176,16 +175,15 @@ describe("FeedbackService.submit", () => {
     expect(notifier.notify).toHaveBeenCalledWith(expect.objectContaining({ kind: "bug", festivalName: null }));
   });
 
-  it("rate limits bug reports and ideas per rolling 24 hours", async () => {
-    const repo = fakeRepo({ countSubmissionsSince: vi.fn().mockResolvedValue(TEXT_FEEDBACK_DAILY_LIMIT) });
-    await expect(service(repo).submit(CONTEXT, { kind: "idea", message: "Dark mode" })).rejects.toMatchObject({
+  it("answers 429 and sends no email when the database rate limit refuses the row", async () => {
+    const repo = fakeRepo({ insertFeedback: vi.fn().mockResolvedValue("rate_limited") });
+    const notifier = fakeNotifier();
+    await expect(
+      service(repo, notifier).submit(CONTEXT, { kind: "idea", message: "Dark mode" }),
+    ).rejects.toMatchObject({
       statusCode: 429,
       code: ErrorCodes.FEEDBACK_RATE_LIMITED,
     });
-    expect(repo.countSubmissionsSince).toHaveBeenCalledWith(
-      USER_ID,
-      ["bug", "idea"],
-      "2026-09-23T08:00:00.000Z",
-    );
+    expect(notifier.notify).not.toHaveBeenCalled();
   });
 });

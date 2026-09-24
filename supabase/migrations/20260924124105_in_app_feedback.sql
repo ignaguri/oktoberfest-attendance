@@ -60,6 +60,41 @@ CREATE POLICY "Super admins can read all feedback"
   TO authenticated
   USING (is_super_admin());
 
+-- Bug reports and ideas each email the admin, so the per-user cap lives here
+-- rather than in the API: a count-then-insert there lets a burst of parallel
+-- requests all pass, and a direct PostgREST insert would skip it entirely.
+-- The advisory lock serializes one user's inserts so each count sees the
+-- rows committed before it. Keep in step with the API's 429 mapping.
+CREATE FUNCTION public.enforce_feedback_rate_limit()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
+BEGIN
+  PERFORM pg_advisory_xact_lock(hashtextextended('feedback_rate_limit:' || NEW.user_id::text, 0));
+
+  IF (
+    SELECT count(*)
+    FROM public.feedback
+    WHERE user_id = NEW.user_id
+      AND kind IN ('bug', 'idea')
+      AND created_at > now() - interval '24 hours'
+  ) >= 10 THEN
+    RAISE EXCEPTION 'feedback rate limit reached' USING ERRCODE = 'FB429';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+REVOKE EXECUTE ON FUNCTION public.enforce_feedback_rate_limit() FROM PUBLIC, anon, authenticated;
+
+CREATE TRIGGER feedback_rate_limit
+  BEFORE INSERT ON public.feedback
+  FOR EACH ROW
+  WHEN (NEW.kind IN ('bug', 'idea'))
+  EXECUTE FUNCTION public.enforce_feedback_rate_limit();
+
 CREATE TABLE public.feedback_prompts (
   user_id uuid NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   festival_id uuid NOT NULL REFERENCES public.festivals(id) ON DELETE CASCADE,

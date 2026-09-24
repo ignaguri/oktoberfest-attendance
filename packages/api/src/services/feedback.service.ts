@@ -12,9 +12,6 @@ import { ApiError, ValidationError } from "../middleware/error";
 import type { FeedbackInsert, IFeedbackRepository } from "../repositories/interfaces";
 import { isPromptAllowed, pickCandidateDay } from "./feedback-prompt-rule";
 
-/** Bug reports plus ideas one user may send per rolling 24 hours. */
-export const TEXT_FEEDBACK_DAILY_LIMIT = 10;
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 /** Far enough back to cover "yesterday" in any festival timezone. */
 const LOGGED_DAY_LOOKBACK_DAYS = 3;
@@ -70,12 +67,6 @@ export class FeedbackService {
       if (!logged) {
         throw new ValidationError(ErrorCodes.FEEDBACK_DAY_NOT_LOGGED);
       }
-    } else {
-      const since = new Date(this.now().getTime() - DAY_MS).toISOString();
-      const recent = await this.repo.countSubmissionsSince(context.userId, ["bug", "idea"], since);
-      if (recent >= TEXT_FEEDBACK_DAILY_LIMIT) {
-        throw new ApiError(429, ErrorCodes.FEEDBACK_RATE_LIMITED);
-      }
     }
 
     const submitter = await this.repo.getSubmitter(context.userId);
@@ -95,6 +86,10 @@ export class FeedbackService {
     };
 
     const outcome = await this.repo.insertFeedback(row);
+    if (outcome === "rate_limited") {
+      // 10 bug reports plus ideas per rolling 24 hours, enforced by a trigger
+      throw new ApiError(429, ErrorCodes.FEEDBACK_RATE_LIMITED);
+    }
     if (body.kind === "day") {
       await this.repo.recordPrompt(context.userId, body.festivalId, body.day, "answered");
     }
