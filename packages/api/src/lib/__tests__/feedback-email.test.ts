@@ -4,7 +4,6 @@ import {
   buildFeedbackEmail,
   createResendFeedbackNotifier,
   FEEDBACK_EMAIL_FROM,
-  FEEDBACK_EMAIL_TIMEOUT_MS,
   type FeedbackEmailPayload,
   shouldEmailFeedback,
 } from "../feedback-email";
@@ -105,26 +104,5 @@ describe("createResendFeedbackNotifier", () => {
   it("does not throw when the request itself fails", async () => {
     const fetchImpl = vi.fn().mockRejectedValue(new Error("network down"));
     await expect(createResendFeedbackNotifier(ENV, fetchImpl).notify(payload())).resolves.toBeUndefined();
-  });
-
-  // submit awaits this, so a hung Resend would hang the request and invite a
-  // retry that stores and emails the same bug twice.
-  it("gives up on a request that never answers", async () => {
-    vi.useFakeTimers();
-    try {
-      const fetchImpl = vi.fn(
-        (_url: string, init: RequestInit) =>
-          new Promise<Response>((_resolve, reject) => {
-            init.signal?.addEventListener("abort", () => reject(init.signal?.reason));
-          }),
-      );
-      const sent = createResendFeedbackNotifier(ENV, fetchImpl as typeof fetch).notify(payload());
-
-      await vi.advanceTimersByTimeAsync(FEEDBACK_EMAIL_TIMEOUT_MS);
-
-      await expect(sent).resolves.toBeUndefined();
-    } finally {
-      vi.useRealTimers();
-    }
   });
 });

@@ -27,7 +27,7 @@ export const FEEDBACK_EMAIL_FROM = "ProstCounter Feedback <feedback@notify.prost
 const RESEND_EMAILS_URL = "https://api.resend.com/emails";
 
 /** submit awaits the send, so a hung Resend must not hang the request. */
-export const FEEDBACK_EMAIL_TIMEOUT_MS = 5000;
+const FEEDBACK_EMAIL_TIMEOUT_MS = 5000;
 const SUBJECT_PREVIEW_LENGTH = 60;
 
 /** Every bug and idea; a day rating only when it came with text. */

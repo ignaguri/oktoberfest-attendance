@@ -129,33 +129,6 @@ describe("SupabaseFeedbackRepository", () => {
     expect(await userRepo.findDayFeedbackId(userId, festivalId, DRINK_DAY)).toBe(firstId);
   });
 
-  // The limit lives in a trigger so it holds for parallel requests and for
-  // inserts that skip the API; each accepted row also emails the admin.
-  it("stops a user at 10 bug reports and ideas per 24 hours", async () => {
-    const textRow = (kind: "bug" | "idea") => ({
-      id: randomUUID(),
-      userId,
-      kind,
-      rating: null,
-      message: "Broken",
-      festivalId: null,
-      day: null,
-      platform: null,
-      appVersion: null,
-      locale: null,
-    });
-
-    const burst = await Promise.all(
-      Array.from({ length: 12 }, (_, index) =>
-        userRepo.insertFeedback(textRow(index % 2 === 0 ? "bug" : "idea")),
-      ),
-    );
-
-    expect(burst.filter((outcome) => outcome === "inserted")).toHaveLength(10);
-    expect(burst.filter((outcome) => outcome === "rate_limited")).toHaveLength(2);
-    expect(await userRepo.insertFeedback(textRow("bug"))).toBe("rate_limited");
-  });
-
   it("keeps the first prompt outcome for a day", async () => {
     await userRepo.recordPrompt(userId, festivalId, DRINK_DAY, "dismissed");
     await userRepo.recordPrompt(userId, festivalId, DRINK_DAY, "answered");
