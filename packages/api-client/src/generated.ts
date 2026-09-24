@@ -9320,7 +9320,7 @@ export interface paths {
                                 /** Format: uuid */
                                 festival_id: string;
                                 /** @enum {string} */
-                                activity_type: "beer_count_update" | "tent_checkin" | "photo_upload" | "group_join" | "achievement_unlock";
+                                activity_type: "beer_count_update" | "tent_checkin" | "photo_upload" | "group_join" | "achievement_unlock" | "day_plan" | "tent_reservation";
                                 activity_data: {
                                     [key: string]: unknown;
                                 };

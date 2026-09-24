@@ -437,6 +437,7 @@ export type Database = {
           created_at: string | null
           date: string
           end_at: string | null
+          feed_at: string
           festival_id: string
           id: string
           kind: string
@@ -457,6 +458,7 @@ export type Database = {
           created_at?: string | null
           date: string
           end_at?: string | null
+          feed_at?: string
           festival_id: string
           id?: string
           kind: string
@@ -477,6 +479,7 @@ export type Database = {
           created_at?: string | null
           date?: string
           end_at?: string | null
+          feed_at?: string
           festival_id?: string
           id?: string
           kind?: string
@@ -2825,6 +2828,8 @@ export type Database = {
         | "photo_upload"
         | "group_join"
         | "achievement_unlock"
+        | "day_plan"
+        | "tent_reservation"
       crowd_level: "empty" | "moderate" | "crowded" | "full"
       drink_type:
         | "beer"
@@ -2997,6 +3002,8 @@ export const Constants = {
         "photo_upload",
         "group_join",
         "achievement_unlock",
+        "day_plan",
+        "tent_reservation",
       ],
       crowd_level: ["empty", "moderate", "crowded", "full"],
       drink_type: [

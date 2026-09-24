@@ -13,6 +13,11 @@ const BUNDLES = { en, de, es } as const;
  */
 const REQUIRED_KEYS = [
   "activityFeed.atTent",
+  "activityFeed.plannedDays",
+  "activityFeed.plannedDays_other",
+  "activityFeed.plannedDaysWith",
+  "activityFeed.plannedDaysWith_other",
+  "activityFeed.reservedTent",
   // Web settings screen
   "notificationSettings.dayStart",
   "notificationSettings.description.dayStart",
