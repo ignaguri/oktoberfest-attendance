@@ -19,6 +19,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { UnlockToastHost } from "@/components/achievements/unlock-toast-host";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { FeedbackPromptHandler } from "@/components/feedback/feedback-prompt-handler";
 import { NotificationAskProvider } from "@/components/notifications/NotificationAskProvider";
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { NovuAutoSubscriber } from "@/components/notifications/NovuAutoSubscriber";
@@ -476,6 +477,7 @@ export default function RootLayout() {
                                         <UpdatePromptHandler />
                                         <StoreUpdatePromptHandler />
                                         <WatchInstallPromptHandler />
+                                        <FeedbackPromptHandler />
                                         <FestivalSwitchPrompt />
                                         <TutorialOverlay />
                                         <Stack
