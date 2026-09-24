@@ -119,9 +119,10 @@ export interface IPhotoRepository {
   /**
    * Get all user's group photo settings
    * @param userId - User ID
+   * @param festivalId - Only return groups of this festival (all groups when omitted)
    * @returns Array of group photo settings
    */
-  getAllGroupPhotoSettings(userId: string): Promise<GroupPhotoSettings[]>;
+  getAllGroupPhotoSettings(userId: string, festivalId?: string): Promise<GroupPhotoSettings[]>;
 
   /**
    * Update visibility for a single photo

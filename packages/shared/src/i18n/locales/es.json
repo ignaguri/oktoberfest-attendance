@@ -152,7 +152,7 @@
   "tabs": {
     "home": "Inicio",
     "attendance": "Asistencia",
-    "groups": "Grupos",
+    "groups": "Social",
     "ranking": "Ranking",
     "profile": "Perfil"
   },
@@ -1521,11 +1521,12 @@
       "globalSettings": "Configuración global",
       "perGroupSettings": "Configuración por grupo",
       "perGroupDescription": "Elegí qué grupos pueden ver tus fotos. Esta configuración solo se aplica cuando el ocultamiento global está desactivado.",
+      "festivalScope": "Mostrando grupos de {{festival}}. Cambiá de festival para configurar los grupos de otros festivales.",
       "hideFromAll": "Ocultar fotos de todos los grupos",
       "hideFromAllDescription": "Cuando está activado, tus fotos no aparecerán en ninguna galería de grupo",
       "hideFromGroup": "Ocultar fotos de {{group}}",
       "hideFromGroupDescription": "Cuando está activado, tus fotos no aparecerán en la galería de este grupo",
-      "noGroups": "Todavía no sos miembro de ningún grupo.",
+      "noGroups": "No sos miembro de ningún grupo de {{festival}}.",
       "globalWarning": "La configuración por grupo está desactivada porque el ocultamiento global está activado.",
       "updateError": "Error al actualizar la configuración de privacidad de fotos",
       "shortDescription": "Controlá quién puede ver tus fotos"
@@ -2709,8 +2710,9 @@
       "visibleToGroups": "Tus fotos ahora son visibles para los grupos (sujeto a la configuración individual de cada grupo)",
       "description": "Controlá quién puede ver tus fotos en las galerías de grupos. Las fotos individuales también pueden configurarse como privadas.",
       "perGroupDescription": "Elegí qué grupos pueden ver tus fotos. Esta configuración solo se aplica cuando el ocultamiento global está desactivado.",
+      "festivalScope": "Mostrando grupos de {{festival}}. Cambiá de festival para configurar los grupos de otros festivales.",
       "globalHidingWarning": "⚠️ El ocultamiento global de fotos está activado. La configuración por grupo está actualmente desactivada.",
-      "noGroupsYet": "Todavía no sos miembro de ningún grupo. Unite a un grupo para ver la configuración de visibilidad de fotos por grupo.",
+      "noGroupsYet": "No sos miembro de ningún grupo de {{festival}}. Unite a un grupo para ver la configuración de visibilidad de fotos por grupo.",
       "defaultGroupName": "grupo",
       "groupSettingsUpdated": "Configuración del grupo actualizada",
       "loadError": "Error al cargar la configuración de privacidad de fotos",

@@ -152,7 +152,7 @@
   "tabs": {
     "home": "Home",
     "attendance": "Attendance",
-    "groups": "Groups",
+    "groups": "Social",
     "ranking": "Ranking",
     "profile": "Profile"
   },
@@ -1461,11 +1461,12 @@
       "globalSettings": "Global Settings",
       "perGroupSettings": "Per-Group Settings",
       "perGroupDescription": "Choose which groups can see your photos. These settings only apply when global hiding is disabled.",
+      "festivalScope": "Showing groups for {{festival}}. Switch festival to manage groups from other festivals.",
       "hideFromAll": "Hide photos from all groups",
       "hideFromAllDescription": "When enabled, your photos won't appear in any group gallery",
       "hideFromGroup": "Hide photos from {{group}}",
       "hideFromGroupDescription": "When enabled, your photos won't appear in this group's gallery",
-      "noGroups": "You're not a member of any groups yet.",
+      "noGroups": "You're not a member of any group for {{festival}}.",
       "globalWarning": "Per-group settings are disabled because global hiding is enabled.",
       "updateError": "Failed to update photo privacy settings",
       "shortDescription": "Control who can see your photos"
@@ -2649,8 +2650,9 @@
       "visibleToGroups": "Your photos are now visible to groups (subject to individual group settings)",
       "description": "Control who can see your photos in group galleries. Individual photos can also be set as private.",
       "perGroupDescription": "Choose which groups can see your photos. These settings only apply when global hiding is disabled.",
+      "festivalScope": "Showing groups for {{festival}}. Switch festival to manage groups from other festivals.",
       "globalHidingWarning": "⚠️ Global photo hiding is enabled. Per-group settings are currently disabled.",
-      "noGroupsYet": "You're not a member of any groups yet. Join a group to see per-group photo visibility settings.",
+      "noGroupsYet": "You're not a member of any group for {{festival}}. Join a group to see per-group photo visibility settings.",
       "defaultGroupName": "group",
       "groupSettingsUpdated": "Group settings updated",
       "loadError": "Failed to load photo privacy settings",

@@ -5,6 +5,7 @@ import {
   GetPhotosQuerySchema,
   GetPhotosResponseSchema,
   GetPhotoUploadUrlQuerySchema,
+  GetGroupPhotoSettingsQuerySchema,
   GetPhotoUploadUrlResponseSchema,
   GlobalPhotoSettingsSchema,
   GroupPhotoSettingsSchema,
@@ -396,7 +397,11 @@ const getAllGroupSettingsRoute = createRoute({
   path: "/photos/settings/groups",
   tags: ["photos"],
   summary: "Get all group photo privacy settings",
-  description: "Returns user's photo visibility settings for all groups",
+  description:
+    "Returns user's photo visibility settings for all groups, optionally limited to one festival",
+  request: {
+    query: GetGroupPhotoSettingsQuerySchema,
+  },
   responses: {
     200: {
       description: "Settings retrieved successfully",
@@ -426,7 +431,8 @@ app.openapi(getAllGroupSettingsRoute, async (c) => {
   const photoRepo = new SupabasePhotoRepository(supabase);
   const photoService = new PhotoService(photoRepo);
 
-  const settings = await photoService.getAllGroupPhotoSettings(user.id);
+  const { festivalId } = c.req.valid("query");
+  const settings = await photoService.getAllGroupPhotoSettings(user.id, festivalId);
 
   return c.json({ settings }, 200);
 });

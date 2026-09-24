@@ -209,10 +209,14 @@ export class PhotoService {
    * Get all user's group photo settings
    *
    * @param userId - User ID
+   * @param festivalId - Only return groups of this festival (all groups when omitted)
    * @returns Array of group photo settings
    */
-  async getAllGroupPhotoSettings(userId: string): Promise<GroupPhotoSettings[]> {
-    return this.photoRepo.getAllGroupPhotoSettings(userId);
+  async getAllGroupPhotoSettings(
+    userId: string,
+    festivalId?: string,
+  ): Promise<GroupPhotoSettings[]> {
+    return this.photoRepo.getAllGroupPhotoSettings(userId, festivalId);
   }
 
   /**

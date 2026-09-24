@@ -18,6 +18,7 @@ vi.mock("../../services/photo.service", () => ({
       confirmUpload: vi.fn(),
       listPhotos: vi.fn(),
       deletePhoto: vi.fn(),
+      getAllGroupPhotoSettings: vi.fn(),
     };
   }),
 }));
@@ -31,6 +32,7 @@ describe("Photo Routes - Unit Tests", () => {
     confirmUpload: ReturnType<typeof vi.fn>;
     listPhotos: ReturnType<typeof vi.fn>;
     deletePhoto: ReturnType<typeof vi.fn>;
+    getAllGroupPhotoSettings: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -44,6 +46,7 @@ describe("Photo Routes - Unit Tests", () => {
       confirmUpload: vi.fn(),
       listPhotos: vi.fn(),
       deletePhoto: vi.fn(),
+      getAllGroupPhotoSettings: vi.fn(),
     };
 
     // Make the mocked constructor return our mock instance
@@ -530,6 +533,71 @@ describe("Photo Routes - Unit Tests", () => {
       const body = (await res.json()) as any;
       expect(body.photos).toHaveLength(0);
       expect(body.total).toBe(0);
+    });
+  });
+
+  describe("GET /photos/settings/groups", () => {
+    const groupSetting = {
+      userId: "123e4567-e89b-12d3-a456-426614174099",
+      groupId: "323e4567-e89b-12d3-a456-426614174002",
+      groupName: "Tent Crew",
+      hidePhotosFromGroup: false,
+    };
+
+    it("should pass festivalId through to the service", async () => {
+      const festivalId = "123e4567-e89b-12d3-a456-426614174000";
+      mockPhotoService.getAllGroupPhotoSettings.mockResolvedValueOnce([groupSetting]);
+
+      const req = createAuthRequest(`/photos/settings/groups?festivalId=${festivalId}`, {
+        method: "GET",
+      });
+
+      const res = await app.request(req.url, {
+        method: req.method,
+        headers: req.headers,
+      });
+
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as any;
+      expect(body.settings).toEqual([groupSetting]);
+      expect(mockPhotoService.getAllGroupPhotoSettings).toHaveBeenCalledWith(
+        mockUser.id,
+        festivalId,
+      );
+    });
+
+    // Older app builds don't send festivalId and must keep getting every group
+    it("should return all groups when festivalId is omitted", async () => {
+      mockPhotoService.getAllGroupPhotoSettings.mockResolvedValueOnce([groupSetting]);
+
+      const req = createAuthRequest("/photos/settings/groups", {
+        method: "GET",
+      });
+
+      const res = await app.request(req.url, {
+        method: req.method,
+        headers: req.headers,
+      });
+
+      expect(res.status).toBe(200);
+      expect(mockPhotoService.getAllGroupPhotoSettings).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+      );
+    });
+
+    it("should validate festivalId is valid UUID when provided", async () => {
+      const req = createAuthRequest("/photos/settings/groups?festivalId=invalid-uuid", {
+        method: "GET",
+      });
+
+      const res = await app.request(req.url, {
+        method: req.method,
+        headers: req.headers,
+      });
+
+      expect(res.status).toBe(400);
+      expect(mockPhotoService.getAllGroupPhotoSettings).not.toHaveBeenCalled();
     });
   });
 

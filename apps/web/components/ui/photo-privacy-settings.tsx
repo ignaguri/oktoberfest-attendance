@@ -1,7 +1,8 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Eye, EyeOff } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Switch } from "@/components/ui/switch";
@@ -16,6 +17,9 @@ interface GroupPhotoSetting {
 
 export function PhotoPrivacySettings() {
   const { t } = useTranslation();
+  const { currentFestival } = useFestival();
+  const festivalId = currentFestival?.id;
+  const festivalName = currentFestival?.name ?? "";
   const [globalSettings, setGlobalSettings] = useState<{
     hide_photos_from_all_groups: boolean;
   }>({
@@ -25,18 +29,31 @@ export function PhotoPrivacySettings() {
   const [isLoading, setIsLoading] = useState(true);
   const [savingGlobal, setSavingGlobal] = useState(false);
   const [savingGroups, setSavingGroups] = useState<Set<string>>(new Set());
+  // Only the latest request may write state, so a slow response for the
+  // previous festival can't overwrite the current one
+  const latestRequestIdRef = useRef(0);
 
   useEffect(() => {
-    loadSettings();
+    // The festival context finishes loading before it commits a selection, so
+    // wait for an actual festival rather than listing every group
+    if (!festivalId) {
+      return;
+    }
+    loadSettings(festivalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [festivalId]);
 
-  const loadSettings = async () => {
+  const loadSettings = async (selectedFestivalId: string) => {
+    const requestId = ++latestRequestIdRef.current;
     try {
       const [globalData, groupData] = await Promise.all([
         apiClient.photos.getGlobalSettings(),
-        apiClient.photos.getAllGroupSettings(),
+        apiClient.photos.getAllGroupSettings({ festivalId: selectedFestivalId }),
       ]);
+
+      if (requestId !== latestRequestIdRef.current) {
+        return;
+      }
 
       setGlobalSettings({
         hide_photos_from_all_groups: globalData.hidePhotosFromAllGroups,
@@ -51,11 +68,15 @@ export function PhotoPrivacySettings() {
         })),
       );
     } catch {
-      toast.error(t("common.status.error"), {
-        description: t("photo.privacy.loadError"),
-      });
+      if (requestId === latestRequestIdRef.current) {
+        toast.error(t("common.status.error"), {
+          description: t("photo.privacy.loadError"),
+        });
+      }
     } finally {
-      setIsLoading(false);
+      if (requestId === latestRequestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -177,6 +198,9 @@ export function PhotoPrivacySettings() {
                 {t("photo.privacy.perGroupSettings")}
               </h4>
               <p className="text-sm text-gray-600">{t("photo.privacy.perGroupDescription")}</p>
+              <p className="text-sm text-gray-600">
+                {t("photo.privacy.festivalScope", { festival: festivalName })}
+              </p>
 
               <div className="space-y-4">
                 {groupSettings.map((group) => (
@@ -222,7 +246,9 @@ export function PhotoPrivacySettings() {
         )}
 
         {groupSettings.length === 0 && (
-          <div className="py-4 text-center text-gray-500">{t("photo.privacy.noGroupsYet")}</div>
+          <div className="py-4 text-center text-gray-500">
+            {t("photo.privacy.noGroupsYet", { festival: festivalName })}
+          </div>
         )}
       </div>
     </div>

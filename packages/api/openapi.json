@@ -13184,10 +13184,21 @@
           "photos"
         ],
         "summary": "Get all group photo privacy settings",
-        "description": "Returns user's photo visibility settings for all groups",
+        "description": "Returns user's photo visibility settings for all groups, optionally limited to one festival",
         "security": [
           {
             "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "festivalId",
+            "in": "query"
           }
         ],
         "responses": {
