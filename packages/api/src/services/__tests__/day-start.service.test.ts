@@ -214,17 +214,17 @@ describe("NotificationService.notifyDayStart", () => {
     expect(client.from).not.toHaveBeenCalledWith("day_start_notifications");
   });
 
-  // The window is today-or-yesterday, not today-only: an offline-queue push
-  // for a visit near midnight festival-time can land after the server has
-  // already rolled to the next day. Yesterday in the festival's own timezone
-  // must still announce.
-  it("still announces for yesterday in the festival's timezone", async () => {
+  // An offline-queue push for a visit near midnight festival-time can land
+  // after the server has already rolled to the next day, so yesterday still
+  // announces until 01:00 in the festival's own timezone.
+  it("still announces for yesterday shortly after midnight", async () => {
+    vi.setSystemTime(new Date("2026-09-22T00:30:00.000Z"));
     mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
 
     const claimed = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
-      date: "2026-09-21", // yesterday relative to the faked "now"
+      date: "2026-09-21",
       kind: "checkin",
       tentName: null,
     });
@@ -232,6 +232,28 @@ describe("NotificationService.notifyDayStart", () => {
     expect(claimed).toBe(true);
     expect(triggerMock).toHaveBeenCalledTimes(1);
   });
+
+  // Past 01:00 a yesterday entry is a backfill (logging last night the next
+  // morning), not a day that is starting.
+  it.each(["2026-09-22T01:00:00.000Z", "2026-09-22T12:00:00.000Z"])(
+    "does not announce yesterday at %s",
+    async (now) => {
+      vi.setSystemTime(new Date(now));
+      const client = mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
+
+      const claimed = await service.notifyDayStart({
+        actorId: ACTOR_ID,
+        festivalId: FESTIVAL_ID,
+        date: "2026-09-21",
+        kind: "drink",
+        tentName: null,
+      });
+
+      expect(claimed).toBe(false);
+      expect(triggerMock).not.toHaveBeenCalled();
+      expect(client.from).not.toHaveBeenCalledWith("day_start_notifications");
+    },
+  );
 
   // Pins current behaviour rather than endorsing it: when every recipient has
   // day-start disabled, notifyDayStart still reports success, which suppresses
