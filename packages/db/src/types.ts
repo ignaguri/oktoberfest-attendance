@@ -2548,6 +2548,8 @@ export type Database = {
           full_name: string
           group_id: string
           group_name: string
+          longest_streak: number
+          tents_visited: number
           total_beers: number
           user_id: string
           username: string
