@@ -1,5 +1,6 @@
 "use client";
 
+import { useFestival } from "@prostcounter/shared/contexts";
 import { Eye, EyeOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +17,9 @@ interface GroupPhotoSetting {
 
 export function PhotoPrivacySettings() {
   const { t } = useTranslation();
+  const { currentFestival, isLoading: isFestivalLoading } = useFestival();
+  const festivalId = currentFestival?.id;
+  const festivalName = currentFestival?.name ?? "";
   const [globalSettings, setGlobalSettings] = useState<{
     hide_photos_from_all_groups: boolean;
   }>({
@@ -27,15 +31,19 @@ export function PhotoPrivacySettings() {
   const [savingGroups, setSavingGroups] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    // Wait for the festival so an unscoped request can't land after the scoped one
+    if (isFestivalLoading) {
+      return;
+    }
     loadSettings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [festivalId, isFestivalLoading]);
 
   const loadSettings = async () => {
     try {
       const [globalData, groupData] = await Promise.all([
         apiClient.photos.getGlobalSettings(),
-        apiClient.photos.getAllGroupSettings(),
+        apiClient.photos.getAllGroupSettings({ festivalId }),
       ]);
 
       setGlobalSettings({
@@ -177,6 +185,9 @@ export function PhotoPrivacySettings() {
                 {t("photo.privacy.perGroupSettings")}
               </h4>
               <p className="text-sm text-gray-600">{t("photo.privacy.perGroupDescription")}</p>
+              <p className="text-sm text-gray-600">
+                {t("photo.privacy.festivalScope", { festival: festivalName })}
+              </p>
 
               <div className="space-y-4">
                 {groupSettings.map((group) => (
@@ -222,7 +233,9 @@ export function PhotoPrivacySettings() {
         )}
 
         {groupSettings.length === 0 && (
-          <div className="py-4 text-center text-gray-500">{t("photo.privacy.noGroupsYet")}</div>
+          <div className="py-4 text-center text-gray-500">
+            {t("photo.privacy.noGroupsYet", { festival: festivalName })}
+          </div>
         )}
       </div>
     </div>

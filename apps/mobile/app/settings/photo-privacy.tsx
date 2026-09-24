@@ -1,3 +1,4 @@
+import { useFestival } from "@prostcounter/shared/contexts";
 import { cn } from "@prostcounter/ui";
 import { Eye, EyeOff, Info, Users } from "lucide-react-native";
 import { useCallback, useEffect, useState } from "react";
@@ -23,6 +24,9 @@ interface PhotoPrivacySettings {
 
 export default function PhotoPrivacyScreen() {
   const { t } = useTranslation();
+  const { currentFestival, isLoading: isFestivalLoading } = useFestival();
+  const festivalId = currentFestival?.id;
+  const festivalName = currentFestival?.name ?? "";
 
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -37,7 +41,7 @@ export default function PhotoPrivacyScreen() {
       // Fetch global setting and group settings
       const [globalResponse, groupsResponse] = await Promise.all([
         apiClient.photos.getGlobalSettings().catch(() => ({ hidePhotosFromAllGroups: false })),
-        apiClient.photos.getAllGroupSettings().catch(() => ({ settings: [] })),
+        apiClient.photos.getAllGroupSettings({ festivalId }).catch(() => ({ settings: [] })),
       ]);
 
       setSettings({
@@ -50,11 +54,15 @@ export default function PhotoPrivacyScreen() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, []);
+  }, [festivalId]);
 
   useEffect(() => {
+    // Wait for the festival so an unscoped request can't land after the scoped one
+    if (isFestivalLoading) {
+      return;
+    }
     fetchSettings();
-  }, [fetchSettings]);
+  }, [fetchSettings, isFestivalLoading]);
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
@@ -179,15 +187,18 @@ export default function PhotoPrivacyScreen() {
           <Text className="mb-2 text-lg font-semibold text-typography-900">
             {t("profile.photoPrivacy.perGroupSettings")}
           </Text>
-          <Text className="mb-4 text-sm text-typography-500">
+          <Text className="mb-2 text-sm text-typography-500">
             {t("profile.photoPrivacy.perGroupDescription")}
+          </Text>
+          <Text className="mb-4 text-sm text-typography-500">
+            {t("profile.photoPrivacy.festivalScope", { festival: festivalName })}
           </Text>
 
           {settings.groups.length === 0 ? (
             <View className="items-center py-4">
               <Users size={48} color={Colors.gray[300]} />
               <Text className="mt-2 text-center text-typography-500">
-                {t("profile.photoPrivacy.noGroups")}
+                {t("profile.photoPrivacy.noGroups", { festival: festivalName })}
               </Text>
             </View>
           ) : (

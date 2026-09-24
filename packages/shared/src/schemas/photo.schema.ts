@@ -143,6 +143,16 @@ export const GroupPhotoSettingsSchema = z.object({
 export type GroupPhotoSettings = z.infer<typeof GroupPhotoSettingsSchema>;
 
 /**
+ * Query for listing group photo settings. Optional so older app builds that
+ * don't send it still get every group.
+ */
+export const GetGroupPhotoSettingsQuerySchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }).optional(),
+});
+
+export type GetGroupPhotoSettingsQuery = z.infer<typeof GetGroupPhotoSettingsQuerySchema>;
+
+/**
  * Update group photo settings request
  */
 export const UpdateGroupPhotoSettingsSchema = z.object({

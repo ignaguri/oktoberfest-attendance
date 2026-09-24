@@ -2034,7 +2034,7 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse(response);
       },
 
-      async getAllGroupSettings(): Promise<{
+      async getAllGroupSettings(query?: { festivalId?: string }): Promise<{
         settings: Array<{
           userId: string;
           groupId: string;
@@ -2043,9 +2043,13 @@ export function createTypedApiClient(config: ApiClientConfig) {
         }>;
       }> {
         const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/photos/settings/groups`, {
-          headers,
-        });
+        const params = new URLSearchParams();
+        if (query?.festivalId) params.set("festivalId", query.festivalId);
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/photos/settings/groups?${params}`,
+          { headers },
+        );
         if (!response.ok) {
           await extractApiError(response, "Failed to fetch group photo settings");
         }

@@ -364,17 +364,26 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     };
   }
 
-  async getAllGroupPhotoSettings(userId: string): Promise<GroupPhotoSettings[]> {
+  async getAllGroupPhotoSettings(
+    userId: string,
+    festivalId?: string,
+  ): Promise<GroupPhotoSettings[]> {
     // Get all groups the user is a member of
-    const { data: memberships, error: membershipError } = await this.supabase
+    let membershipQuery = this.supabase
       .from("group_members")
       .select(
         `
         group_id,
-        groups!inner(id, name)
+        groups!inner(id, name, festival_id)
       `,
       )
       .eq("user_id", userId);
+
+    if (festivalId) {
+      membershipQuery = membershipQuery.eq("groups.festival_id", festivalId);
+    }
+
+    const { data: memberships, error: membershipError } = await membershipQuery;
 
     if (membershipError) {
       throw new DatabaseError(`Failed to fetch group memberships: ${membershipError.message}`);

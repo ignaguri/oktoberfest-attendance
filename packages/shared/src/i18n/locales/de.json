@@ -152,7 +152,7 @@
   "tabs": {
     "home": "Start",
     "attendance": "Besuche",
-    "groups": "Gruppen",
+    "groups": "Social",
     "ranking": "Rangliste",
     "profile": "Profil"
   },
@@ -1706,11 +1706,12 @@
       "globalSettings": "Globale Einstellungen",
       "perGroupSettings": "Gruppenspezifische Einstellungen",
       "perGroupDescription": "Wähle, welche Gruppen deine Fotos sehen können. Diese Einstellungen gelten nur, wenn das globale Verbergen deaktiviert ist.",
+      "festivalScope": "Gruppen für {{festival}}. Wechsle das Fest, um Gruppen anderer Feste zu verwalten.",
       "hideFromAll": "Fotos vor allen Gruppen verbergen",
       "hideFromAllDescription": "Wenn aktiviert, erscheinen deine Fotos in keiner Gruppengalerie",
       "hideFromGroup": "Fotos vor {{group}} verbergen",
       "hideFromGroupDescription": "Wenn aktiviert, erscheinen deine Fotos nicht in der Galerie dieser Gruppe",
-      "noGroups": "Du bist noch kein Mitglied einer Gruppe.",
+      "noGroups": "Du bist in keiner Gruppe für {{festival}}.",
       "globalWarning": "Gruppenspezifische Einstellungen sind deaktiviert, weil das globale Verbergen aktiviert ist.",
       "updateError": "Aktualisierung der Foto-Privatsphäre-Einstellungen fehlgeschlagen",
       "shortDescription": "Steuere, wer deine Fotos sehen kann"
@@ -2867,8 +2868,9 @@
       "visibleToGroups": "deine Fotos sind jetzt für Gruppen sichtbar (abhängig von gruppenspezifischen Einstellungen)",
       "description": "Steuere, wer deine Fotos in Gruppengalerien sehen kann. Einzelne Fotos können auch als privat markiert werden.",
       "perGroupDescription": "Wähle, welche Gruppen deine Fotos sehen können. Diese Einstellungen gelten nur, wenn das globale Verbergen deaktiviert ist.",
+      "festivalScope": "Gruppen für {{festival}}. Wechsle das Fest, um Gruppen anderer Feste zu verwalten.",
       "globalHidingWarning": "⚠️ Globales Foto-Verbergen ist aktiviert. Gruppenspezifische Einstellungen sind derzeit deaktiviert.",
-      "noGroupsYet": "Du bist noch kein Mitglied einer Gruppe. Treten du einer Gruppe bei, um gruppenspezifische Foto-Sichtbarkeitseinstellungen zu sehen.",
+      "noGroupsYet": "Du bist in keiner Gruppe für {{festival}}. Tritt einer Gruppe bei, um gruppenspezifische Foto-Sichtbarkeitseinstellungen zu sehen.",
       "defaultGroupName": "Gruppe",
       "groupSettingsUpdated": "Gruppeneinstellungen aktualisiert",
       "loadError": "Laden der Foto-Privatsphäre-Einstellungen fehlgeschlagen",
