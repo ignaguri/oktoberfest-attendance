@@ -20,7 +20,7 @@ export default function BugReportLink({ className }: { className?: string }) {
       `Time: ${new Date().toISOString()}`,
     ].join("\n");
 
-    const email = "pepe.grillo.parlante@gmail.com";
+    const email = "prostcounter@gmail.com";
     const subject = "[ProstCounter🍻] Bug Report";
     const body = `Please describe the bug you encountered:
 
