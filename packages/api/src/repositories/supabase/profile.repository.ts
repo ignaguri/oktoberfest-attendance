@@ -672,7 +672,7 @@ export class SupabaseProfileRepository {
       previousFestival: row.previous_festival_name
         ? {
             name: row.previous_festival_name,
-            beers: row.previous_festival_beers,
+            beers: Number(row.previous_festival_beers),
             days: row.previous_festival_days,
           }
         : null,

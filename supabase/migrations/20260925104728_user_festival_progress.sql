@@ -19,7 +19,7 @@ RETURNS TABLE(
   tents_visited integer,
   tents_total integer,
   previous_festival_name text,
-  previous_festival_beers integer,
+  previous_festival_beers numeric,
   previous_festival_days integer,
   groups_this_festival integer,
   accepted_friends integer,
@@ -89,9 +89,9 @@ BEGIN
     (SELECT COUNT(*)::integer FROM festival_tents ft WHERE ft.festival_id = p_festival_id),
     (SELECT p.name::text FROM previous p),
     -- Drinks live in consumptions; attendances.beer_count stopped being written
-    -- in 20260317130000_stop_writing_beer_count. Beer and radler, like the
-    -- group leaderboard and attendance_with_totals.
-    (SELECT COUNT(c.id)::integer
+    -- in 20260317130000_stop_writing_beer_count. A Radler is half a beer, like
+    -- the leaderboards (20260325120000_radler_half_beer_leaderboard).
+    (SELECT COALESCE(SUM(CASE WHEN c.drink_type = 'radler' THEN 0.5 ELSE 1.0 END), 0)::numeric
        FROM attendances a
        JOIN previous p ON p.id = a.festival_id
        JOIN consumptions c ON c.attendance_id = a.id AND c.drink_type IN ('beer', 'radler')
@@ -118,21 +118,26 @@ GRANT EXECUTE ON FUNCTION public.get_user_festival_progress(uuid, date) TO authe
 
 -- Highlights showed 0 beers for every attendance since March: this function
 -- still summed attendances.beer_count, which 20260317130000_stop_writing_beer_count
--- stopped writing. Count beer and radler from consumptions instead, like the
--- group leaderboard and attendance_with_totals. Rest of the function unchanged
--- from 20260924144242_group_criteria_tents_streak.
+-- stopped writing. Count beer and radler from consumptions instead, a Radler as
+-- half a beer like the leaderboards, so Highlights matches the positions it
+-- shows. Rest of the function unchanged from
+-- 20260924144242_group_criteria_tents_streak.
 
-CREATE OR REPLACE FUNCTION public.get_user_festival_stats_with_positions(p_user_id uuid, p_festival_id uuid)
- RETURNS TABLE(top_positions jsonb, total_beers bigint, days_attended bigint)
+-- total_beers goes from bigint to numeric for the half Radler, and a return
+-- type change needs DROP + CREATE; the grants it had are restored below.
+DROP FUNCTION IF EXISTS public.get_user_festival_stats_with_positions(uuid, uuid);
+
+CREATE FUNCTION public.get_user_festival_stats_with_positions(p_user_id uuid, p_festival_id uuid)
+ RETURNS TABLE(top_positions jsonb, total_beers numeric, days_attended bigint)
  LANGUAGE plpgsql
 AS $function$
 DECLARE
-  user_total_beers BIGINT := 0;
+  user_total_beers NUMERIC := 0;
   user_days_attended BIGINT := 0;
 BEGIN
   -- Get user's total beers and days attended for the festival
   SELECT
-    (SELECT COUNT(*)
+    (SELECT COALESCE(SUM(CASE WHEN c.drink_type = 'radler' THEN 0.5 ELSE 1.0 END), 0)
        FROM consumptions c
        JOIN attendances a ON a.id = c.attendance_id
       WHERE a.user_id = p_user_id
@@ -197,3 +202,7 @@ BEGIN
 
 END;
 $function$;
+
+GRANT ALL ON FUNCTION public.get_user_festival_stats_with_positions(uuid, uuid) TO anon;
+GRANT ALL ON FUNCTION public.get_user_festival_stats_with_positions(uuid, uuid) TO authenticated;
+GRANT ALL ON FUNCTION public.get_user_festival_stats_with_positions(uuid, uuid) TO service_role;

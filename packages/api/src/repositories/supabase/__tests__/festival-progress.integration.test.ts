@@ -133,6 +133,27 @@ describe("get_user_festival_progress", () => {
     await attend(users.sol.id, festivalIds.current, ["2026-09-30"], 0);
     // sol attended 2024 (2 beers, 1 day), skipped 2025, attended another series in 2025
     await attend(users.sol.id, festivalIds.series2024, ["2024-09-22"], 2);
+    // A Radler is half a beer, like the leaderboards: one on each festival
+    const { data: solAttendances, error: solError } = await admin
+      .from("attendances")
+      .select("id, festival_id, date")
+      .eq("user_id", users.sol.id)
+      .in("date", ["2024-09-22", "2026-09-19"]);
+    if (solError || !solAttendances || solAttendances.length !== 2) {
+      throw new Error(`attendance lookup failed: ${solError?.message}`);
+    }
+    const { error: radlerError } = await admin.from("consumptions").insert(
+      solAttendances.map((attendance) => ({
+        attendance_id: attendance.id,
+        drink_type: "radler" as const,
+        base_price_cents: 1500,
+        price_paid_cents: 1500,
+        recorded_at: `${attendance.date}T13:00:00Z`,
+      })),
+    );
+    if (radlerError) {
+      throw new Error(`radler insert failed: ${radlerError.message}`);
+    }
     await attend(users.sol.id, festivalIds.other2025, ["2025-09-21"], 5);
 
     // current festival has 3 tents; sol visits 2 of them, plus one tent that is
@@ -247,7 +268,7 @@ describe("get_user_festival_progress", () => {
   it("picks the latest attended festival in the same series", async () => {
     const row = await progress(users.sol.client, "2026-09-24");
     expect(row?.previous_festival_name).toBe(`SoloProg ${suffix} 2024`);
-    expect(row?.previous_festival_beers).toBe(2);
+    expect(Number(row?.previous_festival_beers)).toBe(2.5);
     expect(row?.previous_festival_days).toBe(1);
   });
 
@@ -285,13 +306,13 @@ describe("get_user_festival_progress", () => {
     expect((await progress(users.sol.client, "2026-09-24"))?.photos_uploaded).toBe(3);
   });
 
-  it("counts Highlights beers from consumptions, not the stale beer_count", async () => {
+  it("counts Highlights beers from consumptions, a Radler as half", async () => {
     const { data, error } = await admin.rpc("get_user_festival_stats_with_positions", {
       p_user_id: users.sol.id,
       p_festival_id: festivalIds.current,
     });
     expect(error).toBeNull();
-    expect(Number(data?.[0]?.total_beers)).toBe(4);
+    expect(Number(data?.[0]?.total_beers)).toBe(4.5);
   });
 
   it("is not executable by anon", async () => {
