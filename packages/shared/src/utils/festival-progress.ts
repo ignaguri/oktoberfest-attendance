@@ -46,18 +46,19 @@ export function getProgressLines(progress: FestivalProgress, totalBeers: number)
 
   const previous = progress.previousFestival;
   if (previous && previous.beers > 0) {
-    const params = { beers: totalBeers, target: previous.beers, festivalName: previous.name };
+    const target = { target: previous.beers, festivalName: previous.name };
     if (totalBeers >= previous.beers) {
       lines.push({
         id: "record",
         key: "home.progress.record",
-        params,
+        params: { beers: totalBeers, ...target },
       });
     } else {
+      // Beers still needed, not the running total: "8 more to match" reads at a glance
       lines.push({
         id: "chase",
         key: "home.progress.chase",
-        params,
+        params: { count: previous.beers - totalBeers, ...target },
       });
     }
   }

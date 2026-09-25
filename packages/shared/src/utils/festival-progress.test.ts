@@ -33,6 +33,11 @@ describe("getProgressLines", () => {
     expect(lines[0]).toMatchObject({ id: "bestStreak", params: { count: 3 } });
   });
 
+  it("counts the beers still needed to match last time, Radler halves included", () => {
+    const chase = getProgressLines(base, 18.5).find((line) => line.id === "chase");
+    expect(chase?.params).toEqual({ count: 3.5, target: 22, festivalName: "Oktoberfest 2025" });
+  });
+
   it("turns the chase into a record at or over last time", () => {
     const record = getProgressLines(base, 22).find((line) => line.id === "record");
     expect(record?.params).toEqual({ beers: 22, target: 22, festivalName: "Oktoberfest 2025" });
