@@ -3010,6 +3010,25 @@
       "lastTime": "{{festivalName}}: {{beers}} Maß an {{days}} Tagen. Schaffst du mehr?",
       "firstTime": "Dein erstes Mal mit ProstCounter. Lass es krachen!"
     },
+    "progress": {
+      "title": "Dein {{festivalName}}",
+      "streak_one": "🔥 {{count}} Tag in Folge",
+      "streak_other": "🔥 {{count}} Tage in Folge",
+      "streakShort": "🔥 {{count}}",
+      "bestStreak_one": "Beste Serie: {{count}} Tag",
+      "bestStreak_other": "Beste Serie: {{count}} Tage",
+      "tents": "⛺ {{visited}} von {{total}} Zelten",
+      "tentsShort": "⛺ {{visited}}/{{total}}",
+      "chase": "🍺 {{beers}} von {{target}} ({{festivalName}})",
+      "chaseShort": "🍺 {{beers}}/{{target}}",
+      "record": "🏆 Neuer Rekord: {{beers}} ({{festivalName}}: {{target}})",
+      "recordShort": "🏆 {{beers}}",
+      "totals_one": "📅 {{count}} Tag · 🍺 {{beers}}",
+      "totals_other": "📅 {{count}} Tage · 🍺 {{beers}}",
+      "firstDayNudge": "Trag deinen ersten Tag ein und starte deine Serie",
+      "expandLabel": "Dein Festival-Fortschritt",
+      "expandHint": "Zeigt deine Serie, deine Zelte und deinen Vergleich zum letzten Mal"
+    },
     "quickAttendance": {
       "title": "Was trinken du?",
       "tent": "Wo sind du?",

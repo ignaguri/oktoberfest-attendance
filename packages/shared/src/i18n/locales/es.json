@@ -2833,6 +2833,25 @@
       "lastTime": "{{festivalName}}: {{beers}} jarras en {{days}} días. ¿Lo superás?",
       "firstTime": "Tu primera vez con ProstCounter. ¡Que valga la pena!"
     },
+    "progress": {
+      "title": "Tu {{festivalName}}",
+      "streak_one": "🔥 Racha de {{count}} día",
+      "streak_other": "🔥 Racha de {{count}} días",
+      "streakShort": "🔥 {{count}}",
+      "bestStreak_one": "Mejor racha: {{count}} día",
+      "bestStreak_other": "Mejor racha: {{count}} días",
+      "tents": "⛺ {{visited}} de {{total}} carpas",
+      "tentsShort": "⛺ {{visited}}/{{total}}",
+      "chase": "🍺 {{beers}} de {{target}} ({{festivalName}})",
+      "chaseShort": "🍺 {{beers}}/{{target}}",
+      "record": "🏆 ¡Nuevo récord! {{beers}} ({{festivalName}}: {{target}})",
+      "recordShort": "🏆 {{beers}}",
+      "totals_one": "📅 {{count}} día · 🍺 {{beers}}",
+      "totals_other": "📅 {{count}} días · 🍺 {{beers}}",
+      "firstDayNudge": "Registrá tu primer día y arrancá tu racha",
+      "expandLabel": "Tu progreso en el festival",
+      "expandHint": "Muestra tu racha, tus carpas y cómo vas contra la última vez"
+    },
     "quickAdd": {
       "beer": "Cerveza",
       "radler": "Radler",
