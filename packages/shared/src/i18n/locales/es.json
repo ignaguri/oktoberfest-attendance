@@ -268,7 +268,9 @@
       "pending": "Llevando...",
       "success": "{{name}} está listo para {{festival}}. Tus miembros ya fueron invitados.",
       "errorNameTaken": "Ya tenés un grupo llamado {{name}} en este festival.",
-      "errorGeneric": "No se pudo llevar el grupo. Por favor, intentá de nuevo."
+      "errorGeneric": "No se pudo llevar el grupo. Por favor, intentá de nuevo.",
+      "toggleLabel": "Mostrar u ocultar los grupos de la última vez",
+      "toggleHint": "Pliega la tarjeta hasta dejar solo el título"
     },
     "memberCount": "{{count}} miembro",
     "memberCount_other": "{{count}} miembros",

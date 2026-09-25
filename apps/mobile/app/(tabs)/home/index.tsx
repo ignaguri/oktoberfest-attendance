@@ -33,6 +33,7 @@ import {
   useSyncRefresh,
 } from "@/lib/database/adapted-hooks";
 import { useIsOnline } from "@/lib/database/offline-provider";
+import { useTabScreenBottomPadding } from "@/lib/layout/use-tab-screen-bottom-padding";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
@@ -51,6 +52,7 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const bottomPadding = useTabScreenBottomPadding();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
@@ -232,8 +234,9 @@ export default function HomeScreen() {
             colors={[Colors.primary[500]]}
           />
         }
+        contentContainerStyle={{ paddingBottom: bottomPadding }}
       >
-        <VStack space="md" className="p-4 pb-20">
+        <VStack space="md" className="p-4">
           {/* App Header with logo and name */}
           <AppHeader />
 

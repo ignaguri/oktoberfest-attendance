@@ -12,6 +12,7 @@ import { CrowdReportFab } from "@/components/crowd/crowd-report-fab";
 import { QuickAttendanceFab, QuickAttendanceSheet } from "@/components/quick-attendance";
 import { VStack } from "@/components/ui/vstack";
 import { Colors } from "@/lib/constants/colors";
+import { fabBottomOffset, nativeTabBarHeight } from "@/lib/layout/tab-bar-layout";
 import { QuickAttendanceProvider, useQuickAttendance } from "@/lib/quick-attendance";
 
 /**
@@ -116,9 +117,10 @@ function FabGroup({ isFestivalActive }: { isFestivalActive: boolean }) {
   const insets = useSafeAreaInsets();
   const { openSheet, showCrowdFab, onCrowdFabPress } = useQuickAttendance();
 
-  const nativeTabBarHeight = Platform.OS === "android" ? 100 : 50;
-  const margin = insets.bottom === 0 ? 40 : 24;
-  const bottomOffset = nativeTabBarHeight + margin + insets.bottom;
+  const bottomOffset = fabBottomOffset({
+    tabBarHeight: nativeTabBarHeight(Platform.OS),
+    insetBottom: insets.bottom,
+  });
 
   return (
     <VStack space="sm" className="absolute right-4 items-end" style={{ bottom: bottomOffset }}>

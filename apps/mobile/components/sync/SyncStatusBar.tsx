@@ -20,9 +20,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
-
-/** Height of the native tab bar, mirroring the FAB group in `app/(tabs)/_layout.tsx`. */
-const NATIVE_TAB_BAR_HEIGHT = Platform.OS === "android" ? 100 : 50;
+import { fabBottomOffset, nativeTabBarHeight } from "@/lib/layout/tab-bar-layout";
 
 interface SyncStatusBarProps {
   /** Callback when user taps on errors to see details */
@@ -138,7 +136,10 @@ export function SyncStatusBar({ onViewErrors, alwaysShow = false }: SyncStatusBa
   // When there is something to tap, box-none passes touches through everywhere
   // except the pill; otherwise the whole overlay is inert, so the pill doesn't
   // swallow taps meant for the screen underneath it.
-  const bottomOffset = NATIVE_TAB_BAR_HEIGHT + (insets.bottom === 0 ? 40 : 24) + insets.bottom;
+  const bottomOffset = fabBottomOffset({
+    tabBarHeight: nativeTabBarHeight(Platform.OS),
+    insetBottom: insets.bottom,
+  });
 
   return (
     <View
