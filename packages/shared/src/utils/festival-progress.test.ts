@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { FestivalProgress } from "../schemas/profile.schema";
-import { getProgressLines } from "./festival-progress";
+import { getHeadlineLine, getProgressLines } from "./festival-progress";
 
 const base: FestivalProgress = {
   currentStreak: 2,
@@ -42,5 +42,21 @@ describe("getProgressLines", () => {
         0,
       ),
     ).toEqual([]);
+  });
+});
+
+describe("getHeadlineLine", () => {
+  it("prefers a live streak, then the target, then tents, then the best streak", () => {
+    expect(getHeadlineLine(getProgressLines(base, 18))?.id).toBe("streak");
+    expect(getHeadlineLine(getProgressLines({ ...base, currentStreak: 0 }, 18))?.id).toBe("chase");
+    expect(
+      getHeadlineLine(getProgressLines({ ...base, currentStreak: 0, previousFestival: null }, 18))
+        ?.id,
+    ).toBe("tents");
+    expect(
+      getHeadlineLine(
+        getProgressLines({ ...base, currentStreak: 0, tentsTotal: 0, previousFestival: null }, 18),
+      )?.id,
+    ).toBe("bestStreak");
   });
 });

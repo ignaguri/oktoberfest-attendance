@@ -62,3 +62,22 @@ export function getProgressLines(progress: FestivalProgress, totalBeers: number)
 
   return lines;
 }
+
+const HEADLINE_PRIORITY: ProgressLine["id"][] = [
+  "streak",
+  "record",
+  "chase",
+  "tents",
+  "bestStreak",
+];
+
+/** The one line the collapsed card leads with: the most motivating one available. */
+export function getHeadlineLine(lines: ProgressLine[]): ProgressLine | undefined {
+  for (const id of HEADLINE_PRIORITY) {
+    const line = lines.find((candidate) => candidate.id === id);
+    if (line) {
+      return line;
+    }
+  }
+  return undefined;
+}
