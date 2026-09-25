@@ -194,5 +194,6 @@ GestureHandlerRootView → SafeAreaProvider → I18nextProvider → ErrorBoundar
 - **[CAPTCHA_ROLLOUT.md](./docs/CAPTCHA_ROLLOUT.md)** - enabling hCaptcha safely, and the auth-log queries for signup/reset abuse
 - **[EMAIL.md](./docs/EMAIL.md)** - Resend sending domains, sender addresses, tracking rules, DNS records
 - **[BLOG.md](./docs/BLOG.md)** - Blog/MDX content authoring guide
+- **[SOCIAL.md](./docs/SOCIAL.md)** - @prostcounter Instagram: profile, in-app links, post log, asset sources, posting gotchas
 - **[Mobile PRD](./docs/mobile-project/PRD_PROSTCOUNTER_MOBILE.md)** - Mobile app plans
 - **[FRIENDSHIP_SYSTEM.md](./docs/FRIENDSHIP_SYSTEM.md)** - Friendship feature documentation
