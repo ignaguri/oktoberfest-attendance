@@ -266,15 +266,16 @@ export function OfflineDataProvider({
           setLastSyncAt(new Date());
         }
 
+        // Local caches re-read SQLite after a successful sync; highlights also
+        // refresh after a partly failed one that still pushed writes
+        await Promise.all(
+          getPrefixesToRefreshAfterSync(result).map((prefix) =>
+            queryClient.invalidateQueries({ queryKey: [prefix] }),
+          ),
+        );
+
         if (result.success) {
           setSyncStatus("idle");
-          // Invalidate local query caches so adapted hooks re-read from SQLite,
-          // plus highlights when pushed writes changed the server's numbers
-          await Promise.all(
-            getPrefixesToRefreshAfterSync(result).map((prefix) =>
-              queryClient.invalidateQueries({ queryKey: [prefix] }),
-            ),
-          );
         } else if (result.errors.length === 1 && result.errors[0] === "Sync already in progress") {
           // Concurrent sync attempt is not a real error — silently ignore
         } else {

@@ -83,15 +83,20 @@ export const ALL_LOCAL_PREFIXES = [
 ] as const;
 
 /**
- * Query prefixes to invalidate after a successful sync. Local caches always
- * re-read SQLite; when the sync pushed writes (drinks, photos), highlights are
- * computed by the server from those writes, so they are refetched too.
+ * Query prefixes to invalidate after a sync. A successful sync re-reads every
+ * local cache. Highlights are computed by the server from pushed writes
+ * (drinks, photos), so they refresh whenever anything was pushed, even if
+ * another op in the same sync failed.
  */
-export function getPrefixesToRefreshAfterSync(result: { pushed: number }): string[] {
+export function getPrefixesToRefreshAfterSync(result: {
+  success: boolean;
+  pushed: number;
+}): string[] {
+  const prefixes: string[] = result.success ? [...ALL_LOCAL_PREFIXES] : [];
   if (result.pushed > 0) {
-    return [...ALL_LOCAL_PREFIXES, "highlights"];
+    prefixes.push("highlights");
   }
-  return [...ALL_LOCAL_PREFIXES];
+  return prefixes;
 }
 
 /**
