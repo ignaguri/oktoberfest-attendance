@@ -5081,6 +5081,15 @@ export interface paths {
                         "application/json": components["schemas"]["ApiError"];
                     };
                 };
+                /** @description Notifications are not configured */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
             };
         };
         delete?: never;
@@ -5142,6 +5151,15 @@ export interface paths {
                         "application/json": components["schemas"]["ApiError"];
                     };
                 };
+                /** @description Notifications are not configured */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
             };
         };
         delete?: never;
@@ -5195,6 +5213,15 @@ export interface paths {
                 };
                 /** @description Unauthorized */
                 401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Notifications are not configured */
+                503: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -5264,6 +5291,15 @@ export interface paths {
                         "application/json": components["schemas"]["ApiError"];
                     };
                 };
+                /** @description Notifications are not configured */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
             };
         };
         /**
@@ -5306,6 +5342,15 @@ export interface paths {
                 };
                 /** @description Unauthorized */
                 401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Notifications are not configured */
+                503: {
                     headers: {
                         [name: string]: unknown;
                     };

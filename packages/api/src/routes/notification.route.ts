@@ -64,6 +64,14 @@ const registerTokenRoute = createRoute({
         },
       },
     },
+    503: {
+      description: "Notifications are not configured",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
+        },
+      },
+    },
   },
   security: [{ bearerAuth: [] }],
 });
@@ -119,6 +127,14 @@ const enablePushRoute = createRoute({
     },
     401: {
       description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
+        },
+      },
+    },
+    503: {
+      description: "Notifications are not configured",
       content: {
         "application/json": {
           schema: ApiErrorSchema,
@@ -189,6 +205,14 @@ const subscribeUserRoute = createRoute({
         },
       },
     },
+    503: {
+      description: "Notifications are not configured",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
+        },
+      },
+    },
   },
   security: [{ bearerAuth: [] }],
 });
@@ -240,6 +264,14 @@ const getPreferencesRoute = createRoute({
     },
     401: {
       description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
+        },
+      },
+    },
+    503: {
+      description: "Notifications are not configured",
       content: {
         "application/json": {
           schema: ApiErrorSchema,
@@ -311,6 +343,14 @@ const updatePreferencesRoute = createRoute({
     },
     401: {
       description: "Unauthorized",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
+        },
+      },
+    },
+    503: {
+      description: "Notifications are not configured",
       content: {
         "application/json": {
           schema: ApiErrorSchema,

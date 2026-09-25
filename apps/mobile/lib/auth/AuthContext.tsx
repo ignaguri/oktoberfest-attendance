@@ -15,6 +15,7 @@ import { identifyDevice } from "vexo-analytics";
 import { clearAllData } from "@/lib/database/debug";
 import { getDatabase } from "@/lib/database/init";
 import { logger } from "@/lib/logger";
+import { clearBadgeCount } from "@/lib/notifications/handlers";
 import { supabase } from "@/lib/supabase";
 
 import {
@@ -131,6 +132,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Cached queries are keyed "current" user, not by id, so the next user
         // would otherwise see this user's groups until a refetch
         queryClient.clear();
+        // The badge is this user's unread count; nothing else resets it once
+        // the header bell that syncs it is gone
+        clearBadgeCount().catch(() => {});
       }
 
       setSession(session);

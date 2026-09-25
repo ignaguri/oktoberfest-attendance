@@ -8219,6 +8219,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "Notifications are not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
           }
         }
       }
@@ -8318,6 +8328,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "Notifications are not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
           }
         }
       }
@@ -8403,6 +8423,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Notifications are not configured",
             "content": {
               "application/json": {
                 "schema": {
@@ -8514,6 +8544,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "Notifications are not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
           }
         }
       },
@@ -8587,6 +8627,16 @@
           },
           "401": {
             "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Notifications are not configured",
             "content": {
               "application/json": {
                 "schema": {
