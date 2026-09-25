@@ -1771,7 +1771,8 @@
       "buyMeABeer": "Kauf mir ein Bier",
       "whatsNew": "Was ist neu",
       "rateApp": "App bewerten",
-      "shareApp": "App teilen"
+      "shareApp": "App teilen",
+      "followInstagram": "Folge uns auf Instagram"
     },
     "deleteAccount": {
       "title": "Konto löschen",
@@ -3863,6 +3864,8 @@
       "blog": "Blog",
       "download": "Download",
       "legal": "Rechtliches",
+      "followInstagram": "Folge uns auf Instagram",
+      "madeBy": "Gemacht von",
       "blogLinks": {
         "oktoberfestGuide": "Oktoberfest 2026 Guide",
         "firstTimeTips": "Tipps für Erstbesucher",
@@ -3957,6 +3960,7 @@
     "by": "von",
     "buyMeA": "Spendier mir ein",
     "buyMeABeer": "Spendier mir ein Bier",
+    "followInstagram": "Folge uns auf Instagram",
     "copyright": "© 2024 ProstCounter. Alle Rechte vorbehalten.",
     "links": {
       "privacy": "Datenschutz",

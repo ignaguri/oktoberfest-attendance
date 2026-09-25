@@ -1594,7 +1594,8 @@
       "buyMeABeer": "Cómprame una cerveza",
       "whatsNew": "Novedades",
       "rateApp": "Calificar la app",
-      "shareApp": "Compartir la app"
+      "shareApp": "Compartir la app",
+      "followInstagram": "Seguinos en Instagram"
     },
     "deleteAccount": {
       "title": "Eliminar cuenta",
@@ -3474,6 +3475,7 @@
     "buyMeABeer": "Comprame una cerveza",
     "reportBug": "Reportar un error",
     "requestFeature": "Solicitar una función",
+    "followInstagram": "Seguinos en Instagram",
     "links": {
       "privacy": "Privacidad",
       "terms": "Términos",
@@ -3735,6 +3737,8 @@
       "blog": "Blog",
       "download": "Descargar",
       "legal": "Legal",
+      "followInstagram": "Seguinos en Instagram",
+      "madeBy": "Hecho por",
       "blogLinks": {
         "oktoberfestGuide": "Guía del Oktoberfest 2026",
         "firstTimeTips": "Consejos para primerizos",
