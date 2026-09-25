@@ -794,7 +794,13 @@
       "avgPerDay": "Avg/Day",
       "spent": "Spent",
       "baseCost": "Base",
-      "tips": "Tips"
+      "tips": "Tips",
+      "streak_one": "day streak",
+      "streak_other": "days streak",
+      "bestStreak_one": "day (best streak)",
+      "bestStreak_other": "days (best streak)",
+      "tents": "Tents",
+      "photos": "Photos"
     },
     "noFestival": "Please select a festival to view attendance",
     "updateSuccess": "Attendance updated",

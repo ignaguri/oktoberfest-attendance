@@ -794,7 +794,13 @@
       "avgPerDay": "Promedio/Día",
       "spent": "Gastado",
       "baseCost": "Base",
-      "tips": "Propinas"
+      "tips": "Propinas",
+      "streak_one": "día de racha",
+      "streak_other": "días de racha",
+      "bestStreak_one": "día (mejor racha)",
+      "bestStreak_other": "días (mejor racha)",
+      "tents": "Carpas",
+      "photos": "Fotos"
     },
     "noFestival": "Por favor, seleccioná un festival para ver las asistencias",
     "updateSuccess": "Asistencia actualizada",

@@ -13,6 +13,7 @@ import { AttendanceDayList } from "@/components/attendance/attendance-day-list";
 import { AttendanceStrip } from "@/components/attendance/attendance-strip";
 import { CalendarActionSheet } from "@/components/attendance/calendar-action-sheet";
 import { CheckInDialog } from "@/components/attendance/check-in-dialog";
+import { SummaryProgressStats } from "@/components/attendance/summary-progress-stats";
 import { AttendanceSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
@@ -46,10 +47,14 @@ import {
   dayPlanToReservation,
 } from "@/lib/attendance/day-plans";
 import { resolveDayLink } from "@/lib/attendance/day-link";
+import { useTabScreenBottomPadding } from "@/lib/layout/use-tab-screen-bottom-padding";
 import { logger } from "@/lib/logger";
+import { useQuickAttendance } from "@/lib/quick-attendance";
 
 export default function AttendanceScreen() {
   const { t } = useTranslation();
+  const { showCrowdFab } = useQuickAttendance();
+  const bottomPadding = useTabScreenBottomPadding({ hasCrowdFab: showCrowdFab });
   const {
     currentFestival,
     festivals,
@@ -382,8 +387,9 @@ export default function AttendanceScreen() {
       <ScrollView
         className="flex-1 bg-background-50"
         refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
+        contentContainerStyle={{ paddingBottom: bottomPadding }}
       >
-        <View className="p-4 pb-20">
+        <View className="p-4">
           {/* Calendar */}
           <VStack space="md">
             <SegmentedControl
@@ -486,6 +492,7 @@ export default function AttendanceScreen() {
                   </Text>
                 </View>
               </View>
+              <SummaryProgressStats />
             </View>
           )}
         </View>
