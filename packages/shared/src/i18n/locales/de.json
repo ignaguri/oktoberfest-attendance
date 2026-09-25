@@ -3015,7 +3015,7 @@
       "streak_one": "🔥 {{count}} Tag in Folge",
       "streak_other": "🔥 {{count}} Tage in Folge",
       "bestStreak_one": "Beste Serie: {{count}} Tag",
-      "bestStreak_other": "Beste Serie: {{count}} Tage",
+      "bestStreak_other": "Beste Serie: {{count}} Tage in Folge",
       "tents": "⛺ {{visited}} von {{total}} Zelten",
       "chase": "🍺 {{beers}} von {{target}} ({{festivalName}})",
       "record": "🏆 Neuer Rekord: {{beers}} ({{festivalName}}: {{target}})",

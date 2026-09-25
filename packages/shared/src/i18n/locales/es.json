@@ -2838,7 +2838,7 @@
       "streak_one": "🔥 Racha de {{count}} día",
       "streak_other": "🔥 Racha de {{count}} días",
       "bestStreak_one": "Mejor racha: {{count}} día",
-      "bestStreak_other": "Mejor racha: {{count}} días",
+      "bestStreak_other": "Mejor racha: {{count}} días seguidos",
       "tents": "⛺ {{visited}} de {{total}} carpas",
       "chase": "🍺 {{beers}} de {{target}} ({{festivalName}})",
       "record": "🏆 ¡Nuevo récord! {{beers}} ({{festivalName}}: {{target}})",

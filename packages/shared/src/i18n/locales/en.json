@@ -2778,7 +2778,7 @@
       "streak_one": "🔥 {{count}}-day streak",
       "streak_other": "🔥 {{count}}-day streak",
       "bestStreak_one": "Best streak: {{count}} day",
-      "bestStreak_other": "Best streak: {{count}} days",
+      "bestStreak_other": "Best streak: {{count}} days in a row",
       "tents": "⛺ {{visited}} of {{total}} tents",
       "chase": "🍺 {{beers}} of {{target}} ({{festivalName}})",
       "record": "🏆 New record: {{beers}} ({{festivalName}}: {{target}})",
