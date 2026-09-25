@@ -12,9 +12,9 @@ python3 scripts/store-screenshots/render.py en play       # Play, 1080x1920, int
 python3 scripts/store-screenshots/render.py en instagram  # feed 4:5, 1080x1350, into screenshots/instagram/en/
 ```
 
-Play rejects anything longer than 2:1, so it can't take the App Store frames. The
-Instagram frame lets the phone run off the bottom, which hides bottom sheets: the
-log-drink and tent-picker shots don't work there.
+Play rejects anything longer than 2:1, so it can't take the App Store frames.
+Instagram feed posts top out at 4:5, so that frame shrinks the phone to fit whole;
+pick the 4:5 crop in the post flow or Instagram squares it.
 
 Headlines come from `copy.json`, keyed by the raw file name. Adding a locale is
 adding a block there (German with real umlauts, Spanish in voseo) and running the

@@ -5,7 +5,7 @@ Usage: python3 scripts/store-screenshots/render.py [locale] [target]   (defaults
 Reads screenshots/iphone-6.9/raw/<id>.png and copy.json. Targets:
   appstore   1320x2868 (App Store 6.9")  -> screenshots/iphone-6.9/framed/<locale>/
   play       1080x1920 (Play, 9:16)      -> fastlane/metadata/android/<play locale>/images/phoneScreenshots/
-  instagram  1080x1350 (feed, 4:5; the phone runs off the bottom) -> screenshots/instagram/<locale>/
+  instagram  1080x1350 (feed, 4:5, whole phone) -> screenshots/instagram/<locale>/
 """
 import html
 import json
@@ -26,7 +26,7 @@ PLAY_LOCALES = {"en": "en-US", "de": "de-DE", "es": "es-ES"}
 TARGETS = {
     "appstore": dict(width=1320, height=2868, font=124, top=200, head=268, gap=80, phone=990, pad=20, radius=150),
     "play": dict(width=1080, height=1920, font=92, top=110, head=210, gap=60, phone=700, pad=14, radius=106),
-    "instagram": dict(width=1080, height=1350, font=84, top=90, head=190, gap=60, phone=780, pad=16, radius=118),
+    "instagram": dict(width=1080, height=1350, font=64, top=50, head=110, gap=25, phone=500, pad=11, radius=76),
 }
 
 
