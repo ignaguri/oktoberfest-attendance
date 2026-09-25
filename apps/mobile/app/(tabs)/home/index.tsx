@@ -33,6 +33,7 @@ import {
   useSyncRefresh,
 } from "@/lib/database/adapted-hooks";
 import { useIsOnline } from "@/lib/database/offline-provider";
+import { useTabScreenBottomPadding } from "@/lib/layout/use-tab-screen-bottom-padding";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
@@ -70,8 +71,14 @@ export default function HomeScreen() {
   const { isSharing, nearbyMembers } = useLocationContextSafe();
 
   // Quick attendance context (for crowd report prompt after save)
-  const { pendingCrowdReport, setPendingCrowdReport, setShowCrowdFab, setOnCrowdFabPress } =
-    useQuickAttendance();
+  const {
+    pendingCrowdReport,
+    setPendingCrowdReport,
+    showCrowdFab,
+    setShowCrowdFab,
+    setOnCrowdFabPress,
+  } = useQuickAttendance();
+  const bottomPadding = useTabScreenBottomPadding({ hasCrowdFab: showCrowdFab });
 
   // Crowd report prompt state
   const [showCrowdPrompt, setShowCrowdPrompt] = useState(false);
@@ -232,8 +239,9 @@ export default function HomeScreen() {
             colors={[Colors.primary[500]]}
           />
         }
+        contentContainerStyle={{ paddingBottom: bottomPadding }}
       >
-        <VStack space="md" className="p-4 pb-20">
+        <VStack space="md" className="p-4">
           {/* App Header with logo and name */}
           <AppHeader />
 

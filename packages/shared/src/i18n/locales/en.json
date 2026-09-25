@@ -268,7 +268,10 @@
       "pending": "Bringing over...",
       "success": "{{name}} is ready for {{festival}}. Your members have been invited.",
       "errorNameTaken": "You already have a group called {{name}} in this festival.",
-      "errorGeneric": "Could not bring this group over. Please try again."
+      "errorGeneric": "Could not bring this group over. Please try again.",
+      "toggleLabel": "Show or hide the groups from last time",
+      "collapseHint": "Folds the card to its title",
+      "expandHint": "Shows the groups you can bring over"
     },
     "memberCount": "{{count}} member",
     "memberCount_other": "{{count}} members",

@@ -268,7 +268,10 @@
       "pending": "Wird übertragen...",
       "success": "{{name}} ist bereit für {{festival}}. Deine Mitglieder wurden eingeladen.",
       "errorNameTaken": "Du hast bereits eine Gruppe namens {{name}} bei diesem Festival.",
-      "errorGeneric": "Die Gruppe konnte nicht übertragen werden. Bitte versuche es erneut."
+      "errorGeneric": "Die Gruppe konnte nicht übertragen werden. Bitte versuche es erneut.",
+      "toggleLabel": "Gruppen vom letzten Mal ein- oder ausblenden",
+      "collapseHint": "Klappt die Karte auf ihren Titel zusammen",
+      "expandHint": "Zeigt die Gruppen, die du übernehmen kannst"
     },
     "memberCount": "{{count}} Mitglied",
     "memberCount_other": "{{count}} Mitglieder",

@@ -18,12 +18,14 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import { Image } from "react-native";
 
+import { PhotoDetailModal } from "@/components/gallery/photo-detail-modal";
 import { RadlerIcon } from "@/components/icons/radler-icon";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { getPhotoGalleryTarget, type PhotoGalleryTarget } from "@/lib/feed/photo-gallery-target";
 import { getBeerPictureUrl } from "@/lib/utils";
 
 import { ImagePreviewModal } from "./image-preview-modal";
@@ -101,6 +103,7 @@ function getActivityIcon(
 export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
   const { t } = useTranslation();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [galleryPhoto, setGalleryPhoto] = useState<PhotoGalleryTarget | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   // Fetch public profile on demand when modal is opened
@@ -110,9 +113,19 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
     festivalId ?? activity.festival_id,
   );
 
-  const handleImagePress = useCallback((imageUrl: string) => {
-    setPreviewImage(imageUrl);
-  }, []);
+  // With a group in common the photo opens in the gallery viewer, where its
+  // reactions and comments are; otherwise in the plain preview
+  const handleImagePress = useCallback(
+    (imageUrl: string) => {
+      const target = getPhotoGalleryTarget(activity.activity_data);
+      if (target) {
+        setGalleryPhoto(target);
+      } else {
+        setPreviewImage(imageUrl);
+      }
+    },
+    [activity.activity_data],
+  );
 
   const handleClosePreview = useCallback(() => {
     setPreviewImage(null);
@@ -296,6 +309,17 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
         {/* Image Preview Modal */}
         <ImagePreviewModal imageUri={previewImage} onClose={handleClosePreview} />
       </HStack>
+
+      {/* Mounted only while open: it fetches reactions and comments */}
+      {galleryPhoto && (
+        <PhotoDetailModal
+          visible
+          photoId={galleryPhoto.photoId}
+          photoUrl={fullPictureUrl ?? null}
+          groupId={galleryPhoto.groupId}
+          onClose={() => setGalleryPhoto(null)}
+        />
+      )}
 
       {/* User Profile Modal */}
       <UserProfileModal

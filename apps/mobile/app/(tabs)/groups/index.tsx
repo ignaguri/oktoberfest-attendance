@@ -14,6 +14,7 @@ import { EmptyGroupsState } from "@/components/groups/empty-groups-state";
 import { GroupListItem } from "@/components/groups/group-list-item";
 import { JoinGroupSheet } from "@/components/groups/join-group-sheet";
 import { PendingInvitationsSection } from "@/components/groups/pending-invitations-section";
+import { PersonalProgressCard } from "@/components/home/personal-progress-card";
 import { GroupsSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
@@ -171,6 +172,10 @@ export default function GroupsScreen() {
 
         {hasGroups ? (
           <VStack space="md" className="p-4 pb-20">
+            {/* Same card as Home; anyone here has a group, so it is the
+                one-line collapsed version */}
+            <PersonalProgressCard />
+
             {/* Header with action buttons */}
             <HStack className="items-center justify-between">
               <Text className="text-sm text-typography-500">{t("groups.yourGroups")}</Text>
