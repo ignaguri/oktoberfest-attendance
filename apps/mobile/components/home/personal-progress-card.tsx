@@ -42,7 +42,7 @@ export function PersonalProgressCard() {
           <Text className="text-base font-semibold text-typography-900">
             {t("home.progress.firstDayNudge")}
           </Text>
-          {previous && (
+          {previous && previous.beers > 0 && (
             <Text className="text-sm text-typography-500">
               {t("home.festivalStatus.lastTime", {
                 festivalName: previous.name,

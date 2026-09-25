@@ -680,6 +680,9 @@ export class SupabaseProfileRepository {
   }
 
   async getHighlights(userId: string, festivalId: string): Promise<Highlights> {
+    // Runs alongside the queries below; it never rejects
+    const progressPromise = this.getFestivalProgress(userId, festivalId);
+
     // Get user stats from the view
     const { data: stats, error: statsError } = await this.supabase.rpc(
       "get_user_festival_stats_with_positions",
@@ -747,7 +750,7 @@ export class SupabaseProfileRepository {
       });
     }
 
-    const progress = await this.getFestivalProgress(userId, festivalId);
+    const progress = await progressPromise;
 
     return {
       totalBeers: Number(userStats?.total_beers) || 0,
