@@ -1,4 +1,9 @@
 export const changelog: Record<string, string[]> = {
+  "1.9.1": [
+    "Your festival progress on Home: streak, tents, photos and how you compare with your last festival",
+    "The Groups tab is now Social, and the feed shows friends' day plans and tent reservations",
+    "Send us feedback straight from the app",
+  ],
   "1.9.0": [
     "Open a friend's full profile: the groups you share, their favourite tent and their festival history",
     "Invite people to a group by searching for their name",

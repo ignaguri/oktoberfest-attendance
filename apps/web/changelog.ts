@@ -1,4 +1,10 @@
 export const changelog: Record<string, string[]> = {
+  "1.5.1": [
+    "📈 Your festival progress on Home, and how it compares with your last festival",
+    "📅 See friends' day plans and tent reservations in the activity feed",
+    "💬 Send us feedback straight from the app",
+    "📸 Follow ProstCounter on Instagram",
+  ],
   "1.5.0": [
     "👤 Open a friend's full profile: the groups you share, their favourite tent and their festival history",
     "🔍 Invite people to a group by searching for their name",
