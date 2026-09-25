@@ -83,10 +83,7 @@ export function PersonalProgressCard() {
     return null;
   }
 
-  const shortParts = lines.flatMap((line) =>
-    line.shortKey ? [t(line.shortKey, line.params)] : [],
-  );
-  const collapsedText = shortParts.length > 0 ? shortParts.join(" · ") : title;
+  const summary = lines.map((line) => t(line.key, line.params)).join(" · ");
 
   return (
     <Pressable
@@ -98,9 +95,14 @@ export function PersonalProgressCard() {
     >
       <Card size="md" variant="elevated" className="p-3">
         <HStack space="sm" className="items-center justify-between">
-          <Text className="flex-1 text-sm font-medium text-typography-700" numberOfLines={1}>
-            {isExpanded ? title : collapsedText}
-          </Text>
+          <VStack className="flex-1">
+            <Text className="text-sm font-semibold text-typography-900">{title}</Text>
+            {!isExpanded && (
+              <Text className="text-sm text-typography-500" numberOfLines={1}>
+                {summary}
+              </Text>
+            )}
+          </VStack>
           {isExpanded ? (
             <ChevronUp size={16} color={IconColors.muted} />
           ) : (

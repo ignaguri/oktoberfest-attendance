@@ -19,7 +19,7 @@ describe("getProgressLines", () => {
 
   it("falls back to the best streak when the current one is broken", () => {
     const lines = getProgressLines({ ...base, currentStreak: 0 }, 18);
-    expect(lines[0]).toMatchObject({ id: "bestStreak", shortKey: null, params: { count: 3 } });
+    expect(lines[0]).toMatchObject({ id: "bestStreak", params: { count: 3 } });
   });
 
   it("turns the chase into a record at or over last time", () => {
