@@ -3029,7 +3029,7 @@
       "tents": "⛺ {{visited}} von {{total}} Zelten",
       "chase_one": "🍺 Noch {{count}} bis {{festivalName}} ({{target}})",
       "chase_other": "🍺 Noch {{count}} bis {{festivalName}} ({{target}})",
-      "record": "🏆 Neuer Rekord: {{beers}} Mass, bei {{festivalName}} waren es {{target}}",
+      "record": "🏆 Neuer Rekord: {{beers}} Maß, bei {{festivalName}} waren es {{target}}",
       "totals_one": "📅 {{count}} Tag · 🍺 {{beers}}",
       "totals_other": "📅 {{count}} Tage · 🍺 {{beers}}",
       "photos_one": "📸 1 Foto hochgeladen",
