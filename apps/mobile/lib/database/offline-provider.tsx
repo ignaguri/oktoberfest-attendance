@@ -28,7 +28,7 @@ import { AppState, Platform } from "react-native";
 import { logger } from "@/lib/logger";
 
 import { initializeDatabase } from "./init";
-import { ALL_LOCAL_PREFIXES } from "./query-keys";
+import { getPrefixesToRefreshAfterSync } from "./query-keys";
 import type { SyncManager } from "./sync/sync-manager";
 import { createSyncManager, type SyncOptions, type SyncResult } from "./sync/sync-manager";
 import { getQueueStats } from "./sync-queue";
@@ -268,9 +268,10 @@ export function OfflineDataProvider({
 
         if (result.success) {
           setSyncStatus("idle");
-          // Invalidate local query caches so adapted hooks re-read from SQLite
+          // Invalidate local query caches so adapted hooks re-read from SQLite,
+          // plus highlights when pushed writes changed the server's numbers
           await Promise.all(
-            ALL_LOCAL_PREFIXES.map((prefix) =>
+            getPrefixesToRefreshAfterSync(result).map((prefix) =>
               queryClient.invalidateQueries({ queryKey: [prefix] }),
             ),
           );
