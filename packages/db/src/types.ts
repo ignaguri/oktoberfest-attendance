@@ -2610,6 +2610,20 @@ export type Database = {
           hide_photos_from_group: boolean
         }[]
       }
+      get_user_festival_progress: {
+        Args: { p_festival_id: string; p_today?: string }
+        Returns: {
+          accepted_friends: number
+          best_streak: number
+          current_streak: number
+          groups_this_festival: number
+          previous_festival_beers: number
+          previous_festival_days: number
+          previous_festival_name: string
+          tents_total: number
+          tents_visited: number
+        }[]
+      }
       get_user_festival_stats: {
         Args: { p_festival_id: string; p_user_id: string }
         Returns: {
