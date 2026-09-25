@@ -33,7 +33,7 @@ import {
 } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupService } from "../services/group.service";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 /** Fire-and-forget group-join push. Never throws: the join already succeeded. */
@@ -42,13 +42,12 @@ async function announceGroupJoin(
   groupId: string,
   newUserId: string,
 ): Promise<void> {
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (!novuApiKey) {
+  const notificationService = createNotificationService(supabase);
+  if (!notificationService) {
     return;
   }
 
   try {
-    const notificationService = new NotificationService(supabase, novuApiKey);
     await notificationService.notifyGroupJoin(groupId, newUserId);
   } catch (notificationError) {
     logger.error(
@@ -831,10 +830,9 @@ app.openapi(carryOverRoute, async (c) => {
   // as a failure, whose retry then hits GROUP_ALREADY_CARRIED_OVER. Only
   // notifyGroupCarryOver swallows its own failures; getMembers throws
   // NOT_GROUP_MEMBER for a creator who left the source group, and findById
-  // throws on any query error. The constructor throws without an API key, so
-  // guard that like the other routes.
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (novuApiKey) {
+  // throws on any query error.
+  const notificationService = createNotificationService(supabase);
+  if (notificationService) {
     try {
       const sourceMembers = await service.getMembers(id, user.id);
       const recipientIds = sourceMembers
@@ -844,7 +842,6 @@ app.openapi(carryOverRoute, async (c) => {
       const festivalRepo = new SupabaseFestivalRepository(supabase);
       const targetFestival = await festivalRepo.findById(targetFestivalId);
 
-      const notificationService = new NotificationService(supabase, novuApiKey);
       await notificationService.notifyGroupCarryOver(recipientIds, {
         groupName: group.name,
         festivalName: targetFestival?.name ?? "",

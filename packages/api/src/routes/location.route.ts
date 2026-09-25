@@ -9,10 +9,11 @@ import {
   UpdateLocationSchema,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseLocationRepository } from "../repositories/supabase";
 import { LocationService } from "../services/location.service";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 import { createAdminClient } from "../utils/admin-client";
 import { ApiErrorSchema } from "../lib/error-response";
 
@@ -100,15 +101,15 @@ app.openapi(startSessionRoute, async (c) => {
   const session = await locationService.startSession(user.id, data);
 
   // Notify group members about location sharing (fire and forget)
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (novuApiKey) {
-    const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = createNotificationService(supabase);
+  if (notificationService) {
     // Pass groupIds if specific visibility was selected
     const groupIds = data.visibility === "specific" ? data.groupIds : undefined;
     notificationService
       .notifyLocationSharingStarted(user.id, data.festivalId, groupIds)
-      .catch(() => {
-        // Silently ignore notification errors - don't fail the session start
+      .catch((err) => {
+        // Don't fail the session start over a notification
+        logger.error({ err }, "[location-sharing] notification failed");
       });
   }
 

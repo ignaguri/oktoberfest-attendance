@@ -18,7 +18,7 @@ import type { AuthContext } from "../middleware/auth";
 import { SupabaseFriendRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { FriendService } from "../services/friend.service";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 const app = new OpenAPIHono<AuthContext>();
@@ -184,9 +184,8 @@ app.openapi(sendRequestRoute, async (c) => {
   const result = await service.sendRequest(user.id, addresseeId);
 
   // Send push notification to the addressee (fire-and-forget)
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (novuApiKey) {
-    const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = createNotificationService(supabase);
+  if (notificationService) {
     notificationService.notifyFriendRequest(user.id, addresseeId).catch((err) => {
       logger.error({ err }, "[friend-request] notification failed");
     });

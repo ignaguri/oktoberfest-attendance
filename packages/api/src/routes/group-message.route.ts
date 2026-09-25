@@ -17,7 +17,7 @@ import type { AuthContext } from "../middleware/auth";
 import { ForbiddenError, NotFoundError } from "../middleware/error";
 import { ApiErrorSchema } from "../lib/error-response";
 import { logger } from "../lib/logger";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -441,10 +441,9 @@ app.openapi(createMessageRoute, async (c) => {
 
   const message = mapMessageResponse(newMessage, profile);
 
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (novuApiKey) {
+  const notificationService = createNotificationService(supabase);
+  if (notificationService) {
     try {
-      const notificationService = new NotificationService(supabase, novuApiKey);
       await notificationService.notifyGroupMessage({
         authorId: user.id,
         festivalId,

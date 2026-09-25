@@ -17,6 +17,9 @@ vi.mock("@/lib/database/debug", () => ({
 vi.mock("@/lib/database/init", () => ({
   getDatabase: vi.fn(),
 }));
+vi.mock("@/lib/notifications/handlers", () => ({
+  clearBadgeCount: vi.fn(),
+}));
 vi.mock("@/lib/supabase", () => ({
   supabase: { auth: { onAuthStateChange: vi.fn(), getSession: vi.fn(), signOut: vi.fn() } },
 }));

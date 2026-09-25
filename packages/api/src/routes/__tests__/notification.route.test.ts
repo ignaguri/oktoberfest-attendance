@@ -10,16 +10,23 @@ import { NotificationService } from "../../services/notification.service";
 import notificationRoutes from "../notification.route";
 
 // Mock the NotificationService
-vi.mock("../../services/notification.service", () => ({
-  NotificationService: vi.fn().mockImplementation(function () {
-    return {
-      registerPushToken: vi.fn(),
-      subscribeUser: vi.fn(),
-      getUserNotificationPreferences: vi.fn(),
-      updateUserNotificationPreferences: vi.fn(),
-    };
-  }),
-}));
+vi.mock("../../services/notification.service", () => {
+  const mocked = {
+    NotificationService: vi.fn().mockImplementation(function () {
+      return {
+        registerPushToken: vi.fn(),
+        subscribeUser: vi.fn(),
+        getUserNotificationPreferences: vi.fn(),
+        updateUserNotificationPreferences: vi.fn(),
+      };
+    }),
+  };
+  return {
+    ...mocked,
+    createNotificationService: () =>
+      process.env.NOVU_API_KEY ? new mocked.NotificationService() : null,
+  };
+});
 
 describe("Notification Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;

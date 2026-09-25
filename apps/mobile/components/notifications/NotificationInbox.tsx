@@ -12,6 +12,7 @@ import Animated, { interpolate, useAnimatedStyle, type SharedValue } from "react
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { canRenderInboxAvatar } from "@/lib/notifications/inbox-avatar";
 import { getAvatarUrl } from "@/lib/utils";
 
 const EMPTY_CONTAINER_STYLE = { flexGrow: 1 } as const;
@@ -35,6 +36,28 @@ function RightAction({ progress, label }: { progress: SharedValue<number>; label
         <Text className="mt-1 text-xs text-white">{label}</Text>
       </Animated.View>
     </View>
+  );
+}
+
+/** The actor's photo, or a bell when there is none React Native can draw. */
+function NotificationAvatar({ avatar }: { avatar: string | undefined }) {
+  const [failedToLoad, setFailedToLoad] = useState(false);
+
+  if (!canRenderInboxAvatar(avatar) || failedToLoad) {
+    return (
+      <View className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-primary-100">
+        <Bell size={20} color={IconColors.primary} />
+      </View>
+    );
+  }
+
+  return (
+    <Image
+      source={{ uri: getAvatarUrl(avatar) }}
+      className="mr-3 h-10 w-10 rounded-full"
+      alt=""
+      onError={() => setFailedToLoad(true)}
+    />
   );
 }
 
@@ -80,14 +103,7 @@ function NotificationItem({ notification, onPress, onArchive }: NotificationItem
           )}
         </View>
 
-        {/* Avatar */}
-        {notification.avatar && (
-          <Image
-            source={{ uri: getAvatarUrl(notification.avatar) }}
-            className="mr-3 h-10 w-10 rounded-full"
-            alt=""
-          />
-        )}
+        <NotificationAvatar avatar={notification.avatar} />
 
         {/* Content */}
         <View className="flex-1">

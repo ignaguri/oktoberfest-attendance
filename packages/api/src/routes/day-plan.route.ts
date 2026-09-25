@@ -14,7 +14,7 @@ import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseDayPlanRepository } from "../repositories/supabase";
 import { DayPlanService } from "../services/day-plan.service";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 const app = new OpenAPIHono<AuthContext>();
@@ -94,11 +94,10 @@ app.openapi(upsertDayPlanRoute, async (c) => {
   const service = new DayPlanService(new SupabaseDayPlanRepository(supabase));
   const result = await service.upsertPlan(user.id, festivalId, date, input);
 
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (result.becameVisible && novuApiKey) {
+  const notificationService = result.becameVisible ? createNotificationService(supabase) : null;
+  if (notificationService) {
     // Never fail the save over a notification.
     try {
-      const notificationService = new NotificationService(supabase, novuApiKey);
       await notificationService.notifyPlanOverlap({
         actorId: user.id,
         festivalId,

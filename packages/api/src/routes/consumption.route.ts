@@ -14,7 +14,7 @@ import {
 import { tentNamesFor } from "../services/check-in-notifications";
 import { ConsumptionService } from "../services/consumption.service";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 // Query schema for listing consumptions
@@ -104,11 +104,10 @@ app.openapi(logConsumptionRoute, async (c) => {
   // ledger inside notifyDayStart makes this a no-op for every later drink.
   // The key check comes before the tent-name lookup so a Novu-less
   // environment doesn't pay for a query it will throw away.
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (novuApiKey) {
+  const notificationService = createNotificationService(supabase);
+  if (notificationService) {
     try {
       const tentName = data.tentId ? await tentNamesFor(supabase, [data.tentId]) : null;
-      const notificationService = new NotificationService(supabase, novuApiKey);
       await notificationService.notifyDayStart({
         actorId: user.id,
         festivalId: data.festivalId,

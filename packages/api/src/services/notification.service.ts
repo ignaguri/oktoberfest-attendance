@@ -1,5 +1,5 @@
 import { Novu } from "@novu/api";
-import { ChatOrPushProviderEnum } from "@novu/api/models/components";
+import { ChatOrPushProviderEnum, type TriggerEventRequestDto } from "@novu/api/models/components";
 import type { Database } from "@prostcounter/db";
 import type { DayPlanKind, UpdateNotificationPreferencesInput } from "@prostcounter/shared";
 import {
@@ -85,6 +85,44 @@ export class NotificationService {
     });
     this.expoIntegrationId = process.env.NOVU_EXPO_INTEGRATION_ID;
     this.fcmIntegrationId = process.env.NOVU_FCM_INTEGRATION_ID;
+  }
+
+  /**
+   * Trigger a workflow with the iOS icon badge set to the recipient's unread
+   * inbox count. APNs only shows a badge the push itself carries, so without
+   * this the icon never shows a count while the app is closed. The count is
+   * read before this notification exists, hence the +1. A failed lookup only
+   * drops the badge, never the notification.
+   */
+  private async triggerWithBadge(request: TriggerEventRequestDto) {
+    const badge = await this.nextBadgeCount(request.to);
+    if (badge === undefined) {
+      return this.novu.trigger(request);
+    }
+    return this.novu.trigger({
+      ...request,
+      overrides: {
+        ...request.overrides,
+        providers: { ...request.overrides?.providers, expo: { badge } },
+      },
+    });
+  }
+
+  private async nextBadgeCount(to: TriggerEventRequestDto["to"]): Promise<number | undefined> {
+    if (typeof to !== "string") {
+      return undefined;
+    }
+    try {
+      const response = await this.novu.subscribers.notifications.count(
+        to,
+        JSON.stringify([{ read: false }]),
+      );
+      const unread = response.result[0]?.count;
+      return typeof unread === "number" ? unread + 1 : undefined;
+    } catch (error) {
+      logger.warn({ error, subscriberId: to }, "Could not read unread count for push badge");
+      return undefined;
+    }
   }
 
   private requireExpoIntegrationId(): string {
@@ -430,7 +468,7 @@ export class NotificationService {
         return true;
       }
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.RESERVATION_REMINDER,
         to: userId,
         payload,
@@ -464,7 +502,7 @@ export class NotificationService {
         return true;
       }
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.RESERVATION_CHECKIN_PROMPT,
         to: userId,
         payload,
@@ -497,7 +535,7 @@ export class NotificationService {
         return;
       }
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.ACHIEVEMENT_UNLOCKED,
         to: userId,
         payload: {
@@ -537,7 +575,7 @@ export class NotificationService {
 
       const results = await Promise.allSettled(
         enabledRecipientIds.map((to) =>
-          this.novu.trigger({
+          this.triggerWithBadge({
             workflowId: NOTIFICATION_WORKFLOWS.GROUP_ACHIEVEMENT_UNLOCKED,
             to,
             payload: {
@@ -663,7 +701,7 @@ export class NotificationService {
           memberGroupsData.length > 0 ? memberGroupsData.map((g) => g.name).join(", ") : "Group";
         const firstGroupId = memberGroupsData[0]?.id || "";
 
-        return this.novu.trigger({
+        return this.triggerWithBadge({
           workflowId: NOTIFICATION_WORKFLOWS.LOCATION_SHARING,
           to: memberId,
           payload: {
@@ -735,7 +773,7 @@ export class NotificationService {
       };
 
       // Trigger Novu workflow
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.GROUP_JOIN,
         to: adminId,
         payload,
@@ -774,7 +812,7 @@ export class NotificationService {
 
       const results = await Promise.allSettled(
         enabledRecipientIds.map((to) =>
-          this.novu.trigger({
+          this.triggerWithBadge({
             workflowId: NOTIFICATION_WORKFLOWS.GROUP_CARRY_OVER,
             to,
             payload,
@@ -831,7 +869,7 @@ export class NotificationService {
       const requesterName = requester.username || requester.full_name || "Someone";
       const requesterAvatar = resolveAvatarUrl(requester.avatar_url);
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.FRIEND_REQUEST,
         to: addresseeId,
         payload: {
@@ -875,7 +913,7 @@ export class NotificationService {
         .eq("id", input.requesterId)
         .single();
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.GROUP_JOIN_REQUEST,
         to: group.created_by,
         payload: {
@@ -913,7 +951,7 @@ export class NotificationService {
         return;
       }
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.GROUP_JOIN_REQUEST_ACCEPTED,
         to: input.requesterId,
         payload: {
@@ -959,7 +997,7 @@ export class NotificationService {
         .eq("id", input.inviterId)
         .single();
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.GROUP_INVITATION,
         to: input.inviteeId,
         payload: {
@@ -1010,7 +1048,7 @@ export class NotificationService {
         .eq("id", input.inviteeId)
         .single();
 
-      await this.novu.trigger({
+      await this.triggerWithBadge({
         workflowId: NOTIFICATION_WORKFLOWS.GROUP_INVITATION_ACCEPTED,
         to: input.inviterId,
         payload: {
@@ -1123,7 +1161,7 @@ export class NotificationService {
 
       const results = await Promise.allSettled(
         newRecipientIds.map((to) =>
-          this.novu.trigger({
+          this.triggerWithBadge({
             workflowId: NOTIFICATION_WORKFLOWS.FRIEND_PLAN_OVERLAP,
             to,
             payload,
@@ -1288,7 +1326,7 @@ export class NotificationService {
 
       const results = await Promise.allSettled(
         toNotify.map((recipientId) =>
-          this.novu.trigger({
+          this.triggerWithBadge({
             workflowId: NOTIFICATION_WORKFLOWS.DAY_START,
             to: recipientId,
             payload: {
@@ -1395,7 +1433,7 @@ export class NotificationService {
           if (groupId) {
             payload.groupId = groupId;
           }
-          return this.novu.trigger({
+          return this.triggerWithBadge({
             workflowId: NOTIFICATION_WORKFLOWS.GROUP_MESSAGE,
             to: recipientId,
             payload,
@@ -1546,7 +1584,7 @@ export class NotificationService {
 
         const groupNamesText = memberGroups.length > 0 ? memberGroups.join(", ") : "Group";
 
-        return this.novu.trigger({
+        return this.triggerWithBadge({
           workflowId: NOTIFICATION_WORKFLOWS.TENT_CHECKIN,
           to: memberId,
           payload: {
@@ -1575,4 +1613,26 @@ export class NotificationService {
       logger.error({ error }, "Error sending tent checkin notifications");
     }
   }
+}
+
+let warnedMissingNovuKey = false;
+
+/**
+ * The one place that decides whether notifications can be sent. Returns null
+ * without NOVU_API_KEY so callers skip notifying instead of failing the
+ * request; warns once per process so a missing key in local dev or a
+ * misconfigured deploy is visible rather than silently sending nothing.
+ */
+export function createNotificationService(
+  supabase: SupabaseClient<Database>,
+): NotificationService | null {
+  const novuApiKey = process.env.NOVU_API_KEY;
+  if (!novuApiKey) {
+    if (!warnedMissingNovuKey) {
+      warnedMissingNovuKey = true;
+      logger.warn("NOVU_API_KEY is not set; notifications are disabled");
+    }
+    return null;
+  }
+  return new NotificationService(supabase, novuApiKey);
 }

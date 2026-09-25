@@ -16,7 +16,7 @@ import type { AuthContext } from "../middleware/auth";
 import { SupabaseGroupInvitationRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupInvitationService } from "../services/group-invitation.service";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 
 // Registered before group.route.ts in index.ts: GET /groups/{id} there would
 // otherwise match GET /groups/invitations/incoming and reject it as a bad uuid.
@@ -46,8 +46,7 @@ const errorResponses = {
 } as const;
 
 function notificationService(supabase: AuthContext["Variables"]["supabase"]) {
-  const novuApiKey = process.env.NOVU_API_KEY;
-  return novuApiKey ? new NotificationService(supabase, novuApiKey) : null;
+  return createNotificationService(supabase);
 }
 
 function service(supabase: AuthContext["Variables"]["supabase"]) {
