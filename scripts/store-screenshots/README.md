@@ -7,8 +7,14 @@ The raw files are kept on purpose: re-framing or re-wording never needs a re-sho
 ## Re-framing
 
 ```bash
-python3 scripts/store-screenshots/render.py en
+python3 scripts/store-screenshots/render.py en            # App Store, 1320x2868
+python3 scripts/store-screenshots/render.py en play       # Play, 1080x1920, into fastlane/metadata/android/en-US/images/phoneScreenshots/
+python3 scripts/store-screenshots/render.py en instagram  # feed 4:5, 1080x1350, into screenshots/instagram/en/
 ```
+
+Play rejects anything longer than 2:1, so it can't take the App Store frames. The
+Instagram frame lets the phone run off the bottom, which hides bottom sheets: the
+log-drink and tent-picker shots don't work there.
 
 Headlines come from `copy.json`, keyed by the raw file name. Adding a locale is
 adding a block there (German with real umlauts, Spanish in voseo) and running the
