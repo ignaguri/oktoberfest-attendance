@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.13.1] - 2026-09-25
+
+### ✨ Features
+
+- link the ProstCounter Instagram from web and mobile (#358)
+- gallery viewer from feed photos, tab-bar padding (#356)
+- personal festival progress on Home (solo mode) (#353)
+- show friends' day plans and tent reservations (#351)
+- tents and streak group criteria, real group rank in Wrapped (#349)
+- rename Groups tab to Social, scope photo privacy by festival (#347)
+- in-app feedback replaces Canny (#346)
+- make friend requests visible outside the profile tab (#340)
+- admin analytics dashboard (v0) (#339)
+
+### 🐛 Bug Fixes
+
+- Maß, not Mass, in the German record line
+- progress card only on Home, stats in Attendance, clearer copy (#359)
+- avatars, iOS badge, one Novu factory (#355)
+- ask for a crowd report once per tent per day (#352)
+- localize relative times on Hermes (#344)
+- hide tent proximity banner once checked in today (#343)
+- stop day-start pushes for next-morning backfills (#342)
+- hide the Groups tab badge when no requests are pending (#341)
+- keep sheet buttons clear of the Android nav bar (#338)
+- keep the tent search list above the iOS keyboard (#337)
+- stop notification taps from stacking duplicate screens (#336)
+- give friend map pins a distinct blue (#335)
+- show a stranger the real festival stats (#334)
+- drop the stale achievements CHECK on pre-Drizzle databases (#333)
+
+### 📚 Documentation
+
+- add SOCIAL.md for the @prostcounter Instagram
+
+### 🧪 Testing
+
+- stop integration tests leaking users and festivals (#348)
+
+### 🔧 Maintenance
+
+- Play and Instagram renders for the store screenshots (#357)
+- new iOS store screenshots and the pipeline that makes them (#354)
+- code health pass (dead code, skipped tests, Wrapped cache on photos) (#350)
+- use official prostcounter@gmail.com contact address (#345)
+
 ## [0.13.0] - 2026-09-23
 
 ### ✨ Features
