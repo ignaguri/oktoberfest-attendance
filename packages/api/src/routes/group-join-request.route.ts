@@ -11,7 +11,7 @@ import type { AuthContext } from "../middleware/auth";
 import { SupabaseGroupJoinRequestRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { GroupJoinRequestService } from "../services/group-join-request.service";
-import { NotificationService } from "../services/notification.service";
+import { createNotificationService } from "../services/notification.service";
 import { createAdminClient } from "../utils/admin-client";
 import { ApiErrorSchema } from "../lib/error-response";
 
@@ -41,8 +41,7 @@ const errorResponses = {
 } as const;
 
 function notificationService(supabase: AuthContext["Variables"]["supabase"]) {
-  const novuApiKey = process.env.NOVU_API_KEY;
-  return novuApiKey ? new NotificationService(supabase, novuApiKey) : null;
+  return createNotificationService(supabase);
 }
 
 // POST /groups/{id}/join-requests - Ask to join a group

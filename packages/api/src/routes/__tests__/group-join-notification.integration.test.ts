@@ -44,13 +44,20 @@ const { notifyGroupJoinMock, notifyJoinRequestMock, notifyJoinRequestAcceptedMoc
   }),
 );
 
-vi.mock("../../services/notification.service", () => ({
-  NotificationService: class {
-    notifyGroupJoin = notifyGroupJoinMock;
-    notifyJoinRequest = notifyJoinRequestMock;
-    notifyJoinRequestAccepted = notifyJoinRequestAcceptedMock;
-  },
-}));
+vi.mock("../../services/notification.service", () => {
+  const mocked = {
+    NotificationService: class {
+      notifyGroupJoin = notifyGroupJoinMock;
+      notifyJoinRequest = notifyJoinRequestMock;
+      notifyJoinRequestAccepted = notifyJoinRequestAcceptedMock;
+    },
+  };
+  return {
+    ...mocked,
+    createNotificationService: () =>
+      process.env.NOVU_API_KEY ? new mocked.NotificationService() : null,
+  };
+});
 
 let admin: SupabaseClient<Database>;
 const createdUserIds: string[] = [];

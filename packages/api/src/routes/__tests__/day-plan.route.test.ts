@@ -17,11 +17,18 @@ vi.mock("../../services/day-plan.service", () => ({
 
 const { notifyPlanOverlapMock } = vi.hoisted(() => ({ notifyPlanOverlapMock: vi.fn() }));
 
-vi.mock("../../services/notification.service", () => ({
-  NotificationService: vi.fn().mockImplementation(function () {
-    return { notifyPlanOverlap: notifyPlanOverlapMock };
-  }),
-}));
+vi.mock("../../services/notification.service", () => {
+  const mocked = {
+    NotificationService: vi.fn().mockImplementation(function () {
+      return { notifyPlanOverlap: notifyPlanOverlapMock };
+    }),
+  };
+  return {
+    ...mocked,
+    createNotificationService: () =>
+      process.env.NOVU_API_KEY ? new mocked.NotificationService() : null,
+  };
+});
 
 const FESTIVAL_ID = "22222222-2222-4222-8222-222222222222";
 const DATE = "2026-09-26";

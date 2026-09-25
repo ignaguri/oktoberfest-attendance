@@ -12,8 +12,21 @@ import {
 
 import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
-import { NotificationService } from "../services/notification.service";
+import { ApiError } from "../middleware/error";
+import { createNotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
+
+/**
+ * These routes exist only to talk to Novu, so without a key there is nothing
+ * to degrade to: answer 503 instead of the constructor's unexplained 500.
+ */
+function requireNotificationService(supabase: AuthContext["Variables"]["supabase"]) {
+  const notificationService = createNotificationService(supabase);
+  if (!notificationService) {
+    throw new ApiError(503, "Notifications are not configured");
+  }
+  return notificationService;
+}
 
 // Create router
 const app = new OpenAPIHono<AuthContext>();
@@ -69,8 +82,7 @@ app.openapi(registerTokenRoute, async (c) => {
     "Register token request",
   );
 
-  const novuApiKey = process.env.NOVU_API_KEY!;
-  const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = requireNotificationService(supabase);
 
   // Auto-detect token type (Expo push token or FCM token)
   const result = await notificationService.registerPushToken(user.id, token);
@@ -131,8 +143,7 @@ app.openapi(enablePushRoute, async (c) => {
     "Enable push request",
   );
 
-  const novuApiKey = process.env.NOVU_API_KEY!;
-  const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = requireNotificationService(supabase);
 
   const result = await notificationService.subscribeAndRegisterToken(user.id, token, {
     email,
@@ -198,8 +209,7 @@ app.openapi(subscribeUserRoute, async (c) => {
     "Subscribe request",
   );
 
-  const novuApiKey = process.env.NOVU_API_KEY!;
-  const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = requireNotificationService(supabase);
 
   const result = await notificationService.subscribeUser(user.id, {
     email,
@@ -244,8 +254,7 @@ app.openapi(getPreferencesRoute, async (c) => {
   const user = c.var.user;
   const supabase = c.var.supabase;
 
-  const novuApiKey = process.env.NOVU_API_KEY!;
-  const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = requireNotificationService(supabase);
 
   const preferences = await notificationService.getUserNotificationPreferences(user.id);
 
@@ -317,8 +326,7 @@ app.openapi(updatePreferencesRoute, async (c) => {
   const supabase = c.var.supabase;
   const preferences = c.req.valid("json");
 
-  const novuApiKey = process.env.NOVU_API_KEY!;
-  const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = requireNotificationService(supabase);
 
   const success = await notificationService.updateUserNotificationPreferences(user.id, preferences);
 

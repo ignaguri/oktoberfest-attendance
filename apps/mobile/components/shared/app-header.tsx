@@ -1,12 +1,14 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
 import { Bell } from "lucide-react-native";
+import { useEffect } from "react";
 import { Image, View } from "react-native";
 
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors, IconColors } from "@/lib/constants/colors";
+import { setBadgeCount } from "@/lib/notifications/handlers";
 import { useCounts } from "@/lib/notifications/NovuProvider";
 
 const logoImage = require("@/assets/images/logo.png");
@@ -69,6 +71,16 @@ function NotificationBellWithBadge({ onPress }: { onPress: () => void }) {
   const { t } = useTranslation();
   const { counts } = useCounts({ filters: [{ read: false }] });
   const unreadCount = counts?.[0]?.count ?? 0;
+  const countsLoaded = counts !== undefined;
+
+  // Pushes set the icon badge while the app is closed; once it is open the
+  // inbox is the source of truth, so reading notifications clears it. Wait for
+  // the first count so startup does not flash the badge to 0.
+  useEffect(() => {
+    if (countsLoaded) {
+      setBadgeCount(unreadCount).catch(() => {});
+    }
+  }, [countsLoaded, unreadCount]);
 
   return (
     <Pressable

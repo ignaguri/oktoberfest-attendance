@@ -1,10 +1,12 @@
+import { PROD_URL } from "./app";
+
 /**
  * UI constants shared across web and mobile
  */
 
-// Default avatar URL for users without profile pictures
-export const DEFAULT_AVATAR_URL =
-  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face";
+// Default avatar URL for users without profile pictures. An absolute PNG on
+// the web app, since Novu needs a full URL and React Native cannot draw SVG.
+export const DEFAULT_AVATAR_URL = `${PROD_URL}/images/default-avatar.png`;
 
 // Base64 placeholder for image loading states - light gray with subtle pattern
 export const IMAGE_PLACEHOLDER_BASE64 =

@@ -15,11 +15,18 @@ vi.mock("../achievement.service", () => ({
   },
 }));
 
-vi.mock("../notification.service", () => ({
-  NotificationService: class {
-    notifyAchievementUnlocked = notifyAchievementUnlockedMock;
-  },
-}));
+vi.mock("../notification.service", () => {
+  const mocked = {
+    NotificationService: class {
+      notifyAchievementUnlocked = notifyAchievementUnlockedMock;
+    },
+  };
+  return {
+    ...mocked,
+    createNotificationService: () =>
+      process.env.NOVU_API_KEY ? new mocked.NotificationService() : null,
+  };
+});
 
 const USER_ID = "11111111-1111-4111-8111-111111111111";
 const FESTIVAL_ID = "22222222-2222-4222-8222-222222222222";

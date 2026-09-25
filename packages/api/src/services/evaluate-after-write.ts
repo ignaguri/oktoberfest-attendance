@@ -6,7 +6,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { logger } from "../lib/logger";
 import { AchievementMetricsRepository } from "../repositories/supabase/achievement-metrics.repository";
 import { AchievementService } from "./achievement.service";
-import { NotificationService } from "./notification.service";
+import { createNotificationService } from "./notification.service";
 
 /**
  * Push every unlock this write produced, in parallel.
@@ -26,12 +26,13 @@ async function notifyUnlocks(
   userId: string,
   unlocked: PersistedUnlock[],
 ): Promise<void> {
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (!novuApiKey || unlocked.length === 0) {
+  if (unlocked.length === 0) {
     return;
   }
-
-  const notificationService = new NotificationService(supabase, novuApiKey);
+  const notificationService = createNotificationService(supabase);
+  if (!notificationService) {
+    return;
+  }
 
   // Promise.all, not allSettled: each mapped task catches its own error
   // below, so none of them ever rejects, and there is nothing for allSettled's

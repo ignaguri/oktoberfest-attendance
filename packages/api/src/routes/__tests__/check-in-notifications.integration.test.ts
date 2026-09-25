@@ -22,12 +22,19 @@ const { notifyDayStartMock, notifyTentCheckinMock } = vi.hoisted(() => ({
   notifyTentCheckinMock: vi.fn(),
 }));
 
-vi.mock("../../services/notification.service", () => ({
-  NotificationService: class {
-    notifyDayStart = notifyDayStartMock;
-    notifyTentCheckin = notifyTentCheckinMock;
-  },
-}));
+vi.mock("../../services/notification.service", () => {
+  const mocked = {
+    NotificationService: class {
+      notifyDayStart = notifyDayStartMock;
+      notifyTentCheckin = notifyTentCheckinMock;
+    },
+  };
+  return {
+    ...mocked,
+    createNotificationService: () =>
+      process.env.NOVU_API_KEY ? new mocked.NotificationService() : null,
+  };
+});
 
 let admin: SupabaseClient<Database>;
 const createdUserIds: string[] = [];

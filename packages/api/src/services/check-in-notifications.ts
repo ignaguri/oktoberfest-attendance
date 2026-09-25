@@ -2,7 +2,7 @@ import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
-import { NotificationService } from "./notification.service";
+import { createNotificationService } from "./notification.service";
 
 /**
  * One push per check-in.
@@ -12,7 +12,7 @@ import { NotificationService } from "./notification.service";
  * losing it means the day is already underway, so group-mates get the ordinary
  * tent check-in. Never both.
  *
- * Checks NOVU_API_KEY before doing anything else: every caller sits on a
+ * Checks for a notification service before doing anything else: every caller sits on a
  * write path the offline sync queue can hammer, so a Novu-less environment
  * (local dev, most test runs) should not pay for the group-membership and
  * tent-name lookups just to throw the result away.
@@ -28,16 +28,14 @@ export async function announceCheckIn(
     tentIds: string[];
   },
 ): Promise<void> {
-  const novuApiKey = process.env.NOVU_API_KEY;
-  if (!novuApiKey) {
+  const notificationService = createNotificationService(supabase);
+  if (!notificationService) {
     return;
   }
 
   try {
     const groupIds = await groupIdsForFestival(supabase, input.userId, input.festivalId);
     const tentNames = await tentNamesFor(supabase, input.tentIds);
-
-    const notificationService = new NotificationService(supabase, novuApiKey);
 
     const startedDay = await notificationService.notifyDayStart({
       actorId: input.userId,
