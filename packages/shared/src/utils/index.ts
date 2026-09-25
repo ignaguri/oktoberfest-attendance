@@ -84,6 +84,9 @@ export {
   type HomeAudienceInput,
 } from "./home-audience";
 
+// Personal festival progress lines (Home card, web Highlights)
+export { getProgressLines, type ProgressLine } from "./festival-progress";
+
 // Tent visit helpers
 export { getCurrentTentId } from "./tent-visits";
 
