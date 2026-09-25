@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CrowdReportPrompt, CrowdStatusSummary } from "@/components/crowd";
 import { FriendRequestsBanner } from "@/components/friends/friend-requests-banner";
+import { PersonalProgressCard } from "@/components/home/personal-progress-card";
 import { LocationSharingToggle, TentProximityBanner } from "@/components/location";
 import { FestivalAlertCard } from "@/components/notifications/festival-alert-card";
 import { AppHeader } from "@/components/shared/app-header";
@@ -223,6 +224,9 @@ export default function HomeScreen() {
           <TutorialTarget stepId="festival-status">
             <FestivalStatus />
           </TutorialTarget>
+
+          {/* Personal progress: expanded for solo users, one line for social ones */}
+          <PersonalProgressCard />
 
           {/* Pending friend requests, answerable without leaving Home */}
           <FriendRequestsBanner />
