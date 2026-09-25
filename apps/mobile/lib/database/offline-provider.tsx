@@ -28,7 +28,7 @@ import { AppState, Platform } from "react-native";
 import { logger } from "@/lib/logger";
 
 import { initializeDatabase } from "./init";
-import { ALL_LOCAL_PREFIXES } from "./query-keys";
+import { getPrefixesToRefreshAfterSync } from "./query-keys";
 import type { SyncManager } from "./sync/sync-manager";
 import { createSyncManager, type SyncOptions, type SyncResult } from "./sync/sync-manager";
 import { getQueueStats } from "./sync-queue";
@@ -266,14 +266,16 @@ export function OfflineDataProvider({
           setLastSyncAt(new Date());
         }
 
+        // Local caches re-read SQLite after a successful sync; highlights also
+        // refresh after a partly failed one that still pushed writes
+        await Promise.all(
+          getPrefixesToRefreshAfterSync(result).map((prefix) =>
+            queryClient.invalidateQueries({ queryKey: [prefix] }),
+          ),
+        );
+
         if (result.success) {
           setSyncStatus("idle");
-          // Invalidate local query caches so adapted hooks re-read from SQLite
-          await Promise.all(
-            ALL_LOCAL_PREFIXES.map((prefix) =>
-              queryClient.invalidateQueries({ queryKey: [prefix] }),
-            ),
-          );
         } else if (result.errors.length === 1 && result.errors[0] === "Sync already in progress") {
           // Concurrent sync attempt is not a real error — silently ignore
         } else {

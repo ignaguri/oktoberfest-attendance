@@ -1,6 +1,8 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useFestivalCountdown } from "@prostcounter/shared/hooks";
+import { getProgressLines } from "@prostcounter/shared/utils";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,7 @@ import { cn } from "@/lib/utils";
 const Highlights = () => {
   const { t } = useTranslation();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
+  const countdown = useFestivalCountdown(currentFestival);
   const {
     data: highlightsData,
     loading: highlightsLoading,
@@ -51,6 +54,12 @@ const Highlights = () => {
   };
   const spentOnBeers = getSpentOnBeers();
 
+  // Personal progress only while the festival is live, same rule as the mobile card
+  const progressLines =
+    countdown?.phase === "live" && highlightsData?.progress
+      ? getProgressLines(highlightsData.progress, totalBeers)
+      : [];
+
   // Show loading state
   if (festivalLoading || highlightsLoading) {
     return <SkeletonHighlights />;
@@ -62,7 +71,12 @@ const Highlights = () => {
   }
 
   // Determine grid columns based on user stats
-  const gridCols = groupPositions.length > 0 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1";
+  const sectionCount = [
+    groupPositions.length > 0,
+    totalBeers > 0 || totalDays > 0,
+    progressLines.length > 0,
+  ].filter(Boolean).length;
+  const gridCols = sectionCount > 1 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1";
 
   return (
     <Card className="min-h-[140px] rounded-lg border border-gray-200 shadow-lg">
@@ -108,6 +122,20 @@ const Highlights = () => {
                     )}
                   </li>
                 )}
+              </ul>
+            </div>
+          )}
+          {progressLines.length > 0 && (
+            <div className="rounded-lg bg-yellow-50 p-4 shadow-sm">
+              <CardDescription className="mb-2 font-semibold">
+                {t("home.progress.title", { festivalName: currentFestival?.name ?? "" })}
+              </CardDescription>
+              <ul className="text-sm">
+                {progressLines.map((line) => (
+                  <li key={line.id} className="mb-2">
+                    {t(line.key, line.params)}
+                  </li>
+                ))}
               </ul>
             </div>
           )}

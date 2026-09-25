@@ -5,7 +5,7 @@
  * Run with: pnpm test --filter=@prostcounter/mobile
  */
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createQueueProcessor, QueueProcessor, sleep, withRetry } from "../queue-processor";
 import type { SyncQueueItem } from "../schema";
@@ -265,6 +265,13 @@ describe("QueueProcessor", () => {
   });
 
   describe("dependency resolution", () => {
+    afterEach(async () => {
+      const syncQueue = await import("../sync-queue");
+      vi.mocked(syncQueue.getPendingOperations).mockResolvedValue([]);
+      vi.mocked(syncQueue.markOperationCompleted).mockResolvedValue(undefined);
+      vi.mocked(syncQueue.markOperationFailed).mockResolvedValue(undefined);
+    });
+
     it("should not process operations with unresolved dependencies", async () => {
       const { getPendingOperations } = await import("../sync-queue");
       (getPendingOperations as ReturnType<typeof vi.fn>).mockResolvedValueOnce([
@@ -313,6 +320,52 @@ describe("QueueProcessor", () => {
 
       expect(result.succeeded).toBe(1);
       expect(handler).toHaveBeenCalled();
+    });
+
+    it("processes an op in the same run once the op it depends on completes", async () => {
+      const syncQueue = await import("../sync-queue");
+      const ops = [
+        createMockOperation({ id: "attendance", operation: "UPDATE" }),
+        createMockOperation({ id: "photo", operation: "UPLOAD_FILE", depends_on: "attendance" }),
+      ];
+      const status = new Map(ops.map((op) => [op.id, "pending"]));
+      vi.mocked(syncQueue.getPendingOperations).mockImplementation(async () =>
+        ops.filter((op) => status.get(op.id) === "pending"),
+      );
+      vi.mocked(syncQueue.markOperationCompleted).mockImplementation(async (_db, id) => {
+        status.set(id, "completed");
+      });
+      mockDb.getFirstAsync.mockImplementation(async (_sql: string, [id]: string[]) => ({
+        id,
+        status: status.get(id),
+      }));
+      processor.registerHandler("UPDATE", vi.fn().mockResolvedValue(undefined));
+      const upload = vi.fn().mockResolvedValue(undefined);
+      processor.registerHandler("UPLOAD_FILE", upload);
+
+      const result = await processor.processQueue();
+
+      expect(upload).toHaveBeenCalledTimes(1);
+      expect(result.succeeded).toBe(2);
+    });
+
+    it("does not retry a failed op within the same run", async () => {
+      const syncQueue = await import("../sync-queue");
+      const op = createMockOperation({ id: "flaky" });
+      let isPending = true;
+      vi.mocked(syncQueue.getPendingOperations).mockImplementation(async () =>
+        isPending ? [op] : [],
+      );
+      vi.mocked(syncQueue.markOperationFailed).mockImplementation(async () => {
+        isPending = false;
+      });
+      const handler = vi.fn().mockRejectedValue(new Error("boom"));
+      processor.registerHandler("INSERT", handler);
+
+      const result = await processor.processQueue();
+
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(result.failed).toBe(1);
     });
   });
 

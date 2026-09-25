@@ -58,6 +58,8 @@ export type OperationHandler = (operation: SyncQueueItem) => Promise<void>;
 // =============================================================================
 
 const DEFAULT_MAX_RETRIES = 3;
+// Bounds dependency chains resolved in one run; real chains are 2 deep
+const MAX_ROUNDS_PER_RUN = 5;
 const DEFAULT_BASE_DELAY = 1000; // 1 second
 const DEFAULT_MAX_DELAY = 30000; // 30 seconds
 
@@ -129,39 +131,57 @@ export class QueueProcessor {
     };
 
     try {
-      // Get operations that are ready to process (no unresolved dependencies)
-      const operations = await this.getReadyOperations();
-      const total = operations.length;
+      // An op whose dependency completes during this run (a photo upload
+      // waiting on its attendance) becomes ready only after its round was
+      // picked, so keep taking rounds until one completes nothing new. Each op
+      // is attempted at most once per run.
+      const attempted = new Set<string>();
+      let total = 0;
 
-      logger.debug(`[QueueProcessor] Processing ${total} operations`);
-
-      for (const op of operations) {
-        // Check for abort signal
-        if (this.options.signal?.aborted) {
-          logger.debug("[QueueProcessor] Aborted");
+      rounds: for (let round = 0; round < MAX_ROUNDS_PER_RUN; round++) {
+        const operations = (await this.getReadyOperations()).filter((op) => !attempted.has(op.id));
+        if (operations.length === 0) {
           break;
         }
+        total += operations.length;
+        logger.debug(`[QueueProcessor] Processing ${operations.length} operations`);
 
-        const opResult = await this.processOperation(op);
-        result.processed++;
-
-        if (opResult.success) {
-          result.succeeded++;
-          this.options.onSuccess?.(op);
-        } else {
-          if (opResult.skipped) {
-            result.skipped++;
-          } else {
-            result.failed++;
-            result.errors.push({
-              operationId: op.id,
-              error: opResult.error ?? "Unknown error",
-            });
-            this.options.onError?.(op, new Error(opResult.error));
+        let succeededThisRound = 0;
+        for (const op of operations) {
+          // Check for abort signal
+          if (this.options.signal?.aborted) {
+            logger.debug("[QueueProcessor] Aborted");
+            break rounds;
           }
+
+          attempted.add(op.id);
+          const opResult = await this.processOperation(op);
+          result.processed++;
+
+          if (opResult.success) {
+            result.succeeded++;
+            succeededThisRound++;
+            this.options.onSuccess?.(op);
+          } else {
+            if (opResult.skipped) {
+              result.skipped++;
+            } else {
+              result.failed++;
+              result.errors.push({
+                operationId: op.id,
+                error: opResult.error ?? "Unknown error",
+              });
+              this.options.onError?.(op, new Error(opResult.error));
+            }
+          }
+
+          this.options.onProgress?.(result.processed, total);
         }
 
-        this.options.onProgress?.(result.processed, total);
+        // Nothing completed, so no dependency was unblocked
+        if (succeededThisRound === 0) {
+          break;
+        }
       }
     } finally {
       this.isProcessing = false;

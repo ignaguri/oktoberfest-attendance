@@ -75,6 +75,18 @@ export {
   type FestivalDates,
 } from "./festival-countdown";
 
+// Home audience (solo vs social)
+export {
+  classifyHomeAudience,
+  SOLO_MAX_FRIENDS,
+  SOLO_MAX_GROUPS,
+  type HomeAudience,
+  type HomeAudienceInput,
+} from "./home-audience";
+
+// Personal festival progress lines (Home card, web Highlights)
+export { getHeadlineLine, getProgressLines, type ProgressLine } from "./festival-progress";
+
 // Tent visit helpers
 export { getCurrentTentId } from "./tent-visits";
 

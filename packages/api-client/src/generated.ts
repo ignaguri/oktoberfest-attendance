@@ -9137,6 +9137,19 @@ export interface paths {
                                     position: number;
                                     totalMembers: number;
                                 }[];
+                                progress?: {
+                                    currentStreak: number;
+                                    bestStreak: number;
+                                    tentsVisited: number;
+                                    tentsTotal: number;
+                                    photosUploaded: number;
+                                    previousFestival: {
+                                        name: string;
+                                        beers: number;
+                                        days: number;
+                                    } | null;
+                                    isSolo: boolean;
+                                };
                             };
                         };
                     };

@@ -1,5 +1,6 @@
 import type { Database } from "@prostcounter/db";
 import type {
+  FestivalProgress,
   GetAvatarUploadUrlQuery,
   GetAvatarUploadUrlResponse,
   Highlights,
@@ -15,9 +16,14 @@ import type {
   UpdateProfileInput,
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
-import { formatDateForDatabase, replaceLocalhostInUrl } from "@prostcounter/shared/utils";
+import {
+  classifyHomeAudience,
+  formatDateForDatabase,
+  replaceLocalhostInUrl,
+} from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
 import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/error";
 
@@ -630,7 +636,54 @@ export class SupabaseProfileRepository {
     };
   }
 
+  /**
+   * Personal progress for the Home card. Never throws: a failure is logged and
+   * Highlights is returned without it, which also keeps the API safe to deploy
+   * before the migration.
+   */
+  async getFestivalProgress(
+    userId: string,
+    festivalId: string,
+  ): Promise<FestivalProgress | undefined> {
+    const { data, error } = await this.supabase.rpc("get_user_festival_progress", {
+      p_festival_id: festivalId,
+    });
+
+    const row = data?.[0];
+    if (error || !row) {
+      logger.error(
+        { userId, festivalId, error: error?.message ?? "no row" },
+        "get_user_festival_progress failed; Highlights returned without progress",
+      );
+      return undefined;
+    }
+
+    const audience = classifyHomeAudience({
+      groupCount: row.groups_this_festival,
+      friendCount: row.accepted_friends,
+    });
+
+    return {
+      currentStreak: row.current_streak,
+      bestStreak: row.best_streak,
+      tentsVisited: row.tents_visited,
+      tentsTotal: row.tents_total,
+      photosUploaded: row.photos_uploaded,
+      previousFestival: row.previous_festival_name
+        ? {
+            name: row.previous_festival_name,
+            beers: Number(row.previous_festival_beers),
+            days: row.previous_festival_days,
+          }
+        : null,
+      isSolo: audience === "solo",
+    };
+  }
+
   async getHighlights(userId: string, festivalId: string): Promise<Highlights> {
+    // Runs alongside the queries below; it never rejects
+    const progressPromise = this.getFestivalProgress(userId, festivalId);
+
     // Get user stats from the view
     const { data: stats, error: statsError } = await this.supabase.rpc(
       "get_user_festival_stats_with_positions",
@@ -698,6 +751,8 @@ export class SupabaseProfileRepository {
       });
     }
 
+    const progress = await progressPromise;
+
     return {
       totalBeers: Number(userStats?.total_beers) || 0,
       totalDays: Number(userStats?.days_attended) || 0,
@@ -708,6 +763,7 @@ export class SupabaseProfileRepository {
       favoriteDay: null, // Could be calculated if needed
       favoriteTent,
       groupPositions,
+      progress,
     };
   }
 

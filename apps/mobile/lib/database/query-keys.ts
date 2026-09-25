@@ -83,6 +83,23 @@ export const ALL_LOCAL_PREFIXES = [
 ] as const;
 
 /**
+ * Query prefixes to invalidate after a sync. A successful sync re-reads every
+ * local cache. Highlights are computed by the server from pushed writes
+ * (drinks, photos), so they refresh whenever anything was pushed, even if
+ * another op in the same sync failed.
+ */
+export function getPrefixesToRefreshAfterSync(result: {
+  success: boolean;
+  pushed: number;
+}): string[] {
+  const prefixes: string[] = result.success ? [...ALL_LOCAL_PREFIXES] : [];
+  if (result.pushed > 0) {
+    prefixes.push("highlights");
+  }
+  return prefixes;
+}
+
+/**
  * Invalidate all local SQLite query caches.
  * Use after bulk operations or sync. For single mutations, prefer targeted invalidation.
  */

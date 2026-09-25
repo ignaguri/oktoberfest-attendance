@@ -109,6 +109,25 @@ export const GetMissingProfileFieldsResponseSchema = z.object({
   hasMissingFields: z.boolean(),
 });
 
+// Personal festival progress for the Home card (streak, tents, photos, previous festival)
+export const FestivalProgressSchema = z.object({
+  currentStreak: z.number(),
+  bestStreak: z.number(),
+  tentsVisited: z.number(),
+  tentsTotal: z.number(),
+  photosUploaded: z.number(),
+  previousFestival: z
+    .object({
+      name: z.string(),
+      beers: z.number(),
+      days: z.number(),
+    })
+    .nullable(),
+  isSolo: z.boolean(),
+});
+
+export type FestivalProgress = z.infer<typeof FestivalProgressSchema>;
+
 // Highlights (user stats for home page)
 export const HighlightsSchema = z.object({
   totalBeers: z.number(),
@@ -127,6 +146,8 @@ export const HighlightsSchema = z.object({
       totalMembers: z.number(),
     }),
   ),
+  // Optional so older clients and a failed progress query both leave Highlights intact
+  progress: FestivalProgressSchema.optional(),
 });
 
 export type Highlights = z.infer<typeof HighlightsSchema>;

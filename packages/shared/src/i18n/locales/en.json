@@ -2773,6 +2773,24 @@
       "lastTime": "{{festivalName}}: {{beers}} Maß in {{days}} days. Beat it?",
       "firstTime": "Your first one with ProstCounter. Make it count!"
     },
+    "progress": {
+      "title": "Your {{festivalName}} so far",
+      "streak_one": "🔥 {{count}}-day streak",
+      "streak_other": "🔥 {{count}}-day streak",
+      "bestStreak_one": "Best streak: {{count}} day",
+      "bestStreak_other": "Best streak: {{count}} days in a row",
+      "tents": "⛺ {{visited}} of {{total}} tents",
+      "chase": "🍺 {{beers}} of {{target}} ({{festivalName}})",
+      "record": "🏆 New record: {{beers}} ({{festivalName}}: {{target}})",
+      "totals_one": "📅 {{count}} day · 🍺 {{beers}}",
+      "totals_other": "📅 {{count}} days · 🍺 {{beers}}",
+      "photos_one": "📸 1 photo uploaded",
+      "photos_other": "📸 {{count}} photos uploaded",
+      "photosNudge": "📸 No photos yet. Snap your next Maß!",
+      "firstDayNudge": "Log your first day to start your streak",
+      "expandLabel": "Your festival progress",
+      "expandHint": "Shows your streak, tents and how you compare to last time"
+    },
     "quickAdd": {
       "beer": "Beer",
       "radler": "Radler",
