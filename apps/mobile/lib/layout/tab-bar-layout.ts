@@ -23,8 +23,13 @@ export function fabBottomOffset({ tabBarHeight, insetBottom }: BottomLayout): nu
 
 // A large Gluestack FAB, plus breathing room above it
 const FAB_CLEARANCE = 56 + 16;
+// The medium crowd-report FAB and the gap the FAB group stacks it with
+const CROWD_FAB_CLEARANCE = 48 + 8;
 
 /** Bottom padding that lets a tab screen's last row scroll clear of the FABs. */
-export function tabScreenBottomPadding(layout: BottomLayout): number {
-  return fabBottomOffset(layout) + FAB_CLEARANCE;
+export function tabScreenBottomPadding({
+  hasCrowdFab = false,
+  ...layout
+}: BottomLayout & { hasCrowdFab?: boolean }): number {
+  return fabBottomOffset(layout) + FAB_CLEARANCE + (hasCrowdFab ? CROWD_FAB_CLEARANCE : 0);
 }

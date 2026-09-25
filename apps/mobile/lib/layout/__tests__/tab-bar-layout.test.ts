@@ -12,4 +12,11 @@ describe("tab bar layout", () => {
     const layout = { tabBarHeight: 100, insetBottom: 0 };
     expect(tabScreenBottomPadding(layout)).toBeGreaterThan(fabBottomOffset(layout) + 56);
   });
+
+  it("adds room for the crowd FAB stacked above the attendance one", () => {
+    const layout = { tabBarHeight: 50, insetBottom: 34 };
+    expect(tabScreenBottomPadding({ ...layout, hasCrowdFab: true })).toBeGreaterThan(
+      tabScreenBottomPadding(layout) + 48,
+    );
+  });
 });

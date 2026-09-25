@@ -6,6 +6,45 @@
 -- Base is 20260924171847_feed_day_plans_and_reservations.sql; only the
 -- recent_photos activity_data changes.
 
+-- The gallery hides a photo from groups its uploader opted out of, and the
+-- group's reactions and comments endpoints only check membership, so the feed
+-- must not hand out a group the photo is hidden from. The view runs as the
+-- viewer, whose RLS cannot read someone else's photo settings, hence SECURITY
+-- DEFINER. It answers only for the calling viewer and only returns a group
+-- they are a member of.
+CREATE OR REPLACE FUNCTION public.feed_photo_gallery_group(p_uploader_id uuid, p_festival_id uuid)
+RETURNS uuid
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT viewer.group_id
+  FROM group_members viewer
+    JOIN group_members uploader
+      ON uploader.group_id = viewer.group_id AND uploader.user_id = p_uploader_id
+    JOIN groups g ON g.id = viewer.group_id AND g.festival_id = p_festival_id
+  WHERE viewer.user_id = auth.uid()
+    AND viewer.user_id <> p_uploader_id
+    AND NOT EXISTS (
+      SELECT 1 FROM user_photo_global_settings upgs
+      WHERE upgs.user_id = p_uploader_id AND upgs.hide_photos_from_all_groups
+    )
+    AND NOT EXISTS (
+      SELECT 1 FROM user_group_photo_settings ugps
+      WHERE ugps.user_id = p_uploader_id
+        AND ugps.group_id = viewer.group_id
+        AND ugps.hide_photos_from_group
+    )
+  ORDER BY viewer.group_id
+  LIMIT 1
+$$;
+
+-- Supabase grants new functions to anon and authenticated by name, so
+-- revoking from PUBLIC alone leaves anon able to call it
+REVOKE ALL ON FUNCTION public.feed_photo_gallery_group(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.feed_photo_gallery_group(uuid, uuid) TO authenticated;
+
 DROP VIEW IF EXISTS public.activity_feed;
 
 CREATE VIEW public.activity_feed
@@ -88,13 +127,7 @@ recent_photos AS (
       'picture_id', bp.id,
       -- A group the viewer shares with the uploader this festival, so the app
       -- can open the gallery viewer (reactions, comments) for this photo
-      'shared_group_id', (
-        SELECT ugm.group_id
-        FROM user_group_members ugm
-        WHERE ugm.user_id = bp.user_id AND ugm.festival_id = a.festival_id
-        ORDER BY ugm.group_id
-        LIMIT 1
-      )
+      'shared_group_id', public.feed_photo_gallery_group(bp.user_id, a.festival_id)
     ) AS activity_data,
     bp.created_at AS activity_time,
     bp.created_at,

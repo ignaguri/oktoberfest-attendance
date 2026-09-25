@@ -52,7 +52,6 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const bottomPadding = useTabScreenBottomPadding();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
@@ -72,8 +71,14 @@ export default function HomeScreen() {
   const { isSharing, nearbyMembers } = useLocationContextSafe();
 
   // Quick attendance context (for crowd report prompt after save)
-  const { pendingCrowdReport, setPendingCrowdReport, setShowCrowdFab, setOnCrowdFabPress } =
-    useQuickAttendance();
+  const {
+    pendingCrowdReport,
+    setPendingCrowdReport,
+    showCrowdFab,
+    setShowCrowdFab,
+    setOnCrowdFabPress,
+  } = useQuickAttendance();
+  const bottomPadding = useTabScreenBottomPadding({ hasCrowdFab: showCrowdFab });
 
   // Crowd report prompt state
   const [showCrowdPrompt, setShowCrowdPrompt] = useState(false);

@@ -270,7 +270,8 @@
       "errorNameTaken": "Ya tenés un grupo llamado {{name}} en este festival.",
       "errorGeneric": "No se pudo llevar el grupo. Por favor, intentá de nuevo.",
       "toggleLabel": "Mostrar u ocultar los grupos de la última vez",
-      "toggleHint": "Pliega la tarjeta hasta dejar solo el título"
+      "collapseHint": "Pliega la tarjeta hasta dejar solo el título",
+      "expandHint": "Muestra los grupos que podés traer"
     },
     "memberCount": "{{count}} miembro",
     "memberCount_other": "{{count}} miembros",

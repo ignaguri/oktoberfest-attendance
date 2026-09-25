@@ -99,7 +99,9 @@ export function CarryOverGroups({ onSuccess, onError }: CarryOverGroupsProps) {
         onPress={toggleCollapsed}
         accessibilityRole="button"
         accessibilityLabel={t("groups.carryOver.toggleLabel")}
-        accessibilityHint={t("groups.carryOver.toggleHint")}
+        accessibilityHint={t(
+          isCollapsed ? "groups.carryOver.expandHint" : "groups.carryOver.collapseHint",
+        )}
         accessibilityState={{ expanded: !isCollapsed }}
       >
         <HStack space="sm" className="items-center justify-between">

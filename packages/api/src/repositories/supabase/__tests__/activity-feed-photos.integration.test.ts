@@ -83,6 +83,32 @@ describe("activity_feed photo items (Local DB)", () => {
     });
   });
 
+  it("has no shared group once the uploader hides photos from it", async () => {
+    const { error } = await admin
+      .from("user_group_photo_settings")
+      .insert({ user_id: uploader.id, group_id: groupId, hide_photos_from_group: true });
+    expect(error).toBeNull();
+
+    try {
+      expect(await photoSeenBy(groupMate)).toMatchObject({ shared_group_id: null });
+    } finally {
+      await admin.from("user_group_photo_settings").delete().eq("user_id", uploader.id);
+    }
+  });
+
+  it("has no shared group once the uploader hides photos from all groups", async () => {
+    const { error } = await admin
+      .from("user_photo_global_settings")
+      .insert({ user_id: uploader.id, hide_photos_from_all_groups: true });
+    expect(error).toBeNull();
+
+    try {
+      expect(await photoSeenBy(groupMate)).toMatchObject({ shared_group_id: null });
+    } finally {
+      await admin.from("user_photo_global_settings").delete().eq("user_id", uploader.id);
+    }
+  });
+
   it("has no shared group for a friend outside the uploader's groups", async () => {
     expect(await photoSeenBy(friend)).toMatchObject({
       picture_id: pictureId,
