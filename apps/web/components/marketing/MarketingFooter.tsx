@@ -2,7 +2,7 @@
 
 import { Beer } from "lucide-react";
 import Image from "next/image";
-import { CONTACT_EMAIL } from "@prostcounter/shared/constants";
+import { CONTACT_EMAIL, INSTAGRAM_URL } from "@prostcounter/shared/constants";
 import { Link } from "next-view-transitions";
 
 import { ANDROID_PLAY_STORE_URL, IOS_APP_STORE_URL } from "@/lib/constants";
@@ -150,13 +150,27 @@ export function MarketingFooter() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/ignaguri"
+              href={INSTAGRAM_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-gray-500 hover:text-gray-700"
             >
-              @ignaguri
+              {t("marketing.footer.followInstagram")}
             </a>
+            <span className="text-sm text-gray-400" aria-hidden>
+              ·
+            </span>
+            <span className="text-sm text-gray-500">
+              {t("marketing.footer.madeBy")}{" "}
+              <a
+                href="https://github.com/ignaguri"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-700"
+              >
+                @ignaguri
+              </a>
+            </span>
           </div>
         </div>
       </div>

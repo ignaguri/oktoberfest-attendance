@@ -1534,7 +1534,8 @@
       "buyMeABeer": "Buy Me a Beer",
       "whatsNew": "What's New",
       "rateApp": "Rate the app",
-      "shareApp": "Share the app"
+      "shareApp": "Share the app",
+      "followInstagram": "Follow us on Instagram"
     },
     "deleteAccount": {
       "title": "Delete Account",
@@ -3414,6 +3415,7 @@
     "buyMeABeer": "Buy me a beer",
     "reportBug": "Report a bug",
     "requestFeature": "Request a feature",
+    "followInstagram": "Follow us on Instagram",
     "links": {
       "privacy": "Privacy",
       "terms": "Terms",
@@ -3675,6 +3677,8 @@
       "blog": "Blog",
       "download": "Download",
       "legal": "Legal",
+      "followInstagram": "Follow us on Instagram",
+      "madeBy": "Made by",
       "blogLinks": {
         "oktoberfestGuide": "Oktoberfest 2026 Guide",
         "firstTimeTips": "First Time Tips",

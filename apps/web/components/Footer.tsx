@@ -1,6 +1,6 @@
 "use client";
 
-import { CONTACT_EMAIL } from "@prostcounter/shared/constants";
+import { CONTACT_EMAIL, INSTAGRAM_URL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Beer, Heart } from "lucide-react";
 import { Link } from "next-view-transitions";
@@ -91,6 +91,14 @@ const Footer = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
             <Link href="/privacy" aria-label={t("footer.links.privacy")} className="underline">
               {t("footer.links.privacy")}
             </Link>
+
+            <span className="text-gray-400" aria-hidden>
+              ·
+            </span>
+
+            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="underline">
+              {t("footer.followInstagram")}
+            </a>
           </div>
         </div>
       </div>

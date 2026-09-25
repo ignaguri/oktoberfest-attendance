@@ -1,10 +1,20 @@
-import { PROD_URL } from "@prostcounter/shared/constants";
+import { INSTAGRAM_URL, PROD_URL } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { cn } from "@prostcounter/ui";
 import { useRouter } from "expo-router";
+import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import type { LucideIcon } from "lucide-react-native";
-import { Bug, ChevronRight, Lightbulb, Share2, Shield, Sparkles, Star } from "lucide-react-native";
+import {
+  Bug,
+  Camera,
+  ChevronRight,
+  Lightbulb,
+  Share2,
+  Shield,
+  Sparkles,
+  Star,
+} from "lucide-react-native";
 import { useCallback, useState } from "react";
 
 import { FeedbackSheet } from "@/components/feedback/feedback-sheet";
@@ -95,6 +105,15 @@ export function AboutSection() {
   const shareApp = useShareApp();
   const [feedbackKind, setFeedbackKind] = useState<"bug" | "idea" | null>(null);
 
+  // Linking rather than the in-app browser, so the Instagram app opens when installed.
+  const openInstagram = useCallback(async () => {
+    try {
+      await Linking.openURL(INSTAGRAM_URL);
+    } catch (error) {
+      logger.error("Failed to open Instagram:", error);
+    }
+  }, []);
+
   return (
     <Card size="md" variant="elevated">
       <Text className="mb-2 text-lg font-semibold text-typography-900">
@@ -115,6 +134,13 @@ export function AboutSection() {
           bordered
         />
         <ActionRow label={t("profile.about.shareApp")} Icon={Share2} onPress={shareApp} bordered />
+        <ActionRow
+          label={t("profile.about.followInstagram")}
+          Icon={Camera}
+          onPress={openInstagram}
+          accessibilityRole="link"
+          bordered
+        />
 
         <ActionRow
           label={t("profile.about.reportBug")}
