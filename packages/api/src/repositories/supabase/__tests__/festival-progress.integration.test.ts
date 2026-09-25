@@ -252,6 +252,15 @@ describe("get_user_festival_progress", () => {
     expect(soc?.previous_festival_name).toBeNull();
   });
 
+  it("counts Highlights beers from consumptions, not the stale beer_count", async () => {
+    const { data, error } = await admin.rpc("get_user_festival_stats_with_positions", {
+      p_user_id: users.sol.id,
+      p_festival_id: festivalIds.current,
+    });
+    expect(error).toBeNull();
+    expect(Number(data?.[0]?.total_beers)).toBe(4);
+  });
+
   it("is not executable by anon", async () => {
     const { error } = await createTestSupabaseAnon().rpc("get_user_festival_progress", {
       p_festival_id: festivalIds.current,
