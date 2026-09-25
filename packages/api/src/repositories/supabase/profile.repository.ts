@@ -668,6 +668,7 @@ export class SupabaseProfileRepository {
       bestStreak: row.best_streak,
       tentsVisited: row.tents_visited,
       tentsTotal: row.tents_total,
+      photosUploaded: row.photos_uploaded,
       previousFestival: row.previous_festival_name
         ? {
             name: row.previous_festival_name,

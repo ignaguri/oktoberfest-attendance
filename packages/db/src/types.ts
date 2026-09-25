@@ -2617,6 +2617,7 @@ export type Database = {
           best_streak: number
           current_streak: number
           groups_this_festival: number
+          photos_uploaded: number
           previous_festival_beers: number
           previous_festival_days: number
           previous_festival_name: string

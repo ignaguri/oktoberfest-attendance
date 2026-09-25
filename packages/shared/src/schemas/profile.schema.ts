@@ -109,12 +109,13 @@ export const GetMissingProfileFieldsResponseSchema = z.object({
   hasMissingFields: z.boolean(),
 });
 
-// Personal festival progress for the Home card (streak, tents, previous festival)
+// Personal festival progress for the Home card (streak, tents, photos, previous festival)
 export const FestivalProgressSchema = z.object({
   currentStreak: z.number(),
   bestStreak: z.number(),
   tentsVisited: z.number(),
   tentsTotal: z.number(),
+  photosUploaded: z.number(),
   previousFestival: z
     .object({
       name: z.string(),

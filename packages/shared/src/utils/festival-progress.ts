@@ -5,10 +5,12 @@ type ProgressLineKey =
   | "home.progress.bestStreak"
   | "home.progress.tents"
   | "home.progress.chase"
-  | "home.progress.record";
+  | "home.progress.record"
+  | "home.progress.photos"
+  | "home.progress.photosNudge";
 
 export interface ProgressLine {
-  id: "streak" | "bestStreak" | "tents" | "chase" | "record";
+  id: "streak" | "bestStreak" | "tents" | "chase" | "record" | "photos" | "photosNudge";
   key: ProgressLineKey;
   params: Record<string, string | number>;
 }
@@ -60,6 +62,17 @@ export function getProgressLines(progress: FestivalProgress, totalBeers: number)
     }
   }
 
+  // No "0 photos": with none yet, the line asks for the first one instead
+  if (progress.photosUploaded > 0) {
+    lines.push({
+      id: "photos",
+      key: "home.progress.photos",
+      params: { count: progress.photosUploaded },
+    });
+  } else {
+    lines.push({ id: "photosNudge", key: "home.progress.photosNudge", params: {} });
+  }
+
   return lines;
 }
 
@@ -67,8 +80,10 @@ const HEADLINE_PRIORITY: ProgressLine["id"][] = [
   "streak",
   "record",
   "chase",
+  "photosNudge",
   "tents",
   "bestStreak",
+  "photos",
 ];
 
 /** The one line the collapsed card leads with: the most motivating one available. */

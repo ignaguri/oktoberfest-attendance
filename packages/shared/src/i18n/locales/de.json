@@ -3021,6 +3021,9 @@
       "record": "🏆 Neuer Rekord: {{beers}} ({{festivalName}}: {{target}})",
       "totals_one": "📅 {{count}} Tag · 🍺 {{beers}}",
       "totals_other": "📅 {{count}} Tage · 🍺 {{beers}}",
+      "photos_one": "📸 1 Foto hochgeladen",
+      "photos_other": "📸 {{count}} Fotos hochgeladen",
+      "photosNudge": "📸 Noch keine Fotos. Knips deine nächste Maß!",
       "firstDayNudge": "Trag deinen ersten Tag ein und starte deine Serie",
       "expandLabel": "Dein Festival-Fortschritt",
       "expandHint": "Zeigt deine Serie, deine Zelte und deinen Vergleich zum letzten Mal"

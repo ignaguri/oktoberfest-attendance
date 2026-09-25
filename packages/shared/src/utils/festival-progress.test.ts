@@ -8,13 +8,24 @@ const base: FestivalProgress = {
   bestStreak: 3,
   tentsVisited: 7,
   tentsTotal: 17,
+  photosUploaded: 4,
   previousFestival: { name: "Oktoberfest 2025", beers: 22, days: 4 },
   isSolo: true,
 };
 
 describe("getProgressLines", () => {
-  it("shows streak, tents and chase while under last time", () => {
-    expect(getProgressLines(base, 18).map((line) => line.id)).toEqual(["streak", "tents", "chase"]);
+  it("shows streak, tents, chase and photos while under last time", () => {
+    expect(getProgressLines(base, 18).map((line) => line.id)).toEqual([
+      "streak",
+      "tents",
+      "chase",
+      "photos",
+    ]);
+  });
+
+  it("nudges for a first photo instead of showing 0 photos", () => {
+    const photos = getProgressLines({ ...base, photosUploaded: 0 }, 18).at(-1);
+    expect(photos).toMatchObject({ id: "photosNudge", key: "home.progress.photosNudge" });
   });
 
   it("falls back to the best streak when the current one is broken", () => {
@@ -32,31 +43,36 @@ describe("getProgressLines", () => {
       { ...base, tentsTotal: 0, previousFestival: { name: "Oktoberfest 2025", beers: 0, days: 2 } },
       5,
     );
-    expect(lines.map((line) => line.id)).toEqual(["streak"]);
+    expect(lines.map((line) => line.id)).toEqual(["streak", "photos"]);
   });
 
-  it("returns nothing when there is no streak, no tents and no previous festival", () => {
-    expect(
-      getProgressLines(
-        { ...base, currentStreak: 0, bestStreak: 0, tentsTotal: 0, previousFestival: null },
-        0,
-      ),
-    ).toEqual([]);
+  it("returns only the photo nudge when there is nothing else to show", () => {
+    const lines = getProgressLines(
+      {
+        ...base,
+        currentStreak: 0,
+        bestStreak: 0,
+        tentsTotal: 0,
+        photosUploaded: 0,
+        previousFestival: null,
+      },
+      0,
+    );
+    expect(lines.map((line) => line.id)).toEqual(["photosNudge"]);
   });
 });
 
 describe("getHeadlineLine", () => {
-  it("prefers a live streak, then the target, then tents, then the best streak", () => {
+  it("prefers a live streak, then the target, then the photo nudge, then tents", () => {
     expect(getHeadlineLine(getProgressLines(base, 18))?.id).toBe("streak");
     expect(getHeadlineLine(getProgressLines({ ...base, currentStreak: 0 }, 18))?.id).toBe("chase");
-    expect(
-      getHeadlineLine(getProgressLines({ ...base, currentStreak: 0, previousFestival: null }, 18))
-        ?.id,
-    ).toBe("tents");
-    expect(
-      getHeadlineLine(
-        getProgressLines({ ...base, currentStreak: 0, tentsTotal: 0, previousFestival: null }, 18),
-      )?.id,
-    ).toBe("bestStreak");
+    const noTarget = { ...base, currentStreak: 0, previousFestival: null };
+    expect(getHeadlineLine(getProgressLines({ ...noTarget, photosUploaded: 0 }, 18))?.id).toBe(
+      "photosNudge",
+    );
+    expect(getHeadlineLine(getProgressLines(noTarget, 18))?.id).toBe("tents");
+    expect(getHeadlineLine(getProgressLines({ ...noTarget, tentsTotal: 0 }, 18))?.id).toBe(
+      "bestStreak",
+    );
   });
 });

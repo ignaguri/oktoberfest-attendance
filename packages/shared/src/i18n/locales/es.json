@@ -2844,6 +2844,9 @@
       "record": "🏆 ¡Nuevo récord! {{beers}} ({{festivalName}}: {{target}})",
       "totals_one": "📅 {{count}} día · 🍺 {{beers}}",
       "totals_other": "📅 {{count}} días · 🍺 {{beers}}",
+      "photos_one": "📸 1 foto subida",
+      "photos_other": "📸 {{count}} fotos subidas",
+      "photosNudge": "📸 Todavía no hay fotos. ¡Sacale una a tu próxima Maß!",
       "firstDayNudge": "Registrá tu primer día y arrancá tu racha",
       "expandLabel": "Tu progreso en el festival",
       "expandHint": "Muestra tu racha, tus carpas y cómo vas contra la última vez"

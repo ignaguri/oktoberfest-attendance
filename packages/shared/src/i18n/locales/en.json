@@ -2784,6 +2784,9 @@
       "record": "🏆 New record: {{beers}} ({{festivalName}}: {{target}})",
       "totals_one": "📅 {{count}} day · 🍺 {{beers}}",
       "totals_other": "📅 {{count}} days · 🍺 {{beers}}",
+      "photos_one": "📸 1 photo uploaded",
+      "photos_other": "📸 {{count}} photos uploaded",
+      "photosNudge": "📸 No photos yet. Snap your next Maß!",
       "firstDayNudge": "Log your first day to start your streak",
       "expandLabel": "Your festival progress",
       "expandHint": "Shows your streak, tents and how you compare to last time"

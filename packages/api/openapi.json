@@ -15228,6 +15228,9 @@
                             "tentsTotal": {
                               "type": "number"
                             },
+                            "photosUploaded": {
+                              "type": "number"
+                            },
                             "previousFestival": {
                               "type": "object",
                               "nullable": true,
@@ -15257,6 +15260,7 @@
                             "bestStreak",
                             "tentsVisited",
                             "tentsTotal",
+                            "photosUploaded",
                             "previousFestival",
                             "isSolo"
                           ]

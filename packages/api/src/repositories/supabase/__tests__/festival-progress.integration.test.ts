@@ -252,6 +252,30 @@ describe("get_user_festival_progress", () => {
     expect(soc?.previous_festival_name).toBeNull();
   });
 
+  it("counts photos on this festival's attendances only", async () => {
+    const { data: attendances, error } = await admin
+      .from("attendances")
+      .select("id, festival_id")
+      .eq("user_id", users.sol.id)
+      .in("festival_id", [festivalIds.current, festivalIds.series2024]);
+    if (error || !attendances) {
+      throw new Error(`attendance lookup failed: ${error?.message}`);
+    }
+    const currentIds = attendances.filter((a) => a.festival_id === festivalIds.current);
+    const previousId = attendances.find((a) => a.festival_id === festivalIds.series2024);
+    const { error: pictureError } = await admin.from("beer_pictures").insert(
+      [currentIds[0], currentIds[0], currentIds[1], previousId].map((attendance) => ({
+        user_id: users.sol.id,
+        attendance_id: attendance!.id,
+        picture_url: `test/${randomUUID()}.jpg`,
+      })),
+    );
+    if (pictureError) {
+      throw new Error(`picture insert failed: ${pictureError.message}`);
+    }
+    expect((await progress(users.sol.client, "2026-09-24"))?.photos_uploaded).toBe(3);
+  });
+
   it("counts Highlights beers from consumptions, not the stale beer_count", async () => {
     const { data, error } = await admin.rpc("get_user_festival_stats_with_positions", {
       p_user_id: users.sol.id,

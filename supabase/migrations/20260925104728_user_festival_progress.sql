@@ -1,6 +1,6 @@
 -- Personal progress for the Home card: streak, tents X of Y, the previous
--- festival in the same series, and the raw group and friend counts the API
--- uses to decide solo vs social. It returns counts only; the solo rule lives in
+-- festival in the same series, photos uploaded, and the raw group and friend
+-- counts the API uses to decide solo vs social. It returns counts only; the solo rule lives in
 -- packages/shared/src/utils/home-audience.ts so it can change without a
 -- migration.
 --
@@ -22,7 +22,8 @@ RETURNS TABLE(
   previous_festival_beers integer,
   previous_festival_days integer,
   groups_this_festival integer,
-  accepted_friends integer
+  accepted_friends integer,
+  photos_uploaded integer
 )
 LANGUAGE plpgsql
 STABLE
@@ -102,7 +103,10 @@ BEGIN
     (SELECT COUNT(*)::integer
        FROM friendships fr
       WHERE fr.status = 'accepted'
-        AND (fr.requester_id = v_user_id OR fr.addressee_id = v_user_id));
+        AND (fr.requester_id = v_user_id OR fr.addressee_id = v_user_id)),
+    (SELECT COUNT(bp.id)::integer
+       FROM beer_pictures bp JOIN attendances a ON a.id = bp.attendance_id
+      WHERE bp.user_id = v_user_id AND a.festival_id = p_festival_id);
 END;
 $$;
 

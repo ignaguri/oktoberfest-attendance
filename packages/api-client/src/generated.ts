@@ -9142,6 +9142,7 @@ export interface paths {
                                     bestStreak: number;
                                     tentsVisited: number;
                                     tentsTotal: number;
+                                    photosUploaded: number;
                                     previousFestival: {
                                         name: string;
                                         beers: number;

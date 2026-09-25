@@ -17,6 +17,7 @@ const row = {
   previous_festival_days: 4,
   groups_this_festival: 0,
   accepted_friends: 0,
+  photos_uploaded: 5,
 };
 
 describe("SupabaseProfileRepository.getFestivalProgress", () => {
@@ -41,6 +42,7 @@ describe("SupabaseProfileRepository.getFestivalProgress", () => {
       bestStreak: 3,
       tentsVisited: 7,
       tentsTotal: 17,
+      photosUploaded: 5,
       previousFestival: { name: "Oktoberfest 2025", beers: 22, days: 4 },
       isSolo: true,
     });
