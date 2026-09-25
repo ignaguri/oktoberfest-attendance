@@ -81,8 +81,10 @@ BEGIN
     -- Yesterday still counts, so the streak does not read 0 before today is logged
     COALESCE((SELECT r.run_length FROM runs r WHERE r.run_end >= v_today - 1 ORDER BY r.run_end DESC LIMIT 1), 0),
     COALESCE((SELECT MAX(r.run_length) FROM runs r), 0),
+    -- Only tents on this festival's list, so visited never exceeds the total
     (SELECT COUNT(DISTINCT tv.tent_id)::integer
        FROM tent_visits tv
+       JOIN festival_tents ft ON ft.festival_id = tv.festival_id AND ft.tent_id = tv.tent_id
       WHERE tv.user_id = v_user_id AND tv.festival_id = p_festival_id),
     (SELECT COUNT(*)::integer FROM festival_tents ft WHERE ft.festival_id = p_festival_id),
     (SELECT p.name::text FROM previous p),

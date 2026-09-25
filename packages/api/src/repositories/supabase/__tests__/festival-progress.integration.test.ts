@@ -135,14 +135,17 @@ describe("get_user_festival_progress", () => {
     await attend(users.sol.id, festivalIds.series2024, ["2024-09-22"], 2);
     await attend(users.sol.id, festivalIds.other2025, ["2025-09-21"], 5);
 
-    // current festival has 3 tents; sol visits 2 of them
-    const { data: tents, error: tentsError } = await admin.from("tents").select("id").limit(3);
-    if (tentsError || !tents || tents.length < 3) {
-      throw new Error(`need 3 tents in the local DB: ${tentsError?.message}`);
+    // current festival has 3 tents; sol visits 2 of them, plus one tent that is
+    // not on this festival's list and must not count
+    const { data: tents, error: tentsError } = await admin.from("tents").select("id").limit(4);
+    if (tentsError || !tents || tents.length < 4) {
+      throw new Error(`need 4 tents in the local DB: ${tentsError?.message}`);
     }
     const { error: festivalTentsError } = await admin
       .from("festival_tents")
-      .insert(tents.map((tent) => ({ festival_id: festivalIds.current, tent_id: tent.id })));
+      .insert(
+        tents.slice(0, 3).map((tent) => ({ festival_id: festivalIds.current, tent_id: tent.id })),
+      );
     if (festivalTentsError) {
       throw new Error(`festival_tents insert failed: ${festivalTentsError.message}`);
     }
@@ -164,6 +167,12 @@ describe("get_user_festival_progress", () => {
         user_id: users.sol.id,
         festival_id: festivalIds.current,
         tent_id: tents[1].id,
+      },
+      {
+        id: randomUUID(),
+        user_id: users.sol.id,
+        festival_id: festivalIds.current,
+        tent_id: tents[3].id,
       },
     ]);
     if (visitError) {
