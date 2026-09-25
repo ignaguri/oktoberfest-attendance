@@ -2834,7 +2834,7 @@
       "firstTime": "Tu primera vez con ProstCounter. ¡Que valga la pena!"
     },
     "progress": {
-      "title": "Tu {{festivalName}}",
+      "title": "Tu {{festivalName}} hasta ahora",
       "streak_one": "🔥 Racha de {{count}} día",
       "streak_other": "🔥 Racha de {{count}} días",
       "bestStreak_one": "Mejor racha: {{count}} día",

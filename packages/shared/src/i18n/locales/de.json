@@ -3011,7 +3011,7 @@
       "firstTime": "Dein erstes Mal mit ProstCounter. Lass es krachen!"
     },
     "progress": {
-      "title": "Dein {{festivalName}}",
+      "title": "Dein {{festivalName}} bisher",
       "streak_one": "🔥 {{count}} Tag in Folge",
       "streak_other": "🔥 {{count}} Tage in Folge",
       "bestStreak_one": "Beste Serie: {{count}} Tag",
