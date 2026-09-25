@@ -15212,6 +15212,54 @@
                               "totalMembers"
                             ]
                           }
+                        },
+                        "progress": {
+                          "type": "object",
+                          "properties": {
+                            "currentStreak": {
+                              "type": "number"
+                            },
+                            "bestStreak": {
+                              "type": "number"
+                            },
+                            "tentsVisited": {
+                              "type": "number"
+                            },
+                            "tentsTotal": {
+                              "type": "number"
+                            },
+                            "previousFestival": {
+                              "type": "object",
+                              "nullable": true,
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "beers": {
+                                  "type": "number"
+                                },
+                                "days": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "beers",
+                                "days"
+                              ]
+                            },
+                            "isSolo": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "currentStreak",
+                            "bestStreak",
+                            "tentsVisited",
+                            "tentsTotal",
+                            "previousFestival",
+                            "isSolo"
+                          ]
                         }
                       },
                       "required": [
