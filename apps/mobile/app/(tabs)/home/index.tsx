@@ -23,6 +23,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { WrappedCTA } from "@/components/wrapped/wrapped-cta";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { Colors } from "@/lib/constants/colors";
 import { filterUnpromptedTents, recordCrowdPrompted } from "@/lib/crowd/prompt-memory";
 import {
@@ -53,6 +54,8 @@ export default function HomeScreen() {
   const queryClient = useQueryClient();
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
   const isOnline = useIsOnline();
+  const { user } = useAuth();
+  const userId = user?.id;
 
   // Determine if festival is currently active (not ended)
   const isFestivalActive = useMemo(() => {
@@ -124,7 +127,7 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    if (!pendingCrowdReport || pendingCrowdReport.tentIds.length === 0) return;
+    if (!userId || !pendingCrowdReport || pendingCrowdReport.tentIds.length === 0) return;
 
     const { tentIds } = pendingCrowdReport;
     // Consume immediately so we don't re-trigger
@@ -133,23 +136,26 @@ export default function HomeScreen() {
     // Ask once per tent per day: every drink logged in the same tent used to
     // reopen the prompt, even right after reporting. No cleanup-based cancel:
     // consuming the report above re-runs this effect at once.
-    void filterUnpromptedTents(tentIds, today).then((unprompted) => {
+    void filterUnpromptedTents(userId, tentIds, today).then((unprompted) => {
       const resolved = resolveTentNames(unprompted);
       if (resolved.length === 0) {
         return;
       }
-      void recordCrowdPrompted(
-        resolved.map((tent) => tent.id),
-        today,
-      );
       // Small delay so the quick attendance sheet close animation finishes.
+      // Recorded only once the prompt opens, so an unmount during the delay
+      // (which clears this timer) does not hide the tent for the rest of the day.
       crowdPromptTimerRef.current = setTimeout(() => {
         crowdPromptTimerRef.current = null;
+        void recordCrowdPrompted(
+          userId,
+          resolved.map((tent) => tent.id),
+          today,
+        );
         setCrowdPromptTents(resolved);
         setShowCrowdPrompt(true);
       }, 500);
     });
-  }, [pendingCrowdReport, resolveTentNames, setPendingCrowdReport, today]);
+  }, [pendingCrowdReport, resolveTentNames, setPendingCrowdReport, today, userId]);
 
   // Handle crowd FAB press
   const handleCrowdFabPress = useCallback(() => {
