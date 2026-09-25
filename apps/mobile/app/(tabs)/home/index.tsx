@@ -24,6 +24,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { WrappedCTA } from "@/components/wrapped/wrapped-cta";
 import { Colors } from "@/lib/constants/colors";
+import { filterUnpromptedTents, recordCrowdPrompted } from "@/lib/crowd/prompt-memory";
 import {
   useAdaptedAttendanceByDate,
   useAdaptedTents,
@@ -125,20 +126,30 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!pendingCrowdReport || pendingCrowdReport.tentIds.length === 0) return;
 
-    const resolved = resolveTentNames(pendingCrowdReport.tentIds);
+    const { tentIds } = pendingCrowdReport;
     // Consume immediately so we don't re-trigger
     setPendingCrowdReport(null);
 
-    if (resolved.length > 0) {
+    // Ask once per tent per day: every drink logged in the same tent used to
+    // reopen the prompt, even right after reporting. No cleanup-based cancel:
+    // consuming the report above re-runs this effect at once.
+    void filterUnpromptedTents(tentIds, today).then((unprompted) => {
+      const resolved = resolveTentNames(unprompted);
+      if (resolved.length === 0) {
+        return;
+      }
+      void recordCrowdPrompted(
+        resolved.map((tent) => tent.id),
+        today,
+      );
       // Small delay so the quick attendance sheet close animation finishes.
-      // Defer state updates to avoid synchronous setState in effect.
       crowdPromptTimerRef.current = setTimeout(() => {
         crowdPromptTimerRef.current = null;
         setCrowdPromptTents(resolved);
         setShowCrowdPrompt(true);
       }, 500);
-    }
-  }, [pendingCrowdReport, resolveTentNames, setPendingCrowdReport]);
+    });
+  }, [pendingCrowdReport, resolveTentNames, setPendingCrowdReport, today]);
 
   // Handle crowd FAB press
   const handleCrowdFabPress = useCallback(() => {
