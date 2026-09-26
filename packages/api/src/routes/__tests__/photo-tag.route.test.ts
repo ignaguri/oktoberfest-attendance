@@ -47,7 +47,12 @@ describe("Photo tag routes", () => {
   });
 
   it("PUT replaces the tag set for the caller", async () => {
-    const response = { taggedUsers: [], canEdit: true, festivalId: FESTIVAL_ID };
+    const response = {
+      taggedUsers: [],
+      canEdit: true,
+      festivalId: FESTIVAL_ID,
+      uploader: { userId: FRIEND_ID, username: "user1", fullName: null, avatarUrl: null },
+    };
     serviceMock.setTags.mockResolvedValueOnce(response);
 
     const res = await app.request(

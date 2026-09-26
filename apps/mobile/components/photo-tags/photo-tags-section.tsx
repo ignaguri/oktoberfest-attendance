@@ -8,6 +8,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
 interface PhotoTagsSectionProps {
@@ -17,8 +18,8 @@ interface PhotoTagsSectionProps {
 }
 
 /**
- * Who is in the photo, under it in the viewer. The uploader of a public photo
- * can change it; the picker saves when it closes.
+ * Whose photo it is and who is in it, under the photo in the viewer. The
+ * uploader of a public photo can change the tags; the picker saves when it closes.
  */
 export function PhotoTagsSection({ photoId, groupId, onUserPress }: PhotoTagsSectionProps) {
   const { t } = useTranslation();
@@ -58,41 +59,61 @@ export function PhotoTagsSection({ photoId, groupId, onUserPress }: PhotoTagsSec
     }
   }, [taggedUsers, draftUserIds, setPhotoTags, photoId, groupId]);
 
-  if (taggedUsers.length === 0 && !canEdit) {
+  if (!tags) {
     return null;
   }
 
+  const uploaderName = tags.uploader.username || tags.uploader.fullName || "";
+  const showTags = taggedUsers.length > 0 || canEdit;
+
   return (
     <View className="border-b border-outline-200 px-4 py-2">
-      <HStack space="sm" className="flex-wrap items-center">
-        {taggedUsers.map((user) => {
-          const name = user.username || user.fullName || "";
-          return (
-            <Pressable
-              key={user.userId}
-              onPress={() => onUserPress(user.userId)}
-              accessibilityRole="button"
-              accessibilityLabel={name}
-              accessibilityHint={t("photoTags.openProfileHint")}
-              className="rounded-full bg-background-100 px-3 py-1 active:opacity-70"
-            >
-              <Text className="text-sm text-typography-700">{name}</Text>
-            </Pressable>
-          );
-        })}
-        {canEdit && (
-          <Pressable
-            onPress={openPicker}
-            accessibilityRole="button"
-            accessibilityLabel={t("photoTags.tagPeople")}
-            accessibilityHint={t("photoTags.editHint")}
-            className="flex-row items-center rounded-full border border-outline-200 px-3 py-1 active:opacity-70"
-          >
-            <UserPlus size={14} color={IconColors.muted} />
-            <Text className="ml-1 text-sm text-typography-500">{t("photoTags.tagPeople")}</Text>
-          </Pressable>
+      <VStack space="xs">
+        <Pressable
+          onPress={() => onUserPress(tags.uploader.userId)}
+          accessibilityRole="button"
+          accessibilityLabel={t("photoTags.photoBy", { name: uploaderName })}
+          accessibilityHint={t("photoTags.openProfileHint")}
+          className="self-start py-1 active:opacity-70"
+        >
+          <Text className="text-sm text-typography-500">
+            {t("photoTags.photoByPrefix")}{" "}
+            <Text className="text-sm font-semibold text-typography-900">{uploaderName}</Text>
+          </Text>
+        </Pressable>
+        {showTags && (
+          <HStack space="sm" className="flex-wrap items-center">
+            <Text className="text-sm text-typography-500">{t("photoTags.inThisPhoto")}</Text>
+            {taggedUsers.map((user) => {
+              const name = user.username || user.fullName || "";
+              return (
+                <Pressable
+                  key={user.userId}
+                  onPress={() => onUserPress(user.userId)}
+                  accessibilityRole="button"
+                  accessibilityLabel={name}
+                  accessibilityHint={t("photoTags.openProfileHint")}
+                  className="rounded-full bg-background-100 px-3 py-1 active:opacity-70"
+                >
+                  <Text className="text-sm text-typography-700">{name}</Text>
+                </Pressable>
+              );
+            })}
+            {canEdit && (
+              <Pressable
+                onPress={openPicker}
+                accessibilityRole="button"
+                accessibilityLabel={t("photoTags.tagPeople")}
+                accessibilityHint={t("photoTags.editHint")}
+                className="flex-row items-center rounded-full border border-outline-200 px-3 py-1 active:opacity-70"
+              >
+                <UserPlus size={14} color={IconColors.muted} />
+                <Text className="ml-1 text-sm text-typography-500">{t("photoTags.tagPeople")}</Text>
+              </Pressable>
+            )}
+          </HStack>
         )}
-      </HStack>
+      </VStack>
       {saveFailed && (
         <Text className="mt-1 text-xs text-error-600">{t("photoTags.saveFailed")}</Text>
       )}

@@ -8576,6 +8576,13 @@ export interface paths {
                             canEdit: boolean;
                             /** Format: uuid */
                             festivalId: string | null;
+                            uploader: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            };
                         };
                     };
                 };
@@ -8637,6 +8644,13 @@ export interface paths {
                             canEdit: boolean;
                             /** Format: uuid */
                             festivalId: string | null;
+                            uploader: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            };
                         };
                     };
                 };

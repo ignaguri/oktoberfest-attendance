@@ -213,6 +213,8 @@ export const PhotoTagsResponseSchema = z.object({
   canEdit: z.boolean(),
   /** Festival of the photo's attendance, for the tag picker's options */
   festivalId: z.uuid().nullable(),
+  /** Whose photo it is; the viewer is not always opened from a gallery grouped by uploader */
+  uploader: PhotoTaggedUserSchema,
 });
 
 export type PhotoTagsResponse = z.infer<typeof PhotoTagsResponseSchema>;

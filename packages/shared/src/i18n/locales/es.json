@@ -3859,9 +3859,11 @@
   },
   "photoTags": {
     "tagPeople": "Etiquetar gente",
+    "photoByPrefix": "Foto de",
+    "photoBy": "Foto de {{name}}",
     "whosInThese": "¿Quiénes están en estas fotos?",
     "editHint": "Elegí quién está en esta foto",
-    "taggedLabel": "Personas etiquetadas",
+    "inThisPhoto": "En esta foto",
     "openProfileHint": "Abre su perfil",
     "saveFailed": "No se pudieron guardar las etiquetas. Probá de nuevo.",
     "picker": {

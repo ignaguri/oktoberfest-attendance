@@ -9,7 +9,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../lib/logger";
 import { NotFoundError, ValidationError } from "../middleware/error";
-import type { IPhotoTagRepository } from "../repositories/interfaces";
+import type { IPhotoTagRepository, PhotoTagTarget } from "../repositories/interfaces";
 import { SupabaseDayPlanRepository } from "../repositories/supabase/day-plan.repository";
 import { SupabasePhotoTagRepository } from "../repositories/supabase/photo-tag.repository";
 import { createNotificationService } from "./notification.service";
@@ -87,11 +87,7 @@ export class PhotoTagService {
       }
     }
 
-    return {
-      taggedUsers: await this.repo.getTaggedUsers(photoId),
-      canEdit: true,
-      festivalId: target.festivalId,
-    };
+    return this.buildTagsResponse(target, true);
   }
 
   async getTags(photoId: string, callerId: string): Promise<PhotoTagsResponse> {
@@ -101,10 +97,31 @@ export class PhotoTagService {
       throw new NotFoundError(ErrorCodes.PHOTO_NOT_FOUND);
     }
 
+    return this.buildTagsResponse(
+      target,
+      target.uploaderId === callerId && target.visibility === "public",
+    );
+  }
+
+  private async buildTagsResponse(
+    target: PhotoTagTarget,
+    canEdit: boolean,
+  ): Promise<PhotoTagsResponse> {
+    const [taggedUsers, [uploaderProfile]] = await Promise.all([
+      this.repo.getTaggedUsers(target.photoId),
+      this.repo.getProfiles([target.uploaderId]),
+    ]);
+
     return {
-      taggedUsers: await this.repo.getTaggedUsers(photoId),
-      canEdit: target.uploaderId === callerId && target.visibility === "public",
+      taggedUsers,
+      canEdit,
       festivalId: target.festivalId,
+      uploader: uploaderProfile ?? {
+        userId: target.uploaderId,
+        username: null,
+        fullName: null,
+        avatarUrl: null,
+      },
     };
   }
 

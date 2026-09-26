@@ -57,7 +57,12 @@ describe("PhotoTagService.setTags", () => {
       festivalId: FESTIVAL,
       taggedUserIds: [FRIEND_B],
     });
-    expect(result).toEqual({ taggedUsers: [], canEdit: true, festivalId: FESTIVAL });
+    expect(result).toEqual({
+      taggedUsers: [],
+      canEdit: true,
+      festivalId: FESTIVAL,
+      uploader: { userId: UPLOADER, username: null, fullName: null, avatarUrl: null },
+    });
   });
 
   it("removes people no longer in the set without notifying", async () => {
@@ -183,6 +188,28 @@ describe("PhotoTagService.getTags", () => {
       taggedUsers: [],
       canEdit: true,
       festivalId: FESTIVAL,
+      uploader: { userId: UPLOADER, username: null, fullName: null, avatarUrl: null },
+    });
+  });
+
+  it("names the uploader, so a viewer opened outside the gallery can say whose photo it is", async () => {
+    const repo = makeRepo({
+      getProfiles: vi
+        .fn()
+        .mockResolvedValue([
+          { userId: UPLOADER, username: "user1", fullName: "User One", avatarUrl: "a.png" },
+        ]),
+    });
+    const service = new PhotoTagService(repo, vi.fn(), null);
+
+    const result = await service.getTags(PHOTO, FRIEND_A);
+
+    expect(repo.getProfiles).toHaveBeenCalledWith([UPLOADER]);
+    expect(result.uploader).toEqual({
+      userId: UPLOADER,
+      username: "user1",
+      fullName: "User One",
+      avatarUrl: "a.png",
     });
   });
 

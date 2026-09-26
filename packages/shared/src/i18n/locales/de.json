@@ -4036,9 +4036,11 @@
   },
   "photoTags": {
     "tagPeople": "Personen markieren",
+    "photoByPrefix": "Foto von",
+    "photoBy": "Foto von {{name}}",
     "whosInThese": "Wer ist auf den Fotos?",
     "editHint": "Wähle, wer auf diesem Foto ist",
-    "taggedLabel": "Markierte Personen",
+    "inThisPhoto": "Auf diesem Foto",
     "openProfileHint": "Öffnet das Profil",
     "saveFailed": "Markierungen konnten nicht gespeichert werden. Versuch es nochmal.",
     "picker": {

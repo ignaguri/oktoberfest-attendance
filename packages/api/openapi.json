@@ -14341,12 +14341,40 @@
                       "type": "string",
                       "nullable": true,
                       "format": "uuid"
+                    },
+                    "uploader": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "username": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "fullName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "avatarUrl": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "userId",
+                        "username",
+                        "fullName",
+                        "avatarUrl"
+                      ]
                     }
                   },
                   "required": [
                     "taggedUsers",
                     "canEdit",
-                    "festivalId"
+                    "festivalId",
+                    "uploader"
                   ]
                 }
               }
@@ -14463,12 +14491,40 @@
                       "type": "string",
                       "nullable": true,
                       "format": "uuid"
+                    },
+                    "uploader": {
+                      "type": "object",
+                      "properties": {
+                        "userId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "username": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "fullName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "avatarUrl": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "userId",
+                        "username",
+                        "fullName",
+                        "avatarUrl"
+                      ]
                     }
                   },
                   "required": [
                     "taggedUsers",
                     "canEdit",
-                    "festivalId"
+                    "festivalId",
+                    "uploader"
                   ]
                 }
               }

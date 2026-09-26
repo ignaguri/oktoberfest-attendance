@@ -3799,9 +3799,11 @@
   },
   "photoTags": {
     "tagPeople": "Tag people",
+    "photoByPrefix": "Photo by",
+    "photoBy": "Photo by {{name}}",
     "whosInThese": "Who's in these?",
     "editHint": "Choose who is in this photo",
-    "taggedLabel": "Tagged people",
+    "inThisPhoto": "In this photo",
     "openProfileHint": "Opens their profile",
     "saveFailed": "Couldn't save the tags. Try again.",
     "picker": {
