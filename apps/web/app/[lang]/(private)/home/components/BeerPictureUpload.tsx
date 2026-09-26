@@ -4,13 +4,15 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { Camera, Eye, EyeOff } from "lucide-react";
+import { useFestival } from "@prostcounter/shared/contexts";
+import { Camera, Eye, EyeOff, UserPlus } from "lucide-react";
 import Image from "next/image";
 import { Link } from "next-view-transitions";
 import { startTransition, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { PhotoTagPicker } from "@/components/photo-tags/PhotoTagPicker";
 import { Alert } from "@/components/ui/alert";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,6 +53,9 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
   const { t } = useTranslation();
   const [pictureAlreadyUploaded, setPictureAlreadyUploaded] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const { currentFestival } = useFestival();
+  const [taggedUserIds, setTaggedUserIds] = useState<string[]>([]);
+  const [isTagPickerOpen, setIsTagPickerOpen] = useState(false);
 
   const {
     handleSubmit,
@@ -72,11 +77,20 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
     if (!data.picture || !attendanceId) return;
 
     try {
-      await apiClient.photos.upload({
+      const result = await apiClient.photos.upload({
         picture: data.picture,
         attendanceId,
         visibility: data.visibility,
       });
+
+      if (taggedUserIds.length > 0 && data.visibility === "public") {
+        try {
+          await apiClient.photoTags.set(result.pictureId, taggedUserIds);
+        } catch {
+          toast.error(t("photoTags.upload.tagsFailed"));
+        }
+      }
+      setTaggedUserIds([]);
 
       toast.success(t("notifications.success.pictureUploaded"));
       setPictureAlreadyUploaded(true);
@@ -144,9 +158,32 @@ export function BeerPictureUpload({ attendanceId }: BeerPictureUploadProps) {
           </span>
           <Switch
             checked={watchedVisibility === "public"}
-            onCheckedChange={(checked) => setValue("visibility", checked ? "public" : "private")}
+            onCheckedChange={(checked) => {
+              setValue("visibility", checked ? "public" : "private");
+              if (!checked) {
+                setTaggedUserIds([]);
+              }
+            }}
           />
         </div>
+      )}
+
+      {watchedPicture && watchedVisibility === "public" && (
+        <>
+          <Button type="button" variant="outline" onClick={() => setIsTagPickerOpen(true)}>
+            <UserPlus size={16} />
+            {taggedUserIds.length > 0
+              ? `${t("photoTags.tagPeople")} (${taggedUserIds.length})`
+              : t("photoTags.whosInThese")}
+          </Button>
+          <PhotoTagPicker
+            open={isTagPickerOpen}
+            onOpenChange={setIsTagPickerOpen}
+            festivalId={currentFestival?.id}
+            selectedUserIds={taggedUserIds}
+            onChange={setTaggedUserIds}
+          />
+        </>
       )}
 
       {watchedPicture && !errors.picture && (

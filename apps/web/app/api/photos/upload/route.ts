@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create database record using RPC function
-    const { error: dbError } = await supabase.rpc("add_beer_picture", {
+    const { data: pictureId, error: dbError } = await supabase.rpc("add_beer_picture", {
       p_user_id: user.id,
       p_attendance_id: attendanceId,
       p_picture_url: fileName,
@@ -154,6 +154,7 @@ export async function POST(request: NextRequest) {
       {
         success: true,
         pictureUrl: fileName,
+        pictureId,
         message: "Photo uploaded successfully",
       },
       { status: 200 },

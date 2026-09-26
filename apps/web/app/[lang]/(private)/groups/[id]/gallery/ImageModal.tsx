@@ -22,6 +22,7 @@ import Image from "next/image";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 
+import { PhotoTagsPanel } from "@/components/photo-tags/PhotoTagsPanel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -150,6 +151,7 @@ export function ImageModal({ imageUrl, photoId, groupId, onClose }: ImageModalPr
           {/* Social panel — only shown when photoId + groupId are available */}
           {hasSocial && (
             <div className="flex w-full flex-col bg-white sm:w-80">
+              {photoId && <PhotoTagsPanel photoId={photoId} groupId={groupId} />}
               {/* Reactions */}
               <div className="border-b px-4 py-3">
                 <h3 className="mb-2 text-sm font-semibold text-gray-900">

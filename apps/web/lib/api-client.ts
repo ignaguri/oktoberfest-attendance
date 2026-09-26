@@ -73,6 +73,7 @@ export const apiClient: TypedApiClient & {
     }) => Promise<{
       success: boolean;
       pictureUrl: string;
+      pictureId: string;
       message: string;
     }>;
   };
@@ -92,6 +93,7 @@ export const apiClient: TypedApiClient & {
     }): Promise<{
       success: boolean;
       pictureUrl: string;
+      pictureId: string;
       message: string;
     }> {
       const supabase = createSupabaseBrowserClient();

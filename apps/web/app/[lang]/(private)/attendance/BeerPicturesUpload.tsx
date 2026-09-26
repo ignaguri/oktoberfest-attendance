@@ -4,12 +4,14 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { Camera, Eye, EyeOff, X } from "lucide-react";
+import { useFestival } from "@prostcounter/shared/contexts";
+import { Camera, Eye, EyeOff, UserPlus, X } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { PhotoTagPicker } from "@/components/photo-tags/PhotoTagPicker";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,6 +66,9 @@ export function BeerPicturesUpload({
 }: BeerPicturesUploadProps) {
   const { t } = useTranslation();
   const [allPictureUrls, setAllPictureUrls] = useState<string[]>(existingPictureUrls);
+  const { currentFestival } = useFestival();
+  const [taggedUserIds, setTaggedUserIds] = useState<string[]>([]);
+  const [isTagPickerOpen, setIsTagPickerOpen] = useState(false);
 
   const {
     handleSubmit,
@@ -87,12 +92,21 @@ export function BeerPicturesUpload({
 
     try {
       const newUrls: string[] = [];
+      let tagsFailed = false;
       for (const picture of data.pictures) {
         const result = await apiClient.photos.upload({
           picture,
           attendanceId,
           visibility: data.visibility,
         });
+
+        if (taggedUserIds.length > 0 && data.visibility === "public") {
+          try {
+            await apiClient.photoTags.set(result.pictureId, taggedUserIds);
+          } catch {
+            tagsFailed = true;
+          }
+        }
 
         if (result.pictureUrl) {
           newUrls.push(result.pictureUrl);
@@ -101,6 +115,10 @@ export function BeerPicturesUpload({
       const updatedUrls = [...allPictureUrls, ...newUrls];
       setAllPictureUrls(updatedUrls);
       onPicturesUpdate(updatedUrls);
+      if (tagsFailed) {
+        toast.error(t("photoTags.upload.tagsFailed"));
+      }
+      setTaggedUserIds([]);
       toast.success(t("notifications.success.picturesUploaded", { count: newUrls.length }));
       reset();
     } catch (error) {
@@ -128,6 +146,9 @@ export function BeerPicturesUpload({
   const removePicture = (index: number) => {
     const newPictures = watchedPictures.filter((_, i) => i !== index);
     setValue("pictures", newPictures);
+    if (newPictures.length === 0) {
+      setTaggedUserIds([]);
+    }
   };
 
   return (
@@ -202,10 +223,33 @@ export function BeerPicturesUpload({
             </span>
             <Switch
               checked={watchedVisibility === "public"}
-              onCheckedChange={(checked) => setValue("visibility", checked ? "public" : "private")}
+              onCheckedChange={(checked) => {
+                setValue("visibility", checked ? "public" : "private");
+                if (!checked) {
+                  setTaggedUserIds([]);
+                }
+              }}
             />
           </div>
         </div>
+      )}
+
+      {watchedPictures.length > 0 && watchedVisibility === "public" && (
+        <>
+          <Button type="button" variant="outline" onClick={() => setIsTagPickerOpen(true)}>
+            <UserPlus size={16} />
+            {taggedUserIds.length > 0
+              ? `${t("photoTags.tagPeople")} (${taggedUserIds.length})`
+              : t("photoTags.whosInThese")}
+          </Button>
+          <PhotoTagPicker
+            open={isTagPickerOpen}
+            onOpenChange={setIsTagPickerOpen}
+            festivalId={currentFestival?.id}
+            selectedUserIds={taggedUserIds}
+            onChange={setTaggedUserIds}
+          />
+        </>
       )}
 
       {watchedPictures.length > 0 && !errors.pictures && (
