@@ -98,6 +98,7 @@ export function useMessageFeed(festivalId?: string) {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const invalidateQueries = useInvalidateQueries();
 
   const query = useQuery<GetMessageFeedResponse>(
     [...QueryKeys.messageFeed(festivalId || ""), cursor || "initial"],
@@ -139,14 +140,15 @@ export function useMessageFeed(festivalId?: string) {
     try {
       setCursor(null);
       setHasLoadedMore(false);
-      await query.refetch();
+      // Stale every page, so the first one is not served from cache
+      invalidateQueries(QueryKeys.messageFeed(festivalId || ""));
     } catch {
       setCursor(null);
       setHasLoadedMore(false);
     } finally {
       setIsRefreshing(false);
     }
-  }, [query]);
+  }, [invalidateQueries, festivalId]);
 
   return {
     ...query,

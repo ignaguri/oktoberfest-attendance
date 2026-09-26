@@ -4,7 +4,7 @@ import { useTentCrowdStatus } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
   Beer,
@@ -42,6 +42,8 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
 export default function MapScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  // Set when opened from a feed item about a tent
+  const { tentId: tentIdParam } = useLocalSearchParams<{ tentId?: string }>();
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
   const { openSheet } = useQuickAttendance();
@@ -59,6 +61,7 @@ export default function MapScreen() {
   const [selectedTent, setSelectedTent] = useState<NearbyTent | null>(null);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
   const hasInitializedRef = useRef(false);
+  const hasAppliedTentParamRef = useRef(false);
 
   // refreshNearby must stay in the deps. Its identity changes with the current
   // location, and pinning the mount-time copy captures a null location, so every
@@ -97,6 +100,17 @@ export default function MapScreen() {
     setSelectedTab("tents"); // Switch to tents tab to show selection
   }, []);
 
+  // Preselect the tent from the route once nearby tents are in. A tent out of
+  // range is not in the list, so the map just opens unselected.
+  useEffect(() => {
+    if (!tentIdParam || hasAppliedTentParamRef.current) return;
+    const tent = nearbyTents.find((nearby) => nearby.tentId === tentIdParam);
+    if (tent) {
+      hasAppliedTentParamRef.current = true;
+      handleTentSelect(tent);
+    }
+  }, [tentIdParam, nearbyTents, handleTentSelect]);
+
   // Check in at selected tent - closes map and opens quick attendance sheet
   const handleCheckIn = useCallback(() => {
     if (selectedTent) {
@@ -123,6 +137,14 @@ export default function MapScreen() {
     },
     [nearbyTents, handleTentSelect],
   );
+
+  // The tent the screen was opened for goes first, where its Check In button is visible
+  const listedTents = useMemo(() => {
+    const focused = nearbyTents.find((tent) => tent.tentId === tentIdParam);
+    return focused
+      ? [focused, ...nearbyTents.filter((tent) => tent.tentId !== tentIdParam)]
+      : nearbyTents;
+  }, [nearbyTents, tentIdParam]);
 
   if (!currentFestival?.id) {
     return null;
@@ -168,6 +190,7 @@ export default function MapScreen() {
             showTents
             searchRadius={1000}
             selectedTentId={selectedTent?.tentId}
+            focusTentId={tentIdParam}
             onMarkerPress={handleMarkerPress}
           />
           <Pressable
@@ -259,7 +282,7 @@ export default function MapScreen() {
             <NearbyFriendsList members={nearbyMembers} />
           ) : (
             <NearbyTentsList
-              tents={nearbyTents}
+              tents={listedTents}
               selectedTentId={selectedTent?.tentId ?? null}
               onTentSelect={handleTentSelect}
               onCheckIn={handleCheckIn}

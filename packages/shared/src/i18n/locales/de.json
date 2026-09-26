@@ -2994,7 +2994,8 @@
     "userProfile": "Benutzerprofil",
     "title": "Aktivitäts-Feed",
     "profileNotFound": "Profil nicht gefunden",
-    "viewProfile": "Profil anzeigen"
+    "viewProfile": "Profil anzeigen",
+    "openHint": "Öffnet, worum es hier geht"
   },
   "quickAttendance": {
     "sheetTitle": "Heutiger Besuch",
@@ -3060,6 +3061,7 @@
       "title": "Was passiert",
       "empty": "Noch keine Aktivitäten. Beginne dein Festivalerlebnis zu dokumentieren!",
       "loadMore": "Mehr laden",
+      "caughtUp": "Du bist auf dem neuesten Stand",
       "error": "Feed konnte nicht geladen werden",
       "compose": "Neue Nachricht"
     },

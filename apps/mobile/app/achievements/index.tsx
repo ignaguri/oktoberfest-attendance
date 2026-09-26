@@ -149,6 +149,8 @@ export default function AchievementsScreen() {
   // Guards against re-triggering the scroll/highlight on every re-render while
   // the same `?highlight=` value is still in the route params.
   const processedHighlightRef = useRef<string | null>(null);
+  // Card still to scroll to once it is mounted under the right scope tab
+  const pendingScrollCardIdRef = useRef<string | null>(null);
 
   const registerCardRef = useCallback((cardId: string, node: View | null) => {
     if (node) {
@@ -197,9 +199,19 @@ export default function AchievementsScreen() {
     }
 
     processedHighlightRef.current = highlight;
+    // Lifetime cards only render under "All time", so switch to the card's tab
+    // first; the effect below scrolls once it is mounted there.
+    setActiveScope(matchedCard.scope);
     setHighlightedCardId(matchedCard.id);
+    pendingScrollCardIdRef.current = matchedCard.id;
 
-    const cardNode = cardRefs.current.get(matchedCard.id);
+    const timeoutId = setTimeout(() => setHighlightedCardId(null), HIGHLIGHT_DURATION_MS);
+    return () => clearTimeout(timeoutId);
+  }, [highlight, achievementsResponse]);
+
+  useEffect(() => {
+    const cardId = pendingScrollCardIdRef.current;
+    const cardNode = cardId ? cardRefs.current.get(cardId) : undefined;
     // Measured against the ScrollView's inner content view, not the ScrollView
     // itself: measuring against the scroll responder is ambiguous about
     // whether the returned offset already accounts for the current scroll
@@ -214,21 +226,26 @@ export default function AchievementsScreen() {
     // returning without invoking either callback — so the scroll silently never
     // happened at all.
     const relativeNode = contentViewRef.current;
-    if (cardNode && relativeNode) {
+    if (!cardNode || !relativeNode) {
+      // Not mounted yet (tab switch pending, or a collapsed section)
+      return;
+    }
+    // One frame later, so a list that just re-rendered for the scope switch has
+    // been laid out; measuring right away returned the old, shorter offsets
+    const frameId = requestAnimationFrame(() => {
+      pendingScrollCardIdRef.current = null;
       cardNode.measureLayout(
         relativeNode,
         (_left, top) => {
           scrollViewRef.current?.scrollTo({ y: Math.max(top - 24, 0), animated: true });
         },
         () => {
-          // No-op: the card may not be mounted yet (e.g. a collapsed section).
+          // No-op: nothing to scroll to.
         },
       );
-    }
-
-    const timeoutId = setTimeout(() => setHighlightedCardId(null), HIGHLIGHT_DURATION_MS);
-    return () => clearTimeout(timeoutId);
-  }, [highlight, achievementsResponse]);
+    });
+    return () => cancelAnimationFrame(frameId);
+  }, [cards, highlightedCardId]);
 
   // Offline state — achievements require server-side progress calculation
   if (!isOnline) {

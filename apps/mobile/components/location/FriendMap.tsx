@@ -13,6 +13,8 @@ interface FriendMapProps {
   showFriends?: boolean;
   searchRadius?: number;
   selectedTentId?: string | null;
+  /** Centers the camera on this tent instead of the user, while it is nearby */
+  focusTentId?: string;
   onMarkerPress?: (type: "friend" | "tent", id: string) => void;
   style?: object;
 }
@@ -28,6 +30,7 @@ export function FriendMap({
   showFriends = true,
   searchRadius = 1000,
   selectedTentId,
+  focusTentId,
   onMarkerPress,
   style,
 }: FriendMapProps) {
@@ -38,9 +41,19 @@ export function FriendMap({
 
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
 
-  // Calculate initial camera position: user location > festival region
-  // Returns null if neither is available (map will show default world view)
+  // Calculate initial camera position: focused tent > user location > festival region
+  // Returns null if none is available (map will show default world view)
   const cameraPosition = useMemo(() => {
+    // Priority 0: A tent the screen was opened for
+    const focusTent = focusTentId
+      ? nearbyTents.find((tent) => tent.tentId === focusTentId)
+      : undefined;
+    if (focusTent) {
+      return {
+        coordinates: { latitude: focusTent.latitude, longitude: focusTent.longitude },
+        zoom: 17,
+      };
+    }
     // Priority 1: User's current location
     if (currentLocation) {
       return {
@@ -63,7 +76,7 @@ export function FriendMap({
     }
     // No location available - let map use default view
     return undefined;
-  }, [currentLocation, currentFestival]);
+  }, [focusTentId, nearbyTents, currentLocation, currentFestival]);
 
   // Build Apple Maps markers (iOS) - with SF Symbols
   const appleMarkers = useMemo<AppleMaps.Marker[]>(() => {

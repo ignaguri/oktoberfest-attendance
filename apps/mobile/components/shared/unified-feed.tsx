@@ -1,5 +1,5 @@
 import { useFestival } from "@prostcounter/shared/contexts";
-import { type UnifiedFeedItem, useUnifiedFeed } from "@prostcounter/shared/hooks";
+import type { UnifiedFeedItem, useUnifiedFeed } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { MessageSquarePlus, Newspaper, RefreshCw } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -7,7 +7,7 @@ import { ActivityIndicator, View } from "react-native";
 
 import { ComposeMessage } from "@/components/messages/compose-message";
 import { MessageItem } from "@/components/messages/message-item";
-import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -20,7 +20,9 @@ import { Colors, IconColors } from "@/lib/constants/colors";
 import { ActivityItem } from "./activity-item";
 
 interface UnifiedFeedProps {
-  onRefresh?: () => void;
+  /** Owned by the screen, so its scroll view can load the next page. */
+  feed: ReturnType<typeof useUnifiedFeed>;
+  onRefresh?: () => Promise<void> | void;
 }
 
 /**
@@ -30,34 +32,21 @@ interface UnifiedFeedProps {
  * - Compose button to post new messages from the home feed
  * - Renders different item types via switch on feedType
  * - Reuses existing ActivityItem and MessageItem renderers
+ * - No load-more button: the screen fetches the next page as it scrolls
  */
-export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
+export function UnifiedFeed({ feed, onRefresh }: UnifiedFeedProps) {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const { user } = useAuth();
   const [isComposeOpen, setIsComposeOpen] = useState(false);
 
-  const {
-    feedItems,
-    loading,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-    isRefreshing,
-    refresh,
-    error,
-  } = useUnifiedFeed(currentFestival?.id);
+  const { feedItems, loading, hasNextPage, isFetchingNextPage, isRefreshing, refresh, error } =
+    feed;
 
+  // The screen's refresh already resets the feed; fall back to the feed alone
   const handleRefresh = useCallback(async () => {
-    await refresh();
-    onRefresh?.();
+    await (onRefresh ?? refresh)();
   }, [refresh, onRefresh]);
-
-  const handleLoadMore = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleComposeSuccess = useCallback(() => {
     refresh();
@@ -182,21 +171,21 @@ export function UnifiedFeed({ onRefresh }: UnifiedFeedProps) {
           ))}
         </VStack>
 
-        {/* Load More Button */}
-        {hasNextPage && (
-          <Button
-            variant="outline"
-            action="secondary"
-            size="sm"
-            className="mt-2"
-            onPress={handleLoadMore}
-            disabled={isFetchingNextPage}
-          >
-            {isFetchingNextPage && <ButtonSpinner color={Colors.gray[500]} />}
-            <ButtonText>
-              {isFetchingNextPage ? t("common.status.loading") : t("home.unifiedFeed.loadMore")}
-            </ButtonText>
-          </Button>
+        {/* Next page loads as the screen scrolls near the end */}
+        {isFetchingNextPage && (
+          <View className="py-3">
+            <ActivityIndicator
+              size="small"
+              color={Colors.primary[500]}
+              accessibilityLabel={t("common.status.loading")}
+            />
+          </View>
+        )}
+        {/* A page in flight has no data yet, so hasNextPage reads false */}
+        {!hasNextPage && !isFetchingNextPage && (
+          <Text className="py-3 text-center text-sm text-typography-400">
+            {t("home.unifiedFeed.caughtUp")}
+          </Text>
         )}
       </VStack>
 
