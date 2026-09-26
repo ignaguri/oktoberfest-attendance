@@ -15,6 +15,7 @@ export * from "./leaderboard.repository";
 export * from "./location.repository";
 export * from "./notification.repository";
 export * from "./photo.repository";
+export * from "./photo-tag.repository";
 export * from "./reservation.repository";
 export * from "./tent.repository";
 export * from "./wrapped.repository";

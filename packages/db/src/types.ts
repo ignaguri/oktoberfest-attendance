@@ -2522,6 +2522,10 @@ export type Database = {
       }
       expire_old_location_sessions: { Args: never; Returns: undefined }
       expire_old_locations: { Args: never; Returns: undefined }
+      feed_photo_gallery_group: {
+        Args: { p_festival_id: string; p_uploader_id: string }
+        Returns: string
+      }
       fetch_group_gallery: {
         Args: {
           p_festival_id?: string
