@@ -35,6 +35,11 @@ interface CompanionPickerSheetProps {
   onChange: (selection: { userIds: string[]; groupIds: string[] }) => void;
   /** "photo" lists people only, caps the selection and uses photo copy */
   mode?: "plan" | "photo";
+  /**
+   * Render as a native modal. Needed when opened from inside a React Native
+   * Modal (the photo viewer): the default portal sits behind it on iOS.
+   */
+  useRNModal?: boolean;
 }
 
 function toggle(ids: string[], id: string): string[] {
@@ -55,6 +60,7 @@ export function CompanionPickerSheet({
   selectedGroupIds,
   onChange,
   mode = "plan",
+  useRNModal = false,
 }: CompanionPickerSheetProps) {
   const { t } = useTranslation();
   const isPhotoMode = mode === "photo";
@@ -82,7 +88,7 @@ export function CompanionPickerSheet({
   }, [onChange]);
 
   return (
-    <Actionsheet isOpen={isOpen} onClose={onClose}>
+    <Actionsheet isOpen={isOpen} onClose={onClose} useRNModal={useRNModal}>
       <ActionsheetBackdrop />
       <ActionsheetContent className="max-h-[80%] pb-8">
         <ActionsheetDragIndicatorWrapper>

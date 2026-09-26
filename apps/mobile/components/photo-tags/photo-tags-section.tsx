@@ -100,6 +100,7 @@ export function PhotoTagsSection({ photoId, groupId, onUserPress }: PhotoTagsSec
       {canEdit && (
         <CompanionPickerSheet
           mode="photo"
+          useRNModal
           isOpen={isPickerOpen}
           onClose={closePicker}
           options={options ?? null}

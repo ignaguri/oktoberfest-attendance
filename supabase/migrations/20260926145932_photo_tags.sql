@@ -23,14 +23,28 @@ CREATE POLICY "Tags are visible with their photo"
     EXISTS (SELECT 1 FROM public.beer_pictures p WHERE p.id = photo_tags.photo_id)
   );
 
+-- Same people the API offers: accepted friends, or group-mates in the photo's
+-- festival. Enforced here too so a direct PostgREST insert cannot put a
+-- stranger's name on a photo.
 CREATE POLICY "Uploaders tag their public photos"
   ON public.photo_tags FOR INSERT TO authenticated
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM public.beer_pictures p
+      SELECT 1
+      FROM public.beer_pictures p
+        JOIN public.attendances a ON a.id = p.attendance_id
       WHERE p.id = photo_tags.photo_id
         AND p.user_id = (SELECT auth.uid())
         AND p.visibility = 'public'::photo_visibility_enum
+        AND (
+          public.is_friend((SELECT auth.uid()), photo_tags.tagged_user_id)
+          OR EXISTS (
+            SELECT 1 FROM public.v_user_shared_group_members v
+            WHERE v.viewer_id = (SELECT auth.uid())
+              AND v.owner_id = photo_tags.tagged_user_id
+              AND v.festival_id = a.festival_id
+          )
+        )
     )
   );
 
