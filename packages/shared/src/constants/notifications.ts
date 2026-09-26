@@ -33,6 +33,7 @@ export const NOTIFICATION_WORKFLOWS = {
   GROUP_INVITATION: "group-invitation",
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
   PHOTO_REACTION: "photo-reaction",
+  PHOTO_TAG: "photo-tag",
 } as const;
 
 export type NotificationWorkflowId =
@@ -60,6 +61,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   GROUP_INVITATION: "group-invitation",
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
   PHOTO_REACTION: "photo-reaction",
+  PHOTO_TAG: "photo-tag",
 } as const;
 
 export type NotificationPushType =
@@ -82,6 +84,7 @@ interface NotificationPayload {
   date?: string;
   festivalId?: string;
   reactorName?: string;
+  taggerName?: string;
   [key: string]: unknown;
 }
 
@@ -168,6 +171,11 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
       // The group the reaction was made in; its gallery shows the photo
       case NOTIFICATION_PUSH_TYPES.PHOTO_REACTION:
         return payload.groupId ? `/group-detail/${payload.groupId}/gallery` : "/groups";
+
+      // The tagger's shared group shows the photo; without one, the tagged
+      // person's own profile strip does
+      case NOTIFICATION_PUSH_TYPES.PHOTO_TAG:
+        return payload.groupId ? `/group-detail/${payload.groupId}/gallery` : "/profile";
     }
   }
 
@@ -188,6 +196,10 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
   if (payload.inviteToken) return `/join-group?token=${payload.inviteToken}`;
   // A reaction names its reactor and group, and belongs in the gallery
   if (payload.reactorName && payload.groupId) return `/group-detail/${payload.groupId}/gallery`;
+  // A tag names its tagger; it must beat the groupId fallback below
+  if (payload.taggerName) {
+    return payload.groupId ? `/group-detail/${payload.groupId}/gallery` : "/profile";
+  }
   if (payload.groupId) return `/group-detail/${payload.groupId}`;
 
   // Try URL if present

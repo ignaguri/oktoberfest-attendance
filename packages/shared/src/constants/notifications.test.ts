@@ -145,3 +145,24 @@ describe("getNotificationRoute for photo reactions", () => {
     expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_REACTION })).toBe("/groups");
   });
 });
+
+describe("getNotificationRoute for photo tags", () => {
+  const GROUP_ID = "5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d";
+
+  it("opens the shared group's gallery from a push", () => {
+    expect(
+      getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_TAG, groupId: GROUP_ID }),
+    ).toBe(`/group-detail/${GROUP_ID}/gallery`);
+  });
+
+  it("opens your profile when you share no group with the tagger", () => {
+    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_TAG })).toBe("/profile");
+  });
+
+  it("routes an in-app payload without a type by its tagger", () => {
+    expect(getNotificationRoute({ taggerName: "user2", groupId: GROUP_ID })).toBe(
+      `/group-detail/${GROUP_ID}/gallery`,
+    );
+    expect(getNotificationRoute({ taggerName: "user2" })).toBe("/profile");
+  });
+});

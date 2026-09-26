@@ -3508,7 +3508,9 @@
     "WRAPPED_NOT_FOUND": "Rückblick-Daten nicht gefunden.",
     "WRAPPED_NOT_READY": "dein Rückblick ist noch nicht bereit.",
     "FEEDBACK_RATE_LIMITED": "Du hast heute schon viel Feedback geschickt. Versuch es morgen wieder.",
-    "FEEDBACK_DAY_NOT_LOGGED": "Für diesen Tag sind keine Getränke eingetragen."
+    "FEEDBACK_DAY_NOT_LOGGED": "Für diesen Tag sind keine Getränke eingetragen.",
+    "PHOTO_TAG_PRIVATE_PHOTO": "Nur öffentliche Fotos können Markierungen haben.",
+    "PHOTO_TAG_INVALID_USER": "Du kannst nur Freunde und Gruppenmitglieder markieren."
   },
   "offline": {
     "status": {
@@ -4030,6 +4032,27 @@
       "required": "Bitte schreib ein paar Worte.",
       "ratingRequired": "Wähl zuerst ein Gesicht.",
       "tooLong": "Maximal 2000 Zeichen."
+    }
+  },
+  "photoTags": {
+    "tagPeople": "Personen markieren",
+    "whosInThese": "Wer ist auf den Fotos?",
+    "editHint": "Wähle, wer auf diesem Foto ist",
+    "taggedLabel": "Markierte Personen",
+    "openProfileHint": "Öffnet das Profil",
+    "saveFailed": "Markierungen konnten nicht gespeichert werden. Versuch es nochmal.",
+    "picker": {
+      "title": "Wer ist auf diesem Foto?",
+      "empty": "Füge Freunde hinzu oder tritt einer Gruppe bei, um Leute zu markieren.",
+      "limit": "Du kannst bis zu {{count}} Personen markieren."
+    },
+    "strip": {
+      "titleSelf": "Fotos von dir",
+      "titleOther": "Fotos von {{name}}",
+      "openPhotoHint": "Öffnet das Foto"
+    },
+    "upload": {
+      "tagsFailed": "Foto hochgeladen, aber die Markierungen wurden nicht gespeichert."
     }
   }
 }
