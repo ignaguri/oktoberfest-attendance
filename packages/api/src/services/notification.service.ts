@@ -1091,7 +1091,7 @@ export class NotificationService {
 
       const { data: photo, error: photoError } = await adminClient
         .from("beer_pictures")
-        .select("user_id")
+        .select("user_id, visibility, attendances!inner(festival_id)")
         .eq("id", input.photoId)
         .maybeSingle();
 
@@ -1099,10 +1099,34 @@ export class NotificationService {
         logger.error({ error: photoError }, "Error fetching photo for reaction notification");
         return;
       }
-      if (!photo || photo.user_id === input.reactorId) {
+      if (!photo || photo.user_id === input.reactorId || photo.visibility !== "public") {
         return;
       }
       const uploaderId = photo.user_id;
+
+      // Only a photo the group's gallery shows: the uploader is a member and it
+      // is from the group's festival. Reaction RLS checks neither, and the
+      // deep link opens that gallery.
+      const { data: uploaderMembership, error: membershipError } = await adminClient
+        .from("group_members")
+        .select("groups!inner(festival_id)")
+        .eq("group_id", input.groupId)
+        .eq("user_id", uploaderId)
+        .maybeSingle();
+
+      if (membershipError) {
+        logger.error(
+          { error: membershipError },
+          "Error checking uploader membership for reaction notification",
+        );
+        return;
+      }
+      if (
+        !uploaderMembership ||
+        uploaderMembership.groups.festival_id !== photo.attendances.festival_id
+      ) {
+        return;
+      }
 
       const recipients = await this.filterByPreference([uploaderId], "group_notifications_enabled");
       if (!recipients || recipients.length === 0) {

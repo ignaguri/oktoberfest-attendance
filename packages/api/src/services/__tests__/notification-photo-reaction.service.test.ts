@@ -21,6 +21,7 @@ const UPLOADER_ID = "11111111-1111-4111-8111-111111111111";
 const REACTOR_ID = "22222222-2222-4222-8222-222222222222";
 const PHOTO_ID = "33333333-3333-4333-8333-333333333333";
 const GROUP_ID = "44444444-4444-4444-8444-444444444444";
+const FESTIVAL_ID = "55555555-5555-4555-8555-555555555555";
 
 const REACTION = {
   photoId: PHOTO_ID,
@@ -32,16 +33,32 @@ const REACTION = {
 /** The service-role client: the photo's uploader, preferences, and the dedupe ledger. */
 function mockAdmin({
   uploaderId = UPLOADER_ID,
+  visibility = "public",
+  photoFestivalId = FESTIVAL_ID,
+  uploaderInGroup = true,
   prefs = [],
   inserted = true,
 }: {
   uploaderId?: string | null;
+  visibility?: "public" | "private";
+  photoFestivalId?: string;
+  uploaderInGroup?: boolean;
   prefs?: Array<{ user_id: string; group_notifications_enabled: boolean | null }>;
   inserted?: boolean;
 }) {
-  const photoMaybeSingle = vi
-    .fn()
-    .mockResolvedValue({ data: uploaderId ? { user_id: uploaderId } : null, error: null });
+  const photoMaybeSingle = vi.fn().mockResolvedValue({
+    data: uploaderId
+      ? { user_id: uploaderId, visibility, attendances: { festival_id: photoFestivalId } }
+      : null,
+    error: null,
+  });
+  const membershipQuery = {
+    eq: vi.fn(() => membershipQuery),
+    maybeSingle: vi.fn().mockResolvedValue({
+      data: uploaderInGroup ? { groups: { festival_id: FESTIVAL_ID } } : null,
+      error: null,
+    }),
+  };
   const prefsIn = vi.fn().mockResolvedValue({ data: prefs, error: null });
   const ledgerSelect = vi
     .fn()
@@ -60,6 +77,9 @@ function mockAdmin({
             eq: vi.fn().mockReturnValue({ maybeSingle: photoMaybeSingle }),
           }),
         };
+      }
+      if (table === "group_members") {
+        return { select: vi.fn().mockReturnValue(membershipQuery) };
       }
       if (table === "user_notification_preferences") {
         return { select: vi.fn().mockReturnValue({ in: prefsIn }) };
@@ -156,6 +176,33 @@ describe("NotificationService.notifyPhotoReaction", () => {
 
     await service.notifyPhotoReaction(REACTION);
 
+    expect(triggerMock).not.toHaveBeenCalled();
+  });
+
+  it("skips a private photo", async () => {
+    const { upsert } = mockAdmin({ visibility: "private" });
+
+    await service.notifyPhotoReaction(REACTION);
+
+    expect(upsert).not.toHaveBeenCalled();
+    expect(triggerMock).not.toHaveBeenCalled();
+  });
+
+  it("skips a photo whose uploader is not in the group", async () => {
+    const { upsert } = mockAdmin({ uploaderInGroup: false });
+
+    await service.notifyPhotoReaction(REACTION);
+
+    expect(upsert).not.toHaveBeenCalled();
+    expect(triggerMock).not.toHaveBeenCalled();
+  });
+
+  it("skips a photo from another festival than the group's", async () => {
+    const { upsert } = mockAdmin({ photoFestivalId: "66666666-6666-4666-8666-666666666666" });
+
+    await service.notifyPhotoReaction(REACTION);
+
+    expect(upsert).not.toHaveBeenCalled();
     expect(triggerMock).not.toHaveBeenCalled();
   });
 
