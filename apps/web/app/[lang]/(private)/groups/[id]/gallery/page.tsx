@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { use } from "react";
 
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -16,6 +17,8 @@ interface GalleryPageProps {
 export default function GalleryPage({ params }: GalleryPageProps) {
   const { t } = useTranslation();
   const { id: groupId } = use(params);
+  // Set by reaction and tag notifications, to open on the photo they are about
+  const linkedPhotoId = useSearchParams().get("photoId") ?? undefined;
 
   const { data: galleryResponse, loading } = useQuery(
     ["group", groupId, "gallery"],
@@ -41,7 +44,7 @@ export default function GalleryPage({ params }: GalleryPageProps) {
   return (
     <div className="container mx-auto max-w-xl p-4">
       <h1 className="mb-4 text-2xl font-bold">{t("groups.gallery.title")}</h1>
-      <GalleryGrid galleryData={galleryData} groupId={groupId} />
+      <GalleryGrid galleryData={galleryData} groupId={groupId} initialPhotoId={linkedPhotoId} />
     </div>
   );
 }

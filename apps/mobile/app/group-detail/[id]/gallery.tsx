@@ -6,7 +6,7 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { getInitials } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Camera } from "lucide-react-native";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, Image, type LayoutChangeEvent, Pressable, RefreshControl, ScrollView } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
@@ -87,7 +87,11 @@ function groupGalleryData(photos: GalleryPhoto[]): GroupedGallery[] {
 
 export default function GroupGalleryScreen() {
   const { t } = useTranslation();
-  const { id, date } = useLocalSearchParams<{ id: string; date?: string }>();
+  const { id, date, photoId } = useLocalSearchParams<{
+    id: string;
+    date?: string;
+    photoId?: string;
+  }>();
   const [selectedPhoto, setSelectedPhoto] = useState<{
     id: string;
     url: string;
@@ -139,6 +143,20 @@ export default function GroupGalleryScreen() {
   );
 
   const hasPhotos = groupedGallery.length > 0;
+
+  // Opened from a reaction or tag notification: show that photo once the gallery has it
+  const hasOpenedLinkedPhotoRef = useRef(false);
+  useEffect(() => {
+    if (!photoId || hasOpenedLinkedPhotoRef.current || !galleryData) {
+      return;
+    }
+    hasOpenedLinkedPhotoRef.current = true;
+    const linkedPhoto = (galleryData as GalleryPhoto[]).find((photo) => photo.id === photoId);
+    const linkedPhotoUrl = linkedPhoto ? getBeerPictureUrl(linkedPhoto.pictureUrl) : undefined;
+    if (linkedPhotoUrl) {
+      setSelectedPhoto({ id: photoId, url: linkedPhotoUrl });
+    }
+  }, [photoId, galleryData]);
 
   const handleImagePress = useCallback((photoId: string, imageUrl: string) => {
     setSelectedPhoto({ id: photoId, url: imageUrl });

@@ -128,17 +128,28 @@ describe("getNotificationRoute for group invitations", () => {
 
 describe("getNotificationRoute for photo reactions", () => {
   const GROUP_ID = "0f1e2d3c-4b5a-6978-8a9b-0c1d2e3f4a5b";
+  const PHOTO_ID = "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d";
 
-  it("opens the gallery of the group the reaction was made in", () => {
+  it("opens the photo in the gallery of the group the reaction was made in", () => {
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.PHOTO_REACTION,
+        groupId: GROUP_ID,
+        photoId: PHOTO_ID,
+      }),
+    ).toBe(`/group-detail/${GROUP_ID}/gallery?photoId=${PHOTO_ID}`);
+  });
+
+  it("opens the photo from an in-app payload without a type", () => {
+    expect(
+      getNotificationRoute({ reactorName: "user2", groupId: GROUP_ID, photoId: PHOTO_ID }),
+    ).toBe(`/group-detail/${GROUP_ID}/gallery?photoId=${PHOTO_ID}`);
+  });
+
+  it("opens just the gallery when the payload has no photo id", () => {
     expect(
       getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_REACTION, groupId: GROUP_ID }),
     ).toBe(`/group-detail/${GROUP_ID}/gallery`);
-  });
-
-  it("opens the gallery from an in-app payload without a type", () => {
-    expect(getNotificationRoute({ reactorName: "user2", groupId: GROUP_ID })).toBe(
-      `/group-detail/${GROUP_ID}/gallery`,
-    );
   });
 
   it("falls back to the groups list without a group id", () => {
@@ -148,21 +159,28 @@ describe("getNotificationRoute for photo reactions", () => {
 
 describe("getNotificationRoute for photo tags", () => {
   const GROUP_ID = "5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d";
+  const PHOTO_ID = "6b7c8d9e-0f1a-4b2c-8d3e-4f5a6b7c8d9e";
 
-  it("opens the shared group's gallery from a push", () => {
+  it("opens the photo in the shared group's gallery from a push", () => {
     expect(
-      getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_TAG, groupId: GROUP_ID }),
-    ).toBe(`/group-detail/${GROUP_ID}/gallery`);
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.PHOTO_TAG,
+        groupId: GROUP_ID,
+        photoId: PHOTO_ID,
+      }),
+    ).toBe(`/group-detail/${GROUP_ID}/gallery?photoId=${PHOTO_ID}`);
   });
 
-  it("opens your profile when you share no group with the tagger", () => {
-    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_TAG })).toBe("/profile");
+  it("opens Social, where Photos of you lives, when you share no group with the tagger", () => {
+    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_TAG, photoId: PHOTO_ID })).toBe(
+      "/groups",
+    );
   });
 
   it("routes an in-app payload without a type by its tagger", () => {
-    expect(getNotificationRoute({ taggerName: "user2", groupId: GROUP_ID })).toBe(
-      `/group-detail/${GROUP_ID}/gallery`,
-    );
-    expect(getNotificationRoute({ taggerName: "user2" })).toBe("/profile");
+    expect(
+      getNotificationRoute({ taggerName: "user2", groupId: GROUP_ID, photoId: PHOTO_ID }),
+    ).toBe(`/group-detail/${GROUP_ID}/gallery?photoId=${PHOTO_ID}`);
+    expect(getNotificationRoute({ taggerName: "user2" })).toBe("/groups");
   });
 });
