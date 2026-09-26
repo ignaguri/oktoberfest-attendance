@@ -429,6 +429,7 @@ describe("Pull functions", () => {
     it("writes is_super_admin through to a row with unsynced local edits", async () => {
       vi.mocked(apiClient.profile.get).mockResolvedValueOnce({
         profile: {
+          id: "user-1",
           username: "testuser",
           full_name: "Test User",
           avatar_url: null,

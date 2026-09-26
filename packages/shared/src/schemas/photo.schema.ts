@@ -180,3 +180,71 @@ export const BulkUpdatePhotoVisibilitySchema = z.object({
 });
 
 export type BulkUpdatePhotoVisibilityInput = z.infer<typeof BulkUpdatePhotoVisibilitySchema>;
+
+/**
+ * Photo tags
+ */
+export const PHOTO_TAG_LIMIT = 10;
+
+export const PhotoTaggedUserSchema = z.object({
+  userId: z.uuid(),
+  username: z.string().nullable(),
+  fullName: z.string().nullable(),
+  avatarUrl: z.string().nullable(),
+});
+
+export type PhotoTaggedUser = z.infer<typeof PhotoTaggedUserSchema>;
+
+export const PhotoTagUserIdsSchema = z
+  .array(z.uuid())
+  .max(PHOTO_TAG_LIMIT)
+  .refine((ids) => new Set(ids).size === ids.length, { message: "Duplicate user IDs" });
+
+/** PUT /api/v1/photos/:photoId/tags */
+export const SetPhotoTagsBodySchema = z.object({
+  userIds: PhotoTagUserIdsSchema,
+});
+
+export type SetPhotoTagsBody = z.infer<typeof SetPhotoTagsBodySchema>;
+
+export const PhotoTagsResponseSchema = z.object({
+  taggedUsers: z.array(PhotoTaggedUserSchema),
+  /** Caller uploaded the photo and it is public */
+  canEdit: z.boolean(),
+  /** Festival of the photo's attendance, for the tag picker's options */
+  festivalId: z.uuid().nullable(),
+  /** Whose photo it is; the viewer is not always opened from a gallery grouped by uploader */
+  uploader: PhotoTaggedUserSchema,
+});
+
+export type PhotoTagsResponse = z.infer<typeof PhotoTagsResponseSchema>;
+
+export const TaggedPhotoSchema = z.object({
+  id: z.uuid(),
+  /** Storage path; clients resolve it with getBeerPictureUrl */
+  pictureUrl: z.string(),
+  createdAt: z.string(),
+  uploader: PhotoTaggedUserSchema,
+  /** A group the viewer shares with the uploader in this festival, to open the gallery viewer */
+  groupId: z.uuid().nullable(),
+});
+
+export type TaggedPhoto = z.infer<typeof TaggedPhotoSchema>;
+
+/** GET /api/v1/profiles/:userId/tagged-photos */
+export const GetTaggedPhotosQuerySchema = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+});
+
+export const GetTaggedPhotosResponseSchema = z.object({
+  photos: z.array(TaggedPhotoSchema),
+});
+
+export type GetTaggedPhotosResponse = z.infer<typeof GetTaggedPhotosResponseSchema>;
+
+/** Optional body of POST /api/v1/photos/:id/confirm */
+export const ConfirmPhotoUploadBodySchema = z.object({
+  taggedUserIds: PhotoTagUserIdsSchema.optional(),
+});
+
+export type ConfirmPhotoUploadBody = z.infer<typeof ConfirmPhotoUploadBodySchema>;

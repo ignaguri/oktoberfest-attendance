@@ -10,6 +10,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { ALLOWED_EMOJIS } from "@prostcounter/shared/schemas";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { cn, getInitials } from "@prostcounter/ui";
+import { useRouter } from "expo-router";
 import { Send, Trash2, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -25,6 +26,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { PhotoTagsSection } from "@/components/photo-tags/photo-tags-section";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
@@ -40,7 +42,8 @@ interface PhotoDetailModalProps {
   visible: boolean;
   photoId: string | null;
   photoUrl: string | null;
-  groupId: string;
+  /** Without a group there are no reactions or comments, only who is in the photo */
+  groupId?: string;
   onClose: () => void;
 }
 
@@ -54,12 +57,13 @@ export function PhotoDetailModal({
   const { t } = useTranslation();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
 
   // Data hooks
-  const { data: reactionsData } = usePhotoReactions(photoId || "", groupId);
-  const { data: comments } = usePhotoComments(photoId || "", groupId);
+  const { data: reactionsData } = usePhotoReactions(photoId || "", groupId ?? "");
+  const { data: comments } = usePhotoComments(photoId || "", groupId ?? "");
   const addReaction = useAddReaction();
   const removeReaction = useRemoveReaction();
   const addComment = useAddComment();
@@ -73,7 +77,9 @@ export function PhotoDetailModal({
 
   const handleToggleReaction = useCallback(
     async (emoji: string) => {
-      if (!photoId) return;
+      if (!photoId || !groupId) {
+        return;
+      }
 
       try {
         const hasReacted = userReactions.includes(emoji);
@@ -90,7 +96,9 @@ export function PhotoDetailModal({
   );
 
   const handleAddComment = useCallback(async () => {
-    if (!photoId || !commentText.trim()) return;
+    if (!photoId || !groupId || !commentText.trim()) {
+      return;
+    }
 
     try {
       await addComment.mutateAsync({
@@ -106,7 +114,9 @@ export function PhotoDetailModal({
 
   const handleDeleteComment = useCallback(
     async (commentId: string) => {
-      if (!photoId) return;
+      if (!photoId || !groupId) {
+        return;
+      }
 
       try {
         await deleteComment.mutateAsync({ photoId, commentId, groupId });
@@ -175,6 +185,15 @@ export function PhotoDetailModal({
     [user?.id, t, handleDeleteComment],
   );
 
+  // Closing first: the viewer is a Modal and a profile screen cannot sit on top of it
+  const handleTaggedUserPress = useCallback(
+    (userId: string) => {
+      onClose();
+      router.push(`/user/${userId}`);
+    },
+    [onClose, router],
+  );
+
   if (!visible || !photoId || !photoUrl) return null;
 
   return (
@@ -190,7 +209,9 @@ export function PhotoDetailModal({
             style={{ paddingTop: Math.max(insets.top, 12) }}
           >
             <Text className="text-lg font-semibold text-typography-900">
-              {t("groups.gallery.photoDetail.reactions")}
+              {groupId
+                ? t("groups.gallery.photoDetail.reactions")
+                : t("groups.gallery.photoDetail.photo")}
             </Text>
             <Pressable
               onPress={onClose}
@@ -222,107 +243,117 @@ export function PhotoDetailModal({
             />
           </View>
 
-          {/* Emoji Reactions Row */}
-          <View className="border-b border-outline-200 px-4 py-3">
-            <HStack space="sm" className="justify-center">
-              {ALLOWED_EMOJIS.map((emoji) => {
-                const hasReacted = userReactions.includes(emoji);
-                const count = getReactionCount(emoji);
+          <PhotoTagsSection
+            photoId={photoId}
+            groupId={groupId}
+            onUserPress={handleTaggedUserPress}
+          />
 
-                return (
-                  <Pressable
-                    key={emoji}
-                    onPress={() => handleToggleReaction(emoji)}
-                    accessibilityLabel={t("groups.gallery.photoDetail.reactWith", { emoji })}
-                    accessibilityHint={
-                      hasReacted
-                        ? t("groups.gallery.photoDetail.tapToRemoveReaction")
-                        : t("groups.gallery.photoDetail.tapToReact")
-                    }
-                    className={cn(
-                      "flex-row items-center rounded-full px-3 py-1.5",
-                      hasReacted
-                        ? "border-2 border-primary-500 bg-primary-50"
-                        : "border border-outline-200 bg-background-50",
-                    )}
-                  >
-                    <Text className="text-lg">{emoji}</Text>
-                    {count > 0 && (
-                      <Text
+          {groupId && (
+            <>
+              {/* Emoji Reactions Row */}
+              <View className="border-b border-outline-200 px-4 py-3">
+                <HStack space="sm" className="justify-center">
+                  {ALLOWED_EMOJIS.map((emoji) => {
+                    const hasReacted = userReactions.includes(emoji);
+                    const count = getReactionCount(emoji);
+
+                    return (
+                      <Pressable
+                        key={emoji}
+                        onPress={() => handleToggleReaction(emoji)}
+                        accessibilityLabel={t("groups.gallery.photoDetail.reactWith", { emoji })}
+                        accessibilityHint={
+                          hasReacted
+                            ? t("groups.gallery.photoDetail.tapToRemoveReaction")
+                            : t("groups.gallery.photoDetail.tapToReact")
+                        }
                         className={cn(
-                          "ml-1 text-xs font-semibold",
-                          hasReacted ? "text-primary-600" : "text-typography-500",
+                          "flex-row items-center rounded-full px-3 py-1.5",
+                          hasReacted
+                            ? "border-2 border-primary-500 bg-primary-50"
+                            : "border border-outline-200 bg-background-50",
                         )}
                       >
-                        {count}
-                      </Text>
+                        <Text className="text-lg">{emoji}</Text>
+                        {count > 0 && (
+                          <Text
+                            className={cn(
+                              "ml-1 text-xs font-semibold",
+                              hasReacted ? "text-primary-600" : "text-typography-500",
+                            )}
+                          >
+                            {count}
+                          </Text>
+                        )}
+                      </Pressable>
+                    );
+                  })}
+                </HStack>
+              </View>
+
+              {/* Comments Section */}
+              <View className="flex-1">
+                <View className="border-b border-outline-200 px-4 py-2">
+                  <Text className="text-sm font-semibold text-typography-700">
+                    {t("groups.gallery.photoDetail.comments")}
+                  </Text>
+                </View>
+
+                {comments && comments.length > 0 ? (
+                  <FlatList
+                    data={comments}
+                    renderItem={renderComment}
+                    keyExtractor={(item) => item.id}
+                    className="flex-1"
+                    contentContainerStyle={{ paddingVertical: 4 }}
+                  />
+                ) : (
+                  <View className="flex-1 items-center justify-center p-8">
+                    <Text className="text-center text-sm text-typography-400">
+                      {t("groups.gallery.photoDetail.noComments")}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              {/* Comment Input */}
+              <View
+                className="border-t border-outline-200 px-4 py-3"
+                style={{ paddingBottom: Math.max(insets.bottom, 8) }}
+              >
+                <HStack space="sm" className="items-center">
+                  <TextInput
+                    value={commentText}
+                    onChangeText={setCommentText}
+                    placeholder={t("groups.gallery.photoDetail.addComment")}
+                    placeholderTextColor={Colors.gray[400]}
+                    maxLength={500}
+                    multiline
+                    className="flex-1 rounded-full border border-outline-300 bg-background-50 px-4 py-2 text-sm text-typography-900"
+                  />
+                  <Pressable
+                    onPress={handleAddComment}
+                    disabled={!commentText.trim() || addComment.loading}
+                    accessibilityLabel={t("groups.gallery.photoDetail.send")}
+                    className={cn(
+                      "rounded-full p-2",
+                      commentText.trim() ? "bg-primary-500" : "bg-background-200",
+                    )}
+                  >
+                    {addComment.loading ? (
+                      <ActivityIndicator size="small" color={Colors.white} />
+                    ) : (
+                      <Send
+                        size={18}
+                        color={commentText.trim() ? IconColors.white : IconColors.disabled}
+                      />
                     )}
                   </Pressable>
-                );
-              })}
-            </HStack>
-          </View>
-
-          {/* Comments Section */}
-          <View className="flex-1">
-            <View className="border-b border-outline-200 px-4 py-2">
-              <Text className="text-sm font-semibold text-typography-700">
-                {t("groups.gallery.photoDetail.comments")}
-              </Text>
-            </View>
-
-            {comments && comments.length > 0 ? (
-              <FlatList
-                data={comments}
-                renderItem={renderComment}
-                keyExtractor={(item) => item.id}
-                className="flex-1"
-                contentContainerStyle={{ paddingVertical: 4 }}
-              />
-            ) : (
-              <View className="flex-1 items-center justify-center p-8">
-                <Text className="text-center text-sm text-typography-400">
-                  {t("groups.gallery.photoDetail.noComments")}
-                </Text>
+                </HStack>
               </View>
-            )}
-          </View>
-
-          {/* Comment Input */}
-          <View
-            className="border-t border-outline-200 px-4 py-3"
-            style={{ paddingBottom: Math.max(insets.bottom, 8) }}
-          >
-            <HStack space="sm" className="items-center">
-              <TextInput
-                value={commentText}
-                onChangeText={setCommentText}
-                placeholder={t("groups.gallery.photoDetail.addComment")}
-                placeholderTextColor={Colors.gray[400]}
-                maxLength={500}
-                multiline
-                className="flex-1 rounded-full border border-outline-300 bg-background-50 px-4 py-2 text-sm text-typography-900"
-              />
-              <Pressable
-                onPress={handleAddComment}
-                disabled={!commentText.trim() || addComment.loading}
-                accessibilityLabel={t("groups.gallery.photoDetail.send")}
-                className={cn(
-                  "rounded-full p-2",
-                  commentText.trim() ? "bg-primary-500" : "bg-background-200",
-                )}
-              >
-                {addComment.loading ? (
-                  <ActivityIndicator size="small" color={Colors.white} />
-                ) : (
-                  <Send
-                    size={18}
-                    color={commentText.trim() ? IconColors.white : IconColors.disabled}
-                  />
-                )}
-              </Pressable>
-            </HStack>
-          </View>
+            </>
+          )}
         </View>
       </KeyboardAvoidingView>
     </Modal>

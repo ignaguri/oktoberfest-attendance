@@ -7,17 +7,23 @@ import type {
   GroupMember,
   GroupWithMembers,
   ListGroupsQuery,
+  PhotoTaggedUser,
   SearchGroupResult,
   SearchGroupsQuery,
   UpdateGroupInput,
   WinningCriteria,
 } from "@prostcounter/shared";
-import { WINNING_CRITERIA_IDS, winningCriteriaFromId } from "@prostcounter/shared";
+import { PHOTO_TAG_LIMIT, WINNING_CRITERIA_IDS, winningCriteriaFromId } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError, DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
+import {
+  ConflictError,
+  DatabaseError,
+  ForbiddenError,
+  NotFoundError,
+} from "../../middleware/error";
 import type { IGroupRepository } from "../interfaces";
 
 export class SupabaseGroupRepository implements IGroupRepository {
@@ -418,6 +424,10 @@ export class SupabaseGroupRepository implements IGroupRepository {
       throw new DatabaseError(`Failed to get group gallery: ${photosError.message}`);
     }
 
+    const taggedUsersByPhoto = await this.loadTaggedUsers(
+      (photos || []).map((photo: any) => photo.id as string),
+    );
+
     return (photos || []).map((photo: any) => ({
       id: photo.id,
       userId: photo.user_id,
@@ -427,7 +437,71 @@ export class SupabaseGroupRepository implements IGroupRepository {
       pictureUrl: photo.picture_url,
       date: photo.attendances?.date || "",
       createdAt: photo.created_at,
+      taggedUsers: taggedUsersByPhoto.get(photo.id) ?? [],
     }));
+  }
+
+  /** Tags for a gallery page: one tag query and one profile query, no embed. */
+  private async loadTaggedUsers(photoIds: string[]): Promise<Map<string, PhotoTaggedUser[]>> {
+    const result = new Map<string, PhotoTaggedUser[]>();
+    if (photoIds.length === 0) {
+      return result;
+    }
+
+    // PostgREST caps a response at 1000 rows. A photo has at most PHOTO_TAG_LIMIT
+    // tags, so each chunk of photos stays under the cap and no tag is dropped.
+    const chunkSize = Math.floor(1000 / PHOTO_TAG_LIMIT);
+    const chunks: string[][] = [];
+    for (let start = 0; start < photoIds.length; start += chunkSize) {
+      chunks.push(photoIds.slice(start, start + chunkSize));
+    }
+
+    const chunkResults = await Promise.all(
+      chunks.map((chunk) =>
+        this.supabase
+          .from("photo_tags")
+          .select("photo_id, tagged_user_id")
+          .in("photo_id", chunk)
+          .order("created_at", { ascending: true }),
+      ),
+    );
+
+    const tags: { photo_id: string; tagged_user_id: string }[] = [];
+    for (const { data, error: tagsError } of chunkResults) {
+      if (tagsError) {
+        throw new DatabaseError(`Failed to get photo tags: ${tagsError.message}`);
+      }
+      tags.push(...(data ?? []));
+    }
+    if (tags.length === 0) {
+      return result;
+    }
+
+    const userIds = [...new Set(tags.map((tag) => tag.tagged_user_id))];
+    const { data: profiles, error: profilesError } = await this.supabase
+      .from("profiles")
+      .select("id, username, full_name, avatar_url")
+      .in("id", userIds);
+
+    if (profilesError) {
+      throw new DatabaseError(`Failed to get tagged profiles: ${profilesError.message}`);
+    }
+
+    const profileById = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+
+    for (const tag of tags) {
+      const profile = profileById.get(tag.tagged_user_id);
+      const list = result.get(tag.photo_id) ?? [];
+      list.push({
+        userId: tag.tagged_user_id,
+        username: profile?.username ?? null,
+        fullName: profile?.full_name ?? null,
+        avatarUrl: profile?.avatar_url ?? null,
+      });
+      result.set(tag.photo_id, list);
+    }
+
+    return result;
   }
 
   async listCarryOverCandidates(

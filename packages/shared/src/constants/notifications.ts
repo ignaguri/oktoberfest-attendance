@@ -33,6 +33,7 @@ export const NOTIFICATION_WORKFLOWS = {
   GROUP_INVITATION: "group-invitation",
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
   PHOTO_REACTION: "photo-reaction",
+  PHOTO_TAG: "photo-tag",
 } as const;
 
 export type NotificationWorkflowId =
@@ -60,6 +61,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   GROUP_INVITATION: "group-invitation",
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
   PHOTO_REACTION: "photo-reaction",
+  PHOTO_TAG: "photo-tag",
 } as const;
 
 export type NotificationPushType =
@@ -82,6 +84,8 @@ interface NotificationPayload {
   date?: string;
   festivalId?: string;
   reactorName?: string;
+  taggerName?: string;
+  photoId?: string;
   [key: string]: unknown;
 }
 
@@ -89,6 +93,13 @@ interface NotificationPayload {
  * The attendance day a plan overlap points at. The festival rides along because
  * festivals can share dates, and the day must open in the one it was planned for.
  */
+/** A group's gallery, opened on the photo the notification is about when it names one */
+function buildGalleryRoute(groupId: string, photoId: string | undefined): string {
+  return photoId
+    ? `/group-detail/${groupId}/gallery?photoId=${photoId}`
+    : `/group-detail/${groupId}/gallery`;
+}
+
 function buildDayRoute(date: string, festivalId: string | undefined): string {
   return festivalId
     ? `/attendance?date=${date}&festivalId=${festivalId}`
@@ -167,7 +178,12 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
 
       // The group the reaction was made in; its gallery shows the photo
       case NOTIFICATION_PUSH_TYPES.PHOTO_REACTION:
-        return payload.groupId ? `/group-detail/${payload.groupId}/gallery` : "/groups";
+        return payload.groupId ? buildGalleryRoute(payload.groupId, payload.photoId) : "/groups";
+
+      // The tagger's shared group shows the photo; without one, the tagged
+      // person's "Photos of you" strip on Social does
+      case NOTIFICATION_PUSH_TYPES.PHOTO_TAG:
+        return payload.groupId ? buildGalleryRoute(payload.groupId, payload.photoId) : "/groups";
     }
   }
 
@@ -187,7 +203,13 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
   // the invite link has to win over /group-detail.
   if (payload.inviteToken) return `/join-group?token=${payload.inviteToken}`;
   // A reaction names its reactor and group, and belongs in the gallery
-  if (payload.reactorName && payload.groupId) return `/group-detail/${payload.groupId}/gallery`;
+  if (payload.reactorName && payload.groupId) {
+    return buildGalleryRoute(payload.groupId, payload.photoId);
+  }
+  // A tag names its tagger; it must beat the groupId fallback below
+  if (payload.taggerName) {
+    return payload.groupId ? buildGalleryRoute(payload.groupId, payload.photoId) : "/groups";
+  }
   if (payload.groupId) return `/group-detail/${payload.groupId}`;
 
   // Try URL if present

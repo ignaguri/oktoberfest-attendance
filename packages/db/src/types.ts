@@ -1595,6 +1595,32 @@ export type Database = {
           },
         ]
       }
+      photo_tags: {
+        Row: {
+          created_at: string
+          photo_id: string
+          tagged_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          photo_id: string
+          tagged_user_id: string
+        }
+        Update: {
+          created_at?: string
+          photo_id?: string
+          tagged_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_tags_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "beer_pictures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -2496,6 +2522,17 @@ export type Database = {
       }
       expire_old_location_sessions: { Args: never; Returns: undefined }
       expire_old_locations: { Args: never; Returns: undefined }
+      feed_photo_gallery_group: {
+        Args: { p_festival_id: string; p_uploader_id: string }
+        Returns: string
+      }
+      feed_photo_gallery_groups: {
+        Args: { p_festival_id: string; p_uploader_ids: string[] }
+        Returns: {
+          group_id: string
+          uploader_id: string
+        }[]
+      }
       fetch_group_gallery: {
         Args: {
           p_festival_id?: string
@@ -2806,6 +2843,10 @@ export type Database = {
       set_day_plan_companions: {
         Args: { p_group_ids: string[]; p_plan_id: string; p_user_ids: string[] }
         Returns: undefined
+      }
+      set_photo_tags: {
+        Args: { p_photo_id: string; p_user_ids: string[] }
+        Returns: string[]
       }
       tier_to_rarity: {
         Args: { p_tier: number }

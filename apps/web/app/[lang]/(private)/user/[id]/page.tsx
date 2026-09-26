@@ -19,6 +19,7 @@ import { Link } from "next-view-transitions";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
+import { TaggedPhotosStrip } from "@/components/photo-tags/TaggedPhotosStrip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AvatarViewerDialog } from "@/components/ui/avatar-viewer-dialog";
 import { Button } from "@/components/ui/button";
@@ -168,6 +169,18 @@ export default function UserProfilePage() {
         </div>
 
         {/* The private layout centres <main>, so each card opts back out. */}
+        <TaggedPhotosStrip
+          userId={id}
+          festivalId={currentFestival?.id}
+          title={
+            profile.friendshipStatus === "self"
+              ? t("photoTags.strip.titleSelf")
+              : t("photoTags.strip.titleOther", {
+                  name: profile.fullName || profile.username || "",
+                })
+          }
+        />
+
         {profile.sharedGroups.length > 0 && (
           <Card className="gap-3 text-left">
             <CardHeader>

@@ -43,16 +43,32 @@ import type { GalleryData } from "@/lib/types";
 
 import { ImageModal } from "./ImageModal";
 
+function toGalleryImageUrl(urlOrPath: string): string {
+  return `/api/image/${encodeURIComponent(extractFilePath(urlOrPath))}?bucket=beer_pictures`;
+}
+
 interface GalleryGridProps {
   galleryData: GalleryData;
   groupId: string;
+  /** Photo to open on arrival, e.g. from a reaction or tag notification */
+  initialPhotoId?: string;
 }
 
-export function GalleryGrid({ galleryData, groupId }: GalleryGridProps) {
+export function GalleryGrid({ galleryData, groupId, initialPhotoId }: GalleryGridProps) {
   const [selectedImage, setSelectedImage] = useState<{
     url: string;
     photoId: string;
-  } | null>(null);
+  } | null>(() => {
+    if (!initialPhotoId) {
+      return null;
+    }
+    const linkedImage = Object.values(galleryData)
+      .flatMap((userImages) => Object.values(userImages).flat())
+      .find((image) => image.id === initialPhotoId);
+    return linkedImage
+      ? { url: toGalleryImageUrl(linkedImage.url), photoId: linkedImage.id }
+      : null;
+  });
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
 
   // Check if there are any photos
@@ -92,8 +108,7 @@ export function GalleryGrid({ galleryData, groupId }: GalleryGridProps) {
                 <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
                   {images.map((image) => {
                     const isLoaded = loadedImages.has(image.id);
-                    const filePath = extractFilePath(image.url);
-                    const imageUrl = `/api/image/${encodeURIComponent(filePath)}?bucket=beer_pictures`;
+                    const imageUrl = toGalleryImageUrl(image.url);
 
                     return (
                       <div

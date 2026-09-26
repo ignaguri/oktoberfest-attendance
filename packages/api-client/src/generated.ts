@@ -3818,6 +3818,13 @@ export interface paths {
                                 date: string;
                                 /** Format: date-time */
                                 createdAt: string;
+                                taggedUsers: {
+                                    /** Format: uuid */
+                                    userId: string;
+                                    username: string | null;
+                                    fullName: string | null;
+                                    avatarUrl: string | null;
+                                }[];
                             }[];
                             total: number;
                         };
@@ -8530,6 +8537,236 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/photos/{photoId}/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List who is tagged in a photo
+         * @description Tagged people, whether the caller may edit them, and the photo's festival.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    photoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tags retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            taggedUsers: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            }[];
+                            canEdit: boolean;
+                            /** Format: uuid */
+                            festivalId: string | null;
+                            uploader: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Photo not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        /**
+         * Replace who is tagged in a photo
+         * @description Uploader only, public photos only, friends and group-mates of the photo's festival. Newly tagged people are notified.
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    photoId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        userIds: string[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Tags saved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            taggedUsers: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            }[];
+                            canEdit: boolean;
+                            /** Format: uuid */
+                            festivalId: string | null;
+                            uploader: {
+                                /** Format: uuid */
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                avatarUrl: string | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Invalid tags */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Photo not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/profiles/{userId}/tagged-photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Photos a user is tagged in
+         * @description Newest tag first, limited to photos the caller can see, for one festival.
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId: string;
+                };
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Tagged photos retrieved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            photos: {
+                                /** Format: uuid */
+                                id: string;
+                                pictureUrl: string;
+                                createdAt: string;
+                                uploader: {
+                                    /** Format: uuid */
+                                    userId: string;
+                                    username: string | null;
+                                    fullName: string | null;
+                                    avatarUrl: string | null;
+                                };
+                                /** Format: uuid */
+                                groupId: string | null;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/profile": {
         parameters: {
             query?: never;
@@ -8558,6 +8795,8 @@ export interface paths {
                     content: {
                         "application/json": {
                             profile: {
+                                /** Format: uuid */
+                                id: string;
                                 full_name: string | null;
                                 username: string | null;
                                 avatar_url: string | null;

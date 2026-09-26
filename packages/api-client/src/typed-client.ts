@@ -56,6 +56,7 @@ import type {
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
   GetPendingUnlocksResponse,
+  GetTaggedPhotosResponse,
   GetTentCrowdReportsResponse,
   Group,
   GroupActionResponse,
@@ -82,6 +83,7 @@ import type {
   LogConsumptionResponse,
   MarkUnlocksSeenResponse,
   MissingProfileFields,
+  PhotoTagsResponse,
   Profile,
   ProfileDayRow,
   ProfileDetail,
@@ -2222,7 +2224,10 @@ export function createTypedApiClient(config: ApiClientConfig) {
       /**
        * Confirm that a photo was successfully uploaded
        */
-      async confirmUpload(pictureId: string): Promise<{
+      async confirmUpload(
+        pictureId: string,
+        body?: { taggedUserIds?: string[] },
+      ): Promise<{
         id: string;
         pictureUrl: string;
       }> {
@@ -2232,7 +2237,8 @@ export function createTypedApiClient(config: ApiClientConfig) {
           `${baseUrl}/v1/photos/${pictureId}/confirm`,
           {
             method: "POST",
-            headers,
+            headers: { ...headers, "Content-Type": "application/json" },
+            body: JSON.stringify(body ?? {}),
           },
         );
         if (!response.ok) {
@@ -2584,6 +2590,45 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to delete comment");
         }
         return parseJsonResponse(response);
+      },
+    },
+
+    photoTags: {
+      async get(photoId: string): Promise<PhotoTagsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("GET", `${baseUrl}/v1/photos/${photoId}/tags`, {
+          headers,
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch photo tags");
+        }
+        return parseJsonResponse<PhotoTagsResponse>(response);
+      },
+
+      async set(photoId: string, userIds: string[]): Promise<PhotoTagsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("PUT", `${baseUrl}/v1/photos/${photoId}/tags`, {
+          method: "PUT",
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify({ userIds }),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to save photo tags");
+        }
+        return parseJsonResponse<PhotoTagsResponse>(response);
+      },
+
+      async listTaggedPhotos(userId: string, festivalId: string): Promise<GetTaggedPhotosResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging(
+          "GET",
+          `${baseUrl}/v1/profiles/${userId}/tagged-photos?festivalId=${festivalId}`,
+          { headers },
+        );
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch tagged photos");
+        }
+        return parseJsonResponse<GetTaggedPhotosResponse>(response);
       },
     },
 

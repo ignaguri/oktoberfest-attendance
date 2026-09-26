@@ -1189,6 +1189,122 @@ export class NotificationService {
   }
 
   /**
+   * Tell people they were tagged in a photo. Only the newly tagged reach this,
+   * so there is no dedupe ledger. The deep link opens a gallery the tagger and
+   * the tagged person share; without one the app opens the profile strip.
+   */
+  async notifyPhotoTag(input: {
+    photoId: string;
+    taggerId: string;
+    festivalId: string;
+    taggedUserIds: string[];
+  }): Promise<void> {
+    try {
+      const recipients = await this.filterByPreference(
+        input.taggedUserIds.filter((id) => id !== input.taggerId),
+        "group_notifications_enabled",
+      );
+      if (!recipients || recipients.length === 0) {
+        return;
+      }
+
+      let adminClient;
+      try {
+        adminClient = createAdminClient();
+      } catch (adminError) {
+        logger.error(
+          { error: adminError },
+          "Admin client unavailable; skipping photo tag notifications",
+        );
+        return;
+      }
+
+      const sharedGroupByRecipient = new Map<string, string>();
+      const { data: taggerGroups, error: taggerGroupsError } = await adminClient
+        .from("group_members")
+        .select("group_id, groups!inner(festival_id)")
+        .eq("user_id", input.taggerId)
+        .eq("groups.festival_id", input.festivalId);
+
+      if (taggerGroupsError) {
+        logger.error({ error: taggerGroupsError }, "Error listing tagger groups for photo tag");
+      }
+
+      // A group the tagger hid their photos from would open a gallery
+      // without the photo, so it is not a deep link
+      const [{ data: globalSettings }, { data: hiddenGroups }] = await Promise.all([
+        adminClient
+          .from("user_photo_global_settings")
+          .select("hide_photos_from_all_groups")
+          .eq("user_id", input.taggerId)
+          .maybeSingle(),
+        adminClient
+          .from("user_group_photo_settings")
+          .select("group_id")
+          .eq("user_id", input.taggerId)
+          .eq("hide_photos_from_group", true),
+      ]);
+      const hiddenGroupIds = new Set((hiddenGroups ?? []).map((row) => row.group_id));
+
+      const taggerGroupIds = globalSettings?.hide_photos_from_all_groups
+        ? []
+        : (taggerGroups ?? [])
+            .flatMap((row) => (row.group_id ? [row.group_id] : []))
+            .filter((groupId) => !hiddenGroupIds.has(groupId))
+            .sort();
+
+      if (taggerGroupIds.length > 0) {
+        const { data: memberships, error: membershipsError } = await adminClient
+          .from("group_members")
+          .select("user_id, group_id")
+          .in("group_id", taggerGroupIds)
+          .in("user_id", recipients);
+
+        if (membershipsError) {
+          logger.error({ error: membershipsError }, "Error resolving shared groups for photo tag");
+        }
+
+        for (const row of memberships ?? []) {
+          if (row.user_id && row.group_id && !sharedGroupByRecipient.has(row.user_id)) {
+            sharedGroupByRecipient.set(row.user_id, row.group_id);
+          }
+        }
+      }
+
+      const { data: tagger } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.taggerId)
+        .single();
+
+      const taggerName = tagger?.username || tagger?.full_name || "Someone";
+      const taggerAvatar = resolveAvatarUrl(tagger?.avatar_url);
+
+      for (const recipientId of recipients) {
+        const groupId = sharedGroupByRecipient.get(recipientId);
+        try {
+          await this.triggerWithBadge({
+            workflowId: NOTIFICATION_WORKFLOWS.PHOTO_TAG,
+            to: recipientId,
+            payload: {
+              type: NOTIFICATION_PUSH_TYPES.PHOTO_TAG,
+              taggerName,
+              taggerAvatar,
+              taggerId: input.taggerId,
+              photoId: input.photoId,
+              ...(groupId ? { groupId } : {}),
+            },
+          });
+        } catch (sendError) {
+          logger.error({ error: sendError, recipientId }, "Failed to send photo tag notification");
+        }
+      }
+    } catch (error) {
+      logger.error({ error }, "Error sending photo tag notifications");
+    }
+  }
+
+  /**
    * Tell friends and group-mates who marked the same day that the actor is
    * going too.
    *

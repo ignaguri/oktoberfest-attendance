@@ -3271,7 +3271,9 @@
     "WRAPPED_NOT_FOUND": "Wrapped data not found.",
     "WRAPPED_NOT_READY": "Your wrapped isn't ready yet.",
     "FEEDBACK_RATE_LIMITED": "You’ve sent a lot of feedback today. Please try again tomorrow.",
-    "FEEDBACK_DAY_NOT_LOGGED": "There are no drinks logged for that day."
+    "FEEDBACK_DAY_NOT_LOGGED": "There are no drinks logged for that day.",
+    "PHOTO_TAG_PRIVATE_PHOTO": "Only public photos can have tags.",
+    "PHOTO_TAG_INVALID_USER": "You can only tag your friends and group-mates."
   },
   "offline": {
     "status": {
@@ -3793,6 +3795,29 @@
       "required": "Please write a few words.",
       "ratingRequired": "Pick a face first.",
       "tooLong": "Keep it under 2000 characters."
+    }
+  },
+  "photoTags": {
+    "tagPeople": "Tag people",
+    "photoByPrefix": "Photo by",
+    "photoBy": "Photo by {{name}}",
+    "whosInThese": "Who's in these?",
+    "editHint": "Choose who is in this photo",
+    "inThisPhoto": "In this photo",
+    "openProfileHint": "Opens their profile",
+    "saveFailed": "Couldn't save the tags. Try again.",
+    "picker": {
+      "title": "Who's in this photo?",
+      "empty": "Add friends or join a group to tag people.",
+      "limit": "You can tag up to {{count}} people."
+    },
+    "strip": {
+      "titleSelf": "Photos of you",
+      "titleOther": "Photos of {{name}}",
+      "openPhotoHint": "Opens the photo"
+    },
+    "upload": {
+      "tagsFailed": "Photo uploaded, but the tags didn't save."
     }
   }
 }

@@ -544,6 +544,32 @@ describe("enqueuePendingPhotosForAttendance", () => {
     // Reset for other tests
     (fileSystem.copyAsync as ReturnType<typeof vi.fn>).mockResolvedValue(undefined);
   });
+
+  it("stores the batch's tags in each UPLOAD_FILE payload", async () => {
+    const db = {
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+      getFirstAsync: vi.fn().mockResolvedValue(null),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+    };
+    const FRIEND_ID = "22222222-2222-4222-8222-222222222222";
+
+    await enqueuePendingPhotosForAttendance(db as never, {
+      pendingPhotos: [{ localUri: "file:///tmp/a.jpg" }],
+      attendanceId: "attendance-1",
+      userId: "user-1",
+      festivalId: "festival-1",
+      taggedUserIds: [FRIEND_ID],
+    });
+
+    expect(enqueueOperation).toHaveBeenCalledWith(
+      expect.anything(),
+      "UPLOAD_FILE",
+      "beer_pictures",
+      expect.any(String),
+      expect.objectContaining({ taggedUserIds: [FRIEND_ID] }),
+      undefined,
+    );
+  });
 });
 
 describe("runUploadFileOp", () => {
@@ -638,5 +664,76 @@ describe("runUploadFileOp", () => {
       expect.any(String),
       "photo-local-abc",
     ]);
+  });
+
+  it("sends taggedUserIds from the op payload on confirm", async () => {
+    const SERVER_ID = "11111111-1111-4111-8111-111111111111";
+    const FRIEND_ID = "22222222-2222-4222-8222-222222222222";
+    const localPhoto = createMockPhoto({
+      id: "photo-local-tags",
+      _local_uri: "file:///mock/pending-uploads/photo-local-tags.jpg",
+    });
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(localPhoto),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+    const apiClient = {
+      photos: {
+        getUploadUrl: vi.fn().mockResolvedValue({
+          uploadUrl: "https://storage.example.com/signed",
+          pictureId: SERVER_ID,
+        }),
+        confirmUpload: vi.fn().mockResolvedValue({ id: SERVER_ID, pictureUrl: "u/f/p.webp" }),
+      },
+    };
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(64)) })
+      .mockResolvedValueOnce({ ok: true, status: 200 });
+
+    await runUploadFileOp(
+      db as never,
+      { recordId: localPhoto.id, festivalId: "festival-1", taggedUserIds: [FRIEND_ID] },
+      { apiClient },
+    );
+
+    expect(apiClient.photos.confirmUpload).toHaveBeenCalledWith(SERVER_ID, {
+      taggedUserIds: [FRIEND_ID],
+    });
+  });
+
+  it("confirms without a body when the op has no tags", async () => {
+    const SERVER_ID = "11111111-1111-4111-8111-111111111111";
+    const localPhoto = createMockPhoto({
+      id: "photo-local-notags",
+      _local_uri: "file:///mock/pending-uploads/photo-local-notags.jpg",
+    });
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(localPhoto),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+    const apiClient = {
+      photos: {
+        getUploadUrl: vi.fn().mockResolvedValue({
+          uploadUrl: "https://storage.example.com/signed",
+          pictureId: SERVER_ID,
+        }),
+        confirmUpload: vi.fn().mockResolvedValue({ id: SERVER_ID, pictureUrl: "u/f/p.webp" }),
+      },
+    };
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(64)) })
+      .mockResolvedValueOnce({ ok: true, status: 200 });
+
+    await runUploadFileOp(
+      db as never,
+      { recordId: localPhoto.id, festivalId: "festival-1" },
+      { apiClient },
+    );
+
+    expect(apiClient.photos.confirmUpload).toHaveBeenCalledWith(SERVER_ID, undefined);
   });
 });

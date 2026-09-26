@@ -23,6 +23,12 @@ vi.mock("../../services/photo.service", () => ({
   }),
 }));
 
+const { setTagsMock } = vi.hoisted(() => ({ setTagsMock: vi.fn() }));
+
+vi.mock("../../services/photo-tag.service", () => ({
+  createPhotoTagService: () => ({ setTags: setTagsMock }),
+}));
+
 describe("Photo Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;
   let mockSupabase: ReturnType<typeof createMockSupabase>;
@@ -399,6 +405,93 @@ describe("Photo Routes - Unit Tests", () => {
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
+    });
+
+    it("tags the photo when the confirm carries taggedUserIds", async () => {
+      const pictureId = "323e4567-e89b-12d3-a456-426614174002";
+      const friendId = "423e4567-e89b-12d3-a456-426614174003";
+      mockPhotoService.confirmUpload.mockResolvedValueOnce({
+        id: pictureId,
+        attendanceId: "223e4567-e89b-12d3-a456-426614174001",
+        userId: mockUser.id,
+        pictureUrl: "https://storage.example.com/public/beer_photo.jpg",
+        visibility: "public",
+        createdAt: new Date().toISOString(),
+      });
+      setTagsMock.mockResolvedValueOnce({ taggedUsers: [], canEdit: true, festivalId: null });
+
+      const res = await app.request(
+        createAuthRequest(`/photos/${pictureId}/confirm`, {
+          method: "POST",
+          body: JSON.stringify({ taggedUserIds: [friendId] }),
+        }) as Request,
+      );
+
+      expect(res.status).toBe(200);
+      expect(setTagsMock).toHaveBeenCalledWith(pictureId, mockUser.id, [friendId]);
+    });
+
+    it("confirm still succeeds when tagging throws", async () => {
+      const pictureId = "323e4567-e89b-12d3-a456-426614174002";
+      mockPhotoService.confirmUpload.mockResolvedValueOnce({
+        id: pictureId,
+        attendanceId: "223e4567-e89b-12d3-a456-426614174001",
+        userId: mockUser.id,
+        pictureUrl: "https://storage.example.com/public/beer_photo.jpg",
+        visibility: "public",
+        createdAt: new Date().toISOString(),
+      });
+      setTagsMock.mockRejectedValueOnce(new Error("not a companion anymore"));
+
+      const res = await app.request(
+        createAuthRequest(`/photos/${pictureId}/confirm`, {
+          method: "POST",
+          body: JSON.stringify({ taggedUserIds: ["423e4567-e89b-12d3-a456-426614174003"] }),
+        }) as Request,
+      );
+
+      expect(res.status).toBe(200);
+    });
+
+    it("confirms without tagging when the body is not valid JSON", async () => {
+      const pictureId = "323e4567-e89b-12d3-a456-426614174002";
+      mockPhotoService.confirmUpload.mockResolvedValueOnce({
+        id: pictureId,
+        attendanceId: "223e4567-e89b-12d3-a456-426614174001",
+        userId: mockUser.id,
+        pictureUrl: "https://storage.example.com/public/beer_photo.jpg",
+        visibility: "public",
+        createdAt: new Date().toISOString(),
+      });
+
+      const res = await app.request(
+        createAuthRequest(`/photos/${pictureId}/confirm`, {
+          method: "POST",
+          body: "{not json",
+        }) as Request,
+      );
+
+      expect(res.status).toBe(200);
+      expect(setTagsMock).not.toHaveBeenCalled();
+    });
+
+    it("does not tag when the confirm has no body", async () => {
+      const pictureId = "323e4567-e89b-12d3-a456-426614174002";
+      mockPhotoService.confirmUpload.mockResolvedValueOnce({
+        id: pictureId,
+        attendanceId: "223e4567-e89b-12d3-a456-426614174001",
+        userId: mockUser.id,
+        pictureUrl: "https://storage.example.com/public/beer_photo.jpg",
+        visibility: "public",
+        createdAt: new Date().toISOString(),
+      });
+
+      const res = await app.request(
+        createAuthRequest(`/photos/${pictureId}/confirm`, { method: "POST" }) as Request,
+      );
+
+      expect(res.status).toBe(200);
+      expect(setTagsMock).not.toHaveBeenCalled();
     });
   });
 

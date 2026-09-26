@@ -39,6 +39,8 @@ export interface PendingPhotoInput {
   festivalId: string;
   /** Photo visibility */
   visibility?: PhotoVisibility;
+  /** People tagged in the photo; sent with the upload confirm */
+  taggedUserIds?: string[];
   /**
    * Sync-queue op id this UPLOAD_FILE depends on. When the attendance row
    * was created or updated locally in the same flow, set this to the queue
@@ -199,6 +201,9 @@ export async function savePendingPhoto(
       festivalId: input.festivalId,
       attendanceId: input.attendanceId,
       visibility: input.visibility || "public",
+      ...(input.taggedUserIds && input.taggedUserIds.length > 0
+        ? { taggedUserIds: input.taggedUserIds }
+        : {}),
     },
     input.dependsOn ? { dependsOn: input.dependsOn } : undefined,
   );
@@ -253,6 +258,7 @@ export async function enqueuePendingPhotosForAttendance(
     userId: string;
     festivalId: string;
     dependsOn?: string;
+    taggedUserIds?: string[];
   },
 ): Promise<SavedPendingPhoto[]> {
   if (args.pendingPhotos.length === 0) return [];
@@ -264,6 +270,7 @@ export async function enqueuePendingPhotosForAttendance(
       userId: args.userId,
       festivalId: args.festivalId,
       dependsOn: args.dependsOn,
+      taggedUserIds: args.taggedUserIds,
     })),
   );
   if (queued.length !== args.pendingPhotos.length) {
@@ -397,7 +404,10 @@ export interface UploadPhotoOptions {
         fileType: string;
         fileSize: number;
       }) => Promise<{ uploadUrl: string; pictureId: string }>;
-      confirmUpload: (pictureId: string) => Promise<{ id: string; pictureUrl: string }>;
+      confirmUpload: (
+        pictureId: string,
+        body?: { taggedUserIds?: string[] },
+      ) => Promise<{ id: string; pictureUrl: string }>;
     };
   };
   /** Compression options */
@@ -422,6 +432,7 @@ export async function uploadPendingPhoto(
   photo: LocalBeerPicture,
   festivalId: string,
   options: UploadPhotoOptions,
+  taggedUserIds?: string[],
 ): Promise<PhotoUploadResult> {
   const { apiClient, compress, onProgress } = options;
 
@@ -466,7 +477,10 @@ export async function uploadPendingPhoto(
     onProgress?.(photo.id, 0.8);
 
     // 4. Confirm upload with API
-    const confirmedPhoto = await apiClient.photos.confirmUpload(pictureId);
+    const confirmedPhoto = await apiClient.photos.confirmUpload(
+      pictureId,
+      taggedUserIds && taggedUserIds.length > 0 ? { taggedUserIds } : undefined,
+    );
     onProgress?.(photo.id, 0.9);
 
     // 5. Reconcile local id to the server-issued UUID and update the row.
@@ -572,6 +586,7 @@ export async function runUploadFileOp(
   payload: {
     recordId: string;
     festivalId: string;
+    taggedUserIds?: string[];
   },
   options: UploadPhotoOptions,
 ): Promise<void> {
@@ -585,7 +600,13 @@ export async function runUploadFileOp(
     return;
   }
 
-  const result = await uploadPendingPhoto(db, photo, payload.festivalId, options);
+  const result = await uploadPendingPhoto(
+    db,
+    photo,
+    payload.festivalId,
+    options,
+    payload.taggedUserIds,
+  );
 
   if (!result.success) {
     throw new Error(result.error || "Photo upload failed");

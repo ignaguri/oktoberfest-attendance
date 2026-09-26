@@ -25,6 +25,7 @@ import { ActivityIndicator, Image, View } from "react-native";
 
 import { RadlerIcon } from "@/components/icons/radler-icon";
 import { type ImageSource, ImageSourcePicker } from "@/components/image-source-picker";
+import { PhotoTagRow } from "@/components/photo-tags/photo-tag-row";
 import { TentSelectorSheet } from "@/components/tent-selector/tent-selector-sheet";
 import {
   Actionsheet,
@@ -186,6 +187,7 @@ export function QuickAttendanceSheet({
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType | null>(null);
   const [selectedTentId, setSelectedTentId] = useState<string | undefined>();
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
+  const [taggedUserIds, setTaggedUserIds] = useState<string[]>([]);
   const [isTentSheetOpen, setIsTentSheetOpen] = useState(false);
   const [isSourcePickerOpen, setIsSourcePickerOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -265,6 +267,7 @@ export function QuickAttendanceSheet({
     if (isOpen && !wasOpenRef.current) {
       setSelectedDrinkType(null);
       setPendingPhotos([]);
+      setTaggedUserIds([]);
       // Prioritize: 1) preselectedTentId from map/banner, 2) today's attendance tent
       setSelectedTentId(preselectRef.current);
     }
@@ -294,9 +297,16 @@ export function QuickAttendanceSheet({
   );
 
   // Handle remove pending photo
-  const handleRemovePendingPhoto = useCallback((photoId: string) => {
-    setPendingPhotos((prev) => prev.filter((p) => p.id !== photoId));
-  }, []);
+  const handleRemovePendingPhoto = useCallback(
+    (photoId: string) => {
+      const remaining = pendingPhotos.filter((p) => p.id !== photoId);
+      setPendingPhotos(remaining);
+      if (remaining.length === 0) {
+        setTaggedUserIds([]);
+      }
+    },
+    [pendingPhotos],
+  );
 
   // What this save should do. Derived in lib/attendance/quick-save-actions so the
   // combinations are covered by a table test - the mobile vitest config cannot
@@ -381,6 +391,7 @@ export function QuickAttendanceSheet({
               userId,
               festivalId,
               dependsOn: result.attendanceQueueOpId,
+              taggedUserIds,
             });
             await offlineContext?.refreshPendingCount?.();
           }
@@ -434,6 +445,7 @@ export function QuickAttendanceSheet({
     selectedTentId,
     today,
     pendingPhotos,
+    taggedUserIds,
     attendance?.id,
     currentTentId,
     getDrinkPriceCents,
@@ -620,6 +632,14 @@ export function QuickAttendanceSheet({
                   </Pressable>
                 )}
               </HStack>
+              {pendingPhotos.length > 0 && festivalId && (
+                <PhotoTagRow
+                  festivalId={festivalId}
+                  selectedUserIds={taggedUserIds}
+                  onChange={setTaggedUserIds}
+                  disabled={isSaving}
+                />
+              )}
             </VStack>
 
             {/* Save Button */}
