@@ -16,6 +16,7 @@ import { ConflictError, ForbiddenError, NotFoundError } from "../middleware/erro
 import { PgErrorCode } from "../lib/postgres-errors";
 import type { AuthContext } from "../middleware/auth";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { createNotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
@@ -241,6 +242,21 @@ app.openapi(addReactionRoute, async (c) => {
   // Evaluate-only: the unlock reaches the client through the outbox, not this
   // response. Awaited so the outbox row exists before the client's next read.
   await evaluateAfterWrite(supabase, user.id, festivalId, "POST /photos/{photoId}/reactions");
+
+  // Never fail the reaction over a notification.
+  const notificationService = createNotificationService(supabase);
+  if (notificationService) {
+    try {
+      await notificationService.notifyPhotoReaction({
+        photoId,
+        groupId,
+        reactorId: user.id,
+        emoji,
+      });
+    } catch (notificationError) {
+      logger.error({ error: notificationError }, "Failed to send photo reaction notification");
+    }
+  }
 
   return c.json({ success: true }, 200);
 });

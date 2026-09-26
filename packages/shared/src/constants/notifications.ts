@@ -32,6 +32,7 @@ export const NOTIFICATION_WORKFLOWS = {
   GROUP_MESSAGE: "group-message",
   GROUP_INVITATION: "group-invitation",
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
+  PHOTO_REACTION: "photo-reaction",
 } as const;
 
 export type NotificationWorkflowId =
@@ -58,6 +59,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   GROUP_MESSAGE: "group-message",
   GROUP_INVITATION: "group-invitation",
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
+  PHOTO_REACTION: "photo-reaction",
 } as const;
 
 export type NotificationPushType =
@@ -79,6 +81,7 @@ interface NotificationPayload {
   actorName?: string;
   date?: string;
   festivalId?: string;
+  reactorName?: string;
   [key: string]: unknown;
 }
 
@@ -161,6 +164,10 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
 
       case NOTIFICATION_PUSH_TYPES.GROUP_INVITATION_ACCEPTED:
         return payload.groupId ? `/group-detail/${payload.groupId}` : "/groups";
+
+      // The group the reaction was made in; its gallery shows the photo
+      case NOTIFICATION_PUSH_TYPES.PHOTO_REACTION:
+        return payload.groupId ? `/group-detail/${payload.groupId}/gallery` : "/groups";
     }
   }
 
@@ -179,6 +186,8 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
   // A carry-over payload has both, and the recipient is not a member yet, so
   // the invite link has to win over /group-detail.
   if (payload.inviteToken) return `/join-group?token=${payload.inviteToken}`;
+  // A reaction names its reactor and group, and belongs in the gallery
+  if (payload.reactorName && payload.groupId) return `/group-detail/${payload.groupId}/gallery`;
   if (payload.groupId) return `/group-detail/${payload.groupId}`;
 
   // Try URL if present
