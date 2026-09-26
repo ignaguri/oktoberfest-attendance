@@ -34,7 +34,13 @@ export function TaggedPhotosStrip({ userId, festivalId, title }: TaggedPhotosStr
   return (
     <VStack space="sm">
       <Text className="text-sm font-semibold text-typography-700">{title}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {/* Bleeds past the parent's p-4 so thumbnails scroll off the screen edge, not an inset line */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        className="-mx-4"
+        contentContainerClassName="px-4"
+      >
         <HStack space="sm">
           {photos.map((photo) => (
             <Pressable

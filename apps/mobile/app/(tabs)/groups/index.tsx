@@ -1,6 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { GroupWithMembers } from "@prostcounter/shared/schemas";
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { Plus, UserPlus } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -14,6 +15,7 @@ import { EmptyGroupsState } from "@/components/groups/empty-groups-state";
 import { GroupListItem } from "@/components/groups/group-list-item";
 import { JoinGroupSheet } from "@/components/groups/join-group-sheet";
 import { PendingInvitationsSection } from "@/components/groups/pending-invitations-section";
+import { TaggedPhotosStrip } from "@/components/photo-tags/tagged-photos-strip";
 import { GroupsSkeleton } from "@/components/skeletons";
 import {
   AlertDialog,
@@ -31,12 +33,15 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { IconColors } from "@/lib/constants/colors";
 import { useAdaptedGroups, useSyncRefresh } from "@/lib/database/adapted-hooks";
 
 export default function GroupsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
 
   // Dialog state
@@ -114,7 +119,9 @@ export default function GroupsScreen() {
 
   const onRefresh = useCallback(() => {
     syncAndRefresh();
-  }, [syncAndRefresh]);
+    // Photos of you come from the API, not local SQLite, so the sync above misses them
+    queryClient.invalidateQueries({ queryKey: ["tagged-photos"] });
+  }, [syncAndRefresh, queryClient]);
 
   // Loading state - festival or initial data load
   if (festivalLoading || (isLoading && !groups)) {
@@ -153,8 +160,13 @@ export default function GroupsScreen() {
         refreshControl={<RefreshControl refreshing={isSyncing} onRefresh={onRefresh} />}
       >
         {/* Friends are social too, and this tab is where people look for them */}
-        <VStack className="p-4 pb-0">
+        <VStack space="lg" className="p-4 pb-0">
           <FriendsEntryCard />
+          <TaggedPhotosStrip
+            userId={user?.id}
+            festivalId={currentFestival.id}
+            title={t("photoTags.strip.titleSelf")}
+          />
         </VStack>
 
         {/* Outside the hasGroups branch for the same reason CarryOverGroups is:

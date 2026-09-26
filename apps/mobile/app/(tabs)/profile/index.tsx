@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ApiError } from "@prostcounter/api-client";
-import { useFestival } from "@prostcounter/shared/contexts";
 import {
   useDeleteProfile,
   useResetTutorial,
@@ -17,7 +16,6 @@ import { useForm } from "react-hook-form";
 import { RefreshControl } from "react-native";
 
 import { ImageSourcePicker } from "@/components/image-source-picker";
-import { TaggedPhotosStrip } from "@/components/photo-tags/tagged-photos-strip";
 import { AboutSection } from "@/components/profile/about-section";
 import { AdminSection } from "@/components/profile/admin-section";
 import { DangerZone } from "@/components/profile/danger-zone";
@@ -45,7 +43,6 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const { currentFestival } = useFestival();
   const {
     isAvailable: isBiometricAvailable,
     biometricType,
@@ -246,12 +243,6 @@ export default function ProfileScreen() {
           onAvatarPress={handleAvatarPress}
           errors={errors}
           control={control}
-        />
-
-        <TaggedPhotosStrip
-          userId={user?.id}
-          festivalId={currentFestival?.id}
-          title={t("photoTags.strip.titleSelf")}
         />
 
         {/* Settings Section */}

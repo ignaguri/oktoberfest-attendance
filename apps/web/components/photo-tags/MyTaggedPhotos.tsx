@@ -7,7 +7,7 @@ import { useTranslation } from "@/lib/i18n/client";
 
 import { TaggedPhotosStrip } from "./TaggedPhotosStrip";
 
-/** "Photos of you" for the signed-in user's own profile page. */
+/** "Photos of you" for the signed-in user, shown on the groups (social) page. */
 export function MyTaggedPhotos() {
   const { t } = useTranslation();
   const { data: profile } = useCurrentProfile();

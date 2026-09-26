@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import LoadingSpinner from "@/components/LoadingSpinner";
 import MyGroups from "@/components/MyGroups/MyGroups";
+import { MyTaggedPhotos } from "@/components/photo-tags/MyTaggedPhotos";
 import { Separator } from "@/components/ui/separator";
 import { getTranslations } from "@/lib/i18n/server";
 
@@ -23,6 +24,7 @@ export default async function GroupsPage() {
         <div className="flex flex-col gap-6">
           <PendingInvitations />
           <CarryOverGroups />
+          <MyTaggedPhotos />
           <section className="card">
             <MyGroups showGroupsLink={false} />
           </section>
