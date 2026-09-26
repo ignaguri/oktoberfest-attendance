@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Image, ScrollView } from "react-native";
 
 import { PhotoDetailModal } from "@/components/gallery/photo-detail-modal";
-import { ImagePreviewModal } from "@/components/shared/image-preview-modal";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
@@ -61,17 +60,14 @@ export function TaggedPhotosStrip({ userId, festivalId, title }: TaggedPhotosStr
         </HStack>
       </ScrollView>
 
-      {openPhoto?.groupId ? (
-        <PhotoDetailModal
-          visible
-          photoId={openPhoto.id}
-          photoUrl={openUrl}
-          groupId={openPhoto.groupId}
-          onClose={() => setOpenPhoto(null)}
-        />
-      ) : (
-        <ImagePreviewModal imageUri={openUrl} onClose={() => setOpenPhoto(null)} />
-      )}
+      {/* No shared group means no reactions or comments, but still whose photo it is */}
+      <PhotoDetailModal
+        visible={!!openPhoto}
+        photoId={openPhoto?.id ?? null}
+        photoUrl={openUrl}
+        groupId={openPhoto?.groupId ?? undefined}
+        onClose={() => setOpenPhoto(null)}
+      />
     </VStack>
   );
 }
