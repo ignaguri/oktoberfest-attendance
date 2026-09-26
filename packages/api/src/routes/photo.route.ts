@@ -1,6 +1,7 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
   BulkUpdatePhotoVisibilitySchema,
+  ConfirmPhotoUploadBodySchema,
   ConfirmPhotoUploadResponseSchema,
   GetPhotosQuerySchema,
   GetPhotosResponseSchema,
@@ -18,6 +19,7 @@ import type { AuthContext } from "../middleware/auth";
 import { SupabasePhotoRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { PhotoService } from "../services/photo.service";
+import { createPhotoTagService } from "../services/photo-tag.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
@@ -84,6 +86,26 @@ app.openapi(getUploadUrlRoute, async (c) => {
 });
 
 // POST /photos/:id/confirm - Confirm photo upload
+/**
+ * Tags chosen at upload, from the confirm's optional body. Not declared on the
+ * route: builds from before tagging send Content-Type: application/json with
+ * no body, which the route's JSON validator rejects as malformed. An empty or
+ * invalid body means no tags, never a failed confirm.
+ */
+async function readConfirmTaggedUserIds(request: Request): Promise<string[]> {
+  const text = await request.text().catch(() => "");
+  if (!text.trim()) {
+    return [];
+  }
+
+  try {
+    const parsed = ConfirmPhotoUploadBodySchema.safeParse(JSON.parse(text));
+    return parsed.success ? (parsed.data.taggedUserIds ?? []) : [];
+  } catch {
+    return [];
+  }
+}
+
 const confirmUploadRoute = createRoute({
   method: "post",
   path: "/photos/{id}/confirm",
@@ -163,6 +185,24 @@ app.openapi(confirmUploadRoute, async (c) => {
     attendance?.festival_id ?? null,
     "POST /photos/{id}/confirm",
   );
+
+  // Tags chosen at upload ride on the confirm. They must never cost the photo:
+  // a rejected tag is dropped and the uploader can re-tag from the viewer.
+  const taggedUserIds = await readConfirmTaggedUserIds(c.req.raw);
+  if (taggedUserIds.length > 0) {
+    try {
+      await createPhotoTagService(supabase).setTags(picture.id, user.id, taggedUserIds);
+    } catch (tagError) {
+      logger.warn(
+        {
+          userId: user.id,
+          pictureId: picture.id,
+          error: tagError instanceof Error ? tagError.message : tagError,
+        },
+        "Could not tag photo on upload; confirm still succeeds",
+      );
+    }
+  }
 
   return c.json(
     {

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { PhotoTaggedUserSchema } from "./photo.schema";
+
 /**
  * Group winning criteria enum
  */
@@ -242,6 +244,7 @@ export const GroupGalleryPhotoSchema = z.object({
   pictureUrl: z.url(),
   date: z.string(), // Attendance date
   createdAt: z.iso.datetime(),
+  taggedUsers: z.array(PhotoTaggedUserSchema),
 });
 
 export type GroupGalleryPhoto = z.infer<typeof GroupGalleryPhotoSchema>;
