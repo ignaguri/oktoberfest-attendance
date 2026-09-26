@@ -1595,6 +1595,32 @@ export type Database = {
           },
         ]
       }
+      photo_tags: {
+        Row: {
+          created_at: string
+          photo_id: string
+          tagged_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          photo_id: string
+          tagged_user_id: string
+        }
+        Update: {
+          created_at?: string
+          photo_id?: string
+          tagged_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_tags_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "beer_pictures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
