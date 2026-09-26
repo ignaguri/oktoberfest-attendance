@@ -194,13 +194,20 @@ export class SyncManager {
       await pushDelete(op.table_name, op.record_id);
     });
     processor.registerHandler("UPLOAD_FILE", async (op) => {
-      const { festivalId } = JSON.parse(op.payload) as { festivalId?: string };
+      const { festivalId, taggedUserIds } = JSON.parse(op.payload) as {
+        festivalId?: string;
+        taggedUserIds?: string[];
+      };
       if (!festivalId) {
         throw new Error(
           `UPLOAD_FILE op missing festivalId in payload (op.id=${op.id}, table=${op.table_name}, record_id=${op.record_id})`,
         );
       }
-      await runUploadFileOp(this.db, { recordId: op.record_id, festivalId }, { apiClient });
+      await runUploadFileOp(
+        this.db,
+        { recordId: op.record_id, festivalId, taggedUserIds },
+        { apiClient },
+      );
     });
 
     // retryFailed() resets failed ops with retries left back to pending and

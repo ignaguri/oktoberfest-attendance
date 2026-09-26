@@ -46,6 +46,8 @@ interface SaveAttendanceInput {
   tents?: string[];
   existingAttendanceId?: string;
   pendingPhotos: PendingPhoto[];
+  /** People tagged in every pending photo of this save */
+  taggedUserIds?: string[];
   photosToDelete: string[];
   // New: Consumption sync data
   localDrinkCounts?: Record<DrinkType, number>;
@@ -82,6 +84,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         tents,
         existingAttendanceId,
         pendingPhotos,
+        taggedUserIds,
         photosToDelete,
         localDrinkCounts,
         existingConsumptions,
@@ -196,6 +199,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
               userId,
               festivalId,
               dependsOn: result.attendanceQueueOpId,
+              taggedUserIds,
             });
             await offlineContext?.refreshPendingCount?.();
           }
