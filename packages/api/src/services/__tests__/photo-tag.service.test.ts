@@ -21,9 +21,12 @@ function makeRepo(overrides: Partial<IPhotoTagRepository> = {}, current: string[
   };
   const repo: IPhotoTagRepository = {
     getPhotoTarget: vi.fn().mockResolvedValue(target),
-    listTaggedUserIds: vi.fn().mockResolvedValue(current),
-    addTags: vi.fn().mockResolvedValue(undefined),
-    removeTags: vi.fn().mockResolvedValue(undefined),
+    // Like set_photo_tags: the whole set is written, only the new ids come back
+    replaceTags: vi
+      .fn()
+      .mockImplementation(async (_photoId: string, userIds: string[]) =>
+        userIds.filter((userId) => !current.includes(userId)),
+      ),
     getTaggedUsers: vi.fn().mockResolvedValue([]),
     listTaggedPhotos: vi.fn().mockResolvedValue([]),
     getProfiles: vi.fn().mockResolvedValue([]),
@@ -49,8 +52,7 @@ describe("PhotoTagService.setTags", () => {
 
     const result = await service.setTags(PHOTO, UPLOADER, [FRIEND_A, FRIEND_B]);
 
-    expect(repo.addTags).toHaveBeenCalledWith(PHOTO, [FRIEND_B]);
-    expect(repo.removeTags).not.toHaveBeenCalled();
+    expect(repo.replaceTags).toHaveBeenCalledWith(PHOTO, [FRIEND_A, FRIEND_B]);
     expect(notifier.notifyPhotoTag).toHaveBeenCalledWith({
       photoId: PHOTO,
       taggerId: UPLOADER,
@@ -71,19 +73,25 @@ describe("PhotoTagService.setTags", () => {
 
     await service.setTags(PHOTO, UPLOADER, [FRIEND_A]);
 
-    expect(repo.removeTags).toHaveBeenCalledWith(PHOTO, [FRIEND_B]);
-    expect(repo.addTags).not.toHaveBeenCalled();
+    expect(repo.replaceTags).toHaveBeenCalledWith(PHOTO, [FRIEND_A]);
     expect(notifier.notifyPhotoTag).not.toHaveBeenCalled();
   });
 
-  it("re-sending the same set changes nothing and notifies nobody", async () => {
+  it("re-sending the same set notifies nobody", async () => {
     const repo = makeRepo({}, [FRIEND_A]);
     const service = new PhotoTagService(repo, listCompanionUserIds, notifier);
 
     await service.setTags(PHOTO, UPLOADER, [FRIEND_A]);
 
-    expect(repo.addTags).not.toHaveBeenCalled();
-    expect(repo.removeTags).not.toHaveBeenCalled();
+    expect(notifier.notifyPhotoTag).not.toHaveBeenCalled();
+  });
+
+  it("notifies from what the database added, so a racing edit cannot notify twice", async () => {
+    const repo = makeRepo({ replaceTags: vi.fn().mockResolvedValue([]) });
+    const service = new PhotoTagService(repo, listCompanionUserIds, notifier);
+
+    await service.setTags(PHOTO, UPLOADER, [FRIEND_A]);
+
     expect(notifier.notifyPhotoTag).not.toHaveBeenCalled();
   });
 
@@ -93,7 +101,7 @@ describe("PhotoTagService.setTags", () => {
 
     await service.setTags(PHOTO, UPLOADER, []);
 
-    expect(repo.removeTags).toHaveBeenCalledWith(PHOTO, [FRIEND_A]);
+    expect(repo.replaceTags).toHaveBeenCalledWith(PHOTO, []);
     expect(listCompanionUserIds).not.toHaveBeenCalled();
   });
 
@@ -111,7 +119,7 @@ describe("PhotoTagService.setTags", () => {
     await expect(service.setTags(PHOTO, UPLOADER, [FRIEND_B])).rejects.toMatchObject({
       statusCode: 404,
     });
-    expect(repo.addTags).not.toHaveBeenCalled();
+    expect(repo.replaceTags).not.toHaveBeenCalled();
   });
 
   it("treats a photo you cannot see as not found", async () => {
@@ -158,7 +166,7 @@ describe("PhotoTagService.setTags", () => {
       code: ErrorCodes.PHOTO_TAG_INVALID_USER,
     });
     expect(listCompanionUserIds).toHaveBeenCalledWith(UPLOADER, FESTIVAL);
-    expect(repo.addTags).not.toHaveBeenCalled();
+    expect(repo.replaceTags).not.toHaveBeenCalled();
   });
 
   it("keeps the tags when the notification fails", async () => {
@@ -169,7 +177,7 @@ describe("PhotoTagService.setTags", () => {
     await expect(service.setTags(PHOTO, UPLOADER, [FRIEND_A])).resolves.toMatchObject({
       canEdit: true,
     });
-    expect(repo.addTags).toHaveBeenCalledWith(PHOTO, [FRIEND_A]);
+    expect(repo.replaceTags).toHaveBeenCalledWith(PHOTO, [FRIEND_A]);
   });
 
   it("works without a notifier (Novu not configured)", async () => {
@@ -233,16 +241,14 @@ describe("PhotoTagService.getTags", () => {
 describe("PhotoTagService.getTaggedPhotos", () => {
   it("attaches the uploader and a shared group to each photo", async () => {
     const repo = makeRepo({
-      listTaggedPhotos: vi
-        .fn()
-        .mockResolvedValue([
-          {
-            id: PHOTO,
-            pictureUrl: "a/b.webp",
-            createdAt: "2026-09-26T10:00:00Z",
-            uploaderId: UPLOADER,
-          },
-        ]),
+      listTaggedPhotos: vi.fn().mockResolvedValue([
+        {
+          id: PHOTO,
+          pictureUrl: "a/b.webp",
+          createdAt: "2026-09-26T10:00:00Z",
+          uploaderId: UPLOADER,
+        },
+      ]),
       getProfiles: vi
         .fn()
         .mockResolvedValue([
@@ -279,16 +285,14 @@ describe("PhotoTagService.getTaggedPhotos", () => {
 
   it("falls back to a bare uploader and no group", async () => {
     const repo = makeRepo({
-      listTaggedPhotos: vi
-        .fn()
-        .mockResolvedValue([
-          {
-            id: PHOTO,
-            pictureUrl: "a/b.webp",
-            createdAt: "2026-09-26T10:00:00Z",
-            uploaderId: UPLOADER,
-          },
-        ]),
+      listTaggedPhotos: vi.fn().mockResolvedValue([
+        {
+          id: PHOTO,
+          pictureUrl: "a/b.webp",
+          createdAt: "2026-09-26T10:00:00Z",
+          uploaderId: UPLOADER,
+        },
+      ]),
     });
     const service = new PhotoTagService(repo, vi.fn(), null);
 

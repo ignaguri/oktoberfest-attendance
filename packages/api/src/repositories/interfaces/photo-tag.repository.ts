@@ -20,9 +20,8 @@ export interface TaggedPhotoRow {
  */
 export interface IPhotoTagRepository {
   getPhotoTarget(photoId: string): Promise<PhotoTagTarget | null>;
-  listTaggedUserIds(photoId: string): Promise<string[]>;
-  addTags(photoId: string, userIds: string[]): Promise<void>;
-  removeTags(photoId: string, userIds: string[]): Promise<void>;
+  /** Replaces the tag set atomically and returns only the user ids it newly added. */
+  replaceTags(photoId: string, userIds: string[]): Promise<string[]>;
   getTaggedUsers(photoId: string): Promise<PhotoTaggedUser[]>;
   listTaggedPhotos(userId: string, festivalId: string, limit: number): Promise<TaggedPhotoRow[]>;
   getProfiles(userIds: string[]): Promise<PhotoTaggedUser[]>;

@@ -2526,6 +2526,13 @@ export type Database = {
         Args: { p_festival_id: string; p_uploader_id: string }
         Returns: string
       }
+      feed_photo_gallery_groups: {
+        Args: { p_festival_id: string; p_uploader_ids: string[] }
+        Returns: {
+          group_id: string
+          uploader_id: string
+        }[]
+      }
       fetch_group_gallery: {
         Args: {
           p_festival_id?: string
@@ -2836,6 +2843,10 @@ export type Database = {
       set_day_plan_companions: {
         Args: { p_group_ids: string[]; p_plan_id: string; p_user_ids: string[] }
         Returns: undefined
+      }
+      set_photo_tags: {
+        Args: { p_photo_id: string; p_user_ids: string[] }
+        Returns: string[]
       }
       tier_to_rarity: {
         Args: { p_tier: number }

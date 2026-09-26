@@ -62,16 +62,7 @@ export class PhotoTagService {
       }
     }
 
-    const current = await this.repo.listTaggedUserIds(photoId);
-    const added = requested.filter((id) => !current.includes(id));
-    const removed = current.filter((id) => !requested.includes(id));
-
-    if (removed.length > 0) {
-      await this.repo.removeTags(photoId, removed);
-    }
-    if (added.length > 0) {
-      await this.repo.addTags(photoId, added);
-    }
+    const added = await this.repo.replaceTags(photoId, requested);
 
     // Only the newly added hear about it, so editing tags never re-notifies
     if (added.length > 0 && this.notifier) {

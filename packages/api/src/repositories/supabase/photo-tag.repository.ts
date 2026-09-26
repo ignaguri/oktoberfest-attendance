@@ -44,27 +44,18 @@ export class SupabasePhotoTagRepository implements IPhotoTagRepository {
     return (data ?? []).map((row) => row.tagged_user_id);
   }
 
-  async addTags(photoId: string, userIds: string[]): Promise<void> {
-    const { error } = await this.supabase.from("photo_tags").upsert(
-      userIds.map((userId) => ({ photo_id: photoId, tagged_user_id: userId })),
-      { onConflict: "photo_id,tagged_user_id", ignoreDuplicates: true },
-    );
+  async replaceTags(photoId: string, userIds: string[]): Promise<string[]> {
+    // One statement, so a rejected insert cannot leave the old tags deleted
+    const { data, error } = await this.supabase.rpc("set_photo_tags", {
+      p_photo_id: photoId,
+      p_user_ids: userIds,
+    });
 
     if (error) {
-      throw new DatabaseError(`Failed to add photo tags: ${error.message}`);
+      throw new DatabaseError(`Failed to set photo tags: ${error.message}`);
     }
-  }
 
-  async removeTags(photoId: string, userIds: string[]): Promise<void> {
-    const { error } = await this.supabase
-      .from("photo_tags")
-      .delete()
-      .eq("photo_id", photoId)
-      .in("tagged_user_id", userIds);
-
-    if (error) {
-      throw new DatabaseError(`Failed to remove photo tags: ${error.message}`);
-    }
+    return data ?? [];
   }
 
   async getTaggedUsers(photoId: string): Promise<PhotoTaggedUser[]> {
@@ -135,27 +126,28 @@ export class SupabasePhotoTagRepository implements IPhotoTagRepository {
     festivalId: string,
   ): Promise<Map<string, string>> {
     const result = new Map<string, string>();
+    const uploaderIds = userIds.filter((userId) => userId !== viewerId);
+    if (uploaderIds.length === 0) {
+      return result;
+    }
 
-    // feed_photo_gallery_group answers for the calling viewer only, and skips
+    // feed_photo_gallery_groups answers for the calling viewer only, and skips
     // groups the uploader hid their photos from, so the gallery it opens
-    // actually shows the photo. It returns null for the viewer's own photos.
-    await Promise.all(
-      userIds
-        .filter((userId) => userId !== viewerId)
-        .map(async (uploaderId) => {
-          const { data, error } = await this.supabase.rpc("feed_photo_gallery_group", {
-            p_uploader_id: uploaderId,
-            p_festival_id: festivalId,
-          });
+    // actually shows the photo. One call covers every uploader.
+    const { data, error } = await this.supabase.rpc("feed_photo_gallery_groups", {
+      p_uploader_ids: uploaderIds,
+      p_festival_id: festivalId,
+    });
 
-          if (error) {
-            throw new DatabaseError(`Failed to find a shared group: ${error.message}`);
-          }
-          if (data) {
-            result.set(uploaderId, data);
-          }
-        }),
-    );
+    if (error) {
+      throw new DatabaseError(`Failed to find shared groups: ${error.message}`);
+    }
+
+    for (const row of data ?? []) {
+      if (row.group_id) {
+        result.set(row.uploader_id, row.group_id);
+      }
+    }
 
     return result;
   }

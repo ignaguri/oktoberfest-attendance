@@ -13,7 +13,7 @@ import type {
   UpdateGroupInput,
   WinningCriteria,
 } from "@prostcounter/shared";
-import { WINNING_CRITERIA_IDS, winningCriteriaFromId } from "@prostcounter/shared";
+import { PHOTO_TAG_LIMIT, WINNING_CRITERIA_IDS, winningCriteriaFromId } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -448,16 +448,32 @@ export class SupabaseGroupRepository implements IGroupRepository {
       return result;
     }
 
-    const { data: tags, error: tagsError } = await this.supabase
-      .from("photo_tags")
-      .select("photo_id, tagged_user_id")
-      .in("photo_id", photoIds)
-      .order("created_at", { ascending: true });
-
-    if (tagsError) {
-      throw new DatabaseError(`Failed to get photo tags: ${tagsError.message}`);
+    // PostgREST caps a response at 1000 rows. A photo has at most PHOTO_TAG_LIMIT
+    // tags, so each chunk of photos stays under the cap and no tag is dropped.
+    const chunkSize = Math.floor(1000 / PHOTO_TAG_LIMIT);
+    const chunks: string[][] = [];
+    for (let start = 0; start < photoIds.length; start += chunkSize) {
+      chunks.push(photoIds.slice(start, start + chunkSize));
     }
-    if (!tags || tags.length === 0) {
+
+    const chunkResults = await Promise.all(
+      chunks.map((chunk) =>
+        this.supabase
+          .from("photo_tags")
+          .select("photo_id, tagged_user_id")
+          .in("photo_id", chunk)
+          .order("created_at", { ascending: true }),
+      ),
+    );
+
+    const tags: { photo_id: string; tagged_user_id: string }[] = [];
+    for (const { data, error: tagsError } of chunkResults) {
+      if (tagsError) {
+        throw new DatabaseError(`Failed to get photo tags: ${tagsError.message}`);
+      }
+      tags.push(...(data ?? []));
+    }
+    if (tags.length === 0) {
       return result;
     }
 

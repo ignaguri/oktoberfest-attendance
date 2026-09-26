@@ -36,6 +36,8 @@ CREATE POLICY "Uploaders tag their public photos"
       WHERE p.id = photo_tags.photo_id
         AND p.user_id = (SELECT auth.uid())
         AND p.visibility = 'public'::photo_visibility_enum
+        -- The API rejects self-tags; a shared group would otherwise let one through
+        AND photo_tags.tagged_user_id <> (SELECT auth.uid())
         AND (
           public.is_friend((SELECT auth.uid()), photo_tags.tagged_user_id)
           OR EXISTS (
@@ -62,3 +64,44 @@ CREATE POLICY "Uploaders untag their photos"
 REVOKE ALL ON public.photo_tags FROM anon, authenticated;
 GRANT SELECT, INSERT, DELETE ON public.photo_tags TO authenticated;
 GRANT ALL ON public.photo_tags TO service_role;
+
+-- Replaces a photo's tag set in one statement, so a failed insert never leaves
+-- the old tags deleted. Runs as the caller, so the policies above still decide
+-- who may be tagged. Returns only the rows it actually inserted, which is who
+-- gets notified, even when two edits race.
+CREATE FUNCTION public.set_photo_tags(p_photo_id uuid, p_user_ids uuid[])
+RETURNS SETOF uuid
+LANGUAGE sql
+VOLATILE
+SECURITY INVOKER
+SET search_path = public
+AS $$
+  WITH removed AS (
+    DELETE FROM public.photo_tags
+    WHERE photo_id = p_photo_id AND tagged_user_id <> ALL (p_user_ids)
+  ),
+  added AS (
+    INSERT INTO public.photo_tags (photo_id, tagged_user_id)
+    SELECT p_photo_id, user_id FROM unnest(p_user_ids) AS user_id
+    ON CONFLICT (photo_id, tagged_user_id) DO NOTHING
+    RETURNING tagged_user_id
+  )
+  SELECT tagged_user_id FROM added
+$$;
+REVOKE ALL ON FUNCTION public.set_photo_tags(uuid, uuid[]) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.set_photo_tags(uuid, uuid[]) TO authenticated;
+
+-- feed_photo_gallery_group for many uploaders in one round trip, for the
+-- "Photos of you" strip. Rows with a null group_id share no visible gallery.
+CREATE FUNCTION public.feed_photo_gallery_groups(p_uploader_ids uuid[], p_festival_id uuid)
+RETURNS TABLE (uploader_id uuid, group_id uuid)
+LANGUAGE sql
+STABLE
+SECURITY INVOKER
+SET search_path = public
+AS $$
+  SELECT uploader, public.feed_photo_gallery_group(uploader, p_festival_id)
+  FROM unnest(p_uploader_ids) AS uploader
+$$;
+REVOKE ALL ON FUNCTION public.feed_photo_gallery_groups(uuid[], uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.feed_photo_gallery_groups(uuid[], uuid) TO authenticated;
