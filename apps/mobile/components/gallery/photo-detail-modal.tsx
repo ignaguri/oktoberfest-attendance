@@ -10,6 +10,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { ALLOWED_EMOJIS } from "@prostcounter/shared/schemas";
 import { formatRelativeTime } from "@prostcounter/shared/utils";
 import { cn, getInitials } from "@prostcounter/ui";
+import { useRouter } from "expo-router";
 import { Send, Trash2, X } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import {
@@ -25,6 +26,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { PhotoTagsSection } from "@/components/photo-tags/photo-tags-section";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
@@ -54,6 +56,7 @@ export function PhotoDetailModal({
   const { t } = useTranslation();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [imageLoading, setImageLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
 
@@ -175,6 +178,15 @@ export function PhotoDetailModal({
     [user?.id, t, handleDeleteComment],
   );
 
+  // Closing first: the viewer is a Modal and a profile screen cannot sit on top of it
+  const handleTaggedUserPress = useCallback(
+    (userId: string) => {
+      onClose();
+      router.push(`/user/${userId}`);
+    },
+    [onClose, router],
+  );
+
   if (!visible || !photoId || !photoUrl) return null;
 
   return (
@@ -221,6 +233,12 @@ export function PhotoDetailModal({
               alt=""
             />
           </View>
+
+          <PhotoTagsSection
+            photoId={photoId}
+            groupId={groupId}
+            onUserPress={handleTaggedUserPress}
+          />
 
           {/* Emoji Reactions Row */}
           <View className="border-b border-outline-200 px-4 py-3">

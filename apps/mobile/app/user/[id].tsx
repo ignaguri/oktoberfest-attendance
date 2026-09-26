@@ -17,6 +17,7 @@ import {
 } from "lucide-react-native";
 import { useState } from "react";
 
+import { TaggedPhotosStrip } from "@/components/photo-tags/tagged-photos-strip";
 import { AvatarViewerModal } from "@/components/shared/avatar-viewer-modal";
 import { MobileFriendshipBadge } from "@/components/shared/user-profile-modal";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
@@ -172,6 +173,16 @@ export default function UserProfileScreen() {
               <MobileFriendshipBadge status={profile.friendshipStatus} userId={id} />
             )}
           </VStack>
+
+          <TaggedPhotosStrip
+            userId={id}
+            festivalId={currentFestival?.id}
+            title={
+              profile.friendshipStatus === "self"
+                ? t("photoTags.strip.titleSelf")
+                : t("photoTags.strip.titleOther", { name: displayName })
+            }
+          />
 
           {profile.sharedGroups.length > 0 && (
             <Card variant="outline" size="md" className="bg-white">
