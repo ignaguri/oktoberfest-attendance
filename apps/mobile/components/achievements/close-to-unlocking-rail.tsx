@@ -2,15 +2,18 @@ import type { AchievementTier } from "@prostcounter/shared/achievements";
 import { getActiveTier, selectCloseToUnlocking } from "@prostcounter/shared/achievements";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { SeriesCard as SeriesCardData } from "@prostcounter/shared/schemas";
+import { useState } from "react";
 
 import { Card } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
 import { Progress, ProgressFilledTrack } from "@/components/ui/progress";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 
 import { AchievementBadge } from "./achievement-badge";
+import { SeriesCardDetailSheet } from "./series-card-detail-sheet";
 
 interface CloseToUnlockingRailProps {
   cards: SeriesCardData[];
@@ -24,6 +27,9 @@ interface CloseToUnlockingRailProps {
 export function CloseToUnlockingRail({ cards }: CloseToUnlockingRailProps) {
   const { t } = useTranslation();
   const entries = selectCloseToUnlocking(cards);
+  // Kept after close so the sheet can animate out with its content intact.
+  const [detailCard, setDetailCard] = useState<SeriesCardData | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   if (entries.length === 0) {
     return null;
@@ -40,41 +46,55 @@ export function CloseToUnlockingRail({ cards }: CloseToUnlockingRailProps) {
           const activeTier = getActiveTier(card);
 
           return (
-            <Card
+            <Pressable
               key={card.id}
-              variant="outline"
-              size="sm"
-              className="border-yellow-200 bg-yellow-50/30"
+              onPress={() => {
+                setDetailCard(card);
+                setIsDetailOpen(true);
+              }}
+              accessibilityRole="button"
+              accessibilityLabel={t(activeTier.name)}
+              accessibilityHint={t("achievements.viewProgress")}
             >
-              <HStack space="md" className="items-center p-3">
-                <AchievementBadge
-                  glyph={card.glyph}
-                  category={card.category}
-                  tier={activeTier.tier as AchievementTier}
-                  isUnlocked={card.currentTier > 0}
-                  size="md"
-                />
+              <Card variant="outline" size="sm" className="border-yellow-200 bg-yellow-50/30">
+                <HStack space="md" className="items-center p-3">
+                  <AchievementBadge
+                    glyph={card.glyph}
+                    category={card.category}
+                    tier={activeTier.tier as AchievementTier}
+                    isUnlocked={card.currentTier > 0}
+                    size="md"
+                  />
 
-                <VStack className="flex-1" space="xs">
-                  <Text className="text-base font-semibold text-typography-900" numberOfLines={1}>
-                    {t(activeTier.name)}
-                  </Text>
-                  <Progress value={percentage} size="sm">
-                    <ProgressFilledTrack />
-                  </Progress>
-                  <Text className="text-xs text-typography-500">
-                    {t("achievements.progressToNext", {
-                      current: currentValue,
-                      target: nextTarget,
-                      remaining,
-                    })}
-                  </Text>
-                </VStack>
-              </HStack>
-            </Card>
+                  <VStack className="flex-1" space="xs">
+                    <Text className="text-base font-semibold text-typography-900" numberOfLines={1}>
+                      {t(activeTier.name)}
+                    </Text>
+                    <Progress value={percentage} size="sm">
+                      <ProgressFilledTrack />
+                    </Progress>
+                    <Text className="text-xs text-typography-500">
+                      {t("achievements.progressToNext", {
+                        current: currentValue,
+                        target: nextTarget,
+                        remaining,
+                      })}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Card>
+            </Pressable>
           );
         })}
       </VStack>
+
+      {detailCard && (
+        <SeriesCardDetailSheet
+          card={detailCard}
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+        />
+      )}
     </VStack>
   );
 }

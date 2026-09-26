@@ -39,8 +39,11 @@ export type UnifiedFeedItem = ActivityFeedEntry | MessageFeedEntry;
 
 // --- Hook ---
 
-export function useUnifiedFeed(festivalId?: string) {
-  const activities = useActivityFeedItems(festivalId);
+/**
+ * @param activityPageSize - Activities per page; omitted means the API default
+ */
+export function useUnifiedFeed(festivalId?: string, activityPageSize?: number) {
+  const activities = useActivityFeedItems(festivalId, activityPageSize);
   const messages = useMessageFeed(festivalId);
 
   // Map activities to unified items

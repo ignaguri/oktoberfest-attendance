@@ -1,12 +1,21 @@
 import { formatDateForDatabase } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useUnifiedFeed } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useQueryClient } from "@tanstack/react-query";
 import { isAfter, parseISO, startOfDay } from "date-fns";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Map } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Platform, Pressable, RefreshControl, ScrollView, View } from "react-native";
+import {
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  Platform,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CrowdReportPrompt, CrowdStatusSummary } from "@/components/crowd";
@@ -33,6 +42,7 @@ import {
   useSyncRefresh,
 } from "@/lib/database/adapted-hooks";
 import { useIsOnline } from "@/lib/database/offline-provider";
+import { isNearBottom } from "@/lib/layout/is-near-bottom";
 import { useTabScreenBottomPadding } from "@/lib/layout/use-tab-screen-bottom-padding";
 import { useLocationContextSafe } from "@/lib/location";
 import { logger } from "@/lib/logger";
@@ -49,11 +59,16 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
  *
  * Features pull-to-refresh to reload all data.
  */
+/** Activities per feed page; big enough that scrolling rarely waits on a fetch. */
+const FEED_PAGE_SIZE = 15;
+
 export default function HomeScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { currentFestival, isLoading: festivalLoading } = useFestival();
   const queryClient = useQueryClient();
+  const feed = useUnifiedFeed(currentFestival?.id, FEED_PAGE_SIZE);
+  const { hasNextPage, isFetchingNextPage, fetchNextPage, refresh: refreshFeed } = feed;
   const { syncAndRefresh, isSyncing } = useSyncRefresh();
   const isOnline = useIsOnline();
   const { user } = useAuth();
@@ -195,15 +210,26 @@ export default function HomeScreen() {
     try {
       // Sync local SQLite from API, then invalidate local query caches
       await syncAndRefresh();
-      // Also invalidate API-only queries (activity feed, crowd status, messages)
-      await queryClient.invalidateQueries({ queryKey: ["activityFeed"] });
+      // The feed keeps its loaded pages in hook state, so reset it rather
+      // than invalidating its queries
+      await refreshFeed();
+      // Also invalidate other API-only queries
       await queryClient.invalidateQueries({ queryKey: ["crowd-status"] });
-      await queryClient.invalidateQueries({ queryKey: ["message-feed"] });
       await queryClient.invalidateQueries({ queryKey: ["friends", "requests"] });
     } catch (error) {
       logger.error("Failed to refresh:", error);
     }
-  }, [syncAndRefresh, queryClient]);
+  }, [syncAndRefresh, refreshFeed, queryClient]);
+
+  // Load the next feed page as the user nears the end of Home
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (hasNextPage && !isFetchingNextPage && isNearBottom(event.nativeEvent)) {
+        fetchNextPage();
+      }
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
 
   // Loading state - show skeleton while festival is loading
   if (festivalLoading) {
@@ -240,6 +266,8 @@ export default function HomeScreen() {
           />
         }
         contentContainerStyle={{ paddingBottom: bottomPadding }}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
       >
         <VStack space="md" className="p-4">
           {/* App Header with logo and name */}
@@ -297,7 +325,7 @@ export default function HomeScreen() {
 
           {/* Unified Feed (activities + messages interleaved) */}
           <TutorialTarget stepId="unified-feed">
-            <UnifiedFeed onRefresh={handleRefresh} />
+            <UnifiedFeed feed={feed} onRefresh={handleRefresh} />
           </TutorialTarget>
         </VStack>
       </ScrollView>

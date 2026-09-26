@@ -1,10 +1,11 @@
 import type { LocationSessionMember, NearbyTent } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useApiClient, useQuery } from "@prostcounter/shared/data";
 import { useTentCrowdStatus } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { CrowdLevel } from "@prostcounter/shared/schemas";
+import type { CrowdLevel, GetNearbyTentsResponse } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
   Beer,
@@ -35,6 +36,47 @@ import { useLocationContext } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { useQuickAttendance } from "@/lib/quick-attendance";
 
+// The API's largest radius. Around the festival's own coordinates it covers the
+// whole Wiesn.
+const FESTIVAL_TENTS_RADIUS_METERS = 2000;
+
+/**
+ * The tent a feed link opened the map for. Nearby tents only cover 1km around
+ * the viewer, so a tent further away, or any tent with location off, is looked
+ * up around the festival's coordinates instead. Its distance is then measured
+ * from the festival, not the viewer, which `isNearby` flags.
+ */
+function useFocusTent(
+  tentId: string | undefined,
+  nearbyTents: NearbyTent[],
+  festival: { id: string; latitude: number | null; longitude: number | null } | null | undefined,
+): { tent: NearbyTent | null; isNearby: boolean } {
+  const apiClient = useApiClient();
+  const nearbyTent = tentId ? nearbyTents.find((tent) => tent.tentId === tentId) : undefined;
+  const hasFestivalCoordinates = festival?.latitude != null && festival?.longitude != null;
+
+  const festivalTents = useQuery<GetNearbyTentsResponse>(
+    ["tents", "around-festival", festival?.id ?? ""],
+    () =>
+      apiClient.tents.getNearby({
+        latitude: festival!.latitude!,
+        longitude: festival!.longitude!,
+        radiusMeters: FESTIVAL_TENTS_RADIUS_METERS,
+        festivalId: festival!.id,
+      }),
+    {
+      enabled: !!tentId && !nearbyTent && hasFestivalCoordinates,
+      staleTime: 60 * 60 * 1000, // Tent coordinates do not move
+    },
+  );
+
+  if (nearbyTent) {
+    return { tent: nearbyTent, isNearby: true };
+  }
+  const tent = festivalTents.data?.tents.find((candidate) => candidate.tentId === tentId);
+  return { tent: tent ?? null, isNearby: false };
+}
+
 /**
  * Full-screen map page with map, sharing controls, and nearby members list
  * Converted from LocationMapModal to fix z-index issues with global alerts
@@ -42,6 +84,8 @@ import { useQuickAttendance } from "@/lib/quick-attendance";
 export default function MapScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  // Set when opened from a feed item about a tent
+  const { tentId: tentIdParam } = useLocalSearchParams<{ tentId?: string }>();
   const insets = useSafeAreaInsets();
   const { currentFestival } = useFestival();
   const { openSheet } = useQuickAttendance();
@@ -59,6 +103,12 @@ export default function MapScreen() {
   const [selectedTent, setSelectedTent] = useState<NearbyTent | null>(null);
   const [isMapExpanded, setIsMapExpanded] = useState(false);
   const hasInitializedRef = useRef(false);
+  const hasAppliedTentParamRef = useRef(false);
+  const { tent: focusTent, isNearby: isFocusTentNearby } = useFocusTent(
+    tentIdParam,
+    nearbyTents,
+    currentFestival,
+  );
 
   // refreshNearby must stay in the deps. Its identity changes with the current
   // location, and pinning the mount-time copy captures a null location, so every
@@ -97,6 +147,23 @@ export default function MapScreen() {
     setSelectedTab("tents"); // Switch to tents tab to show selection
   }, []);
 
+  // Preselect the tent from the route once it has been found
+  useEffect(() => {
+    if (!focusTent || hasAppliedTentParamRef.current) return;
+    hasAppliedTentParamRef.current = true;
+    handleTentSelect(focusTent);
+  }, [focusTent, handleTentSelect]);
+
+  // The tent the screen was opened for goes first, where its Check In button is
+  // visible. It is listed even when out of range.
+  const listedTents = useMemo(
+    () =>
+      focusTent
+        ? [focusTent, ...nearbyTents.filter((tent) => tent.tentId !== focusTent.tentId)]
+        : nearbyTents,
+    [focusTent, nearbyTents],
+  );
+
   // Check in at selected tent - closes map and opens quick attendance sheet
   const handleCheckIn = useCallback(() => {
     if (selectedTent) {
@@ -113,7 +180,7 @@ export default function MapScreen() {
   const handleMarkerPress = useCallback(
     (type: "friend" | "tent", id: string) => {
       if (type === "tent") {
-        const tent = nearbyTents.find((t) => t.tentId === id);
+        const tent = listedTents.find((t) => t.tentId === id);
         if (tent) {
           handleTentSelect(tent);
         }
@@ -121,7 +188,7 @@ export default function MapScreen() {
         setSelectedTab("friends");
       }
     },
-    [nearbyTents, handleTentSelect],
+    [listedTents, handleTentSelect],
   );
 
   if (!currentFestival?.id) {
@@ -168,6 +235,7 @@ export default function MapScreen() {
             showTents
             searchRadius={1000}
             selectedTentId={selectedTent?.tentId}
+            focusTent={focusTent}
             onMarkerPress={handleMarkerPress}
           />
           <Pressable
@@ -248,7 +316,7 @@ export default function MapScreen() {
                 selectedTab === "tents" ? "text-white" : "text-typography-600",
               )}
             >
-              {t("location.tabs.tents")} ({nearbyTents.length})
+              {t("location.tabs.tents")} ({listedTents.length})
             </Text>
           </Pressable>
         </HStack>
@@ -259,7 +327,8 @@ export default function MapScreen() {
             <NearbyFriendsList members={nearbyMembers} />
           ) : (
             <NearbyTentsList
-              tents={nearbyTents}
+              tents={listedTents}
+              unknownDistanceTentId={isFocusTentNearby ? undefined : focusTent?.tentId}
               selectedTentId={selectedTent?.tentId ?? null}
               onTentSelect={handleTentSelect}
               onCheckIn={handleCheckIn}
@@ -319,6 +388,8 @@ interface NearbyTentsListProps {
   onTentSelect: (tent: NearbyTent) => void;
   onCheckIn: () => void;
   festivalId: string;
+  /** A tent whose distance is not from the viewer, so none is shown */
+  unknownDistanceTentId?: string;
 }
 
 function NearbyTentsList({
@@ -327,6 +398,7 @@ function NearbyTentsList({
   onTentSelect,
   onCheckIn,
   festivalId,
+  unknownDistanceTentId,
 }: NearbyTentsListProps) {
   const { t } = useTranslation();
   const { crowdStatuses } = useTentCrowdStatus(festivalId);
@@ -415,9 +487,11 @@ function NearbyTentsList({
                   </Pressable>
                 ) : (
                   <VStack className="items-end">
-                    <Text className="text-sm font-medium text-typography-700">
-                      {Math.round(tent.distanceMeters)}m
-                    </Text>
+                    {tent.tentId !== unknownDistanceTentId && (
+                      <Text className="text-sm font-medium text-typography-700">
+                        {Math.round(tent.distanceMeters)}m
+                      </Text>
+                    )}
                     {tent.beerPrice && (
                       <Text className="text-xs text-typography-500">
                         {"\u20AC"}

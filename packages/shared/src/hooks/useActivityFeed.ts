@@ -5,7 +5,7 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
-import { useApiClient, useQuery, QueryKeys } from "../data";
+import { useApiClient, useQuery, useInvalidateQueries, QueryKeys } from "../data";
 
 import type { ActivityFeedItem, GetActivityFeedResponse } from "../schemas";
 
@@ -33,20 +33,24 @@ export function useActivityFeed(festivalId?: string, cursor?: string) {
 
 /**
  * Hook to get activity feed items with pagination support
+ *
+ * @param pageSize - Items per page; omitted means the API default
  */
-export function useActivityFeedItems(festivalId?: string) {
+export function useActivityFeedItems(festivalId?: string, pageSize?: number) {
   const apiClient = useApiClient();
   const [allActivities, setAllActivities] = useState<ActivityFeedItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const invalidateQueries = useInvalidateQueries();
 
   const query = useQuery<GetActivityFeedResponse>(
-    [...QueryKeys.activityFeed(festivalId || ""), cursor || "initial"],
+    [...QueryKeys.activityFeed(festivalId || ""), cursor || "initial", pageSize ?? "default"],
     () =>
       apiClient.activityFeed.get({
         festivalId: festivalId!,
         cursor: cursor || undefined,
+        limit: pageSize,
       }),
     {
       enabled: !!festivalId,
@@ -87,8 +91,10 @@ export function useActivityFeedItems(festivalId?: string) {
       setCursor(null);
       setHasLoadedMore(false);
 
-      // Trigger refetch
-      await query.refetch();
+      // Every cached page goes stale, not just the one loaded now: a refetch
+      // would only hit the current cursor, and the first page could then be
+      // served from cache within staleTime
+      invalidateQueries(QueryKeys.activityFeed(festivalId || ""));
 
       // Add a small delay to ensure the refresh animation is visible
       // even if the query completes quickly
@@ -101,7 +107,7 @@ export function useActivityFeedItems(festivalId?: string) {
     } finally {
       setIsRefreshing(false);
     }
-  }, [query]);
+  }, [invalidateQueries, festivalId]);
 
   return {
     ...query,

@@ -2,7 +2,9 @@ import { formatLocalized, formatRelativeTime, formatTimeInTimezone } from "@pros
 import type { ActivityFeedItem } from "@prostcounter/shared/hooks";
 import { usePublicProfile } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { cn } from "@prostcounter/ui";
 import { parseISO } from "date-fns";
+import { useRouter } from "expo-router";
 import {
   Award,
   Beer,
@@ -23,8 +25,9 @@ import { RadlerIcon } from "@/components/icons/radler-icon";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
+import { useAdaptedGroups } from "@/lib/database/adapted-hooks";
+import { getActivityLink } from "@/lib/feed/activity-link";
 import { getPhotoGalleryTarget, type PhotoGalleryTarget } from "@/lib/feed/photo-gallery-target";
 import { getBeerPictureUrl } from "@/lib/utils";
 
@@ -98,10 +101,13 @@ function getActivityIcon(
  * - Activity-specific icon and message
  * - Relative timestamp ("2h ago")
  * - Photo thumbnail for photo_upload type
- * - Tappable avatar opens user profile modal with async loading
+ * - Tappable avatar and name open user profile modal with async loading
+ * - Tappable row opens what the activity is about (see getActivityLink)
  */
 export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { data: memberGroups } = useAdaptedGroups(festivalId ?? activity.festival_id);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [galleryPhoto, setGalleryPhoto] = useState<PhotoGalleryTarget | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -140,6 +146,11 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
   }, []);
 
   const { username, full_name, avatar_url, activity_time, activity_type, activity_data } = activity;
+
+  const link = useMemo(
+    () => getActivityLink(activity, new Set((memberGroups ?? []).map((group) => group.id))),
+    [activity, memberGroups],
+  );
 
   // Format relative time using shared utility
   const timeAgo = useMemo(() => {
@@ -269,42 +280,64 @@ export function ActivityItem({ activity, festivalId }: ActivityItemProps) {
 
   return (
     <>
-      <HStack space="sm" className="py-3">
+      <HStack space="md" className="py-4">
         {/* User Avatar - Tappable to show profile */}
         <TappableAvatar
           avatarUrl={avatar_url}
           username={username}
           fullName={full_name}
+          size="md"
           onPress={handleAvatarPress}
         />
 
-        {/* Activity Content */}
-        <VStack className="flex-1">
+        {/* Activity Content - the row opens what it is about, when it has a target */}
+        <Pressable
+          className={cn("flex-1", link && "active:opacity-70")}
+          onPress={link ? () => router.push(link) : undefined}
+          // A row with a link is one VoiceOver element. Without one it stays a
+          // container, so the name and photo buttons inside remain reachable.
+          accessible={!!link}
+          accessibilityRole={link ? "button" : undefined}
+          accessibilityLabel={link ? `${displayName}, ${description}, ${timeAgo}` : undefined}
+          accessibilityHint={link ? t("activityFeed.openHint") : undefined}
+        >
           <HStack className="items-center justify-between">
             <HStack space="xs" className="flex-1 items-center">
-              <Text className="text-sm font-medium text-typography-900" numberOfLines={1}>
-                {displayName}
-              </Text>
+              <Pressable
+                onPress={handleAvatarPress}
+                accessibilityRole="button"
+                accessibilityLabel={t("activityFeed.viewProfile")}
+                className="shrink"
+              >
+                <Text className="text-base font-medium text-typography-900" numberOfLines={1}>
+                  {displayName}
+                </Text>
+              </Pressable>
               {getActivityIcon(activity_type, activity_data)}
             </HStack>
             <Text className="text-xs text-typography-400">{timeAgo}</Text>
           </HStack>
 
-          <Text className="text-sm text-typography-500">{description}</Text>
+          <Text className="text-base text-typography-500">{description}</Text>
 
           {/* Photo thumbnail for photo uploads */}
           {activity_type === "photo_upload" && fullPictureUrl && (
-            <Pressable onPress={() => handleImagePress(fullPictureUrl)} className="mt-2">
+            <Pressable
+              onPress={() => handleImagePress(fullPictureUrl)}
+              accessibilityRole="button"
+              accessibilityLabel={t("activityFeed.uploadedPhoto")}
+              className="mt-2"
+            >
               <Image
                 source={{ uri: fullPictureUrl }}
-                className="h-16 w-16 rounded-lg"
+                className="h-32 w-32 rounded-lg"
                 resizeMode="cover"
                 alt=""
                 accessibilityLabel={t("activityFeed.uploadedPhoto")}
               />
             </Pressable>
           )}
-        </VStack>
+        </Pressable>
 
         {/* Image Preview Modal */}
         <ImagePreviewModal imageUri={previewImage} onClose={handleClosePreview} />

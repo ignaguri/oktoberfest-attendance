@@ -69,12 +69,13 @@ export function MessageItem({ message, currentUserId, onDelete, festivalId }: Me
 
   return (
     <>
-      <HStack space="sm" className={cn("py-3", isAlert && "bg-amber-50")}>
+      <HStack space="md" className={cn("py-4", isAlert && "bg-amber-50")}>
         {/* Avatar - Tappable to show profile */}
         <TappableAvatar
           avatarUrl={message.avatarUrl}
           username={message.username}
           fullName={message.fullName}
+          size="md"
           onPress={handleAvatarPress}
         />
 
@@ -82,9 +83,16 @@ export function MessageItem({ message, currentUserId, onDelete, festivalId }: Me
         <VStack className="flex-1">
           <HStack className="items-center justify-between">
             <HStack space="xs" className="flex-1 items-center">
-              <Text className="text-sm font-medium text-typography-900" numberOfLines={1}>
-                {displayName}
-              </Text>
+              <Pressable
+                onPress={handleAvatarPress}
+                accessibilityRole="button"
+                accessibilityLabel={t("activityFeed.viewProfile")}
+                className="shrink"
+              >
+                <Text className="text-base font-medium text-typography-900" numberOfLines={1}>
+                  {displayName}
+                </Text>
+              </Pressable>
               {/* Visibility indicator */}
               {message.visibility === "public" ? (
                 <Globe size={12} color={IconColors.muted} />
@@ -98,7 +106,7 @@ export function MessageItem({ message, currentUserId, onDelete, festivalId }: Me
           </HStack>
 
           {/* Message content */}
-          <Text className="text-sm text-typography-500">{message.content}</Text>
+          <Text className="text-base text-typography-500">{message.content}</Text>
 
           {/* Alert badge */}
           {isAlert && (

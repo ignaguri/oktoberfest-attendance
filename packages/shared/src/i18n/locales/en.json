@@ -2757,7 +2757,8 @@
     "userProfile": "User Profile",
     "title": "Activity Feed",
     "profileNotFound": "Profile not found",
-    "viewProfile": "View Profile"
+    "viewProfile": "View Profile",
+    "openHint": "Opens what this is about"
   },
   "quickAttendance": {
     "sheetTitle": "Today's Attendance",
@@ -2829,6 +2830,7 @@
       "title": "What's Happening",
       "empty": "No activity yet. Start logging your festival adventures!",
       "loadMore": "Load More",
+      "caughtUp": "You're all caught up",
       "error": "Failed to load feed",
       "compose": "New Message"
     },
