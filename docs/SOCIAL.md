@@ -34,14 +34,26 @@ Copy key is `followInstagram` under `footer`, `marketing.footer` and `profile.ab
 | ---------- | -------- | ---------------------------------------------------------------------- | -------------------------------------------------- |
 | 2026-09-25 | Carousel | 8 app screenshots, 4:5, alt text per slide                             | `screenshots/instagram/en/`                        |
 | 2026-09-25 | Reel     | 20s promo remix: Maß counter hook, two-tap log, leaderboard, 90 badges | `brags/2026-09-25-162342/brag.mp4` (main checkout) |
+| 2026-09-26 | 8 posts  | One screen per post, headline + a short what-you-can-do caption        | `screenshots/instagram/en/`                        |
 
 Links: [carousel](https://www.instagram.com/prostcounter/p/Ddt5T5tCGEQ/),
 [reel](https://www.instagram.com/prostcounter/reel/Ddt9ydwPRPC/).
+Single posts, oldest first: [map](https://www.instagram.com/prostcounter/p/DdvyjVwCJCN/),
+[wrapped](https://www.instagram.com/prostcounter/p/DdvzpV8iOr6/),
+[badges](https://www.instagram.com/prostcounter/p/Ddv0ekwiKnd/),
+[groups](https://www.instagram.com/prostcounter/p/Ddv0zfqCMvF/),
+[tents](https://www.instagram.com/prostcounter/p/Ddv1XDMiALQ/),
+[log a drink](https://www.instagram.com/prostcounter/p/Ddv1wMtiNLB/),
+[calendar](https://www.instagram.com/prostcounter/p/Ddv3Kq_CBct/),
+[home](https://www.instagram.com/prostcounter/p/Ddv3vMvCD5K/).
+Posted in reverse so the grid reads Home first.
 
 ### Where assets come from
 
 - **Screenshot carousels**: `python3 scripts/store-screenshots/render.py en instagram`
-  renders the store screenshots into a 1080x1350 (4:5) frame with the whole phone visible.
+  renders the store screenshots into a 1080x1350 (4:5) frame. Most shots use a big phone
+  that runs off the bottom; screens whose point is below the fold (home, tents, groups, map)
+  get the whole, smaller phone (`INSTAGRAM_FULL_PHONE` in `render.py`).
   See [scripts/store-screenshots/README.md](../scripts/store-screenshots/README.md).
 - **Promo videos**: `brags/` in the main checkout (gitignored, not on any branch). Each run
   folder has `brag.mp4` (1080x1920), `share-copy.txt` (the caption written for that cut),
@@ -58,6 +70,11 @@ Links: [carousel](https://www.instagram.com/prostcounter/p/Ddt5T5tCGEQ/),
   default is fine.
 - Alt text is per image, under "Accesibilidad" in the caption step. There is no visible
   per-slide caption on the web.
+- Stories can't be posted with video from the web. The mobile-web story button only takes
+  images, and Meta Business Suite needs a separate business login. Share the Reel to the
+  story from the phone instead, with a link sticker to `prostcounter.fun/download`.
+- Posting, deleting and re-posting several times in an hour gets a `login_required` error
+  on share even though the session is fine. Space posts out and retry once, later.
 - Leave the AI label off for screenshots and motion-graphics renders of the real UI.
 - Captions: English, no em-dashes, `prostcounter.fun` spelled out (caption links aren't
   clickable), hashtags `#oktoberfest #wiesn #oktoberfest2026 #munich #prost`.

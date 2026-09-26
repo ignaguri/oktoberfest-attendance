@@ -13,8 +13,11 @@ python3 scripts/store-screenshots/render.py en instagram  # feed 4:5, 1080x1350,
 ```
 
 Play rejects anything longer than 2:1, so it can't take the App Store frames. The
-Instagram frame lets the phone run off the bottom, which hides bottom sheets: the
-log-drink and tent-picker shots don't work there.
+Instagram frame lets the phone run off the bottom, which hides anything low on the
+screen. `render.py` handles that per shot: the whole, smaller phone for home, tents,
+groups and map (`INSTAGRAM_FULL_PHONE`), a band of dimmed rows collapsed on log-drink
+(`INSTAGRAM_COLLAPSE`), and the peak-moment Wrapped slide instead of the personality
+one (`INSTAGRAM_RAW`).
 
 Headlines come from `copy.json`, keyed by the raw file name. Adding a locale is
 adding a block there (German with real umlauts, Spanish in voseo) and running the

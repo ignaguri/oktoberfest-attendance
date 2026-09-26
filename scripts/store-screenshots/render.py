@@ -22,6 +22,18 @@ RAW = ROOT / "screenshots/iphone-6.9/raw"
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 PLAY_LOCALES = {"en": "en-US", "de": "de-DE", "es": "es-ES"}
 
+# Instagram only. The 4:5 frame shows the top ~1750 raw px, so screens whose point sits
+# lower get a band of dimmed or empty rows collapsed (raw px, gap to gap) to pull it up.
+INSTAGRAM_COLLAPSE = {
+    "03-log-drink": (380, 1500),
+    "07-wrapped-personality": (360, 760),
+}
+# Instagram only: the personality slide is mostly empty; the peak-moment slide carries Wrapped.
+INSTAGRAM_RAW = {"07-wrapped-personality": "07b-wrapped-peak"}
+# Instagram only: screens whose point is below the fold get the whole, smaller phone.
+INSTAGRAM_FULL_PHONE = {"01-home", "04-tent-crowd", "05-group-leaderboard", "08-map"}
+INSTAGRAM_FULL = dict(width=1080, height=1350, font=76, top=50, head=160, gap=30, phone=490, pad=12, radius=76)
+
 # Pixel sizes per target. phone = outer width, pad = bezel, radius = outer corner radius.
 TARGETS = {
     "appstore": dict(width=1320, height=2868, font=124, top=200, head=268, gap=80, phone=990, pad=20, radius=150),
@@ -48,6 +60,14 @@ def fill_top_band(src: Path, dst: Path) -> None:
         colour = img.getpixel((img.width // 2, band + 4))
         img.paste(colour, (0, 0, img.width, band))
     img.save(dst)
+
+
+def collapse_rows(path: Path, top: int, bottom: int) -> None:
+    img = Image.open(path)
+    out = Image.new(img.mode, (img.width, img.height - (bottom - top)))
+    out.paste(img.crop((0, 0, img.width, top)), (0, 0))
+    out.paste(img.crop((0, bottom, img.width, img.height)), (0, top))
+    out.save(path)
 
 
 def page(headline: str, shot: Path, t: dict) -> str:
@@ -86,9 +106,13 @@ def main() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         for shot_id, headline in copy.items():
             shot = Path(tmp) / f"{shot_id}.png"
-            fill_top_band(RAW / f"{shot_id}.png", shot)
+            raw_id = INSTAGRAM_RAW.get(shot_id, shot_id) if target == "instagram" else shot_id
+            fill_top_band(RAW / f"{raw_id}.png", shot)
+            if target == "instagram" and shot_id in INSTAGRAM_COLLAPSE:
+                collapse_rows(shot, *INSTAGRAM_COLLAPSE[shot_id])
             page_file = Path(tmp) / f"{shot_id}.html"
-            page_file.write_text(page(headline, shot, t))
+            full = target == "instagram" and shot_id in INSTAGRAM_FULL_PHONE
+            page_file.write_text(page(headline, shot, INSTAGRAM_FULL if full else t))
             subprocess.run(
                 [CHROME, "--headless=new", "--hide-scrollbars", "--force-device-scale-factor=1",
                  f"--window-size={t['width']},{t['height']}", f"--screenshot={out / f'{shot_id}.png'}",
