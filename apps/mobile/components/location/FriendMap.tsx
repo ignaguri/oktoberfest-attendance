@@ -1,3 +1,4 @@
+import type { NearbyTent } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { AppleMaps, GoogleMaps } from "expo-maps";
@@ -13,10 +14,22 @@ interface FriendMapProps {
   showFriends?: boolean;
   searchRadius?: number;
   selectedTentId?: string | null;
-  /** Centers the camera on this tent instead of the user, while it is nearby */
-  focusTentId?: string;
+  /**
+   * Centers the camera on this tent instead of the user. It gets a marker even
+   * when it is not among the nearby tents.
+   */
+  focusTent?: NearbyTent | null;
   onMarkerPress?: (type: "friend" | "tent", id: string) => void;
   style?: object;
+}
+
+/** Android marker snippet: distance when it is from the viewer, and beer price */
+function getTentSnippet(tent: NearbyTent, hasDistance: boolean): string | undefined {
+  const parts = [
+    hasDistance ? `${Math.round(tent.distanceMeters)}m` : null,
+    tent.beerPrice ? `€${tent.beerPrice.toFixed(2)}` : null,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(" • ") : undefined;
 }
 
 /**
@@ -30,7 +43,7 @@ export function FriendMap({
   showFriends = true,
   searchRadius = 1000,
   selectedTentId,
-  focusTentId,
+  focusTent,
   onMarkerPress,
   style,
 }: FriendMapProps) {
@@ -45,9 +58,6 @@ export function FriendMap({
   // Returns null if none is available (map will show default world view)
   const cameraPosition = useMemo(() => {
     // Priority 0: A tent the screen was opened for
-    const focusTent = focusTentId
-      ? nearbyTents.find((tent) => tent.tentId === focusTentId)
-      : undefined;
     if (focusTent) {
       return {
         coordinates: { latitude: focusTent.latitude, longitude: focusTent.longitude },
@@ -76,7 +86,16 @@ export function FriendMap({
     }
     // No location available - let map use default view
     return undefined;
-  }, [focusTentId, nearbyTents, currentLocation, currentFestival]);
+  }, [focusTent, currentLocation, currentFestival]);
+
+  // The focused tent is on the map even when out of range. Its distance is then
+  // not from the viewer, so its snippet leaves it out.
+  const outOfRangeFocusTent =
+    focusTent && !nearbyTents.some((tent) => tent.tentId === focusTent.tentId) ? focusTent : null;
+  const tentsOnMap = useMemo(
+    () => (outOfRangeFocusTent ? [...nearbyTents, outOfRangeFocusTent] : nearbyTents),
+    [nearbyTents, outOfRangeFocusTent],
+  );
 
   // Build Apple Maps markers (iOS) - with SF Symbols
   const appleMarkers = useMemo<AppleMaps.Marker[]>(() => {
@@ -116,7 +135,7 @@ export function FriendMap({
 
     // Tent markers
     if (showTents) {
-      nearbyTents.forEach((tent) => {
+      tentsOnMap.forEach((tent) => {
         const tintColor =
           tent.category === "large"
             ? Colors.primary[500]
@@ -143,7 +162,7 @@ export function FriendMap({
     showFriends,
     showTents,
     nearbyMembers,
-    nearbyTents,
+    tentsOnMap,
     selectedFriendId,
     selectedTentId,
     isSharing,
@@ -186,7 +205,7 @@ export function FriendMap({
 
     // Tent markers
     if (showTents) {
-      nearbyTents.forEach((tent) => {
+      tentsOnMap.forEach((tent) => {
         result.push({
           id: `tent-${tent.tentId}`,
           coordinates: {
@@ -194,15 +213,22 @@ export function FriendMap({
             longitude: tent.longitude,
           },
           title: tent.tentName,
-          snippet: tent.beerPrice
-            ? `${Math.round(tent.distanceMeters)}m • €${tent.beerPrice.toFixed(2)}`
-            : `${Math.round(tent.distanceMeters)}m`,
+          snippet: getTentSnippet(tent, tent !== outOfRangeFocusTent),
         });
       });
     }
 
     return result;
-  }, [currentLocation, showFriends, showTents, nearbyMembers, nearbyTents, isSharing, t]);
+  }, [
+    currentLocation,
+    showFriends,
+    showTents,
+    nearbyMembers,
+    tentsOnMap,
+    outOfRangeFocusTent,
+    isSharing,
+    t,
+  ]);
 
   // Quantize location to ~10m precision to avoid frequent circle re-renders
   const rawLatitude = currentLocation?.coords.latitude;
