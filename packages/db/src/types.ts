@@ -1506,6 +1506,32 @@ export type Database = {
           },
         ]
       }
+      photo_reaction_notifications: {
+        Row: {
+          created_at: string
+          photo_id: string
+          reactor_id: string
+        }
+        Insert: {
+          created_at?: string
+          photo_id: string
+          reactor_id: string
+        }
+        Update: {
+          created_at?: string
+          photo_id?: string
+          reactor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_reaction_notifications_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "beer_pictures"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photo_reactions: {
         Row: {
           created_at: string

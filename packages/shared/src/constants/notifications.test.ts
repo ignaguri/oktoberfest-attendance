@@ -125,3 +125,23 @@ describe("getNotificationRoute for group invitations", () => {
     ).toBe("/groups");
   });
 });
+
+describe("getNotificationRoute for photo reactions", () => {
+  const GROUP_ID = "0f1e2d3c-4b5a-6978-8a9b-0c1d2e3f4a5b";
+
+  it("opens the gallery of the group the reaction was made in", () => {
+    expect(
+      getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_REACTION, groupId: GROUP_ID }),
+    ).toBe(`/group-detail/${GROUP_ID}/gallery`);
+  });
+
+  it("opens the gallery from an in-app payload without a type", () => {
+    expect(getNotificationRoute({ reactorName: "user2", groupId: GROUP_ID })).toBe(
+      `/group-detail/${GROUP_ID}/gallery`,
+    );
+  });
+
+  it("falls back to the groups list without a group id", () => {
+    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.PHOTO_REACTION })).toBe("/groups");
+  });
+});

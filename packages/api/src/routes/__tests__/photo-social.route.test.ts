@@ -13,6 +13,12 @@ import {
 } from "../../__tests__/helpers/test-server";
 import photoSocialRoute from "../photo-social.route";
 
+const { notifyPhotoReactionMock } = vi.hoisted(() => ({ notifyPhotoReactionMock: vi.fn() }));
+
+vi.mock("../../services/notification.service", () => ({
+  createNotificationService: () => ({ notifyPhotoReaction: notifyPhotoReactionMock }),
+}));
+
 // Test constants
 const PHOTO_ID = "123e4567-e89b-12d3-a456-426614174000";
 const GROUP_ID = "223e4567-e89b-12d3-a456-426614174000";
@@ -241,6 +247,43 @@ describe("Photo Social Routes", () => {
       expect(json.success).toBe(true);
     });
 
+    it("notifies the uploader with the reaction it just saved", async () => {
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
+
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions`, {
+        method: "POST",
+        body: JSON.stringify({ groupId: GROUP_ID, emoji: "🍺" }),
+      });
+      const res = await app.request(req as Request);
+
+      expect(res.status).toBe(200);
+      expect(notifyPhotoReactionMock).toHaveBeenCalledWith({
+        photoId: PHOTO_ID,
+        groupId: GROUP_ID,
+        reactorId: mockUser.id,
+        emoji: "🍺",
+      });
+    });
+
+    it("keeps the reaction when the notification fails", async () => {
+      notifyPhotoReactionMock.mockRejectedValueOnce(new Error("novu down"));
+      vi.mocked(mockSupabase.from)
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({ user_id: mockUser.id })))
+        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)));
+
+      const req = createAuthRequest(`/photos/${PHOTO_ID}/reactions`, {
+        method: "POST",
+        body: JSON.stringify({ groupId: GROUP_ID, emoji: "🍺" }),
+      });
+      const res = await app.request(req as Request);
+      const json = (await res.json()) as any;
+
+      expect(res.status).toBe(200);
+      expect(json.success).toBe(true);
+    });
+
     it("should return 409 when reaction already exists (unique constraint)", async () => {
       vi.mocked(mockSupabase.from)
         // 1. Membership check
@@ -261,6 +304,7 @@ describe("Photo Social Routes", () => {
 
       expect(res.status).toBe(409);
       expect(json.error.code).toBe("CONFLICT");
+      expect(notifyPhotoReactionMock).not.toHaveBeenCalled();
     });
 
     it("should return 403 when user is not a group member", async () => {

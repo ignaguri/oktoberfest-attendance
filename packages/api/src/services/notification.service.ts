@@ -1065,6 +1065,130 @@ export class NotificationService {
   }
 
   /**
+   * Tell a photo's uploader that someone reacted to it
+   * (respects group_notifications_enabled; a missing preference row counts as opted in)
+   *
+   * Each reactor is announced once per photo. Changing a reaction is a remove
+   * followed by an add, so the ledger insert is the dedupe, not the reaction row.
+   */
+  async notifyPhotoReaction(input: {
+    photoId: string;
+    groupId: string;
+    reactorId: string;
+    emoji: string;
+  }): Promise<void> {
+    try {
+      let adminClient;
+      try {
+        adminClient = createAdminClient();
+      } catch (adminError) {
+        logger.error(
+          { error: adminError },
+          "Admin client unavailable; skipping photo reaction notification",
+        );
+        return;
+      }
+
+      const { data: photo, error: photoError } = await adminClient
+        .from("beer_pictures")
+        .select("user_id, visibility, attendances!inner(festival_id)")
+        .eq("id", input.photoId)
+        .maybeSingle();
+
+      if (photoError) {
+        logger.error({ error: photoError }, "Error fetching photo for reaction notification");
+        return;
+      }
+      if (!photo || photo.user_id === input.reactorId || photo.visibility !== "public") {
+        return;
+      }
+      const uploaderId = photo.user_id;
+
+      // Only a photo the group's gallery shows: the uploader is a member and it
+      // is from the group's festival. Reaction RLS checks neither, and the
+      // deep link opens that gallery.
+      const { data: uploaderMembership, error: membershipError } = await adminClient
+        .from("group_members")
+        .select("groups!inner(festival_id)")
+        .eq("group_id", input.groupId)
+        .eq("user_id", uploaderId)
+        .maybeSingle();
+
+      if (membershipError) {
+        logger.error(
+          { error: membershipError },
+          "Error checking uploader membership for reaction notification",
+        );
+        return;
+      }
+      if (
+        !uploaderMembership ||
+        uploaderMembership.groups.festival_id !== photo.attendances.festival_id
+      ) {
+        return;
+      }
+
+      const recipients = await this.filterByPreference([uploaderId], "group_notifications_enabled");
+      if (!recipients || recipients.length === 0) {
+        return;
+      }
+
+      const { data: ledgerRows, error: ledgerError } = await adminClient
+        .from("photo_reaction_notifications")
+        .upsert(
+          { photo_id: input.photoId, reactor_id: input.reactorId },
+          { onConflict: "photo_id,reactor_id", ignoreDuplicates: true },
+        )
+        .select("photo_id");
+
+      if (ledgerError) {
+        logger.error({ error: ledgerError }, "Error recording photo reaction notification");
+        return;
+      }
+      if (!ledgerRows || ledgerRows.length === 0) {
+        return;
+      }
+
+      const { data: reactor } = await this.supabase
+        .from("profiles")
+        .select("username, full_name, avatar_url")
+        .eq("id", input.reactorId)
+        .single();
+
+      try {
+        await this.triggerWithBadge({
+          workflowId: NOTIFICATION_WORKFLOWS.PHOTO_REACTION,
+          to: uploaderId,
+          payload: {
+            type: NOTIFICATION_PUSH_TYPES.PHOTO_REACTION,
+            reactorName: reactor?.username || reactor?.full_name || "Someone",
+            reactorAvatar: resolveAvatarUrl(reactor?.avatar_url),
+            reactorId: input.reactorId,
+            emoji: input.emoji,
+            groupId: input.groupId,
+            photoId: input.photoId,
+          },
+        });
+      } catch (sendError) {
+        // A failed send must not count as notified, or the uploader never hears
+        // about this reactor on this photo.
+        const { error: forgetError } = await adminClient
+          .from("photo_reaction_notifications")
+          .delete()
+          .eq("photo_id", input.photoId)
+          .eq("reactor_id", input.reactorId);
+
+        if (forgetError) {
+          logger.error({ error: forgetError }, "Error clearing failed photo reaction notification");
+        }
+        throw sendError;
+      }
+    } catch (error) {
+      logger.error({ error }, "Error sending photo reaction notification");
+    }
+  }
+
+  /**
    * Tell friends and group-mates who marked the same day that the actor is
    * going too.
    *
