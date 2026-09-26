@@ -1,6 +1,8 @@
 import type { LocationSessionMember, NearbyTent } from "@prostcounter/shared";
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useTentCrowdStatus } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import { Stack, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
@@ -13,9 +15,10 @@ import {
   MapPin,
   RefreshCw,
 } from "lucide-react-native";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CrowdLevelBadge } from "@/components/crowd/crowd-level-badge";
 import { FriendMap } from "@/components/location/FriendMap";
 import { LocationSharingToggle } from "@/components/location/LocationSharingToggle";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
@@ -260,6 +263,7 @@ export default function MapScreen() {
               selectedTentId={selectedTent?.tentId ?? null}
               onTentSelect={handleTentSelect}
               onCheckIn={handleCheckIn}
+              festivalId={currentFestival.id}
             />
           )}
         </Box>
@@ -314,10 +318,28 @@ interface NearbyTentsListProps {
   selectedTentId: string | null;
   onTentSelect: (tent: NearbyTent) => void;
   onCheckIn: () => void;
+  festivalId: string;
 }
 
-function NearbyTentsList({ tents, selectedTentId, onTentSelect, onCheckIn }: NearbyTentsListProps) {
+function NearbyTentsList({
+  tents,
+  selectedTentId,
+  onTentSelect,
+  onCheckIn,
+  festivalId,
+}: NearbyTentsListProps) {
   const { t } = useTranslation();
+  const { crowdStatuses } = useTentCrowdStatus(festivalId);
+
+  const crowdLevels = useMemo(() => {
+    const levels = new globalThis.Map<string, CrowdLevel>(); // `Map` is the lucide icon here
+    for (const status of crowdStatuses) {
+      if (status.reportCount > 0 && status.crowdLevel) {
+        levels.set(status.tentId, status.crowdLevel as CrowdLevel);
+      }
+    }
+    return levels;
+  }, [crowdStatuses]);
 
   if (tents.length === 0) {
     return (
@@ -369,9 +391,12 @@ function NearbyTentsList({ tents, selectedTentId, onTentSelect, onCheckIn }: Nea
                 </Box>
                 <VStack className="flex-1">
                   <Text className="font-medium text-typography-900">{tent.tentName}</Text>
-                  <Text className="text-sm capitalize text-typography-500">
-                    {tent.category || "tent"}
-                  </Text>
+                  <HStack space="sm" className="items-center">
+                    <Text className="text-sm capitalize text-typography-500">
+                      {tent.category || "tent"}
+                    </Text>
+                    <CrowdLevelBadge crowdLevel={crowdLevels.get(tent.tentId) ?? null} compact />
+                  </HStack>
                 </VStack>
                 {isSelected ? (
                   <Pressable

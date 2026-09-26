@@ -8,12 +8,12 @@ import {
   useFriends,
   useFriendSuggestions,
   useOutgoingFriendRequests,
+  usePublicProfile,
   useSendFriendRequest,
   useUnfriend,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { Friend, FriendRequest, FriendSuggestion } from "@prostcounter/shared/schemas";
-import { getInitials } from "@prostcounter/ui";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Search, UserPlus, Users, UserX } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -23,6 +23,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { FriendCard } from "@/components/friends/friend-card";
 import { FriendRequestCard } from "@/components/friends/friend-request-card";
 import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
+import { TappableAvatar, UserProfileModal } from "@/components/shared/user-profile-modal";
 import {
   AlertDialog,
   AlertDialogBackdrop,
@@ -32,7 +33,6 @@ import {
   AlertDialogHeader,
   useAlertDialog,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
@@ -41,7 +41,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
-import { getAvatarUrl } from "@/lib/utils";
 
 type TabType = "friends" | "requests";
 
@@ -378,6 +377,7 @@ function MyFriendsTab({
                 suggestion={suggestion}
                 onAdd={onSendRequest}
                 loading={sendRequestLoading}
+                festivalId={festivalId}
               />
             ))}
           </ScrollView>
@@ -438,16 +438,20 @@ interface SuggestionCardProps {
   suggestion: FriendSuggestion;
   onAdd: (userId: string) => void;
   loading: boolean;
+  festivalId?: string;
 }
 
-function SuggestionCard({ suggestion, onAdd, loading }: SuggestionCardProps) {
+function SuggestionCard({ suggestion, onAdd, loading, festivalId }: SuggestionCardProps) {
   const { t } = useTranslation();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Fetch public profile on demand when avatar is tapped
+  const { data: publicProfile, loading: profileLoading } = usePublicProfile(
+    isProfileOpen ? suggestion.id : undefined,
+    festivalId,
+  );
 
   const displayName = suggestion.fullName || suggestion.username || "User";
-  const initials = getInitials({
-    fullName: suggestion.fullName,
-    username: suggestion.username,
-  });
 
   const sharedGroupsText = useMemo(() => {
     if (suggestion.sharedGroups <= 0) return null;
@@ -467,13 +471,13 @@ function SuggestionCard({ suggestion, onAdd, loading }: SuggestionCardProps) {
 
   return (
     <VStack space="sm" className="w-32 items-center rounded-2xl bg-white p-3 shadow-sm">
-      <Avatar size="lg">
-        {suggestion.avatarUrl ? (
-          <AvatarImage source={{ uri: getAvatarUrl(suggestion.avatarUrl) }} />
-        ) : (
-          <AvatarFallbackText>{initials}</AvatarFallbackText>
-        )}
-      </Avatar>
+      <TappableAvatar
+        avatarUrl={suggestion.avatarUrl}
+        username={suggestion.username}
+        fullName={suggestion.fullName}
+        size="lg"
+        onPress={() => setIsProfileOpen(true)}
+      />
 
       <VStack space="xs" className="items-center">
         <Text className="text-center text-sm font-semibold text-typography-900" numberOfLines={1}>
@@ -503,6 +507,14 @@ function SuggestionCard({ suggestion, onAdd, loading }: SuggestionCardProps) {
           </>
         )}
       </Button>
+
+      <UserProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        profile={publicProfile}
+        loading={profileLoading}
+        userId={suggestion.id}
+      />
     </VStack>
   );
 }

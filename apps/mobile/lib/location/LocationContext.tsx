@@ -400,7 +400,9 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         const tentsPromise = apiClient.tents.getNearby({
           latitude: loc.coords.latitude,
           longitude: loc.coords.longitude,
-          radiusMeters: 500, // 500m for tents
+          // Matches the 1km circle the map draws; at 500m, tents at the far
+          // end of the Wiesn (e.g. Marstall) never showed up
+          radiusMeters: 1000,
           festivalId: targetFestivalId,
         });
 
