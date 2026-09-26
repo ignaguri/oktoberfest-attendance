@@ -187,6 +187,9 @@ export {
   useRemoveReaction,
 } from "./usePhotoSocial";
 
+// Photo tag hooks
+export { usePhotoTags, useSetPhotoTags, useTaggedPhotos } from "./usePhotoTags";
+
 // Unified feed hooks
 export { type UnifiedFeedItem, useUnifiedFeed } from "./useUnifiedFeed";
 

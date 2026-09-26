@@ -132,6 +132,9 @@ export class QueryKeys {
     ["photo-reactions", photoId, groupId] as const;
   static photoComments = (photoId: string, groupId: string) =>
     ["photo-comments", photoId, groupId] as const;
+  static photoTags = (photoId: string) => ["photo-tags", photoId] as const;
+  static taggedPhotos = (userId: string, festivalId: string) =>
+    ["tagged-photos", userId, festivalId] as const;
 
   // Friend queries
   static friends = () => ["friends"] as const;
