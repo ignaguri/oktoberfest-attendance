@@ -7609,6 +7609,15 @@ export interface paths {
                         };
                     };
                 };
+                /** @description The file never reached storage; start a new upload */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
