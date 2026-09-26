@@ -1,5 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { GetCompanionOptionsResponse } from "@prostcounter/shared/schemas";
+import { type GetCompanionOptionsResponse, PHOTO_TAG_LIMIT } from "@prostcounter/shared/schemas";
 import { getInitials } from "@prostcounter/ui";
 import { Check, Users, X } from "lucide-react-native";
 import { useCallback } from "react";
@@ -33,6 +33,8 @@ interface CompanionPickerSheetProps {
   selectedUserIds: string[];
   selectedGroupIds: string[];
   onChange: (selection: { userIds: string[]; groupIds: string[] }) => void;
+  /** "photo" lists people only, caps the selection and uses photo copy */
+  mode?: "plan" | "photo";
 }
 
 function toggle(ids: string[], id: string): string[] {
@@ -52,10 +54,14 @@ export function CompanionPickerSheet({
   selectedUserIds,
   selectedGroupIds,
   onChange,
+  mode = "plan",
 }: CompanionPickerSheetProps) {
   const { t } = useTranslation();
+  const isPhotoMode = mode === "photo";
+  const isAtLimit = isPhotoMode && selectedUserIds.length >= PHOTO_TAG_LIMIT;
   const selectedCount = selectedUserIds.length + selectedGroupIds.length;
-  const hasOptions = !!options && (options.users.length > 0 || options.groups.length > 0);
+  const hasOptions =
+    !!options && (options.users.length > 0 || (!isPhotoMode && options.groups.length > 0));
 
   const handleToggleGroup = useCallback(
     (groupId: string) => {
@@ -85,7 +91,9 @@ export function CompanionPickerSheet({
 
         <HStack className="mb-3 w-full items-center justify-between px-2">
           <Text className="text-lg font-semibold text-typography-900">
-            {t("attendance.planner.companionPicker.title")}
+            {isPhotoMode
+              ? t("photoTags.picker.title")
+              : t("attendance.planner.companionPicker.title")}
           </Text>
           <Pressable
             onPress={onClose}
@@ -115,14 +123,16 @@ export function CompanionPickerSheet({
           <VStack space="md" className="items-center justify-center px-4 py-8">
             <Users size={32} color={IconColors.muted} />
             <Text className="text-center text-typography-500">
-              {t("attendance.planner.companionPicker.empty")}
+              {isPhotoMode
+                ? t("photoTags.picker.empty")
+                : t("attendance.planner.companionPicker.empty")}
             </Text>
           </VStack>
         )}
 
         {options && hasOptions && (
           <ActionsheetScrollView className="max-h-[360px] w-full">
-            {options.groups.length > 0 && (
+            {!isPhotoMode && options.groups.length > 0 && (
               <>
                 <ActionsheetSectionHeaderText className="bg-background-50">
                   {t("attendance.planner.companionPicker.groups")}
@@ -165,6 +175,7 @@ export function CompanionPickerSheet({
                       value={user.userId}
                       isChecked={selectedUserIds.includes(user.userId)}
                       onChange={() => handleToggleUser(user.userId)}
+                      isDisabled={isAtLimit && !selectedUserIds.includes(user.userId)}
                       size="md"
                       className="px-4 py-3"
                     >
@@ -194,6 +205,12 @@ export function CompanionPickerSheet({
               </>
             )}
           </ActionsheetScrollView>
+        )}
+
+        {isAtLimit && (
+          <Text className="w-full px-4 pt-2 text-center text-xs text-typography-500">
+            {t("photoTags.picker.limit", { count: PHOTO_TAG_LIMIT })}
+          </Text>
         )}
 
         <HStack className="w-full gap-3 px-2 pt-3">

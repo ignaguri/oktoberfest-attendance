@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { ActivityIndicator, Image, View } from "react-native";
 
 import { type ImageSource, ImageSourcePicker } from "@/components/image-source-picker";
+import { PhotoTagRow } from "@/components/photo-tags/photo-tag-row";
 import { ImagePreviewModal } from "@/components/shared/image-preview-modal";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
@@ -35,6 +36,12 @@ interface BeerPicturesSectionProps {
   disabled?: boolean;
   /** Whether photos are currently uploading */
   isUploading?: boolean;
+  /** Festival of the attendance, for the tag picker's options */
+  festivalId?: string;
+  /** People tagged in every pending photo */
+  taggedUserIds?: string[];
+  /** Called when the pending photos' tags change */
+  onTaggedUserIdsChange?: (userIds: string[]) => void;
 }
 
 /**
@@ -55,6 +62,9 @@ export function BeerPicturesSection({
   onTogglePhotoRemoval,
   disabled = false,
   isUploading = false,
+  festivalId,
+  taggedUserIds = [],
+  onTaggedUserIdsChange,
 }: BeerPicturesSectionProps) {
   const { t } = useTranslation();
   const [showSourcePicker, setShowSourcePicker] = useState(false);
@@ -92,9 +102,13 @@ export function BeerPicturesSection({
 
   const handleRemovePendingPhoto = useCallback(
     (photoId: string) => {
-      onPendingPhotosChange(pendingPhotos.filter((p) => p.id !== photoId));
+      const remaining = pendingPhotos.filter((p) => p.id !== photoId);
+      onPendingPhotosChange(remaining);
+      if (remaining.length === 0) {
+        onTaggedUserIdsChange?.([]);
+      }
     },
-    [pendingPhotos, onPendingPhotosChange],
+    [pendingPhotos, onPendingPhotosChange, onTaggedUserIdsChange],
   );
 
   return (
@@ -182,6 +196,15 @@ export function BeerPicturesSection({
           </Pressable>
         )}
       </HStack>
+
+      {pendingPhotos.length > 0 && festivalId && onTaggedUserIdsChange && (
+        <PhotoTagRow
+          festivalId={festivalId}
+          selectedUserIds={taggedUserIds}
+          onChange={onTaggedUserIdsChange}
+          disabled={disabled || isUploading}
+        />
+      )}
 
       {/* Error message */}
       {error && <Text className="text-sm text-error-600">{error.message}</Text>}

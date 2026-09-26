@@ -90,6 +90,7 @@ export function AttendanceTabContent({
   const [revisitError, setRevisitError] = useState<string | null>(null);
   const [photos, setPhotos] = useState<BeerPicture[]>([]);
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([]);
+  const [taggedUserIds, setTaggedUserIds] = useState<string[]>([]);
   const [photosMarkedForRemoval, setPhotosMarkedForRemoval] = useState<string[]>([]);
   const [selectedDrinkType, setSelectedDrinkType] = useState<DrinkType>("beer");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -238,6 +239,7 @@ export function AttendanceTabContent({
     reset(initialValues);
     setPhotos([]);
     setPendingPhotos([]);
+    setTaggedUserIds([]);
     setPhotosMarkedForRemoval([]);
     setLocalDrinkCounts({
       beer: 0,
@@ -336,6 +338,7 @@ export function AttendanceTabContent({
           tents: hasEditedTents ? data.tents : undefined,
           existingAttendanceId: existingAttendance?.id,
           pendingPhotos,
+          taggedUserIds,
           photosToDelete: photosMarkedForRemoval,
           localDrinkCounts,
           existingConsumptions: consumptions,
@@ -351,6 +354,7 @@ export function AttendanceTabContent({
       festivalId,
       existingAttendance,
       pendingPhotos,
+      taggedUserIds,
       photosMarkedForRemoval,
       saveAttendance,
       onSuccess,
@@ -562,6 +566,9 @@ export function AttendanceTabContent({
           onPendingPhotosChange={setPendingPhotos}
           onTogglePhotoRemoval={handleTogglePhotoRemoval}
           isUploading={isProcessing}
+          festivalId={festivalId}
+          taggedUserIds={taggedUserIds}
+          onTaggedUserIdsChange={setTaggedUserIds}
         />
 
         {/* Footer Buttons */}
