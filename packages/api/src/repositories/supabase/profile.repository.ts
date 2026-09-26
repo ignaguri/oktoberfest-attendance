@@ -54,7 +54,7 @@ export class SupabaseProfileRepository {
     const { data, error } = await this.supabase
       .from("profiles")
       .select(
-        "full_name, username, avatar_url, preferred_language, tip_mode, tip_fixed_amount, is_super_admin",
+        "id, full_name, username, avatar_url, preferred_language, tip_mode, tip_fixed_amount, is_super_admin",
       )
       .eq("id", userId)
       .single();

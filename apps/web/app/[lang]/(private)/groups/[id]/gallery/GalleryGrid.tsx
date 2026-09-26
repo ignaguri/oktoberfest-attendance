@@ -41,11 +41,11 @@ function extractFilePath(urlOrPath: string): string {
 
 import type { GalleryData } from "@/lib/types";
 
+import { ImageModal } from "./ImageModal";
+
 function toGalleryImageUrl(urlOrPath: string): string {
   return `/api/image/${encodeURIComponent(extractFilePath(urlOrPath))}?bucket=beer_pictures`;
 }
-
-import { ImageModal } from "./ImageModal";
 
 interface GalleryGridProps {
   galleryData: GalleryData;

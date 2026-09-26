@@ -27,6 +27,7 @@ export const ProfileSchema = z.object({
 export type Profile = z.infer<typeof ProfileSchema>;
 
 export const ProfileShortSchema = z.object({
+  id: z.string().uuid(),
   full_name: z.string().nullable(),
   username: z.string().nullable(),
   avatar_url: z.string().nullable(),

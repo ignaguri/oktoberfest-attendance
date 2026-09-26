@@ -14714,6 +14714,10 @@
                     "profile": {
                       "type": "object",
                       "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
                         "full_name": {
                           "type": "string",
                           "nullable": true
@@ -14757,6 +14761,7 @@
                         }
                       },
                       "required": [
+                        "id",
                         "full_name",
                         "username",
                         "avatar_url",

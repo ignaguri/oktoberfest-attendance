@@ -82,8 +82,9 @@ export function createGetBeerPictureUrl(config: ImageUrlConfig) {
     }
 
     // Build URL based on strategy
+    // The proxy route is a single [id] segment, so the nested path's slashes must be encoded
     if (config.strategy === "api-proxy") {
-      return `/api/image/${pictureUrl}?bucket=beer_pictures`;
+      return `/api/image/${encodeURIComponent(pictureUrl)}?bucket=beer_pictures`;
     }
 
     // direct-storage strategy
