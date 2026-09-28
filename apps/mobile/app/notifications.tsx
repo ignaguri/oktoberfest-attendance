@@ -1,4 +1,6 @@
 import type { Notification } from "@novu/js";
+import { useTrack } from "@prostcounter/shared/analytics/react";
+import type { NotificationPushType } from "@prostcounter/shared/constants";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Stack } from "expo-router";
 import { useCallback } from "react";
@@ -11,9 +13,19 @@ import { navigateToNotificationRoute } from "@/lib/notifications/handlers";
 export default function NotificationsScreen() {
   const { t } = useTranslation();
 
-  const handleNotificationPress = useCallback((notification: Notification) => {
-    navigateToNotificationRoute(notification.data ?? {});
-  }, []);
+  const track = useTrack();
+
+  const handleNotificationPress = useCallback(
+    (notification: Notification) => {
+      const data = notification.data ?? {};
+      track("notification_opened", {
+        type: (data as Record<string, unknown>).type as NotificationPushType,
+        channel: "inbox",
+      });
+      navigateToNotificationRoute(data);
+    },
+    [track],
+  );
 
   return (
     <View className="flex-1 bg-background-50">

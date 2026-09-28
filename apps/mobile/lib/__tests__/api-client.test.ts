@@ -210,3 +210,45 @@ describe("push permission header", () => {
     expect(headersOf(fetchMock, 1)).not.toHaveProperty("X-Client-Push-Permission");
   });
 });
+
+describe("events.record keepalive", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    getSession.mockReset();
+  });
+
+  it("never reuses a signed-out session's token", async () => {
+    getSession.mockResolvedValue({
+      data: {
+        session: { access_token: "tok-old", expires_at: Math.floor(Date.now() / 1000) + 3600 },
+      },
+    });
+    const fetchMock = await callFestivalsAndCaptureHeaders();
+    const { apiClient } = await import("../api-client");
+
+    // Signed out: the next request fails to get headers.
+    getSession.mockResolvedValue({ data: { session: null } });
+    await apiClient.festivals.list().catch(() => {});
+
+    await apiClient.events
+      .record(
+        {
+          events: [
+            {
+              name: "app_opened",
+              props: { source: "resume" },
+              occurredAt: new Date().toISOString(),
+              sessionId: "00000000-0000-4000-8000-000000000000",
+            },
+          ],
+        },
+        { keepalive: true },
+      )
+      .catch(() => {});
+
+    const eventCalls = fetchMock.mock.calls.filter(([url]) => String(url).includes("/v1/events"));
+    for (const [, init] of eventCalls) {
+      expect((init!.headers as Record<string, string>).Authorization).not.toBe("Bearer tok-old");
+    }
+  });
+});

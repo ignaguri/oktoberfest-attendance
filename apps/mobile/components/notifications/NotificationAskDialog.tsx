@@ -1,3 +1,4 @@
+import { useTrack } from "@prostcounter/shared/analytics/react";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Bell } from "lucide-react-native";
 import { View } from "react-native";
@@ -43,6 +44,7 @@ export function NotificationAskDialog({
   onNotNow,
 }: NotificationAskDialogProps) {
   const { t } = useTranslation();
+  const track = useTrack();
   const copyKey = CONTEXTUAL_ASK_COPY_KEY[trigger];
   const isDenied = permissionStatus === "denied";
   const primaryLabel = isDenied
@@ -56,6 +58,10 @@ export function NotificationAskDialog({
     <AlertDialog
       isOpen={isOpen}
       onClose={() => {
+        track("prompt_answered", {
+          prompt: "notification_ask",
+          answer: "dismissed",
+        });
         void onNotNow();
       }}
       size="md"
@@ -88,6 +94,10 @@ export function NotificationAskDialog({
           <Button
             className="w-full"
             onPress={() => {
+              track("prompt_answered", {
+                prompt: "notification_ask",
+                answer: "accepted",
+              });
               void onPrimary();
             }}
             accessibilityLabel={primaryLabel}
@@ -99,6 +109,10 @@ export function NotificationAskDialog({
             variant="link"
             className="w-full"
             onPress={() => {
+              track("prompt_answered", {
+                prompt: "notification_ask",
+                answer: "dismissed",
+              });
               void onNotNow();
             }}
             accessibilityLabel={t("notifications.ask.notNow")}

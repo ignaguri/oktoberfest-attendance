@@ -12,3 +12,6 @@ export * from "./constants";
 
 // Export utilities
 export * from "./utils";
+
+// Export usage event tracking (non-React)
+export * from "./analytics";

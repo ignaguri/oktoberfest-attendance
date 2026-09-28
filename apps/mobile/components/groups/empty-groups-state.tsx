@@ -8,6 +8,7 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
+import { TrackOnScreen } from "@/lib/analytics/TrackOnScreen";
 import { IconColors } from "@/lib/constants/colors";
 
 interface EmptyGroupsStateProps {
@@ -20,6 +21,7 @@ export function EmptyGroupsState({ onCreateGroup, onJoinGroup }: EmptyGroupsStat
 
   return (
     <View className="flex-1 px-4 pt-8">
+      <TrackOnScreen screens={["/groups"]} name="empty_state_seen" props={{ screen: "groups" }} />
       <Card size="lg" variant="elevated" className="bg-background-0">
         <VStack space="xl" className="items-center py-4">
           <Users size={64} color={IconColors.disabled} />

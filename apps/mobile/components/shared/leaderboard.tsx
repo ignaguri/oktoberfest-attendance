@@ -22,6 +22,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { TrackOnScreen } from "@/lib/analytics/TrackOnScreen";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
 
@@ -200,6 +201,11 @@ export function Leaderboard({
   if (entries.length === 0) {
     return (
       <Card variant="outline" size="md" className="items-center bg-white p-6">
+        <TrackOnScreen
+          screens={["/leaderboard", "/group-detail/[id]"]}
+          name="empty_state_seen"
+          props={{ screen: "leaderboard" }}
+        />
         <Trophy size={48} color={IconColors.disabled} />
         <Text className="mt-2 text-center text-typography-500">
           {emptyMessage || t("leaderboard.empty")}

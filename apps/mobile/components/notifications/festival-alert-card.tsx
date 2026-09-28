@@ -1,3 +1,4 @@
+import { useTrack } from "@prostcounter/shared/analytics/react";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useFestivalCountdown } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
@@ -18,6 +19,7 @@ import { usePushRegistration } from "@/lib/notifications/usePushRegistration";
 
 export function FestivalAlertCard() {
   const { t } = useTranslation();
+  const track = useTrack();
   const { currentFestival } = useFestival();
   const countdown = useFestivalCountdown(currentFestival);
   const { permissionStatus, isPermissionLoading, requestPermission } = useNotificationContextSafe();
@@ -58,6 +60,7 @@ export function FestivalAlertCard() {
   const isDenied = permissionStatus === "denied";
 
   const handleEnable = async () => {
+    track("prompt_answered", { prompt: "festival_alert", answer: "accepted" });
     if (isDenied) {
       if (Platform.OS === "ios") {
         Linking.openURL("app-settings:");
@@ -73,6 +76,7 @@ export function FestivalAlertCard() {
   };
 
   const handleDismiss = async () => {
+    track("prompt_answered", { prompt: "festival_alert", answer: "dismissed" });
     setDismissed(true);
     await setFestivalAlertDismissed(currentFestival.id);
   };

@@ -5,6 +5,7 @@
  * and coordinates the tutorial flow.
  */
 
+import { useTrack } from "@prostcounter/shared/analytics/react";
 import { useCallback, useEffect, useState } from "react";
 import { Modal } from "react-native";
 
@@ -26,6 +27,16 @@ export function TutorialOverlay() {
     previousStep,
     skipTutorial,
   } = useTutorial();
+  const track = useTrack();
+
+  // Keyed on the step id, not the step object, so a re-render never re-fires it
+  const currentStepId = currentStep?.id;
+  useEffect(() => {
+    if (!isActive || !currentStepId) {
+      return;
+    }
+    track("tutorial_step", { step: currentStepId, action: "viewed" });
+  }, [isActive, currentStepId, track]);
 
   const [targetMeasurement, setTargetMeasurement] = useState<TargetMeasurement | null>(null);
   const [isReady, setIsReady] = useState(false);
@@ -83,9 +94,12 @@ export function TutorialOverlay() {
   }, [isActive, currentStep, getTargetMeasurement]);
 
   const handleNext = useCallback(() => {
+    if (currentStep && currentStepIndex === totalSteps - 1) {
+      track("tutorial_step", { step: currentStep.id, action: "completed" });
+    }
     setIsReady(false);
     nextStep();
-  }, [nextStep]);
+  }, [nextStep, currentStep, currentStepIndex, totalSteps, track]);
 
   const handlePrevious = useCallback(() => {
     setIsReady(false);
@@ -93,9 +107,12 @@ export function TutorialOverlay() {
   }, [previousStep]);
 
   const handleSkip = useCallback(() => {
+    if (currentStep) {
+      track("tutorial_step", { step: currentStep.id, action: "skipped" });
+    }
     setIsReady(false);
     skipTutorial();
-  }, [skipTutorial]);
+  }, [skipTutorial, currentStep, track]);
 
   if (!isActive || !currentStep) {
     return null;

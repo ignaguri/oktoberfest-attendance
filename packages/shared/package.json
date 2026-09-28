@@ -18,7 +18,9 @@
     "./constants": "./src/constants/index.ts",
     "./contexts": "./src/contexts/index.ts",
     "./wrapped": "./src/wrapped/index.ts",
-    "./achievements": "./src/achievements/index.ts"
+    "./achievements": "./src/achievements/index.ts",
+    "./analytics": "./src/analytics/index.ts",
+    "./analytics/react": "./src/analytics/react.tsx"
   },
   "scripts": {
     "build": "tsc",
