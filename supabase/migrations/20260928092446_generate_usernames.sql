@@ -29,7 +29,7 @@ BEGIN
         translate(
           replace(lower(coalesce(v_source, '')), 'ß', 'ss'),
           'äöüéèêáàâíìóòôúùûñç',
-          'aoueeeaaaiioooouuunc'
+          'aoueeeaaaiiooouuunc'
         ),
         '[^a-z0-9]+', '_', 'g'
       ),
@@ -107,6 +107,9 @@ $$;
 
 -- Oldest accounts first so they get the cleanest handles. Each UPDATE is
 -- visible to the next generate_username call, which keeps the batch unique.
+-- The check in generate_username and the UPDATE are not atomic, so a username
+-- claimed in between (a user setting one by hand) would abort the whole
+-- migration. Retry with a fresh candidate instead; the last failure still raises.
 DO $$
 DECLARE
   r record;
@@ -118,10 +121,22 @@ BEGIN
     WHERE p.username IS NULL
     ORDER BY u.created_at
   LOOP
-    UPDATE public.profiles
-    SET username = public.generate_username(r.full_name, r.email),
-        updated_at = now()
-    WHERE id = r.id;
+    FOR attempt IN 1..3 LOOP
+      BEGIN
+        -- Re-check NULL: the profile may have been given a username since the
+        -- cursor read it, and that one must not be overwritten.
+        UPDATE public.profiles
+        SET username = public.generate_username(r.full_name, r.email),
+            updated_at = now()
+        WHERE id = r.id AND username IS NULL;
+        EXIT;
+      EXCEPTION
+        WHEN unique_violation THEN
+          IF attempt = 3 THEN
+            RAISE;
+          END IF;
+      END;
+    END LOOP;
   END LOOP;
 END;
 $$;
