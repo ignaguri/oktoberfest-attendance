@@ -17020,6 +17020,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "Events could not be written; the client may retry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
           }
         }
       }

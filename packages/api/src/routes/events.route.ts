@@ -12,9 +12,10 @@ import { eventRateLimiter } from "../services/event-rate-limiter";
 /**
  * Usage events from the apps (see packages/shared/src/analytics).
  *
- * Clients fire and forget: they never read this response, and a failure here
- * must never surface to a user. So invalid, rate-limited or unwritable events
- * are dropped and the route still answers 200 with how many were kept.
+ * Clients fire and forget: they never read this response body, and a failure
+ * here must never surface to a user. Invalid or rate-limited events are
+ * dropped and the route still answers 200 with how many were kept. A failed
+ * insert answers 503, so the tracker gives the batch its one retry.
  */
 const app = new OpenAPIHono<AuthContext>();
 
@@ -42,6 +43,10 @@ const recordEventsRoute = createRoute({
     },
     401: {
       description: "Unauthorized",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+    503: {
+      description: "Events could not be written; the client may retry",
       content: { "application/json": { schema: ApiErrorSchema } },
     },
   },
@@ -77,7 +82,16 @@ app.openapi(recordEventsRoute, async (c) => {
       },
       "Failed to record usage events",
     );
-    return c.json({ accepted: 0 }, 200);
+    return c.json(
+      {
+        error: {
+          message: "Failed to record events",
+          code: "EVENTS_NOT_RECORDED",
+          statusCode: 503,
+        },
+      },
+      503,
+    );
   }
 });
 

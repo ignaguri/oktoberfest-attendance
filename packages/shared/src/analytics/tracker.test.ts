@@ -131,6 +131,30 @@ describe("createTracker", () => {
     expect(send).toHaveBeenCalledTimes(2);
   });
 
+  it("keeps the retry of every batch rejected at the same time", async () => {
+    const rejections: ((error: unknown) => void)[] = [];
+    const send = vi.fn((): Promise<void> => {
+      if (rejections.length < 2) {
+        return new Promise<void>((_, reject) => {
+          rejections.push(reject);
+        });
+      }
+      return Promise.resolve();
+    });
+    const { tracker } = setup(send);
+    // The 20th event starts a normal send; the keepalive one overlaps it.
+    for (let i = 0; i < FLUSH_AT_SIZE; i++) {
+      tracker.track("app_opened", { source: "cold" });
+    }
+    tracker.track("screen_viewed", { screen: "/home" });
+    tracker.flush({ keepalive: true });
+    const serverDown = Object.assign(new Error("503"), { statusCode: 503 });
+    rejections.forEach((reject) => reject(serverDown));
+    await settle();
+    tracker.flush();
+    expect(sentBatches(send)[2]).toHaveLength(FLUSH_AT_SIZE + 1);
+  });
+
   it("keeps events queued through a long offline stretch", async () => {
     const offline = new TypeError("Network request failed");
     const send = vi.fn();

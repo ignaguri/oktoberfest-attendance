@@ -109,10 +109,12 @@ describe("POST /events", () => {
     expect(mockRpc).not.toHaveBeenCalled();
   });
 
-  it("answers 200 with accepted 0 when the insert fails", async () => {
+  it("answers 503 when the insert fails, so the tracker retries the batch", async () => {
     mockRpc.mockResolvedValue({ data: null, error: { message: "db down" } });
     const res = await app.request(post([screenEvent()]));
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ accepted: 0 });
+    expect(res.status).toBe(503);
+    expect(await res.json()).toMatchObject({
+      error: { code: "EVENTS_NOT_RECORDED", statusCode: 503 },
+    });
   });
 });

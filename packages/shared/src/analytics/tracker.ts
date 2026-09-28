@@ -84,7 +84,7 @@ export function createTracker(deps: TrackerDeps): Tracker & { queueSize(): numbe
     });
 
   let queue: TrackedEvent[] = [];
-  // At most one failed batch, waiting for its single retry.
+  // Events from rejected batches, waiting for their single retry.
   let retryBatch: TrackedEvent[] = [];
   let sessionId = deps.createSessionId();
   let pausedAtMs: number | null = null;
@@ -101,8 +101,8 @@ export function createTracker(deps: TrackerDeps): Tracker & { queueSize(): numbe
   }, FLUSH_INTERVAL_MS);
 
   function sendBatch(keepalive: boolean) {
-    const retrying = retryBatch;
-    retryBatch = [];
+    const retrying = retryBatch.slice(0, MAX_EVENTS_PER_BATCH);
+    retryBatch = retryBatch.slice(MAX_EVENTS_PER_BATCH);
     const fresh = queue.splice(0, Math.max(0, MAX_EVENTS_PER_BATCH - retrying.length));
     const batch = [...retrying, ...fresh];
     if (batch.length === 0) {
@@ -128,8 +128,9 @@ export function createTracker(deps: TrackerDeps): Tracker & { queueSize(): numbe
           }
           return;
         }
-        // `retrying` has now failed twice and is dropped; `fresh` gets its one retry.
-        retryBatch = fresh;
+        // `retrying` has now failed twice and is dropped; `fresh` gets its one
+        // retry. Appended, since a keepalive send can fail alongside another.
+        retryBatch = [...retryBatch, ...fresh];
       })
       .finally(() => {
         pendingSends--;
