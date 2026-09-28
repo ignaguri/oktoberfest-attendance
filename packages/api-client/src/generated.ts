@@ -5374,7 +5374,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/wrapped/{festivalId}": {
+    "/v1/wrapped": {
         parameters: {
             query?: never;
             header?: never;
@@ -5382,89 +5382,39 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get wrapped year-in-review data
-         * @description Returns cached wrapped statistics for a user and festival. Returns null if not yet generated.
+         * List the user's Wrapped archive
+         * @description Every festival the user attended whose Wrapped has unlocked, newest first.
          */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
-                path: {
-                    festivalId: string;
-                };
+                path?: never;
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description Wrapped data retrieved successfully */
+                /** @description Wrapped archive */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
                         "application/json": {
-                            wrapped: {
-                                /** Format: uuid */
-                                userId: string;
+                            festivals: {
                                 /** Format: uuid */
                                 festivalId: string;
-                                totalDays: number;
-                                totalBeers: number;
-                                totalSpent: number;
-                                avgBeersPerDay: number;
-                                favoriteTent: {
-                                    /** Format: uuid */
-                                    id: string;
-                                    name: string;
-                                    visitCount: number;
-                                } | null;
-                                topDrinkType: string | null;
-                                drinkStats?: {
-                                    totalDrinks: number;
-                                    topDrinkType: string | null;
-                                    breakdown: {
-                                        drinkType: string;
-                                        count: number;
-                                        percentage: number;
-                                    }[];
-                                };
-                                achievements: {
-                                    /** Format: uuid */
-                                    id: string;
-                                    name: string;
-                                    /** Format: date-time */
-                                    unlockedAt: string;
-                                }[];
-                                globalRank: number | null;
-                                groupRanks: {
-                                    /** Format: uuid */
-                                    groupId: string;
-                                    groupName: string;
-                                    rank: number;
-                                }[];
-                                /** Format: date */
-                                firstVisitDate: string | null;
-                                /** Format: date */
-                                lastVisitDate: string | null;
-                                longestStreak: number;
-                                /** Format: date-time */
-                                generatedAt: string;
-                            } | null;
-                            cached: boolean;
+                                name: string;
+                                startDate: string;
+                                endDate: string;
+                                unlocksAt: string;
+                                viewed: boolean;
+                            }[];
                         };
                     };
                 };
                 /** @description Unauthorized */
                 401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ApiError"];
-                    };
-                };
-                /** @description Festival not found */
-                404: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -5482,20 +5432,18 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/wrapped/{festivalId}/generate": {
+    "/v1/wrapped/{festivalId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
         /**
-         * Generate wrapped year-in-review data
-         * @description Generates or regenerates wrapped statistics for a user and festival. Set force=true to regenerate even if cached.
+         * Get wrapped year-in-review data
+         * @description status=ready with the data, status=locked with unlocksAt (00:00 festival time the day after it ends), or status=not_attended.
          */
-        post: {
+        get: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -5504,39 +5452,121 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        /** @default false */
-                        force?: boolean;
-                    };
-                };
-            };
+            requestBody?: never;
             responses: {
-                /** @description Wrapped data generated successfully */
+                /** @description Wrapped status and data */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
                         "application/json": {
+                            /** @enum {string} */
+                            status: "ready";
                             wrapped: {
-                                /** Format: uuid */
-                                userId: string;
-                                /** Format: uuid */
-                                festivalId: string;
-                                totalDays: number;
-                                totalBeers: number;
-                                totalSpent: number;
-                                avgBeersPerDay: number;
-                                favoriteTent: {
-                                    /** Format: uuid */
+                                userInfo: {
+                                    username: string | null;
+                                    fullName: string | null;
+                                    avatarUrl: string | null;
+                                };
+                                festivalInfo: {
+                                    name: string;
+                                    startDate: string;
+                                    endDate: string;
+                                    location: string | null;
+                                };
+                                basicStats: {
+                                    totalBeers: number;
+                                    daysAttended: number;
+                                    avgBeers: number;
+                                    totalSpent: number;
+                                    beerCost: number;
+                                };
+                                tentStats: {
+                                    uniqueTents: number;
+                                    favoriteTent: string | null;
+                                    tentDiversityPct: number;
+                                    tentBreakdown: {
+                                        tentName: string;
+                                        visitCount: number;
+                                    }[];
+                                };
+                                peakMoments: {
+                                    bestDay: {
+                                        date: string;
+                                        beerCount: number;
+                                        tentsVisited: number;
+                                        spent: number;
+                                    } | null;
+                                    maxSingleSession: number;
+                                    mostExpensiveDay: {
+                                        date: string;
+                                        amount: number;
+                                    } | null;
+                                };
+                                socialStats: {
+                                    groupsJoined: number;
+                                    topRankings: {
+                                        groupName: string;
+                                        position: number;
+                                    }[];
+                                    photosUploaded: number;
+                                    totalGroupMembers: number;
+                                    pictures: {
+                                        id: string;
+                                        pictureUrl: string;
+                                        createdAt: string;
+                                        attendanceDate: string;
+                                    }[];
+                                };
+                                globalLeaderboardPositions: {
+                                    daysAttended: number | null;
+                                    totalBeers: number | null;
+                                    avgBeers: number | null;
+                                };
+                                achievements: {
                                     id: string;
                                     name: string;
-                                    visitCount: number;
-                                } | null;
-                                topDrinkType: string | null;
-                                drinkStats?: {
+                                    description: string;
+                                    icon: string;
+                                    /** @enum {string} */
+                                    category: "consumption" | "attendance" | "explorer" | "social" | "competitive" | "special" | "drinking" | "dedication";
+                                    tier: number;
+                                    points: number;
+                                    rarity: string;
+                                    unlockedAt: string;
+                                }[];
+                                timeline: {
+                                    date: string;
+                                    beerCount: number;
+                                    spent: number;
+                                    tentsVisited: number;
+                                }[];
+                                comparisons: {
+                                    vsFestivalAvg: {
+                                        beersDiffPct: number;
+                                        daysDiffPct: number;
+                                        avgBeers: number;
+                                        avgDays: number;
+                                        medianBeers: number;
+                                        medianDays: number;
+                                        beersPercentile: number;
+                                        daysPercentile: number;
+                                    };
+                                    vsLastYear: {
+                                        beersDiff: number;
+                                        daysDiff: number;
+                                        spentDiff: number;
+                                        prevBeers: number;
+                                        prevDays: number;
+                                        prevFestivalName: string;
+                                    } | null;
+                                };
+                                personality: {
+                                    type: string;
+                                    traits: string[];
+                                };
+                                drinkStats: {
                                     totalDrinks: number;
                                     topDrinkType: string | null;
                                     breakdown: {
@@ -5545,29 +5575,14 @@ export interface paths {
                                         percentage: number;
                                     }[];
                                 };
-                                achievements: {
-                                    /** Format: uuid */
-                                    id: string;
-                                    name: string;
-                                    /** Format: date-time */
-                                    unlockedAt: string;
-                                }[];
-                                globalRank: number | null;
-                                groupRanks: {
-                                    /** Format: uuid */
-                                    groupId: string;
-                                    groupName: string;
-                                    rank: number;
-                                }[];
-                                /** Format: date */
-                                firstVisitDate: string | null;
-                                /** Format: date */
-                                lastVisitDate: string | null;
-                                longestStreak: number;
-                                /** Format: date-time */
-                                generatedAt: string;
                             };
-                            regenerated: boolean;
+                        } | {
+                            /** @enum {string} */
+                            status: "locked";
+                            unlocksAt: string;
+                        } | {
+                            /** @enum {string} */
+                            status: "not_attended";
                         };
                     };
                 };
@@ -5580,17 +5595,10 @@ export interface paths {
                         "application/json": components["schemas"]["ApiError"];
                     };
                 };
-                /** @description Festival not found or no data available */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ApiError"];
-                    };
-                };
             };
         };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5605,8 +5613,9 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Check wrapped access
-         * @description Checks if the user is allowed to access wrapped data for a specific festival.
+         * Check wrapped access (deprecated)
+         * @deprecated
+         * @description Kept for installed app versions. New clients read status from GET /wrapped/{festivalId}.
          */
         get: {
             parameters: {
@@ -5630,63 +5639,6 @@ export interface paths {
                             /** @enum {string} */
                             reason?: "not_ended" | "no_data" | "not_authenticated" | "error";
                             message?: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ApiError"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/wrapped/festivals": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get available wrapped festivals
-         * @description Returns a list of festivals for which wrapped data is available for the user.
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Available festivals list */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            festivals: {
-                                /** Format: uuid */
-                                id: string;
-                                name: string;
-                                year: number;
-                                status: string;
-                                hasData: boolean;
-                            }[];
                         };
                     };
                 };

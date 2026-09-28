@@ -10,6 +10,7 @@ import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
 } from "../../../__tests__/helpers/test-supabase";
+import { SupabaseWrappedRepository } from "../wrapped.repository";
 
 let admin: SupabaseClient<Database>;
 const suffix = randomUUID().slice(0, 8);
@@ -418,5 +419,25 @@ describe("admin regenerate", () => {
       p_festival_id: festivalId,
     });
     expect(count).toBe(0);
+  });
+});
+
+describe("repository against the real RPC", () => {
+  it("maps real get_wrapped_data output through the schema", async () => {
+    const user = await createSignedInUser("repo");
+    const festivalId = await createFestival(`Repo ${suffix} 2026`, isoDate(-10), isoDate(-2));
+    await attend(user.id, festivalId, isoDate(-3), 2);
+    const repo = new SupabaseWrappedRepository(user.client);
+
+    const status = await repo.getStatus(festivalId);
+    expect(status).toMatchObject({ isUnlocked: true, hasAttendance: true });
+    expect(status?.unlocksAt).toMatch(/Z$/);
+
+    const wrapped = await repo.getWrapped(user.id, festivalId);
+    expect(wrapped.basicStats.totalBeers).toBe(2);
+    expect(wrapped.drinkStats.breakdown[0]?.drinkType).toBe("beer");
+
+    const festivals = await repo.listFestivals();
+    expect(festivals.map((festival) => festival.festivalId)).toContain(festivalId);
   });
 });

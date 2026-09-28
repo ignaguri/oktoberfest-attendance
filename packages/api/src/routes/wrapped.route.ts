@@ -1,226 +1,118 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
-  GenerateWrappedResponseSchema,
-  GetAvailableWrappedFestivalsResponseSchema,
+  GetWrappedFestivalsResponseSchema,
   GetWrappedResponseSchema,
   RegenerateWrappedCacheBodySchema,
   RegenerateWrappedCacheResponseSchema,
   WrappedAccessResultSchema,
 } from "@prostcounter/shared";
 
+import { ApiErrorSchema } from "../lib/error-response";
 import type { AuthContext } from "../middleware/auth";
 import { SupabaseWrappedRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { WrappedService } from "../services/wrapped.service";
-import { ApiErrorSchema } from "../lib/error-response";
 
-// Create router
 const app = new OpenAPIHono<AuthContext>();
 
-// GET /wrapped/:festivalId - Get wrapped data
+const unauthorized = {
+  description: "Unauthorized",
+  content: { "application/json": { schema: ApiErrorSchema } },
+};
+
+const festivalParams = z.object({
+  festivalId: z.uuid({ error: "Invalid festival ID" }),
+});
+
+// GET /wrapped - every unlocked festival the user attended.
+// Registered before /wrapped/{festivalId} so the path is never read as an id.
+const listFestivalsRoute = createRoute({
+  method: "get",
+  path: "/wrapped",
+  tags: ["wrapped"],
+  summary: "List the user's Wrapped archive",
+  description: "Every festival the user attended whose Wrapped has unlocked, newest first.",
+  responses: {
+    200: {
+      description: "Wrapped archive",
+      content: { "application/json": { schema: GetWrappedFestivalsResponseSchema } },
+    },
+    401: unauthorized,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listFestivalsRoute, async (c) => {
+  const { supabase } = c.var;
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase));
+
+  const festivals = await wrappedService.listFestivals();
+
+  return c.json({ festivals }, 200);
+});
+
+// GET /wrapped/:festivalId - the Wrapped, or why it is not available
 const getWrappedRoute = createRoute({
   method: "get",
   path: "/wrapped/{festivalId}",
   tags: ["wrapped"],
   summary: "Get wrapped year-in-review data",
   description:
-    "Returns cached wrapped statistics for a user and festival. Returns null if not yet generated.",
-  request: {
-    params: z.object({
-      festivalId: z.uuid({ error: "Invalid festival ID" }),
-    }),
-  },
+    "status=ready with the data, status=locked with unlocksAt (00:00 festival time the day after it ends), or status=not_attended.",
+  request: { params: festivalParams },
   responses: {
     200: {
-      description: "Wrapped data retrieved successfully",
-      content: {
-        "application/json": {
-          schema: GetWrappedResponseSchema,
-        },
-      },
+      description: "Wrapped status and data",
+      content: { "application/json": { schema: GetWrappedResponseSchema } },
     },
-    401: {
-      description: "Unauthorized",
-      content: {
-        "application/json": {
-          schema: ApiErrorSchema,
-        },
-      },
-    },
-    404: {
-      description: "Festival not found",
-      content: {
-        "application/json": {
-          schema: ApiErrorSchema,
-        },
-      },
-    },
+    401: unauthorized,
   },
+  security: [{ bearerAuth: [] }],
 });
 
 app.openapi(getWrappedRoute, async (c) => {
   const { user, supabase } = c.var;
   const { festivalId } = c.req.valid("param");
-
-  const wrappedRepo = new SupabaseWrappedRepository(supabase);
-  const wrappedService = new WrappedService(wrappedRepo);
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase));
 
   const result = await wrappedService.getWrapped(user.id, festivalId);
 
-  // Evaluate-only: the unlock reaches the client through the outbox, not this
-  // response. Awaited so the outbox row exists before the client's next read.
-  await evaluateAfterWrite(supabase, user.id, festivalId, "GET /wrapped/{festivalId}");
+  if (result.status === "ready") {
+    // Evaluate-only: the unlock reaches the client through the outbox, not this
+    // response. Awaited so the outbox row exists before the client's next read.
+    await evaluateAfterWrite(supabase, user.id, festivalId, "GET /wrapped/{festivalId}");
+  }
 
   return c.json(result, 200);
 });
 
-// POST /wrapped/:festivalId/generate - Generate wrapped data
-const generateWrappedRoute = createRoute({
-  method: "post",
-  path: "/wrapped/{festivalId}/generate",
-  tags: ["wrapped"],
-  summary: "Generate wrapped year-in-review data",
-  description:
-    "Generates or regenerates wrapped statistics for a user and festival. Set force=true to regenerate even if cached.",
-  request: {
-    params: z.object({
-      festivalId: z.uuid({ error: "Invalid festival ID" }),
-    }),
-    body: {
-      content: {
-        "application/json": {
-          schema: z.object({
-            force: z.boolean().optional().default(false),
-          }),
-        },
-      },
-      required: false,
-    },
-  },
-  responses: {
-    200: {
-      description: "Wrapped data generated successfully",
-      content: {
-        "application/json": {
-          schema: GenerateWrappedResponseSchema,
-        },
-      },
-    },
-    401: {
-      description: "Unauthorized",
-      content: {
-        "application/json": {
-          schema: ApiErrorSchema,
-        },
-      },
-    },
-    404: {
-      description: "Festival not found or no data available",
-      content: {
-        "application/json": {
-          schema: ApiErrorSchema,
-        },
-      },
-    },
-  },
-});
-
-app.openapi(generateWrappedRoute, async (c) => {
-  const { user, supabase } = c.var;
-  const { festivalId } = c.req.valid("param");
-  const body = await c.req.json().catch(() => ({ force: false }));
-  const force = body.force || false;
-
-  const wrappedRepo = new SupabaseWrappedRepository(supabase);
-  const wrappedService = new WrappedService(wrappedRepo);
-
-  const result = await wrappedService.generateWrapped(user.id, festivalId, force);
-
-  return c.json(result, 200);
-});
-
-// GET /wrapped/:festivalId/access - Check if user can access wrapped
+// GET /wrapped/:festivalId/access - deprecated
 const checkAccessRoute = createRoute({
   method: "get",
   path: "/wrapped/{festivalId}/access",
   tags: ["wrapped"],
-  summary: "Check wrapped access",
-  description: "Checks if the user is allowed to access wrapped data for a specific festival.",
-  request: {
-    params: z.object({
-      festivalId: z.uuid({ error: "Invalid festival ID" }),
-    }),
-  },
+  summary: "Check wrapped access (deprecated)",
+  description: "Kept for installed app versions. New clients read status from GET /wrapped/{festivalId}.",
+  deprecated: true,
+  request: { params: festivalParams },
   responses: {
     200: {
       description: "Access check result",
-      content: {
-        "application/json": {
-          schema: WrappedAccessResultSchema,
-        },
-      },
+      content: { "application/json": { schema: WrappedAccessResultSchema } },
     },
-    401: {
-      description: "Unauthorized",
-      content: {
-        "application/json": {
-          schema: ApiErrorSchema,
-        },
-      },
-    },
+    401: unauthorized,
   },
   security: [{ bearerAuth: [] }],
 });
 
 app.openapi(checkAccessRoute, async (c) => {
-  const { user, supabase } = c.var;
+  const { supabase } = c.var;
   const { festivalId } = c.req.valid("param");
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase));
 
-  const wrappedRepo = new SupabaseWrappedRepository(supabase);
-  const wrappedService = new WrappedService(wrappedRepo);
-
-  const result = await wrappedService.checkAccess(user.id, festivalId);
+  const result = await wrappedService.checkAccessLegacy(festivalId);
 
   return c.json(result, 200);
-});
-
-// GET /wrapped/festivals - Get list of available wrapped festivals
-const getAvailableFestivalsRoute = createRoute({
-  method: "get",
-  path: "/wrapped/festivals",
-  tags: ["wrapped"],
-  summary: "Get available wrapped festivals",
-  description: "Returns a list of festivals for which wrapped data is available for the user.",
-  responses: {
-    200: {
-      description: "Available festivals list",
-      content: {
-        "application/json": {
-          schema: GetAvailableWrappedFestivalsResponseSchema,
-        },
-      },
-    },
-    401: {
-      description: "Unauthorized",
-      content: {
-        "application/json": {
-          schema: ApiErrorSchema,
-        },
-      },
-    },
-  },
-  security: [{ bearerAuth: [] }],
-});
-
-app.openapi(getAvailableFestivalsRoute, async (c) => {
-  const { user, supabase } = c.var;
-
-  const wrappedRepo = new SupabaseWrappedRepository(supabase);
-  const wrappedService = new WrappedService(wrappedRepo);
-
-  const festivals = await wrappedService.getAvailableFestivals(user.id);
-
-  return c.json({ festivals }, 200);
 });
 
 // POST /wrapped/regenerate - Admin function to regenerate wrapped cache
