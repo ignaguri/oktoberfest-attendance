@@ -23,6 +23,7 @@ import type { IPhotoRepository } from "../interfaces/photo.repository";
 export class SupabasePhotoRepository implements IPhotoRepository {
   private readonly BUCKET_NAME = "beer_pictures";
   private readonly UPLOAD_URL_EXPIRY = 60 * 5; // 5 minutes
+  private readonly STALE_UPLOAD_MS = 60 * 60 * 1000; // 1 hour, well past the URL expiry
 
   constructor(private supabase: SupabaseClient<Database>) {}
 
@@ -59,6 +60,14 @@ export class SupabasePhotoRepository implements IPhotoRepository {
         `Failed to generate upload URL: ${uploadError?.message || "Unknown error"}`,
       );
     }
+
+    // Failed attempts leave pending rows behind. Their upload URLs expired
+    // long ago, so clear them here instead of running a cleanup job.
+    await this.supabase
+      .from("photo_uploads")
+      .delete()
+      .eq("user_id", userId)
+      .lt("created_at", new Date(Date.now() - this.STALE_UPLOAD_MS).toISOString());
 
     // Only a pending upload for now: confirmUpload creates the beer_pictures
     // row once the file is in storage, so a failed upload never shows as a

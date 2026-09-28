@@ -95,6 +95,20 @@ describe("signed-URL photo upload (Local DB)", () => {
     expect(await pictureRow(pictureId)).toHaveLength(0);
   });
 
+  it("clears the user's stale pending uploads when a new one starts", async () => {
+    const { pictureId: stale } = await startUpload("stale.webp");
+    const { pictureId: recent } = await startUpload("recent.webp");
+    await admin
+      .from("photo_uploads")
+      .update({ created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() })
+      .eq("id", stale);
+
+    await startUpload("next.webp");
+
+    const { data } = await admin.from("photo_uploads").select("id").in("id", [stale, recent]);
+    expect(data?.map((row) => row.id)).toEqual([recent]);
+  });
+
   it("refuses to confirm an upload whose file never reached storage", async () => {
     const { pictureId } = await startUpload("never-uploaded.webp");
 
