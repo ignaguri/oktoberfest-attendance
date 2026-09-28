@@ -2179,6 +2179,7 @@ export type Database = {
       wrapped_data_cache: {
         Row: {
           created_at: string
+          data_version: number
           festival_id: string
           first_viewed_at: string | null
           generated_by: string
@@ -2189,6 +2190,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          data_version?: number
           festival_id: string
           first_viewed_at?: string | null
           generated_by?: string
@@ -2199,6 +2201,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          data_version?: number
           festival_id?: string
           first_viewed_at?: string | null
           generated_by?: string
@@ -2586,6 +2589,10 @@ export type Database = {
           username: string
         }[]
       }
+      generate_username: {
+        Args: { p_email: string; p_full_name: string }
+        Returns: string
+      }
       get_achievement_leaderboard: {
         Args: { p_festival_id: string }
         Returns: {
@@ -2778,6 +2785,25 @@ export type Database = {
         Args: { p_festival_id: string; p_user_id: string }
         Returns: Json
       }
+      get_wrapped_festivals: {
+        Args: never
+        Returns: {
+          end_date: string
+          festival_id: string
+          name: string
+          start_date: string
+          unlocks_at: string
+          viewed: boolean
+        }[]
+      }
+      get_wrapped_status: {
+        Args: { p_festival_id: string }
+        Returns: {
+          has_attendance: boolean
+          is_unlocked: boolean
+          unlocks_at: string
+        }[]
+      }
       invalidate_festival_wrapped_cache: {
         Args: { p_festival_id: string }
         Returns: number
@@ -2931,6 +2957,8 @@ export type Database = {
         Args: { session_uuid: string }
         Returns: boolean
       }
+      wrapped_data_version: { Args: never; Returns: number }
+      wrapped_unlocks_at: { Args: { p_festival_id: string }; Returns: string }
     }
     Enums: {
       achievement_category_enum:
