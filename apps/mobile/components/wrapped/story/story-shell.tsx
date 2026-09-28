@@ -1,0 +1,123 @@
+import { useTranslation } from "@prostcounter/shared/i18n";
+import {
+  initialStoryState,
+  revealDurationMs,
+  type StorySlide,
+  storyReducer,
+  WRAPPED_STORY_THEME,
+  type WrappedData,
+} from "@prostcounter/shared/wrapped";
+import { cn } from "@prostcounter/ui";
+import * as Haptics from "expo-haptics";
+import { X } from "lucide-react-native";
+import { useEffect, useReducer, useRef } from "react";
+import { Pressable, View } from "react-native";
+import { useReducedMotion } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { PaperBackground } from "./paper-background";
+import { StorySlideView } from "./story-slide";
+
+interface StoryShellProps {
+  data: WrappedData;
+  slides: StorySlide[];
+  onClose: () => void;
+}
+
+/**
+ * Tap-only story: left third goes back, the rest goes forward. The tap zones
+ * sit under the slide content, which ignores touches except on the last slide.
+ */
+export function StoryShell({ data, slides, onClose }: StoryShellProps) {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const reduceMotion = useReducedMotion();
+  const [state, dispatch] = useReducer(storyReducer, slides.length, initialStoryState);
+  const slide = slides[state.index];
+  const hasMoved = useRef(false);
+
+  useEffect(() => {
+    if (state.revealComplete) {
+      return;
+    }
+    if (reduceMotion) {
+      dispatch({ type: "revealDone" });
+      return;
+    }
+    const timerId = setTimeout(() => dispatch({ type: "revealDone" }), revealDurationMs(slide.revealSteps));
+    return () => clearTimeout(timerId);
+  }, [state.index, state.revealComplete, reduceMotion, slide.revealSteps]);
+
+  useEffect(() => {
+    if (!hasMoved.current) {
+      hasMoved.current = true;
+      return;
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, [state.index]);
+
+  const animate = !reduceMotion && !state.revealComplete;
+  const isLast = slide.kind === "prost";
+
+  return (
+    <View className="flex-1">
+      <PaperBackground />
+
+      <Pressable
+        className="absolute bottom-0 left-0 top-0 w-1/3"
+        onPress={() => dispatch({ type: "prev" })}
+        accessibilityRole="button"
+        accessibilityLabel={t("wrapped.story.a11y.prev")}
+        accessibilityHint={t("wrapped.story.a11y.prevHint")}
+      />
+      <Pressable
+        className="absolute bottom-0 right-0 top-0 w-2/3"
+        onPress={() => dispatch({ type: "next" })}
+        accessibilityRole="button"
+        accessibilityLabel={t("wrapped.story.a11y.next")}
+        accessibilityHint={t("wrapped.story.a11y.nextHint")}
+      />
+
+      <View
+        className="flex-1 px-6"
+        style={{ paddingTop: insets.top + 64, paddingBottom: insets.bottom + 24 }}
+        pointerEvents={isLast ? "box-none" : "none"}
+      >
+        <View key={`${state.index}-${animate ? "animating" : "done"}`} className="flex-1" pointerEvents="box-none">
+          <StorySlideView
+            slide={slide}
+            animate={animate}
+            data={data}
+            onReplay={() => dispatch({ type: "replay" })}
+            onClose={onClose}
+          />
+        </View>
+      </View>
+
+      <View
+        className="absolute left-4 right-4 flex-row gap-1"
+        style={{ top: insets.top + 12 }}
+        pointerEvents="none"
+        accessibilityLabel={t("wrapped.story.a11y.progress", { current: state.index + 1, total: slides.length })}
+      >
+        {slides.map((item, index) => (
+          <View
+            key={`${item.kind}-${index}`}
+            className={cn("h-1 flex-1 rounded-full", index <= state.index ? "bg-wrapped-ink" : "bg-wrapped-ink/20")}
+          />
+        ))}
+      </View>
+
+      <Pressable
+        onPress={onClose}
+        className="absolute right-3 rounded-full p-2"
+        style={{ top: insets.top + 22 }}
+        accessibilityRole="button"
+        accessibilityLabel={t("wrapped.close")}
+        accessibilityHint={t("wrapped.story.a11y.closeHint")}
+      >
+        <X size={24} color={WRAPPED_STORY_THEME.ink} />
+      </Pressable>
+    </View>
+  );
+}

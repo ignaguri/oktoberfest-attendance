@@ -33,8 +33,12 @@ export function StoryBig({ children, className }: TextProps) {
   );
 }
 
-export function StoryBody({ children, className }: TextProps) {
-  return <Text className={cn("text-lg leading-relaxed text-wrapped-ink", className)}>{children}</Text>;
+export function StoryBody({ children, className, numberOfLines }: TextProps & { numberOfLines?: number }) {
+  return (
+    <Text numberOfLines={numberOfLines} className={cn("text-lg leading-relaxed text-wrapped-ink", className)}>
+      {children}
+    </Text>
+  );
 }
 
 export function StoryNote({ children, className }: TextProps) {
