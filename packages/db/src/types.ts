@@ -2505,6 +2505,15 @@ export type Database = {
           wau: number
         }[]
       }
+      analytics_record_events: {
+        Args: {
+          p_app_version?: string
+          p_events: Json
+          p_platform?: string
+          p_user_id: string
+        }
+        Returns: number
+      }
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }
         Returns: number
