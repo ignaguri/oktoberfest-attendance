@@ -441,3 +441,17 @@ describe("repository against the real RPC", () => {
     expect(festivals.map((festival) => festival.festivalId)).toContain(festivalId);
   });
 });
+
+describe("unlock gate cannot be bypassed", () => {
+  it("does not let a signed-in user call get_wrapped_data directly", async () => {
+    const user = await createSignedInUser("bypass");
+    const festivalId = await createFestival(`Bypass ${suffix} 2099`, isoDate(-3), isoDate(1));
+    await attend(user.id, festivalId, isoDate(-1), 1);
+    const { data, error } = await user.client.rpc("get_wrapped_data", {
+      p_user_id: user.id,
+      p_festival_id: festivalId,
+    });
+    expect(data).toBeNull();
+    expect(error?.code).toBe("42501");
+  });
+});

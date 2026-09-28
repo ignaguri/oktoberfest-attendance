@@ -14,7 +14,11 @@ function WrappedPageContent() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const { currentFestival } = useFestival();
-  const { data: festivals, loading: festivalsLoading } = useWrappedFestivals();
+  const {
+    data: festivals,
+    loading: festivalsLoading,
+    error: festivalsError,
+  } = useWrappedFestivals();
   const festivalId = resolveWrappedFestivalId(
     searchParams.get("festivalId") ?? undefined,
     festivals,
@@ -24,6 +28,19 @@ function WrappedPageContent() {
 
   if (festivalsLoading || wrappedLoading) {
     return <WrappedLoading />;
+  }
+  if (festivalsError) {
+    return <WrappedError message={t("wrapped.loadError")} />;
+  }
+  // No link, no unlocked Wrapped and no current festival: nothing to open
+  if (!festivalId) {
+    return (
+      <WrappedError
+        title={t("wrapped.notAttended.title")}
+        message={t("wrapped.notAttended.description")}
+        emoji="🍺"
+      />
+    );
   }
   if (error || !result) {
     return <WrappedError message={t("wrapped.loadError")} />;

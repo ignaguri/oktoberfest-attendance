@@ -20,7 +20,11 @@ export default function WrappedScreen() {
   const insets = useSafeAreaInsets();
   const { festivalId: festivalIdParam } = useLocalSearchParams<{ festivalId?: string }>();
   const { currentFestival } = useFestival();
-  const { data: festivals, loading: festivalsLoading } = useWrappedFestivals();
+  const {
+    data: festivals,
+    loading: festivalsLoading,
+    error: festivalsError,
+  } = useWrappedFestivals();
   const festivalId = resolveWrappedFestivalId(festivalIdParam, festivals, currentFestival?.id);
   const { data: result, loading: wrappedLoading, error } = useWrapped(festivalId);
   const loading = festivalsLoading || wrappedLoading;
@@ -38,6 +42,21 @@ export default function WrappedScreen() {
           <Text className="text-base text-gray-600">{t("wrapped.loading")}</Text>
         </VStack>
       </View>
+    );
+  }
+
+  if (festivalsError) {
+    return <WrappedStateScreen title={t("wrapped.error")} onClose={handleClose} />;
+  }
+
+  // No link, no unlocked Wrapped and no current festival: nothing to open
+  if (!festivalId) {
+    return (
+      <WrappedStateScreen
+        title={t("wrapped.notAttended.title")}
+        description={t("wrapped.notAttended.description")}
+        onClose={handleClose}
+      />
     );
   }
 

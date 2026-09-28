@@ -6,6 +6,9 @@ import { DatabaseError, ForbiddenError } from "../../middleware/error";
 import type { IWrappedRepository, WrappedStatus } from "../interfaces/wrapped.repository";
 import { mapToWrappedData } from "./wrapped-mapper";
 
+const REGENERATE_CONCURRENCY = 4;
+const REGENERATE_PAGE_SIZE = 1000;
+
 export class SupabaseWrappedRepository implements IWrappedRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
@@ -104,6 +107,28 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
       throw new ForbiddenError("Insufficient permissions to regenerate cache");
     }
 
+    if (festivalId && userId) {
+      return this.regenerateOne(userId, festivalId);
+    }
+
+    // One RPC per (user, festival): the function computes every target in one
+    // statement, and the admin's JWT carries authenticated's 8s statement_timeout,
+    // so a whole festival in one call would time out at production size.
+    const targets = await this.listRegenerateTargets(festivalId, userId);
+    let regeneratedCount = 0;
+
+    for (let start = 0; start < targets.length; start += REGENERATE_CONCURRENCY) {
+      const batch = targets.slice(start, start + REGENERATE_CONCURRENCY);
+      const counts = await Promise.all(
+        batch.map((target) => this.regenerateOne(target.userId, target.festivalId)),
+      );
+      regeneratedCount += counts.reduce((sum, count) => sum + count, 0);
+    }
+
+    return regeneratedCount;
+  }
+
+  private async regenerateOne(userId: string, festivalId: string): Promise<number> {
     const { data: regeneratedCount, error } = await this.supabase.rpc(
       "regenerate_wrapped_data_cache",
       {
@@ -117,6 +142,51 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     }
 
     return regeneratedCount || 0;
+  }
+
+  /** Distinct (user, festival) pairs with an attendance. The RPC skips locked festivals. */
+  private async listRegenerateTargets(
+    festivalId?: string,
+    userId?: string,
+  ): Promise<{ userId: string; festivalId: string }[]> {
+    const targets = new Map<string, { userId: string; festivalId: string }>();
+
+    // Page until an empty page, advancing by the rows actually returned:
+    // PostgREST's max-rows cap can be smaller than the requested page.
+    let from = 0;
+    for (;;) {
+      let query = this.supabase.from("attendances").select("user_id, festival_id");
+      if (festivalId) {
+        query = query.eq("festival_id", festivalId);
+      }
+      if (userId) {
+        query = query.eq("user_id", userId);
+      }
+
+      const { data, error } = await query
+        .order("id")
+        .range(from, from + REGENERATE_PAGE_SIZE - 1);
+
+      if (error) {
+        throw new DatabaseError(`Failed to list wrapped regenerate targets: ${error.message}`);
+      }
+      if (!data || data.length === 0) {
+        break;
+      }
+
+      for (const row of data) {
+        if (!row.user_id || !row.festival_id) {
+          continue;
+        }
+        targets.set(`${row.user_id}:${row.festival_id}`, {
+          userId: row.user_id,
+          festivalId: row.festival_id,
+        });
+      }
+      from += data.length;
+    }
+
+    return [...targets.values()];
   }
 
   async isAdmin(userId: string): Promise<boolean> {

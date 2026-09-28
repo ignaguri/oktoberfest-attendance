@@ -29,6 +29,13 @@ describe("resolveWrappedFestivalId", () => {
     expect(resolveWrappedFestivalId("", [festival("a")], "c")).toBe("a");
   });
 
+  it("waits for the list instead of fetching the current festival first", () => {
+    // Otherwise the current festival is fetched (and, if unlocked, marked viewed)
+    // before the newest unlocked one replaces it.
+    expect(resolveWrappedFestivalId(undefined, undefined, "c")).toBeUndefined();
+    expect(resolveWrappedFestivalId(undefined, null, "c")).toBeUndefined();
+  });
+
   it("returns undefined while the list is still loading and nothing else is known", () => {
     expect(resolveWrappedFestivalId(undefined, undefined, undefined)).toBeUndefined();
   });

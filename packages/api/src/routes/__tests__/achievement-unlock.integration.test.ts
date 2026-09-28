@@ -872,14 +872,6 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     if (attendanceError) {
       throw new Error(`Failed to seed attendance: ${attendanceError.message}`);
     }
-    // Earn the attendance achievements up front, as logging the day would have.
-    // Unlocking one in the same pass as wrapped_viewed fires the
-    // user_achievements invalidation trigger, which deletes the cache row whose
-    // first_viewed_at get_achievement_metrics reads, before wrapped_viewed is checked.
-    await new AchievementService(new AchievementMetricsRepository(supabaseAdmin)).evaluateAndUnlock(
-      user.id,
-      festival.id,
-    );
 
     // A cached but never-viewed Wrapped. wrapped_viewed is read off
     // wrapped_data_cache.first_viewed_at (see get_achievement_metrics), which
