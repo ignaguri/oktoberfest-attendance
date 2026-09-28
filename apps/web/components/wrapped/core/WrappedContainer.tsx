@@ -5,6 +5,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/virtual";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
 import { useEffect, useMemo, useRef } from "react";
 import { Keyboard, Mousewheel, Pagination, Virtual } from "swiper/modules";
@@ -159,11 +160,13 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
  * Loading state component
  */
 export function WrappedLoading() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex h-screen items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50">
       <div className="flex flex-col items-center gap-4">
         <LoadingSpinner size={48} />
-        <p className="text-xl font-semibold text-gray-700">Preparing your wrapped...</p>
+        <p className="text-xl font-semibold text-gray-700">{t("wrapped.loading")}</p>
       </div>
     </div>
   );
@@ -172,13 +175,23 @@ export function WrappedLoading() {
 /**
  * Error state component
  */
-export function WrappedError({ message }: { message?: string }) {
+export function WrappedError({
+  title,
+  message,
+  emoji = "😕",
+}: {
+  title?: string;
+  message?: string;
+  emoji?: string;
+}) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50">
       <div className="max-w-md px-6 text-center">
-        <div className="mb-4 text-6xl">😕</div>
-        <h2 className="mb-2 text-2xl font-bold text-gray-800">Oops!</h2>
-        <p className="text-gray-600">{message || "Something went wrong loading your wrapped"}</p>
+        <div className="mb-4 text-6xl">{emoji}</div>
+        <h2 className="mb-2 text-2xl font-bold text-gray-800">{title ?? t("wrapped.errorTitle")}</h2>
+        <p className="text-gray-600">{message ?? t("wrapped.error")}</p>
       </div>
     </div>
   );

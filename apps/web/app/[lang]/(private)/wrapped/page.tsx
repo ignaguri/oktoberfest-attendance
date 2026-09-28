@@ -2,6 +2,7 @@
 
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useWrapped, useWrappedFestivals } from "@prostcounter/shared/hooks";
+import { formatLocalized } from "@prostcounter/shared/utils";
 import { resolveWrappedFestivalId } from "@prostcounter/shared/wrapped";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
@@ -27,9 +28,28 @@ function WrappedPageContent() {
   if (error || !result) {
     return <WrappedError message={t("wrapped.loadError")} />;
   }
-  if (result.status !== "ready") {
-    // Task 8 replaces this with the locked / not-attended views.
-    return <WrappedError message={t("wrapped.accessDenied")} />;
+  if (result.status === "locked") {
+    // Browser timezone is right: it is the same instant as 00:00 at the festival
+    const unlocksAt = new Date(result.unlocksAt);
+    return (
+      <WrappedError
+        title={t("wrapped.locked.title")}
+        message={t("wrapped.locked.description", {
+          date: formatLocalized(unlocksAt, "PPP"),
+          time: formatLocalized(unlocksAt, "p"),
+        })}
+        emoji="🔒"
+      />
+    );
+  }
+  if (result.status === "not_attended") {
+    return (
+      <WrappedError
+        title={t("wrapped.notAttended.title")}
+        message={t("wrapped.notAttended.description")}
+        emoji="🍺"
+      />
+    );
   }
   return <WrappedContainer data={result.wrapped} />;
 }

@@ -2500,6 +2500,7 @@
     "progress": "Schritt {{current}} von {{total}}"
   },
   "wrapped": {
+    "errorTitle": "Hoppla!",
     "locked": {
       "title": "Dein Rückblick ist unterwegs",
       "description": "Er wird am {{date}} um {{time}} Uhr freigeschaltet."
@@ -2509,7 +2510,7 @@
       "description": "Trag mindestens einen Tag auf einem Festival ein, um deinen Rückblick zu bekommen."
     },
     "title": "Dein Jahresrückblick",
-    "generating": "dein Rückblick wird erstellt...",
+    "generating": "Dein Rückblick wird erstellt...",
     "loading": "Lade deinen Rückblick...",
     "notAvailable": "Rückblick nicht verfügbar",
     "loadError": "Laden deines Rückblicks fehlgeschlagen",
@@ -2542,7 +2543,7 @@
       }
     },
     "numbers": {
-      "title": "dein Festival in Zahlen",
+      "title": "Dein Festival in Zahlen",
       "subtitle": "Das hast du erreicht",
       "totalBeers": "Getränke gesamt",
       "daysAttended": "Tage besucht",
@@ -2554,7 +2555,7 @@
     },
     "tentExplorer": {
       "title": "Zelt-Entdecker",
-      "subtitle": "deine Zeltabenteuer",
+      "subtitle": "Deine Zeltabenteuer",
       "uniqueTents": "Einzigartige Zelte",
       "diversity": "Zeltvielfalt",
       "favorite": "Lieblingszelt",
@@ -2564,7 +2565,7 @@
     },
     "peakMoment": {
       "title": "Höhepunkt",
-      "subtitle": "dein größter Tag",
+      "subtitle": "Dein größter Tag",
       "bestDay": "Bester Tag",
       "maxSession": "Maximum in einer Sitzung",
       "maxSessionDesc": "Meiste Maß in einer einzigen Sitzung",
@@ -2576,13 +2577,13 @@
     },
     "social": {
       "title": "Soziale Statistiken",
-      "subtitle": "deine Festival-Community",
+      "subtitle": "Deine Festival-Community",
       "groups": "Gruppen beigetreten",
       "photos": "Fotos hochgeladen",
       "friends": "Festival-Freunde"
     },
     "pictures": {
-      "title": "deine Momente",
+      "title": "Deine Momente",
       "subtitle": "Festgehaltene Erinnerungen",
       "count": "Du hast {{count}} Momente festgehalten",
       "count_one": "Du hast {{count}} Moment festgehalten"
@@ -2593,9 +2594,9 @@
       "totalPoints": "Gesamtpunkte"
     },
     "personalitySlide": {
-      "title": "deine Festival-Persönlichkeit",
+      "title": "Deine Festival-Persönlichkeit",
       "subtitle": "Basierend auf deinem Verhalten",
-      "traits": "deine Eigenschaften"
+      "traits": "Deine Eigenschaften"
     },
     "personalityTypes": {
       "Explorer": "Entdecker",
@@ -2624,7 +2625,7 @@
       "Light Drinker": "Leichttrinker"
     },
     "rankings": {
-      "title": "deine Platzierungen",
+      "title": "Deine Platzierungen",
       "subtitle": "Wie du abgeschnitten hast",
       "groupRankings": "Gruppenrankings",
       "globalRankings": "Globale Position"
@@ -2641,9 +2642,11 @@
       "days": "Tage"
     },
     "outro": {
+      "shareHint": "Erstelle eine teilbare Zusammenfassung deines Festivals",
+      "madeWith": "Mit ❤️ und etwas 🍺 gemacht von ProstCounter",
       "title": "Danke für die Erinnerungen!",
       "subtitle": "Bis nächstes Jahr",
-      "share": "deinen Rückblick teilen",
+      "share": "Deinen Rückblick teilen",
       "sharing": "Erstelle dein Teilbild...",
       "summary": {
         "beers": "{{count}} Maß",
@@ -2690,11 +2693,11 @@
     },
     "cta": {
       "preparingFooter": "Vergiss nicht, deinen letzten Tag einzutragen! 📝",
-      "ready": "dein Rückblick ist fertig!",
-      "preparing": "dein Festival wird zusammengefasst!",
+      "ready": "Dein Rückblick ist fertig!",
+      "preparing": "Dein Festival wird zusammengefasst!",
       "readyDescription": "Siehe deine personalisierte {{festivalName}}-Geschichte",
       "preparingDescription": "Wir bereiten deine personalisierte {{festivalName}}-Geschichte vor. Lade deine letzte Teilnahme hoch!",
-      "viewButton": "deinen Rückblick ansehen"
+      "viewButton": "Deinen Rückblick ansehen"
     },
     "intro": {
       "title": "Festival-Rückblick",
@@ -3081,10 +3084,10 @@
     },
     "festivalOver": "Leider ist das {{name}} vorbei. Bis zum nächsten Mal!",
     "wrappedReady": {
-      "title": "dein Rückblick ist fertig!",
+      "title": "Dein Rückblick ist fertig!",
       "subtitle": "Siehe deine personalisierte {{name}}-Geschichte",
-      "viewButton": "deinen Rückblick ansehen",
-      "footer": "deine Festival-Highlights, Statistiken und Persönlichkeit 🎉"
+      "viewButton": "Deinen Rückblick ansehen",
+      "footer": "Deine Festival-Highlights, Statistiken und Persönlichkeit 🎉"
     },
     "latestActivities": "Neueste Aktivitäten",
     "refreshFeed": "Aktivitäts-Feed aktualisieren",

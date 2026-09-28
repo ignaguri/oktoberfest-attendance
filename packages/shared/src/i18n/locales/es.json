@@ -2323,6 +2323,7 @@
     "progress": "Paso {{current}} de {{total}}"
   },
   "wrapped": {
+    "errorTitle": "¡Uy!",
     "locked": {
       "title": "Tu resumen está en camino",
       "description": "Se desbloquea el {{date}} a las {{time}}."
@@ -2476,6 +2477,8 @@
       "days": "Días"
     },
     "outro": {
+      "shareHint": "Generá un resumen para compartir de tu festival",
+      "madeWith": "Hecho con ❤️ y algo de 🍺 por ProstCounter",
       "title": "¡Gracias por los recuerdos!",
       "subtitle": "Nos vemos el año que viene",
       "share": "Compartir Tu Wrapped",

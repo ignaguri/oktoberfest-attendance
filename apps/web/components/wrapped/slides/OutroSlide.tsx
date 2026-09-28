@@ -2,7 +2,7 @@
 
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import { Beer, Download, Heart, HeartHandshake } from "lucide-react";
+import { Download, HeartHandshake } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
@@ -65,14 +65,11 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
           {t("wrapped.outro.share")}
         </Button>
         <p className="text-muted-foreground text-xs">
-          Click to generate a shareable summary of your festival experience
+          {t("wrapped.outro.shareHint")}
         </p>
 
         <div className="mt-2 text-center text-sm text-gray-500">
-          <p className="flex items-center gap-1">
-            Made with <Heart className="size-4" /> and some <Beer className="size-4" /> by
-            ProstCounter
-          </p>
+          <p>{t("wrapped.outro.madeWith")}</p>
         </div>
       </div>
     </BaseSlide>

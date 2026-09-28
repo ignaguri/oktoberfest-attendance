@@ -2263,6 +2263,7 @@
     "progress": "Step {{current}} of {{total}}"
   },
   "wrapped": {
+    "errorTitle": "Oops!",
     "locked": {
       "title": "Your Wrapped is on its way",
       "description": "It unlocks on {{date}} at {{time}}."
@@ -2416,6 +2417,8 @@
       "days": "Days"
     },
     "outro": {
+      "shareHint": "Generate a shareable summary of your festival",
+      "madeWith": "Made with ❤️ and some 🍺 by ProstCounter",
       "title": "Thanks for the memories!",
       "subtitle": "See you next year",
       "share": "Share Your Wrapped",
