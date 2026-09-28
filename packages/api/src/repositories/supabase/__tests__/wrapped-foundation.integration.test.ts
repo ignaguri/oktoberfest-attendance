@@ -324,13 +324,50 @@ describe("cache invalidation", () => {
   let festivalB: string;
   let attendanceA: string;
   let attendanceB: string;
+  let otherUser: Awaited<ReturnType<typeof createSignedInUser>>;
 
   beforeAll(async () => {
     user = await createSignedInUser("inval");
+    otherUser = await createSignedInUser("inval-other");
     festivalA = await createFestival(`InvalA ${suffix} 2026`, isoDate(-10), isoDate(-2));
     festivalB = await createFestival(`InvalB ${suffix} 2026`, isoDate(-10), isoDate(-2));
     attendanceA = await attend(user.id, festivalA, isoDate(-3), 0);
     attendanceB = await attend(user.id, festivalB, isoDate(-3), 0);
+    await attend(otherUser.id, festivalA, isoDate(-4), 1);
+  });
+
+  // Every attendee's Wrapped carries festival-wide numbers (vs festival
+  // average, global positions, group rankings), so one person's late drink
+  // makes everyone's cached row stale, not only their own.
+  it("drops other attendees' rows when a consumption is inserted", async () => {
+    await seedCacheRow(otherUser.id, festivalA);
+    await admin.from("consumptions").insert({
+      attendance_id: attendanceA,
+      drink_type: "beer",
+      base_price_cents: 1500,
+      price_paid_cents: 1500,
+      recorded_at: `${isoDate(-3)}T12:00:00Z`,
+    });
+    expect(await cacheRow(otherUser.id, festivalA)).toBeNull();
+  });
+
+  it("drops other attendees' rows when an attendance is added", async () => {
+    await seedCacheRow(otherUser.id, festivalA);
+    await attend(user.id, festivalA, isoDate(-5), 0);
+    expect(await cacheRow(otherUser.id, festivalA)).toBeNull();
+  });
+
+  it("keeps rows of other festivals when a consumption changes", async () => {
+    await attend(otherUser.id, festivalB, isoDate(-4), 0);
+    await seedCacheRow(otherUser.id, festivalB);
+    await admin.from("consumptions").insert({
+      attendance_id: attendanceA,
+      drink_type: "beer",
+      base_price_cents: 1500,
+      price_paid_cents: 1500,
+      recorded_at: `${isoDate(-3)}T12:00:00Z`,
+    });
+    expect(await cacheRow(otherUser.id, festivalB)).not.toBeNull();
   });
 
   it("drops the row when a consumption is inserted", async () => {

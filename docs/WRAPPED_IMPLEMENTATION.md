@@ -32,12 +32,12 @@ Super admins see locked festivals as unlocked (preview). The preview is computed
 
 **Any migration that changes `get_wrapped_data` output must bump `wrapped_data_version()`.** Otherwise old shapes stay cached forever.
 
-These triggers delete the affected rows:
+These triggers delete the affected rows. Attendances and consumptions drop the whole festival's rows, because every attendee's Wrapped carries festival-wide numbers (average, global positions, group rankings); the rest drop only the owner's:
 
 | Table | When |
 |---|---|
-| `attendances` | any change |
-| `consumptions` | insert, update (both old and new attendance), delete |
+| `attendances` | any change (every row of the festival; both festivals on a move) |
+| `consumptions` | insert, update, delete (every row of the festival; both festivals on a move) |
 | `tent_visits` | any change |
 | `beer_pictures` | insert, delete |
 | `user_achievements` | any change |
