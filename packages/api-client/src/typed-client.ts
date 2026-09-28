@@ -11,6 +11,7 @@ import type {
   AddAllAdminFestivalTentsInput,
   AdminAttendance,
   AdminFestival,
+  AdminFestivalOfficialStats,
   AdminFestivalTent,
   AdminFestivalTentStats,
   AdminGroup,
@@ -98,6 +99,7 @@ import type {
   TutorialStatus,
   UpdateAdminAttendanceInput,
   UpdateAdminFestivalInput,
+  UpdateAdminFestivalOfficialStatsInput,
   UpdateAdminGroupInput,
   UpdateAdminTentInput,
   UpdateAdminUserAuthInput,
@@ -3083,6 +3085,35 @@ export function createTypedApiClient(config: ApiClientConfig) {
             await extractApiError(response, "Failed to update festival");
           }
           return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async getOfficialStats(festivalId: string): Promise<{ stats: AdminFestivalOfficialStats | null }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/official-stats`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch official stats");
+          }
+          return parseJsonResponse<{ stats: AdminFestivalOfficialStats | null }>(response);
+        },
+
+        async updateOfficialStats(
+          festivalId: string,
+          data: UpdateAdminFestivalOfficialStatsInput,
+        ): Promise<{ stats: AdminFestivalOfficialStats }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PUT",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/official-stats`,
+            { method: "PUT", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to save official stats");
+          }
+          return parseJsonResponse<{ stats: AdminFestivalOfficialStats }>(response);
         },
 
         async delete(festivalId: string): Promise<{ success: boolean }> {

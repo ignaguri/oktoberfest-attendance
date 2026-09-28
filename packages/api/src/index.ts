@@ -9,6 +9,7 @@ import { requireAdmin } from "./middleware/require-admin";
 import achievementRoute from "./routes/achievement.route";
 import adminRoute from "./routes/admin.route";
 import adminAnalyticsRoute from "./routes/admin-analytics.route";
+import adminOfficialStatsRoute from "./routes/admin-official-stats.route";
 import activityFeedRoute from "./routes/activity-feed.route";
 import attendanceRoute from "./routes/attendance.route";
 import calendarRoute from "./routes/calendar.route";
@@ -95,6 +96,7 @@ apiV1.route("/", activityFeedRoute);
 apiV1.route("/", crowdReportRoute);
 apiV1.route("/", feedbackRoute);
 apiV1.route("/", adminRoute);
+apiV1.route("/", adminOfficialStatsRoute);
 apiV1.route("/", adminAnalyticsRoute);
 
 // Mount v1 routes under /v1 prefix

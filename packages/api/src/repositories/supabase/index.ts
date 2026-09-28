@@ -16,6 +16,7 @@ export * from "./group.repository";
 export * from "./leaderboard.repository";
 export * from "./location.repository";
 export * from "./notification.repository";
+export * from "./official-stats.repository";
 export * from "./photo.repository";
 export * from "./profile.repository";
 export * from "./reservation.repository";

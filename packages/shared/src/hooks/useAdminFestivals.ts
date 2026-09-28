@@ -9,8 +9,10 @@
 import { QueryKeys, useApiClient, useInvalidateQueries, useMutation, useQuery } from "../data";
 import type {
   AdminFestival,
+  AdminFestivalOfficialStats,
   CreateAdminFestivalInput,
   UpdateAdminFestivalInput,
+  UpdateAdminFestivalOfficialStatsInput,
 } from "../schemas/admin.schema";
 
 /**
@@ -126,4 +128,47 @@ export function useDeleteAdminFestival() {
       invalidateQueries(QueryKeys.adminFestivals());
     },
   });
+}
+
+/** Hook to fetch a festival's official stats (Wiesn-Bilanz) for the admin form. */
+export function useAdminFestivalOfficialStats(festivalId?: string) {
+  const apiClient = useApiClient();
+
+  const query = useQuery<AdminFestivalOfficialStats | null>(
+    QueryKeys.adminFestivalOfficialStats(festivalId ?? ""),
+    async () => {
+      if (!festivalId) return null;
+      const response = await apiClient.admin.festivals.getOfficialStats(festivalId);
+      return response.stats;
+    },
+    {
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      enabled: !!festivalId,
+    },
+  );
+
+  return {
+    stats: query.data ?? null,
+    isLoading: query.loading,
+    error: query.error?.message || null,
+    refetch: query.refetch,
+  };
+}
+
+/** Hook to save a festival's official stats. Open Wrapped reads refetch them. */
+export function useUpdateAdminFestivalOfficialStats() {
+  const apiClient = useApiClient();
+  const invalidateQueries = useInvalidateQueries();
+
+  return useMutation(
+    async ({ festivalId, data }: { festivalId: string; data: UpdateAdminFestivalOfficialStatsInput }) =>
+      apiClient.admin.festivals.updateOfficialStats(festivalId, data),
+    {
+      onSuccess: (_result, variables) => {
+        invalidateQueries(QueryKeys.adminFestivalOfficialStats(variables.festivalId));
+        invalidateQueries(QueryKeys.wrappedAll());
+      },
+    },
+  );
 }

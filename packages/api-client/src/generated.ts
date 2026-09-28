@@ -5552,6 +5552,7 @@ export interface paths {
                                         medianDays: number;
                                         beersPercentile: number;
                                         daysPercentile: number;
+                                        attendeeCount: number;
                                     };
                                     vsLastYear: {
                                         beersDiff: number;
@@ -5575,7 +5576,28 @@ export interface paths {
                                         percentage: number;
                                     }[];
                                 };
+                                timing: {
+                                    timedDays: number;
+                                    medianFirstHour: number | null;
+                                    medianLastHour: number | null;
+                                    peakHour: number | null;
+                                    weekendShare: number | null;
+                                };
                             };
+                            officialStats: {
+                                year: number;
+                                isCurrentFestival: boolean;
+                                visitors: number | null;
+                                massServed: number | null;
+                                mugsConfiscated: number | null;
+                                lostItems: number | null;
+                                curiousFinds: {
+                                    de: string;
+                                    en: string;
+                                    es: string;
+                                }[];
+                                sourceUrl: string | null;
+                            } | null;
                         } | {
                             /** @enum {string} */
                             status: "locked";
@@ -12214,6 +12236,152 @@ export interface paths {
             };
         };
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/festivals/{festivalId}/official-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a festival's official stats (admin) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Official stats, or null when none are stored */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            stats: {
+                                /** Format: uuid */
+                                festivalId: string;
+                                visitors: number | null;
+                                massServed: number | null;
+                                mugsConfiscated: number | null;
+                                lostItems: number | null;
+                                curiousFinds: {
+                                    de: string;
+                                    en: string;
+                                    es: string;
+                                }[];
+                                /** Format: uri */
+                                sourceUrl: string | null;
+                                updatedAt: string | null;
+                            } | null;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        /** Save a festival's official stats (admin) */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    festivalId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        visitors: number | null;
+                        massServed: number | null;
+                        mugsConfiscated: number | null;
+                        lostItems: number | null;
+                        curiousFinds: {
+                            de: string;
+                            en: string;
+                            es: string;
+                        }[];
+                        /** Format: uri */
+                        sourceUrl: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Official stats saved */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            stats: {
+                                /** Format: uuid */
+                                festivalId: string;
+                                visitors: number | null;
+                                massServed: number | null;
+                                mugsConfiscated: number | null;
+                                lostItems: number | null;
+                                curiousFinds: {
+                                    de: string;
+                                    en: string;
+                                    es: string;
+                                }[];
+                                /** Format: uri */
+                                sourceUrl: string | null;
+                                updatedAt: string | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;

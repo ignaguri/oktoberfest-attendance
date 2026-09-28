@@ -9,7 +9,7 @@ import {
 
 import { ApiErrorSchema } from "../lib/error-response";
 import type { AuthContext } from "../middleware/auth";
-import { SupabaseWrappedRepository } from "../repositories/supabase";
+import { SupabaseOfficialStatsRepository, SupabaseWrappedRepository } from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
 import { WrappedService } from "../services/wrapped.service";
 
@@ -44,7 +44,7 @@ const listFestivalsRoute = createRoute({
 
 app.openapi(listFestivalsRoute, async (c) => {
   const { supabase } = c.var;
-  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase));
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase), new SupabaseOfficialStatsRepository(supabase));
 
   const festivals = await wrappedService.listFestivals();
 
@@ -73,7 +73,7 @@ const getWrappedRoute = createRoute({
 app.openapi(getWrappedRoute, async (c) => {
   const { user, supabase } = c.var;
   const { festivalId } = c.req.valid("param");
-  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase));
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase), new SupabaseOfficialStatsRepository(supabase));
 
   const { result, viewRecorded } = await wrappedService.getWrapped(user.id, festivalId);
 
@@ -108,7 +108,7 @@ const checkAccessRoute = createRoute({
 app.openapi(checkAccessRoute, async (c) => {
   const { supabase } = c.var;
   const { festivalId } = c.req.valid("param");
-  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase));
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase), new SupabaseOfficialStatsRepository(supabase));
 
   const result = await wrappedService.checkAccessLegacy(festivalId);
 
@@ -175,7 +175,7 @@ app.openapi(regenerateCacheRoute, async (c) => {
   }
 
   const wrappedRepo = new SupabaseWrappedRepository(supabase);
-  const wrappedService = new WrappedService(wrappedRepo);
+  const wrappedService = new WrappedService(wrappedRepo, new SupabaseOfficialStatsRepository(supabase));
 
   const result = await wrappedService.regenerateCache(user.id, body.festivalId, body.userId);
 

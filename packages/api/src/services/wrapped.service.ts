@@ -2,16 +2,26 @@ import type {
   GetWrappedResponse,
   WrappedAccessResult,
   WrappedFestival,
+  WrappedOfficialStats,
 } from "@prostcounter/shared";
 
+import { logger } from "../lib/logger";
 import type { IWrappedRepository } from "../repositories/interfaces";
+
+/** The one official-stats method Wrapped needs (SupabaseOfficialStatsRepository). */
+export interface OfficialStatsReader {
+  getForWrapped(festivalId: string): Promise<WrappedOfficialStats | null>;
+}
 
 /**
  * Wrapped year-in-review. SQL decides when a festival unlocks; this turns the
  * caller's status into one of three responses and records the view.
  */
 export class WrappedService {
-  constructor(private wrappedRepo: IWrappedRepository) {}
+  constructor(
+    private wrappedRepo: IWrappedRepository,
+    private officialStatsRepo: OfficialStatsReader,
+  ) {}
 
   /**
    * viewRecorded is false for a super admin's preview of a locked festival:
@@ -39,7 +49,9 @@ export class WrappedService {
       await this.wrappedRepo.markViewed(userId, festivalId);
     }
 
-    return { result: { status: "ready", wrapped, officialStats: null }, viewRecorded: !isPreview };
+    const officialStats = await this.readOfficialStats(festivalId);
+
+    return { result: { status: "ready", wrapped, officialStats }, viewRecorded: !isPreview };
   }
 
   async listFestivals(): Promise<WrappedFestival[]> {
@@ -73,5 +85,18 @@ export class WrappedService {
     const regeneratedCount = await this.wrappedRepo.regenerateCache(adminUserId, festivalId, userId);
 
     return { success: true, regeneratedCount };
+  }
+
+  /** Missing stats only drop two slides, so a failed read never blocks the Wrapped. */
+  private async readOfficialStats(festivalId: string): Promise<WrappedOfficialStats | null> {
+    try {
+      return await this.officialStatsRepo.getForWrapped(festivalId);
+    } catch (error) {
+      logger.error(
+        { festivalId, error: error instanceof Error ? error.message : String(error) },
+        "Official stats read failed; serving Wrapped without them",
+      );
+      return null;
+    }
   }
 }

@@ -229,10 +229,12 @@ export {
 } from "./useAdminLocation";
 export {
   useAdminFestival,
+  useAdminFestivalOfficialStats,
   useAdminFestivals,
   useCreateAdminFestival,
   useDeleteAdminFestival,
   useUpdateAdminFestival,
+  useUpdateAdminFestivalOfficialStats,
 } from "./useAdminFestivals";
 export {
   useAdminGroup,

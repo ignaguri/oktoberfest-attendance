@@ -178,6 +178,8 @@ export class QueryKeys {
    * still showing its Active badge.
    */
   static adminFestivalAll = () => ["admin", "festival"] as const;
+  static adminFestivalOfficialStats = (festivalId: string) =>
+    ["admin", "festival", festivalId, "official-stats"] as const;
   static adminGroups = () => ["admin", "groups"] as const;
   static adminGroup = (groupId: string) => ["admin", "group", groupId] as const;
   static adminGroupMembers = (groupId: string) => ["admin", "group", groupId, "members"] as const;
