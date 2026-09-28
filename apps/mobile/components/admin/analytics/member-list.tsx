@@ -40,7 +40,8 @@ export function MemberList({ members, showFestival, onOpen }: MemberListProps) {
           >
             <Text className="text-typography-900">
               {name}
-              {member.username ? (
+              {/* The handle adds nothing when it is already the displayed name */}
+              {member.fullName && member.username && member.username !== member.fullName ? (
                 <Text className="text-typography-500">{`  @${member.username}`}</Text>
               ) : null}
             </Text>

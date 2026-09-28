@@ -15,7 +15,11 @@ import {
   type AnalyticsMembersResponse,
   type AnalyticsScorecardSegment,
 } from "@prostcounter/shared/schemas";
-import { cohortStepCount, scorecardSegmentCount } from "@prostcounter/shared/utils";
+import {
+  cohortStepCount,
+  cohortStepLabelKey,
+  scorecardSegmentCount,
+} from "@prostcounter/shared/utils";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { type ReactNode, useState } from "react";
 
@@ -140,14 +144,14 @@ function CohortMembers({ target }: { target: CohortTarget }) {
 
   return (
     <MembersBody
-      label={`${target.month.slice(0, 7)} · ${t(`admin.analytics.members.cohortSteps.${step}`)}`}
+      label={`${target.month.slice(0, 7)} · ${t(cohortStepLabelKey(step))}`}
       count={row ? cohortStepCount(row, step) : 0}
       chips={
         <HStack space="sm" className="flex-wrap">
           {ANALYTICS_COHORT_STEPS.map((value) => (
             <Chip
               key={value}
-              label={t(`admin.analytics.members.cohortSteps.${value}`)}
+              label={t(cohortStepLabelKey(value))}
               selected={value === step}
               onPress={() => setStep(value)}
               accessibilityHint={t("admin.analytics.members.chipHint")}

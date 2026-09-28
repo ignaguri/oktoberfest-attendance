@@ -9,6 +9,7 @@ import {
   ANALYTICS_TIMELINE_ACTIONS,
   ANALYTICS_TIMELINE_KINDS,
 } from "../../schemas/admin-analytics.schema";
+import { cohortStepLabelKey } from "../../utils/analytics-drilldown";
 import { ANALYTICS_RANGE_PRESETS } from "../../utils/analytics-metrics";
 import { SCORECARD_HINTS } from "../../utils/analytics-scorecard";
 import de from "../locales/de.json";
@@ -44,7 +45,7 @@ const DYNAMIC_KEYS = [
   ...ANALYTICS_RANGE_PRESETS.map((preset) => `admin.analytics.ranges.${preset}`),
   ...SCORECARD_HINTS.map((hint) => `admin.analytics.scorecard.hints.${hint}`),
   ...ANALYTICS_SCORECARD_SEGMENTS.map((segment) => `admin.analytics.members.segments.${segment}`),
-  ...ANALYTICS_COHORT_STEPS.map((step) => `admin.analytics.members.cohortSteps.${step}`),
+  ...ANALYTICS_COHORT_STEPS.map(cohortStepLabelKey),
   ...ANALYTICS_TIMELINE_KINDS.map((kind) => `admin.analytics.timeline.kinds.${kind}`),
   ...[...ANALYTICS_TIMELINE_ACTIONS, ...EVENT_NAMES, "unknown"].map(
     (name) => `admin.analytics.timeline.names.${name}`,

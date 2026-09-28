@@ -9,6 +9,7 @@ import type {
 import {
   COHORT_STEP_FILTERS,
   cohortStepCount,
+  cohortStepLabelKey,
   FUNNEL_STEP_MIN_DAYS,
   groupTimelineByDay,
   SCORECARD_SEGMENT_FILTERS,
@@ -97,6 +98,16 @@ describe("scorecardSegmentCount", () => {
     expect(scorecardSegmentCount(SCORECARD_ROW, "came_back_non_adopters")).toBe(11);
     expect(scorecardSegmentCount(SCORECARD_ROW, "returned_adopters")).toBe(4);
     expect(scorecardSegmentCount(SCORECARD_ROW, "returned_non_adopters")).toBe(3);
+  });
+});
+
+describe("cohortStepLabelKey", () => {
+  it("reuses the cohort table's column label for every step", () => {
+    expect(cohortStepLabelKey("signups")).toBe("admin.analytics.cohorts.signups");
+    expect(cohortStepLabelKey("activated")).toBe("admin.analytics.cohorts.activated");
+    expect(cohortStepLabelKey("activated_7d")).toBe("admin.analytics.cohorts.activated7d");
+    expect(cohortStepLabelKey("engaged")).toBe("admin.analytics.cohorts.engaged");
+    expect(cohortStepLabelKey("returned")).toBe("admin.analytics.cohorts.returned");
   });
 });
 

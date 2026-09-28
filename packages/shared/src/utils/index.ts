@@ -134,6 +134,7 @@ export type {
 export {
   COHORT_STEP_FILTERS,
   cohortStepCount,
+  cohortStepLabelKey,
   FUNNEL_STEP_MIN_DAYS,
   groupTimelineByDay,
   SCORECARD_SEGMENT_FILTERS,

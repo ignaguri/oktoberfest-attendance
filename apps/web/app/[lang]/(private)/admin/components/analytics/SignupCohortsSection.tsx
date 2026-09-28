@@ -7,7 +7,12 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { ANALYTICS_COHORT_STEPS } from "@prostcounter/shared/schemas";
 import type { AnalyticsCohortStep } from "@prostcounter/shared/schemas";
-import { cohortRates, cohortStepCount, formatPercent } from "@prostcounter/shared/utils";
+import {
+  cohortRates,
+  cohortStepCount,
+  cohortStepLabelKey,
+  formatPercent,
+} from "@prostcounter/shared/utils";
 import { useState } from "react";
 
 import {
@@ -101,11 +106,11 @@ export default function SignupCohortsSection() {
               setOpenMonth(null);
             }
           }}
-          label={`${openMonth.slice(0, 7)} · ${t(`admin.analytics.members.cohortSteps.${step}`)}`}
+          label={`${openMonth.slice(0, 7)} · ${t(cohortStepLabelKey(step))}`}
           count={openRow ? cohortStepCount(openRow, step) : 0}
           chips={ANALYTICS_COHORT_STEPS.map((value) => ({
             value,
-            label: t(`admin.analytics.members.cohortSteps.${value}`),
+            label: t(cohortStepLabelKey(value)),
           }))}
           selectedChip={step}
           onChipChange={(value) => setStep(value as AnalyticsCohortStep)}

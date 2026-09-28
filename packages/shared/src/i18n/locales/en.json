@@ -2154,13 +2154,6 @@
           "came_back_non_adopters": "Did not use it, came back",
           "returned_adopters": "Used it, attended a later festival",
           "returned_non_adopters": "Did not use it, attended a later festival"
-        },
-        "cohortSteps": {
-          "signups": "Signed up",
-          "activated": "Logged an attendance",
-          "activated_7d": "Within 7 days",
-          "engaged": "3+ days at one festival",
-          "returned": "2+ festivals"
         }
       },
       "timeline": {

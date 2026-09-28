@@ -2214,13 +2214,6 @@
           "came_back_non_adopters": "No la usaron y volvieron",
           "returned_adopters": "La usaron y fueron a una fiesta posterior",
           "returned_non_adopters": "No la usaron y fueron a una fiesta posterior"
-        },
-        "cohortSteps": {
-          "signups": "Se registraron",
-          "activated": "Registraron una asistencia",
-          "activated_7d": "En los primeros 7 días",
-          "engaged": "3+ días en una misma fiesta",
-          "returned": "2+ fiestas"
         }
       },
       "timeline": {

@@ -94,6 +94,14 @@ export function cohortStepCount(row: AnalyticsCohortRow, step: AnalyticsCohortSt
   }
 }
 
+/**
+ * i18n key for a cohort step's label. Reuses the cohort table's column
+ * headers so the chips read exactly like the table they drill into.
+ */
+export function cohortStepLabelKey(step: AnalyticsCohortStep): string {
+  return `admin.analytics.cohorts.${step === "activated_7d" ? "activated7d" : step}`;
+}
+
 function memberName(member: AnalyticsMember): string {
   return member.fullName ?? member.username ?? "";
 }

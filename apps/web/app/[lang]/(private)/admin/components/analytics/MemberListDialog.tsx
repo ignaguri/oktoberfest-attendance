@@ -84,7 +84,8 @@ export default function MemberListDialog({
               >
                 <span className="text-sm font-medium">
                   {member.fullName ?? member.username ?? t("admin.analytics.members.noName")}
-                  {member.username && (
+                  {/* The handle adds nothing when it is already the displayed name */}
+                  {member.fullName && member.username && member.username !== member.fullName && (
                     <span className="ml-2 font-normal text-muted-foreground">
                       @{member.username}
                     </span>

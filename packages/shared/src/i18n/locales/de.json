@@ -2391,13 +2391,6 @@
           "came_back_non_adopters": "Nicht genutzt, wiedergekommen",
           "returned_adopters": "Genutzt, späteres Fest besucht",
           "returned_non_adopters": "Nicht genutzt, späteres Fest besucht"
-        },
-        "cohortSteps": {
-          "signups": "Registriert",
-          "activated": "Besuch eingetragen",
-          "activated_7d": "Innerhalb von 7 Tagen",
-          "engaged": "3+ Tage auf einem Fest",
-          "returned": "2+ Feste"
         }
       },
       "timeline": {
