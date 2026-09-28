@@ -1,82 +1,38 @@
-import type {
-  AvailableWrappedFestival,
-  WrappedAccessResult,
-  WrappedData,
-} from "@prostcounter/shared";
+import type { WrappedData, WrappedFestival } from "@prostcounter/shared";
+
+export interface WrappedStatus {
+  /** ISO string with Z */
+  unlocksAt: string;
+  /** Unlock time passed, or the caller is a super admin */
+  isUnlocked: boolean;
+  hasAttendance: boolean;
+}
 
 /**
- * Wrapped repository interface
- * Provides data access for wrapped statistics
+ * Wrapped data access. The unlock rule and cache live in SQL
+ * (wrapped_unlocks_at, get_wrapped_data_cached); this layer asks and maps.
  */
 export interface IWrappedRepository {
-  /**
-   * Get cached wrapped data for a user and festival
-   * @param userId - User ID
-   * @param festivalId - Festival ID
-   * @returns Wrapped data if cached, null otherwise
-   */
-  getCached(userId: string, festivalId: string): Promise<WrappedData | null>;
+  /** Status for the signed-in caller; null when the festival does not exist. */
+  getStatus(festivalId: string): Promise<WrappedStatus | null>;
+
+  /** Cached (or freshly computed) Wrapped, mapped to camelCase. Throws if locked. */
+  getWrapped(userId: string, festivalId: string): Promise<WrappedData>;
+
+  /** Every unlocked festival the caller attended, newest first. */
+  listFestivals(): Promise<WrappedFestival[]>;
 
   /**
    * Record the user's first view of their wrapped (no-op on later views).
    * Feeds the wrapped_viewed achievement and admin feature analytics.
-   * @param userId - User ID
-   * @param festivalId - Festival ID
    */
   markViewed(userId: string, festivalId: string): Promise<void>;
 
-  /**
-   * Generate wrapped data for a user and festival
-   * @param userId - User ID
-   * @param festivalId - Festival ID
-   * @param force - Force regeneration even if cached
-   * @returns Generated wrapped data
-   */
-  generate(userId: string, festivalId: string, force?: boolean): Promise<WrappedData>;
-
-  /**
-   * Invalidate wrapped cache for a user and festival
-   * @param userId - User ID
-   * @param festivalId - Festival ID (optional - if not provided, invalidates all)
-   */
+  /** Drop cached rows for a user (and festival, if given). */
   invalidateCache(userId: string, festivalId?: string): Promise<void>;
 
-  /**
-   * Check if wrapped data exists and is fresh
-   * @param userId - User ID
-   * @param festivalId - Festival ID
-   * @returns True if cached data exists and is recent
-   */
-  isCached(userId: string, festivalId: string): Promise<boolean>;
-
-  /**
-   * Check if user can access wrapped for a festival
-   * @param userId - User ID
-   * @param festivalId - Festival ID
-   * @returns Access result with allowed status and reason
-   */
-  checkAccess(userId: string, festivalId: string): Promise<WrappedAccessResult>;
-
-  /**
-   * Get list of festivals with wrapped available for a user
-   * @param userId - User ID
-   * @returns List of festivals with wrapped availability status
-   */
-  getAvailableFestivals(userId: string): Promise<AvailableWrappedFestival[]>;
-
-  /**
-   * Admin function to regenerate cached wrapped data
-   * @param adminUserId - Admin user ID performing the action
-   * @param festivalId - Optional festival ID filter
-   * @param userId - Optional user ID filter
-   * @returns Number of entries regenerated
-   */
+  /** Admin: recompute and upsert rows. Returns the number written. */
   regenerateCache(adminUserId: string, festivalId?: string, userId?: string): Promise<number>;
 
-  /**
-   * Check if user is a super admin
-   * @param userId - User ID
-   * @returns True if user is a super admin
-   */
   isAdmin(userId: string): Promise<boolean>;
 }

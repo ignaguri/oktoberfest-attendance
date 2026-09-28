@@ -34,6 +34,7 @@ export function useLogConsumption() {
         invalidateQueries(["user"]);
         invalidateQueries(["leaderboard"]);
         invalidateQueries(["highlights"]);
+        invalidateQueries(["wrapped"]);
         // Invalidate activity feed
         invalidateQueries(["activity-feed"]);
       },
@@ -84,6 +85,7 @@ export function useDeleteConsumption() {
         invalidateQueries(["user"]);
         invalidateQueries(["leaderboard"]);
         invalidateQueries(["highlights"]);
+        invalidateQueries(["wrapped"]);
         // Invalidate activity feed
         invalidateQueries(["activity-feed"]);
       },

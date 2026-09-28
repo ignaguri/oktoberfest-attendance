@@ -86,8 +86,8 @@ export function PicturesSlide({ data, isActive }: PicturesSlideProps) {
 
   // Show up to 6 pictures
   const pictures = useMemo(
-    () => data.social_stats?.pictures?.slice(0, 6) || [],
-    [data.social_stats?.pictures],
+    () => data.socialStats?.pictures?.slice(0, 6) || [],
+    [data.socialStats?.pictures],
   );
 
   return (
@@ -98,7 +98,7 @@ export function PicturesSlide({ data, isActive }: PicturesSlideProps) {
 
         <Text className="mt-2 text-center text-sm text-gray-500">
           {t("wrapped.pictures.count", {
-            count: data.social_stats?.pictures?.length ?? 0,
+            count: data.socialStats?.pictures?.length ?? 0,
           })}
         </Text>
 
@@ -106,7 +106,7 @@ export function PicturesSlide({ data, isActive }: PicturesSlideProps) {
           {pictures.map((pic, index) => (
             <PictureItem
               key={pic.id}
-              uri={getBeerPictureUrl(pic.picture_url) || ""}
+              uri={getBeerPictureUrl(pic.pictureUrl) || ""}
               size={imageSize}
               index={index}
               isActive={isActive}

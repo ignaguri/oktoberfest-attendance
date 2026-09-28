@@ -13,7 +13,7 @@ interface SocialSlideProps {
 
 export function SocialSlide({ data, isActive = false }: SocialSlideProps) {
   const { t } = useTranslation();
-  const { groups_joined, photos_uploaded, total_group_members } = data.social_stats;
+  const { groupsJoined, photosUploaded, totalGroupMembers } = data.socialStats;
 
   return (
     <BaseSlide isActive={isActive} className="bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -24,19 +24,19 @@ export function SocialSlide({ data, isActive = false }: SocialSlideProps) {
         <StatItem
           icon={<UserSearch className="size-5" />}
           label={t("wrapped.social.groups")}
-          value={groups_joined}
+          value={groupsJoined}
         />
 
         <StatItem
           icon={<Camera className="size-5" />}
           label={t("wrapped.social.photos")}
-          value={photos_uploaded}
+          value={photosUploaded}
         />
 
         <StatItem
           icon={<Users className="size-5" />}
           label={t("wrapped.social.friends")}
-          value={total_group_members}
+          value={totalGroupMembers}
         />
       </SlideContent>
     </BaseSlide>

@@ -27,7 +27,7 @@ export function SocialSlide({ data, isActive }: SocialSlideProps) {
           <VStack space="md">
             <StatItem
               label={t("wrapped.social.groups")}
-              value={String(data.social_stats?.groups_joined ?? 0)}
+              value={String(data.socialStats?.groupsJoined ?? 0)}
               icon={<UsersRound size={24} color={Colors.primary[500]} />}
               isActive={isActive}
               delay={200}
@@ -36,7 +36,7 @@ export function SocialSlide({ data, isActive }: SocialSlideProps) {
               <View className="flex-1">
                 <StatItem
                   label={t("wrapped.social.photos")}
-                  value={String(data.social_stats?.photos_uploaded ?? 0)}
+                  value={String(data.socialStats?.photosUploaded ?? 0)}
                   icon={<Camera size={24} color={Colors.primary[500]} />}
                   isActive={isActive}
                   delay={350}
@@ -45,7 +45,7 @@ export function SocialSlide({ data, isActive }: SocialSlideProps) {
               <View className="flex-1">
                 <StatItem
                   label={t("wrapped.social.friends")}
-                  value={String(data.social_stats?.total_group_members ?? 0)}
+                  value={String(data.socialStats?.totalGroupMembers ?? 0)}
                   icon={<Users size={24} color={Colors.primary[500]} />}
                   isActive={isActive}
                   delay={500}

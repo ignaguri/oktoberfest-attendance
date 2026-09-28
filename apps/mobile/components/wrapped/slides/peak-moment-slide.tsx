@@ -29,7 +29,7 @@ export function PeakMomentSlide({ data, isActive }: PeakMomentSlideProps) {
     }
   }, [isActive]);
 
-  const bestDay = data.peak_moments.best_day;
+  const bestDay = data.peakMoments.bestDay;
 
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-amber-50">
@@ -58,7 +58,7 @@ export function PeakMomentSlide({ data, isActive }: PeakMomentSlideProps) {
               {formatWrappedDate(bestDay.date)}
             </Text>
             <Text className="mt-2 text-3xl font-bold text-yellow-600">
-              {t("wrapped.peakMoment.beers", { count: bestDay.beer_count })}
+              {t("wrapped.peakMoment.beers", { count: bestDay.beerCount })}
             </Text>
             <Text className="mt-1 text-sm text-gray-500">
               {formatCurrency(bestDay.spent)} {t("wrapped.peakMoment.spent")}
@@ -69,7 +69,7 @@ export function PeakMomentSlide({ data, isActive }: PeakMomentSlideProps) {
         <View className="mt-2">
           <StatItem
             label={t("wrapped.peakMoment.maxSession")}
-            value={String(data.peak_moments.max_single_session)}
+            value={String(data.peakMoments.maxSingleSession)}
             isActive={isActive}
             delay={500}
           />

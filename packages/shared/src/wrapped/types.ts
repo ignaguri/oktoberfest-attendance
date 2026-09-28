@@ -3,8 +3,6 @@
  * Provider-agnostic type definitions for the Wrapped slide system
  */
 
-import type { AchievementCategory as AchievementCategoryDb } from "../schemas/achievement.schema";
-
 /**
  * Slide type enumeration
  */
@@ -65,124 +63,6 @@ export interface ThemeConfig {
 }
 
 /**
- * Complete wrapped data structure (matches DB function return)
- */
-export interface WrappedData {
-  user_info: {
-    username: string;
-    full_name: string | null;
-    avatar_url: string | null;
-  };
-  festival_info: {
-    name: string;
-    start_date: string;
-    end_date: string;
-    location: string;
-  };
-  basic_stats: {
-    total_beers: number;
-    days_attended: number;
-    avg_beers: number;
-    total_spent: number;
-    beer_cost: number;
-  };
-  tent_stats: {
-    unique_tents: number;
-    favorite_tent: string | null;
-    tent_diversity_pct: number;
-    tent_breakdown: {
-      tent_name: string;
-      visit_count: number;
-    }[];
-  };
-  peak_moments: {
-    best_day: {
-      date: string;
-      beer_count: number;
-      tents_visited: number;
-      spent: number;
-    } | null;
-    max_single_session: number;
-    most_expensive_day: {
-      date: string;
-      amount: number;
-    } | null;
-  };
-  social_stats: {
-    groups_joined: number;
-    top_3_rankings: {
-      group_name: string;
-      position: number;
-    }[];
-    photos_uploaded: number;
-    total_group_members: number;
-    pictures: {
-      id: string;
-      picture_url: string;
-      created_at: string;
-      attendance_date: string;
-    }[];
-  };
-  global_leaderboard_positions: {
-    days_attended: number | null;
-    total_beers: number | null;
-    avg_beers: number | null;
-  };
-  achievements: {
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    category: AchievementCategoryDb;
-    tier: number;
-    points: number;
-    rarity: string;
-    unlocked_at: string;
-  }[];
-  timeline: {
-    date: string;
-    beer_count: number;
-    spent: number;
-    tents_visited: number;
-  }[];
-  comparisons: {
-    vs_festival_avg: {
-      beers_diff_pct: number;
-      days_diff_pct: number;
-      avg_beers: number;
-      avg_days: number;
-      /**
-       * Percentile rank and median, preferred over the mean-based *_diff_pct above:
-       * the mean is skewed by one-day attendees and by the top of the range, so almost
-       * everyone lands "above average". Optional because cache rows written before
-       * these were added do not carry them.
-       */
-      median_beers?: number;
-      median_days?: number;
-      beers_percentile?: number;
-      days_percentile?: number;
-    };
-    vs_last_year: {
-      beers_diff: number;
-      days_diff: number;
-      spent_diff: number;
-      prev_beers: number;
-      prev_days: number;
-      prev_festival_name: string;
-    } | null;
-  };
-  personality: {
-    type: string;
-    traits: string[];
-  };
-  drinkStats?: {
-    totalDrinks: number;
-    topDrinkType: string | null;
-    breakdown: { drinkType: string; count: number; percentage: number }[];
-  };
-}
-
-/**
  * Slide-specific content types
  */
 export interface IntroSlideContent {
@@ -201,7 +81,7 @@ export interface NumbersSlideContent {
 export interface JourneySlideContent {
   timeline: {
     date: string;
-    beer_count: number;
+    beerCount: number;
     spent: number;
   }[];
 }
@@ -212,8 +92,8 @@ export interface TentExplorerSlideContent {
   favoriteTent: string | null;
   diversityPct: number;
   tentBreakdown: {
-    tent_name: string;
-    visit_count: number;
+    tentName: string;
+    visitCount: number;
   }[];
 }
 
@@ -230,14 +110,14 @@ export interface SocialSlideContent {
   groupsJoined: number;
   photosUploaded: number;
   topRankings: {
-    group_name: string;
+    groupName: string;
     position: number;
   }[];
   pictures: {
     id: string;
-    picture_url: string;
-    created_at: string;
-    attendance_date: string;
+    pictureUrl: string;
+    createdAt: string;
+    attendanceDate: string;
   }[];
 }
 
@@ -260,7 +140,7 @@ export interface PersonalitySlideContent {
 
 export interface RankingsSlideContent {
   topRankings: {
-    group_name: string;
+    groupName: string;
     position: number;
   }[];
 }
@@ -284,13 +164,4 @@ export interface OutroSlideContent {
   totalBeers: number;
   daysAttended: number;
   shareUrl: string;
-}
-
-/**
- * Wrapped access control result
- */
-export interface WrappedAccessResult {
-  allowed: boolean;
-  reason?: "not_ended" | "no_data" | "not_authenticated" | "error";
-  message?: string;
 }

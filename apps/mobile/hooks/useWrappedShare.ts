@@ -15,12 +15,12 @@ export function useWrappedShare(data: WrappedData, shareRef: React.RefObject<Vie
 
   // Generate localized share text
   const shareText = useMemo(() => {
-    const { total_beers, days_attended } = data.basic_stats;
-    const festivalHashtag = data.festival_info.name.replace(/[^\p{L}\p{N}]/gu, "");
+    const { totalBeers, daysAttended } = data.basicStats;
+    const festivalHashtag = data.festivalInfo.name.replace(/[^\p{L}\p{N}]/gu, "");
 
     return (
-      `${t("wrapped.shareText.title", { festivalName: data.festival_info.name })}\n\n` +
-      `${t("wrapped.shareText.stats", { beers: total_beers, days: days_attended })}\n` +
+      `${t("wrapped.shareText.title", { festivalName: data.festivalInfo.name })}\n\n` +
+      `${t("wrapped.shareText.stats", { beers: totalBeers, days: daysAttended })}\n` +
       `${t("wrapped.shareText.personality", { type: data.personality.type })}\n\n` +
       `#${festivalHashtag} #ProstCounter`
     );

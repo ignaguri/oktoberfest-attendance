@@ -5,8 +5,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/virtual";
 
+import { useTranslation } from "@prostcounter/shared/i18n";
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import { hasWrappedData } from "@prostcounter/shared/wrapped";
 import { useEffect, useMemo, useRef } from "react";
 import { Keyboard, Mousewheel, Pagination, Virtual } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -42,21 +42,21 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     () => [
       { key: "intro", component: IntroSlide },
       { key: "numbers", component: NumbersSlide },
-      ...(data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0
+      ...(data.drinkStats.totalDrinks > 0
         ? [{ key: "drink_breakdown", component: DrinkBreakdownSlide }]
         : []),
       { key: "journey", component: JourneySlide },
       { key: "tent_explorer", component: TentExplorerSlide },
       { key: "peak_moment", component: PeakMomentSlide },
       { key: "social", component: SocialSlide },
-      ...(data.social_stats.pictures.length > 0
+      ...(data.socialStats.pictures.length > 0
         ? [{ key: "pictures", component: PicturesSlide }]
         : []),
       ...(data.achievements.length > 0
         ? [{ key: "achievements", component: AchievementsSlide }]
         : []),
       { key: "personality", component: PersonalitySlide },
-      ...(data.social_stats.top_3_rankings.length > 0
+      ...(data.socialStats.topRankings.length > 0
         ? [{ key: "rankings", component: RankingsSlide }]
         : []),
       ...(data.comparisons ? [{ key: "comparisons", component: ComparisonsSlide }] : []),
@@ -101,17 +101,6 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [slides]);
-
-  // Check if user has data
-  if (!hasWrappedData(data)) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-xl text-gray-600">No wrapped data available for this festival</p>
-        </div>
-      </div>
-    );
-  }
 
   // Handle slide change to scroll and update hash
   const handleSlideChange = (swiper: any) => {
@@ -171,11 +160,13 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
  * Loading state component
  */
 export function WrappedLoading() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex h-screen items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50">
       <div className="flex flex-col items-center gap-4">
         <LoadingSpinner size={48} />
-        <p className="text-xl font-semibold text-gray-700">Preparing your wrapped...</p>
+        <p className="text-xl font-semibold text-gray-700">{t("wrapped.loading")}</p>
       </div>
     </div>
   );
@@ -184,13 +175,23 @@ export function WrappedLoading() {
 /**
  * Error state component
  */
-export function WrappedError({ message }: { message?: string }) {
+export function WrappedError({
+  title,
+  message,
+  emoji = "😕",
+}: {
+  title?: string;
+  message?: string;
+  emoji?: string;
+}) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50">
       <div className="max-w-md px-6 text-center">
-        <div className="mb-4 text-6xl">😕</div>
-        <h2 className="mb-2 text-2xl font-bold text-gray-800">Oops!</h2>
-        <p className="text-gray-600">{message || "Something went wrong loading your wrapped"}</p>
+        <div className="mb-4 text-6xl">{emoji}</div>
+        <h2 className="mb-2 text-2xl font-bold text-gray-800">{title ?? t("wrapped.errorTitle")}</h2>
+        <p className="text-gray-600">{message ?? t("wrapped.error")}</p>
       </div>
     </div>
   );

@@ -58,6 +58,8 @@ import type {
   GetPendingUnlocksResponse,
   GetTaggedPhotosResponse,
   GetTentCrowdReportsResponse,
+  GetWrappedFestivalsResponse,
+  GetWrappedResponse,
   Group,
   GroupActionResponse,
   GroupMessageType,
@@ -105,6 +107,7 @@ import type {
   UpsertDayPlanInput,
   WinningCriteriaListResponse,
   WinningCriterion,
+  WrappedAccessResult,
 } from "@prostcounter/shared/schemas";
 
 /**
@@ -1921,30 +1924,16 @@ export function createTypedApiClient(config: ApiClientConfig) {
      * Wrapped API
      */
     wrapped: {
-      async get(festivalId: string): Promise<{
-        wrapped: {
-          userId: string;
-          festivalId: string;
-          totalDays: number;
-          totalBeers: number;
-          totalSpent: number;
-          avgBeersPerDay: number;
-          favoriteTent: { id: string; name: string; visitCount: number } | null;
-          topDrinkType: string | null;
-          achievements: Array<{ id: string; name: string; unlockedAt: string }>;
-          globalRank: number | null;
-          groupRanks: Array<{
-            groupId: string;
-            groupName: string;
-            rank: number;
-          }>;
-          firstVisitDate: string | null;
-          lastVisitDate: string | null;
-          longestStreak: number;
-          generatedAt: string;
-        } | null;
-        cached: boolean;
-      }> {
+      async list(): Promise<GetWrappedFestivalsResponse> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped`, { headers });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to fetch your Wrapped festivals");
+        }
+        return parseJsonResponse(response);
+      },
+
+      async get(festivalId: string): Promise<GetWrappedResponse> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped/${festivalId}`, {
           headers,
@@ -1955,83 +1944,16 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse(response);
       },
 
-      async generate(
-        festivalId: string,
-        force = false,
-      ): Promise<{
-        wrapped: {
-          userId: string;
-          festivalId: string;
-          totalDays: number;
-          totalBeers: number;
-          totalSpent: number;
-          avgBeersPerDay: number;
-          favoriteTent: { id: string; name: string; visitCount: number } | null;
-          topDrinkType: string | null;
-          achievements: Array<{ id: string; name: string; unlockedAt: string }>;
-          globalRank: number | null;
-          groupRanks: Array<{
-            groupId: string;
-            groupName: string;
-            rank: number;
-          }>;
-          firstVisitDate: string | null;
-          lastVisitDate: string | null;
-          longestStreak: number;
-          generatedAt: string;
-        };
-        regenerated: boolean;
-      }> {
-        const headers = await getAuthHeaders();
-        const response = await fetchWithLogging(
-          "POST",
-          `${baseUrl}/v1/wrapped/${festivalId}/generate`,
-          {
-            method: "POST",
-            headers,
-            body: JSON.stringify({ force }),
-          },
-        );
-        if (!response.ok) {
-          await extractApiError(response, "Failed to generate wrapped data");
-        }
-        return parseJsonResponse(response);
-      },
-
-      async checkAccess(festivalId: string): Promise<{
-        allowed: boolean;
-        reason?: "not_ended" | "no_data" | "not_authenticated" | "error";
-        message?: string;
-      }> {
+      /** @deprecated Use get(): its status covers access. */
+      async checkAccess(festivalId: string): Promise<WrappedAccessResult> {
         const headers = await getAuthHeaders();
         const response = await fetchWithLogging(
           "GET",
           `${baseUrl}/v1/wrapped/${festivalId}/access`,
-          {
-            headers,
-          },
+          { headers },
         );
         if (!response.ok) {
           await extractApiError(response, "Failed to check wrapped access");
-        }
-        return parseJsonResponse(response);
-      },
-
-      async getAvailableFestivals(): Promise<{
-        festivals: Array<{
-          id: string;
-          name: string;
-          year: number;
-          status: string;
-          hasData: boolean;
-        }>;
-      }> {
-        const headers = await getAuthHeaders();
-        const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped/festivals`, {
-          headers,
-        });
-        if (!response.ok) {
-          await extractApiError(response, "Failed to fetch available wrapped festivals");
         }
         return parseJsonResponse(response);
       },

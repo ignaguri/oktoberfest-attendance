@@ -8679,214 +8679,64 @@
         }
       }
     },
-    "/v1/wrapped/{festivalId}": {
+    "/v1/wrapped": {
       "get": {
         "tags": [
           "wrapped"
         ],
-        "summary": "Get wrapped year-in-review data",
-        "description": "Returns cached wrapped statistics for a user and festival. Returns null if not yet generated.",
-        "parameters": [
+        "summary": "List the user's Wrapped archive",
+        "description": "Every festival the user attended whose Wrapped has unlocked, newest first.",
+        "security": [
           {
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "required": true,
-            "name": "festivalId",
-            "in": "path"
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
-            "description": "Wrapped data retrieved successfully",
+            "description": "Wrapped archive",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "wrapped": {
-                      "type": "object",
-                      "nullable": true,
-                      "properties": {
-                        "userId": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "festivalId": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "totalDays": {
-                          "type": "integer"
-                        },
-                        "totalBeers": {
-                          "type": "integer"
-                        },
-                        "totalSpent": {
-                          "type": "number"
-                        },
-                        "avgBeersPerDay": {
-                          "type": "number"
-                        },
-                        "favoriteTent": {
-                          "type": "object",
-                          "nullable": true,
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "format": "uuid"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "visitCount": {
-                              "type": "integer"
-                            }
+                    "festivals": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "festivalId": {
+                            "type": "string",
+                            "format": "uuid"
                           },
-                          "required": [
-                            "id",
-                            "name",
-                            "visitCount"
-                          ]
-                        },
-                        "topDrinkType": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "drinkStats": {
-                          "type": "object",
-                          "properties": {
-                            "totalDrinks": {
-                              "type": "integer"
-                            },
-                            "topDrinkType": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "breakdown": {
-                              "type": "array",
-                              "items": {
-                                "type": "object",
-                                "properties": {
-                                  "drinkType": {
-                                    "type": "string"
-                                  },
-                                  "count": {
-                                    "type": "integer"
-                                  },
-                                  "percentage": {
-                                    "type": "number"
-                                  }
-                                },
-                                "required": [
-                                  "drinkType",
-                                  "count",
-                                  "percentage"
-                                ]
-                              }
-                            }
+                          "name": {
+                            "type": "string"
                           },
-                          "required": [
-                            "totalDrinks",
-                            "topDrinkType",
-                            "breakdown"
-                          ]
-                        },
-                        "achievements": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "unlockedAt": {
-                                "type": "string",
-                                "format": "date-time"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "name",
-                              "unlockedAt"
-                            ]
+                          "startDate": {
+                            "type": "string"
+                          },
+                          "endDate": {
+                            "type": "string"
+                          },
+                          "unlocksAt": {
+                            "type": "string"
+                          },
+                          "viewed": {
+                            "type": "boolean"
                           }
                         },
-                        "globalRank": {
-                          "type": "integer",
-                          "nullable": true
-                        },
-                        "groupRanks": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "groupId": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "groupName": {
-                                "type": "string"
-                              },
-                              "rank": {
-                                "type": "integer"
-                              }
-                            },
-                            "required": [
-                              "groupId",
-                              "groupName",
-                              "rank"
-                            ]
-                          }
-                        },
-                        "firstVisitDate": {
-                          "type": "string",
-                          "nullable": true,
-                          "format": "date"
-                        },
-                        "lastVisitDate": {
-                          "type": "string",
-                          "nullable": true,
-                          "format": "date"
-                        },
-                        "longestStreak": {
-                          "type": "integer"
-                        },
-                        "generatedAt": {
-                          "type": "string",
-                          "format": "date-time"
-                        }
-                      },
-                      "required": [
-                        "userId",
-                        "festivalId",
-                        "totalDays",
-                        "totalBeers",
-                        "totalSpent",
-                        "avgBeersPerDay",
-                        "favoriteTent",
-                        "topDrinkType",
-                        "achievements",
-                        "globalRank",
-                        "groupRanks",
-                        "firstVisitDate",
-                        "lastVisitDate",
-                        "longestStreak",
-                        "generatedAt"
-                      ]
-                    },
-                    "cached": {
-                      "type": "boolean"
+                        "required": [
+                          "festivalId",
+                          "name",
+                          "startDate",
+                          "endDate",
+                          "unlocksAt",
+                          "viewed"
+                        ]
+                      }
                     }
                   },
                   "required": [
-                    "wrapped",
-                    "cached"
+                    "festivals"
                   ]
                 }
               }
@@ -8894,16 +8744,6 @@
           },
           "401": {
             "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Festival not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -8915,13 +8755,18 @@
         }
       }
     },
-    "/v1/wrapped/{festivalId}/generate": {
-      "post": {
+    "/v1/wrapped/{festivalId}": {
+      "get": {
         "tags": [
           "wrapped"
         ],
-        "summary": "Generate wrapped year-in-review data",
-        "description": "Generates or regenerates wrapped statistics for a user and festival. Set force=true to regenerate even if cached.",
+        "summary": "Get wrapped year-in-review data",
+        "description": "status=ready with the data, status=locked with unlocksAt (00:00 festival time the day after it ends), or status=not_attended.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "schema": {
@@ -8933,211 +8778,550 @@
             "in": "path"
           }
         ],
-        "requestBody": {
-          "required": false,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "force": {
-                    "type": "boolean",
-                    "default": false
-                  }
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
-            "description": "Wrapped data generated successfully",
+            "description": "Wrapped status and data",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "wrapped": {
+                  "oneOf": [
+                    {
                       "type": "object",
                       "properties": {
-                        "userId": {
+                        "status": {
                           "type": "string",
-                          "format": "uuid"
-                        },
-                        "festivalId": {
-                          "type": "string",
-                          "format": "uuid"
-                        },
-                        "totalDays": {
-                          "type": "integer"
-                        },
-                        "totalBeers": {
-                          "type": "integer"
-                        },
-                        "totalSpent": {
-                          "type": "number"
-                        },
-                        "avgBeersPerDay": {
-                          "type": "number"
-                        },
-                        "favoriteTent": {
-                          "type": "object",
-                          "nullable": true,
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "format": "uuid"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "visitCount": {
-                              "type": "integer"
-                            }
-                          },
-                          "required": [
-                            "id",
-                            "name",
-                            "visitCount"
+                          "enum": [
+                            "ready"
                           ]
                         },
-                        "topDrinkType": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "drinkStats": {
+                        "wrapped": {
                           "type": "object",
                           "properties": {
-                            "totalDrinks": {
-                              "type": "integer"
+                            "userInfo": {
+                              "type": "object",
+                              "properties": {
+                                "username": {
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "fullName": {
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "avatarUrl": {
+                                  "type": "string",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "username",
+                                "fullName",
+                                "avatarUrl"
+                              ]
                             },
-                            "topDrinkType": {
-                              "type": "string",
-                              "nullable": true
+                            "festivalInfo": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "startDate": {
+                                  "type": "string"
+                                },
+                                "endDate": {
+                                  "type": "string"
+                                },
+                                "location": {
+                                  "type": "string",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "startDate",
+                                "endDate",
+                                "location"
+                              ]
                             },
-                            "breakdown": {
+                            "basicStats": {
+                              "type": "object",
+                              "properties": {
+                                "totalBeers": {
+                                  "type": "number"
+                                },
+                                "daysAttended": {
+                                  "type": "number"
+                                },
+                                "avgBeers": {
+                                  "type": "number"
+                                },
+                                "totalSpent": {
+                                  "type": "number"
+                                },
+                                "beerCost": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "totalBeers",
+                                "daysAttended",
+                                "avgBeers",
+                                "totalSpent",
+                                "beerCost"
+                              ]
+                            },
+                            "tentStats": {
+                              "type": "object",
+                              "properties": {
+                                "uniqueTents": {
+                                  "type": "number"
+                                },
+                                "favoriteTent": {
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "tentDiversityPct": {
+                                  "type": "number"
+                                },
+                                "tentBreakdown": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "tentName": {
+                                        "type": "string"
+                                      },
+                                      "visitCount": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "required": [
+                                      "tentName",
+                                      "visitCount"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "uniqueTents",
+                                "favoriteTent",
+                                "tentDiversityPct",
+                                "tentBreakdown"
+                              ]
+                            },
+                            "peakMoments": {
+                              "type": "object",
+                              "properties": {
+                                "bestDay": {
+                                  "type": "object",
+                                  "nullable": true,
+                                  "properties": {
+                                    "date": {
+                                      "type": "string"
+                                    },
+                                    "beerCount": {
+                                      "type": "number"
+                                    },
+                                    "tentsVisited": {
+                                      "type": "number"
+                                    },
+                                    "spent": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "date",
+                                    "beerCount",
+                                    "tentsVisited",
+                                    "spent"
+                                  ]
+                                },
+                                "maxSingleSession": {
+                                  "type": "number"
+                                },
+                                "mostExpensiveDay": {
+                                  "type": "object",
+                                  "nullable": true,
+                                  "properties": {
+                                    "date": {
+                                      "type": "string"
+                                    },
+                                    "amount": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "date",
+                                    "amount"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "bestDay",
+                                "maxSingleSession",
+                                "mostExpensiveDay"
+                              ]
+                            },
+                            "socialStats": {
+                              "type": "object",
+                              "properties": {
+                                "groupsJoined": {
+                                  "type": "number"
+                                },
+                                "topRankings": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "groupName": {
+                                        "type": "string"
+                                      },
+                                      "position": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "required": [
+                                      "groupName",
+                                      "position"
+                                    ]
+                                  }
+                                },
+                                "photosUploaded": {
+                                  "type": "number"
+                                },
+                                "totalGroupMembers": {
+                                  "type": "number"
+                                },
+                                "pictures": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "pictureUrl": {
+                                        "type": "string"
+                                      },
+                                      "createdAt": {
+                                        "type": "string"
+                                      },
+                                      "attendanceDate": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "pictureUrl",
+                                      "createdAt",
+                                      "attendanceDate"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "groupsJoined",
+                                "topRankings",
+                                "photosUploaded",
+                                "totalGroupMembers",
+                                "pictures"
+                              ]
+                            },
+                            "globalLeaderboardPositions": {
+                              "type": "object",
+                              "properties": {
+                                "daysAttended": {
+                                  "type": "number",
+                                  "nullable": true
+                                },
+                                "totalBeers": {
+                                  "type": "number",
+                                  "nullable": true
+                                },
+                                "avgBeers": {
+                                  "type": "number",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "daysAttended",
+                                "totalBeers",
+                                "avgBeers"
+                              ]
+                            },
+                            "achievements": {
                               "type": "array",
                               "items": {
                                 "type": "object",
                                 "properties": {
-                                  "drinkType": {
+                                  "id": {
                                     "type": "string"
                                   },
-                                  "count": {
-                                    "type": "integer"
+                                  "name": {
+                                    "type": "string"
                                   },
-                                  "percentage": {
+                                  "description": {
+                                    "type": "string"
+                                  },
+                                  "icon": {
+                                    "type": "string"
+                                  },
+                                  "category": {
+                                    "type": "string",
+                                    "enum": [
+                                      "consumption",
+                                      "attendance",
+                                      "explorer",
+                                      "social",
+                                      "competitive",
+                                      "special",
+                                      "drinking",
+                                      "dedication"
+                                    ]
+                                  },
+                                  "tier": {
+                                    "type": "number"
+                                  },
+                                  "points": {
+                                    "type": "number"
+                                  },
+                                  "rarity": {
+                                    "type": "string"
+                                  },
+                                  "unlockedAt": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "description",
+                                  "icon",
+                                  "category",
+                                  "tier",
+                                  "points",
+                                  "rarity",
+                                  "unlockedAt"
+                                ]
+                              }
+                            },
+                            "timeline": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "date": {
+                                    "type": "string"
+                                  },
+                                  "beerCount": {
+                                    "type": "number"
+                                  },
+                                  "spent": {
+                                    "type": "number"
+                                  },
+                                  "tentsVisited": {
                                     "type": "number"
                                   }
                                 },
                                 "required": [
-                                  "drinkType",
-                                  "count",
-                                  "percentage"
+                                  "date",
+                                  "beerCount",
+                                  "spent",
+                                  "tentsVisited"
                                 ]
                               }
+                            },
+                            "comparisons": {
+                              "type": "object",
+                              "properties": {
+                                "vsFestivalAvg": {
+                                  "type": "object",
+                                  "properties": {
+                                    "beersDiffPct": {
+                                      "type": "number"
+                                    },
+                                    "daysDiffPct": {
+                                      "type": "number"
+                                    },
+                                    "avgBeers": {
+                                      "type": "number"
+                                    },
+                                    "avgDays": {
+                                      "type": "number"
+                                    },
+                                    "medianBeers": {
+                                      "type": "number"
+                                    },
+                                    "medianDays": {
+                                      "type": "number"
+                                    },
+                                    "beersPercentile": {
+                                      "type": "number"
+                                    },
+                                    "daysPercentile": {
+                                      "type": "number"
+                                    }
+                                  },
+                                  "required": [
+                                    "beersDiffPct",
+                                    "daysDiffPct",
+                                    "avgBeers",
+                                    "avgDays",
+                                    "medianBeers",
+                                    "medianDays",
+                                    "beersPercentile",
+                                    "daysPercentile"
+                                  ]
+                                },
+                                "vsLastYear": {
+                                  "type": "object",
+                                  "nullable": true,
+                                  "properties": {
+                                    "beersDiff": {
+                                      "type": "number"
+                                    },
+                                    "daysDiff": {
+                                      "type": "number"
+                                    },
+                                    "spentDiff": {
+                                      "type": "number"
+                                    },
+                                    "prevBeers": {
+                                      "type": "number"
+                                    },
+                                    "prevDays": {
+                                      "type": "number"
+                                    },
+                                    "prevFestivalName": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "beersDiff",
+                                    "daysDiff",
+                                    "spentDiff",
+                                    "prevBeers",
+                                    "prevDays",
+                                    "prevFestivalName"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "vsFestivalAvg",
+                                "vsLastYear"
+                              ]
+                            },
+                            "personality": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string"
+                                },
+                                "traits": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "required": [
+                                "type",
+                                "traits"
+                              ]
+                            },
+                            "drinkStats": {
+                              "type": "object",
+                              "properties": {
+                                "totalDrinks": {
+                                  "type": "number"
+                                },
+                                "topDrinkType": {
+                                  "type": "string",
+                                  "nullable": true
+                                },
+                                "breakdown": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "drinkType": {
+                                        "type": "string"
+                                      },
+                                      "count": {
+                                        "type": "number"
+                                      },
+                                      "percentage": {
+                                        "type": "number"
+                                      }
+                                    },
+                                    "required": [
+                                      "drinkType",
+                                      "count",
+                                      "percentage"
+                                    ]
+                                  }
+                                }
+                              },
+                              "required": [
+                                "totalDrinks",
+                                "topDrinkType",
+                                "breakdown"
+                              ]
                             }
                           },
                           "required": [
-                            "totalDrinks",
-                            "topDrinkType",
-                            "breakdown"
+                            "userInfo",
+                            "festivalInfo",
+                            "basicStats",
+                            "tentStats",
+                            "peakMoments",
+                            "socialStats",
+                            "globalLeaderboardPositions",
+                            "achievements",
+                            "timeline",
+                            "comparisons",
+                            "personality",
+                            "drinkStats"
                           ]
-                        },
-                        "achievements": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "unlockedAt": {
-                                "type": "string",
-                                "format": "date-time"
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "name",
-                              "unlockedAt"
-                            ]
-                          }
-                        },
-                        "globalRank": {
-                          "type": "integer",
-                          "nullable": true
-                        },
-                        "groupRanks": {
-                          "type": "array",
-                          "items": {
-                            "type": "object",
-                            "properties": {
-                              "groupId": {
-                                "type": "string",
-                                "format": "uuid"
-                              },
-                              "groupName": {
-                                "type": "string"
-                              },
-                              "rank": {
-                                "type": "integer"
-                              }
-                            },
-                            "required": [
-                              "groupId",
-                              "groupName",
-                              "rank"
-                            ]
-                          }
-                        },
-                        "firstVisitDate": {
-                          "type": "string",
-                          "nullable": true,
-                          "format": "date"
-                        },
-                        "lastVisitDate": {
-                          "type": "string",
-                          "nullable": true,
-                          "format": "date"
-                        },
-                        "longestStreak": {
-                          "type": "integer"
-                        },
-                        "generatedAt": {
-                          "type": "string",
-                          "format": "date-time"
                         }
                       },
                       "required": [
-                        "userId",
-                        "festivalId",
-                        "totalDays",
-                        "totalBeers",
-                        "totalSpent",
-                        "avgBeersPerDay",
-                        "favoriteTent",
-                        "topDrinkType",
-                        "achievements",
-                        "globalRank",
-                        "groupRanks",
-                        "firstVisitDate",
-                        "lastVisitDate",
-                        "longestStreak",
-                        "generatedAt"
+                        "status",
+                        "wrapped"
                       ]
                     },
-                    "regenerated": {
-                      "type": "boolean"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "locked"
+                          ]
+                        },
+                        "unlocksAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "unlocksAt"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "not_attended"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "status"
+                      ]
                     }
-                  },
-                  "required": [
-                    "wrapped",
-                    "regenerated"
                   ]
                 }
               }
@@ -9145,16 +9329,6 @@
           },
           "401": {
             "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Festival not found or no data available",
             "content": {
               "application/json": {
                 "schema": {
@@ -9171,8 +9345,9 @@
         "tags": [
           "wrapped"
         ],
-        "summary": "Check wrapped access",
-        "description": "Checks if the user is allowed to access wrapped data for a specific festival.",
+        "summary": "Check wrapped access (deprecated)",
+        "description": "Kept for installed app versions. New clients read status from GET /wrapped/{festivalId}.",
+        "deprecated": true,
         "security": [
           {
             "bearerAuth": []
@@ -9215,78 +9390,6 @@
                   },
                   "required": [
                     "allowed"
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/wrapped/festivals": {
-      "get": {
-        "tags": [
-          "wrapped"
-        ],
-        "summary": "Get available wrapped festivals",
-        "description": "Returns a list of festivals for which wrapped data is available for the user.",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Available festivals list",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "festivals": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "format": "uuid"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "year": {
-                            "type": "integer"
-                          },
-                          "status": {
-                            "type": "string"
-                          },
-                          "hasData": {
-                            "type": "boolean"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "name",
-                          "year",
-                          "status",
-                          "hasData"
-                        ]
-                      }
-                    }
-                  },
-                  "required": [
-                    "festivals"
                   ]
                 }
               }

@@ -28,7 +28,7 @@ export function IntroSlide({ data, isActive }: IntroSlideProps) {
     }
   }, [isActive]);
 
-  const username = data.user_info?.username || data.user_info?.full_name || "";
+  const username = data.userInfo?.username || data.userInfo?.fullName || "";
 
   return (
     <BaseSlide isActive={isActive} backgroundClassName="bg-yellow-50">
@@ -63,7 +63,7 @@ export function IntroSlide({ data, isActive }: IntroSlideProps) {
           transition={{ type: "timing", duration: 500, delay: 400 }}
         >
           <Text className="text-center text-xl font-semibold text-yellow-600">
-            {data.festival_info?.name ?? ""}
+            {data.festivalInfo?.name ?? ""}
           </Text>
         </Motion.View>
 

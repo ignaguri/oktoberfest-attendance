@@ -1,27 +1,31 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useWrappedAccess } from "@prostcounter/shared/hooks";
+import { useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/lib/i18n/client";
 
 export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: boolean }) {
+  const { t } = useTranslation();
   const { currentFestival } = useFestival();
-  const { data: accessResult, loading } = useWrappedAccess(currentFestival?.id);
+  const { data: festivals, loading } = useWrappedFestivals();
 
-  // Don't show if loading or no current festival
   if (loading || !currentFestival) {
     return null;
   }
 
-  // Don't show if not last day and access not allowed
-  if (!isLastDayOfFestival && (!accessResult || !accessResult.allowed)) {
+  const isUnlocked = festivals?.some((festival) => festival.festivalId === currentFestival.id) ?? false;
+
+  if (!isLastDayOfFestival && !isUnlocked) {
     return null;
   }
+
+  const festivalName = currentFestival.name;
 
   return (
     <motion.div
@@ -33,28 +37,19 @@ export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: bool
         <CardContent>
           <div className="flex flex-col items-center gap-4 text-center">
             <motion.div
-              animate={{
-                rotate: [0, 10, -10, 10, 0],
-                scale: [1, 1.1, 1, 1.1, 1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: 3,
-                repeatDelay: 3,
-              }}
+              animate={{ rotate: [0, 10, -10, 10, 0], scale: [1, 1.1, 1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: 3, repeatDelay: 3 }}
             >
               <h3 className="text-xl font-bold text-gray-800">
-                {isLastDayOfFestival ? "Wrapping up your festival!" : "Your Wrapped is ready!"}
+                {isLastDayOfFestival ? t("wrapped.cta.preparing") : t("wrapped.cta.ready")}
               </h3>
             </motion.div>
 
-            <div>
-              <p className="text-sm text-gray-600">
-                {isLastDayOfFestival
-                  ? `We're preparing your personalized ${currentFestival.name} story. Upload your final attendance info - it will be available tomorrow!`
-                  : `See your personalized ${currentFestival.name} story`}
-              </p>
-            </div>
+            <p className="text-sm text-gray-600">
+              {isLastDayOfFestival
+                ? t("wrapped.cta.preparingDescription", { festivalName })
+                : t("wrapped.cta.readyDescription", { festivalName })}
+            </p>
 
             {!isLastDayOfFestival && (
               <Button
@@ -62,17 +57,15 @@ export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: bool
                 size="lg"
                 className="bg-yellow-500 font-semibold text-white shadow-md transition-all hover:bg-yellow-600 hover:shadow-lg"
               >
-                <Link href="/wrapped">
+                <Link href={`/wrapped?festivalId=${currentFestival.id}`}>
                   <Sparkles className="mr-2 size-5" />
-                  View Your Wrapped
+                  {t("wrapped.cta.viewButton")}
                 </Link>
               </Button>
             )}
 
             <p className="text-xs text-gray-500">
-              {isLastDayOfFestival
-                ? "Don't forget to log your final attendance! 📝"
-                : "Your festival highlights, stats, and personality 🎉"}
+              {isLastDayOfFestival ? t("wrapped.cta.preparingFooter") : t("home.wrappedReady.footer")}
             </p>
           </div>
         </CardContent>

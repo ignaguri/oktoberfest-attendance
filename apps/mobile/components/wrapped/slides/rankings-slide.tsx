@@ -35,7 +35,7 @@ export function RankingsSlide({ data, isActive }: RankingsSlideProps) {
         <SlideSubtitle isActive={isActive}>{t("wrapped.rankings.subtitle")}</SlideSubtitle>
 
         {/* Group rankings */}
-        {data.social_stats.top_3_rankings.length > 0 && (
+        {data.socialStats.topRankings.length > 0 && (
           <VStack space="sm" className="mt-4">
             <Motion.View
               initial={{ opacity: 0 }}
@@ -47,9 +47,9 @@ export function RankingsSlide({ data, isActive }: RankingsSlideProps) {
               </Text>
             </Motion.View>
 
-            {data.social_stats.top_3_rankings.map((ranking, index) => (
+            {data.socialStats.topRankings.map((ranking, index) => (
               <Motion.View
-                key={ranking.group_name}
+                key={ranking.groupName}
                 initial={{ opacity: 0, x: -30 }}
                 animate={{
                   opacity: isActive ? 1 : 0,
@@ -66,7 +66,7 @@ export function RankingsSlide({ data, isActive }: RankingsSlideProps) {
                 <HStack space="sm" className="flex-1 items-center">
                   <Text className="text-2xl">{getPositionEmoji(ranking.position)}</Text>
                   <Text className="flex-1 text-base text-gray-700" numberOfLines={1}>
-                    {ranking.group_name}
+                    {ranking.groupName}
                   </Text>
                 </HStack>
                 <Text className="text-sm font-semibold text-sky-600">#{ranking.position}</Text>

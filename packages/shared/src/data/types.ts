@@ -47,8 +47,8 @@ export interface DataQueryOptions {
   enabled?: boolean;
   /** Garbage collection time in milliseconds */
   gcTime?: number;
-  /** Stale time in milliseconds */
-  staleTime?: number;
+  /** Stale time in milliseconds, or a function of the cached data */
+  staleTime?: number | ((data: unknown) => number);
   /** Poll every N milliseconds while the query is mounted */
   refetchInterval?: number;
   /** Retry failed queries */

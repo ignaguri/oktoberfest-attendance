@@ -43,7 +43,7 @@ interface PicturesSlideProps {
 
 export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
   const { t } = useTranslation();
-  const { pictures } = data.social_stats;
+  const { pictures } = data.socialStats;
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const [isMobile, setIsMobile] = useState(false);
 
@@ -126,7 +126,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
               <div className="absolute top-1/4 left-1/4 size-64 -translate-x-1/2 -translate-y-1/2 sm:size-80 md:size-96">
                 {picturesToShow.map((picture, index) => {
                   const isLoaded = loadedImages.has(picture.id);
-                  const filePath = extractFilePath(picture.picture_url);
+                  const filePath = extractFilePath(picture.pictureUrl);
                   const imageUrl = `/api/image/${encodeURIComponent(filePath)}?bucket=beer_pictures`;
 
                   return (
@@ -156,7 +156,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                       <div className="relative h-full w-full overflow-hidden rounded-lg">
                         <Image
                           src={imageUrl}
-                          alt={`Festival photo from ${new Date(picture.attendance_date).toLocaleDateString()}`}
+                          alt={`Festival photo from ${new Date(picture.attendanceDate).toLocaleDateString()}`}
                           fill
                           className={cn(
                             "transform-gpu rounded-lg object-cover transition-all duration-300 will-change-transform",
@@ -189,7 +189,7 @@ export function PicturesSlide({ data, isActive = false }: PicturesSlideProps) {
                           transition={{ duration: 0.3 }}
                         >
                           <p className="text-xs font-medium text-white">
-                            {new Date(picture.attendance_date).toLocaleDateString()}
+                            {new Date(picture.attendanceDate).toLocaleDateString()}
                           </p>
                         </motion.div>
                       </div>

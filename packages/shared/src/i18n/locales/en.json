@@ -1301,6 +1301,11 @@
     }
   },
   "profile": {
+    "wrappedArchive": {
+      "title": "Your Wrapped",
+      "new": "New",
+      "openHint": "Opens your Wrapped for this festival"
+    },
     "pageTitle": "Your Profile",
     "appleWatch": {
       "title": "Apple Watch",
@@ -2007,7 +2012,7 @@
           "regenerating": "Regenerating...",
           "regenerate": "Regenerate Wrapped Cache"
         },
-        "help": "This will recalculate statistics for all users. This can take several minutes for large datasets."
+        "help": "Recalculates Wrapped for every attendee of festivals that have ended, or only the user or festival you enter. Can take a minute."
       }
     },
     "images": {
@@ -2258,6 +2263,15 @@
     "progress": "Step {{current}} of {{total}}"
   },
   "wrapped": {
+    "errorTitle": "Oops!",
+    "locked": {
+      "title": "Your Wrapped is on its way",
+      "description": "It unlocks on {{date}} at {{time}}."
+    },
+    "notAttended": {
+      "title": "No Wrapped for this festival",
+      "description": "Log at least one day at a festival to get your Wrapped."
+    },
     "title": "Your Year in Review",
     "generating": "Generating your wrapped...",
     "loading": "Preparing your wrapped...",
@@ -2403,6 +2417,8 @@
       "days": "Days"
     },
     "outro": {
+      "shareHint": "Generate a shareable summary of your festival",
+      "madeWith": "Made with ❤️ and some 🍺 by ProstCounter",
       "title": "Thanks for the memories!",
       "subtitle": "See you next year",
       "share": "Share Your Wrapped",
@@ -2451,6 +2467,7 @@
       "personality": "Festival personality: {{type}}"
     },
     "cta": {
+      "preparingFooter": "Don't forget to log your final day! 📝",
       "ready": "Your Wrapped is ready!",
       "preparing": "Wrapping up your festival!",
       "readyDescription": "See your personalized {{festivalName}} story",

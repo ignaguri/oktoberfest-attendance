@@ -30,7 +30,7 @@ export function NumbersSlide({ data, isActive }: NumbersSlideProps) {
               <View className="flex-1">
                 <StatItem
                   label={t("wrapped.numbers.totalBeers")}
-                  value={formatNumber(data.basic_stats?.total_beers ?? 0)}
+                  value={formatNumber(data.basicStats?.totalBeers ?? 0)}
                   icon={<Beer size={24} color={Colors.primary[500]} />}
                   isActive={isActive}
                   delay={200}
@@ -39,7 +39,7 @@ export function NumbersSlide({ data, isActive }: NumbersSlideProps) {
               <View className="flex-1">
                 <StatItem
                   label={t("wrapped.numbers.daysAttended")}
-                  value={formatNumber(data.basic_stats?.days_attended ?? 0)}
+                  value={formatNumber(data.basicStats?.daysAttended ?? 0)}
                   icon={<CalendarDays size={24} color={Colors.primary[500]} />}
                   isActive={isActive}
                   delay={350}
@@ -50,7 +50,7 @@ export function NumbersSlide({ data, isActive }: NumbersSlideProps) {
               <View className="flex-1">
                 <StatItem
                   label={t("wrapped.numbers.avgPerDay")}
-                  value={(data.basic_stats?.avg_beers ?? 0).toFixed(1)}
+                  value={(data.basicStats?.avgBeers ?? 0).toFixed(1)}
                   icon={<TrendingUp size={24} color={Colors.primary[500]} />}
                   isActive={isActive}
                   delay={500}
@@ -59,7 +59,7 @@ export function NumbersSlide({ data, isActive }: NumbersSlideProps) {
               <View className="flex-1">
                 <StatItem
                   label={t("wrapped.numbers.totalSpent")}
-                  value={formatCurrency(data.basic_stats?.total_spent ?? 0)}
+                  value={formatCurrency(data.basicStats?.totalSpent ?? 0)}
                   icon={<DollarSign size={24} color={Colors.primary[500]} />}
                   isActive={isActive}
                   delay={650}

@@ -1,51 +1,80 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useWrappedAccess } from "@prostcounter/shared/hooks";
+import { useWrapped, useWrappedFestivals } from "@prostcounter/shared/hooks";
+import { formatLocalized } from "@prostcounter/shared/utils";
+import { resolveWrappedFestivalId } from "@prostcounter/shared/wrapped";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-import { WrappedContainer, WrappedError } from "@/components/wrapped/core/WrappedContainer";
-import { useWrappedData } from "@/hooks/useWrapped";
+import { WrappedContainer, WrappedError, WrappedLoading } from "@/components/wrapped/core/WrappedContainer";
 import { useTranslation } from "@/lib/i18n/client";
 
-export default function WrappedPage() {
+function WrappedPageContent() {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
   const { currentFestival } = useFestival();
-  const festivalId = currentFestival?.id;
+  const {
+    data: festivals,
+    loading: festivalsLoading,
+    error: festivalsError,
+  } = useWrappedFestivals();
+  const festivalId = resolveWrappedFestivalId(
+    searchParams.get("festivalId") ?? undefined,
+    festivals,
+    currentFestival?.id,
+  );
+  const { data: result, loading: wrappedLoading, error } = useWrapped(festivalId);
 
-  // Use direct Supabase call for wrapped data (preserves DB format for slides)
-  const { data: wrappedData, loading: wrappedLoading } = useWrappedData(festivalId);
-  const { data: accessResult, loading: accessLoading } = useWrappedAccess(festivalId);
-
-  // Loading state
-  if (wrappedLoading || accessLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="mb-4 text-6xl">🍺</div>
-          <p className="text-gray-600">{t("wrapped.loading")}</p>
-        </div>
-      </div>
-    );
+  if (festivalsLoading || wrappedLoading) {
+    return <WrappedLoading />;
   }
-
-  // Access denied
-  if (accessResult && !accessResult.allowed) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="max-w-md px-6 text-center">
-          <div className="mb-4 text-6xl">🔒</div>
-          <h2 className="mb-2 text-2xl font-bold text-gray-800">{t("wrapped.notAvailable")}</h2>
-          <p className="mb-6 text-gray-600">{accessResult.message}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (!wrappedData) {
+  if (festivalsError) {
     return <WrappedError message={t("wrapped.loadError")} />;
   }
+  // No link, no unlocked Wrapped and no current festival: nothing to open
+  if (!festivalId) {
+    return (
+      <WrappedError
+        title={t("wrapped.notAttended.title")}
+        message={t("wrapped.notAttended.description")}
+        emoji="🍺"
+      />
+    );
+  }
+  if (error || !result) {
+    return <WrappedError message={t("wrapped.loadError")} />;
+  }
+  if (result.status === "locked") {
+    // Browser timezone is right: it is the same instant as 00:00 at the festival
+    const unlocksAt = new Date(result.unlocksAt);
+    return (
+      <WrappedError
+        title={t("wrapped.locked.title")}
+        message={t("wrapped.locked.description", {
+          date: formatLocalized(unlocksAt, "PPP"),
+          time: formatLocalized(unlocksAt, "p"),
+        })}
+        emoji="🔒"
+      />
+    );
+  }
+  if (result.status === "not_attended") {
+    return (
+      <WrappedError
+        title={t("wrapped.notAttended.title")}
+        message={t("wrapped.notAttended.description")}
+        emoji="🍺"
+      />
+    );
+  }
+  return <WrappedContainer data={result.wrapped} />;
+}
 
-  // Success - show wrapped
-  return <WrappedContainer data={wrappedData} />;
+export default function WrappedPage() {
+  return (
+    <Suspense fallback={<WrappedLoading />}>
+      <WrappedPageContent />
+    </Suspense>
+  );
 }

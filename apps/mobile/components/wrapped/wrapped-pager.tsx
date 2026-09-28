@@ -50,7 +50,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     });
 
     // Drink breakdown (if consumptions data exists)
-    if (data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0) {
+    if (data.drinkStats.totalDrinks > 0) {
       slideList.push({
         key: "drink_breakdown",
         render: (isActive) => <DrinkBreakdownSlide data={data} isActive={isActive} />,
@@ -66,7 +66,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     }
 
     // Tent explorer (if tent data exists)
-    if (data.tent_stats && data.tent_stats.unique_tents > 0) {
+    if (data.tentStats && data.tentStats.uniqueTents > 0) {
       slideList.push({
         key: "tent_explorer",
         render: (isActive) => <TentExplorerSlide data={data} isActive={isActive} />,
@@ -74,7 +74,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     }
 
     // Peak moment (if best day exists)
-    if (data.peak_moments && data.peak_moments.best_day) {
+    if (data.peakMoments && data.peakMoments.bestDay) {
       slideList.push({
         key: "peak_moment",
         render: (isActive) => <PeakMomentSlide data={data} isActive={isActive} />,
@@ -88,7 +88,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     });
 
     // Pictures (if photos exist)
-    if (data.social_stats?.pictures && data.social_stats.pictures.length > 0) {
+    if (data.socialStats?.pictures && data.socialStats.pictures.length > 0) {
       slideList.push({
         key: "pictures",
         render: (isActive) => <PicturesSlide data={data} isActive={isActive} />,
@@ -112,7 +112,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     }
 
     // Rankings (if top 3 group rankings exist)
-    if (data.social_stats?.top_3_rankings && data.social_stats.top_3_rankings.length > 0) {
+    if (data.socialStats?.topRankings && data.socialStats.topRankings.length > 0) {
       slideList.push({
         key: "rankings",
         render: (isActive) => <RankingsSlide data={data} isActive={isActive} />,
@@ -120,7 +120,7 @@ export function WrappedPager({ data, onClose }: WrappedPagerProps) {
     }
 
     // Comparisons (if comparison data exists)
-    if (data.comparisons && data.comparisons.vs_last_year) {
+    if (data.comparisons && data.comparisons.vsLastYear) {
       slideList.push({
         key: "comparisons",
         render: (isActive) => <ComparisonsSlide data={data} isActive={isActive} />,

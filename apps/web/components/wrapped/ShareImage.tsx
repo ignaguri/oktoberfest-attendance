@@ -1,6 +1,6 @@
 "use client";
 
-import type { WrappedData } from "@prostcounter/shared/wrapped";
+import type { GlobalPositionCriteria, WrappedData } from "@prostcounter/shared/wrapped";
 import { prepareShareImageData } from "@prostcounter/shared/wrapped";
 import type { LucideIcon } from "lucide-react";
 import { Award, Beer, CalendarDays, Tent, Trophy } from "lucide-react";
@@ -59,16 +59,18 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
     const { t } = useTranslation();
     const shareData = prepareShareImageData(data);
 
-    const getPositionText = (position: { position: number; criteria: string } | null) => {
+    const getPositionText = (
+      position: { position: number; criteria: GlobalPositionCriteria } | null,
+    ) => {
       if (!position) return "Not ranked";
 
-      const criteriaLabels = {
+      const criteriaLabels: Record<GlobalPositionCriteria, string> = {
         days_attended: "Days",
         total_beers: "Beers",
         avg_beers: "Average",
       };
 
-      return `#${position.position} in ${criteriaLabels[position.criteria as keyof typeof criteriaLabels]}`;
+      return `#${position.position} in ${criteriaLabels[position.criteria]}`;
     };
 
     const getCriteriaLabel = () => {

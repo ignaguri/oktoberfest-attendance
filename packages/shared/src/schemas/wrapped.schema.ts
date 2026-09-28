@@ -1,104 +1,162 @@
 import { z } from "zod";
 
+import { AchievementCategorySchema } from "./achievement.schema";
+
 /**
- * Wrapped data response schema
- * Represents the personalized year-in-review statistics
+ * Wrapped, camelCase. The get_wrapped_data RPC returns the same data in
+ * snake_case (kept for installed mobile binaries that call it directly); the
+ * API maps it with packages/api/src/repositories/supabase/wrapped-mapper.ts.
+ *
+ * Dates and timestamps are plain strings: jsonb and PostgREST emit offsets and
+ * microseconds (2026-09-20T14:03:11.123456+00:00) that z.iso.datetime() rejects.
+ * Numbers are not .int(): a Radler counts as half a beer.
  */
 export const WrappedDataSchema = z.object({
-  userId: z.uuid(),
-  festivalId: z.uuid(),
-  totalDays: z.number().int(),
-  totalBeers: z.number().int(),
-  totalSpent: z.number(),
-  avgBeersPerDay: z.number(),
-  favoriteTent: z
-    .object({
-      id: z.uuid(),
-      name: z.string(),
-      visitCount: z.number().int(),
-    })
-    .nullable(),
-  topDrinkType: z.string().nullable(),
-  drinkStats: z
-    .object({
-      totalDrinks: z.number().int(),
-      topDrinkType: z.string().nullable(),
-      breakdown: z.array(
-        z.object({
-          drinkType: z.string(),
-          count: z.number().int(),
-          percentage: z.number(),
-        }),
-      ),
-    })
-    .optional(),
+  userInfo: z.object({
+    username: z.string().nullable(),
+    fullName: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
+  }),
+  festivalInfo: z.object({
+    name: z.string(),
+    startDate: z.string(),
+    endDate: z.string(),
+    location: z.string().nullable(),
+  }),
+  basicStats: z.object({
+    totalBeers: z.number(),
+    daysAttended: z.number(),
+    avgBeers: z.number(),
+    totalSpent: z.number(),
+    beerCost: z.number(),
+  }),
+  tentStats: z.object({
+    uniqueTents: z.number(),
+    favoriteTent: z.string().nullable(),
+    tentDiversityPct: z.number(),
+    tentBreakdown: z.array(z.object({ tentName: z.string(), visitCount: z.number() })),
+  }),
+  peakMoments: z.object({
+    bestDay: z
+      .object({
+        date: z.string(),
+        beerCount: z.number(),
+        tentsVisited: z.number(),
+        spent: z.number(),
+      })
+      .nullable(),
+    maxSingleSession: z.number(),
+    mostExpensiveDay: z.object({ date: z.string(), amount: z.number() }).nullable(),
+  }),
+  socialStats: z.object({
+    groupsJoined: z.number(),
+    topRankings: z.array(z.object({ groupName: z.string(), position: z.number() })),
+    photosUploaded: z.number(),
+    totalGroupMembers: z.number(),
+    pictures: z.array(
+      z.object({
+        id: z.string(),
+        pictureUrl: z.string(),
+        createdAt: z.string(),
+        attendanceDate: z.string(),
+      }),
+    ),
+  }),
+  globalLeaderboardPositions: z.object({
+    daysAttended: z.number().nullable(),
+    totalBeers: z.number().nullable(),
+    avgBeers: z.number().nullable(),
+  }),
   achievements: z.array(
     z.object({
-      id: z.uuid(),
+      id: z.string(),
       name: z.string(),
-      unlockedAt: z.iso.datetime(),
+      description: z.string(),
+      icon: z.string(),
+      category: AchievementCategorySchema,
+      tier: z.number(),
+      points: z.number(),
+      rarity: z.string(),
+      unlockedAt: z.string(),
     }),
   ),
-  globalRank: z.number().int().nullable(),
-  groupRanks: z.array(
+  timeline: z.array(
     z.object({
-      groupId: z.uuid(),
-      groupName: z.string(),
-      rank: z.number().int(),
+      date: z.string(),
+      beerCount: z.number(),
+      spent: z.number(),
+      tentsVisited: z.number(),
     }),
   ),
-  firstVisitDate: z.iso.date().nullable(),
-  lastVisitDate: z.iso.date().nullable(),
-  longestStreak: z.number().int(),
-  generatedAt: z.iso.datetime(),
+  comparisons: z.object({
+    vsFestivalAvg: z.object({
+      beersDiffPct: z.number(),
+      daysDiffPct: z.number(),
+      avgBeers: z.number(),
+      avgDays: z.number(),
+      medianBeers: z.number(),
+      medianDays: z.number(),
+      beersPercentile: z.number(),
+      daysPercentile: z.number(),
+    }),
+    vsLastYear: z
+      .object({
+        beersDiff: z.number(),
+        daysDiff: z.number(),
+        spentDiff: z.number(),
+        prevBeers: z.number(),
+        prevDays: z.number(),
+        prevFestivalName: z.string(),
+      })
+      .nullable(),
+  }),
+  personality: z.object({ type: z.string(), traits: z.array(z.string()) }),
+  drinkStats: z.object({
+    totalDrinks: z.number(),
+    topDrinkType: z.string().nullable(),
+    breakdown: z.array(
+      z.object({ drinkType: z.string(), count: z.number(), percentage: z.number() }),
+    ),
+  }),
 });
 
 export type WrappedData = z.infer<typeof WrappedDataSchema>;
 
 /**
- * Get wrapped data query
  * GET /api/v1/wrapped/:festivalId
+ * 200 in every case; `status` says which. `unlocksAt` is an ISO string (Z).
  */
-export const GetWrappedQuerySchema = z.object({
-  festivalId: z.uuid({ error: "Invalid festival ID" }),
-});
-
-export type GetWrappedQuery = z.infer<typeof GetWrappedQuerySchema>;
-
-/**
- * Get wrapped data response
- */
-export const GetWrappedResponseSchema = z.object({
-  wrapped: WrappedDataSchema.nullable(),
-  cached: z.boolean(),
-});
+export const GetWrappedResponseSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("ready"), wrapped: WrappedDataSchema }),
+  z.object({ status: z.literal("locked"), unlocksAt: z.string() }),
+  z.object({ status: z.literal("not_attended") }),
+]);
 
 export type GetWrappedResponse = z.infer<typeof GetWrappedResponseSchema>;
 
 /**
- * Generate wrapped data request
- * POST /api/v1/wrapped/:festivalId/generate
+ * GET /api/v1/wrapped: every unlocked festival the user attended, newest first.
  */
-export const GenerateWrappedBodySchema = z.object({
-  festivalId: z.uuid({ error: "Invalid festival ID" }),
-  force: z.boolean().optional().default(false), // Force regeneration even if cached
+export const WrappedFestivalSchema = z.object({
+  festivalId: z.uuid(),
+  name: z.string(),
+  startDate: z.string(),
+  endDate: z.string(),
+  unlocksAt: z.string(),
+  viewed: z.boolean(),
 });
 
-export type GenerateWrappedInput = z.infer<typeof GenerateWrappedBodySchema>;
+export type WrappedFestival = z.infer<typeof WrappedFestivalSchema>;
 
-/**
- * Generate wrapped data response
- */
-export const GenerateWrappedResponseSchema = z.object({
-  wrapped: WrappedDataSchema,
-  regenerated: z.boolean(), // True if cache was invalidated and regenerated
+export const GetWrappedFestivalsResponseSchema = z.object({
+  festivals: z.array(WrappedFestivalSchema),
 });
 
-export type GenerateWrappedResponse = z.infer<typeof GenerateWrappedResponseSchema>;
+export type GetWrappedFestivalsResponse = z.infer<typeof GetWrappedFestivalsResponseSchema>;
 
 /**
- * Wrapped access result schema
  * GET /api/v1/wrapped/:festivalId/access
+ * @deprecated Kept for installed binaries; new clients use GET /wrapped/:festivalId.
  */
 export const WrappedAccessResultSchema = z.object({
   allowed: z.boolean(),
@@ -107,28 +165,6 @@ export const WrappedAccessResultSchema = z.object({
 });
 
 export type WrappedAccessResult = z.infer<typeof WrappedAccessResultSchema>;
-
-/**
- * Available wrapped festival schema
- * GET /api/v1/wrapped/festivals
- */
-export const AvailableWrappedFestivalSchema = z.object({
-  id: z.uuid(),
-  name: z.string(),
-  year: z.number().int(),
-  status: z.string(),
-  hasData: z.boolean(),
-});
-
-export type AvailableWrappedFestival = z.infer<typeof AvailableWrappedFestivalSchema>;
-
-export const GetAvailableWrappedFestivalsResponseSchema = z.object({
-  festivals: z.array(AvailableWrappedFestivalSchema),
-});
-
-export type GetAvailableWrappedFestivalsResponse = z.infer<
-  typeof GetAvailableWrappedFestivalsResponseSchema
->;
 
 /**
  * Regenerate wrapped cache request (admin only)

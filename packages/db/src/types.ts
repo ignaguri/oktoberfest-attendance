@@ -2179,6 +2179,7 @@ export type Database = {
       wrapped_data_cache: {
         Row: {
           created_at: string
+          data_version: number
           festival_id: string
           first_viewed_at: string | null
           generated_by: string
@@ -2189,6 +2190,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          data_version?: number
           festival_id: string
           first_viewed_at?: string | null
           generated_by?: string
@@ -2199,6 +2201,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          data_version?: number
           festival_id?: string
           first_viewed_at?: string | null
           generated_by?: string
@@ -2393,13 +2396,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_user_id"
-            columns: ["owner_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
-          {
-            foreignKeyName: "fk_user_id"
             columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "leaderboard"
@@ -2408,13 +2404,20 @@ export type Database = {
           {
             foreignKeyName: "fk_user_id"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_user_id"
+            columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fk_user_id"
-            columns: ["viewer_id"]
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -2437,6 +2440,10 @@ export type Database = {
       _get_effective_spend_cents: {
         Args: { p_attendance_id: string }
         Returns: number
+      }
+      _previous_festival_in_series: {
+        Args: { p_festival_id: string; p_user_id: string }
+        Returns: string
       }
       accept_friend_request: {
         Args: { p_friendship_id: string; p_user_id: string }
@@ -2492,7 +2499,7 @@ export type Database = {
           festival_id: string
           festival_name: string
           returned_any: number
-          returned_next: number | null
+          returned_next: number
           start_date: string
         }[]
       }
@@ -2504,6 +2511,15 @@ export type Database = {
           mau: number
           wau: number
         }[]
+      }
+      analytics_record_events: {
+        Args: {
+          p_app_version?: string
+          p_events: Json
+          p_platform?: string
+          p_user_id: string
+        }
+        Returns: number
       }
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }
@@ -2585,6 +2601,10 @@ export type Database = {
           user_id: string
           username: string
         }[]
+      }
+      generate_username: {
+        Args: { p_email: string; p_full_name: string }
+        Returns: string
       }
       get_achievement_leaderboard: {
         Args: { p_festival_id: string }
@@ -2778,6 +2798,25 @@ export type Database = {
         Args: { p_festival_id: string; p_user_id: string }
         Returns: Json
       }
+      get_wrapped_festivals: {
+        Args: never
+        Returns: {
+          end_date: string
+          festival_id: string
+          name: string
+          start_date: string
+          unlocks_at: string
+          viewed: boolean
+        }[]
+      }
+      get_wrapped_status: {
+        Args: { p_festival_id: string }
+        Returns: {
+          has_attendance: boolean
+          is_unlocked: boolean
+          unlocks_at: string
+        }[]
+      }
       invalidate_festival_wrapped_cache: {
         Args: { p_festival_id: string }
         Returns: number
@@ -2931,6 +2970,8 @@ export type Database = {
         Args: { session_uuid: string }
         Returns: boolean
       }
+      wrapped_data_version: { Args: never; Returns: number }
+      wrapped_unlocks_at: { Args: { p_festival_id: string }; Returns: string }
     }
     Enums: {
       achievement_category_enum:

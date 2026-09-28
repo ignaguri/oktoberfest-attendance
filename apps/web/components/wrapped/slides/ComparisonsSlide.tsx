@@ -27,14 +27,14 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
     );
   }
 
-  const { vs_festival_avg, vs_last_year } = data.comparisons;
-  const improvement = vs_last_year ? isImprovement(vs_last_year) : null;
+  const { vsFestivalAvg, vsLastYear } = data.comparisons;
+  const improvement = vsLastYear ? isImprovement(vsLastYear) : null;
 
   // Percentile rank is the better statistic, but cache rows written before it was added
   // only carry the mean-based diff, so fall back to that until they are regenerated.
   const hasPercentile =
-    vs_festival_avg?.beers_percentile !== undefined &&
-    vs_festival_avg?.days_percentile !== undefined;
+    vsFestivalAvg?.beersPercentile !== undefined &&
+    vsFestivalAvg?.daysPercentile !== undefined;
 
   const getIcon = (diff: number) => {
     if (diff > 0) return <ArrowUp className="size-5 text-green-500" />;
@@ -48,7 +48,7 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
 
       <div className="w-full max-w-2xl space-y-6">
         {/* vs Festival Average */}
-        {vs_festival_avg && (
+        {vsFestivalAvg && (
           <div className="rounded-xl bg-white p-6 shadow-lg">
             <h3 className="mb-4 text-center text-lg font-semibold text-gray-700">
               {t(
@@ -64,20 +64,20 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
                   <div className="text-right">
                     <span className="font-bold text-gray-800">
                       {t("wrapped.comparisons.betterThan", {
-                        percent: formatPercentile(vs_festival_avg.beers_percentile ?? 0),
+                        percent: formatPercentile(vsFestivalAvg.beersPercentile ?? 0),
                       })}
                     </span>
-                    {vs_festival_avg.median_beers !== undefined && (
+                    {vsFestivalAvg.medianBeers !== undefined && (
                       <p className="text-xs text-gray-500">
-                        {t("wrapped.comparisons.typical", { value: vs_festival_avg.median_beers })}
+                        {t("wrapped.comparisons.typical", { value: vsFestivalAvg.medianBeers })}
                       </p>
                     )}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    {getIcon(vs_festival_avg.beers_diff_pct || 0)}
+                    {getIcon(vsFestivalAvg.beersDiffPct || 0)}
                     <span className="font-bold text-gray-800">
-                      {formatPercentage(vs_festival_avg.beers_diff_pct || 0)}
+                      {formatPercentage(vsFestivalAvg.beersDiffPct || 0)}
                     </span>
                   </div>
                 )}
@@ -88,20 +88,20 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
                   <div className="text-right">
                     <span className="font-bold text-gray-800">
                       {t("wrapped.comparisons.betterThan", {
-                        percent: formatPercentile(vs_festival_avg.days_percentile ?? 0),
+                        percent: formatPercentile(vsFestivalAvg.daysPercentile ?? 0),
                       })}
                     </span>
-                    {vs_festival_avg.median_days !== undefined && (
+                    {vsFestivalAvg.medianDays !== undefined && (
                       <p className="text-xs text-gray-500">
-                        {t("wrapped.comparisons.typical", { value: vs_festival_avg.median_days })}
+                        {t("wrapped.comparisons.typical", { value: vsFestivalAvg.medianDays })}
                       </p>
                     )}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    {getIcon(vs_festival_avg.days_diff_pct || 0)}
+                    {getIcon(vsFestivalAvg.daysDiffPct || 0)}
                     <span className="font-bold text-gray-800">
-                      {formatPercentage(vs_festival_avg.days_diff_pct || 0)}
+                      {formatPercentage(vsFestivalAvg.daysDiffPct || 0)}
                     </span>
                   </div>
                 )}
@@ -111,30 +111,30 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
         )}
 
         {/* vs Last Year */}
-        {vs_last_year && improvement && (
+        {vsLastYear && improvement && (
           <div className="rounded-xl bg-white p-6 shadow-lg">
             <h3 className="mb-4 text-center text-lg font-semibold text-gray-700">
               {t("wrapped.comparisons.vsLastYear")} (
-              {vs_last_year.prev_festival_name || "Previous Festival"})
+              {vsLastYear.prevFestivalName || "Previous Festival"})
             </h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">{t("wrapped.comparisons.beers")}</span>
                 <div className="flex items-center gap-2">
-                  {getIcon(vs_last_year.beers_diff || 0)}
+                  {getIcon(vsLastYear.beersDiff || 0)}
                   <span className="font-bold text-gray-800">
-                    {(vs_last_year.beers_diff || 0) > 0 ? "+" : ""}
-                    {vs_last_year.beers_diff || 0}
+                    {(vsLastYear.beersDiff || 0) > 0 ? "+" : ""}
+                    {vsLastYear.beersDiff || 0}
                   </span>
                 </div>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3">
                 <span className="text-gray-700">{t("wrapped.comparisons.days")}</span>
                 <div className="flex items-center gap-2">
-                  {getIcon(vs_last_year.days_diff || 0)}
+                  {getIcon(vsLastYear.daysDiff || 0)}
                   <span className="font-bold text-gray-800">
-                    {(vs_last_year.days_diff || 0) > 0 ? "+" : ""}
-                    {vs_last_year.days_diff || 0}
+                    {(vsLastYear.daysDiff || 0) > 0 ? "+" : ""}
+                    {vsLastYear.daysDiff || 0}
                   </span>
                 </div>
               </div>
@@ -143,7 +143,7 @@ export function ComparisonsSlide({ data, isActive = false }: ComparisonsSlidePro
         )}
 
         {/* No data message */}
-        {!vs_festival_avg && !vs_last_year && (
+        {!vsFestivalAvg && !vsLastYear && (
           <div className="rounded-xl bg-white p-6 text-center shadow-lg">
             <p className="text-gray-600">No comparison data available for this festival</p>
           </div>

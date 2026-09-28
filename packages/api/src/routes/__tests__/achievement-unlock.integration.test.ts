@@ -864,6 +864,15 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     const festival = await createTestFestival(supabaseAdmin);
     const app = mountRoute(wrappedRoutes);
 
+    // Wrapped is only served to attendees of an unlocked festival; this one
+    // ended in 2024. Inserted before the cache seed, which it would invalidate.
+    const { error: attendanceError } = await supabaseAdmin
+      .from("attendances")
+      .insert({ user_id: user.id, festival_id: festival.id, date: "2024-09-22" });
+    if (attendanceError) {
+      throw new Error(`Failed to seed attendance: ${attendanceError.message}`);
+    }
+
     // A cached but never-viewed Wrapped. wrapped_viewed is read off
     // wrapped_data_cache.first_viewed_at (see get_achievement_metrics), which
     // the GET must stamp before evaluating.

@@ -6,7 +6,7 @@
 import { parseISO } from "date-fns";
 
 import { formatLocalized } from "../utils/date-utils";
-import type { WrappedData } from "./types";
+import type { WrappedData } from "../schemas/wrapped.schema";
 
 /**
  * Format date for display with localization
@@ -53,7 +53,7 @@ export function formatPercentile(percent: number): string {
 /**
  * Get festival year from festival name or dates
  */
-export function getFestivalYear(festivalInfo: WrappedData["festival_info"]): number {
+export function getFestivalYear(festivalInfo: WrappedData["festivalInfo"]): number {
   // Try to extract year from festival name first
   const yearMatch = festivalInfo.name.match(/\d{4}/);
   if (yearMatch) {
@@ -61,7 +61,7 @@ export function getFestivalYear(festivalInfo: WrappedData["festival_info"]): num
   }
 
   // Fall back to start date year
-  return new Date(festivalInfo.start_date).getFullYear();
+  return new Date(festivalInfo.startDate).getFullYear();
 }
 
 /**
@@ -72,29 +72,15 @@ export function calculateTotalPoints(achievements: WrappedData["achievements"]):
 }
 
 /**
- * Check if user has data to show wrapped
- */
-export function hasWrappedData(data: WrappedData | null): boolean {
-  if (!data) return false;
-  if (!data.basic_stats) return false;
-
-  return (
-    data.basic_stats.total_beers > 0 ||
-    data.basic_stats.days_attended > 0 ||
-    (data.achievements && data.achievements.length > 0)
-  );
-}
-
-/**
  * Transform wrapped data for timeline chart
  */
 export function prepareTimelineData(timeline: WrappedData["timeline"]) {
   return timeline.map((day) => ({
     date: formatLocalized(parseISO(day.date), "d MMMM"),
     fullDate: day.date,
-    beers: day.beer_count,
+    beers: day.beerCount,
     spent: day.spent,
-    tents: day.tents_visited,
+    tents: day.tentsVisited,
   }));
 }
 
@@ -102,10 +88,10 @@ export function prepareTimelineData(timeline: WrappedData["timeline"]) {
  * Get top N tent visits
  */
 export function getTopTents(
-  tentBreakdown: WrappedData["tent_stats"]["tent_breakdown"],
+  tentBreakdown: WrappedData["tentStats"]["tentBreakdown"],
   limit: number = 5,
 ) {
-  return tentBreakdown.sort((a, b) => b.visit_count - a.visit_count).slice(0, limit);
+  return tentBreakdown.sort((a, b) => b.visitCount - a.visitCount).slice(0, limit);
 }
 
 /**
@@ -162,7 +148,7 @@ export function sortAchievements(achievements: WrappedData["achievements"]) {
 /**
  * Check if comparison shows improvement vs last year
  */
-export function isImprovement(vsLastYear: WrappedData["comparisons"]["vs_last_year"]): {
+export function isImprovement(vsLastYear: WrappedData["comparisons"]["vsLastYear"]): {
   beers: boolean;
   days: boolean;
   overall: boolean;
@@ -170,9 +156,9 @@ export function isImprovement(vsLastYear: WrappedData["comparisons"]["vs_last_ye
   if (!vsLastYear) return null;
 
   return {
-    beers: vsLastYear.beers_diff > 0,
-    days: vsLastYear.days_diff > 0,
-    overall: vsLastYear.beers_diff > 0 && vsLastYear.days_diff >= 0,
+    beers: vsLastYear.beersDiff > 0,
+    days: vsLastYear.daysDiff > 0,
+    overall: vsLastYear.beersDiff > 0 && vsLastYear.daysDiff >= 0,
   };
 }
 
@@ -180,36 +166,38 @@ export function isImprovement(vsLastYear: WrappedData["comparisons"]["vs_last_ye
  * Calculate number of groups where user ranked in podium (1st, 2nd, 3rd place)
  */
 export function calculatePodiumGroupsCount(data: WrappedData): number {
-  return data.social_stats.top_3_rankings.filter((ranking) => ranking.position <= 3).length;
+  return data.socialStats.topRankings.filter((ranking) => ranking.position <= 3).length;
 }
 
 /**
  * Get the best (highest) global leaderboard position across all criteria
- * Prefers days_attended if there's a tie
+ * Prefers daysAttended if there's a tie
  */
+export type GlobalPositionCriteria = "days_attended" | "total_beers" | "avg_beers";
+
 export function getBestGlobalPosition(data: WrappedData): {
   position: number;
-  criteria: string;
+  criteria: GlobalPositionCriteria;
 } | null {
-  const positions = [];
+  const positions: { position: number; criteria: GlobalPositionCriteria }[] = [];
 
-  if (data.global_leaderboard_positions.days_attended !== null) {
+  if (data.globalLeaderboardPositions.daysAttended !== null) {
     positions.push({
-      position: data.global_leaderboard_positions.days_attended,
+      position: data.globalLeaderboardPositions.daysAttended,
       criteria: "days_attended",
     });
   }
 
-  if (data.global_leaderboard_positions.total_beers !== null) {
+  if (data.globalLeaderboardPositions.totalBeers !== null) {
     positions.push({
-      position: data.global_leaderboard_positions.total_beers,
+      position: data.globalLeaderboardPositions.totalBeers,
       criteria: "total_beers",
     });
   }
 
-  if (data.global_leaderboard_positions.avg_beers !== null) {
+  if (data.globalLeaderboardPositions.avgBeers !== null) {
     positions.push({
-      position: data.global_leaderboard_positions.avg_beers,
+      position: data.globalLeaderboardPositions.avgBeers,
       criteria: "avg_beers",
     });
   }
@@ -232,10 +220,10 @@ export function prepareShareImageData(data: WrappedData) {
   const bestGlobalPosition = getBestGlobalPosition(data);
 
   return {
-    festivalName: data.festival_info.name,
-    daysAttended: data.basic_stats.days_attended,
-    beersDrunk: data.basic_stats.total_beers,
-    tentsVisited: data.tent_stats.unique_tents,
+    festivalName: data.festivalInfo.name,
+    daysAttended: data.basicStats.daysAttended,
+    beersDrunk: data.basicStats.totalBeers,
+    tentsVisited: data.tentStats.uniqueTents,
     podiumGroupsCount,
     bestGlobalPosition,
   };

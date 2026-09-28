@@ -21,6 +21,7 @@ import { AdminSection } from "@/components/profile/admin-section";
 import { DangerZone } from "@/components/profile/danger-zone";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { SettingsSection } from "@/components/profile/settings-section";
+import { WrappedArchiveSection } from "@/components/profile/wrapped-archive-section";
 import { SyncDataSection } from "@/components/profile/sync-data-section";
 import { WatchSection } from "@/components/profile/watch-section";
 import { ProfileSkeleton } from "@/components/skeletons";
@@ -244,6 +245,9 @@ export default function ProfileScreen() {
           errors={errors}
           control={control}
         />
+
+        {/* Wrapped archive */}
+        <WrappedArchiveSection />
 
         {/* Settings Section */}
         <SettingsSection

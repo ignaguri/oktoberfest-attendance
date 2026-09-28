@@ -1,6 +1,6 @@
 import { Motion } from "@legendapp/motion";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useWrappedAccess } from "@prostcounter/shared/hooks";
+import { useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
 import { Sparkles } from "lucide-react-native";
@@ -19,20 +19,23 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const { currentFestival } = useFestival();
-  const { data: accessResult, loading } = useWrappedAccess(currentFestival?.id);
+  const { data: festivals, loading } = useWrappedFestivals();
 
   // Don't show if loading or no current festival
   if (loading || !currentFestival) {
     return null;
   }
 
+  const isUnlocked =
+    festivals?.some((festival) => festival.festivalId === currentFestival.id) ?? false;
+
   // Don't show if not last day and access not allowed
-  if (!isLastDayOfFestival && (!accessResult || !accessResult.allowed)) {
+  if (!isLastDayOfFestival && !isUnlocked) {
     return null;
   }
 
   const festivalName = currentFestival.name;
-  const isReady = !isLastDayOfFestival && accessResult?.allowed;
+  const isReady = !isLastDayOfFestival && isUnlocked;
 
   return (
     <Motion.View
@@ -60,10 +63,12 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
 
           {isReady && (
             <Pressable
-              // @ts-ignore - Route exists but typed routes haven't been regenerated yet
-              onPress={() => router.push("/wrapped")}
+              onPress={() =>
+                router.push({ pathname: "/wrapped", params: { festivalId: currentFestival.id } })
+              }
               className="mt-1 rounded-lg bg-yellow-500 px-6 py-3"
               accessibilityLabel={t("wrapped.cta.viewButton")}
+              accessibilityHint={t("profile.wrappedArchive.openHint")}
               accessibilityRole="button"
             >
               <Text className="font-semibold text-white">{t("wrapped.cta.viewButton")}</Text>

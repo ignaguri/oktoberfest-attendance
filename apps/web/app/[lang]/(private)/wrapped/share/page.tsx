@@ -21,7 +21,7 @@ export default function ShareImagePage() {
 
   // Load wrapped data from localStorage
   useEffect(() => {
-    const storedData = localStorage.getItem("wrapped-share-data");
+    const storedData = localStorage.getItem("wrapped-share-data-v2");
     if (storedData) {
       try {
         const data = JSON.parse(storedData) as WrappedData;
@@ -77,7 +77,7 @@ export default function ShareImagePage() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `${wrappedData.festival_info.name}-wrapped.png`;
+      link.download = `${wrappedData.festivalInfo.name}-wrapped.png`;
       link.click();
 
       // Cleanup
