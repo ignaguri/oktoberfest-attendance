@@ -1,10 +1,13 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
+  AnalyticsCohortsResponseSchema,
   AnalyticsFeatureUsageResponseSchema,
   AnalyticsFestivalRetentionResponseSchema,
   AnalyticsFunnelResponseSchema,
   AnalyticsOverviewResponseSchema,
   AnalyticsRangeQuerySchema,
+  AnalyticsScorecardQuerySchema,
+  AnalyticsScorecardResponseSchema,
 } from "@prostcounter/shared";
 
 import { ApiErrorSchema } from "../lib/error-response";
@@ -129,6 +132,54 @@ const festivalRetentionRoute = createRoute({
 app.openapi(festivalRetentionRoute, async (c) => {
   const repository = new SupabaseAdminAnalyticsRepository();
   return c.json(await repository.getFestivalRetention(), 200);
+});
+
+// GET /admin/analytics/scorecard
+const scorecardRoute = createRoute({
+  method: "get",
+  path: "/admin/analytics/scorecard",
+  tags: ["admin"],
+  summary: "Feature scorecard (admin)",
+  description:
+    "Per feature: attendees, adopters, and for users vs non-users how many came back during the festival and how many attended a later one. Without festivalId, every festival pooled.",
+  request: { query: AnalyticsScorecardQuerySchema },
+  responses: {
+    200: {
+      description: "Scorecard counts",
+      content: { "application/json": { schema: AnalyticsScorecardResponseSchema } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(scorecardRoute, async (c) => {
+  const { festivalId } = c.req.valid("query");
+  const repository = new SupabaseAdminAnalyticsRepository();
+  return c.json(await repository.getFeatureScorecard(festivalId), 200);
+});
+
+// GET /admin/analytics/cohorts
+const cohortsRoute = createRoute({
+  method: "get",
+  path: "/admin/analytics/cohorts",
+  tags: ["admin"],
+  summary: "Signup cohorts (admin)",
+  description:
+    "Per signup month, newest first: sign-ups and how many activated, activated within 7 days, logged 3+ days at a festival, and attended 2+ festivals.",
+  responses: {
+    200: {
+      description: "Signup cohorts",
+      content: { "application/json": { schema: AnalyticsCohortsResponseSchema } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(cohortsRoute, async (c) => {
+  const repository = new SupabaseAdminAnalyticsRepository();
+  return c.json(await repository.getSignupCohorts(), 200);
 });
 
 export default app;

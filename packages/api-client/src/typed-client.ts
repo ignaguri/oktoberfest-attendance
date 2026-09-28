@@ -20,11 +20,14 @@ import type {
   AdminUser,
   AdminUserGroup,
   AdminWrappedCacheEntry,
+  AnalyticsCohortsResponse,
   AnalyticsFeatureUsageResponse,
   AnalyticsFestivalRetentionResponse,
   AnalyticsFunnelResponse,
   AnalyticsOverviewResponse,
   AnalyticsRangeQuery,
+  AnalyticsScorecardQuery,
+  AnalyticsScorecardResponse,
   CopyAdminFestivalTentsInput,
   AttendanceByDate,
   CarryOverCandidatesResponse,
@@ -2938,6 +2941,37 @@ export function createTypedApiClient(config: ApiClientConfig) {
             await extractApiError(response, "Failed to fetch festival retention");
           }
           return parseJsonResponse<AnalyticsFestivalRetentionResponse>(response);
+        },
+
+        async scorecard(query: AnalyticsScorecardQuery): Promise<AnalyticsScorecardResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query.festivalId) {
+            params.set("festivalId", query.festivalId);
+          }
+          const search = params.toString();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/scorecard${search ? `?${search}` : ""}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch feature scorecard");
+          }
+          return parseJsonResponse<AnalyticsScorecardResponse>(response);
+        },
+
+        async cohorts(): Promise<AnalyticsCohortsResponse> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/cohorts`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch signup cohorts");
+          }
+          return parseJsonResponse<AnalyticsCohortsResponse>(response);
         },
       },
 

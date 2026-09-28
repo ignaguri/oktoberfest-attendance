@@ -210,6 +210,9 @@ export class QueryKeys {
     ["admin", "analytics", "activation-funnel", from, to, platform ?? null] as const;
   static adminAnalyticsFestivalRetention = () =>
     ["admin", "analytics", "festival-retention"] as const;
+  static adminAnalyticsScorecard = (festivalId?: string) =>
+    ["admin", "analytics", "scorecard", festivalId ?? null] as const;
+  static adminAnalyticsCohorts = () => ["admin", "analytics", "cohorts"] as const;
   static adminFeedback = (kind?: string) => ["admin", "feedback", kind ?? "all"] as const;
   /** Prefix covering every cached feedback list, for invalidation after a submission. */
   static adminFeedbackAll = () => ["admin", "feedback"] as const;

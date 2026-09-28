@@ -20987,6 +20987,241 @@
           }
         }
       }
+    },
+    "/v1/admin/analytics/scorecard": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Feature scorecard (admin)",
+        "description": "Per feature: attendees, adopters, and for users vs non-users how many came back during the festival and how many attended a later one. Without festivalId, every festival pooled.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "festivalId",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Scorecard counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "features": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "feature": {
+                            "type": "string",
+                            "enum": [
+                              "drinks",
+                              "photos",
+                              "group_joins",
+                              "group_messages",
+                              "photo_reactions",
+                              "photo_comments",
+                              "day_plans",
+                              "crowd_reports",
+                              "friend_requests",
+                              "location_sharing",
+                              "wrapped"
+                            ]
+                          },
+                          "attendees": {
+                            "type": "integer"
+                          },
+                          "adopters": {
+                            "type": "integer"
+                          },
+                          "cameBackUsers": {
+                            "type": "integer"
+                          },
+                          "cameBackUsersBase": {
+                            "type": "integer"
+                          },
+                          "cameBackNonUsers": {
+                            "type": "integer"
+                          },
+                          "cameBackNonUsersBase": {
+                            "type": "integer"
+                          },
+                          "returnedUsers": {
+                            "type": "integer"
+                          },
+                          "returnedUsersBase": {
+                            "type": "integer"
+                          },
+                          "returnedNonUsers": {
+                            "type": "integer"
+                          },
+                          "returnedNonUsersBase": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "feature",
+                          "attendees",
+                          "adopters",
+                          "cameBackUsers",
+                          "cameBackUsersBase",
+                          "cameBackNonUsers",
+                          "cameBackNonUsersBase",
+                          "returnedUsers",
+                          "returnedUsersBase",
+                          "returnedNonUsers",
+                          "returnedNonUsersBase"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "features"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/analytics/cohorts": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Signup cohorts (admin)",
+        "description": "Per signup month, newest first: sign-ups and how many activated, activated within 7 days, logged 3+ days at a festival, and attended 2+ festivals.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signup cohorts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "cohorts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "month": {
+                            "type": "string",
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "signups": {
+                            "type": "integer"
+                          },
+                          "activated": {
+                            "type": "integer"
+                          },
+                          "activated7d": {
+                            "type": "integer"
+                          },
+                          "engaged": {
+                            "type": "integer"
+                          },
+                          "returned": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "month",
+                          "signups",
+                          "activated",
+                          "activated7d",
+                          "engaged",
+                          "returned"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "cohorts"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -8,11 +8,13 @@
 
 import { QueryKeys, useApiClient, useQuery } from "../data";
 import type {
+  AnalyticsCohortsResponse,
   AnalyticsFeatureUsageResponse,
   AnalyticsFestivalRetentionResponse,
   AnalyticsFunnelResponse,
   AnalyticsOverviewResponse,
   AnalyticsRangeQuery,
+  AnalyticsScorecardResponse,
 } from "../schemas/admin-analytics.schema";
 
 // The numbers move slowly and every query scans whole tables, so do not refetch
@@ -57,6 +59,25 @@ export function useAdminAnalyticsFestivalRetention() {
   return useQuery<AnalyticsFestivalRetentionResponse>(
     QueryKeys.adminAnalyticsFestivalRetention(),
     () => apiClient.admin.analytics.festivalRetention(),
+    ANALYTICS_QUERY_OPTIONS,
+  );
+}
+
+/** No festivalId means every festival, pooled. */
+export function useAdminAnalyticsScorecard(festivalId?: string) {
+  const apiClient = useApiClient();
+  return useQuery<AnalyticsScorecardResponse>(
+    QueryKeys.adminAnalyticsScorecard(festivalId),
+    () => apiClient.admin.analytics.scorecard({ festivalId }),
+    ANALYTICS_QUERY_OPTIONS,
+  );
+}
+
+export function useAdminAnalyticsCohorts() {
+  const apiClient = useApiClient();
+  return useQuery<AnalyticsCohortsResponse>(
+    QueryKeys.adminAnalyticsCohorts(),
+    () => apiClient.admin.analytics.cohorts(),
     ANALYTICS_QUERY_OPTIONS,
   );
 }
