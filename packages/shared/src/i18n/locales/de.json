@@ -2269,7 +2269,14 @@
       "loadError": "Analytics konnten nicht geladen werden",
       "empty": "Für diesen Zeitraum gibt es noch keine Daten",
       "retry": "Erneut versuchen",
-      "filters": { "range": "Zeitraum", "platform": "Plattform", "festivals": "Feste" },
+      "filters": {
+        "range": "Zeitraum",
+        "platform": "Plattform",
+        "festivals": "Feste",
+        "presets": "Zeiträume",
+        "search": "Zeiträume und Feste suchen",
+        "noMatch": "Keine Treffer"
+      },
       "ranges": { "7d": "Letzte 7 Tage", "30d": "Letzte 30 Tage", "90d": "Letzte 90 Tage", "365d": "Letzte 365 Tage" },
       "platforms": { "all": "Alle Plattformen", "ios": "iOS", "android": "Android" },
       "sections": {

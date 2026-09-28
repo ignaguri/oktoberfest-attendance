@@ -2032,7 +2032,14 @@
       "loadError": "Could not load analytics",
       "empty": "No data for this range yet",
       "retry": "Retry",
-      "filters": { "range": "Time range", "platform": "Platform", "festivals": "Festivals" },
+      "filters": {
+        "range": "Time range",
+        "platform": "Platform",
+        "festivals": "Festivals",
+        "presets": "Periods",
+        "search": "Search periods and festivals",
+        "noMatch": "Nothing matches"
+      },
       "ranges": { "7d": "Last 7 days", "30d": "Last 30 days", "90d": "Last 90 days", "365d": "Last 365 days" },
       "platforms": { "all": "All platforms", "ios": "iOS", "android": "Android" },
       "sections": {

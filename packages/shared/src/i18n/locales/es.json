@@ -2092,7 +2092,14 @@
       "loadError": "No se pudieron cargar las analíticas",
       "empty": "Todavía no hay datos para este período",
       "retry": "Reintentar",
-      "filters": { "range": "Período", "platform": "Plataforma", "festivals": "Festivales" },
+      "filters": {
+        "range": "Período",
+        "platform": "Plataforma",
+        "festivals": "Festivales",
+        "presets": "Períodos",
+        "search": "Buscá un período o festival",
+        "noMatch": "No hay resultados"
+      },
       "ranges": { "7d": "Últimos 7 días", "30d": "Últimos 30 días", "90d": "Últimos 90 días", "365d": "Últimos 365 días" },
       "platforms": { "all": "Todas las plataformas", "ios": "iOS", "android": "Android" },
       "sections": {
