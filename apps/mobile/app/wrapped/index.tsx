@@ -1,6 +1,7 @@
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useWrapped, useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { formatLocalized } from "@prostcounter/shared/utils";
 import { resolveWrappedFestivalId } from "@prostcounter/shared/wrapped";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { X } from "lucide-react-native";
@@ -10,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { WrappedPager } from "@/components/wrapped/wrapped-pager";
+import { WrappedStateScreen } from "@/components/wrapped/wrapped-state-screen";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
 export default function WrappedScreen() {
@@ -39,31 +41,32 @@ export default function WrappedScreen() {
     );
   }
 
-  // Error state
-  if (error) {
+  if (error || !result) {
+    return <WrappedStateScreen title={t("wrapped.error")} onClose={handleClose} />;
+  }
+
+  if (result.status === "locked") {
+    // Device timezone is right: it is the same instant as 00:00 at the festival
+    const unlocksAt = new Date(result.unlocksAt);
     return (
-      <View className="flex-1 items-center justify-center bg-yellow-50 p-6">
-        <VStack space="md" className="items-center">
-          <Text className="text-center text-base text-gray-600">{t("wrapped.error")}</Text>
-          <Pressable onPress={handleClose} className="rounded-lg bg-primary-500 px-6 py-3">
-            <Text className="font-semibold text-white">{t("wrapped.close")}</Text>
-          </Pressable>
-        </VStack>
-      </View>
+      <WrappedStateScreen
+        title={t("wrapped.locked.title")}
+        description={t("wrapped.locked.description", {
+          date: formatLocalized(unlocksAt, "PPP"),
+          time: formatLocalized(unlocksAt, "p"),
+        })}
+        onClose={handleClose}
+      />
     );
   }
 
-  // No data state
-  if (result?.status !== "ready") {
+  if (result.status === "not_attended") {
     return (
-      <View className="flex-1 items-center justify-center bg-yellow-50 p-6">
-        <VStack space="md" className="items-center">
-          <Text className="text-center text-base text-gray-600">{t("wrapped.accessDenied")}</Text>
-          <Pressable onPress={handleClose} className="rounded-lg bg-primary-500 px-6 py-3">
-            <Text className="font-semibold text-white">{t("wrapped.close")}</Text>
-          </Pressable>
-        </VStack>
-      </View>
+      <WrappedStateScreen
+        title={t("wrapped.notAttended.title")}
+        description={t("wrapped.notAttended.description")}
+        onClose={handleClose}
+      />
     );
   }
 

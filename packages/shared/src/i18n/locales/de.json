@@ -1538,6 +1538,11 @@
     }
   },
   "profile": {
+    "wrappedArchive": {
+      "title": "Deine Rückblicke",
+      "new": "Neu",
+      "openHint": "Öffnet deinen Rückblick für dieses Festival"
+    },
     "pageTitle": "dein Profil",
     "appleWatch": {
       "title": "Apple Watch",
@@ -2495,12 +2500,20 @@
     "progress": "Schritt {{current}} von {{total}}"
   },
   "wrapped": {
-    "title": "dein Jahresrückblick",
+    "locked": {
+      "title": "Dein Rückblick ist unterwegs",
+      "description": "Er wird am {{date}} um {{time}} Uhr freigeschaltet."
+    },
+    "notAttended": {
+      "title": "Kein Rückblick für dieses Festival",
+      "description": "Trag mindestens einen Tag auf einem Festival ein, um deinen Rückblick zu bekommen."
+    },
+    "title": "Dein Jahresrückblick",
     "generating": "dein Rückblick wird erstellt...",
     "loading": "Lade deinen Rückblick...",
     "notAvailable": "Rückblick nicht verfügbar",
     "loadError": "Laden deines Rückblicks fehlgeschlagen",
-    "notReady": "dein Rückblick ist noch nicht bereit. Schauen du nach dem Festival wieder vorbei!",
+    "notReady": "Dein Rückblick ist noch nicht bereit. Schau nach dem Festival wieder vorbei!",
     "share": "Meinen Rückblick teilen",
     "downloadImage": "Bild herunterladen",
     "slides": {
@@ -2676,6 +2689,7 @@
       "personality": "Festival-Persönlichkeit: {{type}}"
     },
     "cta": {
+      "preparingFooter": "Vergiss nicht, deinen letzten Tag einzutragen! 📝",
       "ready": "dein Rückblick ist fertig!",
       "preparing": "dein Festival wird zusammengefasst!",
       "readyDescription": "Siehe deine personalisierte {{festivalName}}-Geschichte",

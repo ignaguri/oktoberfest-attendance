@@ -1361,6 +1361,11 @@
     }
   },
   "profile": {
+    "wrappedArchive": {
+      "title": "Tus resúmenes",
+      "new": "Nuevo",
+      "openHint": "Abre tu resumen de este festival"
+    },
     "pageTitle": "Tu perfil",
     "appleWatch": {
       "title": "Apple Watch",
@@ -2318,6 +2323,14 @@
     "progress": "Paso {{current}} de {{total}}"
   },
   "wrapped": {
+    "locked": {
+      "title": "Tu resumen está en camino",
+      "description": "Se desbloquea el {{date}} a las {{time}}."
+    },
+    "notAttended": {
+      "title": "No hay resumen para este festival",
+      "description": "Registrá al menos un día en un festival para tener tu resumen."
+    },
     "title": "Tu año en retrospectiva",
     "generating": "Generando tu resumen...",
     "loading": "Cargando tu resumen...",
@@ -2511,6 +2524,7 @@
       "personality": "Personalidad del festival: {{type}}"
     },
     "cta": {
+      "preparingFooter": "¡No te olvides de registrar tu último día! 📝",
       "ready": "¡Tu Wrapped está listo!",
       "preparing": "¡Preparando tu festival!",
       "readyDescription": "Mirá tu historia personalizada de {{festivalName}}",

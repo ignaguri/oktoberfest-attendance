@@ -20,12 +20,14 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
   const router = useRouter();
   const { currentFestival } = useFestival();
   const { data: festivals, loading } = useWrappedFestivals();
-  const isUnlocked = !!festivals?.some((festival) => festival.festivalId === currentFestival?.id);
 
   // Don't show if loading or no current festival
   if (loading || !currentFestival) {
     return null;
   }
+
+  const isUnlocked =
+    festivals?.some((festival) => festival.festivalId === currentFestival.id) ?? false;
 
   // Don't show if not last day and access not allowed
   if (!isLastDayOfFestival && !isUnlocked) {
@@ -61,10 +63,12 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
 
           {isReady && (
             <Pressable
-              // @ts-ignore - Route exists but typed routes haven't been regenerated yet
-              onPress={() => router.push("/wrapped")}
+              onPress={() =>
+                router.push({ pathname: "/wrapped", params: { festivalId: currentFestival.id } })
+              }
               className="mt-1 rounded-lg bg-yellow-500 px-6 py-3"
               accessibilityLabel={t("wrapped.cta.viewButton")}
+              accessibilityHint={t("profile.wrappedArchive.openHint")}
               accessibilityRole="button"
             >
               <Text className="font-semibold text-white">{t("wrapped.cta.viewButton")}</Text>
