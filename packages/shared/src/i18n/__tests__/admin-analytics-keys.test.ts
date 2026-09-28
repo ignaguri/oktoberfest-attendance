@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { ANALYTICS_FEATURES, ANALYTICS_FUNNEL_STEPS } from "../../schemas/admin-analytics.schema";
 import { ANALYTICS_RANGE_PRESETS } from "../../utils/analytics-metrics";
+import { SCORECARD_HINTS } from "../../utils/analytics-scorecard";
 import de from "../locales/de.json";
 import en from "../locales/en.json";
 import es from "../locales/es.json";
@@ -33,6 +34,7 @@ const DYNAMIC_KEYS = [
   ...ANALYTICS_FEATURES.map((feature) => `admin.analytics.features.names.${feature}`),
   ...ANALYTICS_FUNNEL_STEPS.map((step) => `admin.analytics.funnel.steps.${step}`),
   ...ANALYTICS_RANGE_PRESETS.map((preset) => `admin.analytics.ranges.${preset}`),
+  ...SCORECARD_HINTS.map((hint) => `admin.analytics.scorecard.hints.${hint}`),
 ];
 
 const REQUIRED_KEYS = [

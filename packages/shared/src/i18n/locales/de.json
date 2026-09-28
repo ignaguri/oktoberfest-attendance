@@ -2276,7 +2276,9 @@
         "overview": "Überblick",
         "features": "Funktionen",
         "funnel": "Aktivierungs-Funnel",
-        "retention": "Wiederkehr pro Fest"
+        "retention": "Wiederkehr pro Fest",
+        "scorecard": "Feature-Bewertung",
+        "cohorts": "Anmelde-Kohorten"
       },
       "overview": {
         "dau": "Täglich aktiv",
@@ -2328,6 +2330,37 @@
         "returnedAny": "Später wiedergekommen",
         "pending": "Das nächste Fest hat noch nicht begonnen",
         "headline": "{{percent}} kamen nach {{festival}} wieder"
+      },
+      "scorecard": {
+        "hint": "Pro Feature: wer es genutzt hat und ob diese Leute wiederkamen, verglichen mit Besuchern, die es nicht genutzt haben. Nutzer vs. Nicht-Nutzer ist eine Korrelation: Vielnutzer probieren mehr Features aus.",
+        "scopeAll": "Alle Feste. Wähle im Zeitraum-Filter ein Fest, um einzugrenzen.",
+        "scopeFestival": "Fest: {{festival}}",
+        "feature": "Feature",
+        "adoption": "Genutzt",
+        "cameBack": "Während des Fests wiedergekommen",
+        "returned": "Bei einem späteren Fest dabei",
+        "hintColumn": "Hinweis",
+        "legend": "Nutzer vs. Nicht-Nutzer",
+        "compared": "{{users}} vs. {{nonUsers}} ({{lift}} Pkt.)",
+        "tooFew": "zu wenige ({{users}}/{{usersBase}} vs. {{nonUsers}}/{{nonUsersBase}})",
+        "notApplicable": "k. A.",
+        "headline": "{{cut}} streichen · {{grow}} ausbauen",
+        "hints": {
+          "cut": "Streichen?",
+          "grow": "Ausbauen",
+          "keep": "Behalten",
+          "unknown": "Zu wenige Daten"
+        }
+      },
+      "cohorts": {
+        "hint": "Echte Nutzer nach Anmeldemonat. Unabhängig von den Filtern.",
+        "month": "Monat",
+        "signups": "Anmeldungen",
+        "activated": "Besuch eingetragen",
+        "activated7d": "Innerhalb von 7 Tagen",
+        "engaged": "3+ Tage auf einem Fest",
+        "returned": "2+ Feste",
+        "headline": "{{month}}: {{percent}} haben einen Besuch eingetragen"
       }
     },
     "feedback": {

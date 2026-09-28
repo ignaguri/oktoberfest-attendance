@@ -2099,7 +2099,9 @@
         "overview": "Resumen",
         "features": "Funciones",
         "funnel": "Embudo de activación",
-        "retention": "Retención por festival"
+        "retention": "Retención por festival",
+        "scorecard": "Evaluación de funciones",
+        "cohorts": "Cohortes de registro"
       },
       "overview": {
         "dau": "Activos diarios",
@@ -2151,6 +2153,37 @@
         "returnedAny": "Volvió más tarde",
         "pending": "El siguiente festival todavía no empezó",
         "headline": "{{percent}} volvió después de {{festival}}"
+      },
+      "scorecard": {
+        "hint": "Por función: quién la usó y si volvió, comparado con quienes no la usaron. Usuarios vs. no usuarios es una correlación: quienes más usan la app prueban más funciones.",
+        "scopeAll": "Todos los festivales. Elegí un festival en el filtro de período para acotarlo.",
+        "scopeFestival": "Festival: {{festival}}",
+        "feature": "Función",
+        "adoption": "La usaron",
+        "cameBack": "Volvieron durante el festival",
+        "returned": "Fueron a un festival posterior",
+        "hintColumn": "Sugerencia",
+        "legend": "usuarios vs. no usuarios",
+        "compared": "{{users}} vs. {{nonUsers}} ({{lift}} pts)",
+        "tooFew": "muy pocos ({{users}}/{{usersBase}} vs. {{nonUsers}}/{{nonUsersBase}})",
+        "notApplicable": "n/d",
+        "headline": "{{cut}} para quitar · {{grow}} para impulsar",
+        "hints": {
+          "cut": "¿Quitar?",
+          "grow": "Impulsar",
+          "keep": "Mantener",
+          "unknown": "Faltan datos"
+        }
+      },
+      "cohorts": {
+        "hint": "Usuarios reales por mes de registro. No depende de los filtros.",
+        "month": "Mes",
+        "signups": "Registros",
+        "activated": "Cargaron una visita",
+        "activated7d": "En 7 días",
+        "engaged": "3+ días en un festival",
+        "returned": "2+ festivales",
+        "headline": "{{month}}: {{percent}} cargaron una visita"
       }
     },
     "feedback": {
