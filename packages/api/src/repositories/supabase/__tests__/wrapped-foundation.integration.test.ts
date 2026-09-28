@@ -215,3 +215,92 @@ describe("gating and archive", () => {
     expect(data ?? []).toHaveLength(0);
   });
 });
+
+async function linkTents(festivalId: string, count: number): Promise<string[]> {
+  const { data: tents, error } = await admin.from("tents").select("id").limit(count);
+  if (error || !tents || tents.length < count) {
+    throw new Error(`need ${count} tents in the local seed: ${error?.message}`);
+  }
+  const { error: linkError } = await admin
+    .from("festival_tents")
+    .insert(tents.map((tent) => ({ festival_id: festivalId, tent_id: tent.id })));
+  if (linkError) {
+    throw new Error(`festival_tents insert failed: ${linkError.message}`);
+  }
+  return tents.map((tent) => tent.id);
+}
+
+describe("tent totals come from festival_tents", () => {
+  it("computes diversity against the festival's own tent list", async () => {
+    const user = await createSignedInUser("tents");
+    const festivalId = await createFestival(`Tents ${suffix} 2026`, isoDate(-10), isoDate(-2));
+    const tentIds = await linkTents(festivalId, 4);
+    await attend(user.id, festivalId, isoDate(-3), 1);
+    const { error: visitError } = await admin.from("tent_visits").insert({
+      id: randomUUID(),
+      user_id: user.id,
+      festival_id: festivalId,
+      tent_id: tentIds[0],
+      visit_date: `${isoDate(-3)}T12:00:00Z`,
+    });
+    expect(visitError).toBeNull();
+
+    const { data } = await user.client.rpc("get_wrapped_data_cached", {
+      p_user_id: user.id,
+      p_festival_id: festivalId,
+    });
+    // 1 of the festival's 4 tents, not 1 of every tent in the table
+    expect((data as { tent_stats: { tent_diversity_pct: number } }).tent_stats.tent_diversity_pct).toBe(25);
+  });
+
+  it("returns 0 diversity for a festival with no tents", async () => {
+    const user = await createSignedInUser("notents");
+    const festivalId = await createFestival(`NoTents ${suffix} 2026`, isoDate(-10), isoDate(-2));
+    await attend(user.id, festivalId, isoDate(-3), 1);
+    const { data, error } = await user.client.rpc("get_wrapped_data_cached", {
+      p_user_id: user.id,
+      p_festival_id: festivalId,
+    });
+    expect(error).toBeNull();
+    const wrapped = data as { tent_stats: { tent_diversity_pct: number }; personality: { type: string } };
+    expect(wrapped.tent_stats.tent_diversity_pct).toBe(0);
+    expect(wrapped.personality.type).not.toBe("Explorer");
+    expect((wrapped.personality as unknown as { traits: string[] }).traits).toContain("Tent Loyalist");
+  });
+});
+
+describe("previous festival matches Home progress", () => {
+  it("picks the same previous festival as get_user_festival_progress", async () => {
+    const user = await createSignedInUser("prev");
+    const series = `Series ${suffix}`;
+    const older = await createFestival(`${series} 2024`, "2024-09-21", "2024-10-06");
+    const previous = await createFestival(`${series} 2025`, "2025-09-20", "2025-10-05");
+    const current = await createFestival(`${series} 2026`, isoDate(-10), isoDate(-2));
+    const otherSeries = await createFestival(`Other ${suffix} 2026`, "2026-03-01", "2026-03-10");
+    await attend(user.id, older, "2024-09-22", 1);
+    await attend(user.id, previous, "2025-09-21", 4);
+    await attend(user.id, otherSeries, "2026-03-02", 9);
+    await attend(user.id, current, isoDate(-3), 2);
+
+    const { data: helperId } = await user.client.rpc("_previous_festival_in_series", {
+      p_user_id: user.id,
+      p_festival_id: current,
+    });
+    expect(helperId).toBe(previous);
+
+    const { data: wrapped } = await user.client.rpc("get_wrapped_data_cached", {
+      p_user_id: user.id,
+      p_festival_id: current,
+    });
+    const vsLastYear = (wrapped as { comparisons: { vs_last_year: { prev_festival_name: string; prev_beers: number } } })
+      .comparisons.vs_last_year;
+    expect(vsLastYear.prev_festival_name).toBe(`${series} 2025`);
+    expect(vsLastYear.prev_beers).toBe(4);
+
+    const { data: progress } = await user.client.rpc("get_user_festival_progress", {
+      p_festival_id: current,
+      p_today: isoDate(-3),
+    });
+    expect(progress?.[0]?.previous_festival_name).toBe(`${series} 2025`);
+  });
+});
