@@ -302,7 +302,7 @@ async function seedCacheRow(userId: string, festivalId: string) {
   const { error } = await admin
     .from("wrapped_data_cache")
     .upsert(
-      { user_id: userId, festival_id: festivalId, wrapped_data: {}, data_version: 2 },
+      { user_id: userId, festival_id: festivalId, wrapped_data: {}, data_version: 1 },
       { onConflict: "user_id,festival_id" },
     );
   if (error) {

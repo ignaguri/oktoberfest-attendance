@@ -1,11 +1,200 @@
--- Wrapped fixes:
--- 1. Tent totals counted every row in tents, not this festival's list, so
+-- Wrapped foundation.
+--
+-- 1. Unlock: Wrapped used to unlock on festivals.status = 'ended', which
+--    nothing ever sets (Oktoberfest 2026 was still 'upcoming' mid-festival). It
+--    now unlocks at 00:00 in the festival's timezone on the day after end_date,
+--    and the rule lives here so no client can compute or cache a Wrapped early.
+-- 2. Cache version: the cache had no TTL and no version, so changing
+--    get_wrapped_data left old shapes cached forever. data_version is compared
+--    with wrapped_data_version(); any migration that changes get_wrapped_data
+--    output must bump that constant.
+-- 3. Tent totals counted every row in tents, not this festival's list, so
 --    tent_diversity_pct, the Explorer personality (>= 70%) and the Tent Explorer
 --    trait (>= 50%) were all too low. Both sites now count festival_tents.
--- 2. Wrapped matched "last year" by festival_type while Home progress matched by
---    series name. Both now call _previous_festival_in_series.
--- get_wrapped_data output changes, so wrapped_data_version goes to 2.
--- Rest of get_wrapped_data unchanged from 20260924144242_group_criteria_tents_streak.
+-- 4. Wrapped matched "last year" by festival_type while Home progress matched
+--    by series name. Both now call _previous_festival_in_series.
+-- 5. Invalidation: drinks live in consumptions, which never invalidated the
+--    cache, and profile name/avatar and group membership are in Wrapped too.
+--    Consumption and attendance changes drop the whole festival's rows, since
+--    every attendee's Wrapped carries festival-wide numbers (vs_festival_avg,
+--    global positions, group rankings). Nothing is cached before the unlock,
+--    so those deletes are no-ops during the festival itself.
+-- 6. Regenerate used to UPDATE existing rows only, so it never seeded anyone.
+-- 7. wrapped_viewed read wrapped_data_cache.first_viewed_at, which any
+--    invalidation deletes. It now reads wrapped_views, the durable record.
+-- 8. get_wrapped_data was executable by authenticated, which let a signed-in
+--    user compute a Wrapped before unlock and skip the gate in
+--    get_wrapped_data_cached.
+
+CREATE OR REPLACE FUNCTION public.wrapped_unlocks_at(p_festival_id uuid)
+RETURNS timestamptz
+LANGUAGE sql
+STABLE
+SET search_path TO 'public'
+AS $$
+  SELECT ((f.end_date + 1)::timestamp AT TIME ZONE COALESCE(f.timezone, 'Europe/Berlin'))
+  FROM festivals f
+  WHERE f.id = p_festival_id;
+$$;
+
+COMMENT ON FUNCTION public.wrapped_unlocks_at(uuid) IS
+  'Instant a festival''s Wrapped unlocks: 00:00 local (festivals.timezone) on end_date + 1.';
+
+-- Bump this in the same migration as any change to get_wrapped_data output.
+CREATE OR REPLACE FUNCTION public.wrapped_data_version()
+RETURNS integer
+LANGUAGE sql
+IMMUTABLE
+AS $$ SELECT 1 $$;
+
+COMMENT ON FUNCTION public.wrapped_data_version() IS
+  'Current shape version of get_wrapped_data. Cached rows with another version are recomputed. Bump on every get_wrapped_data output change.';
+
+ALTER TABLE public.wrapped_data_cache
+  ADD COLUMN IF NOT EXISTS data_version integer NOT NULL DEFAULT 0;
+
+CREATE OR REPLACE FUNCTION public.get_wrapped_status(p_festival_id uuid)
+RETURNS TABLE(unlocks_at timestamptz, is_unlocked boolean, has_attendance boolean)
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  v_user_id uuid := auth.uid();
+  v_unlocks_at timestamptz;
+BEGIN
+  IF v_user_id IS NULL THEN
+    RETURN;
+  END IF;
+
+  v_unlocks_at := wrapped_unlocks_at(p_festival_id);
+  IF v_unlocks_at IS NULL THEN
+    RETURN;
+  END IF;
+
+  RETURN QUERY SELECT
+    v_unlocks_at,
+    (now() >= v_unlocks_at OR public.is_super_admin()),
+    EXISTS (
+      SELECT 1 FROM attendances a
+      WHERE a.user_id = v_user_id AND a.festival_id = p_festival_id
+    );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_wrapped_festivals()
+RETURNS TABLE(
+  festival_id uuid,
+  name text,
+  start_date date,
+  end_date date,
+  unlocks_at timestamptz,
+  viewed boolean
+)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+  SELECT
+    f.id,
+    f.name::text,
+    f.start_date,
+    f.end_date,
+    wrapped_unlocks_at(f.id),
+    EXISTS (
+      SELECT 1 FROM wrapped_views v
+      WHERE v.user_id = auth.uid() AND v.festival_id = f.id
+    )
+  FROM festivals f
+  WHERE auth.uid() IS NOT NULL
+    AND EXISTS (
+      SELECT 1 FROM attendances a
+      WHERE a.user_id = auth.uid() AND a.festival_id = f.id
+    )
+    AND now() >= wrapped_unlocks_at(f.id)
+  ORDER BY f.start_date DESC;
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_wrapped_data_cached(p_user_id uuid, p_festival_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  v_cached_data jsonb;
+  v_calculated_data jsonb;
+  v_is_unlocked boolean;
+BEGIN
+  IF auth.uid() IS NOT NULL
+     AND p_user_id <> auth.uid()
+     AND NOT public.is_super_admin() THEN
+    RAISE EXCEPTION 'Not authorized to read wrapped data for another user'
+      USING ERRCODE = '42501';
+  END IF;
+
+  v_is_unlocked := now() >= COALESCE(wrapped_unlocks_at(p_festival_id), 'infinity'::timestamptz);
+
+  IF NOT v_is_unlocked AND NOT public.is_super_admin() THEN
+    RAISE EXCEPTION 'WRAPPED_NOT_READY' USING ERRCODE = 'P0001';
+  END IF;
+
+  -- Super admin preview of a locked festival: compute, never cache, so no
+  -- pre-unlock row can outlive the festival's last day.
+  IF NOT v_is_unlocked THEN
+    RETURN get_wrapped_data(p_user_id, p_festival_id);
+  END IF;
+
+  SELECT wrapped_data INTO v_cached_data
+  FROM wrapped_data_cache
+  WHERE user_id = p_user_id
+    AND festival_id = p_festival_id
+    AND data_version = wrapped_data_version();
+
+  IF v_cached_data IS NOT NULL THEN
+    RETURN v_cached_data;
+  END IF;
+
+  v_calculated_data := get_wrapped_data(p_user_id, p_festival_id);
+
+  IF v_calculated_data IS NOT NULL THEN
+    INSERT INTO wrapped_data_cache (user_id, festival_id, wrapped_data, generated_by, data_version)
+    VALUES (p_user_id, p_festival_id, v_calculated_data, 'system', wrapped_data_version())
+    ON CONFLICT (user_id, festival_id)
+    DO UPDATE SET
+      wrapped_data = EXCLUDED.wrapped_data,
+      generated_by = EXCLUDED.generated_by,
+      data_version = EXCLUDED.data_version,
+      updated_at = NOW();
+  END IF;
+
+  RETURN v_calculated_data;
+END;
+$$;
+
+COMMENT ON FUNCTION public.get_wrapped_data_cached(uuid, uuid) IS
+  'Cached Wrapped for a user and festival. Raises WRAPPED_NOT_READY before wrapped_unlocks_at unless super admin (computed, not cached). Rows with a stale data_version are recomputed.';
+
+-- Supabase default privileges grant new functions to anon and authenticated
+-- directly, so PUBLIC alone is not enough: revoke by name.
+REVOKE EXECUTE ON FUNCTION public.wrapped_unlocks_at(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.wrapped_unlocks_at(uuid) TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION public.wrapped_data_version() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.wrapped_data_version() TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION public.get_wrapped_status(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_wrapped_status(uuid) TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION public.get_wrapped_festivals() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_wrapped_festivals() TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION public.get_wrapped_data_cached(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_wrapped_data_cached(uuid, uuid) TO authenticated, service_role;
+
+-- get_wrapped_data: rest unchanged from 20260924144242_group_criteria_tents_streak.
 
 CREATE OR REPLACE FUNCTION public._previous_festival_in_series(p_user_id uuid, p_festival_id uuid)
 RETURNS uuid
@@ -705,8 +894,334 @@ $$;
 REVOKE EXECUTE ON FUNCTION public.get_user_festival_progress(uuid, date) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.get_user_festival_progress(uuid, date) TO authenticated;
 
-CREATE OR REPLACE FUNCTION public.wrapped_data_version()
+-- Trigger functions are SECURITY DEFINER so the DELETE passes RLS (same shape
+-- as the beer_pictures trigger, 20260924172539).
+
+CREATE OR REPLACE FUNCTION public.trigger_consumption_cache_invalidation()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+BEGIN
+  -- OLD is NULL on INSERT and NEW is NULL on DELETE; an UPDATE that moves a
+  -- drink to another attendance invalidates both festivals.
+  DELETE FROM wrapped_data_cache
+  WHERE festival_id IN (
+    SELECT a.festival_id
+    FROM attendances a
+    WHERE a.id IN (OLD.attendance_id, NEW.attendance_id)
+  );
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.trigger_wrapped_cache_invalidation()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+BEGIN
+  -- Attendance days feed the days_attended leaderboard, so every attendee's
+  -- position can move. Both festivals when an UPDATE moves the row.
+  DELETE FROM wrapped_data_cache
+  WHERE festival_id IN (OLD.festival_id, NEW.festival_id);
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.trigger_profile_wrapped_cache_invalidation()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+BEGIN
+  PERFORM invalidate_wrapped_cache(NEW.id, NULL);
+  RETURN NEW;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.trigger_group_member_wrapped_cache_invalidation()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  v_festival_id uuid;
+BEGIN
+  -- When the whole group is deleted the row is already gone and the lookup
+  -- finds nothing; that path is not worth a Wrapped refresh.
+  SELECT g.festival_id INTO v_festival_id
+  FROM groups g
+  WHERE g.id = COALESCE(NEW.group_id, OLD.group_id);
+
+  IF v_festival_id IS NOT NULL THEN
+    PERFORM invalidate_wrapped_cache(COALESCE(NEW.user_id, OLD.user_id), v_festival_id);
+  END IF;
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+-- Only ever run as triggers.
+REVOKE EXECUTE ON FUNCTION public.trigger_consumption_cache_invalidation() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.trigger_wrapped_cache_invalidation() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.trigger_profile_wrapped_cache_invalidation() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.trigger_group_member_wrapped_cache_invalidation() FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS tr_consumptions_wrapped_cache_invalidation ON public.consumptions;
+CREATE TRIGGER tr_consumptions_wrapped_cache_invalidation
+AFTER INSERT OR UPDATE OR DELETE ON public.consumptions
+FOR EACH ROW EXECUTE FUNCTION public.trigger_consumption_cache_invalidation();
+
+DROP TRIGGER IF EXISTS tr_profiles_wrapped_cache_invalidation ON public.profiles;
+CREATE TRIGGER tr_profiles_wrapped_cache_invalidation
+AFTER UPDATE OF username, full_name, avatar_url ON public.profiles
+FOR EACH ROW
+WHEN (
+  OLD.username IS DISTINCT FROM NEW.username
+  OR OLD.full_name IS DISTINCT FROM NEW.full_name
+  OR OLD.avatar_url IS DISTINCT FROM NEW.avatar_url
+)
+EXECUTE FUNCTION public.trigger_profile_wrapped_cache_invalidation();
+
+DROP TRIGGER IF EXISTS tr_group_members_wrapped_cache_invalidation ON public.group_members;
+CREATE TRIGGER tr_group_members_wrapped_cache_invalidation
+AFTER INSERT OR DELETE ON public.group_members
+FOR EACH ROW EXECUTE FUNCTION public.trigger_group_member_wrapped_cache_invalidation();
+
+-- Regenerate used to UPDATE existing rows only, so "regenerate all" skipped
+-- everyone who had never opened Wrapped. It now upserts every attendee of every
+-- unlocked festival matching the filters. p_admin_user_id is kept for the
+-- existing client signature and is ignored; authorization comes from the JWT.
+CREATE OR REPLACE FUNCTION public.regenerate_wrapped_data_cache(
+  p_user_id uuid DEFAULT NULL::uuid,
+  p_festival_id uuid DEFAULT NULL::uuid,
+  p_admin_user_id uuid DEFAULT NULL::uuid
+)
 RETURNS integer
-LANGUAGE sql
-IMMUTABLE
-AS $$ SELECT 2 $$;
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public', 'extensions'
+AS $function$
+DECLARE
+  v_regenerated_count integer := 0;
+BEGIN
+  IF auth.uid() IS NOT NULL AND NOT public.is_super_admin() THEN
+    RAISE EXCEPTION 'Insufficient permissions to regenerate cache'
+      USING ERRCODE = '42501';
+  END IF;
+
+  WITH targets AS (
+    SELECT DISTINCT a.user_id, a.festival_id
+    FROM attendances a
+    WHERE (p_user_id IS NULL OR a.user_id = p_user_id)
+      AND (p_festival_id IS NULL OR a.festival_id = p_festival_id)
+      AND now() >= wrapped_unlocks_at(a.festival_id)
+  ),
+  calculated AS (
+    SELECT t.user_id, t.festival_id, get_wrapped_data(t.user_id, t.festival_id) AS new_data
+    FROM targets t
+  )
+  INSERT INTO wrapped_data_cache (user_id, festival_id, wrapped_data, generated_by, data_version)
+  SELECT c.user_id, c.festival_id, c.new_data, 'admin', wrapped_data_version()
+  FROM calculated c
+  WHERE c.new_data IS NOT NULL
+  ON CONFLICT (user_id, festival_id)
+  DO UPDATE SET
+    wrapped_data = EXCLUDED.wrapped_data,
+    generated_by = 'admin',
+    data_version = EXCLUDED.data_version,
+    updated_at = NOW();
+
+  GET DIAGNOSTICS v_regenerated_count = ROW_COUNT;
+
+  RETURN v_regenerated_count;
+END;
+$function$;
+
+REVOKE EXECUTE ON FUNCTION public.regenerate_wrapped_data_cache(uuid, uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.regenerate_wrapped_data_cache(uuid, uuid, uuid) TO authenticated, service_role;
+
+-- get_achievement_metrics body copied from the live definition
+-- (20260805120828_achievement_metrics_function); only wrapped_viewed changes.
+CREATE OR REPLACE FUNCTION public.get_achievement_metrics(p_user_id uuid, p_festival_id uuid)
+ RETURNS jsonb
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE
+  v_result jsonb;
+BEGIN
+  IF auth.uid() IS NOT NULL
+     AND p_user_id <> auth.uid()
+     AND NOT public.is_super_admin() THEN
+    RAISE EXCEPTION 'Not authorized to read achievement metrics for another user'
+      USING ERRCODE = '42501';
+  END IF;
+
+  WITH fest AS (
+    SELECT id, start_date, end_date FROM festivals WHERE id = p_festival_id
+  ),
+  user_att AS (
+    SELECT a.id, a.date
+    FROM attendances a
+    WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
+  ),
+  cons AS (
+    SELECT c.drink_type, c.volume_ml, c.price_paid_cents, c.tip_cents, ua.date
+    FROM user_att ua
+    JOIN consumptions c ON c.attendance_id = ua.id
+  ),
+  per_day AS (
+    SELECT date, count(*) AS drinks FROM cons GROUP BY date
+  ),
+  -- Gaps-and-islands: consecutive dates share (date - row_number).
+  att_streak AS (
+    SELECT coalesce(max(run_len), 0) AS max_streak
+    FROM (
+      SELECT count(*) AS run_len
+      FROM (
+        SELECT date - (row_number() OVER (ORDER BY date))::int AS island
+        FROM (SELECT DISTINCT date FROM user_att) distinct_days
+      ) islands
+      GROUP BY island
+    ) runs
+  ),
+  active_streak AS (
+    SELECT coalesce(max(run_len), 0) AS max_streak
+    FROM (
+      SELECT count(*) AS run_len
+      FROM (
+        SELECT day - (row_number() OVER (ORDER BY day))::int AS island
+        FROM (SELECT DISTINCT day FROM user_active_days WHERE user_id = p_user_id) d
+      ) islands
+      GROUP BY island
+    ) runs
+  ),
+  festival_weekend_days AS (
+    SELECT count(*) AS total
+    FROM fest, generate_series(fest.start_date, fest.end_date, '1 day'::interval) AS d
+    WHERE extract(dow FROM d) IN (0, 6)
+  ),
+  attended_weekend_days AS (
+    SELECT count(DISTINCT ua.date) AS total
+    FROM user_att ua
+    WHERE extract(dow FROM ua.date) IN (0, 6)
+  ),
+  large_tents AS (
+    SELECT count(DISTINCT ft.tent_id) AS total
+    FROM festival_tents ft
+    JOIN tents t ON t.id = ft.tent_id
+    WHERE ft.festival_id = p_festival_id AND t.category = 'large'
+  ),
+  visited_large_tents AS (
+    SELECT count(DISTINCT tv.tent_id) AS total
+    FROM tent_visits tv
+    JOIN tents t ON t.id = tv.tent_id
+    WHERE tv.user_id = p_user_id
+      AND tv.festival_id = p_festival_id
+      AND t.category = 'large'
+  )
+  SELECT jsonb_build_object(
+    -- festival-scoped, numeric
+    'drinks_total',          (SELECT count(*) FROM cons),
+    'drinks_day_max',        (SELECT coalesce(max(drinks), 0) FROM per_day),
+    'drink_types_distinct',  (SELECT count(DISTINCT drink_type) FROM cons),
+    'volume_ml_total',       (SELECT coalesce(sum(volume_ml), 0) FROM cons),
+    'tip_cents_total',       (SELECT coalesce(sum(tip_cents), 0) FROM cons),
+    'spend_cents_total',     (SELECT coalesce(sum(price_paid_cents), 0) FROM cons),
+    'days_attended',         (SELECT count(DISTINCT date) FROM user_att),
+    'attendance_streak_max', (SELECT max_streak FROM att_streak),
+    'tents_distinct',        (SELECT count(DISTINCT tv.tent_id) FROM tent_visits tv
+                                WHERE tv.user_id = p_user_id AND tv.festival_id = p_festival_id),
+    'groups_joined',         (SELECT count(DISTINCT gm.group_id)
+                                FROM group_members gm
+                                JOIN groups g ON g.id = gm.group_id
+                                WHERE gm.user_id = p_user_id AND g.festival_id = p_festival_id),
+    'photos_uploaded',       (SELECT count(*) FROM beer_pictures bp
+                                JOIN user_att ua ON ua.id = bp.attendance_id
+                                WHERE bp.user_id = p_user_id),
+    'reactions_given',       (SELECT count(*) FROM photo_reactions pr
+                                JOIN beer_pictures bp ON bp.id = pr.photo_id
+                                JOIN attendances a ON a.id = bp.attendance_id
+                                WHERE pr.user_id = p_user_id AND a.festival_id = p_festival_id),
+    'crowd_reports',         (SELECT count(*) FROM tent_crowd_reports tcr
+                                WHERE tcr.user_id = p_user_id AND tcr.festival_id = p_festival_id),
+
+    -- lifetime, numeric
+    'festivals_attended',      (SELECT count(DISTINCT a.festival_id) FROM attendances a
+                                  WHERE a.user_id = p_user_id),
+    'festival_types_distinct', (SELECT count(DISTINCT f.festival_type)
+                                  FROM attendances a JOIN festivals f ON f.id = a.festival_id
+                                  WHERE a.user_id = p_user_id),
+    'friends_accepted',        (SELECT count(*) FROM friendships fr
+                                  WHERE fr.status = 'accepted'
+                                    AND (fr.requester_id = p_user_id OR fr.addressee_id = p_user_id)),
+    'group_wins',              (SELECT count(*) FROM festival_group_standings s
+                                  JOIN festivals f ON f.id = s.festival_id
+                                  WHERE s.user_id = p_user_id AND s.rank = 1 AND s.member_count >= 2
+                                    AND f.end_date < CURRENT_DATE),
+    'podium_finishes',         (SELECT count(*) FROM festival_group_standings s
+                                  JOIN festivals f ON f.id = s.festival_id
+                                  WHERE s.user_id = p_user_id AND s.rank <= 3 AND s.member_count >= 2
+                                    AND f.end_date < CURRENT_DATE),
+    'active_days_total',       (SELECT count(*) FROM user_active_days uad
+                                  WHERE uad.user_id = p_user_id),
+    'active_day_streak_max',   (SELECT max_streak FROM active_streak),
+
+    -- festival-scoped, boolean
+    'attended_opening_day', (SELECT EXISTS (
+                                SELECT 1 FROM user_att ua, fest
+                                WHERE ua.date = fest.start_date)),
+    'attended_closing_day', (SELECT EXISTS (
+                                SELECT 1 FROM user_att ua, fest
+                                WHERE ua.date = fest.end_date)),
+    'attended_every_day',   (SELECT (SELECT count(DISTINCT date) FROM user_att)
+                                    = (SELECT (end_date - start_date + 1) FROM fest)
+                              AND (SELECT count(*) FROM user_att) > 0),
+    'attended_every_weekend_day',
+                            (SELECT (SELECT total FROM festival_weekend_days) > 0
+                              AND (SELECT total FROM attended_weekend_days)
+                                  = (SELECT total FROM festival_weekend_days)),
+    'visited_all_large_tents',
+                            (SELECT (SELECT total FROM large_tents) > 0
+                              AND (SELECT total FROM visited_large_tents)
+                                  = (SELECT total FROM large_tents)),
+    'created_group',        (SELECT EXISTS (
+                                SELECT 1 FROM groups g
+                                WHERE g.created_by = p_user_id AND g.festival_id = p_festival_id)),
+
+    -- lifetime, boolean
+    'logged_first_drink',  (SELECT EXISTS (
+                                SELECT 1 FROM consumptions c
+                                JOIN attendances a ON a.id = c.attendance_id
+                                WHERE a.user_id = p_user_id)),
+    'uploaded_first_photo', (SELECT EXISTS (
+                                SELECT 1 FROM beer_pictures bp WHERE bp.user_id = p_user_id)),
+    'profile_complete',     (SELECT EXISTS (
+                                SELECT 1 FROM profiles p
+                                WHERE p.id = p_user_id
+                                  AND p.username IS NOT NULL
+                                  AND p.full_name IS NOT NULL
+                                  AND p.avatar_url IS NOT NULL)),
+    -- wrapped_views, not wrapped_data_cache.first_viewed_at: cache invalidation
+    -- triggers (including the user_achievements one an unlock in the same pass
+    -- fires) delete that row before this is read.
+    'wrapped_viewed',       (SELECT EXISTS (
+                                SELECT 1 FROM wrapped_views wv
+                                WHERE wv.user_id = p_user_id))
+  ) INTO v_result;
+
+  RETURN v_result;
+END;
+$function$;
+
+REVOKE EXECUTE ON FUNCTION public.get_wrapped_data(uuid, uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.get_wrapped_data(uuid, uuid) TO service_role;
