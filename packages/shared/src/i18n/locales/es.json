@@ -2191,6 +2191,75 @@
         "engaged": "3+ días en un festival",
         "returned": "2+ festivales",
         "headline": "{{month}}: {{percent}} cargaron una visita"
+      },
+      "members": {
+        "screenTitle": "Personas",
+        "title": "{{label}} · {{count}}",
+        "tapHint": "Tocá una fila para ver quiénes están detrás.",
+        "dialogHint": "Abrí a alguien para ver su línea de tiempo",
+        "loading": "Cargando…",
+        "empty": "No hay nadie",
+        "truncated": "Solo se muestran las primeras {{count}} personas",
+        "signedUp": "Se registró el {{date}}",
+        "lastActive": "Última actividad el {{date}}",
+        "neverActive": "No hay días activos registrados",
+        "noName": "Sin nombre",
+        "openHint": "Abre la línea de tiempo de esta persona",
+        "chipHint": "Muestra a estas personas",
+        "segments": {
+          "attendees": "Asistentes",
+          "adopters": "La usaron",
+          "non_adopters": "No la usaron",
+          "came_back_adopters": "La usaron y volvieron",
+          "came_back_non_adopters": "No la usaron y volvieron",
+          "returned_adopters": "La usaron y fueron a una fiesta posterior",
+          "returned_non_adopters": "No la usaron y fueron a una fiesta posterior"
+        },
+        "cohortSteps": {
+          "signups": "Se registraron",
+          "activated": "Registraron una asistencia",
+          "activated_7d": "En los primeros 7 días",
+          "engaged": "3+ días en una misma fiesta",
+          "returned": "2+ fiestas"
+        }
+      },
+      "timeline": {
+        "title": "Línea de tiempo",
+        "open": "Línea de tiempo",
+        "openHint": "Todo lo que hizo esta persona, lo más reciente primero",
+        "filterHint": "Filtra la línea de tiempo",
+        "empty": "Todavía no hay nada registrado",
+        "loadMore": "Cargar más",
+        "kinds": {
+          "all": "Todo",
+          "action": "Acciones",
+          "event": "Eventos"
+        },
+        "names": {
+          "signed_up": "Se registró",
+          "attendance": "Registró una asistencia",
+          "drink": "Registró una bebida",
+          "photo": "Subió una foto",
+          "group_join": "Se unió a un grupo",
+          "group_message": "Escribió en un grupo",
+          "photo_reaction": "Reaccionó a una foto",
+          "photo_comment": "Comentó una foto",
+          "day_plan": "Planeó un día",
+          "crowd_report": "Reportó cuánta gente hay en una carpa",
+          "friend_request": "Envió una solicitud de amistad",
+          "location_sharing": "Compartió su ubicación",
+          "wrapped_view": "Abrió el Wrapped",
+          "screen_viewed": "Vio una pantalla",
+          "app_opened": "Abrió la app",
+          "notification_opened": "Abrió una notificación",
+          "sheet_opened": "Abrió un panel",
+          "sheet_abandoned": "Cerró un panel sin guardar",
+          "prompt_answered": "Respondió un aviso",
+          "tutorial_step": "Paso del tutorial",
+          "empty_state_seen": "Vio una pantalla vacía",
+          "error_shown": "Vio un error",
+          "unknown": "Evento: {{name}}"
+        }
       }
     },
     "feedback": {

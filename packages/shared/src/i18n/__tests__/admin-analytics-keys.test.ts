@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { ANALYTICS_FEATURES, ANALYTICS_FUNNEL_STEPS } from "../../schemas/admin-analytics.schema";
+import { EVENT_NAMES } from "../../analytics/events";
+import {
+  ANALYTICS_COHORT_STEPS,
+  ANALYTICS_FEATURES,
+  ANALYTICS_FUNNEL_STEPS,
+  ANALYTICS_SCORECARD_SEGMENTS,
+  ANALYTICS_TIMELINE_ACTIONS,
+  ANALYTICS_TIMELINE_KINDS,
+} from "../../schemas/admin-analytics.schema";
 import { ANALYTICS_RANGE_PRESETS } from "../../utils/analytics-metrics";
 import { SCORECARD_HINTS } from "../../utils/analytics-scorecard";
 import de from "../locales/de.json";
@@ -35,6 +43,12 @@ const DYNAMIC_KEYS = [
   ...ANALYTICS_FUNNEL_STEPS.map((step) => `admin.analytics.funnel.steps.${step}`),
   ...ANALYTICS_RANGE_PRESETS.map((preset) => `admin.analytics.ranges.${preset}`),
   ...SCORECARD_HINTS.map((hint) => `admin.analytics.scorecard.hints.${hint}`),
+  ...ANALYTICS_SCORECARD_SEGMENTS.map((segment) => `admin.analytics.members.segments.${segment}`),
+  ...ANALYTICS_COHORT_STEPS.map((step) => `admin.analytics.members.cohortSteps.${step}`),
+  ...ANALYTICS_TIMELINE_KINDS.map((kind) => `admin.analytics.timeline.kinds.${kind}`),
+  ...[...ANALYTICS_TIMELINE_ACTIONS, ...EVENT_NAMES, "unknown"].map(
+    (name) => `admin.analytics.timeline.names.${name}`,
+  ),
 ];
 
 const REQUIRED_KEYS = [
