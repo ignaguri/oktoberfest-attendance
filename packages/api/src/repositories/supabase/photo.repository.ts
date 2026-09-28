@@ -7,16 +7,23 @@ import type {
   GroupPhotoSettings,
   PhotoVisibility,
 } from "@prostcounter/shared";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { replaceLocalhostInUrl } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
-import { DatabaseError, ForbiddenError, NotFoundError } from "../../middleware/error";
+import {
+  DatabaseError,
+  ForbiddenError,
+  NotFoundError,
+  ValidationError,
+} from "../../middleware/error";
 import type { IPhotoRepository } from "../interfaces/photo.repository";
 
 export class SupabasePhotoRepository implements IPhotoRepository {
   private readonly BUCKET_NAME = "beer_pictures";
   private readonly UPLOAD_URL_EXPIRY = 60 * 5; // 5 minutes
+  private readonly STALE_UPLOAD_MS = 60 * 60 * 1000; // 1 hour, well past the URL expiry
 
   constructor(private supabase: SupabaseClient<Database>) {}
 
@@ -54,21 +61,29 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       );
     }
 
-    // Pre-create beer_pictures record with just the path (like avatars)
-    // Client utilities will construct the full URL
-    const { data: picture, error: pictureError } = await this.supabase
-      .from("beer_pictures")
+    // Failed attempts leave pending rows behind. Their upload URLs expired
+    // long ago, so clear them here instead of running a cleanup job.
+    await this.supabase
+      .from("photo_uploads")
+      .delete()
+      .eq("user_id", userId)
+      .lt("created_at", new Date(Date.now() - this.STALE_UPLOAD_MS).toISOString());
+
+    // Only a pending upload for now: confirmUpload creates the beer_pictures
+    // row once the file is in storage, so a failed upload never shows as a
+    // blank photo. Its id becomes the picture's id.
+    const { data: pending, error: pendingError } = await this.supabase
+      .from("photo_uploads")
       .insert({
         user_id: userId,
         attendance_id: query.attendanceId,
-        picture_url: filePath, // Store only the path, not full URL
-        visibility: "public", // Default to public so photos show in group galleries
+        picture_path: filePath, // Store only the path, not full URL
       })
-      .select()
+      .select("id")
       .single();
 
-    if (pictureError) {
-      throw new DatabaseError(`Failed to create picture record: ${pictureError.message}`);
+    if (pendingError) {
+      throw new DatabaseError(`Failed to create picture record: ${pendingError.message}`);
     }
 
     // Replace localhost with actual network IP for mobile access (upload URLs only)
@@ -86,25 +101,80 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       uploadUrl,
       publicUrl,
       expiresIn: this.UPLOAD_URL_EXPIRY,
-      pictureId: picture.id,
+      pictureId: pending.id,
     };
   }
 
   async confirmUpload(pictureId: string, userId: string): Promise<BeerPicture> {
-    // Verify ownership
+    // Already confirmed, or issued by the old flow that inserted up front
+    const existing = await this.findOwnPicture(pictureId, userId);
+    if (existing) {
+      return this.mapToBeerPicture(existing);
+    }
+
+    const { data: pending, error: pendingError } = await this.supabase
+      .from("photo_uploads")
+      .select("attendance_id, picture_path")
+      .eq("id", pictureId)
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    if (pendingError) {
+      throw new DatabaseError(`Failed to fetch pending upload: ${pendingError.message}`);
+    }
+    if (!pending) {
+      throw new NotFoundError("Picture not found");
+    }
+
+    // The client retries a failed confirm with a fresh upload, so no file means
+    // no photo
+    const { data: fileExists } = await this.supabase.storage
+      .from(this.BUCKET_NAME)
+      .exists(pending.picture_path);
+
+    if (!fileExists) {
+      throw new ValidationError(ErrorCodes.PHOTO_UPLOAD_FAILED);
+    }
+
+    // A racing confirm may insert first; the conflict is then a no-op
+    const { error: insertError } = await this.supabase.from("beer_pictures").upsert(
+      {
+        id: pictureId,
+        user_id: userId,
+        attendance_id: pending.attendance_id,
+        picture_url: pending.picture_path,
+        visibility: "public", // Default to public so photos show in group galleries
+      },
+      { onConflict: "id", ignoreDuplicates: true },
+    );
+
+    if (insertError) {
+      throw new DatabaseError(`Failed to create picture record: ${insertError.message}`);
+    }
+
+    await this.supabase.from("photo_uploads").delete().eq("id", pictureId);
+
+    const picture = await this.findOwnPicture(pictureId, userId);
+    if (!picture) {
+      throw new NotFoundError("Picture not found");
+    }
+
+    return this.mapToBeerPicture(picture);
+  }
+
+  private async findOwnPicture(pictureId: string, userId: string) {
     const { data, error } = await this.supabase
       .from("beer_pictures")
       .select("*")
       .eq("id", pictureId)
       .eq("user_id", userId)
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
-      throw new NotFoundError("Picture not found");
+    if (error) {
+      throw new DatabaseError(`Failed to fetch picture: ${error.message}`);
     }
 
-    // Picture record already exists from getUploadUrl, just return it
-    return this.mapToBeerPicture(data);
+    return data;
   }
 
   async findByAttendance(attendanceId: string, userId: string): Promise<BeerPicture[]> {

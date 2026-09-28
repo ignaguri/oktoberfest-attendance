@@ -127,6 +127,14 @@ const confirmUploadRoute = createRoute({
         },
       },
     },
+    400: {
+      description: "The file never reached storage; start a new upload",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
+        },
+      },
+    },
     401: {
       description: "Unauthorized",
       content: {

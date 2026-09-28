@@ -1621,6 +1621,45 @@ export type Database = {
           },
         ]
       }
+      photo_uploads: {
+        Row: {
+          attendance_id: string
+          created_at: string
+          id: string
+          picture_path: string
+          user_id: string
+        }
+        Insert: {
+          attendance_id: string
+          created_at?: string
+          id?: string
+          picture_path: string
+          user_id: string
+        }
+        Update: {
+          attendance_id?: string
+          created_at?: string
+          id?: string
+          picture_path?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_uploads_attendance_id_fkey"
+            columns: ["attendance_id"]
+            isOneToOne: false
+            referencedRelation: "attendance_with_totals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photo_uploads_attendance_id_fkey"
+            columns: ["attendance_id"]
+            isOneToOne: false
+            referencedRelation: "attendances"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
