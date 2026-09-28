@@ -39,7 +39,8 @@ AS $$
       EXISTS (
         SELECT 1 FROM public.festivals lf
         WHERE (lf.start_date, lf.id) > (f.start_date, f.id)
-          AND lf.start_date <= current_date
+          -- start_date is festival-local; current_date would be UTC
+          AND lf.start_date <= (now() AT TIME ZONE lf.timezone)::date
       ) AS has_started_successor
     FROM public.festivals f
     WHERE p_festival_id IS NULL OR f.id = p_festival_id
