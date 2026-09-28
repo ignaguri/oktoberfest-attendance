@@ -776,6 +776,47 @@ export type Database = {
           },
         ]
       }
+      festival_official_stats: {
+        Row: {
+          curious_finds: Json
+          festival_id: string
+          lost_items: number | null
+          mass_served: number | null
+          mugs_confiscated: number | null
+          source_url: string | null
+          updated_at: string
+          visitors: number | null
+        }
+        Insert: {
+          curious_finds?: Json
+          festival_id: string
+          lost_items?: number | null
+          mass_served?: number | null
+          mugs_confiscated?: number | null
+          source_url?: string | null
+          updated_at?: string
+          visitors?: number | null
+        }
+        Update: {
+          curious_finds?: Json
+          festival_id?: string
+          lost_items?: number | null
+          mass_served?: number | null
+          mugs_confiscated?: number | null
+          source_url?: string | null
+          updated_at?: string
+          visitors?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "festival_official_stats_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: true
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       festival_tents: {
         Row: {
           beer_price: number | null
@@ -2483,6 +2524,22 @@ export type Database = {
           users: number
         }[]
       }
+      analytics_feature_scorecard: {
+        Args: { p_festival_id?: string }
+        Returns: {
+          adopters: number
+          attendees: number
+          came_back_non_users: number
+          came_back_non_users_base: number
+          came_back_users: number
+          came_back_users_base: number
+          feature: string
+          returned_non_users: number
+          returned_non_users_base: number
+          returned_users: number
+          returned_users_base: number
+        }[]
+      }
       analytics_feature_usage: {
         Args: { p_from: string; p_platform?: string; p_to: string }
         Returns: {
@@ -2520,6 +2577,17 @@ export type Database = {
           p_user_id: string
         }
         Returns: number
+      }
+      analytics_signup_cohorts: {
+        Args: never
+        Returns: {
+          activated: number
+          activated_7d: number
+          engaged: number
+          month: string
+          returned: number
+          signups: number
+        }[]
       }
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }
@@ -2640,6 +2708,19 @@ export type Database = {
       get_festival_beer_cost: {
         Args: { p_festival_id: string }
         Returns: number
+      }
+      get_festival_official_stats: {
+        Args: { p_festival_id: string }
+        Returns: {
+          curious_finds: Json
+          lost_items: number
+          mass_served: number
+          mugs_confiscated: number
+          source_festival_id: string
+          source_url: string
+          stats_year: number
+          visitors: number
+        }[]
       }
       get_global_leaderboard: {
         Args: { p_festival_id?: string; p_winning_criteria_id: number }
