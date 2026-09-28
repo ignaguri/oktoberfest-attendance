@@ -238,3 +238,166 @@ export const AnalyticsCohortsResponseSchema = z.object({
   cohorts: z.array(AnalyticsCohortRowSchema),
 });
 export type AnalyticsCohortsResponse = z.infer<typeof AnalyticsCohortsResponseSchema>;
+
+// =============================================================================
+// Drill-down and timeline (piece 2)
+// =============================================================================
+
+/**
+ * Who is behind a scorecard row. Each segment matches one scorecard column;
+ * utils/analytics-drilldown.ts maps it to filters and to that column.
+ */
+export const ANALYTICS_SCORECARD_SEGMENTS = [
+  "attendees",
+  "adopters",
+  "non_adopters",
+  "came_back_adopters",
+  "came_back_non_adopters",
+  "returned_adopters",
+  "returned_non_adopters",
+] as const;
+export const AnalyticsScorecardSegmentSchema = z.enum(ANALYTICS_SCORECARD_SEGMENTS);
+export type AnalyticsScorecardSegment = z.infer<typeof AnalyticsScorecardSegmentSchema>;
+
+/** Who is behind a cohort cell. `signups` is the whole month. */
+export const ANALYTICS_COHORT_STEPS = [
+  "signups",
+  "activated",
+  "activated_7d",
+  "engaged",
+  "returned",
+] as const;
+export const AnalyticsCohortStepSchema = z.enum(ANALYTICS_COHORT_STEPS);
+export type AnalyticsCohortStep = z.infer<typeof AnalyticsCohortStepSchema>;
+
+/** PostgREST's max_rows. A list this long may be missing people. */
+export const ANALYTICS_MEMBERS_MAX_ROWS = 1000;
+
+export const AnalyticsFunnelMembersQuerySchema = z
+  .object({
+    from: IsoDateSchema,
+    to: IsoDateSchema,
+    platform: AnalyticsPlatformSchema.optional(),
+    step: AnalyticsFunnelStepNameSchema,
+  })
+  .superRefine((value, ctx) => {
+    const message = analyticsRangeError(value.from, value.to);
+    if (message) {
+      ctx.addIssue({ code: "custom", message, path: ["from"] });
+    }
+  });
+export type AnalyticsFunnelMembersQuery = z.infer<typeof AnalyticsFunnelMembersQuerySchema>;
+
+/** No festival means every festival, pooled. */
+export const AnalyticsScorecardMembersQuerySchema = z.object({
+  festivalId: z.uuid().optional(),
+  feature: AnalyticsScorecardFeatureSchema,
+  segment: AnalyticsScorecardSegmentSchema,
+});
+export type AnalyticsScorecardMembersQuery = z.infer<typeof AnalyticsScorecardMembersQuerySchema>;
+
+const MonthStartSchema = z
+  .string()
+  .regex(/^\d{4}-(0[1-9]|1[0-2])-01$/, "Expected the first day of a month, YYYY-MM-01");
+
+export const AnalyticsCohortMembersQuerySchema = z.object({
+  month: MonthStartSchema,
+  step: AnalyticsCohortStepSchema,
+});
+export type AnalyticsCohortMembersQuery = z.infer<typeof AnalyticsCohortMembersQuerySchema>;
+
+export const AnalyticsMemberSchema = z.object({
+  userId: z.string(),
+  username: z.string().nullable(),
+  fullName: z.string().nullable(),
+  signedUpAt: z.string().nullable(),
+  lastActiveDay: IsoDateSchema.nullable(),
+  /** Scorecard lists only: in the pooled view a person is listed once per festival. */
+  festivalId: z.string().optional(),
+  festivalName: z.string().optional(),
+});
+export type AnalyticsMember = z.infer<typeof AnalyticsMemberSchema>;
+
+export const AnalyticsMembersResponseSchema = z.object({
+  members: z.array(AnalyticsMemberSchema),
+  /** True when the list reached ANALYTICS_MEMBERS_MAX_ROWS and may be incomplete. */
+  truncated: z.boolean(),
+});
+export type AnalyticsMembersResponse = z.infer<typeof AnalyticsMembersResponseSchema>;
+
+export const AnalyticsUserIdParamSchema = z.object({
+  userId: z.uuid(),
+});
+
+export const ANALYTICS_TIMELINE_KINDS = ["all", "action", "event"] as const;
+export const AnalyticsTimelineKindSchema = z.enum(ANALYTICS_TIMELINE_KINDS);
+export type AnalyticsTimelineKind = z.infer<typeof AnalyticsTimelineKindSchema>;
+
+/** Domain rows in the timeline. Must match the names in analytics_user_timeline. */
+export const ANALYTICS_TIMELINE_ACTIONS = [
+  "signed_up",
+  "attendance",
+  "drink",
+  "photo",
+  "group_join",
+  "group_message",
+  "photo_reaction",
+  "photo_comment",
+  "day_plan",
+  "crowd_report",
+  "friend_request",
+  "location_sharing",
+  "wrapped_view",
+] as const;
+
+export const ANALYTICS_TIMELINE_DEFAULT_LIMIT = 100;
+export const ANALYTICS_TIMELINE_MAX_LIMIT = 200;
+
+/**
+ * The cursor is the last row's (occurredAt, cursorKey), passed back verbatim.
+ * occurredAt keeps Postgres' microseconds; never round-trip it through Date.
+ */
+export const AnalyticsTimelineQuerySchema = z
+  .object({
+    cursorAt: z.iso.datetime({ offset: true }).optional(),
+    cursorKey: z.string().min(1).max(100).optional(),
+    limit: z.coerce.number().int().min(1).max(ANALYTICS_TIMELINE_MAX_LIMIT).optional(),
+    kind: AnalyticsTimelineKindSchema.optional(),
+  })
+  .superRefine((value, ctx) => {
+    if ((value.cursorAt === undefined) !== (value.cursorKey === undefined)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "cursorAt and cursorKey go together",
+        path: ["cursorAt"],
+      });
+    }
+  });
+export type AnalyticsTimelineQuery = z.infer<typeof AnalyticsTimelineQuerySchema>;
+
+export const AnalyticsTimelineRowSchema = z.object({
+  occurredAt: z.string(),
+  kind: z.enum(["action", "event"]),
+  name: z.string(),
+  props: z.record(z.string(), z.unknown()),
+  festivalId: z.string().nullable(),
+  festivalName: z.string().nullable(),
+  platform: z.string().nullable(),
+  appVersion: z.string().nullable(),
+  sessionId: z.string().nullable(),
+  cursorKey: z.string(),
+});
+export type AnalyticsTimelineRow = z.infer<typeof AnalyticsTimelineRowSchema>;
+
+export const AnalyticsTimelineCursorSchema = z.object({
+  cursorAt: z.string(),
+  cursorKey: z.string(),
+});
+export type AnalyticsTimelineCursor = z.infer<typeof AnalyticsTimelineCursorSchema>;
+
+export const AnalyticsTimelineResponseSchema = z.object({
+  rows: z.array(AnalyticsTimelineRowSchema),
+  /** Null when this page is the last one. */
+  nextCursor: AnalyticsTimelineCursorSchema.nullable(),
+});
+export type AnalyticsTimelineResponse = z.infer<typeof AnalyticsTimelineResponseSchema>;
