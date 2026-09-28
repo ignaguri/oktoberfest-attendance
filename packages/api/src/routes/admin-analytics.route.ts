@@ -1,13 +1,20 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import {
+  AnalyticsCohortMembersQuerySchema,
   AnalyticsCohortsResponseSchema,
   AnalyticsFeatureUsageResponseSchema,
   AnalyticsFestivalRetentionResponseSchema,
+  AnalyticsFunnelMembersQuerySchema,
   AnalyticsFunnelResponseSchema,
+  AnalyticsMembersResponseSchema,
   AnalyticsOverviewResponseSchema,
   AnalyticsRangeQuerySchema,
+  AnalyticsScorecardMembersQuerySchema,
   AnalyticsScorecardQuerySchema,
   AnalyticsScorecardResponseSchema,
+  AnalyticsTimelineQuerySchema,
+  AnalyticsTimelineResponseSchema,
+  AnalyticsUserIdParamSchema,
 } from "@prostcounter/shared";
 
 import { ApiErrorSchema } from "../lib/error-response";
@@ -180,6 +187,102 @@ const cohortsRoute = createRoute({
 app.openapi(cohortsRoute, async (c) => {
   const repository = new SupabaseAdminAnalyticsRepository();
   return c.json(await repository.getSignupCohorts(), 200);
+});
+
+// GET /admin/analytics/funnel/members
+const funnelMembersRoute = createRoute({
+  method: "get",
+  path: "/admin/analytics/funnel/members",
+  tags: ["admin"],
+  summary: "People behind a funnel step (admin)",
+  description:
+    "Real users who signed up in the range and reached the step, most recently active first.",
+  request: { query: AnalyticsFunnelMembersQuerySchema },
+  responses: {
+    200: {
+      description: "Members",
+      content: { "application/json": { schema: AnalyticsMembersResponseSchema } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(funnelMembersRoute, async (c) => {
+  const repository = new SupabaseAdminAnalyticsRepository();
+  return c.json(await repository.getFunnelMembers(c.req.valid("query")), 200);
+});
+
+// GET /admin/analytics/scorecard/members
+const scorecardMembersRoute = createRoute({
+  method: "get",
+  path: "/admin/analytics/scorecard/members",
+  tags: ["admin"],
+  summary: "People behind a scorecard number (admin)",
+  description:
+    "Attendees of the festival (every festival, pooled, without festivalId) in the segment for one feature. Pooled lists name each person once per festival.",
+  request: { query: AnalyticsScorecardMembersQuerySchema },
+  responses: {
+    200: {
+      description: "Members",
+      content: { "application/json": { schema: AnalyticsMembersResponseSchema } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(scorecardMembersRoute, async (c) => {
+  const repository = new SupabaseAdminAnalyticsRepository();
+  return c.json(await repository.getScorecardMembers(c.req.valid("query")), 200);
+});
+
+// GET /admin/analytics/cohorts/members
+const cohortMembersRoute = createRoute({
+  method: "get",
+  path: "/admin/analytics/cohorts/members",
+  tags: ["admin"],
+  summary: "People behind a cohort number (admin)",
+  description: "Real users who signed up in the month (Europe/Berlin) and reached the step.",
+  request: { query: AnalyticsCohortMembersQuerySchema },
+  responses: {
+    200: {
+      description: "Members",
+      content: { "application/json": { schema: AnalyticsMembersResponseSchema } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(cohortMembersRoute, async (c) => {
+  const repository = new SupabaseAdminAnalyticsRepository();
+  return c.json(await repository.getCohortMembers(c.req.valid("query")), 200);
+});
+
+// GET /admin/users/{userId}/timeline
+const userTimelineRoute = createRoute({
+  method: "get",
+  path: "/admin/users/{userId}/timeline",
+  tags: ["admin"],
+  summary: "One user's timeline (admin)",
+  description:
+    "Usage events and domain actions, newest first. Pass the previous page's nextCursor back as cursorAt and cursorKey, unchanged.",
+  request: { params: AnalyticsUserIdParamSchema, query: AnalyticsTimelineQuerySchema },
+  responses: {
+    200: {
+      description: "Timeline page",
+      content: { "application/json": { schema: AnalyticsTimelineResponseSchema } },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(userTimelineRoute, async (c) => {
+  const { userId } = c.req.valid("param");
+  const repository = new SupabaseAdminAnalyticsRepository();
+  return c.json(await repository.getUserTimeline(userId, c.req.valid("query")), 200);
 });
 
 export default app;

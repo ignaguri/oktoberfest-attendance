@@ -20,14 +20,20 @@ import type {
   AdminUser,
   AdminUserGroup,
   AdminWrappedCacheEntry,
+  AnalyticsCohortMembersQuery,
   AnalyticsCohortsResponse,
   AnalyticsFeatureUsageResponse,
   AnalyticsFestivalRetentionResponse,
+  AnalyticsFunnelMembersQuery,
   AnalyticsFunnelResponse,
+  AnalyticsMembersResponse,
   AnalyticsOverviewResponse,
   AnalyticsRangeQuery,
+  AnalyticsScorecardMembersQuery,
   AnalyticsScorecardQuery,
   AnalyticsScorecardResponse,
+  AnalyticsTimelineQuery,
+  AnalyticsTimelineResponse,
   CopyAdminFestivalTentsInput,
   AttendanceByDate,
   CarryOverCandidatesResponse,
@@ -2973,6 +2979,56 @@ export function createTypedApiClient(config: ApiClientConfig) {
           }
           return parseJsonResponse<AnalyticsCohortsResponse>(response);
         },
+
+        async funnelMembers(query: AnalyticsFunnelMembersQuery): Promise<AnalyticsMembersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ from: query.from, to: query.to, step: query.step });
+          if (query.platform) {
+            params.set("platform", query.platform);
+          }
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/funnel/members?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch funnel members");
+          }
+          return parseJsonResponse<AnalyticsMembersResponse>(response);
+        },
+
+        async scorecardMembers(
+          query: AnalyticsScorecardMembersQuery,
+        ): Promise<AnalyticsMembersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ feature: query.feature, segment: query.segment });
+          if (query.festivalId) {
+            params.set("festivalId", query.festivalId);
+          }
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/scorecard/members?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch scorecard members");
+          }
+          return parseJsonResponse<AnalyticsMembersResponse>(response);
+        },
+
+        async cohortMembers(query: AnalyticsCohortMembersQuery): Promise<AnalyticsMembersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ month: query.month, step: query.step });
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/cohorts/members?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch cohort members");
+          }
+          return parseJsonResponse<AnalyticsMembersResponse>(response);
+        },
       },
 
       users: {
@@ -3074,6 +3130,35 @@ export function createTypedApiClient(config: ApiClientConfig) {
             await extractApiError(response, "Failed to fetch user groups");
           }
           return parseJsonResponse<{ groups: AdminUserGroup[] }>(response);
+        },
+
+        async timeline(
+          userId: string,
+          query: AnalyticsTimelineQuery,
+        ): Promise<AnalyticsTimelineResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query.kind) {
+            params.set("kind", query.kind);
+          }
+          if (query.limit !== undefined) {
+            params.set("limit", String(query.limit));
+          }
+          // The cursor goes back exactly as the API sent it
+          if (query.cursorAt && query.cursorKey) {
+            params.set("cursorAt", query.cursorAt);
+            params.set("cursorKey", query.cursorKey);
+          }
+          const search = params.toString();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/users/${userId}/timeline${search ? `?${search}` : ""}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch user timeline");
+          }
+          return parseJsonResponse<AnalyticsTimelineResponse>(response);
         },
       },
 
