@@ -1655,7 +1655,27 @@
         "deactivateConfirm": "Esto deja sin festival activo, así que la app no tiene ninguno por defecto. ¿Continuar?",
         "deleteBlockedHint": "Un festival con asistencias, grupos o visitas a carpas no se puede eliminar. Márcalo como Finalizado.",
         "updateError": "No se pudo guardar el cambio",
-        "deleteError": "No se pudo eliminar"
+        "deleteError": "No se pudo eliminar",
+        "officialStatsLink": "Cifras oficiales de la Wiesn",
+        "officialStatsLinkHint": "Abre las cifras oficiales de visitantes y Maß que muestra el Wrapped",
+        "officialStats": {
+          "title": "Cifras oficiales",
+          "hint": "Se muestran en el Wrapped. Cargalas desde el balance final del festival (Wiesn-Bilanz).",
+          "visitors": "Visitantes",
+          "massServed": "Maß servidas",
+          "mugsConfiscated": "Jarras recuperadas en la salida",
+          "lostItems": "Objetos perdidos",
+          "sourceUrl": "URL de la fuente",
+          "finds": "Hallazgos curiosos (hasta 3)",
+          "find": "Hallazgo {{number}}",
+          "localeDe": "Alemán",
+          "localeEn": "Inglés",
+          "localeEs": "Español",
+          "save": "Guardar",
+          "saveError": "No se pudieron guardar las cifras",
+          "invalidNumber": "Usá solo números enteros",
+          "incompleteFind": "Completá los tres idiomas o dejá el hallazgo vacío"
+        }
       },
       "groups": {
         "loading": "Cargando grupos...",
@@ -2331,6 +2351,178 @@
     "notAttended": {
       "title": "No hay resumen para este festival",
       "description": "Registrá al menos un día en un festival para tener tu resumen."
+    },
+    "story": {
+      "a11y": {
+        "next": "Siguiente",
+        "nextHint": "Muestra la siguiente parte de tu Wrapped",
+        "prev": "Anterior",
+        "prevHint": "Vuelve una diapositiva",
+        "closeHint": "Sale de tu Wrapped",
+        "progress": "Diapositiva {{current}} de {{total}}"
+      },
+      "servus": {
+        "title": "¡Servus, {{name}}!",
+        "titleNoName": "¡Servus!",
+        "subtitle": "Así fue tu {{festival}}."
+      },
+      "bigNumber": {
+        "kicker": "En {{festival}} tomaste",
+        "unit_one": "cerveza",
+        "unit_other": "cervezas",
+        "tagline": {
+          "normal_one": "en un solo día.",
+          "normal_other": "en {{count}} días.",
+          "low": "Calidad antes que cantidad.",
+          "zero": "Cero cervezas, Wiesn completa. Respeto."
+        },
+        "comparison": {
+          "percentile": "Más que el {{pct, number(maximumFractionDigits: 0)}} % de ProstCounter.",
+          "median": "El usuario típico de ProstCounter tomó {{median, number(maximumFractionDigits: 1)}}."
+        }
+      },
+      "drinks": {
+        "title": "Cómo tomaste",
+        "top": {
+          "beer": "Casi siempre cerveza. Un clásico.",
+          "radler": "Casi siempre Radler. Dosificando como un pro.",
+          "alcohol_free": "Casi siempre sin alcohol. Tu hígado te lo agradece.",
+          "wine": "Casi siempre vino. En la Wiesn. Valiente.",
+          "soft_drink": "Casi siempre gaseosas. Energía de conductor designado.",
+          "other": "Un poco de todo."
+        },
+        "spent": "{{amount, number(minimumFractionDigits: 2, maximumFractionDigits: 2)}} € bien invertidos."
+      },
+      "drinkTypes": {
+        "beer": "Cerveza",
+        "radler": "Radler",
+        "alcohol_free": "Sin alcohol",
+        "wine": "Vino",
+        "soft_drink": "Gaseosas",
+        "other": "Otros"
+      },
+      "days": {
+        "title": "Tus días",
+        "best": "Tu mejor día: {{beers, number(maximumFractionDigits: 1)}} cervezas",
+        "bestDetails_one": "y {{count}} carpa.",
+        "bestDetails_other": "en {{count}} carpas."
+      },
+      "tents": {
+        "title": "Tus carpas",
+        "favorite": "Tu base: {{tent}}",
+        "count_one": "{{count}} carpa",
+        "count_other": "{{count}} carpas distintas",
+        "share": "Eso es el {{pct, number(maximumFractionDigits: 0)}} % de las carpas."
+      },
+      "people": {
+        "title": "Tu gente",
+        "groups_one": "En {{count}} grupo",
+        "groups_other": "En {{count}} grupos",
+        "bestPlacing": "#{{position}} en {{group}}",
+        "photosLabel": "Tu Wiesn en fotos"
+      },
+      "compare": {
+        "title": "Cómo te fue",
+        "vsAvg": {
+          "more": "{{pct, number(maximumFractionDigits: 0)}} % más cervezas que el usuario promedio de ProstCounter.",
+          "less": "{{pct, number(maximumFractionDigits: 0)}} % menos cervezas que el promedio. Sensato.",
+          "same": "Justo en el promedio. Perfectamente equilibrado."
+        },
+        "vsLastYear": {
+          "up": "{{diff, number(maximumFractionDigits: 1)}} más que en {{festival}}.",
+          "down": "{{diff, number(maximumFractionDigits: 1)}} menos que en {{festival}}. ¿Te estás cuidando?",
+          "same": "Exactamente las mismas que en {{festival}}. Constante."
+        },
+        "global": {
+          "days_attended": "#{{position}} en el ranking global de días.",
+          "total_beers": "#{{position}} en el ranking global de cervezas.",
+          "avg_beers": "#{{position}} en el ranking global de cervezas por día."
+        }
+      },
+      "wiesnAndYou": {
+        "kicker": {
+          "current": "La Wiesn {{year}} en números",
+          "lastYear": "La Wiesn del año pasado ({{year}})"
+        },
+        "headline": {
+          "current": "Fuiste 1 de {{visitors, number}} visitantes.",
+          "lastYear": "El año pasado vinieron {{visitors, number}} personas. Este año, vos fuiste una de ellas."
+        },
+        "share": {
+          "current": "Tus {{beers, number(maximumFractionDigits: 1)}} cervezas fueron el {{pct, number(maximumSignificantDigits: 2)}} % de las {{mass, number}} Maß servidas.",
+          "lastYear": "Tus {{beers, number(maximumFractionDigits: 1)}} cervezas habrían sido el {{pct, number(maximumSignificantDigits: 2)}} % de las {{mass, number}} Maß del año pasado."
+        }
+      },
+      "meanwhile": {
+        "kicker": "Mientras tanto, en la salida",
+        "mugs": {
+          "current": "jarras Maß no lograron pasar a los de seguridad.",
+          "lastYear": "jarras Maß fueron frenadas en la salida el año pasado."
+        },
+        "findsLabel": "También entregaron",
+        "lostItems_one": "{{count, number}} objeto terminó en objetos perdidos.",
+        "lostItems_other": "{{count, number}} objetos terminaron en objetos perdidos."
+      },
+      "source": {
+        "withHost": "Fuente: {{host}}, {{year}}",
+        "plain": "Cifras oficiales, {{year}}"
+      },
+      "badges": {
+        "title": "Tus insignias",
+        "count_one": "{{count}} insignia",
+        "count_other": "{{count}} insignias"
+      },
+      "persona": {
+        "kicker": "Tu persona de la Wiesn",
+        "runnerUp": "con un toque de {{name}}",
+        "einmalAberRichtig": {
+          "description": "Un día, cero arrepentimientos.",
+          "because": "Porque fuiste una vez y la hiciste valer: {{beers, number(maximumFractionDigits: 1)}} cervezas en un solo día."
+        },
+        "massMeister": {
+          "description": "La Maß te tiene miedo.",
+          "because": "Porque promediaste {{avg, number(maximumFractionDigits: 1)}} cervezas cada día que fuiste."
+        },
+        "marathoner": {
+          "description": "La Wiesn es tu segunda casa.",
+          "because": "Porque estuviste {{days}} de los {{festivalDays}} días."
+        },
+        "zeltwanderer": {
+          "description": "No hay carpa que se te resista.",
+          "because": "Porque probaste {{tents}} de las {{totalTents}} carpas."
+        },
+        "stammgast": {
+          "description": "¿Para qué cambiar de mesa si ganás?",
+          "because": "Porque {{tent}} fue tu carpa {{visits}} veces."
+        },
+        "fruehschoppen": {
+          "description": "La primera Maß sabe mejor antes del mediodía.",
+          "because": "Porque tu primera bebida solía caer a las {{time}}."
+        },
+        "nachteule": {
+          "description": "El que apaga la luz de la carpa.",
+          "because": "Porque tu última bebida solía llegar cerca de las {{time}}."
+        },
+        "radlerDiplomat": {
+          "description": "Media cerveza, toda la diversión.",
+          "because": "Porque el {{pct}} % de tus bebidas fueron Radler o sin alcohol."
+        },
+        "wochenendKrieger": {
+          "description": "Entre semana se descansa.",
+          "because": "Porque tus {{days}} días fueron en fin de semana."
+        },
+        "geniesser": {
+          "description": "Por el ambiente, a tu ritmo.",
+          "because_one": "Porque un día y {{beers, number(maximumFractionDigits: 1)}} cervezas fueron justo lo necesario.",
+          "because_other": "Porque {{count}} días y {{beers, number(maximumFractionDigits: 1)}} cervezas fueron justo lo necesario."
+        }
+      },
+      "prost": {
+        "title": "¡Prost!",
+        "summary": "Nos vemos en el próximo {{series}}.",
+        "replay": "Ver de nuevo",
+        "replayHint": "Empieza tu Wrapped desde el principio"
+      }
     },
     "title": "Tu año en retrospectiva",
     "generating": "Generando tu resumen...",
