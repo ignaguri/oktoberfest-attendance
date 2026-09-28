@@ -174,7 +174,7 @@ function festivalTentCount(s: PersonaSignals): number {
   return s.tentDiversityPct > 0 ? Math.round((s.uniqueTents * 100) / s.tentDiversityPct) : s.uniqueTents;
 }
 
-export function becauseFor(id: PersonaId, s: PersonaSignals): CopyRef {
+function becauseFor(id: PersonaId, s: PersonaSignals): CopyRef {
   const key = `wrapped.story.persona.${id}.because`;
   switch (id) {
     case "einmalAberRichtig":
