@@ -13,7 +13,7 @@ client (useWrapped)
   ← { status: "ready", wrapped } | { status: "locked", unlocksAt } | { status: "not_attended" }
 ```
 
-Every case is a 200: the client needs `unlocksAt`, and the typed client drops error details. Serving `ready` records the view (`wrapped_data_cache.first_viewed_at` and `wrapped_views`) and runs achievement evaluation, which is what unlocks `wrapped_viewed`.
+Every case is a 200: the client needs `unlocksAt`, and the typed client drops error details. Serving `ready` records the view (`wrapped_data_cache.first_viewed_at` and `wrapped_views`) and runs achievement evaluation, which is what unlocks `wrapped_viewed` (its metric reads `wrapped_views`; the cache row is not durable).
 
 - API: `packages/api/src/routes/wrapped.route.ts`, `services/wrapped.service.ts`, `repositories/supabase/wrapped.repository.ts`, `repositories/supabase/wrapped-mapper.ts`
 - Contract: `packages/shared/src/schemas/wrapped.schema.ts`
@@ -50,7 +50,7 @@ These triggers delete the affected rows:
 
 ## Admin regenerate
 
-`POST /api/v1/wrapped/regenerate` calls `regenerate_wrapped_data_cache`. It upserts a fresh row for every attendee of every unlocked festival matching the optional user or festival filter, so it also seeds users who never opened Wrapped. Locked festivals are skipped.
+`POST /api/v1/wrapped/regenerate` calls `regenerate_wrapped_data_cache`. It upserts a fresh row for every attendee of every unlocked festival matching the optional user or festival filter, so it also seeds users who never opened Wrapped. Locked festivals are skipped. The repository calls it once per (user, festival), four at a time: one call covering a whole festival would run past authenticated's 8s `statement_timeout`.
 
 ## Why the RPC stays snake_case
 
