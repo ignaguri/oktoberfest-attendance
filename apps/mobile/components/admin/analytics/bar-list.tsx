@@ -4,6 +4,7 @@ import type { LayoutChangeEvent } from "react-native";
 import Svg, { Rect } from "react-native-svg";
 
 import { HStack } from "@/components/ui/hstack";
+import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -21,6 +22,9 @@ export interface BarListItem {
   detail?: string;
   /** Greys the row out (e.g. a dead feature). */
   muted?: boolean;
+  /** Makes the row a button. */
+  onPress?: () => void;
+  accessibilityHint?: string;
 }
 
 interface BarListProps {
@@ -41,41 +45,56 @@ export function BarList({ items, max }: BarListProps) {
 
   return (
     <VStack space="md">
-      {items.map((item, index) => (
-        <VStack key={item.key} space="xs">
-          <HStack space="sm" className="justify-between">
-            <Text
-              className={cn(
-                "flex-1 text-sm",
-                item.muted ? "text-typography-400" : "text-typography-900",
-              )}
-            >
-              {item.label}
-            </Text>
-            <Text className="text-sm text-typography-500">{item.detail ?? String(item.value)}</Text>
-          </HStack>
-          <View className="w-full" onLayout={index === 0 ? handleTrackLayout : undefined}>
-            <Svg width="100%" height={BAR_HEIGHT}>
-              <Rect
-                x={0}
-                y={0}
-                width={trackWidth}
-                height={BAR_HEIGHT}
-                rx={BAR_RADIUS}
-                fill={Colors.gray[200]}
-              />
-              <Rect
-                x={0}
-                y={0}
-                width={trackWidth * barFraction(item.value, scaleMax)}
-                height={BAR_HEIGHT}
-                rx={BAR_RADIUS}
-                fill={item.muted ? Colors.gray[300] : Colors.primary[500]}
-              />
-            </Svg>
-          </View>
-        </VStack>
-      ))}
+      {items.map((item, index) => {
+        const row = (
+          <VStack space="xs">
+            <HStack space="sm" className="justify-between">
+              <Text
+                className={cn(
+                  "flex-1 text-sm",
+                  item.muted ? "text-typography-400" : "text-typography-900",
+                )}
+              >
+                {item.label}
+              </Text>
+              <Text className="text-sm text-typography-500">{item.detail ?? String(item.value)}</Text>
+            </HStack>
+            <View className="w-full" onLayout={index === 0 ? handleTrackLayout : undefined}>
+              <Svg width="100%" height={BAR_HEIGHT}>
+                <Rect
+                  x={0}
+                  y={0}
+                  width={trackWidth}
+                  height={BAR_HEIGHT}
+                  rx={BAR_RADIUS}
+                  fill={Colors.gray[200]}
+                />
+                <Rect
+                  x={0}
+                  y={0}
+                  width={trackWidth * barFraction(item.value, scaleMax)}
+                  height={BAR_HEIGHT}
+                  rx={BAR_RADIUS}
+                  fill={item.muted ? Colors.gray[300] : Colors.primary[500]}
+                />
+              </Svg>
+            </View>
+          </VStack>
+        );
+        return item.onPress ? (
+          <Pressable
+            key={item.key}
+            onPress={item.onPress}
+            accessibilityRole="button"
+            accessibilityLabel={item.label}
+            accessibilityHint={item.accessibilityHint}
+          >
+            {row}
+          </Pressable>
+        ) : (
+          <View key={item.key}>{row}</View>
+        );
+      })}
     </VStack>
   );
 }

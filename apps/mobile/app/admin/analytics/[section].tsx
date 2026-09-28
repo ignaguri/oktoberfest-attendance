@@ -56,7 +56,10 @@ export default function AdminAnalyticsSectionScreen() {
                   })
                 : t("admin.analytics.scorecard.scopeAll")}
             </Text>
-            <FeatureScorecardSection festivalId={params.festivalId} />
+            <FeatureScorecardSection
+              festivalId={params.festivalId}
+              festivalName={params.festivalName}
+            />
           </>
         )}
         {section === "cohorts" && <SignupCohortsSection />}
