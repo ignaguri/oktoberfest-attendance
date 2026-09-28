@@ -3523,7 +3523,8 @@
     "banner": {
       "offlineWithPending": "Du bist offline. {{count}} Änderungen werden synchronisiert, wenn du verbunden bist.",
       "offline": "Du bist offline. Änderungen werden synchronisiert, wenn du dich wieder verbinden.",
-      "error": "Synchronisierung fehlgeschlagen. Tippe zum Wiederholen."
+      "error": "Synchronisierung fehlgeschlagen. Tippe zum Wiederholen.",
+      "unreachable": "Server nicht erreichbar. Prüfe deine Verbindung und versuche es erneut."
     }
   },
   "sync": {

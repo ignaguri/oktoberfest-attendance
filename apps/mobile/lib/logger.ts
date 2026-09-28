@@ -90,6 +90,19 @@ function stringifyContextValues(ctx?: LogContext): LogContext | undefined {
 }
 
 /**
+ * A device with no connection or DNS fails every fetch at once (one Fairphone
+ * sent ~10 events in a second). That is the user's network, not a bug, so it
+ * stays in the console and out of Sentry.
+ */
+const NETWORK_UNREACHABLE_PATTERN =
+  /UnknownHostException|Unable to resolve host|Network request failed/i;
+
+export function isNetworkUnreachableError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  return NETWORK_UNREACHABLE_PATTERN.test(message);
+}
+
+/**
  * An error raised before Sentry.init has run used to be dropped outright, and
  * that is exactly the window cold-start failures live in: a device that could
  * not save a drink for two hours reported nothing for the first of them. Hold
@@ -218,7 +231,7 @@ class Logger {
     console.error(this.formatMessage("error", message, errorContext));
 
     // Send to Sentry in production
-    if (!this.isDev) {
+    if (!this.isDev && !isNetworkUnreachableError(error)) {
       const event: PendingSentryEvent = {
         message,
         error,

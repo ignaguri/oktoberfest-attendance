@@ -3346,7 +3346,8 @@
     "banner": {
       "offlineWithPending": "Estás sin conexión. {{count}} cambios se sincronizarán cuando te conectes.",
       "offline": "Estás sin conexión. Los cambios se sincronizarán cuando te reconectes.",
-      "error": "Error de sincronización. Tocá para reintentar."
+      "error": "Error de sincronización. Tocá para reintentar.",
+      "unreachable": "No se puede conectar con el servidor. Revisá tu conexión e intentá de nuevo."
     }
   },
   "sync": {

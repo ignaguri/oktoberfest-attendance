@@ -3286,7 +3286,8 @@
     "banner": {
       "offlineWithPending": "You're offline. {{count}} changes will sync when connected.",
       "offline": "You're offline. Changes will sync when you reconnect.",
-      "error": "Sync failed. Tap to retry."
+      "error": "Sync failed. Tap to retry.",
+      "unreachable": "Can't reach the server. Check your connection and try again."
     }
   },
   "sync": {

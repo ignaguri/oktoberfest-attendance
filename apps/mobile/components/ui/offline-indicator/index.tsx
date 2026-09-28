@@ -15,7 +15,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { Colors } from "@/lib/constants/colors";
 import { useIsOnline, useOfflineSafe, usePendingCount } from "@/lib/database/offline-provider";
-import { logger } from "@/lib/logger";
+import { isNetworkUnreachableError, logger } from "@/lib/logger";
 
 // =============================================================================
 // Types
@@ -272,7 +272,11 @@ export function OfflineBanner({ className = "" }: OfflineBannerProps) {
       return t("offline.banner.offline");
     }
     if (syncStatus === "error") {
-      return error || t("offline.banner.error");
+      // The stored error is raw exception text ("festivals: fetch failed: ..."),
+      // never something to show a user.
+      return isNetworkUnreachableError(error)
+        ? t("offline.banner.unreachable")
+        : t("offline.banner.error");
     }
     return "";
   };
