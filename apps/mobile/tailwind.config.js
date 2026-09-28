@@ -5,6 +5,8 @@
  * Uses Gluestack's nativewind preset with custom amber/yellow theme colors.
  * CSS variables are supported but hex colors provide better cross-platform compatibility.
  */
+const { platformSelect } = require("nativewind/theme");
+
 module.exports = {
   content: [
     "./app/**/*.{js,jsx,ts,tsx}",
@@ -172,11 +174,18 @@ module.exports = {
           info: "#5399EC",
           error: "#B91C1C",
         },
+        wrapped: {
+          paper: "#FFF8EA",
+          ink: "#16325C",
+          blue: "#3A7AC4",
+          amber: "#F59E0B",
+        },
       },
       fontFamily: {
         heading: undefined,
         body: undefined,
         mono: undefined,
+        wrapped: platformSelect({ ios: "Georgia", android: "serif", default: "serif" }),
       },
       fontWeight: {
         extrablack: "950",
