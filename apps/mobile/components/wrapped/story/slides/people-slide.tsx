@@ -38,7 +38,11 @@ export function PeopleSlide({ slide, animate }: { slide: StorySlideOf<"people">;
                   className="h-32 w-32 rounded"
                   onError={() => setFailedIds((ids) => [...ids, photo.id])}
                   // Decorative: the kicker above already announces this as a photo grid.
+                  // alt alone makes RN treat the image as accessible/focusable, so it
+                  // must be paired with aria-hidden to actually hide it from a11y.
                   alt=""
+                  aria-hidden
+                  importantForAccessibility="no"
                   accessibilityIgnoresInvertColors
                 />
               </View>

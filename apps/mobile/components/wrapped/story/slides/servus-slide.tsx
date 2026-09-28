@@ -22,7 +22,11 @@ export function ServusSlide({ slide, animate }: { slide: StorySlideOf<"servus">;
             source={{ uri: avatarUri }}
             className="h-24 w-24 rounded-full border-4 border-wrapped-ink"
             // Decorative: the greeting and title next to it carry the meaning.
+            // alt alone makes RN treat the image as accessible/focusable, so it
+            // must be paired with aria-hidden to actually hide it from a11y.
             alt=""
+            aria-hidden
+            importantForAccessibility="no"
             accessibilityIgnoresInvertColors
           />
         </Reveal>

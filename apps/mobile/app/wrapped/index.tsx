@@ -4,6 +4,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { formatLocalized } from "@prostcounter/shared/utils";
 import { buildWrappedStory, resolveWrappedFestivalId } from "@prostcounter/shared/wrapped";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 import { Text } from "@/components/ui/text";
@@ -25,6 +26,17 @@ export default function WrappedScreen() {
   const festivalId = resolveWrappedFestivalId(festivalIdParam, festivals, currentFestival?.id);
   const { data: result, loading: wrappedLoading, error } = useWrapped(festivalId);
   const loading = festivalsLoading || wrappedLoading;
+
+  // Built once per ready payload, not on every render: a refetch that changes
+  // the slide count would otherwise leave the shell's reducer holding a
+  // `total` from the previous build, crashing on the now out-of-range index.
+  const readyResult = result?.status === "ready" ? result : null;
+  const slides = useMemo(() => {
+    if (!readyResult) {
+      return null;
+    }
+    return buildWrappedStory(readyResult.wrapped, readyResult.officialStats);
+  }, [readyResult]);
 
   const handleClose = () => {
     router.back();
@@ -86,11 +98,13 @@ export default function WrappedScreen() {
     );
   }
 
+  if (!slides) {
+    return null;
+  }
+
   return (
-    <StoryShell
-      data={result.wrapped}
-      slides={buildWrappedStory(result.wrapped, result.officialStats)}
-      onClose={handleClose}
-    />
+    // Keyed on slide count: a refetch that changes it remounts the shell
+    // instead of leaving its reducer's `total` stale (see the useMemo above).
+    <StoryShell key={slides.length} data={result.wrapped} slides={slides} onClose={handleClose} />
   );
 }

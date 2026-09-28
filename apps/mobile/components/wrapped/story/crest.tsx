@@ -13,7 +13,11 @@ export function Crest({ personaId }: { personaId: PersonaId }) {
         source={source}
         className="h-40 w-40"
         // Decorative: the persona name is always rendered next to the crest.
+        // alt alone makes RN treat the image as accessible/focusable, so it
+        // must be paired with aria-hidden to actually hide it from a11y.
         alt=""
+        aria-hidden
+        importantForAccessibility="no"
         accessibilityIgnoresInvertColors
       />
     );
