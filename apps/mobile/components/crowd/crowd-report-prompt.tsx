@@ -1,3 +1,4 @@
+import { useTrack } from "@prostcounter/shared/analytics/react";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Users, X } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -39,14 +40,19 @@ interface CrowdReportPromptProps {
  */
 export function CrowdReportPrompt({ isOpen, onClose, tents, festivalId }: CrowdReportPromptProps) {
   const { t } = useTranslation();
+  const track = useTrack();
   const [selectedTent, setSelectedTent] = useState<TentInfo | null>(null);
 
   // If only one tent, go directly to report sheet
   const singleTent = tents.length === 1 ? tents[0] : null;
 
-  const handleTentPress = useCallback((tent: TentInfo) => {
-    setSelectedTent(tent);
-  }, []);
+  const handleTentPress = useCallback(
+    (tent: TentInfo) => {
+      track("prompt_answered", { prompt: "crowd_report", answer: "accepted" });
+      setSelectedTent(tent);
+    },
+    [track],
+  );
 
   const handleReportClose = useCallback(() => {
     setSelectedTent(null);
@@ -58,6 +64,13 @@ export function CrowdReportPrompt({ isOpen, onClose, tents, festivalId }: CrowdR
     setSelectedTent(null);
     onClose();
   }, [onClose]);
+
+  // Only the tent picker is a prompt; the single-tent path is measured by the
+  // report sheet's own sheet_opened / sheet_abandoned events.
+  const handlePickerClose = useCallback(() => {
+    track("prompt_answered", { prompt: "crowd_report", answer: "dismissed" });
+    handleClose();
+  }, [handleClose, track]);
 
   // Single tent: show CrowdReportSheet directly instead of the picker
   if (singleTent) {
@@ -74,7 +87,7 @@ export function CrowdReportPrompt({ isOpen, onClose, tents, festivalId }: CrowdR
 
   return (
     <>
-      <Actionsheet isOpen={isOpen && !selectedTent} onClose={handleClose}>
+      <Actionsheet isOpen={isOpen && !selectedTent} onClose={handlePickerClose}>
         <ActionsheetBackdrop />
         <ActionsheetContent>
           <ActionsheetDragIndicatorWrapper>
@@ -90,7 +103,7 @@ export function CrowdReportPrompt({ isOpen, onClose, tents, festivalId }: CrowdR
                   {t("crowdReport.selectLevel")}
                 </Text>
               </HStack>
-              <Pressable onPress={handleClose} hitSlop={8}>
+              <Pressable onPress={handlePickerClose} hitSlop={8}>
                 <X size={24} color={IconColors.default} />
               </Pressable>
             </HStack>

@@ -1,3 +1,4 @@
+import { useSheetTracking } from "@prostcounter/shared/analytics/react";
 import { useSubmitCrowdReport, useTentCrowdReports } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { CrowdLevel } from "@prostcounter/shared/schemas";
@@ -65,6 +66,7 @@ export function CrowdReportSheet({
 
   const { submitReport, isSubmitting, error, reset } = useSubmitCrowdReport();
   const { reports } = useTentCrowdReports(tentId, festivalId);
+  const { markSubmitted } = useSheetTracking("crowd_report", isOpen);
 
   // Ref to track the success auto-close timeout so we can clean up on unmount
   const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -92,6 +94,7 @@ export function CrowdReportSheet({
         crowdLevel: selectedLevel,
         waitTimeMinutes,
       });
+      markSubmitted();
       setShowSuccess(true);
       successTimerRef.current = setTimeout(() => {
         successTimerRef.current = null;
@@ -103,7 +106,7 @@ export function CrowdReportSheet({
     } catch {
       // Error is handled by the hook
     }
-  }, [selectedLevel, waitTimeMinutes, tentId, festivalId, submitReport, onClose]);
+  }, [selectedLevel, waitTimeMinutes, tentId, festivalId, submitReport, onClose, markSubmitted]);
 
   const handleClose = useCallback(() => {
     setSelectedLevel(null);

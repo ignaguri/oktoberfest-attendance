@@ -1,4 +1,5 @@
 import { formatDateForDatabase } from "@prostcounter/shared";
+import { useSheetTracking } from "@prostcounter/shared/analytics/react";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTipCalculation } from "@prostcounter/shared/hooks";
 
@@ -148,6 +149,7 @@ export function QuickAttendanceSheet({
   const { currentFestival } = useFestival();
   const festivalId = currentFestival?.id;
   const { setPendingCrowdReport } = useQuickAttendance();
+  const { markSubmitted } = useSheetTracking("quick_attendance", isOpen);
 
   // Get today's date in the festival's timezone, which is how the server groups
   // visits into days (recalculated each time sheet opens to handle midnight rollover)
@@ -423,6 +425,8 @@ export function QuickAttendanceSheet({
         setPendingCrowdReport({ tentIds: [selectedTentId] });
       }
 
+      markSubmitted();
+
       // Close the sheet
       onClose();
     } catch (error) {
@@ -461,6 +465,7 @@ export function QuickAttendanceSheet({
     onClose,
     setPendingCrowdReport,
     t,
+    markSubmitted,
   ]);
 
   const isLoading = isSaving;
