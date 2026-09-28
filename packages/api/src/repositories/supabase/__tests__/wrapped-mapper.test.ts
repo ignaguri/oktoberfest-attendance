@@ -20,6 +20,14 @@ describe("mapToWrappedData", () => {
     // The drinks slide never rendered while clients read snake_case
     expect(wrapped.drinkStats.totalDrinks).toBe(14);
     expect(wrapped.drinkStats.breakdown[1]).toEqual({ drinkType: "radler", count: 3, percentage: 21.4 });
+    expect(wrapped.timing).toEqual({
+      timedDays: 2,
+      medianFirstHour: 12.5,
+      medianLastHour: 22.75,
+      peakHour: 20,
+      weekendShare: 0.5,
+    });
+    expect(wrapped.comparisons.vsFestivalAvg.attendeeCount).toBe(64);
   });
 
   it("accepts a zero-drink attendee with nulls and empty arrays", () => {

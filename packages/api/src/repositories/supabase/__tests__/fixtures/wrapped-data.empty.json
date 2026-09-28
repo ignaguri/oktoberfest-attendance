@@ -11,10 +11,11 @@
   "comparisons": {
     "vs_festival_avg": {
       "beers_diff_pct": 0, "days_diff_pct": 0, "avg_beers": 0, "avg_days": 0,
-      "median_beers": 0, "median_days": 0, "beers_percentile": 0, "days_percentile": 0
+      "median_beers": 0, "median_days": 0, "beers_percentile": 0, "days_percentile": 0, "attendee_count": 1
     },
     "vs_last_year": null
   },
   "personality": { "type": "Casual Visitor", "traits": [] },
-  "drink_stats": { "total_drinks": 0, "top_drink_type": null, "breakdown": [] }
+  "drink_stats": { "total_drinks": 0, "top_drink_type": null, "breakdown": [] },
+  "timing": { "timed_days": 0, "median_first_hour": null, "median_last_hour": null, "peak_hour": null, "weekend_share": 0 }
 }

@@ -46,7 +46,7 @@
   "comparisons": {
     "vs_festival_avg": {
       "beers_diff_pct": 40.2, "days_diff_pct": 12.5, "avg_beers": 8.9, "avg_days": 3.5,
-      "median_beers": 7, "median_days": 3, "beers_percentile": 81.3, "days_percentile": 66.7
+      "median_beers": 7, "median_days": 3, "beers_percentile": 81.3, "days_percentile": 66.7, "attendee_count": 64
     },
     "vs_last_year": {
       "beers_diff": 2.5, "days_diff": 1, "spent_diff": 40.1,
@@ -61,5 +61,6 @@
       { "drink_type": "beer", "count": 11, "percentage": 78.6 },
       { "drink_type": "radler", "count": 3, "percentage": 21.4 }
     ]
-  }
+  },
+  "timing": { "timed_days": 2, "median_first_hour": 12.5, "median_last_hour": 22.75, "peak_hour": 20, "weekend_share": 0.5 }
 }

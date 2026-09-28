@@ -43,7 +43,7 @@ describe("WrappedService.getWrapped", () => {
       getWrapped: vi.fn().mockResolvedValue(wrapped),
     });
     const { result, viewRecorded } = await new WrappedService(wrappedRepo).getWrapped("u", "f");
-    expect(result).toEqual({ status: "ready", wrapped });
+    expect(result).toEqual({ status: "ready", wrapped, officialStats: null });
     expect(viewRecorded).toBe(true);
     expect(wrappedRepo.markViewed).toHaveBeenCalledWith("u", "f");
   });
@@ -58,7 +58,7 @@ describe("WrappedService.getWrapped", () => {
       getWrapped: vi.fn().mockResolvedValue(wrapped),
     });
     const { result, viewRecorded } = await new WrappedService(wrappedRepo).getWrapped("u", "f");
-    expect(result).toEqual({ status: "ready", wrapped });
+    expect(result).toEqual({ status: "ready", wrapped, officialStats: null });
     expect(viewRecorded).toBe(false);
     expect(wrappedRepo.markViewed).not.toHaveBeenCalled();
   });

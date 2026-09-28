@@ -39,7 +39,7 @@ export class WrappedService {
       await this.wrappedRepo.markViewed(userId, festivalId);
     }
 
-    return { result: { status: "ready", wrapped }, viewRecorded: !isPreview };
+    return { result: { status: "ready", wrapped, officialStats: null }, viewRecorded: !isPreview };
   }
 
   async listFestivals(): Promise<WrappedFestival[]> {
