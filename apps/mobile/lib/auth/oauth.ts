@@ -3,6 +3,8 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
 
+import { apiClient } from "@/lib/api-client";
+import { logger } from "@/lib/logger";
 import { supabase } from "@/lib/supabase";
 
 // Complete the auth session to enable browser redirect handling
@@ -134,6 +136,32 @@ export async function signInWithFacebook(): Promise<{
 }
 
 /**
+ * Apple hands over the user's name only on the first authorization, and only on
+ * the client credential, never in the identity token. Supabase builds the
+ * profile from the token, so the name has to be written to it here.
+ * Best effort: failing to save it must not fail the sign-in.
+ */
+export async function saveAppleFullName(
+  name: AppleAuthentication.AppleAuthenticationFullName | null,
+): Promise<void> {
+  const fullName = [name?.givenName, name?.familyName].filter(Boolean).join(" ").trim();
+  if (!fullName) {
+    return;
+  }
+
+  try {
+    const { profile } = await apiClient.profile.get();
+    // Re-authorizing the app can hand the name over again. Don't overwrite an edit.
+    if (profile.full_name) {
+      return;
+    }
+    await apiClient.profile.update({ full_name: fullName });
+  } catch (err) {
+    logger.error("[Auth] Failed to save Apple full name:", err);
+  }
+}
+
+/**
  * Sign in with Apple (iOS only)
  */
 export async function signInWithApple(): Promise<{
@@ -162,6 +190,8 @@ export async function signInWithApple(): Promise<{
       if (error) {
         return { error };
       }
+
+      await saveAppleFullName(credential.fullName);
     } else {
       return { error: new Error("No identity token received from Apple") };
     }
