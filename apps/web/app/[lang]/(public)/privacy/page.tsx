@@ -6,7 +6,7 @@ export default function PrivacyPolicy() {
       <div className="prose prose-lg max-w-none space-y-6">
         <p className="mb-8 text-sm text-gray-600">
           <strong>Last updated:</strong>{" "}
-          {new Date("2026-05-05").toLocaleDateString("en-US", {
+          {new Date("2026-09-28").toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
@@ -61,6 +61,13 @@ export default function PrivacyPolicy() {
           <h3 className="mt-6 mb-3 text-xl font-medium">2.3 Automatically Collected Information</h3>
           <ul className="ml-4 list-inside list-disc space-y-2">
             <li>Usage analytics through Google Analytics (anonymized)</li>
+            <li>
+              In-app usage events while you are signed in (screens you open, flows you start or
+              leave, prompts you answer), stored with your account to improve the app. They are
+              never shared or sold, are deleted when you delete your account, and are kept for
+              13 months
+            </li>
+            <li>Session replays and interaction heatmaps in the mobile app through Vexo</li>
             <li>Error logs and crash reports through Sentry</li>
             <li>Device information necessary for app functionality</li>
             <li>IP address for security and service provision</li>
@@ -145,6 +152,9 @@ export default function PrivacyPolicy() {
             </li>
             <li>
               <strong>Google Analytics:</strong> Anonymous usage statistics
+            </li>
+            <li>
+              <strong>Vexo:</strong> Mobile app session replays and usage heatmaps
             </li>
             <li>
               <strong>Sentry:</strong> Error monitoring and crash reporting
