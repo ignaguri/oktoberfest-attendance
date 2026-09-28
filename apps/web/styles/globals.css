@@ -394,25 +394,6 @@
   }
 }
 
-/* Swiper Wrapped Styles */
-@layer components {
-  .swiper {
-    width: 100%;
-    height: 100%;
-  }
-
-  .swiper-slide {
-    height: 100dvh;
-    width: 100dvw;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .swiper-wrapper {
-    height: 100%;
-  }
-}
-
 /* Entrance animations on the marketing pages.
  *
  * framer-motion writes the hidden state as an inline transform, and that inline
