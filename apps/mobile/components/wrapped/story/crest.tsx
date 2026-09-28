@@ -8,10 +8,25 @@ import { getCrestImage } from "./crest-images";
 export function Crest({ personaId }: { personaId: PersonaId }) {
   const source = getCrestImage(personaId);
   if (source) {
-    return <Image source={source} className="h-40 w-40" accessibilityIgnoresInvertColors />;
+    return (
+      <Image
+        source={source}
+        className="h-40 w-40"
+        // Decorative: the persona name is always rendered next to the crest.
+        alt=""
+        accessibilityIgnoresInvertColors
+      />
+    );
   }
   return (
-    <Svg width={140} height={160} viewBox="0 0 132 150">
+    <Svg
+      width={140}
+      height={160}
+      viewBox="0 0 132 150"
+      // Decorative: the persona name is always rendered next to the crest.
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
       <Path
         d="M66 4 L124 22 V74 C124 110 98 134 66 146 C34 134 8 110 8 74 V22 Z"
         fill="#FFFFFF"
