@@ -18,7 +18,7 @@ export function ServusSlide({ slide, animate }: { slide: StorySlideOf<"servus">;
       </Reveal>
       {avatarUri ? (
         <Reveal step={1} animate={animate} kind="stamp">
-          <Image src={avatarUri} alt="" width={96} height={96} className="size-24 rounded-full border-4 border-wrapped-ink object-cover" />
+          <Image src={avatarUri} alt="" width={96} height={96} unoptimized className="size-24 rounded-full border-4 border-wrapped-ink object-cover" />
         </Reveal>
       ) : null}
       <Reveal step={2} animate={animate}>

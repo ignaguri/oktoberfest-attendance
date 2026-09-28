@@ -38,8 +38,13 @@ export default function WrappedScreen() {
     return buildWrappedStory(readyResult.wrapped, readyResult.officialStats);
   }, [readyResult]);
 
+  // Nothing to go back to when the screen was opened from a deep link or cold start.
   const handleClose = () => {
-    router.back();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
   };
 
   // Loading state

@@ -15,7 +15,9 @@ const TILTS = ["-rotate-3", "rotate-2", "rotate-1", "-rotate-2"];
 export function PeopleSlide({ slide, animate }: { slide: StorySlideOf<"people">; animate: boolean }) {
   const copy = useStoryCopy();
   const [failedIds, setFailedIds] = useState<string[]>([]);
-  const photos = slide.photos.filter((photo) => !failedIds.includes(photo.id));
+  const photos = slide.photos
+    .map((photo) => ({ id: photo.id, src: getBeerPictureUrl(photo.pictureUrl) }))
+    .filter((photo) => photo.src && !failedIds.includes(photo.id));
   return (
     <div className="flex flex-1 flex-col justify-center gap-6">
       <Reveal step={0} animate={animate}>
@@ -34,8 +36,9 @@ export function PeopleSlide({ slide, animate }: { slide: StorySlideOf<"people">;
             {photos.map((photo, index) => (
               <div key={photo.id} className={cn("rounded-md bg-white p-1.5", TILTS[index % TILTS.length])}>
                 <Image
-                  src={getBeerPictureUrl(photo.pictureUrl) ?? ""}
+                  src={photo.src as string}
                   alt=""
+                  unoptimized
                   width={128}
                   height={128}
                   className="size-32 rounded object-cover"

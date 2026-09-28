@@ -38,6 +38,15 @@ function WrappedPageContent() {
     return buildWrappedStory(readyResult.wrapped, readyResult.officialStats);
   }, [readyResult]);
 
+  // router.back() is a no-op when the page was opened in a new tab or from a shared link.
+  const handleClose = () => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/home");
+    }
+  };
+
   if (festivalsLoading || wrappedLoading) {
     return <WrappedLoading />;
   }
@@ -86,7 +95,7 @@ function WrappedPageContent() {
       key={slides.length}
       data={result.wrapped}
       slides={slides}
-      onClose={() => router.back()}
+      onClose={handleClose}
     />
   );
 }
