@@ -20,7 +20,7 @@ interface IntroSlideProps {
 export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
   const { t } = useTranslation();
   const { isExploding, triggerConfetti } = useConfetti();
-  const username = data.user_info.username || data.user_info.full_name || "You";
+  const username = data.userInfo.username || data.userInfo.fullName || "You";
 
   // Trigger confetti after delay when slide becomes active
   useEffect(() => {
@@ -59,7 +59,7 @@ export function IntroSlide({ data, isActive = false }: IntroSlideProps) {
         />
 
         <SlideTitle className="bg-gradient-to-b from-yellow-400 to-yellow-600 bg-clip-text text-5xl text-transparent md:text-6xl">
-          {data.festival_info.name}
+          {data.festivalInfo.name}
         </SlideTitle>
 
         <SlideSubtitle className="text-2xl font-semibold">{t("wrapped.intro.title")}</SlideSubtitle>

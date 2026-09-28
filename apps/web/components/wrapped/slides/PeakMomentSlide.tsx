@@ -20,18 +20,18 @@ interface PeakMomentSlideProps {
 export function PeakMomentSlide({ data, isActive = false }: PeakMomentSlideProps) {
   const { t } = useTranslation();
   const { isExploding, triggerConfetti } = useConfetti();
-  const { best_day, max_single_session } = data.peak_moments;
+  const { bestDay, maxSingleSession } = data.peakMoments;
 
   useEffect(() => {
-    if (isActive && best_day) {
+    if (isActive && bestDay) {
       const timer = setTimeout(triggerConfetti, ANIMATION_DELAYS.confettiTriggerPeak);
       return () => clearTimeout(timer);
     }
-  }, [isActive, triggerConfetti, best_day]);
+  }, [isActive, triggerConfetti, bestDay]);
 
   return (
     <BaseSlide isActive={isActive} className="bg-gradient-to-br from-amber-50 to-yellow-50">
-      {isExploding && best_day && (
+      {isExploding && bestDay && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <ConfettiExplosion
             force={0.6}
@@ -47,7 +47,7 @@ export function PeakMomentSlide({ data, isActive = false }: PeakMomentSlideProps
       <SlideSubtitle>{t("wrapped.peakMoment.subtitle")}</SlideSubtitle>
 
       <div className="z-10 flex w-full max-w-2xl flex-col gap-4">
-        {best_day && (
+        {bestDay && (
           <div className="flex flex-col items-center gap-2 rounded-xl bg-white p-6 shadow-lg">
             <div className="flex items-center justify-center gap-4">
               <Beer className="size-10" />
@@ -58,26 +58,26 @@ export function PeakMomentSlide({ data, isActive = false }: PeakMomentSlideProps
             </h3>
             <div className="flex items-center justify-center gap-4">
               <div className="text-center">
-                <p className="text-3xl font-bold text-yellow-600">{best_day.beer_count}</p>
+                <p className="text-3xl font-bold text-yellow-600">{bestDay.beerCount}</p>
                 <p className="text-xs text-gray-500">
                   {t("wrapped.peakMoment.beers", {
-                    count: best_day.beer_count,
+                    count: bestDay.beerCount,
                   })}
                 </p>
               </div>
               <div className="text-2xl text-gray-400">+</div>
               <div className="text-center">
-                <p className="text-3xl font-bold text-green-700">{best_day.tents_visited}</p>
+                <p className="text-3xl font-bold text-green-700">{bestDay.tentsVisited}</p>
                 <p className="text-xs text-gray-500">
                   {t("wrapped.peakMoment.tents", {
-                    count: best_day.tents_visited,
+                    count: bestDay.tentsVisited,
                   })}
                 </p>
               </div>
             </div>
-            <p className="text-gray-600">{formatWrappedDate(best_day.date)}</p>
+            <p className="text-gray-600">{formatWrappedDate(bestDay.date)}</p>
             <p className="text-sm text-gray-500">
-              {formatCurrency(best_day.spent)} {t("wrapped.peakMoment.spent")}
+              {formatCurrency(bestDay.spent)} {t("wrapped.peakMoment.spent")}
             </p>
           </div>
         )}
@@ -88,7 +88,7 @@ export function PeakMomentSlide({ data, isActive = false }: PeakMomentSlideProps
             {t("wrapped.peakMoment.maxSession")}
           </h3>
           <p className="text-4xl font-bold text-yellow-600">
-            {t("wrapped.peakMoment.beers", { count: max_single_session })}
+            {t("wrapped.peakMoment.beers", { count: maxSingleSession })}
           </p>
           <p className="text-sm text-gray-500">{t("wrapped.peakMoment.maxSessionDesc")}</p>
         </div>

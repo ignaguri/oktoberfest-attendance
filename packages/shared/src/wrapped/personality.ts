@@ -3,7 +3,7 @@
  * Determines user's festival personality type based on behavior patterns
  */
 
-import type { WrappedData } from "./types";
+import type { WrappedData } from "../schemas/wrapped.schema";
 
 export interface PersonalityAnalysis {
   primaryType: string;
@@ -16,24 +16,24 @@ export interface PersonalityAnalysis {
  * This matches the logic from the database function but can be used client-side too
  */
 export function analyzePersonality(data: WrappedData): PersonalityAnalysis {
-  const { basic_stats, tent_stats, timeline } = data;
+  const { basicStats, tentStats, timeline } = data;
 
   // Use pre-calculated tent diversity percentage from database
   // This is calculated server-side based on the festival's actual tent count
-  const tentDiversityPct = tent_stats.tent_diversity_pct;
+  const tentDiversityPct = tentStats.tentDiversityPct;
 
-  const avgBeers = basic_stats.avg_beers;
-  const daysAttended = basic_stats.days_attended;
+  const avgBeers = basicStats.avgBeers;
+  const daysAttended = basicStats.daysAttended;
   const totalDays = timeline.length;
 
   // Calculate variance in daily consumption
-  const beerCounts = timeline.map((day) => day.beer_count);
+  const beerCounts = timeline.map((day) => day.beerCount);
   const variance = calculateVariance(beerCounts);
 
   // Check if attended first day
   const attendedFirstDay =
     timeline.length > 0 &&
-    new Date(timeline[0].date).getTime() === new Date(data.festival_info.start_date).getTime();
+    new Date(timeline[0].date).getTime() === new Date(data.festivalInfo.startDate).getTime();
 
   // Determine primary personality type with scoring
   const typeScores = {

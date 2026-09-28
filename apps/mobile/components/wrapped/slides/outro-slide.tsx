@@ -65,18 +65,18 @@ export function OutroSlide({ data, isActive, onClose }: OutroSlideProps) {
           transition={{ type: "timing", duration: 500, delay: 500 }}
           className="items-center rounded-2xl bg-white/70 px-6 py-4"
         >
-          <Text className="text-sm text-gray-500">{data.festival_info?.name ?? ""}</Text>
+          <Text className="text-sm text-gray-500">{data.festivalInfo?.name ?? ""}</Text>
           <Text className="mt-1 text-lg font-bold text-gray-800">
             {t("wrapped.outro.summary.beers", {
-              count: data.basic_stats?.total_beers ?? 0,
+              count: data.basicStats?.totalBeers ?? 0,
             })}{" "}
             {"\u{1F37A}"} {"\u{00B7}"}{" "}
             {t("wrapped.outro.summary.tents", {
-              count: data.tent_stats?.unique_tents ?? 0,
+              count: data.tentStats?.uniqueTents ?? 0,
             })}{" "}
             {"\u{1F3AA}"} {"\u{00B7}"}{" "}
             {t("wrapped.outro.summary.days", {
-              count: data.basic_stats?.days_attended ?? 0,
+              count: data.basicStats?.daysAttended ?? 0,
             })}
           </Text>
         </Motion.View>

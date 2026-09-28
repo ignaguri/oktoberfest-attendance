@@ -6,7 +6,6 @@ import "swiper/css/pagination";
 import "swiper/css/virtual";
 
 import type { WrappedData } from "@prostcounter/shared/wrapped";
-import { hasWrappedData } from "@prostcounter/shared/wrapped";
 import { useEffect, useMemo, useRef } from "react";
 import { Keyboard, Mousewheel, Pagination, Virtual } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -42,21 +41,21 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     () => [
       { key: "intro", component: IntroSlide },
       { key: "numbers", component: NumbersSlide },
-      ...(data.drinkStats?.breakdown && data.drinkStats.breakdown.length > 0
+      ...(data.drinkStats.totalDrinks > 0
         ? [{ key: "drink_breakdown", component: DrinkBreakdownSlide }]
         : []),
       { key: "journey", component: JourneySlide },
       { key: "tent_explorer", component: TentExplorerSlide },
       { key: "peak_moment", component: PeakMomentSlide },
       { key: "social", component: SocialSlide },
-      ...(data.social_stats.pictures.length > 0
+      ...(data.socialStats.pictures.length > 0
         ? [{ key: "pictures", component: PicturesSlide }]
         : []),
       ...(data.achievements.length > 0
         ? [{ key: "achievements", component: AchievementsSlide }]
         : []),
       { key: "personality", component: PersonalitySlide },
-      ...(data.social_stats.top_3_rankings.length > 0
+      ...(data.socialStats.topRankings.length > 0
         ? [{ key: "rankings", component: RankingsSlide }]
         : []),
       ...(data.comparisons ? [{ key: "comparisons", component: ComparisonsSlide }] : []),
@@ -101,17 +100,6 @@ export function WrappedContainer({ data }: WrappedContainerProps) {
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, [slides]);
-
-  // Check if user has data
-  if (!hasWrappedData(data)) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-xl text-gray-600">No wrapped data available for this festival</p>
-        </div>
-      </div>
-    );
-  }
 
   // Handle slide change to scroll and update hash
   const handleSlideChange = (swiper: any) => {

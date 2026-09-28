@@ -1,7 +1,7 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useWrappedAccess } from "@prostcounter/shared/hooks";
+import { useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { Link } from "next-view-transitions";
@@ -11,7 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 
 export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: boolean }) {
   const { currentFestival } = useFestival();
-  const { data: accessResult, loading } = useWrappedAccess(currentFestival?.id);
+  const { data: festivals, loading } = useWrappedFestivals();
+  const isUnlocked = !!festivals?.some((festival) => festival.festivalId === currentFestival?.id);
 
   // Don't show if loading or no current festival
   if (loading || !currentFestival) {
@@ -19,7 +20,7 @@ export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: bool
   }
 
   // Don't show if not last day and access not allowed
-  if (!isLastDayOfFestival && (!accessResult || !accessResult.allowed)) {
+  if (!isLastDayOfFestival && !isUnlocked) {
     return null;
   }
 

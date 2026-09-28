@@ -20,8 +20,8 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
   const { t } = useTranslation();
 
   const topTents = useMemo(
-    () => getTopTents(data.tent_stats.tent_breakdown, 3),
-    [data.tent_stats.tent_breakdown],
+    () => getTopTents(data.tentStats.tentBreakdown, 3),
+    [data.tentStats.tentBreakdown],
   );
 
   return (
@@ -35,7 +35,7 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
             <View className="flex-1">
               <StatItem
                 label={t("wrapped.tentExplorer.uniqueTents")}
-                value={String(data.tent_stats.unique_tents)}
+                value={String(data.tentStats.uniqueTents)}
                 isActive={isActive}
                 delay={200}
               />
@@ -43,7 +43,7 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
             <View className="flex-1">
               <StatItem
                 label={t("wrapped.tentExplorer.diversity")}
-                value={`${data.tent_stats.tent_diversity_pct.toFixed(0)}%`}
+                value={`${data.tentStats.tentDiversityPct.toFixed(0)}%`}
                 isActive={isActive}
                 delay={350}
               />
@@ -51,7 +51,7 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
           </HStack>
         </View>
 
-        {data.tent_stats.favorite_tent && (
+        {data.tentStats.favoriteTent && (
           <Motion.View
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
@@ -60,7 +60,7 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
           >
             <Text className="text-sm text-gray-500">{t("wrapped.tentExplorer.favorite")}</Text>
             <Text className="mt-1 text-xl font-bold text-gray-800">
-              {data.tent_stats.favorite_tent}
+              {data.tentStats.favoriteTent}
             </Text>
           </Motion.View>
         )}
@@ -69,7 +69,7 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
         <VStack space="sm" className="mt-2">
           {topTents.map((tent, index) => (
             <Motion.View
-              key={tent.tent_name}
+              key={tent.tentName}
               initial={{ opacity: 0, x: -30 }}
               animate={{
                 opacity: isActive ? 1 : 0,
@@ -84,10 +84,10 @@ export function TentExplorerSlide({ data, isActive }: TentExplorerSlideProps) {
             >
               <HStack space="sm" className="items-center">
                 <Text className="text-lg font-bold text-green-600">#{index + 1}</Text>
-                <Text className="text-base text-gray-700">{tent.tent_name}</Text>
+                <Text className="text-base text-gray-700">{tent.tentName}</Text>
               </HStack>
               <Text className="text-sm text-gray-500">
-                {t("wrapped.tentExplorer.visits", { count: tent.visit_count })}
+                {t("wrapped.tentExplorer.visits", { count: tent.visitCount })}
               </Text>
             </Motion.View>
           ))}

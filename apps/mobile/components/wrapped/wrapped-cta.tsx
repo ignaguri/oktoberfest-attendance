@@ -1,6 +1,6 @@
 import { Motion } from "@legendapp/motion";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useWrappedAccess } from "@prostcounter/shared/hooks";
+import { useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
 import { Sparkles } from "lucide-react-native";
@@ -19,7 +19,8 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
   const { t } = useTranslation();
   const router = useRouter();
   const { currentFestival } = useFestival();
-  const { data: accessResult, loading } = useWrappedAccess(currentFestival?.id);
+  const { data: festivals, loading } = useWrappedFestivals();
+  const isUnlocked = !!festivals?.some((festival) => festival.festivalId === currentFestival?.id);
 
   // Don't show if loading or no current festival
   if (loading || !currentFestival) {
@@ -27,12 +28,12 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
   }
 
   // Don't show if not last day and access not allowed
-  if (!isLastDayOfFestival && (!accessResult || !accessResult.allowed)) {
+  if (!isLastDayOfFestival && !isUnlocked) {
     return null;
   }
 
   const festivalName = currentFestival.name;
-  const isReady = !isLastDayOfFestival && accessResult?.allowed;
+  const isReady = !isLastDayOfFestival && isUnlocked;
 
   return (
     <Motion.View

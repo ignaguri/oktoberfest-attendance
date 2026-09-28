@@ -1,7 +1,8 @@
 import { useFestival } from "@prostcounter/shared/contexts";
+import { useWrapped, useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { hasWrappedData } from "@prostcounter/shared/wrapped";
-import { useRouter } from "expo-router";
+import { resolveWrappedFestivalId } from "@prostcounter/shared/wrapped";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { X } from "lucide-react-native";
 import { ActivityIndicator, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,15 +10,18 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { WrappedPager } from "@/components/wrapped/wrapped-pager";
-import { useWrappedData } from "@/hooks/useWrappedData";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
 export default function WrappedScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { festivalId: festivalIdParam } = useLocalSearchParams<{ festivalId?: string }>();
   const { currentFestival } = useFestival();
-  const { data: wrappedData, loading, error } = useWrappedData(currentFestival?.id);
+  const { data: festivals, loading: festivalsLoading } = useWrappedFestivals();
+  const festivalId = resolveWrappedFestivalId(festivalIdParam, festivals, currentFestival?.id);
+  const { data: result, loading: wrappedLoading, error } = useWrapped(festivalId);
+  const loading = festivalsLoading || wrappedLoading;
 
   const handleClose = () => {
     router.back();
@@ -50,7 +54,7 @@ export default function WrappedScreen() {
   }
 
   // No data state
-  if (!wrappedData || !hasWrappedData(wrappedData)) {
+  if (result?.status !== "ready") {
     return (
       <View className="flex-1 items-center justify-center bg-yellow-50 p-6">
         <VStack space="md" className="items-center">
@@ -77,7 +81,7 @@ export default function WrappedScreen() {
       </Pressable>
 
       {/* Wrapped content */}
-      <WrappedPager data={wrappedData} onClose={handleClose} />
+      <WrappedPager data={result.wrapped} onClose={handleClose} />
     </View>
   );
 }

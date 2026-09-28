@@ -21,7 +21,7 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
 
   const handleDownload = useCallback(() => {
     // Store wrapped data in localStorage for the share page
-    localStorage.setItem("wrapped-share-data", JSON.stringify(data));
+    localStorage.setItem("wrapped-share-data-v2", JSON.stringify(data));
 
     // Navigate to dedicated share page
     router.push("/wrapped/share");
@@ -39,19 +39,19 @@ export function OutroSlide({ data, isActive = false }: OutroSlideProps) {
         <div className="max-w-md rounded-lg bg-white p-6 text-center shadow-lg">
           <p className="mb-2 text-lg font-semibold text-gray-800">
             {t("wrapped.outro.summary.beers", {
-              count: data.basic_stats.total_beers,
+              count: data.basicStats.totalBeers,
             })}{" "}
             &{" "}
             {t("wrapped.outro.summary.tents", {
-              count: data.tent_stats.unique_tents,
+              count: data.tentStats.uniqueTents,
             })}
           </p>
           <p className="text-gray-600">
             {t("wrapped.outro.summary.across", {
               days: t("wrapped.outro.summary.days", {
-                count: data.basic_stats.days_attended,
+                count: data.basicStats.daysAttended,
               }),
-              festival: data.festival_info.name,
+              festival: data.festivalInfo.name,
             })}
           </p>
         </div>

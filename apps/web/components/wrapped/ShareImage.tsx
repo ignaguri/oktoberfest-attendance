@@ -63,9 +63,9 @@ export const ShareImage = forwardRef<HTMLDivElement, ShareImageProps>(
       if (!position) return "Not ranked";
 
       const criteriaLabels = {
-        days_attended: "Days",
-        total_beers: "Beers",
-        avg_beers: "Average",
+        daysAttended: "Days",
+        totalBeers: "Beers",
+        avgBeers: "Average",
       };
 
       return `#${position.position} in ${criteriaLabels[position.criteria as keyof typeof criteriaLabels]}`;

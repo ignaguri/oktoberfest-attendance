@@ -1,92 +1,49 @@
 /**
- * Shared hooks for wrapped data
- *
- * Uses ApiClientContext to get the platform-specific API client
+ * Shared hooks for Wrapped. Both apps read through the API, which records the
+ * view (wrapped_viewed achievement, wrapped_views analytics) on status=ready.
  */
 
-import { useApiClient, useInvalidateQueries, useQuery, QueryKeys } from "../data";
-import type { WrappedAccessResult, WrappedData } from "../wrapped/types";
+import { QueryKeys, useApiClient, useInvalidateQueries, useQuery } from "../data";
+import type { GetWrappedResponse, WrappedFestival } from "../schemas/wrapped.schema";
 
-/**
- * Hook to check if user can access wrapped for a festival
- */
-export function useWrappedAccess(festivalId?: string) {
-  const apiClient = useApiClient();
-
-  return useQuery(
-    QueryKeys.wrappedAccess(festivalId || ""),
-    async (): Promise<WrappedAccessResult> => apiClient.wrapped.checkAccess(festivalId!),
-    {
-      enabled: !!festivalId,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 15 * 60 * 1000, // 15 minutes cache
-      retry: 1,
-    },
-  );
-}
-
-/**
- * Hook to fetch list of festivals with wrapped available
- */
-export function useAvailableWrappedFestivals() {
-  const apiClient = useApiClient();
-
-  return useQuery(
-    QueryKeys.availableWrapped(),
-    async () => {
-      const response = await apiClient.wrapped.getAvailableFestivals();
-      return response.festivals;
-    },
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 15 * 60 * 1000, // 15 minutes cache
-    },
-  );
-}
-
-/**
- * Hook to fetch wrapped data for a specific festival via API
- */
-export function useWrappedDataApi(festivalId?: string) {
+export function useWrapped(festivalId?: string) {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
 
   return useQuery(
     QueryKeys.wrapped(festivalId || ""),
-    async (): Promise<WrappedData | null> => {
+    async (): Promise<GetWrappedResponse> => {
       const response = await apiClient.wrapped.get(festivalId!);
-      // Evaluate-only route: the unlock (if any) reaches the client through
-      // the outbox, not this response. Nudge the pending query so it's not
-      // waiting on the next window focus to pick it up.
-      invalidateQueries(QueryKeys.pendingUnlocks());
-      return response.wrapped ?? null;
+      if (response.status === "ready") {
+        // Evaluate-only route: the unlock reaches the client through the
+        // outbox, so nudge the pending query instead of waiting for focus.
+        invalidateQueries(QueryKeys.pendingUnlocks());
+        // The archive's "new" dot depends on the view just recorded.
+        invalidateQueries(QueryKeys.wrappedFestivals());
+      }
+      return response;
     },
     {
       enabled: !!festivalId,
-      staleTime: 10 * 60 * 1000, // 10 minutes - wrapped data doesn't change often
-      gcTime: 30 * 60 * 1000, // 30 minutes cache
+      staleTime: 10 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
       retry: 2,
     },
   );
 }
 
-/**
- * Hook to generate wrapped data for a specific festival
- */
-export function useGenerateWrapped(festivalId?: string) {
+export function useWrappedFestivals() {
   const apiClient = useApiClient();
 
   return useQuery(
-    [...QueryKeys.wrapped(festivalId || ""), "generate"],
-    async () => {
-      const response = await apiClient.wrapped.generate(festivalId!);
-      return response.wrapped;
+    QueryKeys.wrappedFestivals(),
+    async (): Promise<WrappedFestival[]> => {
+      const response = await apiClient.wrapped.list();
+      return response.festivals;
     },
     {
-      enabled: false, // Only trigger manually
-      staleTime: 10 * 60 * 1000,
-      gcTime: 30 * 60 * 1000,
-      retry: 1,
+      staleTime: 5 * 60 * 1000,
+      gcTime: 15 * 60 * 1000,
     },
   );
 }

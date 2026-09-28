@@ -15,17 +15,17 @@ interface NumbersSlideProps {
 
 export function NumbersSlide({ data, isActive = false }: NumbersSlideProps) {
   const { t } = useTranslation();
-  const { total_beers, days_attended, total_spent, avg_beers } = data.basic_stats;
+  const { totalBeers, daysAttended, totalSpent, avgBeers } = data.basicStats;
 
   const finalMessageKey = useMemo(() => {
-    if (total_beers > 10 || avg_beers > 2.1) {
+    if (totalBeers > 10 || avgBeers > 2.1) {
       return "wrapped.numbers.finalMessageLotsOfProst";
     }
-    if (days_attended > 3) {
+    if (daysAttended > 3) {
       return "wrapped.numbers.finalMessageLotsOfDays";
     }
     return "wrapped.numbers.finalMessageNotBad";
-  }, [avg_beers, days_attended, total_beers]);
+  }, [avgBeers, daysAttended, totalBeers]);
 
   return (
     <BaseSlide isActive={isActive} className="bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -36,25 +36,25 @@ export function NumbersSlide({ data, isActive = false }: NumbersSlideProps) {
         <StatItem
           icon={<Beer className="size-5" />}
           label={t("wrapped.numbers.totalBeers")}
-          value={formatNumber(total_beers)}
+          value={formatNumber(totalBeers)}
         />
 
         <StatItem
           icon={<CalendarDays className="size-5" />}
           label={t("wrapped.numbers.daysAttended")}
-          value={days_attended}
+          value={daysAttended}
         />
 
         <StatItem
           icon={<TrendingUp className="size-5" />}
           label={t("wrapped.numbers.avgPerDay")}
-          value={formatNumber(avg_beers)}
+          value={formatNumber(avgBeers)}
         />
 
         <StatItem
           icon={<DollarSign className="size-5" />}
           label={t("wrapped.numbers.totalSpent")}
-          value={formatCurrency(total_spent)}
+          value={formatCurrency(totalSpent)}
         />
       </SlideContent>
 

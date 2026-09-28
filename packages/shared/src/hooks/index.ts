@@ -219,12 +219,7 @@ export {
 } from "./useFeedback";
 
 // Wrapped hooks
-export {
-  useAvailableWrappedFestivals,
-  useGenerateWrapped,
-  useWrappedAccess,
-  useWrappedDataApi,
-} from "./useWrapped";
+export { useWrapped, useWrappedFestivals } from "./useWrapped";
 
 // Admin hooks
 export {

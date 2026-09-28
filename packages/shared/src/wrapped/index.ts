@@ -9,8 +9,6 @@ export type {
   SlideType,
   SlideData,
   SlideConfig,
-  WrappedData,
-  WrappedAccessResult,
   IntroSlideContent,
   NumbersSlideContent,
   JourneySlideContent,
@@ -23,6 +21,8 @@ export type {
   ComparisonsSlideContent,
   OutroSlideContent,
 } from "./types";
+export type { WrappedData, WrappedFestival } from "../schemas/wrapped.schema";
+export { resolveWrappedFestivalId } from "./resolve-festival";
 
 // Utilities
 export {
@@ -33,7 +33,6 @@ export {
   formatPercentile,
   getFestivalYear,
   calculateTotalPoints,
-  hasWrappedData,
   prepareTimelineData,
   getTopTents,
   getPersonalityEmoji,
