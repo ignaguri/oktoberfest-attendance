@@ -12609,6 +12609,164 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/admin/analytics/scorecard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Feature scorecard (admin)
+         * @description Per feature: attendees, adopters, and for users vs non-users how many came back during the festival and how many attended a later one. Without festivalId, every festival pooled.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    festivalId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Scorecard counts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            features: {
+                                /** @enum {string} */
+                                feature: "drinks" | "photos" | "group_joins" | "group_messages" | "photo_reactions" | "photo_comments" | "day_plans" | "crowd_reports" | "friend_requests" | "location_sharing" | "wrapped";
+                                attendees: number;
+                                adopters: number;
+                                cameBackUsers: number;
+                                cameBackUsersBase: number;
+                                cameBackNonUsers: number;
+                                cameBackNonUsersBase: number;
+                                returnedUsers: number;
+                                returnedUsersBase: number;
+                                returnedNonUsers: number;
+                                returnedNonUsersBase: number;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/analytics/cohorts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Signup cohorts (admin)
+         * @description Per signup month, newest first: sign-ups and how many activated, activated within 7 days, logged 3+ days at a festival, and attended 2+ festivals.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Signup cohorts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            cohorts: {
+                                month: string;
+                                signups: number;
+                                activated: number;
+                                activated7d: number;
+                                engaged: number;
+                                returned: number;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {

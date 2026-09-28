@@ -1,5 +1,12 @@
 /** Analytics sections, in display order. Also the `[section]` route values. */
-export const ANALYTICS_SECTIONS = ["overview", "features", "funnel", "retention"] as const;
+export const ANALYTICS_SECTIONS = [
+  "overview",
+  "features",
+  "funnel",
+  "retention",
+  "scorecard",
+  "cohorts",
+] as const;
 
 export type AnalyticsSection = (typeof ANALYTICS_SECTIONS)[number];
 

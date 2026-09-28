@@ -1,5 +1,6 @@
 import type { Database } from "@prostcounter/db";
 import type {
+  AnalyticsCohortsResponse,
   AnalyticsFeatureUsageResponse,
   AnalyticsFeatureUsageRow,
   AnalyticsFestivalRetentionResponse,
@@ -7,6 +8,8 @@ import type {
   AnalyticsFunnelStep,
   AnalyticsOverviewResponse,
   AnalyticsPlatform,
+  AnalyticsScorecardResponse,
+  AnalyticsScorecardRow,
 } from "@prostcounter/shared";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -106,6 +109,50 @@ export class SupabaseAdminAnalyticsRepository {
         attendees: row.attendees,
         returnedNext: row.returned_next,
         returnedAny: row.returned_any,
+      })),
+    };
+  }
+
+  async getFeatureScorecard(festivalId?: string): Promise<AnalyticsScorecardResponse> {
+    const { data, error } = await this.client.rpc(
+      "analytics_feature_scorecard",
+      festivalId ? { p_festival_id: festivalId } : {},
+    );
+    if (error) {
+      throw new Error(`analytics_feature_scorecard failed: ${error.message}`);
+    }
+    return {
+      features: (data ?? []).map((row) => ({
+        // The SQL VALUES list mirrors ANALYTICS_SCORECARD_FEATURES; the
+        // integration test fails if they drift.
+        feature: row.feature as AnalyticsScorecardRow["feature"],
+        attendees: row.attendees,
+        adopters: row.adopters,
+        cameBackUsers: row.came_back_users,
+        cameBackUsersBase: row.came_back_users_base,
+        cameBackNonUsers: row.came_back_non_users,
+        cameBackNonUsersBase: row.came_back_non_users_base,
+        returnedUsers: row.returned_users,
+        returnedUsersBase: row.returned_users_base,
+        returnedNonUsers: row.returned_non_users,
+        returnedNonUsersBase: row.returned_non_users_base,
+      })),
+    };
+  }
+
+  async getSignupCohorts(): Promise<AnalyticsCohortsResponse> {
+    const { data, error } = await this.client.rpc("analytics_signup_cohorts");
+    if (error) {
+      throw new Error(`analytics_signup_cohorts failed: ${error.message}`);
+    }
+    return {
+      cohorts: (data ?? []).map((row) => ({
+        month: row.month,
+        signups: row.signups,
+        activated: row.activated,
+        activated7d: row.activated_7d,
+        engaged: row.engaged,
+        returned: row.returned,
       })),
     };
   }

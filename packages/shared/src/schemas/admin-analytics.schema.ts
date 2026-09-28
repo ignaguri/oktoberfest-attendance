@@ -165,3 +165,76 @@ export const AnalyticsFestivalRetentionResponseSchema = z.object({
 export type AnalyticsFestivalRetentionResponse = z.infer<
   typeof AnalyticsFestivalRetentionResponseSchema
 >;
+
+// =============================================================================
+// Feature scorecard (piece 3)
+// =============================================================================
+
+/**
+ * Features scored per festival: every v0 feature except attendance, which is
+ * the base the others are measured against. Must match the VALUES list in
+ * `analytics_feature_scorecard`; the integration test fails on drift.
+ */
+export const ANALYTICS_SCORECARD_FEATURES = [
+  "drinks",
+  "photos",
+  "group_joins",
+  "group_messages",
+  "photo_reactions",
+  "photo_comments",
+  "day_plans",
+  "crowd_reports",
+  "friend_requests",
+  "location_sharing",
+  "wrapped",
+] as const;
+
+export const AnalyticsScorecardFeatureSchema = z.enum(ANALYTICS_SCORECARD_FEATURES);
+export type AnalyticsScorecardFeature = z.infer<typeof AnalyticsScorecardFeatureSchema>;
+
+/** No festival means every festival, pooled. */
+export const AnalyticsScorecardQuerySchema = z.object({
+  festivalId: z.uuid().optional(),
+});
+export type AnalyticsScorecardQuery = z.infer<typeof AnalyticsScorecardQuerySchema>;
+
+/** Raw counts; see utils/analytics-scorecard.ts for what they turn into. */
+export const AnalyticsScorecardRowSchema = z.object({
+  feature: AnalyticsScorecardFeatureSchema,
+  attendees: z.number().int(),
+  adopters: z.number().int(),
+  cameBackUsers: z.number().int(),
+  cameBackUsersBase: z.number().int(),
+  cameBackNonUsers: z.number().int(),
+  cameBackNonUsersBase: z.number().int(),
+  returnedUsers: z.number().int(),
+  returnedUsersBase: z.number().int(),
+  returnedNonUsers: z.number().int(),
+  returnedNonUsersBase: z.number().int(),
+});
+export type AnalyticsScorecardRow = z.infer<typeof AnalyticsScorecardRowSchema>;
+
+export const AnalyticsScorecardResponseSchema = z.object({
+  features: z.array(AnalyticsScorecardRowSchema),
+});
+export type AnalyticsScorecardResponse = z.infer<typeof AnalyticsScorecardResponseSchema>;
+
+// =============================================================================
+// Signup cohorts (piece 3)
+// =============================================================================
+
+export const AnalyticsCohortRowSchema = z.object({
+  /** First day of the signup month (Europe/Berlin), YYYY-MM-DD. */
+  month: IsoDateSchema,
+  signups: z.number().int(),
+  activated: z.number().int(),
+  activated7d: z.number().int(),
+  engaged: z.number().int(),
+  returned: z.number().int(),
+});
+export type AnalyticsCohortRow = z.infer<typeof AnalyticsCohortRowSchema>;
+
+export const AnalyticsCohortsResponseSchema = z.object({
+  cohorts: z.array(AnalyticsCohortRowSchema),
+});
+export type AnalyticsCohortsResponse = z.infer<typeof AnalyticsCohortsResponseSchema>;

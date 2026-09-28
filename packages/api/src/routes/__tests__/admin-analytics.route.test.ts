@@ -266,4 +266,112 @@ describe("Admin Analytics Routes - Unit Tests", () => {
       expect(mockRpc).toHaveBeenCalledWith("analytics_festival_retention");
     });
   });
+
+  describe("GET /admin/analytics/scorecard", () => {
+    const sqlRow = {
+      feature: "drinks",
+      attendees: 40,
+      adopters: 30,
+      came_back_users: 20,
+      came_back_users_base: 30,
+      came_back_non_users: 3,
+      came_back_non_users_base: 10,
+      returned_users: 8,
+      returned_users_base: 30,
+      returned_non_users: 1,
+      returned_non_users_base: 10,
+    };
+
+    it("pools every festival when none is given", async () => {
+      mockRpc.mockResolvedValue({ data: [sqlRow], error: null });
+
+      const res = await app.request(createAuthRequest("/admin/analytics/scorecard"));
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        features: [
+          {
+            feature: "drinks",
+            attendees: 40,
+            adopters: 30,
+            cameBackUsers: 20,
+            cameBackUsersBase: 30,
+            cameBackNonUsers: 3,
+            cameBackNonUsersBase: 10,
+            returnedUsers: 8,
+            returnedUsersBase: 30,
+            returnedNonUsers: 1,
+            returnedNonUsersBase: 10,
+          },
+        ],
+      });
+      expect(mockRpc).toHaveBeenCalledWith("analytics_feature_scorecard", {});
+    });
+
+    it("forwards the festival", async () => {
+      mockRpc.mockResolvedValue({ data: [], error: null });
+
+      await app.request(
+        createAuthRequest(
+          "/admin/analytics/scorecard?festivalId=22222222-2222-4222-8222-222222222222",
+        ),
+      );
+
+      expect(mockRpc).toHaveBeenCalledWith("analytics_feature_scorecard", {
+        p_festival_id: "22222222-2222-4222-8222-222222222222",
+      });
+    });
+
+    it("rejects a festival id that is not a uuid", async () => {
+      const res = await app.request(
+        createAuthRequest("/admin/analytics/scorecard?festivalId=oktoberfest"),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockRpc).not.toHaveBeenCalled();
+    });
+
+    it("answers 500 when the function fails", async () => {
+      mockRpc.mockResolvedValue({ data: null, error: { message: "boom" } });
+
+      const res = await app.request(createAuthRequest("/admin/analytics/scorecard"));
+
+      expect(res.status).toBe(500);
+    });
+  });
+
+  describe("GET /admin/analytics/cohorts", () => {
+    it("maps rows to camelCase", async () => {
+      mockRpc.mockResolvedValue({
+        data: [
+          {
+            month: "2026-09-01",
+            signups: 20,
+            activated: 10,
+            activated_7d: 6,
+            engaged: 4,
+            returned: 2,
+          },
+        ],
+        error: null,
+      });
+
+      const res = await app.request(createAuthRequest("/admin/analytics/cohorts"));
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        cohorts: [
+          {
+            month: "2026-09-01",
+            signups: 20,
+            activated: 10,
+            activated7d: 6,
+            engaged: 4,
+            returned: 2,
+          },
+        ],
+      });
+      expect(mockRpc).toHaveBeenCalledWith("analytics_signup_cohorts");
+    });
+  });
 });

@@ -2483,6 +2483,22 @@ export type Database = {
           users: number
         }[]
       }
+      analytics_feature_scorecard: {
+        Args: { p_festival_id?: string }
+        Returns: {
+          adopters: number
+          attendees: number
+          came_back_non_users: number
+          came_back_non_users_base: number
+          came_back_users: number
+          came_back_users_base: number
+          feature: string
+          returned_non_users: number
+          returned_non_users_base: number
+          returned_users: number
+          returned_users_base: number
+        }[]
+      }
       analytics_feature_usage: {
         Args: { p_from: string; p_platform?: string; p_to: string }
         Returns: {
@@ -2520,6 +2536,17 @@ export type Database = {
           p_user_id: string
         }
         Returns: number
+      }
+      analytics_signup_cohorts: {
+        Args: never
+        Returns: {
+          activated: number
+          activated_7d: number
+          engaged: number
+          month: string
+          returned: number
+          signups: number
+        }[]
       }
       calculate_attendance_cost: {
         Args: { p_attendance_id: string }

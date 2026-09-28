@@ -2032,14 +2032,23 @@
       "loadError": "Could not load analytics",
       "empty": "No data for this range yet",
       "retry": "Retry",
-      "filters": { "range": "Time range", "platform": "Platform", "festivals": "Festivals" },
+      "filters": {
+        "range": "Time range",
+        "platform": "Platform",
+        "festivals": "Festivals",
+        "presets": "Periods",
+        "search": "Search periods and festivals",
+        "noMatch": "Nothing matches"
+      },
       "ranges": { "7d": "Last 7 days", "30d": "Last 30 days", "90d": "Last 90 days", "365d": "Last 365 days" },
       "platforms": { "all": "All platforms", "ios": "iOS", "android": "Android" },
       "sections": {
         "overview": "Overview",
         "features": "Features",
         "funnel": "Activation funnel",
-        "retention": "Festival retention"
+        "retention": "Festival retention",
+        "scorecard": "Feature scorecard",
+        "cohorts": "Signup cohorts"
       },
       "overview": {
         "dau": "Daily active",
@@ -2091,6 +2100,37 @@
         "returnedAny": "Came back later",
         "pending": "Next festival has not started",
         "headline": "{{percent}} came back after {{festival}}"
+      },
+      "scorecard": {
+        "hint": "Per feature: who used it and whether they came back, compared with attendees who didn't. Users vs non-users is a correlation: heavy users try more features.",
+        "scopeAll": "All festivals. Pick a festival in the time range filter to narrow it down.",
+        "scopeFestival": "Festival: {{festival}}",
+        "feature": "Feature",
+        "adoption": "Used it",
+        "cameBack": "Came back during the festival",
+        "returned": "Came to a later festival",
+        "hintColumn": "Hint",
+        "legend": "users vs non-users",
+        "compared": "{{users}} vs {{nonUsers}} ({{lift}} pts)",
+        "tooFew": "too few ({{users}}/{{usersBase}} vs {{nonUsers}}/{{nonUsersBase}})",
+        "notApplicable": "n/a",
+        "headline": "{{cut}} to cut · {{grow}} to grow",
+        "hints": {
+          "cut": "Cut?",
+          "grow": "Grow",
+          "keep": "Keep",
+          "unknown": "Not enough data"
+        }
+      },
+      "cohorts": {
+        "hint": "Real users by signup month. Not affected by the filters.",
+        "month": "Month",
+        "signups": "Sign-ups",
+        "activated": "Logged an attendance",
+        "activated7d": "Within 7 days",
+        "engaged": "3+ days at one festival",
+        "returned": "2+ festivals",
+        "headline": "{{month}}: {{percent}} logged an attendance"
       }
     },
     "feedback": {
