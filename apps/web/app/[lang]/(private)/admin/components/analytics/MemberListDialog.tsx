@@ -80,7 +80,7 @@ export default function MemberListDialog({
               <Link
                 href={`/admin/users/${member.userId}`}
                 className="flex flex-col rounded px-2 py-2 text-left hover:bg-muted"
-                aria-label={t("admin.analytics.members.openHint")}
+                title={t("admin.analytics.members.openHint")}
               >
                 <span className="text-sm font-medium">
                   {member.fullName ?? member.username ?? t("admin.analytics.members.noName")}
