@@ -1,14 +1,24 @@
 "use client";
 
-import { useAdminAnalyticsScorecard } from "@prostcounter/shared/hooks";
+import {
+  useAdminAnalyticsScorecard,
+  useAdminAnalyticsScorecardMembers,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { ANALYTICS_SCORECARD_SEGMENTS } from "@prostcounter/shared/schemas";
+import type {
+  AnalyticsScorecardFeature,
+  AnalyticsScorecardSegment,
+} from "@prostcounter/shared/schemas";
 import {
   formatLift,
   formatPercent,
+  scorecardSegmentCount,
   type ScorecardComparison,
   type ScorecardHint,
   scoreFeature,
 } from "@prostcounter/shared/utils";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,6 +31,7 @@ import {
 } from "@/components/ui/table";
 
 import AnalyticsSectionCard from "./AnalyticsSectionCard";
+import MemberListDialog from "./MemberListDialog";
 
 const HINT_VARIANTS: Record<ScorecardHint, "destructive" | "success" | "secondary" | "outline"> = {
   cut: "destructive",
@@ -44,6 +55,14 @@ export default function FeatureScorecardSection({
   const { data, loading, error, refetch } = useAdminAnalyticsScorecard(festivalId);
 
   const scored = (data?.features ?? []).map(scoreFeature);
+
+  const [openFeature, setOpenFeature] = useState<AnalyticsScorecardFeature | null>(null);
+  const [segment, setSegment] = useState<AnalyticsScorecardSegment>("adopters");
+  const members = useAdminAnalyticsScorecardMembers(
+    { festivalId, feature: openFeature ?? "drinks", segment },
+    openFeature !== null,
+  );
+  const openRow = data?.features.find((row) => row.feature === openFeature);
 
   const comparisonText = (comparison: ScorecardComparison): string => {
     if (comparison.status === "notApplicable") {
@@ -71,7 +90,7 @@ export default function FeatureScorecardSection({
   return (
     <AnalyticsSectionCard
       title={t("admin.analytics.sections.scorecard")}
-      description={`${scope} ${t("admin.analytics.scorecard.hint")}`}
+      description={`${scope} ${t("admin.analytics.scorecard.hint")} ${t("admin.analytics.members.tapHint")}`}
       isLoading={loading}
       error={error}
       isEmpty={scored.every((feature) => feature.attendees === 0)}
@@ -103,7 +122,16 @@ export default function FeatureScorecardSection({
           {scored.map((feature) => (
             <TableRow key={feature.feature}>
               <TableCell className="text-left">
-                {t(`admin.analytics.features.names.${feature.feature}`)}
+                <button
+                  type="button"
+                  className="text-left underline-offset-2 hover:underline"
+                  onClick={() => {
+                    setSegment("adopters");
+                    setOpenFeature(feature.feature);
+                  }}
+                >
+                  {t(`admin.analytics.features.names.${feature.feature}`)}
+                </button>
               </TableCell>
               <TableCell className="text-right">
                 {`${feature.adopters} / ${feature.attendees} · ${formatPercent(feature.adoption)}`}
@@ -119,6 +147,32 @@ export default function FeatureScorecardSection({
           ))}
         </TableBody>
       </Table>
+      {openFeature && (
+        <MemberListDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setOpenFeature(null);
+            }
+          }}
+          label={`${t(`admin.analytics.features.names.${openFeature}`)} · ${t(`admin.analytics.members.segments.${segment}`)}`}
+          count={openRow ? scorecardSegmentCount(openRow, segment) : 0}
+          chips={ANALYTICS_SCORECARD_SEGMENTS.map((value) => ({
+            value,
+            label: t(`admin.analytics.members.segments.${value}`),
+          }))}
+          selectedChip={segment}
+          onChipChange={(value) => setSegment(value as AnalyticsScorecardSegment)}
+          members={members.data?.members ?? []}
+          truncated={members.data?.truncated ?? false}
+          isLoading={members.loading}
+          error={members.error}
+          onRetry={() => {
+            void members.refetch();
+          }}
+          showFestival={!festivalId}
+        />
+      )}
     </AnalyticsSectionCard>
   );
 }
