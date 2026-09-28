@@ -6,6 +6,7 @@ import {
   createMockUser,
   createTestApp,
 } from "../../__tests__/helpers/test-server";
+import { evaluateAfterWrite } from "../../services/evaluate-after-write";
 import { WrappedService } from "../../services/wrapped.service";
 import wrappedRoutes from "../wrapped.route";
 import full from "../../repositories/supabase/__tests__/fixtures/wrapped-data.full.json";
@@ -76,7 +77,10 @@ describe("Wrapped routes", () => {
   });
 
   it("GET /wrapped/{id} returns ready with camelCase data", async () => {
-    mockService.getWrapped.mockResolvedValue({ status: "ready", wrapped: mapToWrappedData(full) });
+    mockService.getWrapped.mockResolvedValue({
+      result: { status: "ready", wrapped: mapToWrappedData(full) },
+      viewRecorded: true,
+    });
     const res = await app.request(createAuthRequest(`/wrapped/${festivalId}`));
     expect(res.status).toBe(200);
     const body = (await res.json()) as {
@@ -88,15 +92,28 @@ describe("Wrapped routes", () => {
   });
 
   it("GET /wrapped/{id} returns locked with unlocksAt", async () => {
-    mockService.getWrapped.mockResolvedValue({ status: "locked", unlocksAt: "2026-10-04T22:00:00.000Z" });
+    mockService.getWrapped.mockResolvedValue({
+      result: { status: "locked", unlocksAt: "2026-10-04T22:00:00.000Z" },
+      viewRecorded: false,
+    });
     const res = await app.request(createAuthRequest(`/wrapped/${festivalId}`));
     expect(await res.json()).toEqual({ status: "locked", unlocksAt: "2026-10-04T22:00:00.000Z" });
   });
 
   it("GET /wrapped/{id} returns not_attended", async () => {
-    mockService.getWrapped.mockResolvedValue({ status: "not_attended" });
+    mockService.getWrapped.mockResolvedValue({ result: { status: "not_attended" }, viewRecorded: false });
     const res = await app.request(createAuthRequest(`/wrapped/${festivalId}`));
     expect(await res.json()).toEqual({ status: "not_attended" });
+  });
+
+  it("GET /wrapped/{id} skips achievement evaluation for a preview", async () => {
+    mockService.getWrapped.mockResolvedValue({
+      result: { status: "ready", wrapped: mapToWrappedData(full) },
+      viewRecorded: false,
+    });
+    const res = await app.request(createAuthRequest(`/wrapped/${festivalId}`));
+    expect(res.status).toBe(200);
+    expect(evaluateAfterWrite).not.toHaveBeenCalled();
   });
 
   it("GET /wrapped/{id}/access keeps the legacy shape", async () => {

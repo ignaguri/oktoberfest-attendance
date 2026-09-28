@@ -34,7 +34,10 @@ export function mapQueryOptions(
   return {
     enabled: options.enabled,
     gcTime: options.gcTime,
-    staleTime: options.staleTime,
+    staleTime:
+      typeof options.staleTime === "function"
+        ? (query) => (options.staleTime as (data: unknown) => number)(query.state.data)
+        : options.staleTime,
     // Conditional for the same reason as `retry` below: an explicit
     // `refetchInterval: undefined` would override a QueryClient default.
     ...(options.refetchInterval !== undefined ? { refetchInterval: options.refetchInterval } : {}),

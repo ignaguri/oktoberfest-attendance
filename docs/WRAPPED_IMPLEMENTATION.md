@@ -24,7 +24,7 @@ Every case is a 200: the client needs `unlocksAt`, and the typed client drops er
 
 `wrapped_unlocks_at(festival)` = 00:00 in `festivals.timezone` on `end_date + 1`. `festivals.status` is not consulted (nothing sets it). `get_wrapped_data_cached` enforces the rule itself and raises `WRAPPED_NOT_READY` when locked, so no client can compute or cache a Wrapped early.
 
-Super admins see locked festivals as unlocked (preview). The preview is computed and never cached.
+Super admins see locked festivals as unlocked (preview). The preview is computed and never cached, and it records no view and runs no achievement evaluation (the service checks `now < unlocksAt`).
 
 ## Cache
 

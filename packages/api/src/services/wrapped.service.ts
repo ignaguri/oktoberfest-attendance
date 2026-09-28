@@ -13,22 +13,33 @@ import type { IWrappedRepository } from "../repositories/interfaces";
 export class WrappedService {
   constructor(private wrappedRepo: IWrappedRepository) {}
 
-  async getWrapped(userId: string, festivalId: string): Promise<GetWrappedResponse> {
+  /**
+   * viewRecorded is false for a super admin's preview of a locked festival:
+   * that is not the user seeing their Wrapped, so it records nothing and the
+   * route skips achievement evaluation.
+   */
+  async getWrapped(
+    userId: string,
+    festivalId: string,
+  ): Promise<{ result: GetWrappedResponse; viewRecorded: boolean }> {
     const status = await this.wrappedRepo.getStatus(festivalId);
 
     if (!status || !status.hasAttendance) {
-      return { status: "not_attended" };
+      return { result: { status: "not_attended" }, viewRecorded: false };
     }
 
     if (!status.isUnlocked) {
-      return { status: "locked", unlocksAt: status.unlocksAt };
+      return { result: { status: "locked", unlocksAt: status.unlocksAt }, viewRecorded: false };
     }
 
     const wrapped = await this.wrappedRepo.getWrapped(userId, festivalId);
-    // Returning it here is the user seeing it
-    await this.wrappedRepo.markViewed(userId, festivalId);
+    const isPreview = Date.now() < new Date(status.unlocksAt).getTime();
+    if (!isPreview) {
+      // Returning it here is the user seeing it
+      await this.wrappedRepo.markViewed(userId, festivalId);
+    }
 
-    return { status: "ready", wrapped };
+    return { result: { status: "ready", wrapped }, viewRecorded: !isPreview };
   }
 
   async listFestivals(): Promise<WrappedFestival[]> {

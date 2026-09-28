@@ -75,9 +75,9 @@ app.openapi(getWrappedRoute, async (c) => {
   const { festivalId } = c.req.valid("param");
   const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase));
 
-  const result = await wrappedService.getWrapped(user.id, festivalId);
+  const { result, viewRecorded } = await wrappedService.getWrapped(user.id, festivalId);
 
-  if (result.status === "ready") {
+  if (viewRecorded) {
     // Evaluate-only: the unlock reaches the client through the outbox, not this
     // response. Awaited so the outbox row exists before the client's next read.
     await evaluateAfterWrite(supabase, user.id, festivalId, "GET /wrapped/{festivalId}");

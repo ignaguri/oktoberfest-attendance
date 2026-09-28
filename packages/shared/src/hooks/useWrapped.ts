@@ -6,6 +6,14 @@
 import { QueryKeys, useApiClient, useInvalidateQueries, useQuery } from "../data";
 import type { GetWrappedResponse, WrappedFestival } from "../schemas/wrapped.schema";
 
+/**
+ * Only a ready Wrapped is worth keeping: a locked answer has to be refetched
+ * once unlocksAt passes, or reopening shows a countdown that already ended.
+ */
+export function wrappedStaleTime(response: GetWrappedResponse | undefined): number {
+  return response?.status === "ready" ? 10 * 60 * 1000 : 0;
+}
+
 export function useWrapped(festivalId?: string) {
   const apiClient = useApiClient();
   const invalidateQueries = useInvalidateQueries();
@@ -25,7 +33,7 @@ export function useWrapped(festivalId?: string) {
     },
     {
       enabled: !!festivalId,
-      staleTime: 10 * 60 * 1000,
+      staleTime: (data) => wrappedStaleTime(data as GetWrappedResponse | undefined),
       gcTime: 30 * 60 * 1000,
       retry: 2,
     },

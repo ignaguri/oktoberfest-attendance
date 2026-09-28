@@ -68,4 +68,12 @@ describe("mapQueryOptions", () => {
 
     expect(resolved.retry).toBe(5);
   });
+
+  it("forwards a data-dependent staleTime as a function of the cached data", () => {
+    const mapped = mapQueryOptions({ staleTime: (data) => (data === "fresh" ? 1000 : 0) });
+    const staleTime = mapped.staleTime as (query: { state: { data: unknown } }) => number;
+
+    expect(staleTime({ state: { data: "fresh" } })).toBe(1000);
+    expect(staleTime({ state: { data: "locked" } })).toBe(0);
+  });
 });

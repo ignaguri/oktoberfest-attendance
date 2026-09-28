@@ -173,11 +173,13 @@ export function calculatePodiumGroupsCount(data: WrappedData): number {
  * Get the best (highest) global leaderboard position across all criteria
  * Prefers daysAttended if there's a tie
  */
+export type GlobalPositionCriteria = "days_attended" | "total_beers" | "avg_beers";
+
 export function getBestGlobalPosition(data: WrappedData): {
   position: number;
-  criteria: string;
+  criteria: GlobalPositionCriteria;
 } | null {
-  const positions = [];
+  const positions: { position: number; criteria: GlobalPositionCriteria }[] = [];
 
   if (data.globalLeaderboardPositions.daysAttended !== null) {
     positions.push({

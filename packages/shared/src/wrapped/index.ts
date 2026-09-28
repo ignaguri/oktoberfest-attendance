@@ -43,6 +43,7 @@ export {
   getBestGlobalPosition,
   prepareShareImageData,
 } from "./utils";
+export type { GlobalPositionCriteria } from "./utils";
 
 // Personality
 export type { PersonalityAnalysis } from "./personality";
