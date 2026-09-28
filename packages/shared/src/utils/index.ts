@@ -112,3 +112,22 @@ export type {
   FunnelStepConversion,
   OverviewSummary,
 } from "./analytics-metrics";
+export {
+  cohortRates,
+  countHints,
+  formatLift,
+  SCORECARD_CUT_MAX_ADOPTION,
+  SCORECARD_CUT_MIN_ATTENDEES,
+  SCORECARD_GROW_MAX_ADOPTION,
+  SCORECARD_GROW_MIN_LIFT_POINTS,
+  SCORECARD_HINTS,
+  SCORECARD_MIN_GROUP,
+  scoreFeature,
+  scorecardFestivalId,
+} from "./analytics-scorecard";
+export type {
+  CohortRates,
+  ScorecardComparison,
+  ScorecardHint,
+  ScoredFeature,
+} from "./analytics-scorecard";

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { AnalyticsRangeQuerySchema, analyticsRangeError } from "./admin-analytics.schema";
+import {
+  ANALYTICS_FEATURES,
+  ANALYTICS_SCORECARD_FEATURES,
+  AnalyticsRangeQuerySchema,
+  AnalyticsScorecardQuerySchema,
+  analyticsRangeError,
+} from "./admin-analytics.schema";
 
 describe("analyticsRangeError", () => {
   it("accepts a single day", () => {
@@ -64,5 +70,31 @@ describe("AnalyticsRangeQuerySchema", () => {
       AnalyticsRangeQuerySchema.safeParse({ from: "2026-09-01", to: "2026-09-30", platform: "web" })
         .success,
     ).toBe(false);
+  });
+});
+
+describe("AnalyticsScorecardQuerySchema", () => {
+  it("accepts no festival", () => {
+    expect(AnalyticsScorecardQuerySchema.safeParse({}).success).toBe(true);
+  });
+
+  it("accepts a festival uuid", () => {
+    expect(
+      AnalyticsScorecardQuerySchema.safeParse({
+        festivalId: "22222222-2222-4222-8222-222222222222",
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects a festival id that is not a uuid", () => {
+    expect(AnalyticsScorecardQuerySchema.safeParse({ festivalId: "okto" }).success).toBe(false);
+  });
+});
+
+describe("ANALYTICS_SCORECARD_FEATURES", () => {
+  it("is every v0 feature except attendance", () => {
+    expect([...ANALYTICS_SCORECARD_FEATURES]).toEqual(
+      ANALYTICS_FEATURES.filter((feature) => feature !== "attendance"),
+    );
   });
 });
