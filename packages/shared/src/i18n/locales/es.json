@@ -1674,7 +1674,9 @@
           "save": "Guardar",
           "saveError": "No se pudieron guardar las cifras",
           "invalidNumber": "Usá solo números enteros",
-          "incompleteFind": "Completá los tres idiomas o dejá el hallazgo vacío"
+          "incompleteFind": "Completá los tres idiomas o dejá el hallazgo vacío",
+          "invalidUrl": "Usá un link completo que empiece con http:// o https://",
+          "saveHint": "Guarda las cifras oficiales de este festival"
         }
       },
       "groups": {

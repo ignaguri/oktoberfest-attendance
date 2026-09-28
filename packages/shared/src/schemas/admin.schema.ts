@@ -482,7 +482,7 @@ export const AdminFestivalOfficialStatsSchema = z.object({
   mugsConfiscated: z.number().int().nonnegative().nullable(),
   lostItems: z.number().int().nonnegative().nullable(),
   curiousFinds: z.array(CuriousFindSchema).max(3),
-  sourceUrl: z.url().nullable(),
+  sourceUrl: z.url({ protocol: /^https?$/ }).nullable(),
   updatedAt: z.string().nullable(),
 });
 

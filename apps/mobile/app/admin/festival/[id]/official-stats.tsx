@@ -30,6 +30,15 @@ interface Draft {
 
 const emptyFind = (): CuriousFind => ({ de: "", en: "", es: "" });
 
+/** Mirrors the server's `z.url({ protocol: /^https?$/ })` check, so a bad link gets the targeted error. */
+const isHttpUrl = (value: string): boolean => {
+  try {
+    return /^https?:$/.test(new URL(value).protocol);
+  } catch {
+    return false;
+  }
+};
+
 export default function AdminFestivalOfficialStatsScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -73,6 +82,11 @@ export default function AdminFestivalOfficialStatsScreen() {
       showDialog(t("common.status.error"), t("admin.mobile.festivalDetail.officialStats.incompleteFind"));
       return;
     }
+    const trimmedSourceUrl = current.sourceUrl.trim();
+    if (trimmedSourceUrl !== "" && !isHttpUrl(trimmedSourceUrl)) {
+      showDialog(t("common.status.error"), t("admin.mobile.festivalDetail.officialStats.invalidUrl"));
+      return;
+    }
     try {
       await updateStats.mutate({
         festivalId: id,
@@ -81,7 +95,7 @@ export default function AdminFestivalOfficialStatsScreen() {
           massServed: parsed.massServed ?? null,
           mugsConfiscated: parsed.mugsConfiscated ?? null,
           lostItems: parsed.lostItems ?? null,
-          sourceUrl: current.sourceUrl.trim() === "" ? null : current.sourceUrl.trim(),
+          sourceUrl: trimmedSourceUrl === "" ? null : trimmedSourceUrl,
           curiousFinds: filled.map((find) => ({ de: find.de.trim(), en: find.en.trim(), es: find.es.trim() })),
         },
       });
@@ -177,7 +191,12 @@ export default function AdminFestivalOfficialStatsScreen() {
           </VStack>
         </Card>
 
-        <Button onPress={handleSave} isDisabled={updateStats.loading}>
+        <Button
+          onPress={handleSave}
+          isDisabled={updateStats.loading}
+          accessibilityLabel={t("admin.mobile.festivalDetail.officialStats.save")}
+          accessibilityHint={t("admin.mobile.festivalDetail.officialStats.saveHint")}
+        >
           {updateStats.loading && <ButtonSpinner />}
           <ButtonText>{t("admin.mobile.festivalDetail.officialStats.save")}</ButtonText>
         </Button>

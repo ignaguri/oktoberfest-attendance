@@ -151,7 +151,7 @@ export const WrappedOfficialStatsSchema = z.object({
   mugsConfiscated: z.number().nullable(),
   lostItems: z.number().nullable(),
   curiousFinds: z.array(CuriousFindSchema).max(3),
-  sourceUrl: z.string().nullable(),
+  sourceUrl: z.url({ protocol: /^https?$/ }).nullable(),
 });
 
 export type WrappedOfficialStats = z.infer<typeof WrappedOfficialStatsSchema>;

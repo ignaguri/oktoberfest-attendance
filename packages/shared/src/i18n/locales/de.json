@@ -1851,7 +1851,9 @@
           "save": "Speichern",
           "saveError": "Die Zahlen konnten nicht gespeichert werden",
           "invalidNumber": "Nur ganze Zahlen",
-          "incompleteFind": "Alle drei Sprachen ausfüllen oder das Fundstück leer lassen"
+          "incompleteFind": "Alle drei Sprachen ausfüllen oder das Fundstück leer lassen",
+          "invalidUrl": "Nutze einen vollständigen Link mit http:// oder https://",
+          "saveHint": "Speichert die offiziellen Zahlen für dieses Festival"
         }
       },
       "groups": {

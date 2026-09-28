@@ -1614,7 +1614,9 @@
           "save": "Save",
           "saveError": "Could not save the figures",
           "invalidNumber": "Use whole numbers only",
-          "incompleteFind": "Fill in all three languages or leave the find empty"
+          "incompleteFind": "Fill in all three languages or leave the find empty",
+          "invalidUrl": "Use a full link starting with http:// or https://",
+          "saveHint": "Saves the official figures for this festival"
         }
       },
       "groups": {
