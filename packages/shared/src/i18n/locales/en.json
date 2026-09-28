@@ -2007,7 +2007,7 @@
           "regenerating": "Regenerating...",
           "regenerate": "Regenerate Wrapped Cache"
         },
-        "help": "This will recalculate statistics for all users. This can take several minutes for large datasets."
+        "help": "Recalculates Wrapped for every attendee of festivals that have ended, or only the user or festival you enter. Can take a minute."
       }
     },
     "images": {

@@ -2067,7 +2067,7 @@
           "regenerating": "Regenerando...",
           "regenerate": "Regenerar caché de Wrapped"
         },
-        "help": "Esto recalculará las estadísticas para todos los usuarios. Puede tardar varios minutos para conjuntos de datos grandes."
+        "help": "Recalcula el resumen de todos los asistentes de festivales terminados, o solo del usuario o festival que ingreses. Puede tardar un minuto."
       }
     },
     "images": {

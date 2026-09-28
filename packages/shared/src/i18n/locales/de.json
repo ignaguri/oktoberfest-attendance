@@ -2244,7 +2244,7 @@
           "regenerating": "Wird neu erstellt...",
           "regenerate": "Wrapped-Cache neu erstellen"
         },
-        "help": "Damit werden die Statistiken für alle Benutzer neu berechnet. Bei großen Datenmengen kann das mehrere Minuten dauern."
+        "help": "Berechnet den Rückblick für alle Teilnehmenden beendeter Festivals neu, oder nur für den eingegebenen Benutzer bzw. das Festival. Kann eine Minute dauern."
       }
     },
     "images": {

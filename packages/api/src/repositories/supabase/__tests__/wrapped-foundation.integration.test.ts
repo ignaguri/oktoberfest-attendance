@@ -304,3 +304,119 @@ describe("previous festival matches Home progress", () => {
     expect(progress?.[0]?.previous_festival_name).toBe(`${series} 2025`);
   });
 });
+
+async function seedCacheRow(userId: string, festivalId: string) {
+  const { error } = await admin
+    .from("wrapped_data_cache")
+    .upsert(
+      { user_id: userId, festival_id: festivalId, wrapped_data: {}, data_version: 2 },
+      { onConflict: "user_id,festival_id" },
+    );
+  if (error) {
+    throw new Error(`cache seed failed: ${error.message}`);
+  }
+}
+
+describe("cache invalidation", () => {
+  let user: Awaited<ReturnType<typeof createSignedInUser>>;
+  let festivalA: string;
+  let festivalB: string;
+  let attendanceA: string;
+  let attendanceB: string;
+
+  beforeAll(async () => {
+    user = await createSignedInUser("inval");
+    festivalA = await createFestival(`InvalA ${suffix} 2026`, isoDate(-10), isoDate(-2));
+    festivalB = await createFestival(`InvalB ${suffix} 2026`, isoDate(-10), isoDate(-2));
+    attendanceA = await attend(user.id, festivalA, isoDate(-3), 0);
+    attendanceB = await attend(user.id, festivalB, isoDate(-3), 0);
+  });
+
+  it("drops the row when a consumption is inserted", async () => {
+    await seedCacheRow(user.id, festivalA);
+    await admin.from("consumptions").insert({
+      attendance_id: attendanceA,
+      drink_type: "beer",
+      base_price_cents: 1500,
+      price_paid_cents: 1500,
+      recorded_at: `${isoDate(-3)}T12:00:00Z`,
+    });
+    expect(await cacheRow(user.id, festivalA)).toBeNull();
+  });
+
+  it("drops both festivals' rows when a consumption moves between them", async () => {
+    const { data: drink } = await admin
+      .from("consumptions")
+      .select("id")
+      .eq("attendance_id", attendanceA)
+      .limit(1)
+      .single();
+    await seedCacheRow(user.id, festivalA);
+    await seedCacheRow(user.id, festivalB);
+    await admin.from("consumptions").update({ attendance_id: attendanceB }).eq("id", drink!.id);
+    expect(await cacheRow(user.id, festivalA)).toBeNull();
+    expect(await cacheRow(user.id, festivalB)).toBeNull();
+  });
+
+  it("drops the row when a consumption is deleted", async () => {
+    await seedCacheRow(user.id, festivalB);
+    await admin.from("consumptions").delete().eq("attendance_id", attendanceB);
+    expect(await cacheRow(user.id, festivalB)).toBeNull();
+  });
+
+  it("drops all of a user's rows when their display name changes", async () => {
+    await seedCacheRow(user.id, festivalA);
+    await seedCacheRow(user.id, festivalB);
+    await admin.from("profiles").update({ full_name: `Renamed ${suffix}` }).eq("id", user.id);
+    expect(await cacheRow(user.id, festivalA)).toBeNull();
+    expect(await cacheRow(user.id, festivalB)).toBeNull();
+  });
+
+  it("keeps rows when an unrelated profile column changes", async () => {
+    await seedCacheRow(user.id, festivalA);
+    await admin.from("profiles").update({ updated_at: new Date().toISOString() }).eq("id", user.id);
+    expect(await cacheRow(user.id, festivalA)).not.toBeNull();
+  });
+
+  it("drops the row when the user joins a group of that festival", async () => {
+    await seedCacheRow(user.id, festivalA);
+    const { data: groupId, error } = await user.client.rpc("create_group_with_member", {
+      p_group_name: `Grp ${suffix}`.slice(0, 40),
+      p_user_id: user.id,
+      p_festival_id: festivalA,
+    });
+    expect(error).toBeNull();
+    expect(groupId).toBeTruthy();
+    expect(await cacheRow(user.id, festivalA)).toBeNull();
+  });
+});
+
+describe("admin regenerate", () => {
+  it("seeds rows for attendees that had none, with the current version", async () => {
+    const user = await createSignedInUser("regen");
+    const festivalId = await createFestival(`Regen ${suffix} 2026`, isoDate(-10), isoDate(-2));
+    await attend(user.id, festivalId, isoDate(-3), 2);
+    expect(await cacheRow(user.id, festivalId)).toBeNull();
+
+    // Service role has no JWT, which regenerate allows.
+    const { data: count, error } = await admin.rpc("regenerate_wrapped_data_cache", {
+      p_festival_id: festivalId,
+    });
+    expect(error).toBeNull();
+    expect(count).toBe(1);
+    const row = await cacheRow(user.id, festivalId);
+    const { data: version } = await admin.rpc("wrapped_data_version");
+    expect(row?.generated_by).toBe("admin");
+    expect(row?.data_version).toBe(version);
+  });
+
+  it("skips festivals that have not unlocked", async () => {
+    const user = await createSignedInUser("regenlocked");
+    const festivalId = await createFestival(`RegenLocked ${suffix} 2099`, isoDate(-3), isoDate(1));
+    await attend(user.id, festivalId, isoDate(-1), 1);
+    const { data: count } = await admin.rpc("regenerate_wrapped_data_cache", {
+      p_festival_id: festivalId,
+    });
+    expect(count).toBe(0);
+  });
+});
