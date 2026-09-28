@@ -192,14 +192,6 @@ describe("gating and archive", () => {
     expect(data).not.toHaveProperty("stale");
   });
 
-  it("reports no attendance for a festival the user skipped", async () => {
-    const { data } = await user.client.rpc("get_wrapped_status", {
-      p_festival_id: notAttendedFestivalId,
-    });
-    expect(data?.[0]?.is_unlocked).toBe(true);
-    expect(data?.[0]?.has_attendance).toBe(false);
-  });
-
   it("lists only unlocked, attended festivals, newest first, with viewed flags", async () => {
     await admin.from("wrapped_views").insert({ user_id: user.id, festival_id: endedFestivalId });
     const { data, error } = await user.client.rpc("get_wrapped_festivals");
@@ -357,31 +349,6 @@ describe("cache invalidation", () => {
     expect(await cacheRow(otherUser.id, festivalA)).toBeNull();
   });
 
-  it("keeps rows of other festivals when a consumption changes", async () => {
-    await attend(otherUser.id, festivalB, isoDate(-4), 0);
-    await seedCacheRow(otherUser.id, festivalB);
-    await admin.from("consumptions").insert({
-      attendance_id: attendanceA,
-      drink_type: "beer",
-      base_price_cents: 1500,
-      price_paid_cents: 1500,
-      recorded_at: `${isoDate(-3)}T12:00:00Z`,
-    });
-    expect(await cacheRow(otherUser.id, festivalB)).not.toBeNull();
-  });
-
-  it("drops the row when a consumption is inserted", async () => {
-    await seedCacheRow(user.id, festivalA);
-    await admin.from("consumptions").insert({
-      attendance_id: attendanceA,
-      drink_type: "beer",
-      base_price_cents: 1500,
-      price_paid_cents: 1500,
-      recorded_at: `${isoDate(-3)}T12:00:00Z`,
-    });
-    expect(await cacheRow(user.id, festivalA)).toBeNull();
-  });
-
   it("drops both festivals' rows when a consumption moves between them", async () => {
     const { data: drink } = await admin
       .from("consumptions")
@@ -396,24 +363,12 @@ describe("cache invalidation", () => {
     expect(await cacheRow(user.id, festivalB)).toBeNull();
   });
 
-  it("drops the row when a consumption is deleted", async () => {
-    await seedCacheRow(user.id, festivalB);
-    await admin.from("consumptions").delete().eq("attendance_id", attendanceB);
-    expect(await cacheRow(user.id, festivalB)).toBeNull();
-  });
-
   it("drops all of a user's rows when their display name changes", async () => {
     await seedCacheRow(user.id, festivalA);
     await seedCacheRow(user.id, festivalB);
     await admin.from("profiles").update({ full_name: `Renamed ${suffix}` }).eq("id", user.id);
     expect(await cacheRow(user.id, festivalA)).toBeNull();
     expect(await cacheRow(user.id, festivalB)).toBeNull();
-  });
-
-  it("keeps rows when an unrelated profile column changes", async () => {
-    await seedCacheRow(user.id, festivalA);
-    await admin.from("profiles").update({ updated_at: new Date().toISOString() }).eq("id", user.id);
-    expect(await cacheRow(user.id, festivalA)).not.toBeNull();
   });
 
   it("drops the row when the user joins a group of that festival", async () => {

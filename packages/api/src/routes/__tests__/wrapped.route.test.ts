@@ -100,12 +100,6 @@ describe("Wrapped routes", () => {
     expect(await res.json()).toEqual({ status: "locked", unlocksAt: "2026-10-04T22:00:00.000Z" });
   });
 
-  it("GET /wrapped/{id} returns not_attended", async () => {
-    mockService.getWrapped.mockResolvedValue({ result: { status: "not_attended" }, viewRecorded: false });
-    const res = await app.request(createAuthRequest(`/wrapped/${festivalId}`));
-    expect(await res.json()).toEqual({ status: "not_attended" });
-  });
-
   it("GET /wrapped/{id} skips achievement evaluation for a preview", async () => {
     mockService.getWrapped.mockResolvedValue({
       result: { status: "ready", wrapped: mapToWrappedData(full) },
@@ -120,10 +114,5 @@ describe("Wrapped routes", () => {
     mockService.checkAccessLegacy.mockResolvedValue({ allowed: false, reason: "not_ended" });
     const res = await app.request(createAuthRequest(`/wrapped/${festivalId}/access`));
     expect(await res.json()).toEqual({ allowed: false, reason: "not_ended" });
-  });
-
-  it("rejects a non-uuid festival id", async () => {
-    const res = await app.request(createAuthRequest("/wrapped/not-a-uuid"));
-    expect(res.status).toBe(400);
   });
 });

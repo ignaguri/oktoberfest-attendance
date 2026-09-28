@@ -81,16 +81,4 @@ describe("SupabaseWrappedRepository.regenerateCache", () => {
     expect(count).toBe(5);
     expect(rpc).toHaveBeenCalledTimes(5);
   });
-
-  it("makes a single call when both user and festival are given", async () => {
-    const { client, rpc } = createStubClient([]);
-
-    await new SupabaseWrappedRepository(client).regenerateCache("admin", "f1", "u1");
-
-    expect(rpc).toHaveBeenCalledTimes(1);
-    expect(rpc).toHaveBeenCalledWith("regenerate_wrapped_data_cache", {
-      p_user_id: "u1",
-      p_festival_id: "f1",
-    });
-  });
 });

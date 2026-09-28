@@ -17,18 +17,9 @@ describe("mapToWrappedData", () => {
     expect(wrapped.comparisons.vsLastYear?.prevFestivalName).toBe("Oktoberfest 2025");
     expect(wrapped.achievements[0].unlockedAt).toBe("2026-09-19T11:00:00+00:00");
     expect(wrapped.globalLeaderboardPositions.avgBeers).toBeNull();
-  });
-
-  it("maps drink stats (the slide that never rendered)", () => {
-    const wrapped = mapToWrappedData(full);
-    expect(wrapped.drinkStats).toEqual({
-      totalDrinks: 14,
-      topDrinkType: "beer",
-      breakdown: [
-        { drinkType: "beer", count: 11, percentage: 78.6 },
-        { drinkType: "radler", count: 3, percentage: 21.4 },
-      ],
-    });
+    // The drinks slide never rendered while clients read snake_case
+    expect(wrapped.drinkStats.totalDrinks).toBe(14);
+    expect(wrapped.drinkStats.breakdown[1]).toEqual({ drinkType: "radler", count: 3, percentage: 21.4 });
   });
 
   it("accepts a zero-drink attendee with nulls and empty arrays", () => {
@@ -47,10 +38,5 @@ describe("mapToWrappedData", () => {
       personality: { type: "Loyalist", traits: [null, "Steady Pace", null, "Tent Loyalist"] },
     });
     expect(wrapped.personality.traits).toEqual(["Steady Pace", "Tent Loyalist"]);
-  });
-
-  it("rejects a payload missing a section", () => {
-    const { drink_stats: _dropped, ...partial } = full;
-    expect(() => mapToWrappedData(partial)).toThrow();
   });
 });

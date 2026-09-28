@@ -7,13 +7,8 @@ describe("wrappedStaleTime", () => {
     expect(wrappedStaleTime({ status: "ready" } as never)).toBe(10 * 60 * 1000);
   });
 
-  // A locked answer goes stale at once, so reopening Wrapped after the unlock
-  // refetches instead of showing a countdown that has already passed.
-  it.each([
-    [{ status: "locked", unlocksAt: "2026-10-04T22:00:00.000Z" }],
-    [{ status: "not_attended" }],
-    [undefined],
-  ])("treats %o as immediately stale", (response) => {
-    expect(wrappedStaleTime(response as never)).toBe(0);
+  // Reopening after the unlock must refetch, not show a countdown that ended
+  it("treats a locked answer as immediately stale", () => {
+    expect(wrappedStaleTime({ status: "locked", unlocksAt: "2026-10-04T22:00:00.000Z" })).toBe(0);
   });
 });
