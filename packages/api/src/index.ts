@@ -15,6 +15,7 @@ import calendarRoute from "./routes/calendar.route";
 import consumptionRoute from "./routes/consumption.route";
 import crowdReportRoute from "./routes/crowd-report.route";
 import dayPlanRoute from "./routes/day-plan.route";
+import eventsRoute from "./routes/events.route";
 import feedbackRoute from "./routes/feedback.route";
 import festivalRoute from "./routes/festival.route";
 import friendRoute from "./routes/friend.route";
@@ -94,6 +95,7 @@ apiV1.route("/", profileRoute);
 apiV1.route("/", activityFeedRoute);
 apiV1.route("/", crowdReportRoute);
 apiV1.route("/", feedbackRoute);
+apiV1.route("/", eventsRoute);
 apiV1.route("/", adminRoute);
 apiV1.route("/", adminAnalyticsRoute);
 

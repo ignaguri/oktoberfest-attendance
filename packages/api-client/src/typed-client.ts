@@ -106,6 +106,7 @@ import type {
   WinningCriteriaListResponse,
   WinningCriterion,
 } from "@prostcounter/shared/schemas";
+import type { RecordEventsBody } from "@prostcounter/shared/analytics";
 
 /**
  * Headers type compatible with both browser and Node.js environments
@@ -241,8 +242,22 @@ export function createTypedApiClient(config: ApiClientConfig) {
     clientHeaders["X-Client-Version"] = clientVersion;
   }
 
+  // The last headers getAuthHeaders produced, for events.record's keepalive
+  // sends: those run as the page unloads, when an await before fetch() means
+  // the request is never issued.
+  let lastAuthHeaders: ApiHeaders | null = null;
+
   async function getAuthHeaders(): Promise<ApiHeaders> {
-    return { ...(await getConfiguredAuthHeaders()), ...clientHeaders };
+    try {
+      const headers = { ...(await getConfiguredAuthHeaders()), ...clientHeaders };
+      lastAuthHeaders = headers;
+      return headers;
+    } catch (error) {
+      // Signed out (mobile throws AuthRequiredError): forget the old token so a
+      // later keepalive send cannot go out under the previous account.
+      lastAuthHeaders = null;
+      throw error;
+    }
   }
 
   /**
@@ -1218,6 +1233,34 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to dismiss the feedback prompt");
         }
         return parseJsonResponse<DismissDayFeedbackPromptResponse>(response);
+      },
+    },
+
+    /**
+     * Usage events (fire-and-forget, see packages/shared/src/analytics).
+     *
+     * Deliberately bypasses fetchWithLogging: on mobile its onError and
+     * onResponse hooks report to Sentry, and a lost analytics batch is not an
+     * error worth an event. Throws on a network failure or non-2xx so the
+     * tracker can schedule its single retry; nothing else looks at the result.
+     * keepalive lets a flush started as a web tab hides outlive the page; it
+     * reuses the last auth headers so fetch() starts synchronously, before the
+     * page is gone. A token that expired since then gets a 401 and the batch is
+     * dropped like any failed one.
+     */
+    events: {
+      async record(body: RecordEventsBody, options?: { keepalive?: boolean }): Promise<void> {
+        const headers =
+          options?.keepalive && lastAuthHeaders ? lastAuthHeaders : await getAuthHeaders();
+        const response = await fetch(`${baseUrl}/v1/events`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(body),
+          keepalive: options?.keepalive ?? false,
+        });
+        if (!response.ok) {
+          throw new ApiError("EVENTS_NOT_RECORDED", "Failed to record events", response.status);
+        }
       },
     },
 
