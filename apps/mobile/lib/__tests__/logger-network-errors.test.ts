@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { createRequire } from "node:module";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { isNetworkUnreachableError } from "../logger";
 
 describe("isNetworkUnreachableError", () => {
@@ -24,5 +26,55 @@ describe("isNetworkUnreachableError", () => {
     expect(isNetworkUnreachableError(new Error("500 Internal Server Error"))).toBe(false);
     expect(isNetworkUnreachableError(null)).toBe(false);
     expect(isNetworkUnreachableError(undefined)).toBe(false);
+  });
+});
+
+describe("logger.error Sentry policy in production", () => {
+  // The logger loads Sentry with a runtime require(), which vi.mock does not
+  // intercept, so the fake goes into Node's require cache instead.
+  const nodeRequire = createRequire(import.meta.url);
+  const sentryPath = nodeRequire.resolve("@sentry/react-native");
+  const captureException = vi.fn();
+  const captureMessage = vi.fn();
+  const originalEntry = nodeRequire.cache[sentryPath];
+
+  beforeEach(() => {
+    captureException.mockClear();
+    captureMessage.mockClear();
+    nodeRequire.cache[sentryPath] = {
+      id: sentryPath,
+      filename: sentryPath,
+      loaded: true,
+      exports: { getClient: () => ({}), captureException, captureMessage },
+    } as unknown as NodeJS.Module;
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.resetModules();
+    (globalThis as { __DEV__?: boolean }).__DEV__ = false;
+  });
+
+  afterEach(() => {
+    if (originalEntry) {
+      nodeRequire.cache[sentryPath] = originalEntry;
+    } else {
+      delete nodeRequire.cache[sentryPath];
+    }
+    delete (globalThis as { __DEV__?: boolean }).__DEV__;
+    vi.restoreAllMocks();
+  });
+
+  it("does not capture an unresolved-host failure", async () => {
+    const { logger } = await import("../logger");
+    logger.error(
+      "[SyncManager] Pull festivals failed:",
+      new Error("fetch failed: java.net.UnknownHostException: Unable to resolve host"),
+    );
+    expect(captureException).not.toHaveBeenCalled();
+    expect(captureMessage).not.toHaveBeenCalled();
+  });
+
+  it("still captures any other error", async () => {
+    const { logger } = await import("../logger");
+    logger.error("[SyncManager] Pull festivals failed:", new Error("boom"));
+    expect(captureException).toHaveBeenCalledTimes(1);
   });
 });
