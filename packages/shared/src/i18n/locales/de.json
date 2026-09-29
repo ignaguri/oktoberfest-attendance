@@ -2908,6 +2908,73 @@
       "stats": "{{beers}} Maß über {{days}} Tage!",
       "personality": "Festival-Persönlichkeit: {{type}}"
     },
+    "shareCards": {
+      "kicker": "Mein {{festival}}",
+      "numbers": {
+        "boxStat": "{{value, number}}",
+        "days_one": "Tag",
+        "days_other": "Tage",
+        "tents_one": "Zelt",
+        "tents_other": "Zelte",
+        "homeTent": "Stammzelt: {{tent}}"
+      },
+      "rhythm": {
+        "title_one": "{{count}} Tag auf der Wiesn",
+        "title_other": "{{count}} Tage auf der Wiesn",
+        "titleGeneric_one": "{{count}} Tag auf dem Fest",
+        "titleGeneric_other": "{{count}} Tage auf dem Fest",
+        "best": "Bester Tag: {{date}}"
+      },
+      "city": {
+        "visitors": {
+          "current": "Besucher. Ich war mittendrin",
+          "lastYear": "Besucher im letzten Jahr. Ich wär mittendrin gewesen"
+        },
+        "share": {
+          "current_one": "ausgeschenkten Maß war mein eines Bier",
+          "current_other": "ausgeschenkten Maß war eins meiner {{count, number(maximumFractionDigits: 1)}} Biere",
+          "lastYear_one": "Maß vom letzten Jahr wäre mein eines Bier gewesen",
+          "lastYear_other": "Maß vom letzten Jahr wäre eins meiner {{count, number(maximumFractionDigits: 1)}} Biere gewesen"
+        }
+      },
+      "photos": {
+        "title": "Mit meinen Leuten"
+      },
+      "og": {
+        "title": "Mein {{festival}} auf ProstCounter",
+        "tagline": "Hol dir deinen eigenen Rückblick"
+      },
+      "caption": {
+        "title": "Mein {{festival}}-Rückblick",
+        "stats": "{{beers}} Biere an {{days}} Tagen!",
+        "persona": "Festival-Persona: {{name}}"
+      },
+      "carousel": {
+        "title": "Wähl deine Karte",
+        "share": "Diese Karte teilen",
+        "shareHint": "Öffnet das Teilen-Menü mit dieser Karte",
+        "copyLink": "Link kopieren",
+        "copyLinkHint": "Kopiert einen öffentlichen Link zu dieser Karte",
+        "linkCopied": "Link kopiert",
+        "stopSharing": "Nicht mehr teilen",
+        "stopSharingTitle": "Link nicht mehr teilen?",
+        "stopSharingMessage": "Der Link funktioniert dann für niemanden mehr.",
+        "loading1": "Deine Karte wird gezapft…",
+        "loading2": "Das Fass wird angestochen…",
+        "loading3": "Der Maßkrug wird poliert…",
+        "error": "Die hier ist danebengegangen",
+        "offline": "Du bist offline. Verbinde dich, um deine Karte zu laden.",
+        "retry": "Nochmal",
+        "close": "Schließen",
+        "cardLabel": "Karte {{index}} von {{total}}"
+      },
+      "teaser": {
+        "title": "Mein {{festival}} auf ProstCounter",
+        "cta": "Hol dir deinen eigenen Rückblick",
+        "unavailable": "Dieser Rückblick wird nicht mehr geteilt",
+        "imageAlt": "Eine ProstCounter-Rückblick-Karte zum {{festival}}"
+      }
+    },
     "cta": {
       "preparingFooter": "Vergiss nicht, deinen letzten Tag einzutragen! 📝",
       "ready": "Dein Rückblick ist fertig!",

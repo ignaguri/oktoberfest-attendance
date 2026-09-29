@@ -2,6 +2,7 @@ import i18next from "i18next";
 import { describe, expect, it } from "vitest";
 
 import { buildWrappedStory } from "../../wrapped/story/build-story";
+import { buildShareCards } from "../../wrapped/share/build-share-cards";
 import { PERSONA_IDS } from "../../wrapped/story/persona";
 import { makeOfficialStats, makeWrapped } from "../../wrapped/story/story-fixtures";
 import { slideSummaryText } from "../../wrapped/story/summary";
@@ -175,6 +176,36 @@ describe("Wrapped story copy", () => {
 
     const oktoberfest = buildWrappedStory(makeWrapped(), null).find((slide) => slide.kind === "persona");
     expect(oktoberfest && oktoberfest.kind === "persona" && translate(oktoberfest.kicker.key)).toMatch(/Wiesn/);
+  });
+
+  it("has every en share-card key in de and es", () => {
+    const keys = leafKeys(lookup(en, "wrapped.shareCards"), "wrapped.shareCards");
+    expect(keys.length).toBeGreaterThan(30);
+    for (const bundle of [de, es]) {
+      for (const key of keys) {
+        expect(typeof lookup(bundle, key), key).toBe("string");
+      }
+    }
+  });
+
+  it("resolves every key the share-card builder emits, in every locale", () => {
+    const cards = [
+      buildShareCards(makeWrapped(), makeOfficialStats()),
+      buildShareCards(makeWrapped(), makeOfficialStats({ year: 2025, isCurrentFestival: false })),
+      buildShareCards(
+        makeWrapped((data) => {
+          data.basicStats.totalBeers = 0;
+          data.festivalInfo = { ...data.festivalInfo, festivalType: "starkbierfest" };
+        }),
+        makeOfficialStats(),
+      ),
+    ];
+    const keys = new Set([...copyRefs(cards).map((ref) => ref.key), "wrapped.shareCards.rhythm.best"]);
+    for (const [locale, bundle] of Object.entries(BUNDLES)) {
+      for (const key of keys) {
+        expect(resolves(bundle, key), `${locale}: ${key}`).toBe(true);
+      }
+    }
   });
 
   it("has the admin official-stats keys", () => {

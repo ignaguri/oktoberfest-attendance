@@ -2743,6 +2743,73 @@
       "stats": "{{beers}} cervezas en {{days}} días!",
       "personality": "Personalidad del festival: {{type}}"
     },
+    "shareCards": {
+      "kicker": "Mi {{festival}}",
+      "numbers": {
+        "boxStat": "{{value, number}}",
+        "days_one": "día",
+        "days_other": "días",
+        "tents_one": "carpa",
+        "tents_other": "carpas",
+        "homeTent": "Mi base: {{tent}}"
+      },
+      "rhythm": {
+        "title_one": "{{count}} día en la Wiesn",
+        "title_other": "{{count}} días en la Wiesn",
+        "titleGeneric_one": "{{count}} día en el festival",
+        "titleGeneric_other": "{{count}} días en el festival",
+        "best": "Mejor día: {{date}}"
+      },
+      "city": {
+        "visitors": {
+          "current": "visitantes. Yo estuve ahí",
+          "lastYear": "visitantes el año pasado. Yo habría estado ahí"
+        },
+        "share": {
+          "current_one": "Maß servidas fue mi única cerveza",
+          "current_other": "Maß servidas fue una de mis {{count, number(maximumFractionDigits: 1)}} cervezas",
+          "lastYear_one": "Maß del año pasado habría sido mi única cerveza",
+          "lastYear_other": "Maß del año pasado habría sido una de mis {{count, number(maximumFractionDigits: 1)}} cervezas"
+        }
+      },
+      "photos": {
+        "title": "Con mi gente"
+      },
+      "og": {
+        "title": "Mi {{festival}} en ProstCounter",
+        "tagline": "Conseguí tu propio Wrapped"
+      },
+      "caption": {
+        "title": "Mi {{festival}} Wrapped",
+        "stats": "¡{{beers}} cervezas en {{days}} días!",
+        "persona": "Persona del festival: {{name}}"
+      },
+      "carousel": {
+        "title": "Elegí tu tarjeta",
+        "share": "Compartir esta tarjeta",
+        "shareHint": "Abre el menú para compartir esta tarjeta",
+        "copyLink": "Copiar link",
+        "copyLinkHint": "Copia un link público a esta tarjeta",
+        "linkCopied": "Link copiado",
+        "stopSharing": "Dejar de compartir",
+        "stopSharingTitle": "¿Dejar de compartir este link?",
+        "stopSharingMessage": "El link va a dejar de funcionar para todos los que lo tengan.",
+        "loading1": "Tirando tu tarjeta…",
+        "loading2": "Pinchando el barril…",
+        "loading3": "Puliendo la Maß…",
+        "error": "Esta no salió",
+        "offline": "Estás sin conexión. Conectate para ver tu tarjeta.",
+        "retry": "Reintentar",
+        "close": "Cerrar",
+        "cardLabel": "Tarjeta {{index}} de {{total}}"
+      },
+      "teaser": {
+        "title": "Mi {{festival}} en ProstCounter",
+        "cta": "Conseguí tu propio Wrapped",
+        "unavailable": "Este Wrapped ya no se comparte",
+        "imageAlt": "Una tarjeta Wrapped de ProstCounter de {{festival}}"
+      }
+    },
     "cta": {
       "preparingFooter": "¡No te olvides de registrar tu último día! 📝",
       "ready": "¡Tu Wrapped está listo!",

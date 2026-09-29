@@ -2683,6 +2683,73 @@
       "stats": "{{beers}} beers across {{days}} days!",
       "personality": "Festival personality: {{type}}"
     },
+    "shareCards": {
+      "kicker": "My {{festival}}",
+      "numbers": {
+        "boxStat": "{{value, number}}",
+        "days_one": "day",
+        "days_other": "days",
+        "tents_one": "tent",
+        "tents_other": "tents",
+        "homeTent": "Home tent: {{tent}}"
+      },
+      "rhythm": {
+        "title_one": "{{count}} day on the Wiesn",
+        "title_other": "{{count}} days on the Wiesn",
+        "titleGeneric_one": "{{count}} day at the festival",
+        "titleGeneric_other": "{{count}} days at the festival",
+        "best": "Best day: {{date}}"
+      },
+      "city": {
+        "visitors": {
+          "current": "visitors. I was one of them",
+          "lastYear": "visitors last year. I'd have been one of them"
+        },
+        "share": {
+          "current_one": "Maß poured was my one beer",
+          "current_other": "Maß poured was one of my {{count, number(maximumFractionDigits: 1)}} beers",
+          "lastYear_one": "Maß last year would have been my one beer",
+          "lastYear_other": "Maß last year would have been one of my {{count, number(maximumFractionDigits: 1)}} beers"
+        }
+      },
+      "photos": {
+        "title": "With my people"
+      },
+      "og": {
+        "title": "My {{festival}} on ProstCounter",
+        "tagline": "Get your own Wrapped"
+      },
+      "caption": {
+        "title": "My {{festival}} Wrapped",
+        "stats": "{{beers}} beers across {{days}} days!",
+        "persona": "Festival persona: {{name}}"
+      },
+      "carousel": {
+        "title": "Pick your card",
+        "share": "Share this card",
+        "shareHint": "Opens the share sheet with this card",
+        "copyLink": "Copy link",
+        "copyLinkHint": "Copies a public link to this card",
+        "linkCopied": "Link copied",
+        "stopSharing": "Stop sharing",
+        "stopSharingTitle": "Stop sharing this link?",
+        "stopSharingMessage": "The link stops working for everyone who has it.",
+        "loading1": "Pouring your card…",
+        "loading2": "Tapping the keg…",
+        "loading3": "Polishing the Maß…",
+        "error": "Couldn't pour this one",
+        "offline": "You're offline. Connect to get your card.",
+        "retry": "Retry",
+        "close": "Close",
+        "cardLabel": "Card {{index}} of {{total}}"
+      },
+      "teaser": {
+        "title": "My {{festival}} on ProstCounter",
+        "cta": "Get your own Wrapped",
+        "unavailable": "This Wrapped isn't shared anymore",
+        "imageAlt": "A ProstCounter Wrapped card for {{festival}}"
+      }
+    },
     "cta": {
       "preparingFooter": "Don't forget to log your final day! 📝",
       "ready": "Your Wrapped is ready!",
