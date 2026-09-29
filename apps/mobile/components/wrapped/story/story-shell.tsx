@@ -5,6 +5,7 @@ import {
   type StorySlide,
   storyReducer,
   useSlideSummary,
+  useStoryLanguage,
   WRAPPED_STORY_THEME,
   type WrappedData,
   type WrappedShareContext,
@@ -12,10 +13,13 @@ import {
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { X } from "lucide-react-native";
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { AccessibilityInfo, Pressable, View } from "react-native";
 import { useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { ShareCarousel } from "@/components/wrapped/share/share-carousel";
+import { useShareCards } from "@/hooks/useShareCards";
 
 import { PaperBackground } from "./paper-background";
 import { StorySlideView } from "./story-slide";
@@ -69,6 +73,23 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
 
   const animate = !reduceMotion && !state.revealComplete;
   const isLast = slide.kind === "prost";
+  const lang = useStoryLanguage();
+  // Held here, not in the Prost slide: the slide remounts when its reveal ends
+  const [carouselOpen, setCarouselOpen] = useState(false);
+  const [reachedProst, setReachedProst] = useState(false);
+  const shareCards = useShareCards({
+    festivalId: share.festivalId,
+    data,
+    officialStats: share.officialStats,
+    lang,
+    enabled: reachedProst,
+  });
+
+  useEffect(() => {
+    if (isLast) {
+      setReachedProst(true);
+    }
+  }, [isLast]);
 
   return (
     <View className="flex-1">
@@ -105,8 +126,7 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
           <StorySlideView
             slide={slide}
             animate={animate}
-            data={data}
-            share={share}
+            onShare={() => setCarouselOpen(true)}
             onReplay={() => dispatch({ type: "replay" })}
             onClose={onClose}
           />
@@ -139,6 +159,17 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
       >
         <X size={24} color={WRAPPED_STORY_THEME.ink} />
       </Pressable>
+
+      <ShareCarousel
+        visible={carouselOpen}
+        onClose={() => setCarouselOpen(false)}
+        festivalId={share.festivalId}
+        lang={lang}
+        data={data}
+        cards={shareCards.cards}
+        states={shareCards.states}
+        onRetry={shareCards.retry}
+      />
     </View>
   );
 }

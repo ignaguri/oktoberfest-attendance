@@ -1,20 +1,12 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  type StorySlideOf,
-  useStoryCopy,
-  useStoryLanguage,
-  type WrappedData,
-  type WrappedShareContext,
-} from "@prostcounter/shared/wrapped";
+import { type StorySlideOf, useStoryCopy } from "@prostcounter/shared/wrapped";
 import * as Haptics from "expo-haptics";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Pressable, View } from "react-native";
 
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { ShareCarousel } from "@/components/wrapped/share/share-carousel";
-import { useShareCards } from "@/hooks/useShareCards";
 
 import { Crest } from "../crest";
 import { Reveal } from "../reveal";
@@ -23,28 +15,19 @@ import { StoryBig, StoryHeading } from "../story-text";
 interface ProstSlideProps {
   slide: StorySlideOf<"prost">;
   animate: boolean;
-  data: WrappedData;
-  share: WrappedShareContext;
+  onShare: () => void;
   onReplay: () => void;
   onClose: () => void;
 }
 
-export function ProstSlide({ slide, animate, data, share, onReplay, onClose }: ProstSlideProps) {
+export function ProstSlide({ slide, animate, onShare, onReplay, onClose }: ProstSlideProps) {
   const { t } = useTranslation();
   const copy = useStoryCopy();
-  const lang = useStoryLanguage();
-  const [carouselOpen, setCarouselOpen] = useState(false);
-  const shareCards = useShareCards({
-    festivalId: share.festivalId,
-    data,
-    officialStats: share.officialStats,
-    lang,
-  });
 
   const onSharePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setCarouselOpen(true);
-  }, []);
+    onShare();
+  }, [onShare]);
 
   return (
     <VStack space="lg" className="flex-1 justify-center" pointerEvents="box-none">
@@ -102,17 +85,6 @@ export function ProstSlide({ slide, animate, data, share, onReplay, onClose }: P
           <Text className="text-sm text-wrapped-ink/70">{t("wrapped.close")}</Text>
         </Pressable>
       </VStack>
-
-      <ShareCarousel
-        visible={carouselOpen}
-        onClose={() => setCarouselOpen(false)}
-        festivalId={share.festivalId}
-        lang={lang}
-        data={data}
-        cards={shareCards.cards}
-        states={shareCards.states}
-        onRetry={shareCards.retry}
-      />
     </VStack>
   );
 }

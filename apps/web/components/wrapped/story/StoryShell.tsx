@@ -7,15 +7,18 @@ import {
   type StorySlide,
   storyReducer,
   useSlideSummary,
+  useStoryLanguage,
   type WrappedData,
   type WrappedShareContext,
 } from "@prostcounter/shared/wrapped";
 import { useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
+import { ShareCarousel } from "../share/ShareCarousel";
+import { useWebShareCards } from "../share/useWebShareCards";
 import { StorySlideView } from "./StorySlide";
 
 interface StoryShellProps {
@@ -37,6 +40,23 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
   const slide = slides[state.index];
   const summary = useSlideSummary(slide);
   const isLast = slide.kind === "prost";
+  const lang = useStoryLanguage();
+  // Held here, not in the Prost slide: the slide remounts when its reveal ends
+  const [carouselOpen, setCarouselOpen] = useState(false);
+  const [reachedProst, setReachedProst] = useState(false);
+  const shareCards = useWebShareCards({
+    festivalId: share.festivalId,
+    data,
+    officialStats: share.officialStats,
+    lang,
+    enabled: reachedProst,
+  });
+
+  useEffect(() => {
+    if (isLast) {
+      setReachedProst(true);
+    }
+  }, [isLast]);
 
   useEffect(() => {
     if (state.revealComplete) {
@@ -51,6 +71,10 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
   }, [state.index, state.revealComplete, reduceMotion, slide.revealSteps]);
 
   useEffect(() => {
+    // The carousel dialog handles its own keys; Escape there must not close the story
+    if (carouselOpen) {
+      return;
+    }
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.altKey || event.ctrlKey || event.metaKey) {
         return;
@@ -68,7 +92,7 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+  }, [carouselOpen, onClose]);
 
   const animate = !reduceMotion && !state.revealComplete;
 
@@ -101,8 +125,7 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
             <StorySlideView
               slide={slide}
               animate={animate}
-              data={data}
-              share={share}
+              onShare={() => setCarouselOpen(true)}
               onReplay={() => dispatch({ type: "replay" })}
               onClose={onClose}
             />
@@ -132,6 +155,17 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
           <X className="size-6" />
         </button>
       </div>
+
+      <ShareCarousel
+        open={carouselOpen}
+        onOpenChange={setCarouselOpen}
+        festivalId={share.festivalId}
+        lang={lang}
+        data={data}
+        cards={shareCards.cards}
+        states={shareCards.states}
+        onRetry={shareCards.retry}
+      />
     </div>
   );
 }

@@ -13,7 +13,9 @@ vi.mock("next/image", () => ({
 vi.mock("../../share/useWebShareCards", () => ({
   useWebShareCards: () => ({ cards: [], states: {}, retry: vi.fn() }),
 }));
-vi.mock("../../share/ShareCarousel", () => ({ ShareCarousel: () => null }));
+vi.mock("../../share/ShareCarousel", () => ({
+  ShareCarousel: ({ open }: { open: boolean }) => (open ? <div>share carousel</div> : null),
+}));
 
 // AchievementBadge's useTranslation import goes through the `@/lib/data` barrel, which drags in
 // Next.js server actions and Sentry (via useProfile -> Avatar/actions.ts); neither can load under
@@ -98,5 +100,23 @@ describe("StoryShell", () => {
       fireEvent.keyDown(window, { key: "Escape" });
     });
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("leaves the keys to the share carousel while it is open", async () => {
+    const { slides, onClose } = renderStory();
+    for (let index = 1; index < slides.length; index += 1) {
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "Next" }));
+      });
+    }
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Share your Wrapped" }));
+    });
+    await act(async () => {
+      fireEvent.keyDown(window, { key: "ArrowLeft" });
+      fireEvent.keyDown(window, { key: "Escape" });
+    });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByText("Prost!")).toBeTruthy();
   });
 });

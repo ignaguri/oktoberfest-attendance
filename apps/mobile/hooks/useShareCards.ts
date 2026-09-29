@@ -27,17 +27,20 @@ interface UseShareCardsOptions {
   data: WrappedData;
   officialStats: WrappedOfficialStats | null;
   lang: ShareLang;
+  /** Downloads start once this is true; the story turns it on at the Prost slide. */
+  enabled?: boolean;
 }
 
 /**
- * Downloads every offered card into the cache as soon as it mounts (the Prost
- * slide), so they are usually ready by the time the carousel opens.
+ * Downloads every offered card into the cache once enabled, so they are
+ * usually ready by the time the carousel opens.
  */
 export function useShareCards({
   festivalId,
   data,
   officialStats,
   lang,
+  enabled = true,
 }: UseShareCardsOptions) {
   const apiClient = useApiClient();
   const cards = useMemo(
@@ -104,10 +107,13 @@ export function useShareCards({
   );
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     for (const card of cards) {
       void load(card);
     }
-  }, [cards, load]);
+  }, [cards, enabled, load]);
 
   const retry = useCallback(
     (kind: ShareCardKind) => {

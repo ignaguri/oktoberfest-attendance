@@ -141,19 +141,17 @@ describe("useWebShareCards", () => {
       ),
     );
     let objectUrlCount = 0;
+    const createObjectURL = vi.fn(() => `blob:${++objectUrlCount}`);
     const revokeObjectURL = vi.fn();
     vi.stubGlobal(
       "URL",
-      Object.assign(URL, {
-        createObjectURL: () => `blob:${++objectUrlCount}`,
-        revokeObjectURL,
-      }),
+      Object.assign(URL, { createObjectURL, revokeObjectURL }),
     );
     const finish = async (url: string) => {
       await waitFor(() => expect(pending.has(url)).toBe(true));
       await act(async () => pending.get(url)!());
     };
-    return { finish, revokeObjectURL };
+    return { finish, createObjectURL, revokeObjectURL };
   }
 
   function renderWithLang() {
@@ -176,6 +174,34 @@ describe("useWebShareCards", () => {
     expect(state?.status === "ready" && (await state.blob.text())).toBe(
       "http://api/numbers/de",
     );
+  });
+
+  it("waits to download until it is enabled", async () => {
+    stubSlowDownloads();
+    const { rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) =>
+        useWebShareCards({
+          festivalId: "f",
+          data,
+          officialStats,
+          lang: "en",
+          enabled,
+        }),
+      { initialProps: { enabled: false } },
+    );
+    await act(async () => {});
+    expect(shareCardRequest).not.toHaveBeenCalled();
+    rerender({ enabled: true });
+    await waitFor(() => expect(shareCardRequest).toHaveBeenCalled());
+  });
+
+  it("keeps no image from a download that lands after unmount", async () => {
+    const { finish, createObjectURL } = stubSlowDownloads();
+    const { unmount } = renderWithLang();
+    await waitFor(() => expect(shareCardRequest).toHaveBeenCalled());
+    unmount();
+    await finish("http://api/numbers/en");
+    expect(createObjectURL).not.toHaveBeenCalled();
   });
 
   it("releases a card's old image once its new one is ready", async () => {

@@ -23,14 +23,17 @@ interface Options {
   data: WrappedData;
   officialStats: WrappedOfficialStats | null;
   lang: ShareLang;
+  /** Downloads start once this is true; the story turns it on at the Prost slide. */
+  enabled?: boolean;
 }
 
-/** Fetches every offered card as a blob on mount (the Prost slide); a replaced or unmounted card's URL is revoked. */
+/** Fetches every offered card as a blob once enabled; a replaced or unmounted card's URL is revoked. */
 export function useWebShareCards({
   festivalId,
   data,
   officialStats,
   lang,
+  enabled = true,
 }: Options) {
   const apiClient = useApiClient();
   const cards = useMemo(
@@ -41,6 +44,8 @@ export function useWebShareCards({
     Partial<Record<ShareCardKind, WebShareCardState>>
   >({});
   const objectUrls = useRef<Partial<Record<ShareCardKind, string>>>({});
+  // A download landing after unmount would create a URL nothing ever revokes
+  const unmounted = useRef(false);
   // Only a card's latest download may land; an older one finishing late is dropped
   const [beginRequest] = useState(createLatestRequestGate<ShareCardKind>);
 
@@ -65,7 +70,7 @@ export function useWebShareCards({
           );
         }
         const blob = await response.blob();
-        if (isStale()) {
+        if (isStale() || unmounted.current) {
           return;
         }
         const objectUrl = URL.createObjectURL(blob);
@@ -92,19 +97,24 @@ export function useWebShareCards({
   );
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     for (const card of cards) {
       void load(card);
     }
-  }, [cards, load]);
+  }, [cards, enabled, load]);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    // Strict Mode runs this cleanup once before the real mount
+    unmounted.current = false;
+    return () => {
+      unmounted.current = true;
       for (const objectUrl of Object.values(objectUrls.current)) {
         URL.revokeObjectURL(objectUrl);
       }
-    },
-    [],
-  );
+    };
+  }, []);
 
   const retry = useCallback(
     (kind: ShareCardKind) => {

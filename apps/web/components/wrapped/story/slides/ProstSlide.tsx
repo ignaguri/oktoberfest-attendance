@@ -1,17 +1,7 @@
 "use client";
 
 import { useTranslation } from "@prostcounter/shared/i18n";
-import {
-  type StorySlideOf,
-  useStoryCopy,
-  useStoryLanguage,
-  type WrappedData,
-  type WrappedShareContext,
-} from "@prostcounter/shared/wrapped";
-import { useState } from "react";
-
-import { ShareCarousel } from "../../share/ShareCarousel";
-import { useWebShareCards } from "../../share/useWebShareCards";
+import { type StorySlideOf, useStoryCopy } from "@prostcounter/shared/wrapped";
 
 import { Crest } from "../Crest";
 import { Reveal } from "../Reveal";
@@ -20,23 +10,14 @@ import { StoryBig, StoryHeading } from "../StoryText";
 interface ProstSlideProps {
   slide: StorySlideOf<"prost">;
   animate: boolean;
-  data: WrappedData;
-  share: WrappedShareContext;
+  onShare: () => void;
   onReplay: () => void;
   onClose: () => void;
 }
 
-export function ProstSlide({ slide, animate, data, share, onReplay, onClose }: ProstSlideProps) {
+export function ProstSlide({ slide, animate, onShare, onReplay, onClose }: ProstSlideProps) {
   const { t } = useTranslation();
   const copy = useStoryCopy();
-  const lang = useStoryLanguage();
-  const [carouselOpen, setCarouselOpen] = useState(false);
-  const shareCards = useWebShareCards({
-    festivalId: share.festivalId,
-    data,
-    officialStats: share.officialStats,
-    lang,
-  });
 
   return (
     <div className="flex flex-1 flex-col justify-center gap-6">
@@ -61,7 +42,7 @@ export function ProstSlide({ slide, animate, data, share, onReplay, onClose }: P
       <div className="mt-4 flex flex-col gap-3">
         <button
           type="button"
-          onClick={() => setCarouselOpen(true)}
+          onClick={onShare}
           className="pointer-events-auto rounded-xl bg-wrapped-amber px-6 py-4 text-base font-bold text-wrapped-ink"
         >
           {t("wrapped.outro.share")}
@@ -77,16 +58,6 @@ export function ProstSlide({ slide, animate, data, share, onReplay, onClose }: P
           {t("wrapped.close")}
         </button>
       </div>
-      <ShareCarousel
-        open={carouselOpen}
-        onOpenChange={setCarouselOpen}
-        festivalId={share.festivalId}
-        lang={lang}
-        data={data}
-        cards={shareCards.cards}
-        states={shareCards.states}
-        onRetry={shareCards.retry}
-      />
     </div>
   );
 }
