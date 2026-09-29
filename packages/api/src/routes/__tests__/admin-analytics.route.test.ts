@@ -19,12 +19,13 @@ vi.mock("../../utils/admin-client", () => ({
 
 /**
  * A PostgREST builder stand-in: chainable filters, awaitable result. The
- * repository filters member RPCs with .eq/.gte/.range before awaiting them.
+ * repository filters member RPCs with .eq/.gte/.order/.range before awaiting them.
  */
 function queryResult(data: unknown[]) {
   const builder = {
     eq: vi.fn(() => builder),
     gte: vi.fn(() => builder),
+    order: vi.fn(() => builder),
     range: vi.fn(() => builder),
     then: (resolve: (value: { data: unknown[]; error: null }) => unknown) =>
       resolve({ data, error: null }),
@@ -185,7 +186,9 @@ describe("Admin Analytics Routes - Unit Tests", () => {
       mockRpc.mockResolvedValue({ data: [], error: null });
 
       await app.request(
-        createAuthRequest("/admin/analytics/features?from=2026-09-01&to=2026-09-30&platform=android"),
+        createAuthRequest(
+          "/admin/analytics/features?from=2026-09-01&to=2026-09-30&platform=android",
+        ),
       );
 
       expect(mockRpc).toHaveBeenCalledWith("analytics_feature_usage", {
@@ -434,6 +437,14 @@ describe("Admin Analytics Routes - Unit Tests", () => {
         p_to: "2026-09-30",
       });
       expect(members.gte).toHaveBeenCalledWith("attendance_days", 5);
+      // Ordered before the cap, so a capped list keeps the most recently active
+      expect(members.order.mock.calls).toEqual([
+        ["last_active_day", { ascending: false, nullsFirst: false }],
+        ["user_id"],
+      ]);
+      expect(members.order.mock.invocationCallOrder[1]).toBeLessThan(
+        members.range.mock.invocationCallOrder[0],
+      );
       expect(mockRpc).toHaveBeenCalledWith("analytics_member_profiles", {
         p_user_ids: ["22222222-2222-4222-8222-222222222222"],
       });
