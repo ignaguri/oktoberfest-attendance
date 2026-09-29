@@ -3,6 +3,7 @@ import { makeWrapped } from "@prostcounter/shared/wrapped/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createTestApp } from "../../__tests__/helpers/test-server";
+import { shareCardHash } from "../../share-cards/public";
 import { renderShareCard } from "../../share-cards/render";
 import publicWrappedShareRoutes from "../public-wrapped-share.route";
 
@@ -43,7 +44,7 @@ describe("Public Wrapped share images", () => {
       festivalName: "Oktoberfest 2026",
     });
     const res = await app.request(
-      "/public/wrapped-shares/abc/og?lang=es&v=123",
+      `/public/wrapped-shares/abc/og?lang=es&v=${shareCardHash(card)}`,
     );
     expect(res.status).toBe(200);
     expect(res.headers.get("Cache-Control")).toBe(
@@ -53,6 +54,21 @@ describe("Public Wrapped share images", () => {
       lang: "es",
       variant: "og",
     });
+  });
+
+  it.each([
+    ["a stale hash", "lang=en&v=0123456789ab"],
+    ["no hash", "lang=en"],
+    ["an unsupported lang", `lang=fr&v=${shareCardHash(card)}`],
+  ])("404s %s instead of rendering a new cache entry", async (_, query) => {
+    getPublic.mockResolvedValue({
+      kind: "numbers",
+      card,
+      festivalName: "Oktoberfest 2026",
+    });
+    const res = await app.request(`/public/wrapped-shares/abc/story?${query}`);
+    expect(res.status).toBe(404);
+    expect(renderShareCard).not.toHaveBeenCalled();
   });
 
   it("404s a revoked or unknown link", async () => {

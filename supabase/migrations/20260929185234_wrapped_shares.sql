@@ -32,16 +32,20 @@ ALTER TABLE public.wrapped_shares ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Owners read their share links" ON public.wrapped_shares
   FOR SELECT TO authenticated USING ((SELECT auth.uid()) = user_id);
 
-CREATE POLICY "Owners create their share links" ON public.wrapped_shares
-  FOR INSERT TO authenticated WITH CHECK ((SELECT auth.uid()) = user_id);
-
--- Revoke is an update; there is no delete policy.
-CREATE POLICY "Owners update their share links" ON public.wrapped_shares
+-- Revoke is the one write a user makes: it sets revoked_at on a live link and
+-- nothing else. There is no insert or delete policy.
+CREATE POLICY "Owners revoke their share links" ON public.wrapped_shares
   FOR UPDATE TO authenticated
-  USING ((SELECT auth.uid()) = user_id)
-  WITH CHECK ((SELECT auth.uid()) = user_id);
+  USING ((SELECT auth.uid()) = user_id AND revoked_at IS NULL)
+  WITH CHECK ((SELECT auth.uid()) = user_id AND revoked_at IS NOT NULL);
 
-REVOKE ALL ON TABLE public.wrapped_shares FROM anon;
+-- The snapshot is published under the ProstCounter name, so only the API
+-- writes it (service role, from the user's own Wrapped). Default privileges
+-- give authenticated every table right; take them back and grant only what
+-- revoking needs.
+REVOKE ALL ON TABLE public.wrapped_shares FROM anon, authenticated;
+GRANT SELECT ON TABLE public.wrapped_shares TO authenticated;
+GRANT UPDATE (revoked_at) ON TABLE public.wrapped_shares TO authenticated;
 
 -- The only public read: a live link's card, by token.
 CREATE FUNCTION public.get_wrapped_share(p_token text)

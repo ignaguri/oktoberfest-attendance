@@ -15,6 +15,9 @@ import wrappedShareRoutes from "../wrapped-share.route";
 vi.mock("../../services/wrapped-share.service", () => ({
   WrappedShareService: vi.fn(),
 }));
+vi.mock("../../utils/admin-client", () => ({
+  createAdminClient: vi.fn(() => ({})),
+}));
 vi.mock("../../share-cards/render", () => ({
   SHARE_IMAGE_VARIANTS: ["story", "og"],
   renderShareCard: vi

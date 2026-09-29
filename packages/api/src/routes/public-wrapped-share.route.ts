@@ -1,10 +1,14 @@
 import type { Database } from "@prostcounter/db";
-import { ShareLangSchema } from "@prostcounter/shared";
+import {
+  SUPPORTED_LANGUAGES,
+  type SupportedLanguage,
+} from "@prostcounter/shared/i18n/core";
 import { createClient } from "@supabase/supabase-js";
 import { Hono } from "hono";
 
 import { NotFoundError } from "../middleware/error";
 import { SupabaseWrappedShareRepository } from "../repositories/supabase/wrapped-share.repository";
+import { shareCardHash } from "../share-cards/public";
 import {
   renderShareCard,
   SHARE_IMAGE_VARIANTS,
@@ -13,7 +17,11 @@ import {
 
 const app = new Hono();
 
-/** The URL carries the card's hash, so a new snapshot is a new URL and this can cache forever. */
+/**
+ * The URL carries the card's hash, so a new snapshot is a new URL and this can
+ * cache forever. That only holds if nothing else gets a cache entry: a wrong
+ * hash or language is a 404, or anyone could mint fresh renders by varying them.
+ */
 const PUBLIC_CACHE = "public, max-age=31536000, s-maxage=31536000, immutable";
 
 function publicShareRepository(): SupabaseWrappedShareRepository {
@@ -33,13 +41,19 @@ app.get("/wrapped-shares/:token/:variant", async (c) => {
   if (!(SHARE_IMAGE_VARIANTS as readonly string[]).includes(variant)) {
     throw new NotFoundError("Unknown share image");
   }
-  const lang = ShareLangSchema.parse(c.req.query("lang"));
+  const lang = c.req.query("lang");
+  if (!(SUPPORTED_LANGUAGES as readonly string[]).includes(lang ?? "")) {
+    throw new NotFoundError("Unknown share image");
+  }
   const share = await publicShareRepository().getPublic(c.req.param("token"));
   if (!share) {
     throw new NotFoundError("This Wrapped isn't shared anymore");
   }
+  if (c.req.query("v") !== shareCardHash(share.card)) {
+    throw new NotFoundError("Unknown share image");
+  }
   const jpeg = await renderShareCard(share.card, {
-    lang,
+    lang: lang as SupportedLanguage,
     variant: variant as ShareImageVariant,
   });
   return c.body(new Uint8Array(jpeg), 200, {

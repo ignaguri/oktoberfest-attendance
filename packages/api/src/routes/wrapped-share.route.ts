@@ -19,6 +19,7 @@ import {
 } from "../repositories/supabase";
 import { WrappedShareService } from "../services/wrapped-share.service";
 import { renderShareCard } from "../share-cards/render";
+import { createAdminClient } from "../utils/admin-client";
 
 const app = new OpenAPIHono<AuthContext>();
 
@@ -31,7 +32,7 @@ function serviceFor(supabase: AuthContext["Variables"]["supabase"]) {
   return new WrappedShareService(
     new SupabaseWrappedRepository(supabase),
     new SupabaseOfficialStatsRepository(supabase),
-    new SupabaseWrappedShareRepository(supabase),
+    new SupabaseWrappedShareRepository(supabase, createAdminClient()),
   );
 }
 

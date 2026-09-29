@@ -91,6 +91,15 @@ describe("renderShareCard", () => {
     );
   }, 30_000);
 
+  it("only fetches storage paths, never an absolute URL", async () => {
+    const photo = await webpPhoto();
+    stubPhotoFetch(() => new Response(photo, { status: 200 }));
+    expect(
+      await preparePhotos(["http://169.254.169.254/latest", "file:///etc/x"]),
+    ).toEqual([]);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
   it("drops photos that fail to load", async () => {
     stubPhotoFetch(() => new Response("nope", { status: 404 }));
     const card = cards.find((candidate) => candidate.kind === "photos")!;

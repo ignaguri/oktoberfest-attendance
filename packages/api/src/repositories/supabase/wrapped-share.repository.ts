@@ -16,7 +16,23 @@ import type {
 const UNIQUE_VIOLATION = "23505";
 
 export class SupabaseWrappedShareRepository implements WrappedShareStore {
-  constructor(private supabase: SupabaseClient<Database>) {}
+  /**
+   * `supabase` reads (and revokes) as the caller, under RLS. Snapshots are
+   * published under the ProstCounter name, so users cannot write them: only
+   * `writer` (the API's service-role client) can, after the service built the
+   * card from the caller's own Wrapped.
+   */
+  constructor(
+    private supabase: SupabaseClient<Database>,
+    private writer?: SupabaseClient<Database>,
+  ) {}
+
+  private requireWriter(): SupabaseClient<Database> {
+    if (!this.writer) {
+      throw new DatabaseError("Share links need a service-role writer");
+    }
+    return this.writer;
+  }
 
   async listLive(
     userId: string,
@@ -44,13 +60,15 @@ export class SupabaseWrappedShareRepository implements WrappedShareStore {
     kind: LinkableShareCardKind,
     card: ShareCard,
   ): Promise<string> {
+    const writer = this.requireWriter();
     const cardData = card as unknown as Json;
     const existing = await this.findLiveToken(userId, festivalId, kind);
     if (existing) {
-      const { error } = await this.supabase
+      const { error } = await writer
         .from("wrapped_shares")
         .update({ card_data: cardData })
-        .eq("token", existing);
+        .eq("token", existing)
+        .eq("user_id", userId);
       if (error) {
         throw new DatabaseError(
           `Failed to refresh share link: ${error.message}`,
@@ -59,7 +77,7 @@ export class SupabaseWrappedShareRepository implements WrappedShareStore {
       return existing;
     }
 
-    const { data, error } = await this.supabase
+    const { data, error } = await writer
       .from("wrapped_shares")
       .insert({
         user_id: userId,
@@ -104,12 +122,19 @@ export class SupabaseWrappedShareRepository implements WrappedShareStore {
       throw new DatabaseError(`Failed to read share link: ${error.message}`);
     }
     const row = data?.[0];
-    if (!row || !isLinkableShareCardKind(row.card_kind)) {
+    const card = row?.card_data as unknown as ShareCard | undefined;
+    // A snapshot must be the card its row says it is, and never photos
+    if (
+      !row ||
+      !card ||
+      !isLinkableShareCardKind(row.card_kind) ||
+      card.kind !== row.card_kind
+    ) {
       return null;
     }
     return {
       kind: row.card_kind,
-      card: row.card_data as unknown as ShareCard,
+      card,
       festivalName: row.festival_name,
     };
   }
