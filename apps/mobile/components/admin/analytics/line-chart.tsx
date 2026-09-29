@@ -36,6 +36,7 @@ type ChartRow<K extends string> = { x: string } & Record<K, number | null>;
 
 export interface LineChartProps<K extends string> {
   rows: readonly ChartRow<K>[];
+  /** All series must share one format; the y axis follows the first. */
   series: readonly ChartSeries<K>[];
   /** Axis label for a row's x. */
   formatXTick: (x: string) => string;
@@ -141,8 +142,8 @@ function ChartCanvas<K extends string>({
   onPressedIndexChange,
 }: ChartCanvasProps<K>) {
   const keys: string[] = series.map((line) => line.key);
-  const isPercent = series.every((line) => line.format === "percent");
-  const format = isPercent ? "percent" : "count";
+  const format = series[0]?.format ?? "count";
+  const isPercent = format === "percent";
   const data = rows.map((row, index) => {
     const point: CanvasPoint = { index };
     for (const line of series) {
@@ -151,6 +152,9 @@ function ChartCanvas<K extends string>({
     return point;
   });
   const initialY = Object.fromEntries(keys.map((key) => [key, 0])) as Record<string, number>;
+  // A count axis with no positive value would collapse to a zero-height scale.
+  const hasPositiveValue = data.some((point) => keys.some((key) => (point[key] ?? 0) > 0));
+  const yDomain: [number] | [number, number] = isPercent || !hasPositiveValue ? [0, 1] : [0];
   const { state, isActive } = useChartPressState({ x: 0, y: initialY });
 
   useAnimatedReaction(
@@ -179,7 +183,7 @@ function ChartCanvas<K extends string>({
         {
           font: AXIS_FONT,
           tickCount: 4,
-          domain: isPercent ? [0, 1] : [0],
+          domain: yDomain,
           formatYLabel: (value) => formatChartValue(Number(value), format),
           labelColor: Colors.gray[500],
           lineColor: Colors.gray[200],
