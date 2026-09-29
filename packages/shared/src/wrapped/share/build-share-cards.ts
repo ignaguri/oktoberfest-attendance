@@ -201,7 +201,7 @@ export function isLinkableShareCardKind(
 }
 
 /** Bump whenever a layout changes, so every cached card image refreshes. */
-export const SHARE_CARD_RENDER_VERSION = "1";
+export const SHARE_CARD_RENDER_VERSION = "2";
 
 /** A cheap hash (djb2) of the content and layout version, for naming cached card files; not for security. */
 export function shareCardFingerprint(

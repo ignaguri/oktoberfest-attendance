@@ -1,3 +1,4 @@
+import { PROD_URL } from "@prostcounter/shared/constants";
 import type {
   CityShareCard,
   NumbersShareCard,
@@ -20,6 +21,8 @@ export interface LayoutContext {
   photoDataUrls: string[];
 }
 
+/** Printed on every card, so a shared image says where it came from. */
+const BRAND_DOMAIN = new URL(PROD_URL).host;
 const MAX_COLUMN_DOTS = 12;
 const MAX_TENT_ICONS = 3;
 /** Light festivals still get a track; taller than the story's 4, the card has the room. */
@@ -46,14 +49,13 @@ function Brand(): ReactElement {
         color: COLORS.ink,
         fontWeight: 900,
         fontSize: 40,
-        letterSpacing: 6,
+        letterSpacing: 1,
         padding: "18px 44px",
         borderRadius: 999,
         border: `4px solid ${COLORS.ink}`,
-        transform: "rotate(-2deg)",
       })}
     >
-      PROSTCOUNTER
+      {BRAND_DOMAIN}
     </div>
   );
 }
@@ -705,14 +707,13 @@ export function ogLayout(
             backgroundColor: COLORS.amber,
             fontWeight: 900,
             fontSize: 30,
-            letterSpacing: 5,
+            letterSpacing: 1,
             padding: "14px 34px",
             borderRadius: 999,
             border: `4px solid ${COLORS.ink}`,
-            transform: "rotate(-2deg)",
           }}
         >
-          PROSTCOUNTER
+          {BRAND_DOMAIN}
         </div>
       </div>
     </div>
