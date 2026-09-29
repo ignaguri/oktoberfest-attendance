@@ -1982,15 +1982,22 @@ export function createTypedApiClient(config: ApiClientConfig) {
         return parseJsonResponse(response);
       },
 
-      /** URL and auth headers for a card's JPEG; apps download it directly (binary, off the typed client). */
+      /**
+       * URL and auth headers for a card's JPEG; apps download it directly (binary, off the typed client).
+       * `version` (the card's fingerprint) keys the URL, so a cached response never outlives the card.
+       */
       async shareCardRequest(
         festivalId: string,
         kind: ShareCardKind,
         lang: ShareLang,
+        version: string,
       ): Promise<{ url: string; headers: Record<string, string> }> {
         const headers = await getAuthHeaders();
         const authOnly: Record<string, string> = headers.Authorization ? { Authorization: headers.Authorization } : {};
-        return { url: `${baseUrl}/v1/wrapped/${festivalId}/share-cards/${kind}?lang=${lang}`, headers: authOnly };
+        return {
+          url: `${baseUrl}/v1/wrapped/${festivalId}/share-cards/${kind}?lang=${lang}&v=${version}`,
+          headers: authOnly,
+        };
       },
 
       shareLinks: {

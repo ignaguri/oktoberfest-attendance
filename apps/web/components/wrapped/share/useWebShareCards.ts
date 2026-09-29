@@ -6,6 +6,7 @@ import {
   buildShareCards,
   type ShareCard,
   type ShareCardKind,
+  shareCardFingerprint,
   type WrappedData,
   type WrappedOfficialStats,
 } from "@prostcounter/shared/wrapped";
@@ -51,6 +52,7 @@ export function useWebShareCards({
           festivalId,
           card.kind,
           lang,
+          shareCardFingerprint(card),
         );
         const response = await fetch(url, { headers });
         if (!response.ok) {

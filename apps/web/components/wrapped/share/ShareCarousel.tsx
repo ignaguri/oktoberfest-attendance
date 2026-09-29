@@ -133,18 +133,41 @@ export function ShareCarousel({
     anchor.click();
   }, [caption, card, state, t]);
 
-  const onCopyLink = useCallback(async () => {
+  const onCopyLink = useCallback(() => {
     if (!card || !isLinkableShareCardKind(card.kind)) {
       return;
     }
-    try {
-      const link = await createLink.mutateAsync({ kind: card.kind, lang });
-      await navigator.clipboard.writeText(link.url);
-      toast.success(t("wrapped.shareCards.carousel.linkCopied"));
-    } catch {
-      toast.error(t("wrapped.shareCards.carousel.error"));
-    }
+    const linkUrl = createLink
+      .mutateAsync({ kind: card.kind, lang })
+      .then((link) => link.url);
+    // Safari only lets the clipboard be written during the tap itself, so claim
+    // it now with an item that resolves once the link exists.
+    const copied =
+      typeof ClipboardItem !== "undefined" && navigator.clipboard?.write
+        ? navigator.clipboard.write([
+            new ClipboardItem({
+              "text/plain": linkUrl.then(
+                (url) => new Blob([url], { type: "text/plain" }),
+              ),
+            }),
+          ])
+        : linkUrl.then((url) => navigator.clipboard.writeText(url));
+    copied.then(
+      () => toast.success(t("wrapped.shareCards.carousel.linkCopied")),
+      () => toast.error(t("wrapped.shareCards.carousel.error")),
+    );
   }, [card, createLink, lang, t]);
+
+  // The pages remount on open, scrolled to the first card, so the index follows
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (!next) {
+        setIndex(0);
+      }
+      onOpenChange(next);
+    },
+    [onOpenChange],
+  );
 
   const onStopSharing = useCallback(() => {
     if (
@@ -158,7 +181,7 @@ export function ShareCarousel({
   }, [liveLink, revokeLink, t]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="wrapped-paper max-w-md border-2 border-wrapped-ink">
         <DialogTitle className="font-wrapped text-2xl font-extrabold text-wrapped-ink">
           {t("wrapped.shareCards.carousel.title")}

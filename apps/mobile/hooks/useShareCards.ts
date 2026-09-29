@@ -53,9 +53,10 @@ export function useShareCards({
         ...previous,
         [card.kind]: { status: "loading" },
       }));
+      const fingerprint = shareCardFingerprint(card);
       const file = new File(
         Paths.cache,
-        `wrapped-${festivalId}-${card.kind}-${lang}-${shareCardFingerprint(card)}.jpg`,
+        `wrapped-${festivalId}-${card.kind}-${lang}-${fingerprint}.jpg`,
       );
       try {
         if (!file.exists || (file.size ?? 0) < MIN_CARD_BYTES) {
@@ -63,6 +64,7 @@ export function useShareCards({
             festivalId,
             card.kind,
             lang,
+            fingerprint,
           );
           await File.downloadFileAsync(url, file, {
             headers,

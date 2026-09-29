@@ -16,8 +16,8 @@ import { cn } from "@prostcounter/ui";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import * as Sharing from "expo-sharing";
-import { Check, X } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
+import { X } from "lucide-react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -32,10 +32,8 @@ import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { HStack } from "@/components/ui/hstack";
 import { SafeAreaView } from "@/components/ui/safe-area-view";
 import { Text } from "@/components/ui/text";
-import { useToast } from "@/components/ui/toast";
 import { VStack } from "@/components/ui/vstack";
 import type { ShareCardState } from "@/hooks/useShareCards";
-import { Colors } from "@/lib/constants/colors";
 import { useIsOnline } from "@/lib/database/offline-provider";
 import { logger } from "@/lib/logger";
 
@@ -66,10 +64,37 @@ export function ShareCarousel({
   onRetry,
 }: ShareCarouselProps) {
   const { t } = useTranslation();
-  const toast = useToast();
   const isOnline = useIsOnline();
   const { dialog, showDialog, closeDialog } = useAlertDialog();
   const [index, setIndex] = useState(0);
+  // Shown on the button itself: a toast or dialog in the root overlay would sit behind this Modal
+  const [copyFeedback, setCopyFeedback] = useState<
+    "linkCopied" | "error" | null
+  >(null);
+  const feedbackTimerId = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (feedbackTimerId.current) {
+        clearTimeout(feedbackTimerId.current);
+      }
+    },
+    [],
+  );
+
+  const flashCopyFeedback = useCallback((feedback: "linkCopied" | "error") => {
+    setCopyFeedback(feedback);
+    if (feedbackTimerId.current) {
+      clearTimeout(feedbackTimerId.current);
+    }
+    feedbackTimerId.current = setTimeout(() => setCopyFeedback(null), 2000);
+  }, []);
+
+  // The list remounts on open, scrolled to the first card, so the index follows
+  const handleClose = useCallback(() => {
+    setIndex(0);
+    onClose();
+  }, [onClose]);
   const links = useWrappedShareLinks(visible ? festivalId : undefined, lang);
   const createLink = useCreateWrappedShareLink(festivalId);
   const revokeLink = useRevokeWrappedShareLink(festivalId);
@@ -137,21 +162,13 @@ export function ShareCarousel({
     try {
       const link = await createLink.mutateAsync({ kind: card.kind, lang });
       await Clipboard.setStringAsync(link.url);
-      toast.show({
-        placement: "top",
-        render: () => (
-          <HStack className="items-center gap-2 rounded-lg bg-success-500 px-4 py-3">
-            <Check size={18} color={Colors.white} />
-            <Text className="font-medium text-white">
-              {t("wrapped.shareCards.carousel.linkCopied")}
-            </Text>
-          </HStack>
-        ),
-      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      flashCopyFeedback("linkCopied");
     } catch (error) {
       logger.error("Failed to create Wrapped share link", error);
+      flashCopyFeedback("error");
     }
-  }, [card, createLink, lang, t, toast]);
+  }, [card, createLink, flashCopyFeedback, lang]);
 
   const onStopSharing = useCallback(() => {
     if (!liveLink) {
@@ -170,7 +187,7 @@ export function ShareCarousel({
   }, [liveLink, revokeLink, showDialog, t]);
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" onRequestClose={handleClose}>
       <View className="flex-1 bg-wrapped-paper">
         <PaperBackground />
         <SafeAreaView className="flex-1">
@@ -179,7 +196,7 @@ export function ShareCarousel({
               {t("wrapped.shareCards.carousel.title")}
             </Text>
             <Pressable
-              onPress={onClose}
+              onPress={handleClose}
               className="p-2"
               accessibilityRole="button"
               accessibilityLabel={t("wrapped.shareCards.carousel.close")}
@@ -259,7 +276,9 @@ export function ShareCarousel({
                 )}
               >
                 <Text className="text-base font-bold text-wrapped-ink">
-                  {t("wrapped.shareCards.carousel.copyLink")}
+                  {t(
+                    `wrapped.shareCards.carousel.${copyFeedback ?? "copyLink"}`,
+                  )}
                 </Text>
               </Pressable>
             ) : null}
@@ -280,7 +299,7 @@ export function ShareCarousel({
           </VStack>
         </SafeAreaView>
       </View>
-      <ConfirmAlertDialog dialog={dialog} onClose={closeDialog} />
+      <ConfirmAlertDialog dialog={dialog} onClose={closeDialog} useRNModal />
     </Modal>
   );
 }
