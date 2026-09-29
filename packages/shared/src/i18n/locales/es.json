@@ -2781,7 +2781,8 @@
       },
       "caption": {
         "title": "Mi {{festival}} Wrapped",
-        "stats": "¡{{beers}} cervezas en {{days}} días!",
+        "stats_one": "¡{{beers}} en {{count}} día!",
+        "stats_other": "¡{{beers}} en {{count}} días!",
         "persona": "Persona del festival: {{name}}"
       },
       "carousel": {

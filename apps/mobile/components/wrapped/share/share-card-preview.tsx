@@ -84,12 +84,14 @@ export function ShareCardPreview({
   onRetry,
 }: ShareCardPreviewProps) {
   const { t } = useTranslation();
+  // An accessible View hides its children, which would leave Retry unreachable
+  const isError = state?.status === "error";
   return (
     <View
       className="aspect-[9/16] overflow-hidden rounded-2xl border-2 border-wrapped-ink bg-wrapped-paper"
       style={{ width }}
-      accessible
-      accessibilityLabel={label}
+      accessible={!isError}
+      accessibilityLabel={isError ? undefined : label}
     >
       {state?.status === "ready" ? (
         <Animated.Image

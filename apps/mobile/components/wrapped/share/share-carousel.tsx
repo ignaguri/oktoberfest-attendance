@@ -124,8 +124,10 @@ export function ShareCarousel({
         festival: data.festivalInfo.name,
       }),
       t("wrapped.shareCards.caption.stats", {
-        beers: data.basicStats.totalBeers,
-        days: data.basicStats.daysAttended,
+        beers: t("wrapped.story.units.beers", {
+          count: data.basicStats.totalBeers,
+        }),
+        count: data.basicStats.daysAttended,
       }),
       persona?.kind === "persona"
         ? t("wrapped.shareCards.caption.persona", { name: persona.name })

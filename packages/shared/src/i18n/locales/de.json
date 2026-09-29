@@ -2946,7 +2946,8 @@
       },
       "caption": {
         "title": "Mein {{festival}}-Rückblick",
-        "stats": "{{beers}} Biere an {{days}} Tagen!",
+        "stats_one": "{{beers}} an {{count}} Tag!",
+        "stats_other": "{{beers}} an {{count}} Tagen!",
         "persona": "Festival-Persona: {{name}}"
       },
       "carousel": {
