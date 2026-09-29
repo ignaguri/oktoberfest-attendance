@@ -10308,6 +10308,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record usage events
+         * @description Batch of 1-50 usage events for the signed-in user. Events with an unknown name, invalid or oversized props, or an unparseable timestamp are dropped individually; timestamps are clamped to the last 24 hours. Answers with the number recorded.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        events: {
+                            name: string;
+                            props?: {
+                                [key: string]: unknown;
+                            };
+                            occurredAt: string;
+                            /** Format: uuid */
+                            sessionId: string;
+                        }[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Events recorded (possibly fewer than sent) */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            accepted: number;
+                        };
+                    };
+                };
+                /** @description Malformed batch */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Events could not be written; the client may retry */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/admin/users": {
         parameters: {
             query?: never;
@@ -12835,6 +12917,500 @@ export interface paths {
                                 returnedNext: number | null;
                                 returnedAny: number;
                             }[];
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/analytics/scorecard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Feature scorecard (admin)
+         * @description Per feature: attendees, adopters, and for users vs non-users how many came back during the festival and how many attended a later one. Without festivalId, every festival pooled.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    festivalId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Scorecard counts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            features: {
+                                /** @enum {string} */
+                                feature: "drinks" | "photos" | "group_joins" | "group_messages" | "photo_reactions" | "photo_comments" | "day_plans" | "crowd_reports" | "friend_requests" | "location_sharing" | "wrapped";
+                                attendees: number;
+                                adopters: number;
+                                cameBackUsers: number;
+                                cameBackUsersBase: number;
+                                cameBackNonUsers: number;
+                                cameBackNonUsersBase: number;
+                                returnedUsers: number;
+                                returnedUsersBase: number;
+                                returnedNonUsers: number;
+                                returnedNonUsersBase: number;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/analytics/cohorts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Signup cohorts (admin)
+         * @description Per signup month, newest first: sign-ups and how many activated, activated within 7 days, logged 3+ days at a festival, and attended 2+ festivals.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Signup cohorts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            cohorts: {
+                                month: string;
+                                signups: number;
+                                activated: number;
+                                activated7d: number;
+                                engaged: number;
+                                returned: number;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/analytics/funnel/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * People behind a funnel step (admin)
+         * @description Real users who signed up in the range and reached the step, most recently active first.
+         */
+        get: {
+            parameters: {
+                query: {
+                    from: string;
+                    to: string;
+                    platform?: "ios" | "android";
+                    step: "signed_up" | "logged_attendance" | "five_days";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Members */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            members: {
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                signedUpAt: string | null;
+                                lastActiveDay: string | null;
+                                festivalId?: string;
+                                festivalName?: string;
+                            }[];
+                            truncated: boolean;
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/analytics/scorecard/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * People behind a scorecard number (admin)
+         * @description Attendees of the festival (every festival, pooled, without festivalId) in the segment for one feature. Pooled lists name each person once per festival.
+         */
+        get: {
+            parameters: {
+                query: {
+                    festivalId?: string;
+                    feature: "drinks" | "photos" | "group_joins" | "group_messages" | "photo_reactions" | "photo_comments" | "day_plans" | "crowd_reports" | "friend_requests" | "location_sharing" | "wrapped";
+                    segment: "attendees" | "adopters" | "non_adopters" | "came_back_adopters" | "came_back_non_adopters" | "returned_adopters" | "returned_non_adopters";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Members */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            members: {
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                signedUpAt: string | null;
+                                lastActiveDay: string | null;
+                                festivalId?: string;
+                                festivalName?: string;
+                            }[];
+                            truncated: boolean;
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/analytics/cohorts/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * People behind a cohort number (admin)
+         * @description Real users who signed up in the month (Europe/Berlin) and reached the step.
+         */
+        get: {
+            parameters: {
+                query: {
+                    month: string;
+                    step: "signups" | "activated" | "activated_7d" | "engaged" | "returned";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Members */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            members: {
+                                userId: string;
+                                username: string | null;
+                                fullName: string | null;
+                                signedUpAt: string | null;
+                                lastActiveDay: string | null;
+                                festivalId?: string;
+                                festivalName?: string;
+                            }[];
+                            truncated: boolean;
+                        };
+                    };
+                };
+                /** @description Invalid range */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users/{userId}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One user's timeline (admin)
+         * @description Usage events and domain actions, newest first. Pass the previous page's nextCursor back as cursorAt and cursorKey, unchanged.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    cursorAt?: string;
+                    cursorKey?: string;
+                    limit?: number;
+                    kind?: "all" | "action" | "event";
+                };
+                header?: never;
+                path: {
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Timeline page */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            rows: {
+                                occurredAt: string;
+                                /** @enum {string} */
+                                kind: "action" | "event";
+                                name: string;
+                                props: {
+                                    [key: string]: unknown;
+                                };
+                                festivalId: string | null;
+                                festivalName: string | null;
+                                platform: string | null;
+                                appVersion: string | null;
+                                sessionId: string | null;
+                                cursorKey: string;
+                            }[];
+                            nextCursor: {
+                                cursorAt: string;
+                                cursorKey: string;
+                            } | null;
                         };
                     };
                 };

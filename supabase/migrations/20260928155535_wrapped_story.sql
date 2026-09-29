@@ -6,7 +6,7 @@
 --    festival_info.festival_type, which keeps the Wiesn copy to Oktoberfest, and a
 --    social_score per picture (reactions + comments + 2x tags) over the whole
 --    festival, so the story can show the photos friends engaged with. Output changes,
---    so wrapped_data_version goes to 2.
+--    so wrapped_data_version goes to 3 (the foundation's migrations left it at 2).
 -- 2. festival_official_stats holds the city's final numbers (Wiesn-Bilanz),
 --    read next to the cached Wrapped, never inside it. get_festival_official_stats
 --    falls back to the latest earlier festival of the same series.
@@ -669,7 +669,7 @@ CREATE OR REPLACE FUNCTION public.wrapped_data_version()
 RETURNS integer
 LANGUAGE sql
 IMMUTABLE
-AS $$ SELECT 2 $$;
+AS $$ SELECT 3 $$;
 
 CREATE TABLE IF NOT EXISTS public.festival_official_stats (
   festival_id uuid PRIMARY KEY REFERENCES public.festivals(id) ON DELETE CASCADE,

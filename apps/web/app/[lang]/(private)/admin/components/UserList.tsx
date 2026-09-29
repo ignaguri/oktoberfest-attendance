@@ -14,6 +14,7 @@ import { formatDate } from "date-fns/format";
 import { Beer, Tent, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link } from "next-view-transitions";
 import { toast } from "sonner";
 
 import { UserSearch } from "@/components/admin/search/UserSearch";
@@ -548,14 +549,19 @@ const UserList = () => {
         description={t("admin.users.editUserDescription")}
       >
         {selectedUser && (
-          <UserEditForm
-            user={selectedUser}
-            onSubmit={handleUpdateUser}
-            attendances={attendances}
-            onDeleteAttendance={handleDeleteAttendance}
-            onFetchAttendances={() => selectedUser && fetchAttendances(selectedUser.id)}
-            isFetchingAttendances={isFetchingAttendances}
-          />
+          <div className="flex flex-col gap-4">
+            <Link href={`/admin/users/${selectedUser.id}`} className="text-sm underline">
+              {t("admin.analytics.timeline.open")}
+            </Link>
+            <UserEditForm
+              user={selectedUser}
+              onSubmit={handleUpdateUser}
+              attendances={attendances}
+              onDeleteAttendance={handleDeleteAttendance}
+              onFetchAttendances={() => selectedUser && fetchAttendances(selectedUser.id)}
+              isFetchingAttendances={isFetchingAttendances}
+            />
+          </div>
         )}
       </ResponsiveDialog>
 

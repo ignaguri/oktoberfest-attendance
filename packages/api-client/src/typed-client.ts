@@ -21,11 +21,20 @@ import type {
   AdminUser,
   AdminUserGroup,
   AdminWrappedCacheEntry,
+  AnalyticsCohortMembersQuery,
+  AnalyticsCohortsResponse,
   AnalyticsFeatureUsageResponse,
   AnalyticsFestivalRetentionResponse,
+  AnalyticsFunnelMembersQuery,
   AnalyticsFunnelResponse,
+  AnalyticsMembersResponse,
   AnalyticsOverviewResponse,
   AnalyticsRangeQuery,
+  AnalyticsScorecardMembersQuery,
+  AnalyticsScorecardQuery,
+  AnalyticsScorecardResponse,
+  AnalyticsTimelineQuery,
+  AnalyticsTimelineResponse,
   CopyAdminFestivalTentsInput,
   AttendanceByDate,
   CarryOverCandidatesResponse,
@@ -115,6 +124,7 @@ import type {
   WrappedAccessResult,
   WrappedShareLink,
 } from "@prostcounter/shared/schemas";
+import type { RecordEventsBody } from "@prostcounter/shared/analytics";
 import type { ShareCardKind } from "@prostcounter/shared/wrapped";
 
 /**
@@ -251,8 +261,22 @@ export function createTypedApiClient(config: ApiClientConfig) {
     clientHeaders["X-Client-Version"] = clientVersion;
   }
 
+  // The last headers getAuthHeaders produced, for events.record's keepalive
+  // sends: those run as the page unloads, when an await before fetch() means
+  // the request is never issued.
+  let lastAuthHeaders: ApiHeaders | null = null;
+
   async function getAuthHeaders(): Promise<ApiHeaders> {
-    return { ...(await getConfiguredAuthHeaders()), ...clientHeaders };
+    try {
+      const headers = { ...(await getConfiguredAuthHeaders()), ...clientHeaders };
+      lastAuthHeaders = headers;
+      return headers;
+    } catch (error) {
+      // Signed out (mobile throws AuthRequiredError): forget the old token so a
+      // later keepalive send cannot go out under the previous account.
+      lastAuthHeaders = null;
+      throw error;
+    }
   }
 
   /**
@@ -1228,6 +1252,34 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to dismiss the feedback prompt");
         }
         return parseJsonResponse<DismissDayFeedbackPromptResponse>(response);
+      },
+    },
+
+    /**
+     * Usage events (fire-and-forget, see packages/shared/src/analytics).
+     *
+     * Deliberately bypasses fetchWithLogging: on mobile its onError and
+     * onResponse hooks report to Sentry, and a lost analytics batch is not an
+     * error worth an event. Throws on a network failure or non-2xx so the
+     * tracker can schedule its single retry; nothing else looks at the result.
+     * keepalive lets a flush started as a web tab hides outlive the page; it
+     * reuses the last auth headers so fetch() starts synchronously, before the
+     * page is gone. A token that expired since then gets a 401 and the batch is
+     * dropped like any failed one.
+     */
+    events: {
+      async record(body: RecordEventsBody, options?: { keepalive?: boolean }): Promise<void> {
+        const headers =
+          options?.keepalive && lastAuthHeaders ? lastAuthHeaders : await getAuthHeaders();
+        const response = await fetch(`${baseUrl}/v1/events`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(body),
+          keepalive: options?.keepalive ?? false,
+        });
+        if (!response.ok) {
+          throw new ApiError("EVENTS_NOT_RECORDED", "Failed to record events", response.status);
+        }
       },
     },
 
@@ -2959,6 +3011,87 @@ export function createTypedApiClient(config: ApiClientConfig) {
           }
           return parseJsonResponse<AnalyticsFestivalRetentionResponse>(response);
         },
+
+        async scorecard(query: AnalyticsScorecardQuery): Promise<AnalyticsScorecardResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query.festivalId) {
+            params.set("festivalId", query.festivalId);
+          }
+          const search = params.toString();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/scorecard${search ? `?${search}` : ""}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch feature scorecard");
+          }
+          return parseJsonResponse<AnalyticsScorecardResponse>(response);
+        },
+
+        async cohorts(): Promise<AnalyticsCohortsResponse> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/cohorts`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch signup cohorts");
+          }
+          return parseJsonResponse<AnalyticsCohortsResponse>(response);
+        },
+
+        async funnelMembers(query: AnalyticsFunnelMembersQuery): Promise<AnalyticsMembersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ from: query.from, to: query.to, step: query.step });
+          if (query.platform) {
+            params.set("platform", query.platform);
+          }
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/funnel/members?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch funnel members");
+          }
+          return parseJsonResponse<AnalyticsMembersResponse>(response);
+        },
+
+        async scorecardMembers(
+          query: AnalyticsScorecardMembersQuery,
+        ): Promise<AnalyticsMembersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ feature: query.feature, segment: query.segment });
+          if (query.festivalId) {
+            params.set("festivalId", query.festivalId);
+          }
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/scorecard/members?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch scorecard members");
+          }
+          return parseJsonResponse<AnalyticsMembersResponse>(response);
+        },
+
+        async cohortMembers(query: AnalyticsCohortMembersQuery): Promise<AnalyticsMembersResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams({ month: query.month, step: query.step });
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/analytics/cohorts/members?${params}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch cohort members");
+          }
+          return parseJsonResponse<AnalyticsMembersResponse>(response);
+        },
       },
 
       users: {
@@ -3060,6 +3193,35 @@ export function createTypedApiClient(config: ApiClientConfig) {
             await extractApiError(response, "Failed to fetch user groups");
           }
           return parseJsonResponse<{ groups: AdminUserGroup[] }>(response);
+        },
+
+        async timeline(
+          userId: string,
+          query: AnalyticsTimelineQuery,
+        ): Promise<AnalyticsTimelineResponse> {
+          const headers = await getAuthHeaders();
+          const params = new URLSearchParams();
+          if (query.kind) {
+            params.set("kind", query.kind);
+          }
+          if (query.limit !== undefined) {
+            params.set("limit", String(query.limit));
+          }
+          // The cursor goes back exactly as the API sent it
+          if (query.cursorAt && query.cursorKey) {
+            params.set("cursorAt", query.cursorAt);
+            params.set("cursorKey", query.cursorKey);
+          }
+          const search = params.toString();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/users/${userId}/timeline${search ? `?${search}` : ""}`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch user timeline");
+          }
+          return parseJsonResponse<AnalyticsTimelineResponse>(response);
         },
       },
 

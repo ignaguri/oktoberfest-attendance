@@ -1,18 +1,24 @@
 import {
   useAdminAnalyticsActivationFunnel,
+  useAdminAnalyticsCohorts,
   useAdminAnalyticsFeatures,
   useAdminAnalyticsFestivalRetention,
   useAdminAnalyticsOverview,
+  useAdminAnalyticsScorecard,
   useFestivals,
 } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AnalyticsPlatform, Festival } from "@prostcounter/shared/schemas";
 import {
+  cohortRates,
+  countHints,
   DEFAULT_ANALYTICS_RANGE_PRESET,
   formatPercent,
   funnelConversion,
   resolveAnalyticsRange,
   retentionRates,
+  scoreFeature,
+  scorecardFestivalId,
   summarizeOverview,
 } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
@@ -43,6 +49,12 @@ export default function AdminAnalyticsScreen() {
   const features = useAdminAnalyticsFeatures({ ...range, platform });
   const funnel = useAdminAnalyticsActivationFunnel({ ...range, platform });
   const retention = useAdminAnalyticsFestivalRetention();
+  const scorecardFestival = scorecardFestivalId(rangeKey);
+  const scorecardFestivalName = festivals?.find(
+    (festival) => festival.id === scorecardFestival,
+  )?.name;
+  const scorecard = useAdminAnalyticsScorecard(scorecardFestival);
+  const cohorts = useAdminAnalyticsCohorts();
 
   const empty = t("admin.analytics.empty");
 
@@ -55,6 +67,9 @@ export default function AdminAnalyticsScreen() {
   const latestFestival = retention.data?.festivals.find(
     (festival) => festival.returnedNext !== null && festival.attendees > 0,
   );
+  const scoredFeatures = (scorecard.data?.features ?? []).map(scoreFeature);
+  const hintCounts = countHints(scoredFeatures);
+  const latestCohort = cohorts.data?.cohorts[0];
 
   const headlines: Record<AnalyticsSection, string> = {
     overview: !overviewSeries.every((point) => point.mau === 0)
@@ -77,6 +92,16 @@ export default function AdminAnalyticsScreen() {
           festival: latestFestival.festivalName,
         })
       : empty,
+    scorecard: scoredFeatures.some((feature) => feature.attendees > 0)
+      ? t("admin.analytics.scorecard.headline", { cut: hintCounts.cut, grow: hintCounts.grow })
+      : empty,
+    cohorts:
+      latestCohort && latestCohort.signups > 0
+        ? t("admin.analytics.cohorts.headline", {
+            month: latestCohort.month.slice(0, 7),
+            percent: formatPercent(cohortRates(latestCohort).activated),
+          })
+        : empty,
   };
 
   const states: Record<AnalyticsSection, { loading: boolean; error: Error | null }> = {
@@ -84,6 +109,8 @@ export default function AdminAnalyticsScreen() {
     features: { loading: features.loading, error: features.error },
     funnel: { loading: funnel.loading, error: funnel.error },
     retention: { loading: retention.loading, error: retention.error },
+    scorecard: { loading: scorecard.loading, error: scorecard.error },
+    cohorts: { loading: cohorts.loading, error: cohorts.error },
   };
 
   const openSection = (section: AnalyticsSection) => {
@@ -94,6 +121,8 @@ export default function AdminAnalyticsScreen() {
         from: range.from,
         to: range.to,
         ...(platform ? { platform } : {}),
+        ...(scorecardFestival ? { festivalId: scorecardFestival } : {}),
+        ...(scorecardFestivalName ? { festivalName: scorecardFestivalName } : {}),
       },
     });
   };

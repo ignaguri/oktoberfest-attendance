@@ -1,4 +1,5 @@
-import { getNotificationRoute } from "@prostcounter/shared/constants";
+import { useTrack } from "@prostcounter/shared/analytics/react";
+import { getNotificationRoute, type NotificationPushType } from "@prostcounter/shared/constants";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 import { useEffect } from "react";
@@ -58,7 +59,10 @@ let lastHandledResponseKey: string | null = null;
 /**
  * Handle notification response (user tapped on notification)
  */
-function handleNotificationResponse(response: Notifications.NotificationResponse) {
+function handleNotificationResponse(
+  response: Notifications.NotificationResponse,
+  track: ReturnType<typeof useTrack>,
+) {
   const responseKey = `${response.notification.request.identifier}:${response.actionIdentifier}`;
 
   if (responseKey === lastHandledResponseKey) {
@@ -75,6 +79,9 @@ function handleNotificationResponse(response: Notifications.NotificationResponse
   if (!data) {
     return;
   }
+
+  // An unknown or missing type is dropped by the tracker's schema.
+  track("notification_opened", { type: data.type as NotificationPushType, channel: "push" });
 
   navigateToNotificationRoute(data);
 }
@@ -108,6 +115,8 @@ export function setupNotificationListeners(): () => void {
  * The pending tap stays in getLastNotificationResponse until then.
  */
 export function useNotificationResponseNavigation(canNavigate: boolean) {
+  const track = useTrack();
+
   useEffect(() => {
     if (!canNavigate) {
       return;
@@ -116,17 +125,17 @@ export function useNotificationResponseNavigation(canNavigate: boolean) {
     const launchResponse = Notifications.getLastNotificationResponse();
 
     if (launchResponse) {
-      handleNotificationResponse(launchResponse);
+      handleNotificationResponse(launchResponse, track);
     }
 
-    const subscription = Notifications.addNotificationResponseReceivedListener(
-      handleNotificationResponse,
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) =>
+      handleNotificationResponse(response, track),
     );
 
     return () => {
       subscription.remove();
     };
-  }, [canNavigate]);
+  }, [canNavigate, track]);
 }
 
 /**

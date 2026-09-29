@@ -40,6 +40,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
+import { TrackOnScreen } from "@/lib/analytics/TrackOnScreen";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
 type TabType = "friends" | "requests";
@@ -397,6 +398,11 @@ function MyFriendsTab({
     if (isLoading) return null;
     return (
       <VStack space="md" className="items-center px-8 pt-16">
+        <TrackOnScreen
+          screens={["/friends"]}
+          name="empty_state_seen"
+          props={{ screen: "friends" }}
+        />
         <Users size={56} color={Colors.gray[300]} />
         <Text className="text-center text-base text-typography-500">{t("friends.empty")}</Text>
         <Button

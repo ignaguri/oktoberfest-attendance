@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { parsePushPermissionHeader } from "../client-headers";
+import {
+  parseClientPlatformHeader,
+  parseClientVersionHeader,
+  parsePushPermissionHeader,
+} from "../client-headers";
 
 describe("parsePushPermissionHeader", () => {
   it("accepts the three statuses the mobile app reports", () => {
@@ -18,5 +22,23 @@ describe("parsePushPermissionHeader", () => {
     expect(parsePushPermissionHeader("Granted")).toBeUndefined();
     expect(parsePushPermissionHeader(" granted")).toBeUndefined();
     expect(parsePushPermissionHeader("provisional")).toBeUndefined();
+  });
+});
+
+describe("parseClientPlatformHeader", () => {
+  it("accepts ios, android and web only", () => {
+    expect(parseClientPlatformHeader("ios")).toBe("ios");
+    expect(parseClientPlatformHeader("android")).toBe("android");
+    expect(parseClientPlatformHeader("web")).toBe("web");
+    expect(parseClientPlatformHeader("windows")).toBeUndefined();
+    expect(parseClientPlatformHeader(undefined)).toBeUndefined();
+  });
+});
+
+describe("parseClientVersionHeader", () => {
+  it("bounds the version and drops empty values", () => {
+    expect(parseClientVersionHeader("1.7.0")).toBe("1.7.0");
+    expect(parseClientVersionHeader("")).toBeUndefined();
+    expect(parseClientVersionHeader("9".repeat(100))).toHaveLength(32);
   });
 });

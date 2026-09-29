@@ -17,3 +17,24 @@ export function parsePushPermissionHeader(value: string | undefined): PushPermis
   }
   return value as PushPermission;
 }
+
+export type ClientPlatform = "ios" | "android" | "web";
+
+const CLIENT_PLATFORMS: ReadonlySet<string> = new Set<ClientPlatform>(["ios", "android", "web"]);
+const MAX_CLIENT_VERSION_LENGTH = 32;
+
+/** X-Client-Platform, or undefined for anything the apps do not send. */
+export function parseClientPlatformHeader(value: string | undefined): ClientPlatform | undefined {
+  if (value === undefined || !CLIENT_PLATFORMS.has(value)) {
+    return undefined;
+  }
+  return value as ClientPlatform;
+}
+
+/** X-Client-Version, bounded; undefined when empty. */
+export function parseClientVersionHeader(value: string | undefined): string | undefined {
+  if (!value) {
+    return undefined;
+  }
+  return value.slice(0, MAX_CLIENT_VERSION_LENGTH);
+}

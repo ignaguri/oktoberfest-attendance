@@ -1,10 +1,14 @@
+import { ApiError } from "@prostcounter/api-client";
+import { screenFromSegments, toEventCode } from "@prostcounter/shared/analytics";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import { useSegments } from "expo-router";
 import { AlertCircle, RefreshCw } from "lucide-react-native";
 import React from "react";
 
 import { Alert, AlertText } from "@/components/ui/alert";
 import { Button, ButtonText } from "@/components/ui/button";
 import { VStack } from "@/components/ui/vstack";
+import { TrackOnScreen } from "@/lib/analytics/TrackOnScreen";
 import { IconColors } from "@/lib/constants/colors";
 
 interface ErrorStateProps {
@@ -31,8 +35,14 @@ export function ErrorState({ error, message, title, onRetry, showRetry = true }:
 
   const errorTitle = title || t("common.errors.title");
 
+  // This screen's own route: tab screens mount at launch, so the event waits
+  // until the user is actually on it (TrackOnScreen).
+  const screen = screenFromSegments(useSegments());
+  const code = toEventCode(error instanceof ApiError ? error.code : undefined);
+
   return (
     <VStack space="md" className="items-center p-4">
+      <TrackOnScreen screens={[screen]} name="error_shown" props={{ screen, code }} />
       <Alert action="error" variant="outline" className="w-full">
         <AlertCircle size={20} color={IconColors.error} />
         <VStack space="xs" className="flex-1">

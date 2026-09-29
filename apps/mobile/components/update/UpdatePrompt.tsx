@@ -1,3 +1,4 @@
+import { useTrack } from "@prostcounter/shared/analytics/react";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { LucideIcon } from "lucide-react-native";
 import { View } from "react-native";
@@ -44,9 +45,20 @@ export function UpdatePrompt({
   isLoading = false,
 }: UpdatePromptProps) {
   const { t } = useTranslation();
+  const track = useTrack();
+
+  const handleUpdate = () => {
+    track("prompt_answered", { prompt: "app_update", answer: "accepted" });
+    void onUpdate();
+  };
+
+  const handleClose = () => {
+    track("prompt_answered", { prompt: "app_update", answer: "dismissed" });
+    onClose();
+  };
 
   return (
-    <AlertDialog isOpen={isOpen} onClose={onClose} size="md">
+    <AlertDialog isOpen={isOpen} onClose={handleClose} size="md">
       <AlertDialogBackdrop />
       <AlertDialogContent className="bg-background-0">
         <AlertDialogHeader className="flex-col items-center pb-4">
@@ -65,7 +77,7 @@ export function UpdatePrompt({
         <AlertDialogFooter className="flex-col gap-2 pt-4">
           <Button
             className="w-full"
-            onPress={onUpdate}
+            onPress={handleUpdate}
             disabled={isLoading}
             accessibilityLabel={t(primaryButtonKey)}
           >
@@ -78,7 +90,7 @@ export function UpdatePrompt({
           <Button
             variant="link"
             className="w-full"
-            onPress={onClose}
+            onPress={handleClose}
             disabled={isLoading}
             accessibilityLabel={t(dismissButtonKey)}
           >

@@ -562,9 +562,9 @@ describe("wrapped timing", () => {
     expect(data.comparisons.vs_festival_avg.attendee_count).toBe(2);
   });
 
-  it("reports data version 2", async () => {
+  it("reports data version 3", async () => {
     const { data } = await admin.rpc("wrapped_data_version");
-    expect(data).toBe(2);
+    expect(data).toBe(3);
   });
 });
 

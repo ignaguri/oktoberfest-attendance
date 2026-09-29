@@ -274,8 +274,14 @@ export {
 } from "./useAdminUsers";
 export {
   useAdminAnalyticsActivationFunnel,
+  useAdminAnalyticsCohortMembers,
+  useAdminAnalyticsCohorts,
   useAdminAnalyticsFeatures,
   useAdminAnalyticsFestivalRetention,
+  useAdminAnalyticsFunnelMembers,
   useAdminAnalyticsOverview,
+  useAdminAnalyticsScorecard,
+  useAdminAnalyticsScorecardMembers,
+  useAdminUserTimeline,
 } from "./useAdminAnalytics";
 export { useAdminWrappedCache, useRegenerateWrappedCache } from "./useAdminWrappedCache";

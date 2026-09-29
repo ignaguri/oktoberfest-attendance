@@ -2292,14 +2292,23 @@
       "loadError": "Analytics konnten nicht geladen werden",
       "empty": "Für diesen Zeitraum gibt es noch keine Daten",
       "retry": "Erneut versuchen",
-      "filters": { "range": "Zeitraum", "platform": "Plattform", "festivals": "Feste" },
+      "filters": {
+        "range": "Zeitraum",
+        "platform": "Plattform",
+        "festivals": "Feste",
+        "presets": "Zeiträume",
+        "search": "Zeiträume und Feste suchen",
+        "noMatch": "Keine Treffer"
+      },
       "ranges": { "7d": "Letzte 7 Tage", "30d": "Letzte 30 Tage", "90d": "Letzte 90 Tage", "365d": "Letzte 365 Tage" },
       "platforms": { "all": "Alle Plattformen", "ios": "iOS", "android": "Android" },
       "sections": {
         "overview": "Überblick",
         "features": "Funktionen",
         "funnel": "Aktivierungs-Funnel",
-        "retention": "Wiederkehr pro Fest"
+        "retention": "Wiederkehr pro Fest",
+        "scorecard": "Feature-Bewertung",
+        "cohorts": "Anmelde-Kohorten"
       },
       "overview": {
         "dau": "Täglich aktiv",
@@ -2351,6 +2360,99 @@
         "returnedAny": "Später wiedergekommen",
         "pending": "Das nächste Fest hat noch nicht begonnen",
         "headline": "{{percent}} kamen nach {{festival}} wieder"
+      },
+      "scorecard": {
+        "hint": "Pro Feature: wer es genutzt hat und ob diese Leute wiederkamen, verglichen mit Besuchern, die es nicht genutzt haben. Nutzer vs. Nicht-Nutzer ist eine Korrelation: Vielnutzer probieren mehr Features aus.",
+        "scopeAll": "Alle Feste. Wähle im Zeitraum-Filter ein Fest, um einzugrenzen.",
+        "scopeFestival": "Fest: {{festival}}",
+        "feature": "Feature",
+        "adoption": "Genutzt",
+        "cameBack": "Während des Fests wiedergekommen",
+        "returned": "Bei einem späteren Fest dabei",
+        "hintColumn": "Hinweis",
+        "legend": "Nutzer vs. Nicht-Nutzer",
+        "compared": "{{users}} vs. {{nonUsers}} ({{lift}} Pkt.)",
+        "tooFew": "zu wenige ({{users}}/{{usersBase}} vs. {{nonUsers}}/{{nonUsersBase}})",
+        "notApplicable": "k. A.",
+        "headline": "{{cut}} streichen · {{grow}} ausbauen",
+        "hints": {
+          "cut": "Streichen?",
+          "grow": "Ausbauen",
+          "keep": "Behalten",
+          "unknown": "Zu wenige Daten"
+        }
+      },
+      "cohorts": {
+        "hint": "Echte Nutzer nach Anmeldemonat. Unabhängig von den Filtern.",
+        "month": "Monat",
+        "signups": "Anmeldungen",
+        "activated": "Besuch eingetragen",
+        "activated7d": "Innerhalb von 7 Tagen",
+        "engaged": "3+ Tage auf einem Fest",
+        "returned": "2+ Feste",
+        "headline": "{{month}}: {{percent}} haben einen Besuch eingetragen"
+      },
+      "members": {
+        "screenTitle": "Personen",
+        "title": "{{label}} · {{count}}",
+        "tapHint": "Tippe auf eine Zeile, um die Personen dahinter zu sehen.",
+        "dialogHint": "Öffne eine Person, um ihre Timeline zu sehen",
+        "loading": "Wird geladen…",
+        "empty": "Niemand hier",
+        "truncated": "Nur die ersten {{count}} Personen",
+        "signedUp": "Registriert am {{date}}",
+        "lastActive": "Zuletzt aktiv am {{date}}",
+        "neverActive": "Keine aktiven Tage erfasst",
+        "noName": "Kein Name",
+        "openHint": "Öffnet die Timeline dieser Person",
+        "chipHint": "Zeigt stattdessen diese Personen",
+        "segments": {
+          "attendees": "Besucher",
+          "adopters": "Genutzt",
+          "non_adopters": "Nicht genutzt",
+          "came_back_adopters": "Genutzt und wiedergekommen",
+          "came_back_non_adopters": "Nicht genutzt, wiedergekommen",
+          "returned_adopters": "Genutzt, späteres Fest besucht",
+          "returned_non_adopters": "Nicht genutzt, späteres Fest besucht"
+        }
+      },
+      "timeline": {
+        "title": "Timeline",
+        "open": "Timeline",
+        "openHint": "Alles, was diese Person gemacht hat, neueste zuerst",
+        "filterHint": "Filtert die Timeline",
+        "empty": "Noch nichts erfasst",
+        "loadMore": "Mehr laden",
+        "kinds": {
+          "all": "Alle",
+          "action": "Aktionen",
+          "event": "Ereignisse"
+        },
+        "names": {
+          "signed_up": "Registriert",
+          "attendance": "Besuch eingetragen",
+          "drink": "Getränk eingetragen",
+          "photo": "Foto hochgeladen",
+          "group_join": "Gruppe beigetreten",
+          "group_message": "In einer Gruppe geschrieben",
+          "photo_reaction": "Auf ein Foto reagiert",
+          "photo_comment": "Ein Foto kommentiert",
+          "day_plan": "Einen Tag geplant",
+          "crowd_report": "Zeltauslastung gemeldet",
+          "friend_request": "Freundschaftsanfrage gesendet",
+          "location_sharing": "Standort geteilt",
+          "wrapped_view": "Wrapped geöffnet",
+          "screen_viewed": "Bildschirm angesehen",
+          "app_opened": "App geöffnet",
+          "notification_opened": "Benachrichtigung geöffnet",
+          "sheet_opened": "Sheet geöffnet",
+          "sheet_abandoned": "Sheet ohne Speichern geschlossen",
+          "prompt_answered": "Abfrage beantwortet",
+          "tutorial_step": "Tutorial-Schritt",
+          "empty_state_seen": "Leeren Bildschirm gesehen",
+          "error_shown": "Fehler gesehen",
+          "unknown": "Ereignis: {{name}}"
+        }
       }
     },
     "feedback": {

@@ -8,6 +8,7 @@ import {
   DEFAULT_ANALYTICS_RANGE_PRESET,
   festivalRangeKey,
   resolveAnalyticsRange,
+  scorecardFestivalId,
 } from "@prostcounter/shared/utils";
 import { useMemo, useState } from "react";
 
@@ -22,9 +23,11 @@ import {
 } from "@/components/ui/select";
 
 import ActivationFunnelSection from "./ActivationFunnelSection";
+import FeatureScorecardSection from "./FeatureScorecardSection";
 import FeatureUsageSection from "./FeatureUsageSection";
 import FestivalRetentionSection from "./FestivalRetentionSection";
 import OverviewSection from "./OverviewSection";
+import SignupCohortsSection from "./SignupCohortsSection";
 
 const ALL_PLATFORMS = "all";
 
@@ -40,6 +43,10 @@ export default function AnalyticsDashboard() {
   const [platform, setPlatform] = useState<AnalyticsPlatform | undefined>(undefined);
 
   const range = useMemo(() => resolveAnalyticsRange(rangeKey, festivals), [rangeKey, festivals]);
+  const scorecardFestival = scorecardFestivalId(rangeKey);
+  const scorecardFestivalName = festivals?.find(
+    (festival) => festival.id === scorecardFestival,
+  )?.name;
 
   const handlePlatformChange = (value: string) => {
     if (value === "ios" || value === "android") {
@@ -103,6 +110,11 @@ export default function AnalyticsDashboard() {
       <FeatureUsageSection from={range.from} to={range.to} platform={platform} />
       <ActivationFunnelSection from={range.from} to={range.to} platform={platform} />
       <FestivalRetentionSection />
+      <FeatureScorecardSection
+        festivalId={scorecardFestival}
+        festivalName={scorecardFestivalName}
+      />
+      <SignupCohortsSection />
     </div>
   );
 }
