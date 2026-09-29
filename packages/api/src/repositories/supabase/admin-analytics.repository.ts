@@ -181,13 +181,18 @@ export class SupabaseAdminAnalyticsRepository {
   }
 
   async getFunnelMembers(query: AnalyticsFunnelMembersQuery): Promise<AnalyticsMembersResponse> {
-    const { data, error } = await this.client
+    const request = this.client
       .rpc("analytics_funnel_members", {
         p_from: query.from,
         p_to: query.to,
         ...(query.platform ? { p_platform: query.platform } : {}),
       })
-      .gte("attendance_days", FUNNEL_STEP_MIN_DAYS[query.step])
+      .gte("attendance_days", FUNNEL_STEP_MIN_DAYS[query.step]);
+    const { data, error } = await request
+      // sortMembers' order, so a capped list keeps the most recently active;
+      // user_id keeps the cut stable between fetches
+      .order("last_active_day", { ascending: false, nullsFirst: false })
+      .order("user_id")
       .range(0, ANALYTICS_MEMBERS_MAX_ROWS - 1);
     if (error) {
       throw new Error(`analytics_funnel_members failed: ${error.message}`);
@@ -207,7 +212,12 @@ export class SupabaseAdminAnalyticsRepository {
     for (const [column, value] of Object.entries(SCORECARD_SEGMENT_FILTERS[query.segment])) {
       request = request.eq(column, value);
     }
-    const { data, error } = await request.range(0, ANALYTICS_MEMBERS_MAX_ROWS - 1);
+    const { data, error } = await request
+      // sortMembers' order, so a capped list keeps the most recently active;
+      // user_id keeps the cut stable between fetches
+      .order("last_active_day", { ascending: false, nullsFirst: false })
+      .order("user_id")
+      .range(0, ANALYTICS_MEMBERS_MAX_ROWS - 1);
     if (error) {
       throw new Error(`analytics_scorecard_members failed: ${error.message}`);
     }
@@ -219,7 +229,12 @@ export class SupabaseAdminAnalyticsRepository {
     for (const [column, value] of Object.entries(COHORT_STEP_FILTERS[query.step])) {
       request = request.eq(column, value);
     }
-    const { data, error } = await request.range(0, ANALYTICS_MEMBERS_MAX_ROWS - 1);
+    const { data, error } = await request
+      // sortMembers' order, so a capped list keeps the most recently active;
+      // user_id keeps the cut stable between fetches
+      .order("last_active_day", { ascending: false, nullsFirst: false })
+      .order("user_id")
+      .range(0, ANALYTICS_MEMBERS_MAX_ROWS - 1);
     if (error) {
       throw new Error(`analytics_cohort_members failed: ${error.message}`);
     }
@@ -259,7 +274,9 @@ export class SupabaseAdminAnalyticsRepository {
       rows,
       // The cursor strings go back verbatim; parsing occurredAt would drop microseconds
       nextCursor:
-        rows.length === limit && last ? { cursorAt: last.occurredAt, cursorKey: last.cursorKey } : null,
+        rows.length === limit && last
+          ? { cursorAt: last.occurredAt, cursorKey: last.cursorKey }
+          : null,
     };
   }
 

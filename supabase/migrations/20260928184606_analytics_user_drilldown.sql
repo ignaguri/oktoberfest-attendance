@@ -18,7 +18,7 @@ CREATE OR REPLACE FUNCTION public.analytics_funnel_members(
   p_from date,
   p_to date,
   p_platform text DEFAULT NULL
-) RETURNS TABLE (user_id uuid, attendance_days integer)
+) RETURNS TABLE (user_id uuid, attendance_days integer, last_active_day date)
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
@@ -27,7 +27,8 @@ AS $$
   SELECT
     ru.user_id,
     (SELECT count(DISTINCT a.date) FROM public.attendances a WHERE a.user_id = ru.user_id)::integer
-      AS attendance_days
+      AS attendance_days,
+    (SELECT max(uad.day) FROM public.user_active_days uad WHERE uad.user_id = ru.user_id) AS last_active_day
   FROM analytics.real_users ru
   WHERE ru.signed_up_at::date BETWEEN p_from AND p_to
     AND (
@@ -43,7 +44,7 @@ REVOKE ALL ON FUNCTION public.analytics_funnel_members(date, date, text) FROM PU
 GRANT EXECUTE ON FUNCTION public.analytics_funnel_members(date, date, text) TO service_role;
 
 COMMENT ON FUNCTION public.analytics_funnel_members(date, date, text) IS
-  'Admin drill-down: the activation funnel cohort (real users who signed up in [p_from, p_to], limited to users ever active on p_platform when given), one row each, with their distinct attendance days at any festival. analytics_activation_funnel counts over it. service_role only.';
+  'Admin drill-down: the activation funnel cohort (real users who signed up in [p_from, p_to], limited to users ever active on p_platform when given), one row each, with their distinct attendance days at any festival and last day in user_active_days (the API orders by it before capping a list). analytics_activation_funnel counts over it. service_role only.';
 
 CREATE OR REPLACE FUNCTION public.analytics_activation_funnel(
   p_from date,
@@ -87,7 +88,8 @@ CREATE OR REPLACE FUNCTION public.analytics_scorecard_members(
   is_user boolean,
   came_back boolean,
   successor_started boolean,
-  returned boolean
+  returned boolean,
+  last_active_day date
 )
 LANGUAGE sql
 STABLE
@@ -124,7 +126,8 @@ AS $$
         JOIN public.festivals lf ON lf.id = la.festival_id
         WHERE la.user_id = a.user_id
           AND (lf.start_date, lf.id) > (fe.start_date, fe.id)
-      ) AS returned
+      ) AS returned,
+      (SELECT max(uad.day) FROM public.user_active_days uad WHERE uad.user_id = a.user_id) AS last_active_day
     FROM public.attendances a
     JOIN analytics.real_users ru ON ru.user_id = a.user_id
     JOIN fest fe ON fe.id = a.festival_id
@@ -204,7 +207,8 @@ AS $$
       ELSE at.last_day > at.first_day
     END AS came_back,
     at.has_started_successor AS successor_started,
-    at.returned
+    at.returned,
+    at.last_active_day
   FROM features ft
   CROSS JOIN attendee at
   JOIN fest fe ON fe.id = at.festival_id
@@ -218,7 +222,7 @@ REVOKE ALL ON FUNCTION public.analytics_scorecard_members(uuid) FROM PUBLIC, ano
 GRANT EXECUTE ON FUNCTION public.analytics_scorecard_members(uuid) TO service_role;
 
 COMMENT ON FUNCTION public.analytics_scorecard_members(uuid) IS
-  'Admin drill-down: one row per (feature, festival attendee) of the festival (or of every festival when p_festival_id is NULL, so a person at two festivals is two rows per feature). is_user: used the feature there; came_back: logged a day after their reference day; successor_started: a later festival has started; returned: attended a later festival. Real users only. analytics_feature_scorecard counts over it. service_role only.';
+  'Admin drill-down: one row per (feature, festival attendee) of the festival (or of every festival when p_festival_id is NULL, so a person at two festivals is two rows per feature). is_user: used the feature there; came_back: logged a day after their reference day; successor_started: a later festival has started; returned: attended a later festival; last_active_day: last day in user_active_days (the API orders by it before capping a list). Real users only. analytics_feature_scorecard counts over it. service_role only.';
 
 CREATE OR REPLACE FUNCTION public.analytics_feature_scorecard(
   p_festival_id uuid DEFAULT NULL
@@ -286,7 +290,8 @@ RETURNS TABLE (
   activated boolean,
   activated_7d boolean,
   engaged boolean,
-  returned boolean
+  returned boolean,
+  last_active_day date
 )
 LANGUAGE sql
 STABLE
@@ -307,7 +312,8 @@ AS $$
         HAVING count(DISTINCT a.date) >= 3
       ) AS engaged,
       (SELECT count(DISTINCT a.festival_id) FROM public.attendances a WHERE a.user_id = ru.user_id)
-        >= 2 AS returned
+        >= 2 AS returned,
+      (SELECT max(uad.day) FROM public.user_active_days uad WHERE uad.user_id = ru.user_id) AS last_active_day
     FROM analytics.real_users ru
   )
   SELECT
@@ -316,7 +322,8 @@ AS $$
     pu.first_attendance_at IS NOT NULL AS activated,
     coalesce(pu.first_attendance_at < pu.signed_up_at + interval '7 days', false) AS activated_7d,
     pu.engaged,
-    pu.returned
+    pu.returned,
+    pu.last_active_day
   FROM per_user pu;
 $$;
 
@@ -324,7 +331,7 @@ REVOKE ALL ON FUNCTION public.analytics_cohort_members() FROM PUBLIC, anon, auth
 GRANT EXECUTE ON FUNCTION public.analytics_cohort_members() TO service_role;
 
 COMMENT ON FUNCTION public.analytics_cohort_members() IS
-  'Admin drill-down: one row per real user with their signup month (Europe/Berlin) and whether they ever logged an attendance, logged one within 7 days of signing up (by attendances.created_at), logged 3+ days at a single festival, and attended 2+ festivals. analytics_signup_cohorts counts over it. service_role only.';
+  'Admin drill-down: one row per real user with their signup month (Europe/Berlin) and whether they ever logged an attendance, logged one within 7 days of signing up (by attendances.created_at), logged 3+ days at a single festival, and attended 2+ festivals, plus their last day in user_active_days (the API orders by it before capping a list). analytics_signup_cohorts counts over it. service_role only.';
 
 CREATE OR REPLACE FUNCTION public.analytics_signup_cohorts()
 RETURNS TABLE (

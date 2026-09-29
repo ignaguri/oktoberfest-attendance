@@ -34,6 +34,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      _tmp_drilldown_seed: {
+        Row: {
+          id: string
+          kind: string
+        }
+        Insert: {
+          id: string
+          kind: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+        }
+        Relationships: []
+      }
       achievement_events: {
         Row: {
           achievement_id: string
@@ -2530,6 +2545,7 @@ export type Database = {
           activated: boolean
           activated_7d: boolean
           engaged: boolean
+          last_active_day: string
           month: string
           returned: boolean
           user_id: string
@@ -2575,6 +2591,7 @@ export type Database = {
         Args: { p_from: string; p_platform?: string; p_to: string }
         Returns: {
           attendance_days: number
+          last_active_day: string
           user_id: string
         }[]
       }
@@ -2614,6 +2631,7 @@ export type Database = {
           festival_id: string
           festival_name: string
           is_user: boolean
+          last_active_day: string
           returned: boolean
           successor_started: boolean
           user_id: string

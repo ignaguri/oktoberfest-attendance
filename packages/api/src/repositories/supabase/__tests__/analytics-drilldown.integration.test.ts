@@ -213,6 +213,15 @@ describe("analytics drill-down functions", () => {
       throw new Error(`Failed to seed consumptions: ${drinkError.message}`);
     }
 
+    // Two app-open days for userOne; member lists sort by the later one.
+    const { error: activeDaysError } = await admin.from("user_active_days").insert([
+      { user_id: userOne.id, day: "2001-01-01", platform: "ios" },
+      { user_id: userOne.id, day: "2001-01-05", platform: "ios" },
+    ]);
+    if (activeDaysError) {
+      throw new Error(`Failed to seed active days: ${activeDaysError.message}`);
+    }
+
     // Timeline user: an attendance at 09:00, a group message at 10:30 whose
     // body must never surface, and events at 10:00 and twice at 11:00 (a tie).
     const { error: timelineAttendanceError } = await admin.from("attendances").insert({
@@ -340,7 +349,33 @@ describe("analytics drill-down functions", () => {
     const { data } = await admin
       .rpc("analytics_funnel_members", { p_from: today, p_to: today })
       .eq("user_id", userOne.id);
-    expect(data).toEqual([{ user_id: userOne.id, attendance_days: 5 }]);
+    expect(data).toEqual([
+      { user_id: userOne.id, attendance_days: 5, last_active_day: "2001-01-05" },
+    ]);
+  });
+
+  // The API caps member lists and orders by this column before the cap, so a
+  // capped list keeps the most recently active people.
+  it("gives every member list each person's last active day", async () => {
+    const today = todayUtc();
+    const funnel = await admin
+      .rpc("analytics_funnel_members", { p_from: today, p_to: today })
+      .eq("user_id", userOne.id);
+    const scorecardRows = await admin
+      .rpc("analytics_scorecard_members", {})
+      .eq("feature", "drinks")
+      .eq("user_id", userOne.id);
+    const cohort = await admin
+      .rpc("analytics_cohort_members")
+      .eq("month", currentBerlinMonth())
+      .eq("user_id", userOne.id);
+    for (const { data, error } of [funnel, scorecardRows, cohort]) {
+      expect(error).toBeNull();
+      expect(data?.length).toBeGreaterThan(0);
+      expect((data ?? []).map((row) => row.last_active_day)).toEqual(
+        (data ?? []).map(() => "2001-01-05"),
+      );
+    }
   });
 
   it("lists as many people as each cohort step this month", async () => {
