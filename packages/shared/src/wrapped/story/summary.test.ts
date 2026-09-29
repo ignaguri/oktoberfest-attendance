@@ -38,14 +38,14 @@ describe("slideSummaryParts", () => {
 
   it("includes the text that is not copy: persona name, finds, the big number", () => {
     const persona = slides.find((slide) => slide.kind === "persona");
-    const meanwhile = slides.find((slide) => slide.kind === "meanwhile");
+    const wiesn = slides.find((slide) => slide.kind === "wiesnAndYou");
     const bigNumber = slides.find((slide) => slide.kind === "bigNumber");
-    if (!persona || !meanwhile || !bigNumber) {
+    if (!persona || !wiesn || !bigNumber) {
       throw new Error("fixture story is missing a slide");
     }
 
     expect(flat(slideSummaryParts(persona, "en"))).toContainEqual({ text: persona.name });
-    expect(flat(slideSummaryParts(meanwhile, "de"))).toContainEqual({ text: meanwhile.finds[0].de });
+    expect(flat(slideSummaryParts(wiesn, "de"))).toContainEqual({ text: wiesn.finds[0].de });
     expect(flat(slideSummaryParts(bigNumber, "en"))).toContainEqual({ number: bigNumber.beers });
   });
 });
@@ -78,6 +78,6 @@ describe("slideSummaryText", () => {
   });
 
   it("reads the mug count with its line", () => {
-    expect(text("meanwhile")).toContain("116000 Maß mugs never made it past the stewards.");
+    expect(text("wiesnAndYou")).toContain("116,000 Maß mugs tried to sneak out.");
   });
 });

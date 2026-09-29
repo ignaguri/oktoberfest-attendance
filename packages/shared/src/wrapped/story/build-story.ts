@@ -8,7 +8,6 @@ import type {
   CopyRef,
   DaysSlide,
   DrinksSlide,
-  MeanwhileSlide,
   PeopleSlide,
   PersonaSlide,
   ProstSlide,
@@ -255,6 +254,12 @@ function peopleSlide(data: WrappedData): PeopleSlide | null {
   };
 }
 
+/** A comparison as a big stat ("+141%") over its caption; both read the same params. */
+const compareRow = (key: string, params?: CopyRef["params"]) => ({
+  stat: copy(`${key}.stat`, params),
+  caption: copy(`${key}.caption`, params),
+});
+
 function compareSlide(data: WrappedData, tiny: boolean): CompareSlide | null {
   const { vsFestivalAvg, vsLastYear } = data.comparisons;
   const best = tiny ? null : getBestGlobalPosition(data);
@@ -262,72 +267,99 @@ function compareSlide(data: WrappedData, tiny: boolean): CompareSlide | null {
     return null;
   }
 
-  const rows: CopyRef[] = [];
+  const rows: CompareSlide["rows"] = [];
   if (!tiny) {
     const diff = vsFestivalAvg.beersDiffPct;
     if (Math.abs(diff) < SAME_AS_AVERAGE_PCT) {
-      rows.push(copy("compare.vsAvg.same"));
+      rows.push(compareRow("compare.vsAvg.same"));
     } else if (diff > 0) {
-      rows.push(copy("compare.vsAvg.more", { pct: diff }));
+      rows.push(compareRow("compare.vsAvg.more", { pct: diff }));
     } else {
-      rows.push(copy("compare.vsAvg.less", { pct: -diff }));
+      rows.push(compareRow("compare.vsAvg.less", { pct: -diff }));
     }
   }
   if (vsLastYear) {
     const festival = vsLastYear.prevFestivalName;
     if (vsLastYear.beersDiff > 0) {
-      rows.push(copy("compare.vsLastYear.up", { diff: vsLastYear.beersDiff, festival }));
+      rows.push(compareRow("compare.vsLastYear.up", { diff: vsLastYear.beersDiff, festival }));
     } else if (vsLastYear.beersDiff < 0) {
-      rows.push(copy("compare.vsLastYear.down", { diff: -vsLastYear.beersDiff, festival }));
+      rows.push(compareRow("compare.vsLastYear.down", { diff: -vsLastYear.beersDiff, festival }));
     } else {
-      rows.push(copy("compare.vsLastYear.same", { festival }));
+      rows.push(compareRow("compare.vsLastYear.same", { festival }));
     }
   }
   if (best) {
-    rows.push(copy(`compare.global.${best.criteria}`, { position: best.position }));
+    rows.push(compareRow(`compare.global.${best.criteria}`, { position: best.position }));
   }
 
   return { kind: "compare", revealSteps: rows.length + 1, title: copy("compare.title"), rows };
 }
 
-function wiesnAndYouSlide(data: WrappedData, stats: WrappedOfficialStats | null): WiesnAndYouSlide | null {
-  if (!stats || stats.visitors === null || stats.massServed === null) {
+/** How long after a festival its own city figures are still worth waiting for. */
+const CHECK_BACK_DAYS = 30;
+
+/** The city's figures next to yours: big cards for the crowd and your share, small ones for the fun facts. */
+function wiesnAndYouSlide(
+  data: WrappedData,
+  stats: WrappedOfficialStats | null,
+  now: Date,
+): WiesnAndYouSlide | null {
+  if (!stats) {
     return null;
   }
   const when = stats.isCurrentFestival ? "current" : "lastYear";
   const beers = data.basicStats.totalBeers;
-  return {
-    kind: "wiesnAndYou",
-    revealSteps: 3,
-    kicker: copy(`wiesnAndYou.kicker.${when}`, { year: stats.year }),
-    headline: copy(`wiesnAndYou.headline.${when}`, { visitors: stats.visitors }),
-    share:
-      beers > 0 && stats.massServed > 0
-        ? copy(`wiesnAndYou.share.${when}`, {
-            count: beers,
-            pct: (beers / stats.massServed) * 100,
-            mass: stats.massServed,
-          })
-        : null,
-    source: sourceCopy(stats),
-  };
-}
-
-function meanwhileSlide(stats: WrappedOfficialStats | null): MeanwhileSlide | null {
-  if (!stats || (stats.mugsConfiscated === null && stats.curiousFinds.length === 0)) {
+  const visitors =
+    stats.visitors !== null
+      ? {
+          stat: copy("wiesnAndYou.visitorsStat", { visitors: stats.visitors }),
+          caption: copy(`wiesnAndYou.visitors.${when}`),
+        }
+      : null;
+  // "1 in 520,000" reads better than 0.00019%; the copy rounds it to two digits.
+  const share =
+    stats.massServed !== null && stats.massServed > 0 && beers > 0
+      ? {
+          stat: copy("wiesnAndYou.shareStat", { every: Math.round(stats.massServed / beers) }),
+          caption: copy(`wiesnAndYou.share.${when}`, { count: beers }),
+        }
+      : null;
+  const mugs =
+    stats.mugsConfiscated !== null
+      ? { stat: copy("wiesnAndYou.mugsStat", { mugs: stats.mugsConfiscated }), caption: copy("wiesnAndYou.mugs") }
+      : null;
+  const lostAndFound =
+    stats.lostItems !== null
+      ? {
+          stat: copy("wiesnAndYou.lostStat", { count: stats.lostItems }),
+          caption: copy("wiesnAndYou.lost", { count: stats.lostItems }),
+        }
+      : null;
+  const finds = stats.curiousFinds;
+  if (!visitors && !share && !mugs && !lostAndFound && finds.length === 0) {
     return null;
   }
-  const when = stats.isCurrentFestival ? "current" : "lastYear";
+
   return {
-    kind: "meanwhile",
-    revealSteps: 2 + stats.curiousFinds.length,
-    kicker: copy("meanwhile.kicker"),
-    mugs: stats.mugsConfiscated,
-    mugsLine: stats.mugsConfiscated !== null ? copy(`meanwhile.mugs.${when}`) : null,
-    findsLabel: copy("meanwhile.findsLabel"),
-    finds: stats.curiousFinds,
-    lostItems: stats.lostItems !== null ? copy("meanwhile.lostItems", { count: stats.lostItems }) : null,
+    kind: "wiesnAndYou",
+    // Kicker, each big card, the small cards together, then the finds.
+    revealSteps:
+      1 + Number(visitors !== null) + Number(share !== null) + Number(mugs !== null || lostAndFound !== null) + Number(finds.length > 0),
+    kicker: copy(`wiesnAndYou.kicker.${when}`, { year: stats.year }),
+    visitors,
+    share,
+    mugs,
+    lostAndFound,
+    findsLabel: copy("wiesnAndYou.findsLabel"),
+    finds,
     source: sourceCopy(stats),
+    // Last year's figures stand in until the city publishes this year's. Only
+    // worth saying for a festival that just ended; an archived one never gets them.
+    checkBack:
+      !stats.isCurrentFestival &&
+      now.getTime() - Date.parse(`${data.festivalInfo.endDate}T00:00:00Z`) <= CHECK_BACK_DAYS * 86_400_000
+        ? copy("wiesnAndYou.checkBack")
+        : null,
   };
 }
 
@@ -351,8 +383,12 @@ function badgesSlide(data: WrappedData): BadgesSlide | null {
     kind: "badges",
     revealSteps: 1 + top.length,
     title: copy("badges.title"),
-    count: copy("badges.count", { count: data.achievements.length }),
+    count: {
+      stat: copy("badges.countStat", { count: data.achievements.length }),
+      caption: copy("badges.earned", { count: data.achievements.length }),
+    },
     top,
+    more: data.achievements.length > top.length ? copy("badges.more", { count: data.achievements.length - top.length }) : null,
   };
 }
 
@@ -374,11 +410,24 @@ function personaSlide(data: WrappedData): PersonaSlide {
 }
 
 function prostSlide(data: WrappedData): ProstSlide {
+  const persona = derivePersona(data);
+  const { totalBeers, daysAttended } = data.basicStats;
+  const tents = data.tentStats.uniqueTents;
   return {
     kind: "prost",
-    revealSteps: 2,
+    revealSteps: 3,
     title: copy("prost.title"),
     summary: copy("prost.summary", { series: seriesName(data.festivalInfo.name) }),
+    // The story in one card: the one thing people screenshot even if they never tap Share.
+    recap: {
+      personaId: persona.id,
+      name: personaName(persona.id, isWiesn(data)),
+      facts: [
+        ...(totalBeers > 0 ? [copy("units.beers", { count: totalBeers })] : []),
+        copy("prost.recap.days", { count: daysAttended }),
+        ...(tents > 0 ? [copy("prost.recap.tents", { count: tents })] : []),
+      ],
+    },
   };
 }
 
@@ -386,6 +435,7 @@ function prostSlide(data: WrappedData): ProstSlide {
 export function buildWrappedStory(
   data: WrappedData,
   officialStats: WrappedOfficialStats | null,
+  now: Date = new Date(),
 ): StorySlide[] {
   const tiny = data.comparisons.vsFestivalAvg.attendeeCount < TINY_FESTIVAL_ATTENDEES;
   const slides: (StorySlide | null)[] = [
@@ -396,8 +446,7 @@ export function buildWrappedStory(
     tentsSlide(data),
     peopleSlide(data),
     compareSlide(data, tiny),
-    wiesnAndYouSlide(data, officialStats),
-    meanwhileSlide(officialStats),
+    wiesnAndYouSlide(data, officialStats, now),
     badgesSlide(data),
     personaSlide(data),
     prostSlide(data),

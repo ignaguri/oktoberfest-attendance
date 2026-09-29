@@ -19,7 +19,7 @@ export type {
   CopyRef,
   DaysSlide,
   DrinksSlide,
-  MeanwhileSlide,
+  StatCard,
   PeopleSlide,
   PersonaSlide,
   ProstSlide,

@@ -26,9 +26,9 @@ export function PersonaSlide({ slide, animate }: { slide: StorySlideOf<"persona"
   }, [animate]);
 
   return (
-    <VStack space="md" className="flex-1 justify-center">
+    <VStack space="lg" className="flex-1 justify-center">
       <Reveal step={0} animate={animate}>
-        <StoryKicker className="text-center">{copy(slide.kicker)}</StoryKicker>
+        <StoryKicker className="text-center text-sm">{copy(slide.kicker)}</StoryKicker>
       </Reveal>
       <Reveal step={CREST_STEP} animate={animate} kind="stamp" className="items-center">
         <View className="-rotate-6">
@@ -36,12 +36,13 @@ export function PersonaSlide({ slide, animate }: { slide: StorySlideOf<"persona"
         </View>
       </Reveal>
       <Reveal step={2} animate={animate}>
-        <StoryHeading className="text-center">{slide.name}</StoryHeading>
-        <StoryBody className="mt-1 text-center italic">{copy(slide.description)}</StoryBody>
+        <StoryHeading className="text-center text-5xl">{slide.name}</StoryHeading>
+        <StoryBody className="mt-2 text-center text-xl italic">{copy(slide.description)}</StoryBody>
       </Reveal>
       <Reveal step={3} animate={animate} kind="fade">
-        <View className="rounded-xl border-2 border-dashed border-wrapped-ink/30 bg-white/70 p-4">
-          <StoryBody className="text-base">{copy(slide.because)}</StoryBody>
+        {/* A card like the compare ones, not a dashed box that reads as a form field. */}
+        <View className="mx-4 rounded-2xl border-2 border-wrapped-ink bg-white px-5 py-4">
+          <StoryBody className="text-center text-lg">{copy(slide.because)}</StoryBody>
         </View>
       </Reveal>
       {slide.runnerUp ? (

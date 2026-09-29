@@ -5,7 +5,6 @@ import { BigNumberSlide } from "./slides/big-number-slide";
 import { CompareSlide } from "./slides/compare-slide";
 import { DaysSlide } from "./slides/days-slide";
 import { DrinksSlide } from "./slides/drinks-slide";
-import { MeanwhileSlide } from "./slides/meanwhile-slide";
 import { PeopleSlide } from "./slides/people-slide";
 import { PersonaSlide } from "./slides/persona-slide";
 import { ProstSlide } from "./slides/prost-slide";
@@ -39,8 +38,6 @@ export function StorySlideView({ slide, animate, data, onReplay, onClose }: Stor
       return <CompareSlide slide={slide} animate={animate} />;
     case "wiesnAndYou":
       return <WiesnAndYouSlide slide={slide} animate={animate} />;
-    case "meanwhile":
-      return <MeanwhileSlide slide={slide} animate={animate} />;
     case "badges":
       return <BadgesSlide slide={slide} animate={animate} />;
     case "persona":

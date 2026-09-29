@@ -56,24 +56,36 @@ export function slideSummaryParts(slide: StorySlide, language: Language): Summar
     case "people":
       return [slide.title, ...present(slide.groups), ...present(slide.bestPlacing), ...present(slide.photosLabel)];
     case "compare":
-      return [slide.title, ...slide.rows];
-    case "wiesnAndYou":
-      return [slide.kicker, slide.headline, ...present(slide.share), slide.source];
-    case "meanwhile":
+      return [slide.title, ...slide.rows.map((row) => ({ sentence: [row.stat, row.caption] }))];
+    case "wiesnAndYou": {
+      const cards = [slide.visitors, slide.share, slide.mugs, slide.lostAndFound].filter(
+        (card): card is NonNullable<typeof card> => card !== null,
+      );
       return [
         slide.kicker,
-        ...(slide.mugs !== null && slide.mugsLine ? [{ sentence: [{ number: slide.mugs }, slide.mugsLine] }] : []),
+        ...cards.map((card) => ({ sentence: [card.stat, card.caption] })),
         ...(slide.finds.length > 0 ? [slide.findsLabel] : []),
         ...slide.finds.map((find) => ({ text: find[language] ?? find.en })),
-        ...present(slide.lostItems),
         slide.source,
+        ...present(slide.checkBack),
       ];
+    }
     case "badges":
-      return [slide.title, slide.count, ...slide.top.map((badge) => badge.name)];
+      return [
+        slide.title,
+        { sentence: [slide.count.stat, slide.count.caption] },
+        ...slide.top.map((badge) => badge.name),
+        ...present(slide.more),
+      ];
     case "persona":
       return [slide.kicker, { text: slide.name }, slide.description, slide.because, ...present(slide.runnerUp)];
     case "prost":
-      return [slide.title, slide.summary];
+      return [
+        slide.title,
+        slide.summary,
+        { text: slide.recap.name },
+        ...slide.recap.facts,
+      ];
   }
 }
 

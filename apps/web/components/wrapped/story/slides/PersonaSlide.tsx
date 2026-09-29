@@ -9,9 +9,9 @@ import { StoryBody, StoryHeading, StoryKicker, StoryStamp } from "../StoryText";
 export function PersonaSlide({ slide, animate }: { slide: StorySlideOf<"persona">; animate: boolean }) {
   const copy = useStoryCopy();
   return (
-    <div className="flex flex-1 flex-col justify-center gap-4">
+    <div className="flex flex-1 flex-col justify-center gap-6">
       <Reveal step={0} animate={animate}>
-        <StoryKicker className="text-center">{copy(slide.kicker)}</StoryKicker>
+        <StoryKicker className="text-center text-sm">{copy(slide.kicker)}</StoryKicker>
       </Reveal>
       <Reveal step={1} animate={animate} kind="stamp" className="flex justify-center">
         <div className="-rotate-6">
@@ -19,12 +19,13 @@ export function PersonaSlide({ slide, animate }: { slide: StorySlideOf<"persona"
         </div>
       </Reveal>
       <Reveal step={2} animate={animate}>
-        <StoryHeading className="text-center">{slide.name}</StoryHeading>
-        <StoryBody className="mt-1 text-center italic">{copy(slide.description)}</StoryBody>
+        <StoryHeading className="text-center text-5xl">{slide.name}</StoryHeading>
+        <StoryBody className="mt-2 text-center text-xl italic">{copy(slide.description)}</StoryBody>
       </Reveal>
       <Reveal step={3} animate={animate} kind="fade">
-        <div className="rounded-xl border-2 border-dashed border-wrapped-ink/30 bg-white/70 p-4">
-          <StoryBody className="text-base">{copy(slide.because)}</StoryBody>
+        {/* A card like the compare ones, not a dashed box that reads as a form field. */}
+        <div className="mx-4 rounded-2xl border-2 border-wrapped-ink bg-white px-5 py-4">
+          <StoryBody className="text-center text-lg">{copy(slide.because)}</StoryBody>
         </div>
       </Reveal>
       {slide.runnerUp ? (

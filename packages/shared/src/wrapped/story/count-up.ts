@@ -16,8 +16,11 @@ export function countUpValue(target: number, elapsedMs: number, durationMs: numb
   return target * (1 - (1 - progress) ** 3);
 }
 
-/** The number to display: counts up while animating, the target otherwise. */
-export function useCountUp(target: number, animate: boolean, durationMs = 900): number {
+/**
+ * The number to display: counts up while animating, the target otherwise.
+ * delayMs holds it at 0 first, for a number that reveals a few steps in.
+ */
+export function useCountUp(target: number, animate: boolean, durationMs = 900, delayMs = 0): number {
   const [value, setValue] = useState(animate ? 0 : target);
 
   useEffect(() => {
@@ -27,14 +30,14 @@ export function useCountUp(target: number, animate: boolean, durationMs = 900): 
     }
     const startedAt = Date.now();
     let frameId = requestAnimationFrame(function tick() {
-      const elapsed = Date.now() - startedAt;
+      const elapsed = Date.now() - startedAt - delayMs;
       setValue(countUpValue(target, elapsed, durationMs));
       if (elapsed < durationMs) {
         frameId = requestAnimationFrame(tick);
       }
     });
     return () => cancelAnimationFrame(frameId);
-  }, [animate, target, durationMs]);
+  }, [animate, target, durationMs, delayMs]);
 
   return value;
 }

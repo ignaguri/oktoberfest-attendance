@@ -4,23 +4,26 @@ import { PERSONA_CREST_FILES, type PersonaId } from "@prostcounter/shared/wrappe
 import Image from "next/image";
 import { useState } from "react";
 
+/** lg is the persona reveal; sm sits in the Prost recap card. */
+const CREST_PX = { lg: 288, sm: 64 } as const;
+
 /** The persona's crest PNG, or a plain stamped shield when it is missing. */
-export function Crest({ personaId }: { personaId: PersonaId }) {
+export function Crest({ personaId, size = "lg" }: { personaId: PersonaId; size?: "lg" | "sm" }) {
   const [failed, setFailed] = useState(false);
   if (!failed) {
     return (
       <Image
         src={`/wrapped/crests/${PERSONA_CREST_FILES[personaId]}.png`}
         alt=""
-        width={160}
-        height={160}
+        width={CREST_PX[size]}
+        height={CREST_PX[size]}
         aria-hidden="true"
         onError={() => setFailed(true)}
       />
     );
   }
   return (
-    <svg width={140} height={160} viewBox="0 0 132 150" aria-hidden="true">
+    <svg width={(CREST_PX[size] * 7) / 8} height={CREST_PX[size]} viewBox="0 0 132 150" aria-hidden="true">
       <path
         d="M66 4 L124 22 V74 C124 110 98 134 66 146 C34 134 8 110 8 74 V22 Z"
         fill="#FFFFFF"

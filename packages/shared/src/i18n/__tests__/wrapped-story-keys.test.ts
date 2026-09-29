@@ -117,16 +117,15 @@ describe("Wrapped story copy", () => {
   });
 
   it.each([
-    ["en", "Your one beer was", "Your one beer would have been", "Your 3 beers were"],
-    ["de", "Dein eines Bier war", "Dein eines Bier wäre", "Deine 3 Biere waren"],
-    ["es", "Tu única cerveza fue", "Tu única cerveza habría sido", "Tus 3 cervezas fueron"],
-  ] as const)("agrees the share line with the beer count in %s", async (locale, current, lastYear, plural) => {
+    ["en", "Maß poured was your one beer", "Maß last year would have been your one beer", "Maß poured was one of your 3 beers"],
+    ["de", "ausgeschenkten Maß war dein eines Bier", "Maß vom letzten Jahr wäre dein eines Bier gewesen", "ausgeschenkten Maß war eins deiner 3 Biere"],
+    ["es", "Maß servidas fue tu única cerveza", "Maß del año pasado habría sido tu única cerveza", "Maß servidas fue una de tus 3 cervezas"],
+  ] as const)("agrees the share caption with the beer count in %s", async (locale, current, lastYear, plural) => {
     const i18n = i18next.createInstance();
     await i18n.init({ resources: { [locale]: { translation: BUNDLES[locale] } }, lng: locale, interpolation: { escapeValue: false } });
-    const params = { pct: 0.01, mass: 7000000 };
-    expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 1, ...params })).toMatch(new RegExp(`^${current} `));
-    expect(i18n.t("wrapped.story.wiesnAndYou.share.lastYear", { count: 1, ...params })).toMatch(new RegExp(`^${lastYear} `));
-    expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 3, ...params })).toMatch(new RegExp(`^${plural} `));
+    expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 1 })).toBe(current);
+    expect(i18n.t("wrapped.story.wiesnAndYou.share.lastYear", { count: 1 })).toBe(lastYear);
+    expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 3 })).toBe(plural);
   });
 
   // i18next splits a format on commas, so two number() options need a semicolon.

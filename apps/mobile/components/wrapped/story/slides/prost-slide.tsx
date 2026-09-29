@@ -5,11 +5,13 @@ import { useCallback, useRef } from "react";
 import { Pressable, View } from "react-native";
 import ViewShot, { type ViewShotRef } from "react-native-view-shot";
 
+import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { ShareImage } from "@/components/wrapped/share-image";
 import { useWrappedShare } from "@/hooks/useWrappedShare";
 
+import { Crest } from "../crest";
 import { Reveal } from "../reveal";
 import { StoryBig, StoryHeading } from "../story-text";
 
@@ -35,21 +37,40 @@ export function ProstSlide({ slide, animate, data, onReplay, onClose }: ProstSli
   return (
     <VStack space="lg" className="flex-1 justify-center" pointerEvents="box-none">
       <Reveal step={0} animate={animate} kind="stamp">
-        <StoryBig className="text-7xl">{copy(slide.title)}</StoryBig>
+        {/* Amber on the paper is too faint alone, so a navy copy sits behind it as a sticker shadow. */}
+        <View>
+          <Text
+            className="absolute left-0 right-0 top-0 translate-x-1 translate-y-1 text-center font-wrapped text-8xl font-extrabold leading-none text-wrapped-ink"
+            aria-hidden
+            importantForAccessibility="no"
+          >
+            {copy(slide.title)}
+          </Text>
+          <StoryBig className="text-center text-8xl text-wrapped-amber">{copy(slide.title)}</StoryBig>
+        </View>
       </Reveal>
       <Reveal step={1} animate={animate}>
-        <StoryHeading className="text-2xl">{copy(slide.summary)}</StoryHeading>
+        <StoryHeading className="text-center text-2xl">{copy(slide.summary)}</StoryHeading>
       </Reveal>
-      <VStack space="md" className="mt-8" pointerEvents="box-none">
+      <Reveal step={2} animate={animate}>
+        <HStack space="md" className="items-center rounded-2xl bg-wrapped-ink px-4 py-3">
+          <Crest personaId={slide.recap.personaId} size="sm" />
+          <VStack className="flex-1">
+            <Text className="font-wrapped text-xl font-extrabold text-wrapped-paper">{slide.recap.name}</Text>
+            <Text className="text-sm font-bold text-wrapped-amber">{slide.recap.facts.map(copy).join(" · ")}</Text>
+          </VStack>
+        </HStack>
+      </Reveal>
+      <VStack space="md" className="mt-4" pointerEvents="box-none">
         <Pressable
           onPress={onSharePress}
           disabled={isSharing}
-          className="items-center rounded-xl bg-wrapped-ink px-6 py-4"
+          className="items-center rounded-xl bg-wrapped-amber px-6 py-4"
           accessibilityRole="button"
           accessibilityLabel={t("wrapped.outro.share")}
           accessibilityHint={t("wrapped.outro.shareHint")}
         >
-          <Text className="text-base font-bold text-wrapped-paper">
+          <Text className="text-base font-bold text-wrapped-ink">
             {isSharing ? t("wrapped.outro.sharing") : t("wrapped.outro.share")}
           </Text>
         </Pressable>

@@ -1,24 +1,34 @@
+import { cn } from "@prostcounter/ui";
 import { type StorySlideOf, useStoryCopy } from "@prostcounter/shared/wrapped";
-import { View } from "react-native";
 
 import { VStack } from "@/components/ui/vstack";
 
 import { Reveal } from "../reveal";
-import { StoryBody, StoryHeading } from "../story-text";
+import { StoryBig, StoryBody, StoryHeading } from "../story-text";
+
+/** Cards lean alternately, like the photos on the people slide. */
+const TILTS = ["-rotate-2", "rotate-2"];
 
 export function CompareSlide({ slide, animate }: { slide: StorySlideOf<"compare">; animate: boolean }) {
   const copy = useStoryCopy();
 
   return (
-    <VStack space="lg" className="flex-1 justify-center">
+    <VStack space="4xl" className="flex-1 justify-center">
       <Reveal step={0} animate={animate}>
-        <StoryHeading>{copy(slide.title)}</StoryHeading>
+        <StoryHeading className="text-center text-4xl">{copy(slide.title)}</StoryHeading>
       </Reveal>
       {slide.rows.map((row, index) => (
-        <Reveal key={row.key} step={index + 1} animate={animate}>
-          <View className="border-l-4 border-wrapped-amber pl-4">
-            <StoryBody className="text-xl">{copy(row)}</StoryBody>
-          </View>
+        <Reveal key={row.caption.key} step={index + 1} animate={animate}>
+          <VStack
+            space="xs"
+            className={cn(
+              "mx-4 my-2 rounded-2xl border-2 border-wrapped-ink bg-white px-5 py-5",
+              TILTS[index % TILTS.length],
+            )}
+          >
+            <StoryBig className="text-center text-6xl">{copy(row.stat)}</StoryBig>
+            <StoryBody className="text-center text-lg">{copy(row.caption)}</StoryBody>
+          </VStack>
         </Reveal>
       ))}
     </VStack>

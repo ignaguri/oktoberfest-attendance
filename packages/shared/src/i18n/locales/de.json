@@ -2610,21 +2610,21 @@
         "photosLabelGeneric": "Dein Fest in Bildern"
       },
       "compare": {
-        "title": "So schlägst du dich",
+        "title": "Du gegen den Rest",
         "vsAvg": {
-          "more": "{{pct, number(maximumFractionDigits: 0)}} % mehr Bier als der durchschnittliche ProstCounter-Nutzer.",
-          "less": "{{pct, number(maximumFractionDigits: 0)}} % weniger Bier als der Durchschnitt. Vernünftig.",
-          "same": "Genau im Durchschnitt. Perfekt ausbalanciert."
+          "more": { "stat": "+{{pct, number(maximumFractionDigits: 0)}} %", "caption": "mehr Bier als der durchschnittliche ProstCounter-Nutzer" },
+          "less": { "stat": "−{{pct, number(maximumFractionDigits: 0)}} %", "caption": "weniger Bier als der Durchschnitt. Vernünftig" },
+          "same": { "stat": "±0 %", "caption": "genau im Durchschnitt. Perfekt ausbalanciert" }
         },
         "vsLastYear": {
-          "up": "{{diff, number(maximumFractionDigits: 1)}} mehr als auf dem {{festival}}.",
-          "down": "{{diff, number(maximumFractionDigits: 1)}} weniger als auf dem {{festival}}. Gut eingeteilt?",
-          "same": "Genau so viele wie auf dem {{festival}}. Konstant."
+          "up": { "stat": "+{{diff, number(maximumFractionDigits: 1)}}", "caption": "mehr als auf dem {{festival}}" },
+          "down": { "stat": "−{{diff, number(maximumFractionDigits: 1)}}", "caption": "weniger als auf dem {{festival}}. Gut eingeteilt?" },
+          "same": { "stat": "±0", "caption": "genau so viele wie auf dem {{festival}}. Konstant" }
         },
         "global": {
-          "days_attended": "Platz {{position}} in der globalen Rangliste für Tage.",
-          "total_beers": "Platz {{position}} in der globalen Rangliste für Biere.",
-          "avg_beers": "Platz {{position}} in der globalen Rangliste für Biere pro Tag."
+          "days_attended": { "stat": "#{{position}}", "caption": "in der globalen Rangliste für Tage" },
+          "total_beers": { "stat": "#{{position}}", "caption": "in der globalen Rangliste für Biere" },
+          "avg_beers": { "stat": "#{{position}}", "caption": "in der globalen Rangliste für Biere pro Tag" }
         }
       },
       "wiesnAndYou": {
@@ -2632,26 +2632,25 @@
           "current": "Die Wiesn {{year}} in Zahlen",
           "lastYear": "Die Wiesn im letzten Jahr ({{year}})"
         },
-        "headline": {
-          "current": "Du warst 1 von {{visitors, number}} Besuchern.",
-          "lastYear": "Letztes Jahr kamen {{visitors, number}} Leute. Dieses Jahr warst du dabei."
+        "visitorsStat": "{{visitors, number}}",
+        "visitors": {
+          "current": "Besucher. Du warst mittendrin",
+          "lastYear": "Besucher. Du wärst mittendrin gewesen"
         },
+        "checkBack": "Die offiziellen Zahlen für dieses Jahr sind unterwegs. Schau in ein paar Tagen wieder rein.",
+        "shareStat": "1 von {{every, number(maximumSignificantDigits: 2)}}",
         "share": {
-          "current_one": "Dein eines Bier war {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} ausgeschenkten Maß.",
-          "current_other": "Deine {{count, number(maximumFractionDigits: 1)}} Biere waren {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} ausgeschenkten Maß.",
-          "lastYear_one": "Dein eines Bier wäre {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} Maß vom letzten Jahr gewesen.",
-          "lastYear_other": "Deine {{count, number(maximumFractionDigits: 1)}} Biere wären {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} Maß vom letzten Jahr gewesen."
-        }
-      },
-      "meanwhile": {
-        "kicker": "Derweil am Ausgang",
-        "mugs": {
-          "current": "Maßkrüge hat das Ordnerpersonal wieder eingesammelt.",
-          "lastYear": "Maßkrüge hat das Ordnerpersonal letztes Jahr eingesammelt."
+          "current_one": "ausgeschenkten Maß war dein eines Bier",
+          "current_other": "ausgeschenkten Maß war eins deiner {{count, number(maximumFractionDigits: 1)}} Biere",
+          "lastYear_one": "Maß vom letzten Jahr wäre dein eines Bier gewesen",
+          "lastYear_other": "Maß vom letzten Jahr wäre eins deiner {{count, number(maximumFractionDigits: 1)}} Biere gewesen"
         },
-        "findsLabel": "Außerdem abgegeben",
-        "lostItems_one": "{{count, number}} Fundstück landete im Fundbüro.",
-        "lostItems_other": "{{count, number}} Fundstücke landeten im Fundbüro."
+        "mugsStat": "{{mugs, number}}",
+        "mugs": "Maßkrüge wollten heimlich mit",
+        "lostStat": "{{count, number}}",
+        "lost_one": "Fundstück im Fundbüro",
+        "lost_other": "Fundstücke im Fundbüro",
+        "findsLabel": "Unter den Fundstücken"
       },
       "source": {
         "withHost": "Quelle: {{host}}, {{year}}",
@@ -2659,8 +2658,11 @@
       },
       "badges": {
         "title": "Deine Abzeichen",
-        "count_one": "{{count}} Abzeichen",
-        "count_other": "{{count}} Abzeichen"
+        "countStat": "{{count, number}}",
+        "earned_one": "Abzeichen verdient",
+        "earned_other": "Abzeichen verdient",
+        "more_one": "+{{count}} weiteres in deiner Sammlung",
+        "more_other": "+{{count}} weitere in deiner Sammlung"
       },
       "persona": {
         "kicker": "Deine Wiesn-Persona",
@@ -2715,7 +2717,13 @@
         "title": "Prost!",
         "summary": "Bis zum nächsten {{series}}.",
         "replay": "Nochmal ansehen",
-        "replayHint": "Startet dein Wrapped von vorne"
+        "replayHint": "Startet dein Wrapped von vorne",
+        "recap": {
+          "days_one": "{{count, number}} Tag",
+          "days_other": "{{count, number}} Tage",
+          "tents_one": "{{count, number}} Zelt",
+          "tents_other": "{{count, number}} Zelte"
+        }
       }
     },
     "title": "Dein Jahresrückblick",

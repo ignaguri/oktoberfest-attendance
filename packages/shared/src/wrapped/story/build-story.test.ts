@@ -29,7 +29,7 @@ const zeroDrinks = () =>
   });
 
 describe("buildWrappedStory", () => {
-  it("builds all 12 slides in order for a full Wrapped with current stats", () => {
+  it("builds all 11 slides in order for a full Wrapped with current stats", () => {
     expect(kinds(buildWrappedStory(makeWrapped(), makeOfficialStats()))).toEqual([
       "servus",
       "bigNumber",
@@ -39,7 +39,6 @@ describe("buildWrappedStory", () => {
       "people",
       "compare",
       "wiesnAndYou",
-      "meanwhile",
       "badges",
       "persona",
       "prost",
@@ -48,7 +47,7 @@ describe("buildWrappedStory", () => {
 
   it("keeps a zero-drink attendee's story short and kind", () => {
     const slides = buildWrappedStory(zeroDrinks(), makeOfficialStats());
-    expect(kinds(slides)).toEqual(["servus", "bigNumber", "wiesnAndYou", "meanwhile", "persona", "prost"]);
+    expect(kinds(slides)).toEqual(["servus", "bigNumber", "wiesnAndYou", "persona", "prost"]);
     expect(find(slides, "bigNumber").variant).toBe("zero");
     expect(find(slides, "bigNumber").comparison).toBeNull();
     expect(find(slides, "wiesnAndYou").share).toBeNull();
@@ -83,9 +82,16 @@ describe("buildWrappedStory", () => {
       null,
     );
     expect(find(slides, "bigNumber").comparison).toBeNull();
-    expect(find(slides, "compare").rows.map((row) => row.key)).toEqual([
-      "wrapped.story.compare.vsLastYear.up",
+    expect(find(slides, "compare").rows.map((row) => row.caption.key)).toEqual([
+      "wrapped.story.compare.vsLastYear.up.caption",
     ]);
+  });
+
+  it("splits each comparison into a big stat and its caption", () => {
+    const [vsAvg] = find(buildWrappedStory(makeWrapped(), null), "compare").rows;
+    expect(vsAvg.stat.key).toBe("wrapped.story.compare.vsAvg.more.stat");
+    expect(vsAvg.caption.key).toBe("wrapped.story.compare.vsAvg.more.caption");
+    expect(vsAvg.stat.params).toEqual(vsAvg.caption.params);
   });
 
   it("drops the compare slide without last year and at a tiny festival", () => {
@@ -228,29 +234,64 @@ describe("buildWrappedStory", () => {
   });
 
   it("words last year's stats as last year and names the source", () => {
-    const slides = buildWrappedStory(makeWrapped(), makeOfficialStats({ year: 2025, isCurrentFestival: false }));
+    const lastYear = makeOfficialStats({ year: 2025, isCurrentFestival: false });
+    const slides = buildWrappedStory(makeWrapped(), lastYear, new Date("2026-10-06T10:00:00Z"));
     const wiesn = find(slides, "wiesnAndYou");
     expect(wiesn.kicker).toEqual({ key: "wrapped.story.wiesnAndYou.kicker.lastYear", params: { year: 2025 } });
-    expect(wiesn.headline.key).toBe("wrapped.story.wiesnAndYou.headline.lastYear");
+    expect(wiesn.visitors?.caption.key).toBe("wrapped.story.wiesnAndYou.visitors.lastYear");
+    expect(wiesn.checkBack).toEqual({ key: "wrapped.story.wiesnAndYou.checkBack" });
+    // An archived festival never gets its own figures, so it doesn't promise them.
+    const archived = find(buildWrappedStory(makeWrapped(), lastYear, new Date("2026-12-01T10:00:00Z")), "wiesnAndYou");
+    expect(archived.checkBack).toBeNull();
     expect(wiesn.source).toEqual({
       key: "wrapped.story.source.withHost",
       params: { host: "muenchen.de", year: 2025 },
     });
-    expect(find(slides, "meanwhile").mugsLine?.key).toBe("wrapped.story.meanwhile.mugs.lastYear");
+    expect(wiesn.mugs?.caption.key).toBe("wrapped.story.wiesnAndYou.mugs");
   });
 
-  it("computes the share of the Wiesn", () => {
+  it("puts the visitors and your share of the Maß on their own cards", () => {
     const wiesn = find(buildWrappedStory(makeWrapped(), makeOfficialStats()), "wiesnAndYou");
-    expect(wiesn.share?.params?.pct).toBeCloseTo((12.5 / 6500000) * 100, 10);
+    expect(wiesn.visitors?.stat).toEqual({ key: "wrapped.story.wiesnAndYou.visitorsStat", params: { visitors: 6500000 } });
+    // 12.5 beers out of 6.5M Maß: one in every 520,000.
+    expect(wiesn.share?.stat).toEqual({ key: "wrapped.story.wiesnAndYou.shareStat", params: { every: 520000 } });
+    expect(wiesn.share?.caption).toEqual({ key: "wrapped.story.wiesnAndYou.share.current", params: { count: 12.5 } });
+    expect(wiesn.checkBack).toBeNull();
   });
 
-  it("skips the city slides without stats, and each one without its own fields", () => {
+  it("drops each city card without its figure, and the slide only without any", () => {
     expect(kinds(buildWrappedStory(makeWrapped(), null))).not.toContain("wiesnAndYou");
-    const partial = kinds(
+    const partial = find(
       buildWrappedStory(makeWrapped(), makeOfficialStats({ visitors: null, mugsConfiscated: null, curiousFinds: [] })),
+      "wiesnAndYou",
     );
-    expect(partial).not.toContain("wiesnAndYou");
-    expect(partial).not.toContain("meanwhile");
+    expect(partial.visitors).toBeNull();
+    expect(partial.mugs).toBeNull();
+    expect(partial.share).not.toBeNull();
+    expect(partial.lostAndFound?.stat).toEqual({ key: "wrapped.story.wiesnAndYou.lostStat", params: { count: 4500 } });
+    const empty = makeOfficialStats({
+      visitors: null,
+      massServed: null,
+      mugsConfiscated: null,
+      lostItems: null,
+      curiousFinds: [],
+    });
+    expect(kinds(buildWrappedStory(makeWrapped(), empty))).not.toContain("wiesnAndYou");
+  });
+
+  it("ends with a recap of the persona and the headline numbers", () => {
+    const slides = buildWrappedStory(makeWrapped(), null);
+    const { recap } = find(slides, "prost");
+    expect(recap.personaId).toBe(find(slides, "persona").personaId);
+    expect(recap.name).toBe(find(slides, "persona").name);
+    expect(recap.facts).toEqual([
+      { key: "wrapped.story.units.beers", params: { count: 12.5 } },
+      { key: "wrapped.story.prost.recap.days", params: { count: 4 } },
+      { key: "wrapped.story.prost.recap.tents", params: { count: 3 } },
+    ]);
+    // A zero doesn't make the recap: no "0 beers", no "0 tents".
+    const dry = find(buildWrappedStory(zeroDrinks(), null), "prost");
+    expect(dry.recap.facts.map((fact) => fact.key)).toEqual(["wrapped.story.prost.recap.days"]);
   });
 
   it("orders badges by tier and keeps three", () => {
@@ -270,7 +311,11 @@ describe("buildWrappedStory", () => {
       "badges",
     );
     expect(badges.top.map((badge) => badge.tier)).toEqual([4, 3, 2]);
-    expect(badges.count.params).toEqual({ count: 4 });
+    expect(badges.count.stat).toEqual({ key: "wrapped.story.badges.countStat", params: { count: 4 } });
+    expect(badges.count.caption).toEqual({ key: "wrapped.story.badges.earned", params: { count: 4 } });
+    // The one that didn't make the top three is pointed to, not dropped silently.
+    expect(badges.more).toEqual({ key: "wrapped.story.badges.more", params: { count: 1 } });
+    expect(find(buildWrappedStory(makeWrapped(), null), "badges").more).toBeNull();
   });
 
   it("hands badge names over as translation keys, like the DB stores them", () => {

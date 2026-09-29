@@ -2373,21 +2373,21 @@
         "photosLabelGeneric": "Your festival in pictures"
       },
       "compare": {
-        "title": "How you stack up",
+        "title": "You vs. everyone else",
         "vsAvg": {
-          "more": "{{pct, number(maximumFractionDigits: 0)}}% more beers than the average ProstCounter user.",
-          "less": "{{pct, number(maximumFractionDigits: 0)}}% fewer beers than the average. Sensible.",
-          "same": "Right on the average. Perfectly balanced."
+          "more": { "stat": "+{{pct, number(maximumFractionDigits: 0)}}%", "caption": "more beers than the average ProstCounter user" },
+          "less": { "stat": "−{{pct, number(maximumFractionDigits: 0)}}%", "caption": "fewer beers than the average. Sensible" },
+          "same": { "stat": "±0%", "caption": "right on the average. Perfectly balanced" }
         },
         "vsLastYear": {
-          "up": "{{diff, number(maximumFractionDigits: 1)}} more than at {{festival}}.",
-          "down": "{{diff, number(maximumFractionDigits: 1)}} fewer than at {{festival}}. Pacing yourself?",
-          "same": "Exactly as many as at {{festival}}. Consistent."
+          "up": { "stat": "+{{diff, number(maximumFractionDigits: 1)}}", "caption": "more than at {{festival}}" },
+          "down": { "stat": "−{{diff, number(maximumFractionDigits: 1)}}", "caption": "fewer than at {{festival}}. Pacing yourself?" },
+          "same": { "stat": "±0", "caption": "exactly as many as at {{festival}}. Consistent" }
         },
         "global": {
-          "days_attended": "#{{position}} on the global leaderboard for days.",
-          "total_beers": "#{{position}} on the global leaderboard for beers.",
-          "avg_beers": "#{{position}} on the global leaderboard for beers per day."
+          "days_attended": { "stat": "#{{position}}", "caption": "on the global leaderboard for days" },
+          "total_beers": { "stat": "#{{position}}", "caption": "on the global leaderboard for beers" },
+          "avg_beers": { "stat": "#{{position}}", "caption": "on the global leaderboard for beers per day" }
         }
       },
       "wiesnAndYou": {
@@ -2395,35 +2395,37 @@
           "current": "The Wiesn {{year}} in numbers",
           "lastYear": "Last year's Wiesn ({{year}})"
         },
-        "headline": {
-          "current": "You were 1 of {{visitors, number}} visitors.",
-          "lastYear": "{{visitors, number}} people came last year. This year, you were one of them."
+        "visitorsStat": "{{visitors, number}}",
+        "visitors": {
+          "current": "visitors. You were one of them",
+          "lastYear": "visitors. You'd have been one in the crowd"
         },
+        "checkBack": "This year's official numbers are on their way. Check back in a few days.",
+        "shareStat": "1 in {{every, number(maximumSignificantDigits: 2)}}",
         "share": {
-          "current_one": "Your one beer was {{pct, number(maximumSignificantDigits: 2)}}% of the {{mass, number}} Maß served.",
-          "current_other": "Your {{count, number(maximumFractionDigits: 1)}} beers were {{pct, number(maximumSignificantDigits: 2)}}% of the {{mass, number}} Maß served.",
-          "lastYear_one": "Your one beer would have been {{pct, number(maximumSignificantDigits: 2)}}% of last year's {{mass, number}} Maß.",
-          "lastYear_other": "Your {{count, number(maximumFractionDigits: 1)}} beers would have been {{pct, number(maximumSignificantDigits: 2)}}% of last year's {{mass, number}} Maß."
-        }
-      },
-      "meanwhile": {
-        "kicker": "Meanwhile, at the exit",
-        "mugs": {
-          "current": "Maß mugs never made it past the stewards.",
-          "lastYear": "Maß mugs were stopped at the exit last year."
+          "current_one": "Maß poured was your one beer",
+          "current_other": "Maß poured was one of your {{count, number(maximumFractionDigits: 1)}} beers",
+          "lastYear_one": "Maß last year would have been your one beer",
+          "lastYear_other": "Maß last year would have been one of your {{count, number(maximumFractionDigits: 1)}}"
         },
-        "findsLabel": "Also handed in",
-        "lostItems_one": "{{count, number}} item ended up at the lost-and-found.",
-        "lostItems_other": "{{count, number}} items ended up at the lost-and-found."
+        "mugsStat": "{{mugs, number}}",
+        "mugs": "Maß mugs tried to sneak out",
+        "lostStat": "{{count, number}}",
+        "lost_one": "thing handed in at the lost-and-found",
+        "lost_other": "things handed in at the lost-and-found",
+        "findsLabel": "Among the finds"
       },
       "source": {
         "withHost": "Source: {{host}}, {{year}}",
         "plain": "Official figures, {{year}}"
       },
       "badges": {
-        "title": "Badges you earned",
-        "count_one": "{{count}} badge",
-        "count_other": "{{count}} badges"
+        "title": "Your badges",
+        "countStat": "{{count, number}}",
+        "earned_one": "badge earned",
+        "earned_other": "badges earned",
+        "more_one": "+{{count}} more in your collection",
+        "more_other": "+{{count}} more in your collection"
       },
       "persona": {
         "kicker": "Your Wiesn persona",
@@ -2478,7 +2480,13 @@
         "title": "Prost!",
         "summary": "See you at the next {{series}}.",
         "replay": "Watch again",
-        "replayHint": "Starts your Wrapped from the beginning"
+        "replayHint": "Starts your Wrapped from the beginning",
+        "recap": {
+          "days_one": "{{count, number}} day",
+          "days_other": "{{count, number}} days",
+          "tents_one": "{{count, number}} tent",
+          "tents_other": "{{count, number}} tents"
+        }
       }
     },
     "title": "Your Year in Review",
@@ -2630,7 +2638,7 @@
       "madeWith": "Made with ❤️ and some 🍺 by ProstCounter",
       "title": "Thanks for the memories!",
       "subtitle": "See you next year",
-      "share": "Share Your Wrapped",
+      "share": "Share your Wrapped",
       "sharing": "Creating your share image...",
       "summary": {
         "beers": "{{count}} beers",

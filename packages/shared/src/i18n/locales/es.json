@@ -2433,21 +2433,21 @@
         "photosLabelGeneric": "Tu festival en fotos"
       },
       "compare": {
-        "title": "Cómo te fue",
+        "title": "Vos contra el resto",
         "vsAvg": {
-          "more": "{{pct, number(maximumFractionDigits: 0)}} % más cervezas que el usuario promedio de ProstCounter.",
-          "less": "{{pct, number(maximumFractionDigits: 0)}} % menos cervezas que el promedio. Sensato.",
-          "same": "Justo en el promedio. Perfectamente equilibrado."
+          "more": { "stat": "+{{pct, number(maximumFractionDigits: 0)}} %", "caption": "más cervezas que el usuario promedio de ProstCounter" },
+          "less": { "stat": "−{{pct, number(maximumFractionDigits: 0)}} %", "caption": "menos cervezas que el promedio. Sensato" },
+          "same": { "stat": "±0 %", "caption": "justo en el promedio. Perfectamente equilibrado" }
         },
         "vsLastYear": {
-          "up": "{{diff, number(maximumFractionDigits: 1)}} más que en {{festival}}.",
-          "down": "{{diff, number(maximumFractionDigits: 1)}} menos que en {{festival}}. ¿Te estás cuidando?",
-          "same": "Exactamente las mismas que en {{festival}}. Constante."
+          "up": { "stat": "+{{diff, number(maximumFractionDigits: 1)}}", "caption": "más que en {{festival}}" },
+          "down": { "stat": "−{{diff, number(maximumFractionDigits: 1)}}", "caption": "menos que en {{festival}}. ¿Te estás cuidando?" },
+          "same": { "stat": "±0", "caption": "exactamente las mismas que en {{festival}}. Constante" }
         },
         "global": {
-          "days_attended": "#{{position}} en el ranking global de días.",
-          "total_beers": "#{{position}} en el ranking global de cervezas.",
-          "avg_beers": "#{{position}} en el ranking global de cervezas por día."
+          "days_attended": { "stat": "#{{position}}", "caption": "en el ranking global de días" },
+          "total_beers": { "stat": "#{{position}}", "caption": "en el ranking global de cervezas" },
+          "avg_beers": { "stat": "#{{position}}", "caption": "en el ranking global de cervezas por día" }
         }
       },
       "wiesnAndYou": {
@@ -2455,26 +2455,25 @@
           "current": "La Wiesn {{year}} en números",
           "lastYear": "La Wiesn del año pasado ({{year}})"
         },
-        "headline": {
-          "current": "Fuiste 1 de {{visitors, number}} visitantes.",
-          "lastYear": "El año pasado vinieron {{visitors, number}} personas. Este año, vos fuiste una de ellas."
+        "visitorsStat": "{{visitors, number}}",
+        "visitors": {
+          "current": "visitantes. Vos estuviste ahí",
+          "lastYear": "visitantes. Vos habrías estado ahí"
         },
+        "checkBack": "Los números oficiales de este año están por llegar. Volvé a mirar en unos días.",
+        "shareStat": "1 de cada {{every, number(maximumSignificantDigits: 2)}}",
         "share": {
-          "current_one": "Tu única cerveza fue el {{pct, number(maximumSignificantDigits: 2)}} % de las {{mass, number}} Maß servidas.",
-          "current_other": "Tus {{count, number(maximumFractionDigits: 1)}} cervezas fueron el {{pct, number(maximumSignificantDigits: 2)}} % de las {{mass, number}} Maß servidas.",
-          "lastYear_one": "Tu única cerveza habría sido el {{pct, number(maximumSignificantDigits: 2)}} % de las {{mass, number}} Maß del año pasado.",
-          "lastYear_other": "Tus {{count, number(maximumFractionDigits: 1)}} cervezas habrían sido el {{pct, number(maximumSignificantDigits: 2)}} % de las {{mass, number}} Maß del año pasado."
-        }
-      },
-      "meanwhile": {
-        "kicker": "Mientras tanto, en la salida",
-        "mugs": {
-          "current": "jarras Maß no lograron pasar a los de seguridad.",
-          "lastYear": "jarras Maß fueron frenadas en la salida el año pasado."
+          "current_one": "Maß servidas fue tu única cerveza",
+          "current_other": "Maß servidas fue una de tus {{count, number(maximumFractionDigits: 1)}} cervezas",
+          "lastYear_one": "Maß del año pasado habría sido tu única cerveza",
+          "lastYear_other": "Maß del año pasado habría sido una de tus {{count, number(maximumFractionDigits: 1)}} cervezas"
         },
-        "findsLabel": "También entregaron",
-        "lostItems_one": "{{count, number}} objeto terminó en objetos perdidos.",
-        "lostItems_other": "{{count, number}} objetos terminaron en objetos perdidos."
+        "mugsStat": "{{mugs, number}}",
+        "mugs": "Maß intentaron escaparse",
+        "lostStat": "{{count, number}}",
+        "lost_one": "objeto en objetos perdidos",
+        "lost_other": "objetos en objetos perdidos",
+        "findsLabel": "Entre los hallazgos"
       },
       "source": {
         "withHost": "Fuente: {{host}}, {{year}}",
@@ -2482,8 +2481,11 @@
       },
       "badges": {
         "title": "Tus insignias",
-        "count_one": "{{count}} insignia",
-        "count_other": "{{count}} insignias"
+        "countStat": "{{count, number}}",
+        "earned_one": "insignia ganada",
+        "earned_other": "insignias ganadas",
+        "more_one": "+{{count}} más en tu colección",
+        "more_other": "+{{count}} más en tu colección"
       },
       "persona": {
         "kicker": "Tu persona de la Wiesn",
@@ -2538,7 +2540,13 @@
         "title": "¡Prost!",
         "summary": "Nos vemos en el próximo {{series}}.",
         "replay": "Ver de nuevo",
-        "replayHint": "Empieza tu Wrapped desde el principio"
+        "replayHint": "Empieza tu Wrapped desde el principio",
+        "recap": {
+          "days_one": "{{count, number}} día",
+          "days_other": "{{count, number}} días",
+          "tents_one": "{{count, number}} carpa",
+          "tents_other": "{{count, number}} carpas"
+        }
       }
     },
     "title": "Tu año en retrospectiva",
@@ -2690,7 +2698,7 @@
       "madeWith": "Hecho con ❤️ y algo de 🍺 por ProstCounter",
       "title": "¡Gracias por los recuerdos!",
       "subtitle": "Nos vemos el año que viene",
-      "share": "Compartir Tu Wrapped",
+      "share": "Compartir tu Wrapped",
       "sharing": "Creando tu imagen para compartir...",
       "summary": {
         "beers": "{{count}} cervezas",

@@ -68,32 +68,34 @@ export interface PeopleSlide extends SlideBase {
 export interface CompareSlide extends SlideBase {
   kind: "compare";
   title: CopyRef;
-  rows: CopyRef[];
+  rows: { stat: CopyRef; caption: CopyRef }[];
+}
+
+/** A figure as a big stat over its caption. */
+export interface StatCard {
+  stat: CopyRef;
+  caption: CopyRef;
 }
 
 export interface WiesnAndYouSlide extends SlideBase {
   kind: "wiesnAndYou";
   kicker: CopyRef;
-  headline: CopyRef;
-  share: CopyRef | null;
-  source: CopyRef;
-}
-
-export interface MeanwhileSlide extends SlideBase {
-  kind: "meanwhile";
-  kicker: CopyRef;
-  mugs: number | null;
-  mugsLine: CopyRef | null;
+  visitors: StatCard | null;
+  share: StatCard | null;
+  mugs: StatCard | null;
+  lostAndFound: StatCard | null;
   findsLabel: CopyRef;
   finds: CuriousFind[];
-  lostItems: CopyRef | null;
   source: CopyRef;
+  checkBack: CopyRef | null;
 }
 
 export interface BadgesSlide extends SlideBase {
   kind: "badges";
   title: CopyRef;
-  count: CopyRef;
+  count: StatCard;
+  /** "+6 more in your collection", when there are more than the top three. */
+  more: CopyRef | null;
   top: {
     id: string;
     /** achievements.name is a translation key, so it travels as a CopyRef. */
@@ -120,6 +122,7 @@ export interface ProstSlide extends SlideBase {
   kind: "prost";
   title: CopyRef;
   summary: CopyRef;
+  recap: { personaId: PersonaId; name: string; facts: CopyRef[] };
 }
 
 export type StorySlide =
@@ -131,7 +134,6 @@ export type StorySlide =
   | PeopleSlide
   | CompareSlide
   | WiesnAndYouSlide
-  | MeanwhileSlide
   | BadgesSlide
   | PersonaSlide
   | ProstSlide;

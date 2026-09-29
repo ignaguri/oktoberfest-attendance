@@ -4,14 +4,18 @@ import Svg, { Path } from "react-native-svg";
 
 import { getCrestImage } from "./crest-images";
 
+/** lg is the persona reveal; sm sits in the Prost recap card. */
+const CREST_CLASSES = { lg: "h-72 w-72", sm: "h-16 w-16" } as const;
+const FALLBACK_PX = { lg: { width: 252, height: 288 }, sm: { width: 56, height: 64 } } as const;
+
 /** The persona's crest PNG, or a plain stamped shield until one exists. */
-export function Crest({ personaId }: { personaId: PersonaId }) {
+export function Crest({ personaId, size = "lg" }: { personaId: PersonaId; size?: "lg" | "sm" }) {
   const source = getCrestImage(personaId);
   if (source) {
     return (
       <Image
         source={source}
-        className="h-40 w-40"
+        className={CREST_CLASSES[size]}
         // Decorative: the persona name is always rendered next to the crest.
         // alt alone makes RN treat the image as accessible/focusable, so it
         // must be paired with aria-hidden to actually hide it from a11y.
@@ -24,8 +28,8 @@ export function Crest({ personaId }: { personaId: PersonaId }) {
   }
   return (
     <Svg
-      width={140}
-      height={160}
+      width={FALLBACK_PX[size].width}
+      height={FALLBACK_PX[size].height}
       viewBox="0 0 132 150"
       // Decorative: the persona name is always rendered next to the crest.
       accessibilityElementsHidden
