@@ -88,6 +88,7 @@ export function ShareCarousel({
   const state = card ? states[card.kind] : undefined;
   const liveLink =
     links.data?.links.find((link) => link.kind === card?.kind) ?? null;
+  const canLink = card ? isLinkableShareCardKind(card.kind) : false;
 
   const caption = useMemo(() => {
     const persona = cards.find((candidate) => candidate.kind === "persona");
@@ -267,25 +268,31 @@ export function ShareCarousel({
           >
             {t("wrapped.shareCards.carousel.share")}
           </button>
-          {card && isLinkableShareCardKind(card.kind) ? (
-            <button
-              type="button"
-              onClick={onCopyLink}
-              disabled={createLink.loading}
-              className="rounded-xl border-2 border-wrapped-ink px-6 py-3 text-base font-bold text-wrapped-ink"
-            >
-              {t("wrapped.shareCards.carousel.copyLink")}
-            </button>
-          ) : null}
-          {liveLink ? (
-            <button
-              type="button"
-              onClick={onStopSharing}
-              className="px-6 py-2 text-sm text-wrapped-ink/70"
-            >
-              {t("wrapped.shareCards.carousel.stopSharing")}
-            </button>
-          ) : null}
+          {/* Both link rows always take their space, so every card gets the same height */}
+          <button
+            type="button"
+            onClick={onCopyLink}
+            disabled={!canLink || createLink.loading}
+            aria-hidden={!canLink}
+            className={cn(
+              "rounded-xl border-2 border-wrapped-ink px-6 py-3 text-base font-bold text-wrapped-ink",
+              !canLink && "invisible",
+            )}
+          >
+            {t("wrapped.shareCards.carousel.copyLink")}
+          </button>
+          <button
+            type="button"
+            onClick={onStopSharing}
+            disabled={!liveLink}
+            aria-hidden={!liveLink}
+            className={cn(
+              "px-6 py-2 text-sm text-wrapped-ink/70",
+              !liveLink && "invisible",
+            )}
+          >
+            {t("wrapped.shareCards.carousel.stopSharing")}
+          </button>
         </div>
       </DialogContent>
     </Dialog>

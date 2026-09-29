@@ -23,6 +23,7 @@ import {
   FlatList,
   Modal,
   Pressable,
+  useWindowDimensions,
   View,
   type ViewToken,
 } from "react-native";
@@ -40,6 +41,8 @@ import { logger } from "@/lib/logger";
 import { PaperBackground } from "../story/paper-background";
 import { ShareCardPreview } from "./share-card-preview";
 
+/** Space around the card inside its page, in points. */
+const PAGE_GUTTER = 24;
 const VIEWABILITY_CONFIG = { itemVisiblePercentThreshold: 60 };
 
 interface ShareCarouselProps {
@@ -68,6 +71,13 @@ export function ShareCarousel({
   const isOnline = useIsOnline();
   const { dialog, showDialog, closeDialog } = useAlertDialog();
   const [index, setIndex] = useState(0);
+  // The card fills whatever height the header, dots and buttons leave over
+  const { width: screenWidth } = useWindowDimensions();
+  const [pageHeight, setPageHeight] = useState(0);
+  const cardWidth = Math.min(
+    screenWidth - PAGE_GUTTER * 2,
+    ((pageHeight - PAGE_GUTTER) * 9) / 16,
+  );
   // Shown on the button itself: a toast or dialog in the root overlay would sit behind this Modal
   const [copyFeedback, setCopyFeedback] = useState<
     "linkCopied" | "error" | null
@@ -104,6 +114,7 @@ export function ShareCarousel({
   const state = card ? states[card.kind] : undefined;
   const liveLink =
     links.data?.links.find((link) => link.kind === card?.kind) ?? null;
+  const canLink = card ? isLinkableShareCardKind(card.kind) : false;
 
   const caption = useMemo(() => {
     const persona = cards.find((candidate) => candidate.kind === "persona");
@@ -210,30 +221,38 @@ export function ShareCarousel({
             </Pressable>
           </HStack>
 
-          <FlatList
-            data={cards}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => item.kind}
-            onViewableItemsChanged={onViewableItemsChanged}
-            viewabilityConfig={VIEWABILITY_CONFIG}
-            className="flex-grow-0"
-            renderItem={({ item, index: itemIndex }) => (
-              <View className="w-screen items-center justify-center py-4">
-                <ShareCardPreview
-                  card={item}
-                  state={states[item.kind]}
-                  isOnline={isOnline}
-                  label={t("wrapped.shareCards.carousel.cardLabel", {
-                    index: itemIndex + 1,
-                    total: cards.length,
-                  })}
-                  onRetry={() => onRetry(item.kind)}
-                />
-              </View>
-            )}
-          />
+          <View
+            className="flex-1"
+            onLayout={(event) => setPageHeight(event.nativeEvent.layout.height)}
+          >
+            <FlatList
+              data={cards}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.kind}
+              onViewableItemsChanged={onViewableItemsChanged}
+              viewabilityConfig={VIEWABILITY_CONFIG}
+              renderItem={({ item, index: itemIndex }) => (
+                <View
+                  className="w-screen items-center justify-center"
+                  style={{ height: pageHeight }}
+                >
+                  <ShareCardPreview
+                    card={item}
+                    state={states[item.kind]}
+                    isOnline={isOnline}
+                    label={t("wrapped.shareCards.carousel.cardLabel", {
+                      index: itemIndex + 1,
+                      total: cards.length,
+                    })}
+                    width={Math.max(cardWidth, 0)}
+                    onRetry={() => onRetry(item.kind)}
+                  />
+                </View>
+              )}
+            />
+          </View>
 
           <HStack className="justify-center gap-2 pb-4">
             {cards.map((item, dotIndex) => (
@@ -269,38 +288,41 @@ export function ShareCarousel({
                 </Text>
               )}
             </Pressable>
-            {card && isLinkableShareCardKind(card.kind) ? (
-              <Pressable
-                onPress={onCopyLink}
-                disabled={createLink.loading}
-                className="items-center rounded-xl border-2 border-wrapped-ink px-6 py-3"
-                accessibilityRole="button"
-                accessibilityLabel={t("wrapped.shareCards.carousel.copyLink")}
-                accessibilityHint={t(
-                  "wrapped.shareCards.carousel.copyLinkHint",
-                )}
-              >
-                <Text className="text-base font-bold text-wrapped-ink">
-                  {t(
-                    `wrapped.shareCards.carousel.${copyFeedback ?? "copyLink"}`,
-                  )}
-                </Text>
-              </Pressable>
-            ) : null}
-            {liveLink ? (
-              <Pressable
-                onPress={onStopSharing}
-                className="items-center px-6 py-2"
-                accessibilityRole="button"
-                accessibilityLabel={t(
-                  "wrapped.shareCards.carousel.stopSharing",
-                )}
-              >
-                <Text className="text-sm text-wrapped-ink/70">
-                  {t("wrapped.shareCards.carousel.stopSharing")}
-                </Text>
-              </Pressable>
-            ) : null}
+            {/* Both links rows always take their space, so every card gets the same height */}
+            <Pressable
+              onPress={onCopyLink}
+              disabled={!canLink || createLink.loading}
+              className={cn(
+                "items-center rounded-xl border-2 border-wrapped-ink px-6 py-3",
+                !canLink && "opacity-0",
+              )}
+              accessibilityElementsHidden={!canLink}
+              importantForAccessibility={
+                canLink ? "auto" : "no-hide-descendants"
+              }
+              accessibilityRole="button"
+              accessibilityLabel={t("wrapped.shareCards.carousel.copyLink")}
+              accessibilityHint={t("wrapped.shareCards.carousel.copyLinkHint")}
+            >
+              <Text className="text-base font-bold text-wrapped-ink">
+                {t(`wrapped.shareCards.carousel.${copyFeedback ?? "copyLink"}`)}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={onStopSharing}
+              disabled={!liveLink}
+              className={cn("items-center px-6 py-2", !liveLink && "opacity-0")}
+              accessibilityElementsHidden={!liveLink}
+              importantForAccessibility={
+                liveLink ? "auto" : "no-hide-descendants"
+              }
+              accessibilityRole="button"
+              accessibilityLabel={t("wrapped.shareCards.carousel.stopSharing")}
+            >
+              <Text className="text-sm text-wrapped-ink/70">
+                {t("wrapped.shareCards.carousel.stopSharing")}
+              </Text>
+            </Pressable>
           </VStack>
         </View>
       </View>

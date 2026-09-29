@@ -70,6 +70,8 @@ interface ShareCardPreviewProps {
   state: ShareCardState | undefined;
   isOnline: boolean;
   label: string;
+  /** Measured by the carousel: the biggest 9:16 box its page fits. */
+  width: number;
   onRetry: () => void;
 }
 
@@ -78,12 +80,14 @@ export function ShareCardPreview({
   state,
   isOnline,
   label,
+  width,
   onRetry,
 }: ShareCardPreviewProps) {
   const { t } = useTranslation();
   return (
     <View
-      className="aspect-[9/16] w-[60%] overflow-hidden rounded-2xl border-2 border-wrapped-ink bg-wrapped-paper"
+      className="aspect-[9/16] overflow-hidden rounded-2xl border-2 border-wrapped-ink bg-wrapped-paper"
+      style={{ width }}
       accessible
       accessibilityLabel={label}
     >
