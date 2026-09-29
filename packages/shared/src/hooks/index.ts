@@ -220,6 +220,11 @@ export {
 
 // Wrapped hooks
 export { useWrapped, useWrappedFestivals } from "./useWrapped";
+export {
+  useCreateWrappedShareLink,
+  useRevokeWrappedShareLink,
+  useWrappedShareLinks,
+} from "./useWrappedShareLinks";
 
 // Admin hooks
 export {

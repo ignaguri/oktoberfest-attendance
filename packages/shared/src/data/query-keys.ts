@@ -93,6 +93,8 @@ export class QueryKeys {
   static wrappedFestivals = () => ["wrapped", "festivals"] as const;
   /** Prefix covering every Wrapped read, for invalidation after a regeneration. */
   static wrappedAll = () => ["wrapped"] as const;
+  static wrappedShareLinks = (festivalId: string, lang: string) =>
+    ["wrapped-share-links", festivalId, lang] as const;
 
   // Calendar queries
   static personalCalendar = (festivalId: string) => ["calendar", "personal", festivalId] as const;

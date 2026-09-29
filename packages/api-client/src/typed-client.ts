@@ -33,6 +33,7 @@ import type {
   CreateMessageResponse,
   CreateAdminFestivalInput,
   CreateAdminTentInput,
+  CreateWrappedShareLinkBody,
   CrowdLevel,
   DayPlanResponse,
   DeleteAttendanceResponse,
@@ -82,6 +83,7 @@ import type {
   ListGroupsResponse,
   ListInvitableUsersResponse,
   ListSentGroupInvitationsResponse,
+  ListWrappedShareLinksResponse,
   LogConsumptionInput,
   LogConsumptionResponse,
   MarkUnlocksSeenResponse,
@@ -93,6 +95,7 @@ import type {
   ProfileShort,
   PublicProfile,
   SearchUsersResponse,
+  ShareLang,
   SubmitCrowdReportResponse,
   SubmitFeedbackBody,
   SubmitFeedbackResponse,
@@ -110,7 +113,9 @@ import type {
   WinningCriteriaListResponse,
   WinningCriterion,
   WrappedAccessResult,
+  WrappedShareLink,
 } from "@prostcounter/shared/schemas";
+import type { ShareCardKind } from "@prostcounter/shared/wrapped";
 
 /**
  * Headers type compatible with both browser and Node.js environments
@@ -1975,6 +1980,55 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to regenerate wrapped cache");
         }
         return parseJsonResponse(response);
+      },
+
+      /** URL and auth headers for a card's JPEG; apps download it directly (binary, off the typed client). */
+      async shareCardRequest(
+        festivalId: string,
+        kind: ShareCardKind,
+        lang: ShareLang,
+      ): Promise<{ url: string; headers: Record<string, string> }> {
+        const headers = await getAuthHeaders();
+        const authOnly: Record<string, string> = headers.Authorization ? { Authorization: headers.Authorization } : {};
+        return { url: `${baseUrl}/v1/wrapped/${festivalId}/share-cards/${kind}?lang=${lang}`, headers: authOnly };
+      },
+
+      shareLinks: {
+        async list(festivalId: string, lang: ShareLang): Promise<ListWrappedShareLinksResponse> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped/${festivalId}/share-links?lang=${lang}`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch share links");
+          }
+          return parseJsonResponse(response);
+        },
+
+        async create(festivalId: string, body: CreateWrappedShareLinkBody): Promise<WrappedShareLink> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("POST", `${baseUrl}/v1/wrapped/${festivalId}/share-links`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(body),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to create share link");
+          }
+          return parseJsonResponse(response);
+        },
+
+        async revoke(token: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("DELETE", `${baseUrl}/v1/wrapped/share-links/${token}`, {
+            method: "DELETE",
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to stop sharing");
+          }
+          return parseJsonResponse(response);
+        },
       },
     },
 

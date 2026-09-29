@@ -27,9 +27,10 @@ export type ListWrappedShareLinksResponse = z.infer<
   typeof ListWrappedShareLinksResponseSchema
 >;
 
+// Strict here: `.catch` has no OpenAPI form, and the apps only send supported languages
 export const CreateWrappedShareLinkBodySchema = z.object({
   kind: LinkableShareCardKindSchema,
-  lang: ShareLangSchema,
+  lang: z.enum(SUPPORTED_LANGUAGES),
 });
 export type CreateWrappedShareLinkBody = z.infer<
   typeof CreateWrappedShareLinkBodySchema
