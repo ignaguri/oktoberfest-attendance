@@ -200,9 +200,15 @@ export function isLinkableShareCardKind(
   return (LINKABLE_SHARE_CARD_KINDS as readonly string[]).includes(kind);
 }
 
-/** A cheap content hash (djb2) for naming cached card files; not for security. */
-export function shareCardFingerprint(card: ShareCard): string {
-  const text = JSON.stringify(card);
+/** Bump whenever a layout changes, so every cached card image refreshes. */
+export const SHARE_CARD_RENDER_VERSION = "1";
+
+/** A cheap hash (djb2) of the content and layout version, for naming cached card files; not for security. */
+export function shareCardFingerprint(
+  card: ShareCard,
+  renderVersion: string = SHARE_CARD_RENDER_VERSION,
+): string {
+  const text = JSON.stringify(card) + renderVersion;
   let hash = 5381;
   for (let index = 0; index < text.length; index++) {
     hash = ((hash << 5) + hash + text.charCodeAt(index)) | 0;

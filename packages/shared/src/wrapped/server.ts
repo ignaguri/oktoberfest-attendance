@@ -18,6 +18,7 @@ export { LINKABLE_SHARE_CARD_KINDS, SHARE_CARD_KINDS } from "./share/types";
 export {
   buildShareCards,
   isLinkableShareCardKind,
+  SHARE_CARD_RENDER_VERSION,
   shareCardFingerprint,
 } from "./share/build-share-cards";
 export { PERSONA_CREST_FILES, type PersonaId } from "./story/persona";

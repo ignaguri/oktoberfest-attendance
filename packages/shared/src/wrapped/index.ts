@@ -64,8 +64,10 @@ export type {
   WrappedShareContext,
 } from "./share/types";
 export { LINKABLE_SHARE_CARD_KINDS, SHARE_CARD_KINDS } from "./share/types";
+export { createLatestRequestGate } from "./share/latest-request";
 export {
   buildShareCards,
   isLinkableShareCardKind,
+  SHARE_CARD_RENDER_VERSION,
   shareCardFingerprint,
 } from "./share/build-share-cards";

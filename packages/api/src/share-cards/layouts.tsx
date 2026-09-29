@@ -323,6 +323,26 @@ function PersonaLayout({
   );
 }
 
+/** Column, dot and tent sizes for one bar per festival day, within CHART_WIDTH. */
+export function rhythmSizing(barCount: number) {
+  const columnWidth = Math.floor(CHART_WIDTH / Math.max(barCount, 1));
+  // Past ~38 days the columns get narrow, so the gap and outline thin out first
+  const isNarrow = columnWidth < 24;
+  const gap = isNarrow ? 4 : 6;
+  const border = isNarrow ? 1 : 3;
+  const inner = columnWidth - gap - 2 * border;
+  return {
+    columnWidth,
+    gap,
+    border,
+    dot: Math.max(2, Math.min(36, inner - 2)),
+    tentSize: Math.min(
+      Math.max(12, Math.min(30, columnWidth - 12)),
+      columnWidth - gap,
+    ),
+  };
+}
+
 function RhythmLayout({
   card,
   context,
@@ -331,10 +351,10 @@ function RhythmLayout({
   context: LayoutContext;
 }): ReactElement {
   const { t } = context;
-  const columnWidth = Math.floor(CHART_WIDTH / Math.max(card.bars.length, 1));
-  const dot = Math.max(10, Math.min(36, columnWidth - 14));
+  const { columnWidth, gap, border, dot, tentSize } = rhythmSizing(
+    card.bars.length,
+  );
   const chartHeight = MAX_COLUMN_DOTS * (dot + 6) + dot + 12;
-  const tentSize = Math.max(12, Math.min(30, columnWidth - 12));
   return (
     <Page kicker={t(card.kicker)}>
       <div
@@ -359,9 +379,9 @@ function RhythmLayout({
                   ...column,
                   justifyContent: "flex-end",
                   height: chartHeight,
-                  width: columnWidth - 6,
+                  width: columnWidth - gap,
                   borderRadius: 12,
-                  border: `3px solid ${bar.attended ? COLORS.inkFaint : "transparent"}`,
+                  border: `${border}px solid ${bar.attended ? COLORS.inkFaint : "transparent"}`,
                   paddingBottom: 6,
                 }}
               >

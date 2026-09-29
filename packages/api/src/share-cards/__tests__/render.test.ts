@@ -9,6 +9,7 @@ import sharp from "sharp";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { preparePhotos } from "../photos";
+import { rhythmSizing } from "../layouts";
 import { renderShareCard } from "../render";
 
 const JPEG_MAGIC = [0xff, 0xd8, 0xff];
@@ -125,4 +126,15 @@ describe("renderShareCard", () => {
       1920,
     );
   }, 30_000);
+});
+
+describe("rhythmSizing", () => {
+  it("fits every column and its contents for festivals up to two months", () => {
+    for (let days = 1; days <= 60; days++) {
+      const { columnWidth, gap, border, dot, tentSize } = rhythmSizing(days);
+      expect(columnWidth * days).toBeLessThanOrEqual(920);
+      expect(dot + 2 * border).toBeLessThanOrEqual(columnWidth - gap);
+      expect(tentSize).toBeLessThanOrEqual(columnWidth);
+    }
+  });
 });

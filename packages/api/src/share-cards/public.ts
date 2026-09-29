@@ -1,15 +1,15 @@
 import { createHash } from "node:crypto";
 
 import type { ShareLang } from "@prostcounter/shared";
-import type { ShareCard } from "@prostcounter/shared/wrapped/server";
-
-/** Bump whenever a layout changes, so cached public images refresh. */
-export const RENDER_VERSION = "1";
+import {
+  SHARE_CARD_RENDER_VERSION,
+  type ShareCard,
+} from "@prostcounter/shared/wrapped/server";
 
 export function shareCardHash(card: ShareCard): string {
   return createHash("sha256")
     .update(JSON.stringify(card))
-    .update(RENDER_VERSION)
+    .update(SHARE_CARD_RENDER_VERSION)
     .digest("hex")
     .slice(0, 12);
 }

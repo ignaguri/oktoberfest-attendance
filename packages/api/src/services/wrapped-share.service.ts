@@ -65,7 +65,13 @@ export class WrappedShareService {
     if (!isLinkableShareCardKind(kind)) {
       throw new ValidationError("This card can't be shared by link");
     }
-    const card = await this.getCard(userId, festivalId, kind);
+    const card = (await this.getCards(userId, festivalId)).find(
+      (candidate) => candidate.kind === kind,
+    );
+    // The Wrapped exists, the request asked for a card it doesn't offer
+    if (!card) {
+      throw new ValidationError("This Wrapped has no such card");
+    }
     return this.store.upsertLive(userId, festivalId, kind, card);
   }
 

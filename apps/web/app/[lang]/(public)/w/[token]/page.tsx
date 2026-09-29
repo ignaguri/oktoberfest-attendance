@@ -5,6 +5,7 @@ import type { ShareCard } from "@prostcounter/shared/wrapped/server";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { cache } from "react";
 
 import { toSupportedLanguage } from "@/lib/utils/marketingUrl";
 import { createClient } from "@/utils/supabase/server";
@@ -13,7 +14,8 @@ type Params = { lang: string; token: string };
 
 initI18n();
 
-async function loadShare(
+// Metadata and page both need it; cache() makes that one RPC per request
+const loadShare = cache(async function loadShare(
   token: string,
 ): Promise<{ card: ShareCard; festivalName: string } | null> {
   const supabase = await createClient();
@@ -28,7 +30,7 @@ async function loadShare(
     card: row.card_data as unknown as ShareCard,
     festivalName: row.festival_name,
   };
-}
+});
 
 async function siteOrigin(): Promise<string> {
   if (process.env.VERCEL_ENV === "production") {

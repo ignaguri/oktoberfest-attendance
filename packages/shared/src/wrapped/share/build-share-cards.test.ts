@@ -105,4 +105,11 @@ describe("buildShareCards", () => {
     );
     expect(shareCardFingerprint(a)).not.toBe(shareCardFingerprint(b));
   });
+
+  it("changes the fingerprint when the layouts change", () => {
+    const [card] = buildShareCards(makeWrapped(), null);
+    expect(shareCardFingerprint(card, "1")).not.toBe(
+      shareCardFingerprint(card, "2"),
+    );
+  });
 });

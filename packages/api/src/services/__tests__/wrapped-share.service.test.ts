@@ -91,6 +91,13 @@ describe("WrappedShareService", () => {
     ).rejects.toBeInstanceOf(ValidationError);
   });
 
+  it("refuses to link a card the Wrapped does not offer", async () => {
+    const { service } = setup(ready, null as never);
+    await expect(service.createLink("u", "f", "city")).rejects.toBeInstanceOf(
+      ValidationError,
+    );
+  });
+
   it("throws NotFound when revoking a token that is not live", async () => {
     const { service, store } = setup(ready);
     vi.mocked(store.revoke).mockResolvedValue(false);
