@@ -250,6 +250,13 @@ describe("buildWrappedStory", () => {
     expect(wiesn.mugs?.caption.key).toBe("wrapped.story.wiesnAndYou.mugs");
   });
 
+  it("skips the city slide outside Oktoberfest, where its Wiesn copy doesn't fit", () => {
+    const springFest = makeWrapped((data) => {
+      data.festivalInfo.festivalType = "fruehlingsfest";
+    });
+    expect(kinds(buildWrappedStory(springFest, makeOfficialStats()))).not.toContain("wiesnAndYou");
+  });
+
   it("puts the visitors and your share of the Maß on their own cards", () => {
     const wiesn = find(buildWrappedStory(makeWrapped(), makeOfficialStats()), "wiesnAndYou");
     expect(wiesn.visitors?.stat).toEqual({ key: "wrapped.story.wiesnAndYou.visitorsStat", params: { visitors: 6500000 } });

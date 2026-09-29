@@ -304,7 +304,8 @@ function wiesnAndYouSlide(
   stats: WrappedOfficialStats | null,
   now: Date,
 ): WiesnAndYouSlide | null {
-  if (!stats) {
+  // Its copy is all Wiesn and Maß, so no other festival gets it yet
+  if (!stats || !isWiesn(data)) {
     return null;
   }
   const when = stats.isCurrentFestival ? "current" : "lastYear";
