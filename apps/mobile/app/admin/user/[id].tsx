@@ -9,7 +9,7 @@ import {
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AdminAttendance } from "@prostcounter/shared/schemas";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { CalendarDays, Trash2, UsersRound } from "lucide-react-native";
+import { CalendarDays, History, Trash2, UsersRound } from "lucide-react-native";
 import { useCallback, useState } from "react";
 
 import { AdminAttendanceList } from "@/components/admin/admin-attendance-list";
@@ -211,6 +211,24 @@ export default function AdminUserDetailScreen() {
                 onRetry={refetchGroups}
                 onOpen={(groupId) => router.push(`/admin/group/${groupId}`)}
               />
+            </VStack>
+          </Card>
+
+          {/* Timeline */}
+          <Card size="md" variant="elevated">
+            <VStack space="sm">
+              <HStack space="sm" className="items-center">
+                <History size={18} color={IconColors.primary} />
+                <Text className="text-typography-900">{t("admin.analytics.timeline.title")}</Text>
+              </HStack>
+              <Button
+                variant="outline"
+                onPress={() => router.push(`/admin/user-timeline/${id}`)}
+                accessibilityLabel={t("admin.analytics.timeline.open")}
+                accessibilityHint={t("admin.analytics.timeline.openHint")}
+              >
+                <ButtonText>{t("admin.analytics.timeline.open")}</ButtonText>
+              </Button>
             </VStack>
           </Card>
 

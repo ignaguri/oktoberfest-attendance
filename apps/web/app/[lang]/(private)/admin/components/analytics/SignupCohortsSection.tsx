@@ -1,8 +1,19 @@
 "use client";
 
-import { useAdminAnalyticsCohorts } from "@prostcounter/shared/hooks";
+import {
+  useAdminAnalyticsCohortMembers,
+  useAdminAnalyticsCohorts,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { cohortRates, formatPercent } from "@prostcounter/shared/utils";
+import { ANALYTICS_COHORT_STEPS } from "@prostcounter/shared/schemas";
+import type { AnalyticsCohortStep } from "@prostcounter/shared/schemas";
+import {
+  cohortRates,
+  cohortStepCount,
+  cohortStepLabelKey,
+  formatPercent,
+} from "@prostcounter/shared/utils";
+import { useState } from "react";
 
 import {
   Table,
@@ -14,6 +25,7 @@ import {
 } from "@/components/ui/table";
 
 import AnalyticsSectionCard from "./AnalyticsSectionCard";
+import MemberListDialog from "./MemberListDialog";
 
 export default function SignupCohortsSection() {
   const { t } = useTranslation();
@@ -21,10 +33,18 @@ export default function SignupCohortsSection() {
 
   const cohorts = data?.cohorts ?? [];
 
+  const [openMonth, setOpenMonth] = useState<string | null>(null);
+  const [step, setStep] = useState<AnalyticsCohortStep>("signups");
+  const members = useAdminAnalyticsCohortMembers(
+    { month: openMonth ?? "1970-01-01", step },
+    openMonth !== null,
+  );
+  const openRow = cohorts.find((cohort) => cohort.month === openMonth);
+
   return (
     <AnalyticsSectionCard
       title={t("admin.analytics.sections.cohorts")}
-      description={t("admin.analytics.cohorts.hint")}
+      description={`${t("admin.analytics.cohorts.hint")} ${t("admin.analytics.members.tapHint")}`}
       isLoading={loading}
       error={error}
       isEmpty={cohorts.length === 0}
@@ -48,7 +68,18 @@ export default function SignupCohortsSection() {
             const rates = cohortRates(cohort);
             return (
               <TableRow key={cohort.month}>
-                <TableCell className="text-left">{cohort.month.slice(0, 7)}</TableCell>
+                <TableCell className="text-left">
+                  <button
+                    type="button"
+                    className="text-left underline-offset-2 hover:underline"
+                    onClick={() => {
+                      setStep("signups");
+                      setOpenMonth(cohort.month);
+                    }}
+                  >
+                    {cohort.month.slice(0, 7)}
+                  </button>
+                </TableCell>
                 <TableCell className="text-right">{cohort.signups}</TableCell>
                 <TableCell className="text-right">
                   {`${cohort.activated} (${formatPercent(rates.activated)})`}
@@ -67,6 +98,31 @@ export default function SignupCohortsSection() {
           })}
         </TableBody>
       </Table>
+      {openMonth && (
+        <MemberListDialog
+          open
+          onOpenChange={(open) => {
+            if (!open) {
+              setOpenMonth(null);
+            }
+          }}
+          label={`${openMonth.slice(0, 7)} · ${t(cohortStepLabelKey(step))}`}
+          count={openRow ? cohortStepCount(openRow, step) : 0}
+          chips={ANALYTICS_COHORT_STEPS.map((value) => ({
+            value,
+            label: t(cohortStepLabelKey(value)),
+          }))}
+          selectedChip={step}
+          onChipChange={(value) => setStep(value as AnalyticsCohortStep)}
+          members={members.data?.members ?? []}
+          truncated={members.data?.truncated ?? false}
+          isLoading={members.loading}
+          error={members.error}
+          onRetry={() => {
+            void members.refetch();
+          }}
+        />
+      )}
     </AnalyticsSectionCard>
   );
 }

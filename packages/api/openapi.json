@@ -21222,6 +21222,637 @@
           }
         }
       }
+    },
+    "/v1/admin/analytics/funnel/members": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "People behind a funnel step (admin)",
+        "description": "Real users who signed up in the range and reached the step, most recently active first.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "required": true,
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ios",
+                "android"
+              ]
+            },
+            "required": false,
+            "name": "platform",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "signed_up",
+                "logged_attendance",
+                "five_days"
+              ]
+            },
+            "required": true,
+            "name": "step",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "fullName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "signedUpAt": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "lastActiveDay": {
+                            "type": "string",
+                            "nullable": true,
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "festivalId": {
+                            "type": "string"
+                          },
+                          "festivalName": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "userId",
+                          "username",
+                          "fullName",
+                          "signedUpAt",
+                          "lastActiveDay"
+                        ]
+                      }
+                    },
+                    "truncated": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "members",
+                    "truncated"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/analytics/scorecard/members": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "People behind a scorecard number (admin)",
+        "description": "Attendees of the festival (every festival, pooled, without festivalId) in the segment for one feature. Pooled lists name each person once per festival.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": false,
+            "name": "festivalId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "drinks",
+                "photos",
+                "group_joins",
+                "group_messages",
+                "photo_reactions",
+                "photo_comments",
+                "day_plans",
+                "crowd_reports",
+                "friend_requests",
+                "location_sharing",
+                "wrapped"
+              ]
+            },
+            "required": true,
+            "name": "feature",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "attendees",
+                "adopters",
+                "non_adopters",
+                "came_back_adopters",
+                "came_back_non_adopters",
+                "returned_adopters",
+                "returned_non_adopters"
+              ]
+            },
+            "required": true,
+            "name": "segment",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "fullName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "signedUpAt": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "lastActiveDay": {
+                            "type": "string",
+                            "nullable": true,
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "festivalId": {
+                            "type": "string"
+                          },
+                          "festivalName": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "userId",
+                          "username",
+                          "fullName",
+                          "signedUpAt",
+                          "lastActiveDay"
+                        ]
+                      }
+                    },
+                    "truncated": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "members",
+                    "truncated"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/analytics/cohorts/members": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "People behind a cohort number (admin)",
+        "description": "Real users who signed up in the month (Europe/Berlin) and reached the step.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-(0[1-9]|1[0-2])-01$"
+            },
+            "required": true,
+            "name": "month",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "signups",
+                "activated",
+                "activated_7d",
+                "engaged",
+                "returned"
+              ]
+            },
+            "required": true,
+            "name": "step",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          },
+                          "username": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "fullName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "signedUpAt": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "lastActiveDay": {
+                            "type": "string",
+                            "nullable": true,
+                            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                          },
+                          "festivalId": {
+                            "type": "string"
+                          },
+                          "festivalName": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "userId",
+                          "username",
+                          "fullName",
+                          "signedUpAt",
+                          "lastActiveDay"
+                        ]
+                      }
+                    },
+                    "truncated": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "members",
+                    "truncated"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/users/{userId}/timeline": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "One user's timeline (admin)",
+        "description": "Usage events and domain actions, newest first. Pass the previous page's nextCursor back as cursorAt and cursorKey, unchanged.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "userId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "required": false,
+            "name": "cursorAt",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "required": false,
+            "name": "cursorKey",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "all",
+                "action",
+                "event"
+              ]
+            },
+            "required": false,
+            "name": "kind",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Timeline page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rows": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "occurredAt": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "action",
+                              "event"
+                            ]
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "props": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "nullable": true
+                            }
+                          },
+                          "festivalId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "festivalName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "platform": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "appVersion": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "sessionId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "cursorKey": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "occurredAt",
+                          "kind",
+                          "name",
+                          "props",
+                          "festivalId",
+                          "festivalName",
+                          "platform",
+                          "appVersion",
+                          "sessionId",
+                          "cursorKey"
+                        ]
+                      }
+                    },
+                    "nextCursor": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "cursorAt": {
+                          "type": "string"
+                        },
+                        "cursorKey": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "cursorAt",
+                        "cursorKey"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "rows",
+                    "nextCursor"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid range",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

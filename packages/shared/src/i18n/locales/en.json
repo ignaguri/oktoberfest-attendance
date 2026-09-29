@@ -2131,6 +2131,68 @@
         "engaged": "3+ days at one festival",
         "returned": "2+ festivals",
         "headline": "{{month}}: {{percent}} logged an attendance"
+      },
+      "members": {
+        "screenTitle": "People",
+        "title": "{{label}} · {{count}}",
+        "tapHint": "Tap a row to see the people behind it.",
+        "dialogHint": "Open someone to see their timeline",
+        "loading": "Loading…",
+        "empty": "Nobody here",
+        "truncated": "Showing only the first {{count}} people",
+        "signedUp": "Signed up {{date}}",
+        "lastActive": "Last active {{date}}",
+        "neverActive": "No active days recorded",
+        "noName": "No name",
+        "openHint": "Opens this person's timeline",
+        "chipHint": "Shows these people instead",
+        "segments": {
+          "attendees": "Attendees",
+          "adopters": "Used it",
+          "non_adopters": "Did not use it",
+          "came_back_adopters": "Used it and came back",
+          "came_back_non_adopters": "Did not use it, came back",
+          "returned_adopters": "Used it, attended a later festival",
+          "returned_non_adopters": "Did not use it, attended a later festival"
+        }
+      },
+      "timeline": {
+        "title": "Timeline",
+        "open": "Timeline",
+        "openHint": "Everything this person did, newest first",
+        "filterHint": "Filters the timeline",
+        "empty": "Nothing recorded yet",
+        "loadMore": "Load more",
+        "kinds": {
+          "all": "All",
+          "action": "Actions",
+          "event": "Events"
+        },
+        "names": {
+          "signed_up": "Signed up",
+          "attendance": "Logged an attendance",
+          "drink": "Logged a drink",
+          "photo": "Uploaded a photo",
+          "group_join": "Joined a group",
+          "group_message": "Posted in a group",
+          "photo_reaction": "Reacted to a photo",
+          "photo_comment": "Commented on a photo",
+          "day_plan": "Planned a day",
+          "crowd_report": "Reported how full a tent is",
+          "friend_request": "Sent a friend request",
+          "location_sharing": "Shared their location",
+          "wrapped_view": "Opened Wrapped",
+          "screen_viewed": "Viewed a screen",
+          "app_opened": "Opened the app",
+          "notification_opened": "Opened a notification",
+          "sheet_opened": "Opened a sheet",
+          "sheet_abandoned": "Closed a sheet without saving",
+          "prompt_answered": "Answered a prompt",
+          "tutorial_step": "Tutorial step",
+          "empty_state_seen": "Saw an empty screen",
+          "error_shown": "Saw an error",
+          "unknown": "Event: {{name}}"
+        }
       }
     },
     "feedback": {

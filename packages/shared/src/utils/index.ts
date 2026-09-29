@@ -131,3 +131,16 @@ export type {
   ScorecardHint,
   ScoredFeature,
 } from "./analytics-scorecard";
+export {
+  COHORT_STEP_FILTERS,
+  cohortStepCount,
+  cohortStepLabelKey,
+  FUNNEL_STEP_MIN_DAYS,
+  groupTimelineByDay,
+  SCORECARD_SEGMENT_FILTERS,
+  scorecardSegmentCount,
+  sortMembers,
+  timelineLabelKey,
+  timelinePropsText,
+} from "./analytics-drilldown";
+export type { CohortMemberFlag, ScorecardMemberFlag, TimelineDay } from "./analytics-drilldown";

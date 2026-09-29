@@ -56,6 +56,12 @@ export default function Breadcrumbs() {
       return [];
     }
 
+    // Same for the admin user timeline: `/admin/users` is not a route (users are
+    // a tab of /admin), and the page has its own link back to the dashboard.
+    if (pathname.startsWith("/admin/users/")) {
+      return [];
+    }
+
     const segments = pathname.split("/").filter((segment) => segment !== "");
     const newBreadcrumbs: BreadcrumbSegment[] = [];
 

@@ -2368,6 +2368,68 @@
         "engaged": "3+ Tage auf einem Fest",
         "returned": "2+ Feste",
         "headline": "{{month}}: {{percent}} haben einen Besuch eingetragen"
+      },
+      "members": {
+        "screenTitle": "Personen",
+        "title": "{{label}} · {{count}}",
+        "tapHint": "Tippe auf eine Zeile, um die Personen dahinter zu sehen.",
+        "dialogHint": "Öffne eine Person, um ihre Timeline zu sehen",
+        "loading": "Wird geladen…",
+        "empty": "Niemand hier",
+        "truncated": "Nur die ersten {{count}} Personen",
+        "signedUp": "Registriert am {{date}}",
+        "lastActive": "Zuletzt aktiv am {{date}}",
+        "neverActive": "Keine aktiven Tage erfasst",
+        "noName": "Kein Name",
+        "openHint": "Öffnet die Timeline dieser Person",
+        "chipHint": "Zeigt stattdessen diese Personen",
+        "segments": {
+          "attendees": "Besucher",
+          "adopters": "Genutzt",
+          "non_adopters": "Nicht genutzt",
+          "came_back_adopters": "Genutzt und wiedergekommen",
+          "came_back_non_adopters": "Nicht genutzt, wiedergekommen",
+          "returned_adopters": "Genutzt, späteres Fest besucht",
+          "returned_non_adopters": "Nicht genutzt, späteres Fest besucht"
+        }
+      },
+      "timeline": {
+        "title": "Timeline",
+        "open": "Timeline",
+        "openHint": "Alles, was diese Person gemacht hat, neueste zuerst",
+        "filterHint": "Filtert die Timeline",
+        "empty": "Noch nichts erfasst",
+        "loadMore": "Mehr laden",
+        "kinds": {
+          "all": "Alle",
+          "action": "Aktionen",
+          "event": "Ereignisse"
+        },
+        "names": {
+          "signed_up": "Registriert",
+          "attendance": "Besuch eingetragen",
+          "drink": "Getränk eingetragen",
+          "photo": "Foto hochgeladen",
+          "group_join": "Gruppe beigetreten",
+          "group_message": "In einer Gruppe geschrieben",
+          "photo_reaction": "Auf ein Foto reagiert",
+          "photo_comment": "Ein Foto kommentiert",
+          "day_plan": "Einen Tag geplant",
+          "crowd_report": "Zeltauslastung gemeldet",
+          "friend_request": "Freundschaftsanfrage gesendet",
+          "location_sharing": "Standort geteilt",
+          "wrapped_view": "Wrapped geöffnet",
+          "screen_viewed": "Bildschirm angesehen",
+          "app_opened": "App geöffnet",
+          "notification_opened": "Benachrichtigung geöffnet",
+          "sheet_opened": "Sheet geöffnet",
+          "sheet_abandoned": "Sheet ohne Speichern geschlossen",
+          "prompt_answered": "Abfrage beantwortet",
+          "tutorial_step": "Tutorial-Schritt",
+          "empty_state_seen": "Leeren Bildschirm gesehen",
+          "error_shown": "Fehler gesehen",
+          "unknown": "Ereignis: {{name}}"
+        }
       }
     },
     "feedback": {
