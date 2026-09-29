@@ -110,6 +110,12 @@ export default function WrappedScreen() {
   return (
     // Keyed on slide count: a refetch that changes it remounts the shell
     // instead of leaving its reducer's `total` stale (see the useMemo above).
-    <StoryShell key={slides.length} data={result.wrapped} slides={slides} onClose={handleClose} />
+    <StoryShell
+      key={slides.length}
+      data={result.wrapped}
+      slides={slides}
+      share={{ festivalId, officialStats: result.officialStats }}
+      onClose={handleClose}
+    />
   );
 }

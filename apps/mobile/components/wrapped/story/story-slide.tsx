@@ -1,4 +1,4 @@
-import type { StorySlide, WrappedData } from "@prostcounter/shared/wrapped";
+import type { StorySlide, WrappedData, WrappedShareContext } from "@prostcounter/shared/wrapped";
 
 import { BadgesSlide } from "./slides/badges-slide";
 import { BigNumberSlide } from "./slides/big-number-slide";
@@ -16,11 +16,12 @@ interface StorySlideViewProps {
   slide: StorySlide;
   animate: boolean;
   data: WrappedData;
+  share: WrappedShareContext;
   onReplay: () => void;
   onClose: () => void;
 }
 
-export function StorySlideView({ slide, animate, data, onReplay, onClose }: StorySlideViewProps) {
+export function StorySlideView({ slide, animate, data, share, onReplay, onClose }: StorySlideViewProps) {
   switch (slide.kind) {
     case "servus":
       return <ServusSlide slide={slide} animate={animate} />;
@@ -43,6 +44,6 @@ export function StorySlideView({ slide, animate, data, onReplay, onClose }: Stor
     case "persona":
       return <PersonaSlide slide={slide} animate={animate} />;
     case "prost":
-      return <ProstSlide slide={slide} animate={animate} data={data} onReplay={onReplay} onClose={onClose} />;
+      return <ProstSlide slide={slide} animate={animate} data={data} share={share} onReplay={onReplay} onClose={onClose} />;
   }
 }

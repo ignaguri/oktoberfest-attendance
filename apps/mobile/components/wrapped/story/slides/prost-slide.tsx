@@ -1,15 +1,20 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { type StorySlideOf, useStoryCopy, type WrappedData } from "@prostcounter/shared/wrapped";
+import {
+  type StorySlideOf,
+  useStoryCopy,
+  useStoryLanguage,
+  type WrappedData,
+  type WrappedShareContext,
+} from "@prostcounter/shared/wrapped";
 import * as Haptics from "expo-haptics";
-import { useCallback, useRef } from "react";
+import { useCallback, useState } from "react";
 import { Pressable, View } from "react-native";
-import ViewShot, { type ViewShotRef } from "react-native-view-shot";
 
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { ShareImage } from "@/components/wrapped/share-image";
-import { useWrappedShare } from "@/hooks/useWrappedShare";
+import { ShareCarousel } from "@/components/wrapped/share/share-carousel";
+import { useShareCards } from "@/hooks/useShareCards";
 
 import { Crest } from "../crest";
 import { Reveal } from "../reveal";
@@ -19,20 +24,27 @@ interface ProstSlideProps {
   slide: StorySlideOf<"prost">;
   animate: boolean;
   data: WrappedData;
+  share: WrappedShareContext;
   onReplay: () => void;
   onClose: () => void;
 }
 
-export function ProstSlide({ slide, animate, data, onReplay, onClose }: ProstSlideProps) {
+export function ProstSlide({ slide, animate, data, share, onReplay, onClose }: ProstSlideProps) {
   const { t } = useTranslation();
   const copy = useStoryCopy();
-  const shareRef = useRef<ViewShotRef>(null);
-  const { handleShare, isSharing } = useWrappedShare(data, shareRef);
+  const lang = useStoryLanguage();
+  const [carouselOpen, setCarouselOpen] = useState(false);
+  const shareCards = useShareCards({
+    festivalId: share.festivalId,
+    data,
+    officialStats: share.officialStats,
+    lang,
+  });
 
-  const onSharePress = useCallback(async () => {
+  const onSharePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    await handleShare();
-  }, [handleShare]);
+    setCarouselOpen(true);
+  }, []);
 
   return (
     <VStack space="lg" className="flex-1 justify-center" pointerEvents="box-none">
@@ -64,15 +76,12 @@ export function ProstSlide({ slide, animate, data, onReplay, onClose }: ProstSli
       <VStack space="md" className="mt-4" pointerEvents="box-none">
         <Pressable
           onPress={onSharePress}
-          disabled={isSharing}
           className="items-center rounded-xl bg-wrapped-amber px-6 py-4"
           accessibilityRole="button"
           accessibilityLabel={t("wrapped.outro.share")}
           accessibilityHint={t("wrapped.outro.shareHint")}
         >
-          <Text className="text-base font-bold text-wrapped-ink">
-            {isSharing ? t("wrapped.outro.sharing") : t("wrapped.outro.share")}
-          </Text>
+          <Text className="text-base font-bold text-wrapped-ink">{t("wrapped.outro.share")}</Text>
         </Pressable>
         <Pressable
           onPress={onReplay}
@@ -94,12 +103,16 @@ export function ProstSlide({ slide, animate, data, onReplay, onClose }: ProstSli
         </Pressable>
       </VStack>
 
-      {/* Off-screen share image for capture, as the old outro slide did */}
-      <View className="absolute -left-[9999px] top-0">
-        <ViewShot ref={shareRef} options={{ format: "png", quality: 0.95 }}>
-          <ShareImage data={data} />
-        </ViewShot>
-      </View>
+      <ShareCarousel
+        visible={carouselOpen}
+        onClose={() => setCarouselOpen(false)}
+        festivalId={share.festivalId}
+        lang={lang}
+        data={data}
+        cards={shareCards.cards}
+        states={shareCards.states}
+        onRetry={shareCards.retry}
+      />
     </VStack>
   );
 }

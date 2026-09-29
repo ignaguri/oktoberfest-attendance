@@ -7,6 +7,7 @@ import {
   useSlideSummary,
   WRAPPED_STORY_THEME,
   type WrappedData,
+  type WrappedShareContext,
 } from "@prostcounter/shared/wrapped";
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
@@ -22,6 +23,7 @@ import { StorySlideView } from "./story-slide";
 interface StoryShellProps {
   data: WrappedData;
   slides: StorySlide[];
+  share: WrappedShareContext;
   onClose: () => void;
 }
 
@@ -29,7 +31,7 @@ interface StoryShellProps {
  * Tap-only story: left third goes back, the rest goes forward. The tap zones
  * sit under the slide content, which ignores touches except on the last slide.
  */
-export function StoryShell({ data, slides, onClose }: StoryShellProps) {
+export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
@@ -104,6 +106,7 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
             slide={slide}
             animate={animate}
             data={data}
+            share={share}
             onReplay={() => dispatch({ type: "replay" })}
             onClose={onClose}
           />
