@@ -26,7 +26,7 @@ export function Reveal({ step, animate, kind = "fadeUp", className, children }: 
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={
         kind === "stamp"
-          ? { delay: (step * REVEAL_STEP_MS) / 1000, type: "spring", damping: 18, stiffness: 180 }
+          ? { delay: (step * REVEAL_STEP_MS) / 1000, type: "spring", damping: 20, stiffness: 180 }
           : { delay: (step * REVEAL_STEP_MS) / 1000, duration: 0.35 }
       }
     >
