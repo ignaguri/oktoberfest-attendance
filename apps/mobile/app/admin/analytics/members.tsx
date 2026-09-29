@@ -72,7 +72,7 @@ function MembersBody({ label, count, subtitle, chips, members, showFestival }: M
           <MemberList
             members={list}
             showFestival={showFestival}
-            onOpen={(userId) => router.push(`/admin/user/${userId}`)}
+            onOpen={(userId) => router.push(`/admin/user-timeline/${userId}`)}
           />
         </SectionState>
       </VStack>

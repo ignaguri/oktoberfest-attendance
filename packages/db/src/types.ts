@@ -34,21 +34,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      _tmp_drilldown_seed: {
-        Row: {
-          id: string
-          kind: string
-        }
-        Insert: {
-          id: string
-          kind: string
-        }
-        Update: {
-          id?: string
-          kind?: string
-        }
-        Relationships: []
-      }
       achievement_events: {
         Row: {
           achievement_id: string

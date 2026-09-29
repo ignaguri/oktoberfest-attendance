@@ -538,6 +538,12 @@ describe("Admin Analytics Routes - Unit Tests", () => {
       expect(members.eq).toHaveBeenCalledWith("feature", "photos");
       expect(members.eq).toHaveBeenCalledWith("is_user", true);
       expect(members.eq).toHaveBeenCalledWith("came_back", true);
+      // Pooled, a person has a row per festival: festival_id makes the cut stable
+      expect(members.order.mock.calls).toEqual([
+        ["last_active_day", { ascending: false, nullsFirst: false }],
+        ["user_id"],
+        ["festival_id"],
+      ]);
     });
 
     it("pools every festival without festivalId", async () => {

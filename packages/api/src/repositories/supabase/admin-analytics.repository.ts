@@ -214,9 +214,11 @@ export class SupabaseAdminAnalyticsRepository {
     }
     const { data, error } = await request
       // sortMembers' order, so a capped list keeps the most recently active;
-      // user_id keeps the cut stable between fetches
+      // user_id and festival_id (pooled, a person has a row per festival) keep
+      // the cut stable between fetches
       .order("last_active_day", { ascending: false, nullsFirst: false })
       .order("user_id")
+      .order("festival_id")
       .range(0, ANALYTICS_MEMBERS_MAX_ROWS - 1);
     if (error) {
       throw new Error(`analytics_scorecard_members failed: ${error.message}`);
