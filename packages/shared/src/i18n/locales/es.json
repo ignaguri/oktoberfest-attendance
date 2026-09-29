@@ -2220,6 +2220,10 @@
         "returned": "2+ festivales",
         "headline": "{{month}}: {{percent}} cargaron una visita"
       },
+      "chart": {
+        "toggleHint": "Muestra u oculta esta línea",
+        "scrubHint": "Mantené presionado y deslizá para ver cada punto"
+      },
       "members": {
         "screenTitle": "Personas",
         "title": "{{label}} · {{count}}",

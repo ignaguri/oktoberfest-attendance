@@ -2397,6 +2397,10 @@
         "returned": "2+ Feste",
         "headline": "{{month}}: {{percent}} haben einen Besuch eingetragen"
       },
+      "chart": {
+        "toggleHint": "Blendet diese Linie ein oder aus",
+        "scrubHint": "Gedrückt halten und ziehen, um jeden Punkt zu sehen"
+      },
       "members": {
         "screenTitle": "Personen",
         "title": "{{label}} · {{count}}",

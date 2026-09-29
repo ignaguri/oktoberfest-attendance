@@ -2160,6 +2160,10 @@
         "returned": "2+ festivals",
         "headline": "{{month}}: {{percent}} logged an attendance"
       },
+      "chart": {
+        "toggleHint": "Shows or hides this line",
+        "scrubHint": "Press and drag to see each point"
+      },
       "members": {
         "screenTitle": "People",
         "title": "{{label}} · {{count}}",
