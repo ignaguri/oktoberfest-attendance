@@ -16,7 +16,7 @@ export function Reveal({ step, animate, kind = "fadeUp", className, children }: 
   let entering;
   if (animate) {
     if (kind === "stamp") {
-      entering = ZoomIn.delay(delay).springify().damping(11);
+      entering = ZoomIn.delay(delay).springify().damping(16);
     } else if (kind === "fade") {
       entering = FadeIn.delay(delay).duration(300);
     } else {
