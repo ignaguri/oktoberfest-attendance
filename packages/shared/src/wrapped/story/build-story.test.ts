@@ -124,8 +124,8 @@ describe("buildWrappedStory", () => {
   it("lays out one bar per festival day", () => {
     const days = find(buildWrappedStory(makeWrapped(), null), "days");
     expect(days.bars).toHaveLength(16);
-    expect(days.bars[1]).toEqual({ date: "2026-09-20", beers: 5, attended: true });
-    expect(days.bars[2]).toEqual({ date: "2026-09-21", beers: 0, attended: false });
+    expect(days.bars[1]).toEqual({ date: "2026-09-20", beers: 5, attended: true, tents: 2 });
+    expect(days.bars[2]).toEqual({ date: "2026-09-21", beers: 0, attended: false, tents: 0 });
     expect(days.maxBeers).toBe(5);
   });
 
@@ -141,7 +141,90 @@ describe("buildWrappedStory", () => {
       "drinks",
     );
     expect(drinks.top?.key).toBe("wrapped.story.drinks.top.other");
-    expect(drinks.breakdown[0].label.key).toBe("wrapped.story.drinkTypes.other");
+    expect(drinks.breakdown.find((drink) => drink.drinkType === "other")?.count).toBe(14);
+  });
+
+  describe("photo pick", () => {
+    // Photo n was taken on day n; scores by index.
+    const pick = (scores: number[]) =>
+      find(
+        buildWrappedStory(
+          makeWrapped((data) => {
+            data.socialStats.pictures = scores.map((socialScore, index) => ({
+              id: `p${index}`,
+              pictureUrl: `pics/${index}.jpg`,
+              createdAt: `2026-09-${String(19 + index).padStart(2, "0")}T12:00:00+00:00`,
+              attendanceDate: `2026-09-${String(19 + index).padStart(2, "0")}`,
+              socialScore,
+            }));
+          }),
+          null,
+        ),
+        "people",
+      ).photos.map((photo) => photo.id);
+
+    it("shows the photos friends engaged with, then spreads the rest over the festival", () => {
+      expect(pick([0, 0, 2, 0, 0, 0, 1, 0, 0])).toEqual(["p0", "p2", "p6", "p8"]);
+    });
+
+    it("keeps the four most engaged when more have a score", () => {
+      expect(pick([1, 5, 1, 3, 2, 4])).toEqual(["p1", "p3", "p4", "p5"]);
+    });
+
+    it("spreads first to last when nobody engaged", () => {
+      expect(pick([0, 0, 0, 0, 0, 0, 0, 0, 0])).toEqual(["p0", "p3", "p5", "p8"]);
+    });
+  });
+
+  it("keeps tents tied at the cutoff instead of picking one, up to five", () => {
+    const tentsWith = (visits: number[]) =>
+      find(
+        buildWrappedStory(
+          makeWrapped((data) => {
+            data.tentStats.favoriteTent = "A";
+            data.tentStats.tentBreakdown = visits.map((visitCount, index) => ({
+              tentName: String.fromCharCode(70 - index),
+              visitCount,
+            }));
+            data.tentStats.tentBreakdown[0].tentName = "A";
+          }),
+          null,
+        ),
+        "tents",
+      ).topTents;
+
+    expect(tentsWith([3, 1, 1, 1, 1]).map((tent) => [tent.name, tent.visits, tent.isFavorite])).toEqual([
+      ["A", 3, true],
+      ["B", 1, false],
+      ["C", 1, false],
+      ["D", 1, false],
+      ["E", 1, false],
+    ]);
+    expect(tentsWith([3, 1, 1, 1, 1, 1])).toHaveLength(5);
+    expect(tentsWith([3, 2, 2, 1])).toHaveLength(3);
+  });
+
+  it("lists every drink type in a fixed order, zeros included except other", () => {
+    const drinks = find(
+      buildWrappedStory(
+        makeWrapped((data) => {
+          data.drinkStats.breakdown = [
+            { drinkType: "wine", count: 2, percentage: 40 },
+            { drinkType: "beer", count: 3, percentage: 60 },
+          ];
+        }),
+        null,
+      ),
+      "drinks",
+    );
+    expect(drinks.breakdown.map((drink) => [drink.drinkType, drink.count])).toEqual([
+      ["beer", 3],
+      ["radler", 0],
+      ["alcohol_free", 0],
+      ["wine", 2],
+      ["soft_drink", 0],
+    ]);
+    expect(drinks.breakdown[0].label).toEqual({ key: "wrapped.story.drinkTypes.beer" });
   });
 
   it("words last year's stats as last year and names the source", () => {

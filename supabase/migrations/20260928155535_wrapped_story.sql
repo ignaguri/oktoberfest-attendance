@@ -3,12 +3,16 @@
 -- 1. get_wrapped_data gains a timing block (first/last drink hour, peak hour,
 --    weekend share, in the festival's timezone) and vs_festival_avg.attendee_count,
 --    which the story uses to skip percentiles at tiny festivals, and
---    festival_info.festival_type, which keeps the Wiesn copy to Oktoberfest. Output changes,
+--    festival_info.festival_type, which keeps the Wiesn copy to Oktoberfest, and a
+--    social_score per picture (reactions + comments + 2x tags) over the whole
+--    festival, so the story can show the photos friends engaged with. Output changes,
 --    so wrapped_data_version goes to 2.
 -- 2. festival_official_stats holds the city's final numbers (Wiesn-Bilanz),
 --    read next to the cached Wrapped, never inside it. get_festival_official_stats
 --    falls back to the latest earlier festival of the same series.
 -- 3. Seed: Oktoberfest 2025 from the muenchen.de Wiesn-Bilanz 2025.
+-- 4. Reactions, comments and tags now pick the story's photos, so a write to any of
+--    them drops the photo owner's cached Wrapped, like a beer_pictures write does.
 
 CREATE OR REPLACE FUNCTION public.get_wrapped_data(p_user_id uuid, p_festival_id uuid)
  RETURNS jsonb
@@ -274,12 +278,18 @@ BEGIN
       AND a.date <= v_festival.end_date
       AND a.festival_id = p_festival_id
   ),
+  -- Every festival photo (capped), not the newest few: the story picks from the
+  -- whole festival. social_score weighs a tagged friend double a reaction or
+  -- comment, since the slide is "Your people".
   user_pictures AS (
     SELECT
       bp.id,
       bp.picture_url,
       bp.created_at,
-      a.date as attendance_date
+      a.date as attendance_date,
+      (SELECT COUNT(*) FROM photo_reactions r WHERE r.photo_id = bp.id)
+        + (SELECT COUNT(*) FROM photo_comments c WHERE c.photo_id = bp.id)
+        + 2 * (SELECT COUNT(*) FROM photo_tags t WHERE t.photo_id = bp.id) AS social_score
     FROM beer_pictures bp
     JOIN attendances a ON bp.attendance_id = a.id
     WHERE bp.user_id = p_user_id
@@ -287,7 +297,7 @@ BEGIN
       AND a.date <= v_festival.end_date
       AND a.festival_id = p_festival_id
     ORDER BY bp.created_at DESC
-    LIMIT 20
+    LIMIT 100
   )
   SELECT jsonb_build_object(
     'groups_joined', ug.groups_joined,
@@ -300,8 +310,10 @@ BEGIN
           'id', up.id,
           'picture_url', up.picture_url,
           'created_at', up.created_at,
-          'attendance_date', up.attendance_date
+          'attendance_date', up.attendance_date,
+          'social_score', up.social_score
         )
+        ORDER BY up.created_at DESC
       ) FROM user_pictures up),
       '[]'::JSONB
     )
@@ -748,3 +760,49 @@ SELECT
 FROM public.festivals f
 WHERE f.name = 'Oktoberfest 2025'
 ON CONFLICT (festival_id) DO NOTHING;
+
+-- 4. Engagement on a photo changes its social_score, so it drops the owner's
+-- cached Wrapped. The owner and festival come from the photo; when the photo
+-- itself is deleted the lookup finds nothing, and the beer_pictures trigger
+-- covers that case.
+CREATE OR REPLACE FUNCTION public.trigger_photo_engagement_cache_invalidation()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO 'public'
+AS $$
+DECLARE
+  v_user_id uuid;
+  v_festival_id uuid;
+BEGIN
+  SELECT bp.user_id, a.festival_id INTO v_user_id, v_festival_id
+  FROM beer_pictures bp
+  JOIN attendances a ON a.id = bp.attendance_id
+  WHERE bp.id = COALESCE(NEW.photo_id, OLD.photo_id);
+
+  IF v_user_id IS NOT NULL AND v_festival_id IS NOT NULL THEN
+    PERFORM invalidate_wrapped_cache(v_user_id, v_festival_id);
+  END IF;
+
+  RETURN COALESCE(NEW, OLD);
+END;
+$$;
+
+-- Only ever runs as a trigger; EXECUTE is checked when the trigger is created,
+-- not when it fires, so no role needs it.
+REVOKE EXECUTE ON FUNCTION public.trigger_photo_engagement_cache_invalidation() FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS tr_photo_reactions_wrapped_cache_invalidation ON public.photo_reactions;
+CREATE TRIGGER tr_photo_reactions_wrapped_cache_invalidation
+AFTER INSERT OR DELETE ON public.photo_reactions
+FOR EACH ROW EXECUTE FUNCTION public.trigger_photo_engagement_cache_invalidation();
+
+DROP TRIGGER IF EXISTS tr_photo_comments_wrapped_cache_invalidation ON public.photo_comments;
+CREATE TRIGGER tr_photo_comments_wrapped_cache_invalidation
+AFTER INSERT OR DELETE ON public.photo_comments
+FOR EACH ROW EXECUTE FUNCTION public.trigger_photo_engagement_cache_invalidation();
+
+DROP TRIGGER IF EXISTS tr_photo_tags_wrapped_cache_invalidation ON public.photo_tags;
+CREATE TRIGGER tr_photo_tags_wrapped_cache_invalidation
+AFTER INSERT OR DELETE ON public.photo_tags
+FOR EACH ROW EXECUTE FUNCTION public.trigger_photo_engagement_cache_invalidation();

@@ -19,6 +19,15 @@ export function formatWrappedDate(dateString: string): string {
   }
 }
 
+/** "19 Sep": the chart's axis ends, where the full date would crowd the columns. */
+export function formatWrappedShortDate(dateString: string): string {
+  try {
+    return formatLocalized(parseISO(dateString), "d MMM");
+  } catch {
+    return dateString;
+  }
+}
+
 /**
  * Calculate number of groups where user ranked in podium (1st, 2nd, 3rd place)
  */

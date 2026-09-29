@@ -34,7 +34,7 @@ export interface BigNumberSlide extends SlideBase {
 export interface DrinksSlide extends SlideBase {
   kind: "drinks";
   title: CopyRef;
-  breakdown: { drinkType: string; count: number; percentage: number; label: CopyRef }[];
+  breakdown: { drinkType: string; count: number; label: CopyRef }[];
   top: CopyRef | null;
   spent: CopyRef | null;
 }
@@ -42,7 +42,7 @@ export interface DrinksSlide extends SlideBase {
 export interface DaysSlide extends SlideBase {
   kind: "days";
   title: CopyRef;
-  bars: { date: string; beers: number; attended: boolean }[];
+  bars: { date: string; beers: number; attended: boolean; tents: number }[];
   maxBeers: number;
   bestDay: { date: string; callout: CopyRef; details: CopyRef } | null;
 }
@@ -53,7 +53,7 @@ export interface TentsSlide extends SlideBase {
   favorite: CopyRef | null;
   count: CopyRef;
   share: CopyRef | null;
-  topTents: { name: string; visits: number }[];
+  topTents: { name: string; visits: number; isFavorite: boolean }[];
 }
 
 export interface PeopleSlide extends SlideBase {

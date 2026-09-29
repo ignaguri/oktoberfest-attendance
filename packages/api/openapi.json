@@ -9012,13 +9012,17 @@
                                       },
                                       "attendanceDate": {
                                         "type": "string"
+                                      },
+                                      "socialScore": {
+                                        "type": "number"
                                       }
                                     },
                                     "required": [
                                       "id",
                                       "pictureUrl",
                                       "createdAt",
-                                      "attendanceDate"
+                                      "attendanceDate",
+                                      "socialScore"
                                     ]
                                   }
                                 }

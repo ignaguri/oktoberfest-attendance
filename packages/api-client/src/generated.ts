@@ -5518,6 +5518,7 @@ export interface paths {
                                         pictureUrl: string;
                                         createdAt: string;
                                         attendanceDate: string;
+                                        socialScore: number;
                                     }[];
                                 };
                                 globalLeaderboardPositions: {

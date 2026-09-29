@@ -61,6 +61,8 @@ export const WrappedDataSchema = z.object({
         pictureUrl: z.string(),
         createdAt: z.string(),
         attendanceDate: z.string(),
+        /** Reactions + comments + 2x tags: how much friends engaged with it. */
+        socialScore: z.number(),
       }),
     ),
   }),

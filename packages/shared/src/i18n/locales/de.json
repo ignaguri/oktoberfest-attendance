@@ -2548,7 +2548,7 @@
       "servus": {
         "title": "Servus, {{name}}!",
         "titleNoName": "Servus!",
-        "subtitle": "Das war dein {{festival}}."
+        "subtitle": "Schnapp dir eine Maß, wir gehen dein {{festival}} Runde für Runde durch"
       },
       "bigNumber": {
         "kicker": "Auf dem {{festival}} hattest du",
@@ -2591,8 +2591,8 @@
       "days": {
         "title": "Deine Tage",
         "best": "Bester Tag: $t(wrapped.story.units.beers, {\"count\": {{beers}} })",
-        "bestDetails_one": "und {{count}} Zelt.",
-        "bestDetails_other": "in {{count}} Zelten."
+        "bestDetails_one": "in {{count}} Zelt",
+        "bestDetails_other": "in {{count}} Zelten"
       },
       "tents": {
         "title": "Deine Zelte",
@@ -2603,8 +2603,8 @@
       },
       "people": {
         "title": "Deine Leute",
-        "groups_one": "In {{count}} Gruppe",
-        "groups_other": "In {{count}} Gruppen",
+        "groups_one": "{{count}} Gruppe",
+        "groups_other": "{{count}} Gruppen",
         "bestPlacing": "Platz {{position}} in {{group}}",
         "photosLabel": "Deine Wiesn in Bildern",
         "photosLabelGeneric": "Dein Fest in Bildern"

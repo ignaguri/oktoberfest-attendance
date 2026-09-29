@@ -26,6 +26,8 @@ const SAME_AS_AVERAGE_PCT = 5;
 const MAX_PHOTOS = 4;
 const MAX_BADGES = 3;
 const MAX_TENTS = 3;
+/** Ties at the cutoff all get in, rather than luck picking one; this caps how long that can run. */
+const MAX_TENTS_WITH_TIES = 5;
 const KNOWN_DRINK_TYPES = ["beer", "radler", "alcohol_free", "wine", "soft_drink", "other"];
 
 const copy = (key: string, params?: CopyRef["params"]): CopyRef =>
@@ -126,12 +128,15 @@ function drinksSlide(data: WrappedData): DrinksSlide | null {
     kind: "drinks",
     revealSteps: 3,
     title: copy("drinks.title"),
-    breakdown: breakdown.map((drink) => ({
-      drinkType: drink.drinkType,
-      count: drink.count,
-      percentage: drink.percentage,
-      label: copy(`drinkTypes.${drinkTypeKey(drink.drinkType)}`),
-    })),
+    // Every type, zeros included, so the rows read as a full menu of what you did and didn't drink.
+    // An empty "Other" says nothing, so it only shows when something landed there.
+    breakdown: KNOWN_DRINK_TYPES.map((drinkType) => ({
+      drinkType,
+      count: breakdown
+        .filter((drink) => drinkTypeKey(drink.drinkType) === drinkType)
+        .reduce((sum, drink) => sum + drink.count, 0),
+      label: copy(`drinkTypes.${drinkType}`),
+    })).filter((drink) => drink.drinkType !== "other" || drink.count > 0),
     top: topDrinkType ? forFestival(copy(`drinks.top.${drinkTypeKey(topDrinkType)}`), isWiesn(data)) : null,
     spent: data.basicStats.totalSpent > 0 ? copy("drinks.spent", { amount: data.basicStats.totalSpent }) : null,
   };
@@ -141,11 +146,12 @@ function daysSlide(data: WrappedData): DaysSlide | null {
   if (!data.timeline.some((day) => day.beerCount > 0)) {
     return null;
   }
-  const beersByDate = new Map(data.timeline.map((day) => [day.date, day.beerCount]));
+  const dayByDate = new Map(data.timeline.map((day) => [day.date, day]));
   const dayCount = festivalDayCount(data.festivalInfo.startDate, data.festivalInfo.endDate);
   const bars = Array.from({ length: dayCount }, (_, offset) => {
     const date = addDays(data.festivalInfo.startDate, offset);
-    return { date, beers: beersByDate.get(date) ?? 0, attended: beersByDate.has(date) };
+    const day = dayByDate.get(date);
+    return { date, beers: day?.beerCount ?? 0, attended: day !== undefined, tents: day?.tentsVisited ?? 0 };
   });
   const best = data.peakMoments.bestDay;
 
@@ -178,16 +184,59 @@ function tentsSlide(data: WrappedData): TentsSlide | null {
     favorite: favoriteTent ? copy("tents.favorite", { tent: favoriteTent }) : null,
     count: copy("tents.count", { count: uniqueTents }),
     share: tentDiversityPct > 0 ? copy("tents.share", { pct: tentDiversityPct }) : null,
-    topTents: [...tentBreakdown]
-      .sort((a, b) => b.visitCount - a.visitCount)
-      .slice(0, MAX_TENTS)
-      .map((tent) => ({ name: tent.tentName, visits: tent.visitCount })),
+    topTents: topTents(tentBreakdown, favoriteTent),
   };
+}
+
+function topTents(
+  tentBreakdown: WrappedData["tentStats"]["tentBreakdown"],
+  favoriteTent: string | null,
+): TentsSlide["topTents"] {
+  const sorted = [...tentBreakdown].sort(
+    (a, b) =>
+      b.visitCount - a.visitCount ||
+      Number(b.tentName === favoriteTent) - Number(a.tentName === favoriteTent) ||
+      a.tentName.localeCompare(b.tentName),
+  );
+  const cutoff = sorted[MAX_TENTS - 1]?.visitCount;
+  return sorted
+    .filter((tent, index) => index < MAX_TENTS || tent.visitCount === cutoff)
+    .slice(0, MAX_TENTS_WITH_TIES)
+    .map((tent) => ({ name: tent.tentName, visits: tent.visitCount, isFavorite: tent.tentName === favoriteTent }));
+}
+
+type Picture = WrappedData["socialStats"]["pictures"][number];
+
+const byTakenAt = (a: Picture, b: Picture) => a.createdAt.localeCompare(b.createdAt);
+
+/** `count` items evenly spaced from first to last (one alone is the middle). */
+function spread<T>(items: T[], count: number): T[] {
+  if (items.length <= count) {
+    return items;
+  }
+  if (count === 1) {
+    return [items[Math.floor((items.length - 1) / 2)]];
+  }
+  return Array.from({ length: count }, (_, index) => items[Math.round((index * (items.length - 1)) / (count - 1))]);
+}
+
+/**
+ * The photos friends engaged with first (tags count double, see
+ * get_wrapped_data), then the rest spread over the festival, so four uploads
+ * from the last night don't crowd out the other days. Shown in the order taken.
+ */
+function pickPhotos(pictures: Picture[]): Picture[] {
+  const social = pictures
+    .filter((picture) => picture.socialScore > 0)
+    .sort((a, b) => b.socialScore - a.socialScore || byTakenAt(b, a))
+    .slice(0, MAX_PHOTOS);
+  const rest = pictures.filter((picture) => !social.includes(picture)).sort(byTakenAt);
+  return [...social, ...spread(rest, MAX_PHOTOS - social.length)].sort(byTakenAt);
 }
 
 function peopleSlide(data: WrappedData): PeopleSlide | null {
   const { groupsJoined, topRankings, pictures } = data.socialStats;
-  const photos = pictures.slice(0, MAX_PHOTOS).map((picture) => ({
+  const photos = pickPhotos(pictures).map((picture) => ({
     id: picture.id,
     pictureUrl: picture.pictureUrl,
   }));

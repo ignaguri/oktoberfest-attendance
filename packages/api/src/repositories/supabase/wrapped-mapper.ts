@@ -68,6 +68,7 @@ export function mapToWrappedData(raw: any): WrappedData {
         pictureUrl: picture.picture_url,
         createdAt: picture.created_at,
         attendanceDate: picture.attendance_date,
+        socialScore: picture.social_score,
       })),
     },
     globalLeaderboardPositions: {

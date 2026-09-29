@@ -10,20 +10,20 @@ export function BigNumberSlide({ slide, animate }: { slide: StorySlideOf<"bigNum
   const formatNumber = useStoryNumber();
   const beers = useCountUp(slide.beers, animate);
   return (
-    <div className="flex flex-1 flex-col justify-center gap-4">
+    <div className="flex flex-1 flex-col justify-center gap-6 text-center">
       <Reveal step={0} animate={animate}>
-        <StoryKicker>{copy(slide.kicker)}</StoryKicker>
+        <StoryKicker className="text-sm">{copy(slide.kicker)}</StoryKicker>
       </Reveal>
       <Reveal step={1} animate={animate}>
-        <StoryBig>{formatNumber(beers)}</StoryBig>
-        <StoryHeading className="text-2xl">{copy(slide.unit)}</StoryHeading>
+        <StoryBig className="text-9xl">{formatNumber(beers)}</StoryBig>
+        <StoryHeading className="text-4xl">{copy(slide.unit)}</StoryHeading>
       </Reveal>
       <Reveal step={2} animate={animate}>
-        <StoryBody>{copy(slide.tagline)}</StoryBody>
+        <StoryBody className="text-2xl">{copy(slide.tagline)}</StoryBody>
       </Reveal>
       {slide.comparison ? (
         <Reveal step={3} animate={animate}>
-          <StoryNote className="text-base">{copy(slide.comparison)}</StoryNote>
+          <StoryNote className="text-lg">{copy(slide.comparison)}</StoryNote>
         </Reveal>
       ) : null}
     </div>

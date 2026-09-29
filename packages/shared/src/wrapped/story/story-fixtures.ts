@@ -40,6 +40,7 @@ const BASE: WrappedData = {
         pictureUrl: "pics/a.jpg",
         createdAt: "2026-09-20T14:03:11.123456+00:00",
         attendanceDate: "2026-09-20",
+        socialScore: 0,
       },
     ],
   },

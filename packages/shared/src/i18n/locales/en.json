@@ -2311,7 +2311,7 @@
       "servus": {
         "title": "Servus, {{name}}!",
         "titleNoName": "Servus!",
-        "subtitle": "This was your {{festival}}."
+        "subtitle": "Grab a Maß, let's relive your {{festival}} round by round"
       },
       "bigNumber": {
         "kicker": "At {{festival}} you had",
@@ -2354,8 +2354,8 @@
       "days": {
         "title": "Your days",
         "best": "Best day: $t(wrapped.story.units.beers, {\"count\": {{beers}} })",
-        "bestDetails_one": "and {{count}} tent.",
-        "bestDetails_other": "across {{count}} tents."
+        "bestDetails_one": "in {{count}} tent",
+        "bestDetails_other": "across {{count}} tents"
       },
       "tents": {
         "title": "Your tents",
@@ -2366,8 +2366,8 @@
       },
       "people": {
         "title": "Your people",
-        "groups_one": "In {{count}} group",
-        "groups_other": "In {{count}} groups",
+        "groups_one": "{{count}} group",
+        "groups_other": "{{count}} groups",
         "bestPlacing": "#{{position}} in {{group}}",
         "photosLabel": "Your Wiesn in pictures",
         "photosLabelGeneric": "Your festival in pictures"
