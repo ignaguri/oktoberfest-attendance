@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-import { slideSummaryParts } from "./summary";
+import { slideSummaryText } from "./summary";
 import type { CopyRef, StorySlide } from "./types";
 
 export function useStoryCopy(): (ref: CopyRef) => string {
@@ -32,10 +32,5 @@ export function useSlideSummary(slide: StorySlide): string {
   const copy = useStoryCopy();
   const formatNumber = useStoryNumber();
   const language = useStoryLanguage();
-  return slideSummaryParts(slide, language)
-    .map((part) => ("key" in part ? copy(part) : "number" in part ? formatNumber(part.number) : part.text))
-    .filter((text) => text.length > 0)
-    // Headings carry no full stop, so add one where a sentence would otherwise run on.
-    .map((text) => (/[.!?:…]$/.test(text) ? text : `${text}.`))
-    .join(" ");
+  return slideSummaryText(slide, language, copy, formatNumber);
 }

@@ -30,7 +30,7 @@ export function DaysSlide({ slide, animate }: { slide: StorySlideOf<"days">; ani
           {slide.bars.map((bar) => {
             const filled = filledDots(bar.beers, slide.maxBeers);
             return (
-              <VStack key={bar.date} className="items-center" space="xs">
+              <VStack key={bar.date} className="min-w-0 flex-1 items-center" space="xs">
                 {Array.from({ length: COLUMN_DOTS }, (_, index) => (
                   <View
                     key={index}
@@ -40,7 +40,7 @@ export function DaysSlide({ slide, animate }: { slide: StorySlideOf<"days">; ani
                     )}
                   />
                 ))}
-                <View className={cn("mt-1 h-1 w-3 rounded-full", bar.attended ? "bg-wrapped-amber" : "bg-transparent")} />
+                <View className={cn("mt-1 h-1 w-full max-w-3 rounded-full", bar.attended ? "bg-wrapped-amber" : "bg-transparent")} />
               </VStack>
             );
           })}

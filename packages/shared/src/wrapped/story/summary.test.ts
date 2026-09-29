@@ -1,9 +1,11 @@
-import { describe, expect, it } from "vitest";
+import i18next from "i18next";
+import { beforeAll, describe, expect, it } from "vitest";
 
+import en from "../../i18n/locales/en.json";
 import { buildWrappedStory } from "./build-story";
 import { makeOfficialStats, makeWrapped } from "./story-fixtures";
-import { slideSummaryParts } from "./summary";
-import type { CopyRef } from "./types";
+import { type SummaryPart, slideSummaryParts, slideSummaryText } from "./summary";
+import type { CopyRef, StorySlide, StorySlideKind } from "./types";
 
 function copyRefs(node: unknown): CopyRef[] {
   if (Array.isArray(node)) {
@@ -20,11 +22,14 @@ function copyRefs(node: unknown): CopyRef[] {
 
 const slides = buildWrappedStory(makeWrapped(), makeOfficialStats());
 
+const flat = (parts: SummaryPart[]): SummaryPart[] =>
+  parts.flatMap((part) => ("sentence" in part ? flat(part.sentence) : [part]));
+
 describe("slideSummaryParts", () => {
   it.each(slides.map((slide) => [slide.kind, slide] as const))(
     "reads out every piece of copy on the %s slide",
     (_kind, slide) => {
-      const parts = slideSummaryParts(slide, "en");
+      const parts = flat(slideSummaryParts(slide, "en"));
       for (const ref of copyRefs(slide)) {
         expect(parts).toContainEqual(ref);
       }
@@ -39,8 +44,40 @@ describe("slideSummaryParts", () => {
       throw new Error("fixture story is missing a slide");
     }
 
-    expect(slideSummaryParts(persona, "en")).toContainEqual({ text: persona.name });
-    expect(slideSummaryParts(meanwhile, "de")).toContainEqual({ text: meanwhile.finds[0].de });
-    expect(slideSummaryParts(bigNumber, "en")).toContainEqual({ number: bigNumber.beers });
+    expect(flat(slideSummaryParts(persona, "en"))).toContainEqual({ text: persona.name });
+    expect(flat(slideSummaryParts(meanwhile, "de"))).toContainEqual({ text: meanwhile.finds[0].de });
+    expect(flat(slideSummaryParts(bigNumber, "en"))).toContainEqual({ number: bigNumber.beers });
+  });
+});
+
+describe("slideSummaryText", () => {
+  const i18n = i18next.createInstance();
+  beforeAll(async () => {
+    await i18n.init({ resources: { en: { translation: en } }, lng: "en", interpolation: { escapeValue: false } });
+  });
+  const text = (kind: StorySlideKind) => {
+    const slide = slides.find((candidate) => candidate.kind === kind) as StorySlide;
+    const translate = i18n.t as unknown as (key: string, options?: Record<string, unknown>) => string;
+    return slideSummaryText(slide, "en", (ref) => translate(ref.key, ref.params), (value) => String(value));
+  };
+
+  it("reads the big number as one sentence", () => {
+    expect(text("bigNumber")).toMatch(/^At Oktoberfest 2026 you had 12\.5 beers over 4 days\. /);
+  });
+
+  it("gives every drink its count, as the bars do", () => {
+    expect(text("drinks")).toContain("Beer 11. Radler 3.");
+  });
+
+  it("names the best day and keeps its details in the same sentence", () => {
+    expect(text("days")).toContain("20 September 2026. Best day: 5 beers across 2 tents.");
+  });
+
+  it("lists the top tents", () => {
+    expect(text("tents")).toContain("Augustiner-Festhalle. Schottenhamel.");
+  });
+
+  it("reads the mug count with its line", () => {
+    expect(text("meanwhile")).toContain("116000 Maß mugs never made it past the stewards.");
   });
 });

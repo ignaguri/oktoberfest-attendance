@@ -2578,7 +2578,7 @@
           "soft_drink": "Meistens Softdrinks. Fahrer-Energie.",
           "other": "Von allem ein bisschen."
         },
-        "spent": "{{amount, number(minimumFractionDigits: 2, maximumFractionDigits: 2)}} € gut investiert."
+        "spent": "{{amount, number(minimumFractionDigits: 2; maximumFractionDigits: 2)}} € gut investiert."
       },
       "drinkTypes": {
         "beer": "Bier",

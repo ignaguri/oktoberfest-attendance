@@ -28,7 +28,7 @@ export function DaysSlide({ slide, animate }: { slide: StorySlideOf<"days">; ani
           {slide.bars.map((bar) => {
             const filled = filledDots(bar.beers, slide.maxBeers);
             return (
-              <div key={bar.date} className="flex flex-col items-center gap-1">
+              <div key={bar.date} className="flex min-w-0 flex-1 flex-col items-center gap-1">
                 {Array.from({ length: COLUMN_DOTS }, (_, index) => (
                   <span
                     key={index}
@@ -38,7 +38,7 @@ export function DaysSlide({ slide, animate }: { slide: StorySlideOf<"days">; ani
                     )}
                   />
                 ))}
-                <span className={cn("mt-1 h-1 w-3 rounded-full", bar.attended ? "bg-wrapped-amber" : "bg-transparent")} />
+                <span className={cn("mt-1 h-1 w-full max-w-3 rounded-full", bar.attended ? "bg-wrapped-amber" : "bg-transparent")} />
               </div>
             );
           })}

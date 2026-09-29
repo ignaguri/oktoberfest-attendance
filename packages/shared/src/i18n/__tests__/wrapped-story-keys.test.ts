@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { buildWrappedStory } from "../../wrapped/story/build-story";
 import { PERSONA_IDS } from "../../wrapped/story/persona";
 import { makeOfficialStats, makeWrapped } from "../../wrapped/story/story-fixtures";
-import { slideSummaryParts } from "../../wrapped/story/summary";
+import { slideSummaryText } from "../../wrapped/story/summary";
 import type { WrappedData } from "../../schemas/wrapped.schema";
 import type { CopyRef } from "../../wrapped/story/types";
 import de from "../locales/de.json";
@@ -129,6 +129,17 @@ describe("Wrapped story copy", () => {
     expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 3, ...params })).toMatch(new RegExp(`^${plural} `));
   });
 
+  // i18next splits a format on commas, so two number() options need a semicolon.
+  it.each([
+    ["en", "276.70 € well spent."],
+    ["de", "276,70 € gut investiert."],
+    ["es", "276,70 € bien invertidos."],
+  ] as const)("formats the spend for %s readers", async (locale, expected) => {
+    const i18n = i18next.createInstance();
+    await i18n.init({ resources: { [locale]: { translation: BUNDLES[locale] } }, lng: locale, interpolation: { escapeValue: false } });
+    expect(i18n.t("wrapped.story.drinks.spent", { amount: 276.7 })).toBe(expected);
+  });
+
   // The Wiesn is Oktoberfest only; Frühlingsfest and Starkbierfest get neutral copy.
   it.each(["en", "de", "es"] as const)("never says Wiesn outside Oktoberfest in %s", async (locale) => {
     const i18n = i18next.createInstance();
@@ -159,8 +170,7 @@ describe("Wrapped story copy", () => {
     const translate = i18n.t as unknown as (key: string, options?: Record<string, unknown>) => string;
     const text = stories
       .flat()
-      .flatMap((slide) => slideSummaryParts(slide, locale))
-      .map((part) => ("key" in part ? translate(part.key, part.params) : "text" in part ? part.text : ""))
+      .map((slide) => slideSummaryText(slide, locale, (ref) => translate(ref.key, ref.params), String))
       .join("\n");
     expect(text).not.toMatch(/wiesn/i);
 

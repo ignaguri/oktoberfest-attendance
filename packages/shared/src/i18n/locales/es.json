@@ -2401,7 +2401,7 @@
           "soft_drink": "Casi siempre gaseosas. Energía de conductor designado.",
           "other": "Un poco de todo."
         },
-        "spent": "{{amount, number(minimumFractionDigits: 2, maximumFractionDigits: 2)}} € bien invertidos."
+        "spent": "{{amount, number(minimumFractionDigits: 2; maximumFractionDigits: 2)}} € bien invertidos."
       },
       "drinkTypes": {
         "beer": "Cerveza",

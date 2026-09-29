@@ -2341,7 +2341,7 @@
           "soft_drink": "Mostly soft drinks. Designated driver energy.",
           "other": "A bit of everything."
         },
-        "spent": "{{amount, number(minimumFractionDigits: 2, maximumFractionDigits: 2)}} € well spent."
+        "spent": "{{amount, number(minimumFractionDigits: 2; maximumFractionDigits: 2)}} € well spent."
       },
       "drinkTypes": {
         "beer": "Beer",
