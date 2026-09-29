@@ -49,3 +49,23 @@ export { countUpValue, useCountUp } from "./story/count-up";
 export { useSlideSummary, useStoryCopy, useStoryLanguage, useStoryNumber } from "./story/use-story-copy";
 export { type SummaryPart, slideSummaryParts, slideSummaryText } from "./story/summary";
 export { WRAPPED_STORY_THEME } from "./story/theme";
+
+// Share cards
+export type {
+  CityShareCard,
+  LinkableShareCardKind,
+  NumbersShareCard,
+  PersonaShareCard,
+  PhotosShareCard,
+  RhythmShareCard,
+  ShareCard,
+  ShareCardKind,
+  ShareCardOf,
+  WrappedShareContext,
+} from "./share/types";
+export { LINKABLE_SHARE_CARD_KINDS, SHARE_CARD_KINDS } from "./share/types";
+export {
+  buildShareCards,
+  isLinkableShareCardKind,
+  shareCardFingerprint,
+} from "./share/build-share-cards";
