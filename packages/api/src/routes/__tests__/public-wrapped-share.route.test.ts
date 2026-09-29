@@ -63,6 +63,9 @@ describe("Public Wrapped share images", () => {
     ["a stale hash", "lang=en&v=0123456789ab"],
     ["no hash", "lang=en"],
     ["an unsupported lang", `lang=fr&v=${shareCardHash(card)}`],
+    ["an extra parameter", `lang=en&v=${shareCardHash(card)}&x=1`],
+    ["reordered parameters", `v=${shareCardHash(card)}&lang=en`],
+    ["a repeated parameter", `lang=en&lang=en&v=${shareCardHash(card)}`],
   ])("404s %s instead of rendering a new cache entry", async (_, query) => {
     getPublic.mockResolvedValue({
       kind: "numbers",

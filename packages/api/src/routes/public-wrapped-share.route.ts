@@ -48,11 +48,16 @@ app.get("/wrapped-shares/:token/:variant", async (c) => {
   if (!(SUPPORTED_LANGUAGES as readonly string[]).includes(lang ?? "")) {
     throw new NotFoundError("Unknown share image");
   }
+  // The CDN keys on the raw query, so an extra or reordered parameter would be a fresh render
+  const hash = c.req.query("v") ?? "";
+  if (new URL(c.req.url).search !== `?lang=${lang}&v=${hash}`) {
+    throw new NotFoundError("Unknown share image");
+  }
   const share = await publicShareRepository().getPublic(c.req.param("token"));
   if (!share) {
     throw new NotFoundError("This Wrapped isn't shared anymore");
   }
-  if (c.req.query("v") !== shareCardHash(share.card)) {
+  if (hash !== shareCardHash(share.card)) {
     throw new NotFoundError("Unknown share image");
   }
   const jpeg = await renderShareCard(share.card, {
