@@ -124,49 +124,49 @@ const cap = (value: number) => Math.min(value, 2);
 
 /**
  * Each rule returns its strength when it qualifies, otherwise null. Thresholds
- * are starting values, tuned against real data before merge (see the spec).
+ * were tuned against production data (Oktoberfest 2025 and 2026, Frühlingsfest
+ * 2026) so that no persona takes more than ~35% of attendees and Der Genießer
+ * stays under ~30%. Most people come 1-3 days and drink 2-4 a day, which is
+ * why the bars sit lower than the names suggest.
  */
 const RULES: { id: Exclude<PersonaId, "geniesser">; strength: (s: PersonaSignals) => number | null }[] = [
   {
     id: "einmalAberRichtig",
-    strength: (s) => (s.daysAttended === 1 && s.totalBeers >= 4 ? cap(s.totalBeers / 4) : null),
+    strength: (s) => (s.daysAttended === 1 && s.totalBeers >= 2 ? cap(s.totalBeers / 2) : null),
   },
-  { id: "massMeister", strength: (s) => (s.avgBeers >= 5 ? cap(s.avgBeers / 5) : null) },
+  { id: "massMeister", strength: (s) => (s.avgBeers >= 4 ? cap(s.avgBeers / 4) : null) },
   {
     id: "marathoner",
     strength: (s) =>
-      s.attendanceRatio >= 0.6 && s.daysAttended >= 5 ? cap(s.attendanceRatio / 0.6) : null,
+      s.attendanceRatio >= 0.3 && s.daysAttended >= 5 ? cap(s.attendanceRatio / 0.3) : null,
   },
-  {
-    id: "zeltwanderer",
-    strength: (s) =>
-      s.tentDiversityPct >= 40 && s.uniqueTents >= 4 ? cap(s.tentDiversityPct / 40) : null,
-  },
+  // A tent count, not the diversity share: 40% of the 40 Wiesn tents is 16, which nobody visits.
+  { id: "zeltwanderer", strength: (s) => (s.uniqueTents >= 4 ? cap(s.uniqueTents / 4) : null) },
   {
     id: "stammgast",
-    strength: (s) => (s.topTentShare >= 0.6 && s.tentVisits >= 4 ? cap(s.topTentShare / 0.6) : null),
+    strength: (s) => (s.topTentShare >= 0.6 && s.tentVisits >= 3 ? cap(s.topTentShare / 0.6) : null),
   },
   {
     id: "fruehschoppen",
     strength: (s) =>
-      s.timedDays >= 2 && s.medianFirstHour !== null && s.medianFirstHour < 12
-        ? cap((18 - s.medianFirstHour) / 6)
+      s.timedDays >= 1 && s.medianFirstHour !== null && s.medianFirstHour < 13
+        ? cap((18 - s.medianFirstHour) / 5)
         : null,
   },
   {
     id: "nachteule",
     strength: (s) =>
-      s.timedDays >= 2 && s.medianLastHour !== null && s.medianLastHour >= 22
-        ? cap((s.medianLastHour - 18) / 4)
+      s.timedDays >= 1 && s.medianLastHour !== null && s.medianLastHour >= 21.5
+        ? cap((s.medianLastHour - 18) / 3.5)
         : null,
   },
   {
     id: "radlerDiplomat",
-    strength: (s) => (s.totalDrinks >= 4 && s.softShare >= 0.4 ? cap(s.softShare / 0.4) : null),
+    strength: (s) => (s.totalDrinks >= 3 && s.softShare >= 0.3 ? cap(s.softShare / 0.3) : null),
   },
   {
     id: "wochenendKrieger",
-    strength: (s) => (s.daysAttended >= 2 && s.weekendShare === 1 ? 1 : null),
+    strength: (s) => (s.daysAttended >= 1 && s.weekendShare === 1 ? 1 : null),
   },
 ];
 
@@ -194,7 +194,7 @@ function becauseFor(id: PersonaId, s: PersonaSignals): CopyRef {
     case "radlerDiplomat":
       return { key, params: { pct: Math.round(s.softShare * 100) } };
     case "wochenendKrieger":
-      return { key, params: { days: s.daysAttended } };
+      return { key, params: { count: s.daysAttended } };
     case "geniesser":
       return { key, params: { count: s.daysAttended, beers: s.totalBeers } };
   }

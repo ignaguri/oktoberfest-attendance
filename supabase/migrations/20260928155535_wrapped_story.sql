@@ -587,6 +587,7 @@ BEGIN
   WITH timed AS (
     SELECT
       a.date,
+      c.recorded_at,
       EXTRACT(HOUR FROM (c.recorded_at AT TIME ZONE COALESCE(v_festival.timezone, 'Europe/Berlin')))
         + EXTRACT(MINUTE FROM (c.recorded_at AT TIME ZONE COALESCE(v_festival.timezone, 'Europe/Berlin'))) / 60.0
         AS local_hour
@@ -594,9 +595,19 @@ BEGIN
     JOIN attendances a ON a.id = c.attendance_id
     WHERE a.user_id = p_user_id AND a.festival_id = p_festival_id
   ),
+  -- Backfilled drinks (older festivals were migrated from beer_count) share one
+  -- made-up timestamp per day, so only days with at least two distinct times
+  -- count as timed. A real one-drink day is dropped too, which is harmless.
+  logged AS (
+    SELECT date, recorded_at, local_hour
+    FROM timed
+    WHERE date IN (
+      SELECT date FROM timed GROUP BY date HAVING COUNT(DISTINCT recorded_at) > 1
+    )
+  ),
   shifted AS (
     SELECT date, CASE WHEN local_hour < 6 THEN local_hour + 24 ELSE local_hour END AS hour
-    FROM timed
+    FROM logged
   ),
   per_day AS (
     SELECT date, MIN(hour) AS first_hour, MAX(hour) AS last_hour

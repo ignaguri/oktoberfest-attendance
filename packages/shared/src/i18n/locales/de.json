@@ -2688,7 +2688,8 @@
         },
         "wochenendKrieger": {
           "description": "Unter der Woche wird regeneriert.",
-          "because": "Weil alle {{days}} deiner Tage am Wochenende waren."
+          "because_one": "Weil dein einziger Tag am Wochenende war.",
+          "because_other": "Weil alle {{count}} deiner Tage am Wochenende waren."
         },
         "geniesser": {
           "description": "Für die Stimmung da, im eigenen Tempo.",

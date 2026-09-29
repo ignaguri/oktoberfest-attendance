@@ -2451,7 +2451,8 @@
         },
         "wochenendKrieger": {
           "description": "Weekdays are for recovery.",
-          "because": "Because all {{days}} of your days were on a weekend."
+          "because_one": "Because your one day was on a weekend.",
+          "because_other": "Because all {{count}} of your days were on a weekend."
         },
         "geniesser": {
           "description": "Here for the vibes, at your own pace.",

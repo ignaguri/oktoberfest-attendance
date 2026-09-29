@@ -531,6 +531,24 @@ describe("wrapped timing", () => {
     expect(Number(data.timing.weekend_share)).toBeCloseTo(0, 2);
   });
 
+  it("ignores backfilled days, whose drinks all share one timestamp", async () => {
+    const user = await createSignedInUser("timing-backfill");
+    const festivalId = await createFestival(`Timing backfill ${suffix} 2025`, "2025-06-10", "2025-06-20");
+    const backfilled = await attend(user.id, festivalId, "2025-06-12", 0);
+    const logged = await attend(user.id, festivalId, "2025-06-13", 0);
+    await drinkAt(backfilled, "2025-06-13T00:00:00Z"); // 02:00 local, twice
+    await drinkAt(backfilled, "2025-06-13T00:00:00Z");
+    await drinkAt(logged, "2025-06-13T12:00:00Z"); // 14:00 local
+    await drinkAt(logged, "2025-06-13T18:00:00Z"); // 20:00 local
+
+    const data = await wrappedDataAsAdmin(user.id, festivalId);
+
+    expect(data.timing.timed_days).toBe(1);
+    expect(Number(data.timing.median_first_hour)).toBeCloseTo(14, 2);
+    expect(Number(data.timing.median_last_hour)).toBeCloseTo(20, 2);
+    expect(data.timing.peak_hour).toBe(14);
+  });
+
   it("counts the festival's attendees", async () => {
     const first = await createSignedInUser("count-a");
     const second = await createSignedInUser("count-b");

@@ -75,22 +75,58 @@ describe("derivePersona", () => {
   it("breaks a tie by priority (Frühschoppen before Nachteule)", () => {
     const persona = derivePersona(
       neutral((data) => {
-        data.timing.medianFirstHour = 10.5; // strength 1.25
-        data.timing.medianLastHour = 23; // strength 1.25
+        data.timing.medianFirstHour = 8; // strength capped at 2
+        data.timing.medianLastHour = 25; // strength capped at 2
       }),
     );
     expect(persona.id).toBe("fruehschoppen");
     expect(persona.runnerUpId).toBe("nachteule");
   });
 
-  it("needs two timed days for the timing personas", () => {
+  it("needs a timed day for the timing personas", () => {
     const persona = derivePersona(
       neutral((data) => {
-        data.timing.timedDays = 1;
+        data.timing.timedDays = 0;
         data.timing.medianLastHour = 23;
       }),
     );
     expect(persona.id).toBe("geniesser");
+  });
+
+  // Thresholds tuned against production data (Oktoberfest 2025/2026, Frühlingsfest
+  // 2026): each case sits exactly on its persona's boundary.
+  it.each<[string, (data: WrappedData) => void]>([
+    ["einmalAberRichtig", (data) => {
+      data.basicStats.daysAttended = 1;
+      data.basicStats.totalBeers = 2;
+      data.basicStats.avgBeers = 2;
+    }],
+    ["massMeister", (data) => { data.basicStats.avgBeers = 4; }],
+    ["marathoner", (data) => { data.basicStats.daysAttended = 5; }],
+    ["zeltwanderer", (data) => { data.tentStats.uniqueTents = 4; data.tentStats.tentDiversityPct = 10; }],
+    ["stammgast", (data) => {
+      data.tentStats.tentBreakdown = [
+        { tentName: "Schottenhamel", visitCount: 2 },
+        { tentName: "Hacker-Festzelt", visitCount: 1 },
+      ];
+    }],
+    ["fruehschoppen", (data) => { data.timing.timedDays = 1; data.timing.medianFirstHour = 12.99; }],
+    ["nachteule", (data) => { data.timing.timedDays = 1; data.timing.medianLastHour = 21.5; }],
+    ["radlerDiplomat", (data) => {
+      data.drinkStats.totalDrinks = 3;
+      data.drinkStats.breakdown = [
+        { drinkType: "beer", count: 2, percentage: 66.7 },
+        { drinkType: "radler", count: 1, percentage: 33.3 },
+      ];
+    }],
+    ["wochenendKrieger", (data) => {
+      data.basicStats.daysAttended = 1;
+      data.basicStats.totalBeers = 1;
+      data.basicStats.avgBeers = 1;
+      data.timing.weekendShare = 1;
+    }],
+  ])("%s qualifies at its tuned threshold", (expected, mutate) => {
+    expect(derivePersona(neutral(mutate)).id).toBe(expected);
   });
 
   it("passes the real numbers to the because line", () => {
@@ -117,6 +153,16 @@ describe("derivePersona", () => {
 
     const owl = derivePersona(neutral((data) => { data.timing.medianLastHour = 24.25; }));
     expect(owl.because.params).toEqual({ time: "00:15" });
+
+    // count, so the copy can say "your one day" instead of "all 1 of your days"
+    const weekend = derivePersona(
+      neutral((data) => {
+        data.basicStats.daysAttended = 1;
+        data.basicStats.totalBeers = 1;
+        data.timing.weekendShare = 1;
+      }),
+    );
+    expect(weekend.because.params).toEqual({ count: 1 });
   });
 });
 

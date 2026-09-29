@@ -2511,7 +2511,8 @@
         },
         "wochenendKrieger": {
           "description": "Entre semana se descansa.",
-          "because": "Porque tus {{days}} días fueron en fin de semana."
+          "because_one": "Porque tu único día fue en fin de semana.",
+          "because_other": "Porque tus {{count}} días fueron en fin de semana."
         },
         "geniesser": {
           "description": "Por el ambiente, a tu ritmo.",
