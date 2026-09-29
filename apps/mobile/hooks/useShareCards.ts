@@ -2,6 +2,7 @@ import type { ShareLang } from "@prostcounter/shared";
 import { useApiClient } from "@prostcounter/shared/data";
 import {
   buildShareCards,
+  createLatestRequestGate,
   type ShareCard,
   type ShareCardKind,
   shareCardFingerprint,
@@ -46,9 +47,12 @@ export function useShareCards({
   const [states, setStates] = useState<
     Partial<Record<ShareCardKind, ShareCardState>>
   >({});
+  // Only a card's latest download may land; an older one finishing late is dropped
+  const [beginRequest] = useState(createLatestRequestGate<ShareCardKind>);
 
   const load = useCallback(
     async (card: ShareCard) => {
+      const isStale = beginRequest(card.kind);
       setStates((previous) => ({
         ...previous,
         [card.kind]: { status: "loading" },
@@ -75,6 +79,9 @@ export function useShareCards({
           file.delete();
           throw new Error(`Share card ${card.kind} came back empty`);
         }
+        if (isStale()) {
+          return;
+        }
         setStates((previous) => ({
           ...previous,
           [card.kind]: { status: "ready", uri: file.uri },
@@ -84,13 +91,16 @@ export function useShareCards({
           kind: card.kind,
           error: error instanceof Error ? error.message : String(error),
         });
+        if (isStale()) {
+          return;
+        }
         setStates((previous) => ({
           ...previous,
           [card.kind]: { status: "error" },
         }));
       }
     },
-    [apiClient, festivalId, lang],
+    [apiClient, beginRequest, festivalId, lang],
   );
 
   useEffect(() => {

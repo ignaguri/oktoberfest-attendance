@@ -120,9 +120,90 @@ describe("useWebShareCards", () => {
       );
     });
   });
+
+  function stubSlowDownloads() {
+    const pending = new Map<string, () => void>();
+    shareCardRequest.mockImplementation(
+      async (_festivalId: string, kind: string, lang: string) => ({
+        url: `http://api/${kind}/${lang}`,
+        headers: {},
+      }),
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        (url: string) =>
+          new Promise<Response>((resolve) =>
+            pending.set(url, () =>
+              resolve(new Response(new Blob([url]), { status: 200 })),
+            ),
+          ),
+      ),
+    );
+    let objectUrlCount = 0;
+    const revokeObjectURL = vi.fn();
+    vi.stubGlobal(
+      "URL",
+      Object.assign(URL, {
+        createObjectURL: () => `blob:${++objectUrlCount}`,
+        revokeObjectURL,
+      }),
+    );
+    const finish = async (url: string) => {
+      await waitFor(() => expect(pending.has(url)).toBe(true));
+      await act(async () => pending.get(url)!());
+    };
+    return { finish, revokeObjectURL };
+  }
+
+  function renderWithLang() {
+    return renderHook(
+      ({ lang }: { lang: "en" | "de" }) =>
+        useWebShareCards({ festivalId: "f", data, officialStats, lang }),
+      { initialProps: { lang: "en" } },
+    );
+  }
+
+  it("keeps the newest image when an older download finishes last", async () => {
+    const { finish } = stubSlowDownloads();
+    const { result, rerender } = renderWithLang();
+    rerender({ lang: "de" });
+    await finish("http://api/numbers/de");
+    await finish("http://api/numbers/en");
+
+    const state = result.current.states.numbers;
+    expect(state?.status).toBe("ready");
+    expect(state?.status === "ready" && (await state.blob.text())).toBe(
+      "http://api/numbers/de",
+    );
+  });
+
+  it("releases a card's old image once its new one is ready", async () => {
+    const { finish, revokeObjectURL } = stubSlowDownloads();
+    const { result, rerender } = renderWithLang();
+    await finish("http://api/numbers/en");
+    const first = result.current.states.numbers;
+    rerender({ lang: "de" });
+    await finish("http://api/numbers/de");
+
+    expect(first?.status === "ready" && first.url).toBeTruthy();
+    expect(revokeObjectURL).toHaveBeenCalledWith(
+      first?.status === "ready" ? first.url : undefined,
+    );
+  });
 });
 
 describe("ShareCarousel", () => {
+  it("describes the dialog for screen readers", () => {
+    render(<Harness />);
+    const describedBy = screen
+      .getByRole("dialog")
+      .getAttribute("aria-describedby");
+    expect(
+      describedBy && document.getElementById(describedBy)?.textContent,
+    ).toBe("wrapped.shareCards.carousel.description");
+  });
+
   it("starts again on the first card after closing", async () => {
     render(<Harness />);
     expect(screen.getByRole("button", { name: COPY_LINK })).toBeTruthy();

@@ -2951,6 +2951,7 @@
       },
       "carousel": {
         "title": "Wähl deine Karte",
+        "description": "Wisch zu einer Karte, dann teil sie oder kopier ihren Link.",
         "share": "Diese Karte teilen",
         "shareHint": "Öffnet das Teilen-Menü mit dieser Karte",
         "copyLink": "Link kopieren",

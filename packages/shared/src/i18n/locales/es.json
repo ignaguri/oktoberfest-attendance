@@ -2786,6 +2786,7 @@
       },
       "carousel": {
         "title": "Elegí tu tarjeta",
+        "description": "Deslizá para elegir una tarjeta y después compartila o copiá su link.",
         "share": "Compartir esta tarjeta",
         "shareHint": "Abre el menú para compartir esta tarjeta",
         "copyLink": "Copiar link",

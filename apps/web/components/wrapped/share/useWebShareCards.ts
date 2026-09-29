@@ -4,6 +4,7 @@ import type { ShareLang } from "@prostcounter/shared";
 import { useApiClient } from "@prostcounter/shared/data";
 import {
   buildShareCards,
+  createLatestRequestGate,
   type ShareCard,
   type ShareCardKind,
   shareCardFingerprint,
@@ -24,7 +25,7 @@ interface Options {
   lang: ShareLang;
 }
 
-/** Fetches every offered card as a blob on mount (the Prost slide); URLs are revoked on unmount. */
+/** Fetches every offered card as a blob on mount (the Prost slide); a replaced or unmounted card's URL is revoked. */
 export function useWebShareCards({
   festivalId,
   data,
@@ -39,10 +40,13 @@ export function useWebShareCards({
   const [states, setStates] = useState<
     Partial<Record<ShareCardKind, WebShareCardState>>
   >({});
-  const objectUrls = useRef<string[]>([]);
+  const objectUrls = useRef<Partial<Record<ShareCardKind, string>>>({});
+  // Only a card's latest download may land; an older one finishing late is dropped
+  const [beginRequest] = useState(createLatestRequestGate<ShareCardKind>);
 
   const load = useCallback(
     async (card: ShareCard) => {
+      const isStale = beginRequest(card.kind);
       setStates((previous) => ({
         ...previous,
         [card.kind]: { status: "loading" },
@@ -61,20 +65,30 @@ export function useWebShareCards({
           );
         }
         const blob = await response.blob();
+        if (isStale()) {
+          return;
+        }
         const objectUrl = URL.createObjectURL(blob);
-        objectUrls.current.push(objectUrl);
+        const replaced = objectUrls.current[card.kind];
+        if (replaced) {
+          URL.revokeObjectURL(replaced);
+        }
+        objectUrls.current[card.kind] = objectUrl;
         setStates((previous) => ({
           ...previous,
           [card.kind]: { status: "ready", url: objectUrl, blob },
         }));
       } catch {
+        if (isStale()) {
+          return;
+        }
         setStates((previous) => ({
           ...previous,
           [card.kind]: { status: "error" },
         }));
       }
     },
-    [apiClient, festivalId, lang],
+    [apiClient, beginRequest, festivalId, lang],
   );
 
   useEffect(() => {
@@ -85,7 +99,7 @@ export function useWebShareCards({
 
   useEffect(
     () => () => {
-      for (const objectUrl of objectUrls.current) {
+      for (const objectUrl of Object.values(objectUrls.current)) {
         URL.revokeObjectURL(objectUrl);
       }
     },

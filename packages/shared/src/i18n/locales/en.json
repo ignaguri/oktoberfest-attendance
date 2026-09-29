@@ -2726,6 +2726,7 @@
       },
       "carousel": {
         "title": "Pick your card",
+        "description": "Swipe to pick a card, then share it or copy its link.",
         "share": "Share this card",
         "shareHint": "Opens the share sheet with this card",
         "copyLink": "Copy link",

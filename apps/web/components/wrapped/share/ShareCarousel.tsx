@@ -18,7 +18,12 @@ import { cn } from "@prostcounter/ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import type { WebShareCardState } from "./useWebShareCards";
 
@@ -186,6 +191,9 @@ export function ShareCarousel({
         <DialogTitle className="font-wrapped text-2xl font-extrabold text-wrapped-ink">
           {t("wrapped.shareCards.carousel.title")}
         </DialogTitle>
+        <DialogDescription className="sr-only">
+          {t("wrapped.shareCards.carousel.description")}
+        </DialogDescription>
         <div
           ref={scroller}
           onScroll={onScroll}
