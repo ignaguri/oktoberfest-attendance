@@ -101,6 +101,23 @@ describe("renderShareCard", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
+  it("reads a legacy full URL from our own bucket, and no one else's", async () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://xyz.supabase.co");
+    const photo = await webpPhoto();
+    stubPhotoFetch(() => new Response(photo, { status: 200 }));
+    const bucket = "/storage/v1/object/public/beer_pictures/user/beer.webp";
+    expect(
+      await preparePhotos([
+        `https://xyz.supabase.co${bucket}`,
+        `https://evil.example${bucket}`,
+        "https://xyz.supabase.co/storage/v1/object/public/avatars/me.webp",
+      ]),
+    ).toEqual([expect.stringMatching(/^data:image\/jpeg;base64,/)]);
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(fetch).mock.calls[0][0]).toBe(`https://xyz.supabase.co${bucket}`);
+    vi.unstubAllEnvs();
+  });
+
   it("drops photos that fail to load", async () => {
     stubPhotoFetch(() => new Response("nope", { status: 404 }));
     const card = cards.find((candidate) => candidate.kind === "photos")!;
