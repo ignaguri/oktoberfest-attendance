@@ -13,9 +13,9 @@ ignoredBuiltDependencies:
 # package.json: pnpm 10.14 no longer reads that field, which silently disabled
 # both of them.
 onlyBuiltDependencies:
-  - "@shopify/react-native-skia"
   - "@firebase/util"
   - "@sentry/cli"
+  - "@shopify/react-native-skia"
   - "@swc/core"
   - "@tailwindcss/oxide"
   - "@vercel/speed-insights"
