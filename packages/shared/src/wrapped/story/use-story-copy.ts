@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-import type { CopyRef } from "./types";
+import { slideSummaryParts } from "./summary";
+import type { CopyRef, StorySlide } from "./types";
 
 export function useStoryCopy(): (ref: CopyRef) => string {
   const { t } = useTranslation();
@@ -24,4 +25,17 @@ export function useStoryNumber(): (value: number, maxFractionDigits?: number) =>
       new Intl.NumberFormat(i18n.language, { maximumFractionDigits: maxFractionDigits }).format(value),
     [i18n.language],
   );
+}
+
+/** The slide's whole text as one string, for its accessibility label / live region. */
+export function useSlideSummary(slide: StorySlide): string {
+  const copy = useStoryCopy();
+  const formatNumber = useStoryNumber();
+  const language = useStoryLanguage();
+  return slideSummaryParts(slide, language)
+    .map((part) => ("key" in part ? copy(part) : "number" in part ? formatNumber(part.number) : part.text))
+    .filter((text) => text.length > 0)
+    // Headings carry no full stop, so add one where a sentence would otherwise run on.
+    .map((text) => (/[.!?:…]$/.test(text) ? text : `${text}.`))
+    .join(" ");
 }

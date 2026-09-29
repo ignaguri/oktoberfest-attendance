@@ -24,7 +24,7 @@ export function PeopleSlide({ slide, animate }: { slide: StorySlideOf<"people">;
       </Reveal>
       {slide.bestPlacing ? (
         <Reveal step={1} animate={animate} kind="stamp">
-          <StoryStamp className="py-2">{copy(slide.bestPlacing)}</StoryStamp>
+          <StoryStamp numberOfLines={2} className="py-2">{copy(slide.bestPlacing)}</StoryStamp>
         </Reveal>
       ) : null}
       {slide.photosLabel && photos.length > 0 ? (

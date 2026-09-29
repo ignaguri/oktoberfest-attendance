@@ -100,6 +100,7 @@ export default function AdminFestivalOfficialStatsScreen() {
         },
       });
       setDraft(null);
+      showDialog(t("common.status.success"), t("admin.mobile.festivalDetail.officialStats.saved"));
     } catch {
       showDialog(t("common.status.error"), t("admin.mobile.festivalDetail.officialStats.saveError"));
     }

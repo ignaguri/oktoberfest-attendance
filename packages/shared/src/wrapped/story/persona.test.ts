@@ -83,6 +83,18 @@ describe("derivePersona", () => {
     expect(persona.runnerUpId).toBe("nachteule");
   });
 
+  it("does not crown a zero-drink weekend visit a Wochenend-Krieger", () => {
+    const persona = derivePersona(
+      neutral((data) => {
+        data.basicStats.daysAttended = 1;
+        data.basicStats.totalBeers = 0;
+        data.basicStats.avgBeers = 0;
+        data.timing.weekendShare = 1;
+      }),
+    );
+    expect(persona.id).toBe("geniesser");
+  });
+
   it("needs a timed day for the timing personas", () => {
     const persona = derivePersona(
       neutral((data) => {

@@ -234,7 +234,7 @@ function wiesnAndYouSlide(data: WrappedData, stats: WrappedOfficialStats | null)
     share:
       beers > 0 && stats.massServed > 0
         ? copy(`wiesnAndYou.share.${when}`, {
-            beers,
+            count: beers,
             pct: (beers / stats.massServed) * 100,
             mass: stats.massServed,
           })
@@ -270,7 +270,7 @@ function badgesSlide(data: WrappedData): BadgesSlide | null {
     .slice(0, MAX_BADGES)
     .map((achievement) => ({
       id: achievement.id,
-      name: achievement.name,
+      name: { key: achievement.name },
       icon: achievement.icon,
       category: achievement.category,
       tier: achievement.tier,

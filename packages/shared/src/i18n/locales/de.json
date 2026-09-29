@@ -1850,6 +1850,7 @@
           "localeEs": "Spanisch",
           "save": "Speichern",
           "saveError": "Die Zahlen konnten nicht gespeichert werden",
+          "saved": "Zahlen gespeichert. Wrapped übernimmt sie beim nächsten Öffnen.",
           "invalidNumber": "Nur ganze Zahlen",
           "incompleteFind": "Alle drei Sprachen ausfüllen oder das Fundstück leer lassen",
           "invalidUrl": "Nutze einen vollständigen Link mit http:// oder https://",
@@ -2532,6 +2533,10 @@
       "description": "Trag mindestens einen Tag auf einem Festival ein, um deinen Rückblick zu bekommen."
     },
     "story": {
+      "units": {
+        "beers_one": "{{count, number}} Bier",
+        "beers_other": "{{count, number}} Biere"
+      },
       "a11y": {
         "next": "Weiter",
         "nextHint": "Zeigt den nächsten Teil deines Wrapped",
@@ -2582,7 +2587,7 @@
       },
       "days": {
         "title": "Deine Tage",
-        "best": "Bester Tag: {{beers, number(maximumFractionDigits: 1)}} Biere",
+        "best": "Bester Tag: $t(wrapped.story.units.beers, {\"count\": {{beers}} })",
         "bestDetails_one": "und {{count}} Zelt.",
         "bestDetails_other": "in {{count}} Zelten."
       },
@@ -2628,8 +2633,10 @@
           "lastYear": "Letztes Jahr kamen {{visitors, number}} Leute. Dieses Jahr warst du dabei."
         },
         "share": {
-          "current": "Deine {{beers, number(maximumFractionDigits: 1)}} Biere waren {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} ausgeschenkten Maß.",
-          "lastYear": "Deine {{beers, number(maximumFractionDigits: 1)}} Biere wären {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} Maß vom letzten Jahr gewesen."
+          "current_one": "Dein eines Bier war {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} ausgeschenkten Maß.",
+          "current_other": "Deine {{count, number(maximumFractionDigits: 1)}} Biere waren {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} ausgeschenkten Maß.",
+          "lastYear_one": "Dein eines Bier wäre {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} Maß vom letzten Jahr gewesen.",
+          "lastYear_other": "Deine {{count, number(maximumFractionDigits: 1)}} Biere wären {{pct, number(maximumSignificantDigits: 2)}} % der {{mass, number}} Maß vom letzten Jahr gewesen."
         }
       },
       "meanwhile": {
@@ -2693,8 +2700,8 @@
         },
         "geniesser": {
           "description": "Für die Stimmung da, im eigenen Tempo.",
-          "because_one": "Weil ein Tag und {{beers, number(maximumFractionDigits: 1)}} Biere genau richtig waren.",
-          "because_other": "Weil {{count}} Tage und {{beers, number(maximumFractionDigits: 1)}} Biere genau richtig waren."
+          "because_one": "Weil ein Tag und $t(wrapped.story.units.beers, {\"count\": {{beers}} }) genau richtig waren.",
+          "because_other": "Weil {{count}} Tage und $t(wrapped.story.units.beers, {\"count\": {{beers}} }) genau richtig waren."
         }
       },
       "prost": {

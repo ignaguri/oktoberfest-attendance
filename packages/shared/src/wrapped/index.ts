@@ -45,5 +45,6 @@ export {
 export type { StoryAction, StoryState } from "./story/navigation";
 export { initialStoryState, REVEAL_STEP_MS, revealDurationMs, storyReducer } from "./story/navigation";
 export { countUpValue, useCountUp } from "./story/count-up";
-export { useStoryCopy, useStoryLanguage, useStoryNumber } from "./story/use-story-copy";
+export { useSlideSummary, useStoryCopy, useStoryLanguage, useStoryNumber } from "./story/use-story-copy";
+export { type SummaryPart, slideSummaryParts } from "./story/summary";
 export { WRAPPED_STORY_THEME } from "./story/theme";

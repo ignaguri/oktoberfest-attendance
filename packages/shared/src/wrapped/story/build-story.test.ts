@@ -190,6 +190,19 @@ describe("buildWrappedStory", () => {
     expect(badges.count.params).toEqual({ count: 4 });
   });
 
+  it("hands badge names over as translation keys, like the DB stores them", () => {
+    const badges = find(
+      buildWrappedStory(
+        makeWrapped((data) => {
+          data.achievements[0].name = "achievements.drinks_total.t1.name";
+        }),
+        null,
+      ),
+      "badges",
+    );
+    expect(badges.top[0].name).toEqual({ key: "achievements.drinks_total.t1.name" });
+  });
+
   it("names the series without the year on the last slide", () => {
     const prost = find(buildWrappedStory(makeWrapped(), null), "prost");
     expect(prost.summary).toEqual({ key: "wrapped.story.prost.summary", params: { series: "Oktoberfest" } });

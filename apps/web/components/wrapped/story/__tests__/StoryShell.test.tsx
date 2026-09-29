@@ -64,6 +64,27 @@ describe("StoryShell", () => {
     expect(screen.getByText("Servus, Maxi Muster!")).toBeTruthy();
   });
 
+  it("announces the slide and its whole text to screen readers", async () => {
+    renderStory();
+    await act(async () => {
+      fireEvent.keyDown(window, { key: "ArrowRight" });
+    });
+    const region = screen.getByRole("status");
+    expect(region.getAttribute("aria-live")).toBe("polite");
+    expect(region.textContent).toContain("2 of");
+    expect(region.textContent).toContain("At Oktoberfest 2026 you had");
+  });
+
+  it("leaves Space to a focused button instead of moving on", async () => {
+    renderStory();
+    const close = screen.getByRole("button", { name: "Close" });
+    close.focus();
+    await act(async () => {
+      fireEvent.keyDown(close, { key: " " });
+    });
+    expect(screen.getByText("Servus, Maxi Muster!")).toBeTruthy();
+  });
+
   it("renders every slide through to Prost and closes on Escape", async () => {
     const { slides, onClose } = renderStory();
     for (let index = 1; index < slides.length; index += 1) {

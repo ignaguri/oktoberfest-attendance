@@ -46,8 +46,9 @@ const BASE: WrappedData = {
   achievements: [
     {
       id: "2b1d7c4e-3a5f-4e6b-8c9d-0e1f2a3b4c5d",
-      name: "First Maß",
-      description: "Log your first beer",
+      // The DB stores translation keys here, not display text
+      name: "achievements.drinks_total.t1.name",
+      description: "achievements.drinks_total.t1.description",
       icon: "masskrug",
       category: "consumption",
       tier: 1,

@@ -1613,6 +1613,7 @@
           "localeEs": "Spanish",
           "save": "Save",
           "saveError": "Could not save the figures",
+          "saved": "Figures saved. Wrapped picks them up on the next open.",
           "invalidNumber": "Use whole numbers only",
           "incompleteFind": "Fill in all three languages or leave the find empty",
           "invalidUrl": "Use a full link starting with http:// or https://",
@@ -2295,6 +2296,10 @@
       "description": "Log at least one day at a festival to get your Wrapped."
     },
     "story": {
+      "units": {
+        "beers_one": "{{count, number}} beer",
+        "beers_other": "{{count, number}} beers"
+      },
       "a11y": {
         "next": "Next",
         "nextHint": "Shows the next part of your Wrapped",
@@ -2345,7 +2350,7 @@
       },
       "days": {
         "title": "Your days",
-        "best": "Best day: {{beers, number(maximumFractionDigits: 1)}} beers",
+        "best": "Best day: $t(wrapped.story.units.beers, {\"count\": {{beers}} })",
         "bestDetails_one": "and {{count}} tent.",
         "bestDetails_other": "across {{count}} tents."
       },
@@ -2391,8 +2396,10 @@
           "lastYear": "{{visitors, number}} people came last year. This year, you were one of them."
         },
         "share": {
-          "current": "Your {{beers, number(maximumFractionDigits: 1)}} beers were {{pct, number(maximumSignificantDigits: 2)}}% of the {{mass, number}} Maß served.",
-          "lastYear": "Your {{beers, number(maximumFractionDigits: 1)}} beers would have been {{pct, number(maximumSignificantDigits: 2)}}% of last year's {{mass, number}} Maß."
+          "current_one": "Your one beer was {{pct, number(maximumSignificantDigits: 2)}}% of the {{mass, number}} Maß served.",
+          "current_other": "Your {{count, number(maximumFractionDigits: 1)}} beers were {{pct, number(maximumSignificantDigits: 2)}}% of the {{mass, number}} Maß served.",
+          "lastYear_one": "Your one beer would have been {{pct, number(maximumSignificantDigits: 2)}}% of last year's {{mass, number}} Maß.",
+          "lastYear_other": "Your {{count, number(maximumFractionDigits: 1)}} beers would have been {{pct, number(maximumSignificantDigits: 2)}}% of last year's {{mass, number}} Maß."
         }
       },
       "meanwhile": {
@@ -2456,8 +2463,8 @@
         },
         "geniesser": {
           "description": "Here for the vibes, at your own pace.",
-          "because_one": "Because one day and {{beers, number(maximumFractionDigits: 1)}} beers was exactly enough.",
-          "because_other": "Because {{count}} days and {{beers, number(maximumFractionDigits: 1)}} beers was exactly enough."
+          "because_one": "Because one day and $t(wrapped.story.units.beers, {\"count\": {{beers}} }) was exactly enough.",
+          "because_other": "Because {{count}} days and $t(wrapped.story.units.beers, {\"count\": {{beers}} }) was exactly enough."
         }
       },
       "prost": {

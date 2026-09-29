@@ -21,7 +21,7 @@ export function BadgesSlide({ slide, animate }: { slide: StorySlideOf<"badges">;
         <Reveal key={badge.id} step={index + 1} animate={animate} kind="stamp">
           <div className="flex items-center gap-4">
             <AchievementBadge
-              name={badge.name}
+              name=""
               icon={badge.icon}
               category={badge.category as AchievementCategory}
               tier={badge.tier as 1 | 2 | 3 | 4}
@@ -30,7 +30,7 @@ export function BadgesSlide({ slide, animate }: { slide: StorySlideOf<"badges">;
               isUnlocked
               size="md"
             />
-            <StoryBody className="line-clamp-2 flex-1 font-bold">{badge.name}</StoryBody>
+            <StoryBody className="line-clamp-2 flex-1 font-bold">{copy(badge.name)}</StoryBody>
           </div>
         </Reveal>
       ))}

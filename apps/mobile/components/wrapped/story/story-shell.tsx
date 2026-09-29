@@ -4,6 +4,7 @@ import {
   revealDurationMs,
   type StorySlide,
   storyReducer,
+  useSlideSummary,
   WRAPPED_STORY_THEME,
   type WrappedData,
 } from "@prostcounter/shared/wrapped";
@@ -11,7 +12,7 @@ import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { X } from "lucide-react-native";
 import { useEffect, useReducer, useRef } from "react";
-import { Pressable, View } from "react-native";
+import { AccessibilityInfo, Pressable, View } from "react-native";
 import { useReducedMotion } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -35,6 +36,8 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
   const [state, dispatch] = useReducer(storyReducer, slides.length, initialStoryState);
   const slide = slides[state.index];
   const hasMoved = useRef(false);
+  const summary = useSlideSummary(slide);
+  const progressLabel = t("wrapped.story.a11y.progress", { current: state.index + 1, total: slides.length });
 
   useEffect(() => {
     if (state.revealComplete) {
@@ -55,6 +58,12 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   }, [state.index]);
+
+  // The tap zones are the only focus targets a slide change leaves behind, so a
+  // screen reader would hear nothing new on "Next" without this.
+  useEffect(() => {
+    AccessibilityInfo.announceForAccessibility(`${progressLabel}. ${summary}`);
+  }, [progressLabel, summary]);
 
   const animate = !reduceMotion && !state.revealComplete;
   const isLast = slide.kind === "prost";
@@ -83,7 +92,14 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
         style={{ paddingTop: insets.top + 64, paddingBottom: insets.bottom + 24 }}
         pointerEvents={isLast ? "box-none" : "none"}
       >
-        <View key={`${state.index}-${animate ? "animating" : "done"}`} className="flex-1" pointerEvents="box-none">
+        {/* One accessible summary per slide; the Prost slide stays open so its buttons remain reachable. */}
+        <View
+          key={`${state.index}-${animate ? "animating" : "done"}`}
+          className="flex-1"
+          pointerEvents="box-none"
+          accessible={!isLast}
+          accessibilityLabel={isLast ? undefined : summary}
+        >
           <StorySlideView
             slide={slide}
             animate={animate}
@@ -98,7 +114,9 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
         className="absolute left-4 right-4 flex-row gap-1"
         style={{ top: insets.top + 12 }}
         pointerEvents="none"
-        accessibilityLabel={t("wrapped.story.a11y.progress", { current: state.index + 1, total: slides.length })}
+        accessible
+        accessibilityRole="progressbar"
+        accessibilityLabel={progressLabel}
       >
         {slides.map((item, index) => (
           <View

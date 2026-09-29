@@ -5596,6 +5596,7 @@ export interface paths {
                                     en: string;
                                     es: string;
                                 }[];
+                                /** Format: uri */
                                 sourceUrl: string | null;
                             } | null;
                         } | {

@@ -166,7 +166,7 @@ const RULES: { id: Exclude<PersonaId, "geniesser">; strength: (s: PersonaSignals
   },
   {
     id: "wochenendKrieger",
-    strength: (s) => (s.daysAttended >= 1 && s.weekendShare === 1 ? 1 : null),
+    strength: (s) => (s.daysAttended >= 1 && s.totalBeers > 0 && s.weekendShare === 1 ? 1 : null),
   },
 ];
 

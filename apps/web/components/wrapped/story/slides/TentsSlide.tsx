@@ -14,7 +14,7 @@ export function TentsSlide({ slide, animate }: { slide: StorySlideOf<"tents">; a
       </Reveal>
       {slide.favorite ? (
         <Reveal step={1} animate={animate} kind="stamp">
-          <StoryStamp className="py-2">{copy(slide.favorite)}</StoryStamp>
+          <StoryStamp className="line-clamp-2 py-2">{copy(slide.favorite)}</StoryStamp>
         </Reveal>
       ) : null}
       <Reveal step={2} animate={animate}>

@@ -29,7 +29,7 @@ export function MeanwhileSlide({ slide, animate }: { slide: StorySlideOf<"meanwh
       </Reveal>
       <VStack space="md">
         {slide.finds.map((find, index) => (
-          <Reveal key={find.en} step={index + 1} animate={animate} kind="stamp">
+          <Reveal key={`${index}-${find.en}`} step={index + 1} animate={animate} kind="stamp">
             <View
               className={cn(
                 "self-start rounded-md border-2 border-wrapped-ink bg-white px-3 py-2",

@@ -1,3 +1,4 @@
+import i18next from "i18next";
 import { describe, expect, it } from "vitest";
 
 import { buildWrappedStory } from "../../wrapped/story/build-story";
@@ -92,6 +93,38 @@ describe("Wrapped story copy", () => {
         expect(resolves(bundle, `wrapped.story.persona.${id}.because`), `${locale} ${id}`).toBe(true);
       }
     }
+  });
+
+  // Most visitors log 1-3 beers, so the singular is the common case, not an edge.
+  it.each([
+    ["en", "1 beer", "1 beers"],
+    ["de", "1 Bier", "1 Biere"],
+    ["es", "1 cerveza", "1 cervezas"],
+  ] as const)("says one beer in the singular in %s", async (locale, singular, broken) => {
+    const i18n = i18next.createInstance();
+    await i18n.init({ resources: { [locale]: { translation: BUNDLES[locale] } }, lng: locale, interpolation: { escapeValue: false } });
+    const lines = [
+      i18n.t("wrapped.story.days.best", { beers: 1 }),
+      i18n.t("wrapped.story.persona.geniesser.because", { count: 1, beers: 1 }),
+      i18n.t("wrapped.story.persona.geniesser.because", { count: 3, beers: 1 }),
+    ];
+    for (const line of lines) {
+      expect(line).toContain(singular);
+      expect(line).not.toContain(broken);
+    }
+  });
+
+  it.each([
+    ["en", "Your one beer was", "Your one beer would have been", "Your 3 beers were"],
+    ["de", "Dein eines Bier war", "Dein eines Bier wäre", "Deine 3 Biere waren"],
+    ["es", "Tu única cerveza fue", "Tu única cerveza habría sido", "Tus 3 cervezas fueron"],
+  ] as const)("agrees the share line with the beer count in %s", async (locale, current, lastYear, plural) => {
+    const i18n = i18next.createInstance();
+    await i18n.init({ resources: { [locale]: { translation: BUNDLES[locale] } }, lng: locale, interpolation: { escapeValue: false } });
+    const params = { pct: 0.01, mass: 7000000 };
+    expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 1, ...params })).toMatch(new RegExp(`^${current} `));
+    expect(i18n.t("wrapped.story.wiesnAndYou.share.lastYear", { count: 1, ...params })).toMatch(new RegExp(`^${lastYear} `));
+    expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 3, ...params })).toMatch(new RegExp(`^${plural} `));
   });
 
   it("has the admin official-stats keys", () => {

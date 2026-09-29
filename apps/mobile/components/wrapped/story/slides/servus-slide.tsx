@@ -32,7 +32,7 @@ export function ServusSlide({ slide, animate }: { slide: StorySlideOf<"servus">;
         </Reveal>
       ) : null}
       <Reveal step={2} animate={animate}>
-        <StoryHeading className="text-5xl">{copy(slide.title)}</StoryHeading>
+        <StoryHeading numberOfLines={2} className="text-5xl">{copy(slide.title)}</StoryHeading>
       </Reveal>
       <Reveal step={3} animate={animate}>
         <StoryBody>{copy(slide.subtitle)}</StoryBody>

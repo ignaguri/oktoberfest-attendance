@@ -27,7 +27,7 @@ export function BadgesSlide({ slide, animate }: { slide: StorySlideOf<"badges">;
               isUnlocked
               size="md"
             />
-            <StoryBody numberOfLines={2} className="flex-1 font-bold">{badge.name}</StoryBody>
+            <StoryBody numberOfLines={2} className="flex-1 font-bold">{copy(badge.name)}</StoryBody>
           </HStack>
         </Reveal>
       ))}

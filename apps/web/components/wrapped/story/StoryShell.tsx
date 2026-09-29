@@ -6,6 +6,7 @@ import {
   revealDurationMs,
   type StorySlide,
   storyReducer,
+  useSlideSummary,
   type WrappedData,
 } from "@prostcounter/shared/wrapped";
 import { useReducedMotion } from "framer-motion";
@@ -32,6 +33,8 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
   const reduceMotion = useReducedMotion() ?? false;
   const [state, dispatch] = useReducer(storyReducer, slides.length, initialStoryState);
   const slide = slides[state.index];
+  const summary = useSlideSummary(slide);
+  const isLast = slide.kind === "prost";
 
   useEffect(() => {
     if (state.revealComplete) {
@@ -47,7 +50,12 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight" || event.key === " ") {
+      if (event.altKey || event.ctrlKey || event.metaKey) {
+        return;
+      }
+      // Space on a focused Share/Replay/Close button presses that button
+      const onControl = event.target instanceof HTMLElement && event.target.closest("button, a") !== null;
+      if (event.key === "ArrowRight" || (event.key === " " && !onControl)) {
         event.preventDefault();
         dispatch({ type: "next" });
       } else if (event.key === "ArrowLeft") {
@@ -81,7 +89,12 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
         />
 
         <div className="pointer-events-none flex h-full flex-col px-6 pt-20 pb-8">
-          <div key={`${state.index}-${animate ? "animating" : "done"}`} className="flex flex-1 flex-col">
+          {/* Screen readers get the slide from the live region below; Prost stays exposed for its buttons. */}
+          <div
+            key={`${state.index}-${animate ? "animating" : "done"}`}
+            className="flex flex-1 flex-col"
+            aria-hidden={isLast ? undefined : true}
+          >
             <StorySlideView
               slide={slide}
               animate={animate}
@@ -92,10 +105,11 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
           </div>
         </div>
 
-        <div
-          className="pointer-events-none absolute top-4 right-4 left-4 flex gap-1"
-          aria-label={t("wrapped.story.a11y.progress", { current: state.index + 1, total: slides.length })}
-        >
+        <output aria-live="polite" className="sr-only">
+          {`${t("wrapped.story.a11y.progress", { current: state.index + 1, total: slides.length })}. ${summary}`}
+        </output>
+
+        <div className="pointer-events-none absolute top-4 right-4 left-4 flex gap-1" aria-hidden>
           {slides.map((item, index) => (
             <span
               key={`${item.kind}-${index}`}

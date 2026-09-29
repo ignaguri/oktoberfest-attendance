@@ -33,7 +33,7 @@ export function MeanwhileSlide({ slide, animate }: { slide: StorySlideOf<"meanwh
       </Reveal>
       <div className="flex flex-col gap-3">
         {slide.finds.map((find, index) => (
-          <Reveal key={find.en} step={index + 1} animate={animate} kind="stamp">
+          <Reveal key={`${index}-${find.en}`} step={index + 1} animate={animate} kind="stamp">
             <div
               className={cn(
                 "inline-block rounded-md border-2 border-wrapped-ink bg-white px-3 py-2 shadow-[3px_3px_0_#16325C]",

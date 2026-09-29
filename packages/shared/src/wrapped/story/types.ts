@@ -96,7 +96,8 @@ export interface BadgesSlide extends SlideBase {
   count: CopyRef;
   top: {
     id: string;
-    name: string;
+    /** achievements.name is a translation key, so it travels as a CopyRef. */
+    name: CopyRef;
     icon: string;
     category: string;
     tier: number;
