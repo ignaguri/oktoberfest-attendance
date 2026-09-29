@@ -2275,6 +2275,50 @@ export type Database = {
           },
         ]
       }
+      wrapped_shares: {
+        Row: {
+          card_data: Json
+          card_kind: string
+          created_at: string
+          festival_id: string
+          id: string
+          revoked_at: string | null
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_data: Json
+          card_kind: string
+          created_at?: string
+          festival_id: string
+          id?: string
+          revoked_at?: string | null
+          token?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_data?: Json
+          card_kind?: string
+          created_at?: string
+          festival_id?: string
+          id?: string
+          revoked_at?: string | null
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wrapped_shares_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wrapped_views: {
         Row: {
           festival_id: string
@@ -2524,6 +2568,18 @@ export type Database = {
           users: number
         }[]
       }
+      analytics_cohort_members: {
+        Args: never
+        Returns: {
+          activated: boolean
+          activated_7d: boolean
+          engaged: boolean
+          last_active_day: string
+          month: string
+          returned: boolean
+          user_id: string
+        }[]
+      }
       analytics_feature_scorecard: {
         Args: { p_festival_id?: string }
         Returns: {
@@ -2560,6 +2616,24 @@ export type Database = {
           start_date: string
         }[]
       }
+      analytics_funnel_members: {
+        Args: { p_from: string; p_platform?: string; p_to: string }
+        Returns: {
+          attendance_days: number
+          last_active_day: string
+          user_id: string
+        }[]
+      }
+      analytics_member_profiles: {
+        Args: { p_user_ids: string[] }
+        Returns: {
+          full_name: string
+          last_active_day: string
+          signed_up_at: string
+          user_id: string
+          username: string
+        }[]
+      }
       analytics_overview: {
         Args: { p_from: string; p_platform?: string; p_to: string }
         Returns: {
@@ -2578,6 +2652,20 @@ export type Database = {
         }
         Returns: number
       }
+      analytics_scorecard_members: {
+        Args: { p_festival_id?: string }
+        Returns: {
+          came_back: boolean
+          feature: string
+          festival_id: string
+          festival_name: string
+          is_user: boolean
+          last_active_day: string
+          returned: boolean
+          successor_started: boolean
+          user_id: string
+        }[]
+      }
       analytics_signup_cohorts: {
         Args: never
         Returns: {
@@ -2587,6 +2675,27 @@ export type Database = {
           month: string
           returned: number
           signups: number
+        }[]
+      }
+      analytics_user_timeline: {
+        Args: {
+          p_cursor_at?: string
+          p_cursor_key?: string
+          p_kind?: string
+          p_limit?: number
+          p_user_id: string
+        }
+        Returns: {
+          app_version: string
+          cursor_key: string
+          festival_id: string
+          festival_name: string
+          kind: string
+          name: string
+          occurred_at: string
+          platform: string
+          props: Json
+          session_id: string
         }[]
       }
       calculate_attendance_cost: {
@@ -2888,6 +2997,14 @@ export type Database = {
           start_date: string
           unlocks_at: string
           viewed: boolean
+        }[]
+      }
+      get_wrapped_share: {
+        Args: { p_token: string }
+        Returns: {
+          card_data: Json
+          card_kind: string
+          festival_name: string
         }[]
       }
       get_wrapped_status: {
