@@ -428,6 +428,7 @@ describe("repository against the real RPC", () => {
     const wrapped = await repo.getWrapped(user.id, festivalId);
     expect(wrapped.basicStats.totalBeers).toBe(2);
     expect(wrapped.drinkStats.breakdown[0]?.drinkType).toBe("beer");
+    expect(wrapped.festivalInfo.festivalType).toBe("oktoberfest");
 
     const festivals = await repo.listFestivals();
     expect(festivals.map((festival) => festival.festivalId)).toContain(festivalId);

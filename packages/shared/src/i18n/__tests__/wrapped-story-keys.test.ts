@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import { buildWrappedStory } from "../../wrapped/story/build-story";
 import { PERSONA_IDS } from "../../wrapped/story/persona";
 import { makeOfficialStats, makeWrapped } from "../../wrapped/story/story-fixtures";
+import { slideSummaryParts } from "../../wrapped/story/summary";
+import type { WrappedData } from "../../schemas/wrapped.schema";
 import type { CopyRef } from "../../wrapped/story/types";
 import de from "../locales/de.json";
 import en from "../locales/en.json";
@@ -125,6 +127,45 @@ describe("Wrapped story copy", () => {
     expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 1, ...params })).toMatch(new RegExp(`^${current} `));
     expect(i18n.t("wrapped.story.wiesnAndYou.share.lastYear", { count: 1, ...params })).toMatch(new RegExp(`^${lastYear} `));
     expect(i18n.t("wrapped.story.wiesnAndYou.share.current", { count: 3, ...params })).toMatch(new RegExp(`^${plural} `));
+  });
+
+  // The Wiesn is Oktoberfest only; Frühlingsfest and Starkbierfest get neutral copy.
+  it.each(["en", "de", "es"] as const)("never says Wiesn outside Oktoberfest in %s", async (locale) => {
+    const i18n = i18next.createInstance();
+    await i18n.init({ resources: { [locale]: { translation: BUNDLES[locale] } }, lng: locale, interpolation: { escapeValue: false } });
+    const elsewhere = (mutate: (data: WrappedData) => void) =>
+      makeWrapped((data) => {
+        data.festivalInfo = { ...data.festivalInfo, name: "Starkbierfest 2026", festivalType: "starkbierfest" };
+        mutate(data);
+      });
+    const stories = [
+      elsewhere((data) => {
+        data.basicStats.totalBeers = 0;
+      }),
+      elsewhere((data) => {
+        data.comparisons.vsFestivalAvg.beersPercentile = 20;
+        data.drinkStats.topDrinkType = "wine";
+        data.basicStats.daysAttended = 12;
+      }),
+      elsewhere((data) => {
+        data.basicStats.avgBeers = 8;
+      }),
+    ].map((data) => buildWrappedStory(data, null));
+    const personas = stories.map((story) => story.find((slide) => slide.kind === "persona"));
+    expect(personas.map((slide) => slide?.kind === "persona" && slide.personaId)).toEqual(
+      expect.arrayContaining(["marathoner", "massMeister"]),
+    );
+
+    const translate = i18n.t as unknown as (key: string, options?: Record<string, unknown>) => string;
+    const text = stories
+      .flat()
+      .flatMap((slide) => slideSummaryParts(slide, locale))
+      .map((part) => ("key" in part ? translate(part.key, part.params) : "text" in part ? part.text : ""))
+      .join("\n");
+    expect(text).not.toMatch(/wiesn/i);
+
+    const oktoberfest = buildWrappedStory(makeWrapped(), null).find((slide) => slide.kind === "persona");
+    expect(oktoberfest && oktoberfest.kind === "persona" && translate(oktoberfest.kicker.key)).toMatch(/Wiesn/);
   });
 
   it("has the admin official-stats keys", () => {

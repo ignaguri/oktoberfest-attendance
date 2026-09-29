@@ -31,6 +31,15 @@ export const PERSONA_NAMES: Record<PersonaId, string> = {
   geniesser: "Der Genießer",
 };
 
+/** Outside Oktoberfest a name can't say Wiesn; the rest fit any festival. */
+const GENERIC_PERSONA_NAMES: Partial<Record<PersonaId, string>> = {
+  marathoner: "Fest-Marathoner",
+};
+
+export function personaName(id: PersonaId, isWiesn: boolean): string {
+  return (isWiesn ? undefined : GENERIC_PERSONA_NAMES[id]) ?? PERSONA_NAMES[id];
+}
+
 /** Crest PNG basenames (mobile assets/wrapped/crests, web public/wrapped/crests). */
 export const PERSONA_CREST_FILES: Record<PersonaId, string> = {
   einmalAberRichtig: "einmal-aber-richtig",

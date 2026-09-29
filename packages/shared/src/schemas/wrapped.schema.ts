@@ -22,6 +22,8 @@ export const WrappedDataSchema = z.object({
     startDate: z.string(),
     endDate: z.string(),
     location: z.string().nullable(),
+    // festivals.festival_type. A plain string: admin.schema's enum imports this file.
+    festivalType: z.string(),
   }),
   basicStats: z.object({
     totalBeers: z.number(),

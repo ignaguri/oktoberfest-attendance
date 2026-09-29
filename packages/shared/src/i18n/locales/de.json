@@ -2558,11 +2558,13 @@
           "normal_one": "an einem einzigen Tag.",
           "normal_other": "an {{count}} Tagen.",
           "low": "Qualität statt Quantität.",
-          "zero": "Null Bier, volle Wiesn. Respekt."
+          "zero": "Null Bier, volle Wiesn. Respekt.",
+          "zeroGeneric": "Null Bier, volles Fest. Respekt."
         },
         "comparison": {
           "percentile": "Mehr als {{pct, number(maximumFractionDigits: 0)}} % von ProstCounter.",
-          "median": "Der typische ProstCounter-Wiesngänger hatte {{median, number(maximumFractionDigits: 1)}}."
+          "median": "Der typische ProstCounter-Wiesngänger hatte {{median, number(maximumFractionDigits: 1)}}.",
+          "medianGeneric": "Der typische ProstCounter-Festbesucher hatte {{median, number(maximumFractionDigits: 1)}}."
         }
       },
       "drinks": {
@@ -2572,6 +2574,7 @@
           "radler": "Meistens Radler. Wie ein Profi eingeteilt.",
           "alcohol_free": "Meistens alkoholfrei. Deine Leber sagt danke.",
           "wine": "Meistens Wein. Auf der Wiesn. Mutig.",
+          "wineGeneric": "Meistens Wein. Auf einem Bierfest. Mutig.",
           "soft_drink": "Meistens Softdrinks. Fahrer-Energie.",
           "other": "Von allem ein bisschen."
         },
@@ -2603,7 +2606,8 @@
         "groups_one": "In {{count}} Gruppe",
         "groups_other": "In {{count}} Gruppen",
         "bestPlacing": "Platz {{position}} in {{group}}",
-        "photosLabel": "Deine Wiesn in Bildern"
+        "photosLabel": "Deine Wiesn in Bildern",
+        "photosLabelGeneric": "Dein Fest in Bildern"
       },
       "compare": {
         "title": "So schlägst du dich",
@@ -2660,6 +2664,7 @@
       },
       "persona": {
         "kicker": "Deine Wiesn-Persona",
+        "kickerGeneric": "Deine Fest-Persona",
         "runnerUp": "mit einem Schuss {{name}}",
         "einmalAberRichtig": {
           "description": "Ein Tag, null Reue.",
@@ -2667,10 +2672,12 @@
         },
         "massMeister": {
           "description": "Die Maß hat Respekt vor dir.",
-          "because": "Weil du an jedem Wiesntag im Schnitt {{avg, number(maximumFractionDigits: 1)}} Biere hattest."
+          "because": "Weil du an jedem Wiesntag im Schnitt {{avg, number(maximumFractionDigits: 1)}} Biere hattest.",
+          "becauseGeneric": "Weil du an jedem Festtag im Schnitt {{avg, number(maximumFractionDigits: 1)}} Biere hattest."
         },
         "marathoner": {
           "description": "Die Wiesn ist dein zweites Zuhause.",
+          "descriptionGeneric": "Der Festplatz ist dein zweites Zuhause.",
           "because": "Weil du an {{days}} von {{festivalDays}} Tagen da warst."
         },
         "zeltwanderer": {

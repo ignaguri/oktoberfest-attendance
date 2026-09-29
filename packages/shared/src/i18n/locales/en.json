@@ -2321,11 +2321,13 @@
           "normal_one": "in a single day.",
           "normal_other": "over {{count}} days.",
           "low": "Quality over quantity.",
-          "zero": "Zero beers, full Wiesn. Respect."
+          "zero": "Zero beers, full Wiesn. Respect.",
+          "zeroGeneric": "Zero beers, full festival. Respect."
         },
         "comparison": {
           "percentile": "More than {{pct, number(maximumFractionDigits: 0)}}% of ProstCounter.",
-          "median": "The typical ProstCounter Wiesn-goer had {{median, number(maximumFractionDigits: 1)}}."
+          "median": "The typical ProstCounter Wiesn-goer had {{median, number(maximumFractionDigits: 1)}}.",
+          "medianGeneric": "The typical ProstCounter festival-goer had {{median, number(maximumFractionDigits: 1)}}."
         }
       },
       "drinks": {
@@ -2335,6 +2337,7 @@
           "radler": "Mostly Radler. Pacing like a pro.",
           "alcohol_free": "Mostly alcohol-free. Your liver says thanks.",
           "wine": "Mostly wine. At the Wiesn. Bold.",
+          "wineGeneric": "Mostly wine. At a beer festival. Bold.",
           "soft_drink": "Mostly soft drinks. Designated driver energy.",
           "other": "A bit of everything."
         },
@@ -2366,7 +2369,8 @@
         "groups_one": "In {{count}} group",
         "groups_other": "In {{count}} groups",
         "bestPlacing": "#{{position}} in {{group}}",
-        "photosLabel": "Your Wiesn in pictures"
+        "photosLabel": "Your Wiesn in pictures",
+        "photosLabelGeneric": "Your festival in pictures"
       },
       "compare": {
         "title": "How you stack up",
@@ -2423,6 +2427,7 @@
       },
       "persona": {
         "kicker": "Your Wiesn persona",
+        "kickerGeneric": "Your festival persona",
         "runnerUp": "with a dash of {{name}}",
         "einmalAberRichtig": {
           "description": "One day, zero regrets.",
@@ -2430,10 +2435,12 @@
         },
         "massMeister": {
           "description": "The Maß fears you.",
-          "because": "Because you averaged {{avg, number(maximumFractionDigits: 1)}} beers every day you went."
+          "because": "Because you averaged {{avg, number(maximumFractionDigits: 1)}} beers every day you went.",
+          "becauseGeneric": "Because you averaged {{avg, number(maximumFractionDigits: 1)}} beers every day you went."
         },
         "marathoner": {
           "description": "The Wiesn is your second home.",
+          "descriptionGeneric": "The festival grounds are your second home.",
           "because": "Because you were there {{days}} of the {{festivalDays}} days."
         },
         "zeltwanderer": {

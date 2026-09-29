@@ -5474,6 +5474,7 @@ export interface paths {
                                     startDate: string;
                                     endDate: string;
                                     location: string | null;
+                                    festivalType: string;
                                 };
                                 basicStats: {
                                     totalBeers: number;

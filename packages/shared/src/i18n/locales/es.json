@@ -2381,11 +2381,13 @@
           "normal_one": "en un solo día.",
           "normal_other": "en {{count}} días.",
           "low": "Calidad antes que cantidad.",
-          "zero": "Cero cervezas, Wiesn completa. Respeto."
+          "zero": "Cero cervezas, Wiesn completa. Respeto.",
+          "zeroGeneric": "Cero cervezas, festival completo. Respeto."
         },
         "comparison": {
           "percentile": "Más que el {{pct, number(maximumFractionDigits: 0)}} % de ProstCounter.",
-          "median": "El usuario típico de ProstCounter tomó {{median, number(maximumFractionDigits: 1)}}."
+          "median": "El usuario típico de ProstCounter tomó {{median, number(maximumFractionDigits: 1)}}.",
+          "medianGeneric": "El usuario típico de ProstCounter tomó {{median, number(maximumFractionDigits: 1)}}."
         }
       },
       "drinks": {
@@ -2395,6 +2397,7 @@
           "radler": "Casi siempre Radler. Dosificando como un pro.",
           "alcohol_free": "Casi siempre sin alcohol. Tu hígado te lo agradece.",
           "wine": "Casi siempre vino. En la Wiesn. Valiente.",
+          "wineGeneric": "Casi siempre vino. En un festival de cerveza. Valiente.",
           "soft_drink": "Casi siempre gaseosas. Energía de conductor designado.",
           "other": "Un poco de todo."
         },
@@ -2426,7 +2429,8 @@
         "groups_one": "En {{count}} grupo",
         "groups_other": "En {{count}} grupos",
         "bestPlacing": "#{{position}} en {{group}}",
-        "photosLabel": "Tu Wiesn en fotos"
+        "photosLabel": "Tu Wiesn en fotos",
+        "photosLabelGeneric": "Tu festival en fotos"
       },
       "compare": {
         "title": "Cómo te fue",
@@ -2483,6 +2487,7 @@
       },
       "persona": {
         "kicker": "Tu persona de la Wiesn",
+        "kickerGeneric": "Tu persona del festival",
         "runnerUp": "con un toque de {{name}}",
         "einmalAberRichtig": {
           "description": "Un día, cero arrepentimientos.",
@@ -2490,10 +2495,12 @@
         },
         "massMeister": {
           "description": "La Maß te tiene miedo.",
-          "because": "Porque promediaste {{avg, number(maximumFractionDigits: 1)}} cervezas cada día que fuiste."
+          "because": "Porque promediaste {{avg, number(maximumFractionDigits: 1)}} cervezas cada día que fuiste.",
+          "becauseGeneric": "Porque promediaste {{avg, number(maximumFractionDigits: 1)}} cervezas cada día que fuiste."
         },
         "marathoner": {
           "description": "La Wiesn es tu segunda casa.",
+          "descriptionGeneric": "El predio del festival es tu segunda casa.",
           "because": "Porque estuviste {{days}} de los {{festivalDays}} días."
         },
         "zeltwanderer": {

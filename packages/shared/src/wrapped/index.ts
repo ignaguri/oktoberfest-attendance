@@ -40,6 +40,7 @@ export {
   PERSONA_CREST_FILES,
   PERSONA_IDS,
   PERSONA_NAMES,
+  personaName,
   personaSignals,
 } from "./story/persona";
 export type { StoryAction, StoryState } from "./story/navigation";

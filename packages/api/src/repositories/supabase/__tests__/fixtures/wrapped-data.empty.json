@@ -1,6 +1,6 @@
 {
   "user_info": { "username": null, "full_name": null, "avatar_url": null },
-  "festival_info": { "name": "Frühlingsfest 2026", "start_date": "2026-04-17", "end_date": "2026-05-10", "location": null },
+  "festival_info": { "name": "Frühlingsfest 2026", "start_date": "2026-04-17", "end_date": "2026-05-10", "location": null, "festival_type": "fruehlingsfest" },
   "basic_stats": { "total_beers": 0, "days_attended": 1, "avg_beers": 0, "total_spent": 0, "beer_cost": 16.2 },
   "tent_stats": { "unique_tents": 0, "favorite_tent": null, "tent_diversity_pct": 0, "tent_breakdown": [] },
   "peak_moments": { "best_day": null, "max_single_session": null, "most_expensive_day": null },

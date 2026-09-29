@@ -8834,13 +8834,17 @@
                                 "location": {
                                   "type": "string",
                                   "nullable": true
+                                },
+                                "festivalType": {
+                                  "type": "string"
                                 }
                               },
                               "required": [
                                 "name",
                                 "startDate",
                                 "endDate",
-                                "location"
+                                "location",
+                                "festivalType"
                               ]
                             },
                             "basicStats": {

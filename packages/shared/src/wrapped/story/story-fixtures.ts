@@ -12,6 +12,7 @@ const BASE: WrappedData = {
     startDate: "2026-09-19",
     endDate: "2026-10-04",
     location: "Munich",
+    festivalType: "oktoberfest",
   },
   basicStats: { totalBeers: 12.5, daysAttended: 4, avgBeers: 3.13, totalSpent: 198.4, beerCost: 15.8 },
   tentStats: {

@@ -1,6 +1,6 @@
 import type { WrappedData, WrappedOfficialStats } from "../../schemas/wrapped.schema";
 import { getBestGlobalPosition } from "../utils";
-import { derivePersona, festivalDayCount, PERSONA_NAMES } from "./persona";
+import { derivePersona, festivalDayCount, personaName } from "./persona";
 import type {
   BadgesSlide,
   BigNumberSlide,
@@ -30,6 +30,27 @@ const KNOWN_DRINK_TYPES = ["beer", "radler", "alcohol_free", "wine", "soft_drink
 
 const copy = (key: string, params?: CopyRef["params"]): CopyRef =>
   params ? { key: `wrapped.story.${key}`, params } : { key: `wrapped.story.${key}` };
+
+/**
+ * Copy that says Wiesn. Other festivals get the key's Generic sibling; only
+ * Oktoberfest is the Wiesn, even though Frühlingsfest shares its grounds.
+ */
+const WIESN_KEYS = new Set(
+  [
+    "bigNumber.tagline.zero",
+    "bigNumber.comparison.median",
+    "drinks.top.wine",
+    "people.photosLabel",
+    "persona.kicker",
+    "persona.marathoner.description",
+    "persona.massMeister.because",
+  ].map((key) => `wrapped.story.${key}`),
+);
+
+const forFestival = (ref: CopyRef, isWiesn: boolean): CopyRef =>
+  isWiesn || !WIESN_KEYS.has(ref.key) ? ref : { ...ref, key: `${ref.key}Generic` };
+
+const isWiesn = (data: WrappedData) => data.festivalInfo.festivalType === "oktoberfest";
 
 const drinkTypeKey = (drinkType: string) =>
   KNOWN_DRINK_TYPES.includes(drinkType) ? drinkType : "other";
@@ -78,7 +99,7 @@ function bigNumberSlide(data: WrappedData, tiny: boolean): BigNumberSlide {
     comparison =
       beersPercentile >= FLATTERING_PERCENTILE
         ? copy("bigNumber.comparison.percentile", { pct: beersPercentile })
-        : copy("bigNumber.comparison.median", { median: medianBeers });
+        : forFestival(copy("bigNumber.comparison.median", { median: medianBeers }), isWiesn(data));
   }
 
   return {
@@ -91,7 +112,7 @@ function bigNumberSlide(data: WrappedData, tiny: boolean): BigNumberSlide {
     tagline:
       variant === "normal"
         ? copy("bigNumber.tagline.normal", { count: data.basicStats.daysAttended })
-        : copy(`bigNumber.tagline.${variant}`),
+        : forFestival(copy(`bigNumber.tagline.${variant}`), isWiesn(data)),
     comparison,
   };
 }
@@ -111,7 +132,7 @@ function drinksSlide(data: WrappedData): DrinksSlide | null {
       percentage: drink.percentage,
       label: copy(`drinkTypes.${drinkTypeKey(drink.drinkType)}`),
     })),
-    top: topDrinkType ? copy(`drinks.top.${drinkTypeKey(topDrinkType)}`) : null,
+    top: topDrinkType ? forFestival(copy(`drinks.top.${drinkTypeKey(topDrinkType)}`), isWiesn(data)) : null,
     spent: data.basicStats.totalSpent > 0 ? copy("drinks.spent", { amount: data.basicStats.totalSpent }) : null,
   };
 }
@@ -180,7 +201,7 @@ function peopleSlide(data: WrappedData): PeopleSlide | null {
     title: copy("people.title"),
     groups: groupsJoined > 0 ? copy("people.groups", { count: groupsJoined }) : null,
     bestPlacing: best ? copy("people.bestPlacing", { position: best.position, group: best.groupName }) : null,
-    photosLabel: photos.length > 0 ? copy("people.photosLabel") : null,
+    photosLabel: photos.length > 0 ? forFestival(copy("people.photosLabel"), isWiesn(data)) : null,
     photos,
   };
 }
@@ -288,15 +309,18 @@ function badgesSlide(data: WrappedData): BadgesSlide | null {
 
 function personaSlide(data: WrappedData): PersonaSlide {
   const persona = derivePersona(data);
+  const wiesn = isWiesn(data);
   return {
     kind: "persona",
     revealSteps: 5,
-    kicker: copy("persona.kicker"),
+    kicker: forFestival(copy("persona.kicker"), wiesn),
     personaId: persona.id,
-    name: PERSONA_NAMES[persona.id],
-    description: copy(`persona.${persona.id}.description`),
-    because: persona.because,
-    runnerUp: persona.runnerUpId ? copy("persona.runnerUp", { name: PERSONA_NAMES[persona.runnerUpId] }) : null,
+    name: personaName(persona.id, wiesn),
+    description: forFestival(copy(`persona.${persona.id}.description`), wiesn),
+    because: forFestival(persona.because, wiesn),
+    runnerUp: persona.runnerUpId
+      ? copy("persona.runnerUp", { name: personaName(persona.runnerUpId, wiesn) })
+      : null,
   };
 }
 

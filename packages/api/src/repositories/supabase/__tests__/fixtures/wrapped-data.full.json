@@ -1,6 +1,6 @@
 {
   "user_info": { "username": "maxi", "full_name": "Maxi Muster", "avatar_url": "avatars/maxi.jpg" },
-  "festival_info": { "name": "Oktoberfest 2026", "start_date": "2026-09-19", "end_date": "2026-10-04", "location": "Munich" },
+  "festival_info": { "name": "Oktoberfest 2026", "start_date": "2026-09-19", "end_date": "2026-10-04", "location": "Munich", "festival_type": "oktoberfest" },
   "basic_stats": { "total_beers": 12.5, "days_attended": 4, "avg_beers": 3.13, "total_spent": 198.4, "beer_cost": 15.8 },
   "tent_stats": {
     "unique_tents": 3,

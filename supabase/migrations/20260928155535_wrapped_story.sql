@@ -2,7 +2,8 @@
 --
 -- 1. get_wrapped_data gains a timing block (first/last drink hour, peak hour,
 --    weekend share, in the festival's timezone) and vs_festival_avg.attendee_count,
---    which the story uses to skip percentiles at tiny festivals. Output changes,
+--    which the story uses to skip percentiles at tiny festivals, and
+--    festival_info.festival_type, which keeps the Wiesn copy to Oktoberfest. Output changes,
 --    so wrapped_data_version goes to 2.
 -- 2. festival_official_stats holds the city's final numbers (Wiesn-Bilanz),
 --    read next to the cached Wrapped, never inside it. get_festival_official_stats
@@ -69,7 +70,8 @@ BEGIN
       'name', v_festival.name,
       'start_date', v_festival.start_date,
       'end_date', v_festival.end_date,
-      'location', v_festival.location
+      'location', v_festival.location,
+      'festival_type', v_festival.festival_type
     )
   );
 

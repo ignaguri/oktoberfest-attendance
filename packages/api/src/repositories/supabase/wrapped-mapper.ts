@@ -23,6 +23,7 @@ export function mapToWrappedData(raw: any): WrappedData {
       startDate: raw.festival_info.start_date,
       endDate: raw.festival_info.end_date,
       location: raw.festival_info.location,
+      festivalType: raw.festival_info.festival_type,
     },
     basicStats: {
       totalBeers: raw.basic_stats.total_beers,
