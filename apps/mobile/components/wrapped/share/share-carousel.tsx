@@ -26,11 +26,11 @@ import {
   View,
   type ViewToken,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAlertDialog } from "@/components/ui/alert-dialog";
 import { ConfirmAlertDialog } from "@/components/ui/alert-dialog/confirm";
 import { HStack } from "@/components/ui/hstack";
-import { SafeAreaView } from "@/components/ui/safe-area-view";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import type { ShareCardState } from "@/hooks/useShareCards";
@@ -64,6 +64,7 @@ export function ShareCarousel({
   onRetry,
 }: ShareCarouselProps) {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const isOnline = useIsOnline();
   const { dialog, showDialog, closeDialog } = useAlertDialog();
   const [index, setIndex] = useState(0);
@@ -190,7 +191,11 @@ export function ShareCarousel({
     <Modal visible={visible} animationType="slide" onRequestClose={handleClose}>
       <View className="flex-1 bg-wrapped-paper">
         <PaperBackground />
-        <SafeAreaView className="flex-1">
+        {/* SafeAreaView reads zero insets inside a sliding Modal, so pad by hand */}
+        <View
+          className="flex-1"
+          style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+        >
           <HStack className="items-center justify-between px-6 pt-2">
             <Text className="font-wrapped text-2xl font-extrabold text-wrapped-ink">
               {t("wrapped.shareCards.carousel.title")}
@@ -297,7 +302,7 @@ export function ShareCarousel({
               </Pressable>
             ) : null}
           </VStack>
-        </SafeAreaView>
+        </View>
       </View>
       <ConfirmAlertDialog dialog={dialog} onClose={closeDialog} useRNModal />
     </Modal>
