@@ -1,4 +1,4 @@
-import { buildShareCards } from "@prostcounter/shared/wrapped";
+import { buildShareCards } from "@prostcounter/shared/wrapped/server";
 import { makeWrapped } from "@prostcounter/shared/wrapped/testing";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 

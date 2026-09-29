@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 import type { ShareLang } from "@prostcounter/shared";
-import type { ShareCard } from "@prostcounter/shared/wrapped";
+import type { ShareCard } from "@prostcounter/shared/wrapped/server";
 
 /** Bump whenever a layout changes, so cached public images refresh. */
 export const RENDER_VERSION = "1";

@@ -3,7 +3,7 @@ import {
   isLinkableShareCardKind,
   type LinkableShareCardKind,
   type ShareCard,
-} from "@prostcounter/shared/wrapped";
+} from "@prostcounter/shared/wrapped/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { DatabaseError } from "../../middleware/error";

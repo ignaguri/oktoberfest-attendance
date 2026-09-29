@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 
-import { buildShareCards } from "@prostcounter/shared/wrapped";
+import { buildShareCards } from "@prostcounter/shared/wrapped/server";
 import {
   makeOfficialStats,
   makeWrapped,

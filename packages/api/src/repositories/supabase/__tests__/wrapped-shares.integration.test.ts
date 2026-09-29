@@ -2,7 +2,7 @@
 // Run with: pnpm --filter=@prostcounter/api test:integration wrapped-shares
 import { randomUUID } from "crypto";
 import type { Database } from "@prostcounter/db";
-import { buildShareCards } from "@prostcounter/shared/wrapped";
+import { buildShareCards } from "@prostcounter/shared/wrapped/server";
 import { makeWrapped } from "@prostcounter/shared/wrapped/testing";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

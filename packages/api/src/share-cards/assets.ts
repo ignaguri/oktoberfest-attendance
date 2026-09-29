@@ -4,7 +4,7 @@ import { join } from "node:path";
 import {
   PERSONA_CREST_FILES,
   type PersonaId,
-} from "@prostcounter/shared/wrapped";
+} from "@prostcounter/shared/wrapped/server";
 
 import { FONT_FAMILY } from "./theme";
 

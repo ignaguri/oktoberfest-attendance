@@ -1,5 +1,5 @@
 import type { ShareLang } from "@prostcounter/shared";
-import type { ShareCard } from "@prostcounter/shared/wrapped";
+import type { ShareCard } from "@prostcounter/shared/wrapped/server";
 import { ImageResponse } from "next/og";
 import sharp from "sharp";
 

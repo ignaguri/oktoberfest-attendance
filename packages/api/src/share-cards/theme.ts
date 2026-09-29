@@ -1,4 +1,4 @@
-import { WRAPPED_STORY_THEME } from "@prostcounter/shared/wrapped";
+import { WRAPPED_STORY_THEME } from "@prostcounter/shared/wrapped/server";
 
 export const CARD_SIZE = { width: 1080, height: 1920 } as const;
 export const OG_SIZE = { width: 1200, height: 630 } as const;

@@ -5,7 +5,7 @@ import {
   type ShareCard,
   type ShareCardKind,
   type WrappedOfficialStats,
-} from "@prostcounter/shared/wrapped";
+} from "@prostcounter/shared/wrapped/server";
 
 import { logger } from "../lib/logger";
 import { NotFoundError, ValidationError } from "../middleware/error";

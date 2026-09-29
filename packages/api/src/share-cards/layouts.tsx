@@ -6,7 +6,7 @@ import type {
   RhythmShareCard,
   ShareCard,
   StatCard,
-} from "@prostcounter/shared/wrapped";
+} from "@prostcounter/shared/wrapped/server";
 import type { CSSProperties, ReactElement, ReactNode } from "react";
 
 import type { CardTranslate } from "./translate";

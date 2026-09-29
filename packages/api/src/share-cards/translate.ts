@@ -1,6 +1,6 @@
 import type { ShareLang } from "@prostcounter/shared";
 import { defaultNS, resources } from "@prostcounter/shared/i18n/core";
-import type { CopyRef } from "@prostcounter/shared/wrapped";
+import type { CopyRef } from "@prostcounter/shared/wrapped/server";
 import i18next from "i18next";
 
 export type CardTranslate = (ref: CopyRef) => string;

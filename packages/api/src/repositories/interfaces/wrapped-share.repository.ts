@@ -1,4 +1,7 @@
-import type { LinkableShareCardKind, ShareCard } from "@prostcounter/shared/wrapped";
+import type {
+  LinkableShareCardKind,
+  ShareCard,
+} from "@prostcounter/shared/wrapped/server";
 
 export interface WrappedShareRecord {
   token: string;
