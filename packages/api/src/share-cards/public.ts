@@ -14,6 +14,11 @@ export function shareCardHash(card: ShareCard): string {
     .slice(0, 12);
 }
 
+/** CDN tag on all of a link's images, so revoking it can purge them. */
+export function shareImageCacheTag(token: string): string {
+  return `wrapped-share-${token}`;
+}
+
 /** Path (under the site origin) of a live link's image; the hash keys the CDN cache. */
 export function publicShareImagePath(
   token: string,

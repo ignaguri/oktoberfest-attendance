@@ -1,5 +1,6 @@
 import { buildShareCards } from "@prostcounter/shared/wrapped/server";
 import { makeWrapped } from "@prostcounter/shared/wrapped/testing";
+import { dangerouslyDeleteByTag } from "@vercel/functions";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createMockSupabase } from "../../__tests__/helpers/mock-supabase";
@@ -14,6 +15,9 @@ import wrappedShareRoutes from "../wrapped-share.route";
 
 vi.mock("../../services/wrapped-share.service", () => ({
   WrappedShareService: vi.fn(),
+}));
+vi.mock("@vercel/functions", () => ({
+  dangerouslyDeleteByTag: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock("../../utils/admin-client", () => ({
   createAdminClient: vi.fn(() => ({})),
@@ -123,12 +127,13 @@ describe("Wrapped share routes", () => {
     });
   });
 
-  it("revokes a link", async () => {
+  it("revokes a link and drops its images from the CDN", async () => {
     service.revokeLink.mockResolvedValue(undefined);
     const res = await app.request(
       createAuthRequest(`/wrapped/share-links/abc`, { method: "DELETE" }),
     );
     expect(res.status).toBe(200);
     expect(service.revokeLink).toHaveBeenCalledWith("test-user-id", "abc");
+    expect(dangerouslyDeleteByTag).toHaveBeenCalledWith("wrapped-share-abc");
   });
 });

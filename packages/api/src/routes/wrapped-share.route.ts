@@ -8,8 +8,10 @@ import {
   ShareLangSchema,
   WrappedShareLinkSchema,
 } from "@prostcounter/shared";
+import { dangerouslyDeleteByTag } from "@vercel/functions";
 
 import { ApiErrorSchema } from "../lib/error-response";
+import { logger } from "../lib/logger";
 import type { AuthContext } from "../middleware/auth";
 import { ValidationError } from "../middleware/error";
 import {
@@ -18,6 +20,7 @@ import {
   SupabaseWrappedShareRepository,
 } from "../repositories/supabase";
 import { WrappedShareService } from "../services/wrapped-share.service";
+import { shareImageCacheTag } from "../share-cards/public";
 import { renderShareCard } from "../share-cards/render";
 import { createAdminClient } from "../utils/admin-client";
 
@@ -192,6 +195,15 @@ app.openapi(revokeLinkRoute, async (c) => {
   const { user, supabase } = c.var;
   const { token } = c.req.valid("param");
   await serviceFor(supabase).revokeLink(user.id, token);
+  // The link is dead either way; a failed purge only leaves the CDN copy until it expires
+  try {
+    await dangerouslyDeleteByTag(shareImageCacheTag(token));
+  } catch (error) {
+    logger.error(
+      { error: error instanceof Error ? error.message : String(error) },
+      "Purging a revoked Wrapped share's images failed",
+    );
+  }
   return c.json({ success: true }, 200);
 });
 

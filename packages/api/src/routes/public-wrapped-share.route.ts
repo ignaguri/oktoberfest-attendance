@@ -8,7 +8,7 @@ import { Hono } from "hono";
 
 import { NotFoundError } from "../middleware/error";
 import { SupabaseWrappedShareRepository } from "../repositories/supabase/wrapped-share.repository";
-import { shareCardHash } from "../share-cards/public";
+import { shareCardHash, shareImageCacheTag } from "../share-cards/public";
 import {
   renderShareCard,
   SHARE_IMAGE_VARIANTS,
@@ -18,11 +18,14 @@ import {
 const app = new Hono();
 
 /**
- * The URL carries the card's hash, so a new snapshot is a new URL and this can
- * cache forever. That only holds if nothing else gets a cache entry: a wrong
- * hash or language is a 404, or anyone could mint fresh renders by varying them.
+ * The URL carries the card's hash, so a new snapshot is a new URL and the CDN
+ * can keep it for a year; revoking the link purges it by tag. Browsers get an
+ * hour, since nothing can purge them. The long cache only holds if nothing else
+ * gets an entry: a wrong hash or language is a 404, or anyone could mint fresh
+ * renders by varying them.
  */
-const PUBLIC_CACHE = "public, max-age=31536000, s-maxage=31536000, immutable";
+const BROWSER_CACHE = "public, max-age=3600";
+const CDN_CACHE = "max-age=31536000";
 
 function publicShareRepository(): SupabaseWrappedShareRepository {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -58,7 +61,9 @@ app.get("/wrapped-shares/:token/:variant", async (c) => {
   });
   return c.body(new Uint8Array(jpeg), 200, {
     "Content-Type": "image/jpeg",
-    "Cache-Control": PUBLIC_CACHE,
+    "Cache-Control": BROWSER_CACHE,
+    "Vercel-CDN-Cache-Control": CDN_CACHE,
+    "Vercel-Cache-Tag": shareImageCacheTag(c.req.param("token")),
   });
 });
 

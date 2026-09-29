@@ -37,7 +37,7 @@ describe("Public Wrapped share images", () => {
     vi.clearAllMocks();
   });
 
-  it("serves a live link's OG image with a long public cache", async () => {
+  it("serves a live link's OG image, cached on the CDN under the link's tag", async () => {
     getPublic.mockResolvedValue({
       kind: "numbers",
       card,
@@ -47,9 +47,12 @@ describe("Public Wrapped share images", () => {
       `/public/wrapped-shares/abc/og?lang=es&v=${shareCardHash(card)}`,
     );
     expect(res.status).toBe(200);
-    expect(res.headers.get("Cache-Control")).toBe(
-      "public, max-age=31536000, s-maxage=31536000, immutable",
+    // Browsers only keep it an hour: a revoke can purge the CDN, not them
+    expect(res.headers.get("Cache-Control")).toBe("public, max-age=3600");
+    expect(res.headers.get("Vercel-CDN-Cache-Control")).toBe(
+      "max-age=31536000",
     );
+    expect(res.headers.get("Vercel-Cache-Tag")).toBe("wrapped-share-abc");
     expect(renderShareCard).toHaveBeenCalledWith(card, {
       lang: "es",
       variant: "og",
