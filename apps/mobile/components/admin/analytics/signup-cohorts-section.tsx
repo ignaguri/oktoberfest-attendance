@@ -1,6 +1,13 @@
 import { useAdminAnalyticsCohorts } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { cohortRates, formatPercent } from "@prostcounter/shared/utils";
+import {
+  COHORT_SERIES,
+  cohortChartRows,
+  cohortRates,
+  formatChartMonthTick,
+  formatCohortReadout,
+  formatPercent,
+} from "@prostcounter/shared/utils";
 import { useRouter } from "expo-router";
 
 import { Card } from "@/components/ui/card";
@@ -10,6 +17,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { membersRouteParams } from "@/lib/admin/analytics-members-params";
 
+import { LineChart } from "./line-chart";
 import { SectionState } from "./section-state";
 
 export function SignupCohortsSection() {
@@ -18,6 +26,7 @@ export function SignupCohortsSection() {
   const { data, loading, error, refetch } = useAdminAnalyticsCohorts();
 
   const cohorts = data?.cohorts ?? [];
+  const chartRows = cohortChartRows(cohorts);
 
   return (
     <SectionState
@@ -32,6 +41,18 @@ export function SignupCohortsSection() {
         <Text className="text-sm text-typography-500">
           {`${t("admin.analytics.cohorts.hint")} ${t("admin.analytics.members.tapHint")}`}
         </Text>
+        <LineChart
+          rows={chartRows}
+          series={COHORT_SERIES}
+          formatXTick={formatChartMonthTick}
+          formatValue={(rowIndex, key) => {
+            const row = chartRows[rowIndex];
+            if (!row) {
+              return formatCohortReadout(null, 0, 0);
+            }
+            return formatCohortReadout(row[key], row.counts[key], row.signups);
+          }}
+        />
         {cohorts.map((cohort) => {
           const rates = cohortRates(cohort);
           const steps = [
@@ -46,7 +67,11 @@ export function SignupCohortsSection() {
               onPress={() =>
                 router.push({
                   pathname: "/admin/analytics/members",
-                  params: membersRouteParams({ metric: "cohorts", month: cohort.month, step: "signups" }),
+                  params: membersRouteParams({
+                    metric: "cohorts",
+                    month: cohort.month,
+                    step: "signups",
+                  }),
                 })
               }
               accessibilityRole="button"
