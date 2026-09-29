@@ -10,6 +10,7 @@ export const COLORS = {
   blue: WRAPPED_STORY_THEME.patternBlue,
   white: "#FFFFFF",
   inkFaint: "rgba(22, 50, 92, 0.35)",
+  inkTrack: "rgba(22, 50, 92, 0.1)",
 } as const;
 
 const RHOMBUS_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"><path d="M30 0 L60 30 L30 60 L0 30 Z" fill="none" stroke="${COLORS.blue}" stroke-opacity="0.1" stroke-width="3"/><path d="M30 12 L48 30 L30 48 L12 30 Z" fill="${COLORS.blue}" fill-opacity="0.1"/></svg>`;

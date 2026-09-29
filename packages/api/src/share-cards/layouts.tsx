@@ -22,6 +22,8 @@ export interface LayoutContext {
 
 const MAX_COLUMN_DOTS = 12;
 const MAX_TENT_ICONS = 3;
+/** Light festivals still get a track; taller than the story's 4, the card has the room. */
+const MIN_TRACK_DOTS = 6;
 const CHART_WIDTH = 920;
 
 const column: CSSProperties = {
@@ -256,6 +258,11 @@ function NumbersLayout({
   );
 }
 
+/** Keeps even "Einmal, aber richtig" on one line inside the name box. */
+export function personaNameFontSize(name: string): number {
+  return Math.max(60, Math.min(110, Math.floor(1350 / name.length)));
+}
+
 function PersonaLayout({
   card,
   context,
@@ -266,58 +273,62 @@ function PersonaLayout({
   const { t } = context;
   return (
     <Page kicker={t(card.kicker)}>
-      {context.crestDataUrl ? (
-        <img
-          src={context.crestDataUrl}
-          width={760}
-          height={760}
-          style={{ marginTop: 20, transform: "rotate(-3deg)" }}
-        />
-      ) : null}
-      <div
-        style={text({
-          fontSize: 110,
-          fontWeight: 900,
-          marginTop: -20,
-          backgroundColor: COLORS.amber,
-          padding: "6px 40px",
-          borderRadius: 24,
-          border: `6px solid ${COLORS.ink}`,
-          transform: "rotate(2deg)",
-        })}
-      >
-        {card.name}
-      </div>
-      <div
-        style={text({
-          fontSize: 50,
-          fontWeight: 800,
-          marginTop: 30,
-          maxWidth: 860,
-        })}
-      >
-        {t(card.description)}
-      </div>
-      <div
-        style={{
-          ...column,
-          width: 860,
-          marginTop: 40,
-          backgroundColor: COLORS.ink,
-          color: COLORS.amber,
-          borderRadius: 32,
-          padding: "28px 48px",
-          transform: "rotate(-1deg)",
-        }}
-      >
-        {card.facts.map((fact) => (
-          <div
-            key={fact.key}
-            style={text({ fontSize: 60, fontWeight: 900, padding: "8px 0" })}
-          >
-            {t(fact)}
-          </div>
-        ))}
+      <div style={{ ...column, flex: 1, justifyContent: "center" }}>
+        {context.crestDataUrl ? (
+          <img
+            src={context.crestDataUrl}
+            width={620}
+            height={620}
+            style={{ transform: "rotate(-3deg)" }}
+          />
+        ) : null}
+        <div
+          style={text({
+            fontSize: personaNameFontSize(card.name),
+            fontWeight: 900,
+            lineHeight: 1.15,
+            maxWidth: 920,
+            marginTop: 10,
+            backgroundColor: COLORS.amber,
+            padding: "10px 40px",
+            borderRadius: 24,
+            border: `6px solid ${COLORS.ink}`,
+            transform: "rotate(2deg)",
+          })}
+        >
+          {card.name}
+        </div>
+        <div
+          style={text({
+            fontSize: 50,
+            fontWeight: 800,
+            marginTop: 30,
+            maxWidth: 860,
+          })}
+        >
+          {t(card.description)}
+        </div>
+        <div
+          style={{
+            ...column,
+            width: 860,
+            marginTop: 40,
+            backgroundColor: COLORS.ink,
+            color: COLORS.amber,
+            borderRadius: 32,
+            padding: "28px 48px",
+            transform: "rotate(-1deg)",
+          }}
+        >
+          {card.facts.map((fact) => (
+            <div
+              key={fact.key}
+              style={text({ fontSize: 60, fontWeight: 900, padding: "8px 0" })}
+            >
+              {t(fact)}
+            </div>
+          ))}
+        </div>
       </div>
     </Page>
   );
@@ -335,7 +346,7 @@ export function rhythmSizing(barCount: number) {
     columnWidth,
     gap,
     border,
-    dot: Math.max(2, Math.min(36, inner - 2)),
+    dot: Math.max(2, Math.min(44, inner - 2)),
     tentSize: Math.min(
       Math.max(12, Math.min(30, columnWidth - 12)),
       columnWidth - gap,
@@ -354,7 +365,20 @@ function RhythmLayout({
   const { columnWidth, gap, border, dot, tentSize } = rhythmSizing(
     card.bars.length,
   );
-  const chartHeight = MAX_COLUMN_DOTS * (dot + 6) + dot + 12;
+  // As on the story slide: a faint track as tall as the biggest day, on every day
+  const trackDots = Math.min(
+    Math.max(...card.bars.map((bar) => Math.round(bar.beers)), MIN_TRACK_DOTS),
+    MAX_COLUMN_DOTS,
+  );
+  const hasBeerOverflow = card.bars.some(
+    (bar) => Math.round(bar.beers) > MAX_COLUMN_DOTS,
+  );
+  const tentRows = Math.min(
+    Math.max(0, ...card.bars.map((bar) => bar.tents)),
+    MAX_TENT_ICONS,
+  );
+  const firstDate = card.bars[0]?.date;
+  const lastDate = card.bars[card.bars.length - 1]?.date;
   return (
     <Page kicker={t(card.kicker)}>
       <div
@@ -367,68 +391,100 @@ function RhythmLayout({
       >
         {t(card.title)}
       </div>
-      <div style={{ display: "flex", alignItems: "flex-end", marginTop: 80 }}>
-        {card.bars.map((bar) => {
-          const isBest = card.bestDay?.date === bar.date;
-          const color = isBest ? COLORS.amber : COLORS.ink;
-          const dots = Math.max(bar.beers > 0 ? 1 : 0, Math.round(bar.beers));
-          return (
-            <div key={bar.date} style={{ ...column, width: columnWidth }}>
-              <div
-                style={{
-                  ...column,
-                  justifyContent: "flex-end",
-                  height: chartHeight,
-                  width: columnWidth - gap,
-                  borderRadius: 12,
-                  border: `${border}px solid ${bar.attended ? COLORS.inkFaint : "transparent"}`,
-                  paddingBottom: 6,
-                }}
-              >
-                {dots > MAX_COLUMN_DOTS ? (
-                  <div style={text({ fontSize: dot, fontWeight: 900, color })}>
-                    +
-                  </div>
-                ) : null}
-                {Array.from(
-                  { length: Math.min(dots, MAX_COLUMN_DOTS) },
-                  (_, index) => (
+      <div style={{ ...column, flex: 1, justifyContent: "center" }}>
+        <div style={{ display: "flex", alignItems: "flex-end" }}>
+          {card.bars.map((bar) => {
+            const isBest = card.bestDay?.date === bar.date;
+            const color = isBest ? COLORS.amber : COLORS.ink;
+            const filled = Math.min(
+              Math.max(bar.beers > 0 ? 1 : 0, Math.round(bar.beers)),
+              trackDots,
+            );
+            return (
+              <div key={bar.date} style={{ ...column, width: columnWidth }}>
+                <div
+                  style={{
+                    ...column,
+                    justifyContent: "flex-end",
+                    width: columnWidth - gap,
+                    borderRadius: 12,
+                    border: `${border}px solid ${bar.attended ? COLORS.inkFaint : "transparent"}`,
+                    padding: "6px 0",
+                  }}
+                >
+                  {hasBeerOverflow ? (
+                    <div
+                      style={text({
+                        fontSize: dot,
+                        fontWeight: 900,
+                        color,
+                        height: dot,
+                        lineHeight: 1,
+                      })}
+                    >
+                      {Math.round(bar.beers) > MAX_COLUMN_DOTS ? "+" : ""}
+                    </div>
+                  ) : null}
+                  {Array.from({ length: trackDots }, (_, index) => (
                     <div
                       key={index}
                       style={{
                         width: dot,
                         height: dot,
                         borderRadius: dot / 2,
-                        backgroundColor: color,
-                        marginTop: 6,
+                        backgroundColor:
+                          trackDots - index > filled ? COLORS.inkTrack : color,
+                        marginTop: index === 0 && !hasBeerOverflow ? 0 : 6,
                       }}
                     />
-                  ),
-                )}
+                  ))}
+                </div>
+                {tentRows > 0 ? (
+                  <div
+                    style={{
+                      ...column,
+                      height: tentRows * (tentSize + 4) + 8,
+                      marginTop: 10,
+                    }}
+                  >
+                    {Array.from(
+                      { length: Math.min(bar.tents, MAX_TENT_ICONS) },
+                      (_, index) => (
+                        <TentIcon key={index} size={tentSize} />
+                      ),
+                    )}
+                  </div>
+                ) : null}
               </div>
-              <div
-                style={{
-                  ...column,
-                  height: MAX_TENT_ICONS * (tentSize + 4) + 8,
-                  marginTop: 10,
-                }}
-              >
-                {Array.from(
-                  { length: Math.min(bar.tents, MAX_TENT_ICONS) },
-                  (_, index) => (
-                    <TentIcon key={index} size={tentSize} />
-                  ),
-                )}
-              </div>
+            );
+          })}
+        </div>
+        {firstDate && lastDate ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: columnWidth * card.bars.length,
+              marginTop: 16,
+              fontSize: 36,
+              fontWeight: 800,
+              color: COLORS.inkFaint,
+            }}
+          >
+            <div style={{ display: "flex" }}>
+              {context.formatDate(firstDate)}
             </div>
-          );
-        })}
+            <div style={{ display: "flex" }}>
+              {context.formatDate(lastDate)}
+            </div>
+          </div>
+        ) : null}
+        {card.bestDay ? (
+          <Sticker rotate={-1} style={{ marginTop: 70 }}>
+            {`${t({ key: "wrapped.shareCards.rhythm.best", params: { date: context.formatDate(card.bestDay.date) } })} · ${t(card.bestDay.beers)}`}
+          </Sticker>
+        ) : null}
       </div>
-      {card.bestDay ? (
-        <Sticker rotate={-1} style={{ marginTop: 60 }}>
-          {`${t({ key: "wrapped.shareCards.rhythm.best", params: { date: context.formatDate(card.bestDay.date) } })} · ${t(card.bestDay.beers)}`}
-        </Sticker>
-      ) : null}
     </Page>
   );
 }
