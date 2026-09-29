@@ -90,7 +90,8 @@ export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
           title={t("wrapped.story.a11y.nextHint")}
         />
 
-        <div className="pointer-events-none flex h-full flex-col px-6 pt-20 pb-8">
+        {/* relative: a static box paints under the absolute zones, whatever the DOM order */}
+        <div className="pointer-events-none relative flex h-full flex-col px-6 pt-20 pb-8">
           {/* Screen readers get the slide from the live region below; Prost stays exposed for its buttons. */}
           <div
             key={`${state.index}-${animate ? "animating" : "done"}`}

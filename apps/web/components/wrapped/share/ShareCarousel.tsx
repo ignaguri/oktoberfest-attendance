@@ -187,7 +187,8 @@ export function ShareCarousel({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="wrapped-paper max-w-md border-2 border-wrapped-ink">
+      {/* Full screen on phones, so the card gets all the height; a dialog from sm up */}
+      <DialogContent className="wrapped-paper flex h-dvh max-w-none flex-col rounded-none border-0 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:grid sm:h-auto sm:max-w-md sm:rounded-lg sm:border-2 sm:border-wrapped-ink sm:py-6">
         <DialogTitle className="font-wrapped text-2xl font-extrabold text-wrapped-ink">
           {t("wrapped.shareCards.carousel.title")}
         </DialogTitle>
@@ -197,17 +198,17 @@ export function ShareCarousel({
         <div
           ref={scroller}
           onScroll={onScroll}
-          className="flex snap-x snap-mandatory overflow-x-auto"
+          className="flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {cards.map((item, itemIndex) => {
             const itemState = states[item.kind];
             return (
               <div
                 key={item.kind}
-                className="flex w-full shrink-0 snap-center justify-center py-2"
+                className="flex h-full w-full shrink-0 snap-center items-center justify-center py-2"
               >
                 <div
-                  className="aspect-[9/16] w-3/5 overflow-hidden rounded-2xl border-2 border-wrapped-ink"
+                  className="aspect-[9/16] h-full max-w-full overflow-hidden rounded-2xl border-2 border-wrapped-ink sm:h-auto sm:w-3/5"
                   aria-label={t("wrapped.shareCards.carousel.cardLabel", {
                     index: itemIndex + 1,
                     total: cards.length,
