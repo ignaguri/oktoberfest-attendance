@@ -520,9 +520,6 @@ importers:
       hono:
         specifier: ^4.13.7
         version: 4.13.7
-      html-to-image:
-        specifier: ^1.11.13
-        version: 1.11.13
       i18next:
         specifier: ^26.4.2
         version: 26.4.2(typescript@5.9.3)
@@ -7567,9 +7564,6 @@ packages:
 
   html-parse-stringify@4.0.1:
     resolution: {integrity: sha512-0zHsZJrK7S3K2aucXWL6ycoYJ/iNtIcFHC/nYQgFklPtrv5LpJctIiSCroWZWeuoXvuyFdzp6KzjJQ+OT5MfFw==}
-
-  html-to-image@1.11.13:
-    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
 
   html2canvas@1.4.1:
     resolution: {integrity: sha512-fPU6BHNpsyIhr8yyMpTLLxAbkaK8ArIBcmZIRiBLiDhjeqvXolaEmDGmELFuX9I4xDcaKKcJl+TKZLqruBbmWA==}
@@ -18049,8 +18043,6 @@ snapshots:
       lru-cache: 10.4.3
 
   html-parse-stringify@4.0.1: {}
-
-  html-to-image@1.11.13: {}
 
   html2canvas@1.4.1:
     dependencies:

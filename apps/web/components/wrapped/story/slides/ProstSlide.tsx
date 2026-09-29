@@ -1,9 +1,17 @@
 "use client";
 
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { type StorySlideOf, useStoryCopy, type WrappedData } from "@prostcounter/shared/wrapped";
-import { useRouter } from "next/navigation";
-import { useCallback } from "react";
+import {
+  type StorySlideOf,
+  useStoryCopy,
+  useStoryLanguage,
+  type WrappedData,
+  type WrappedShareContext,
+} from "@prostcounter/shared/wrapped";
+import { useState } from "react";
+
+import { ShareCarousel } from "../../share/ShareCarousel";
+import { useWebShareCards } from "../../share/useWebShareCards";
 
 import { Crest } from "../Crest";
 import { Reveal } from "../Reveal";
@@ -13,19 +21,22 @@ interface ProstSlideProps {
   slide: StorySlideOf<"prost">;
   animate: boolean;
   data: WrappedData;
+  share: WrappedShareContext;
   onReplay: () => void;
   onClose: () => void;
 }
 
-export function ProstSlide({ slide, animate, data, onReplay, onClose }: ProstSlideProps) {
+export function ProstSlide({ slide, animate, data, share, onReplay, onClose }: ProstSlideProps) {
   const { t } = useTranslation();
   const copy = useStoryCopy();
-  const router = useRouter();
-
-  const handleShare = useCallback(() => {
-    localStorage.setItem("wrapped-share-data-v2", JSON.stringify(data));
-    router.push("/wrapped/share");
-  }, [data, router]);
+  const lang = useStoryLanguage();
+  const [carouselOpen, setCarouselOpen] = useState(false);
+  const shareCards = useWebShareCards({
+    festivalId: share.festivalId,
+    data,
+    officialStats: share.officialStats,
+    lang,
+  });
 
   return (
     <div className="flex flex-1 flex-col justify-center gap-6">
@@ -50,7 +61,7 @@ export function ProstSlide({ slide, animate, data, onReplay, onClose }: ProstSli
       <div className="mt-4 flex flex-col gap-3">
         <button
           type="button"
-          onClick={handleShare}
+          onClick={() => setCarouselOpen(true)}
           className="pointer-events-auto rounded-xl bg-wrapped-amber px-6 py-4 text-base font-bold text-wrapped-ink"
         >
           {t("wrapped.outro.share")}
@@ -66,6 +77,16 @@ export function ProstSlide({ slide, animate, data, onReplay, onClose }: ProstSli
           {t("wrapped.close")}
         </button>
       </div>
+      <ShareCarousel
+        open={carouselOpen}
+        onOpenChange={setCarouselOpen}
+        festivalId={share.festivalId}
+        lang={lang}
+        data={data}
+        cards={shareCards.cards}
+        states={shareCards.states}
+        onRetry={shareCards.retry}
+      />
     </div>
   );
 }

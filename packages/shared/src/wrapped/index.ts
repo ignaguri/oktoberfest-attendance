@@ -8,7 +8,7 @@ export type { WrappedData, WrappedFestival } from "../schemas/wrapped.schema";
 export { resolveWrappedFestivalId } from "./resolve-festival";
 
 // Utilities
-export { formatWrappedDate, formatWrappedShortDate, getBestGlobalPosition, prepareShareImageData } from "./utils";
+export { formatWrappedDate, formatWrappedShortDate, getBestGlobalPosition } from "./utils";
 export type { GlobalPositionCriteria } from "./utils";
 
 // Story

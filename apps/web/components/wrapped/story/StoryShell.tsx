@@ -8,6 +8,7 @@ import {
   storyReducer,
   useSlideSummary,
   type WrappedData,
+  type WrappedShareContext,
 } from "@prostcounter/shared/wrapped";
 import { useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
@@ -20,6 +21,7 @@ import { StorySlideView } from "./StorySlide";
 interface StoryShellProps {
   data: WrappedData;
   slides: StorySlide[];
+  share: WrappedShareContext;
   onClose: () => void;
 }
 
@@ -28,7 +30,7 @@ interface StoryShellProps {
  * Space too, Escape closes. The zones sit under the content, which ignores
  * pointer events except the Prost slide's buttons.
  */
-export function StoryShell({ data, slides, onClose }: StoryShellProps) {
+export function StoryShell({ data, slides, share, onClose }: StoryShellProps) {
   const { t } = useTranslation();
   const reduceMotion = useReducedMotion() ?? false;
   const [state, dispatch] = useReducer(storyReducer, slides.length, initialStoryState);
@@ -99,6 +101,7 @@ export function StoryShell({ data, slides, onClose }: StoryShellProps) {
               slide={slide}
               animate={animate}
               data={data}
+              share={share}
               onReplay={() => dispatch({ type: "replay" })}
               onClose={onClose}
             />

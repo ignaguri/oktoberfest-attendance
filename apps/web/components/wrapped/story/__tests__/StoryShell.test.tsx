@@ -9,10 +9,11 @@ vi.mock("next/image", () => ({
   default: ({ src, alt }: { src: string; alt: string }) => <img src={src} alt={alt} />,
 }));
 
-// ProstSlide calls useRouter, which throws outside a mounted app router.
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn() }),
+// The share carousel fetches through the API client, which needs a provider; the story itself does not.
+vi.mock("../../share/useWebShareCards", () => ({
+  useWebShareCards: () => ({ cards: [], states: {}, retry: vi.fn() }),
 }));
+vi.mock("../../share/ShareCarousel", () => ({ ShareCarousel: () => null }));
 
 // AchievementBadge's useTranslation import goes through the `@/lib/data` barrel, which drags in
 // Next.js server actions and Sentry (via useProfile -> Avatar/actions.ts); neither can load under
@@ -42,7 +43,7 @@ function renderStory() {
   const data = makeWrapped();
   const slides = buildWrappedStory(data, makeOfficialStats());
   const onClose = vi.fn();
-  render(<StoryShell data={data} slides={slides} onClose={onClose} />);
+  render(<StoryShell data={data} slides={slides} share={{ festivalId: "f", officialStats: null }} onClose={onClose} />);
   return { slides, onClose };
 }
 

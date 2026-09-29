@@ -77,20 +77,3 @@ export function getBestGlobalPosition(data: WrappedData): {
 
   return bestPosition;
 }
-
-/**
- * Prepare data for share image generation
- */
-export function prepareShareImageData(data: WrappedData) {
-  const podiumGroupsCount = calculatePodiumGroupsCount(data);
-  const bestGlobalPosition = getBestGlobalPosition(data);
-
-  return {
-    festivalName: data.festivalInfo.name,
-    daysAttended: data.basicStats.daysAttended,
-    beersDrunk: data.basicStats.totalBeers,
-    tentsVisited: data.tentStats.uniqueTents,
-    podiumGroupsCount,
-    bestGlobalPosition,
-  };
-}

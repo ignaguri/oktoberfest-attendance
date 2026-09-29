@@ -95,6 +95,7 @@ function WrappedPageContent() {
       key={slides.length}
       data={result.wrapped}
       slides={slides}
+      share={{ festivalId, officialStats: result.officialStats }}
       onClose={handleClose}
     />
   );
