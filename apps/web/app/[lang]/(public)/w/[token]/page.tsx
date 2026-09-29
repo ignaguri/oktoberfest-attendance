@@ -67,16 +67,25 @@ export async function generateMetadata({
   const title = t("wrapped.shareCards.teaser.title", {
     festival: share.festivalName,
   });
+  // Without its own, the preview falls back to the site-wide description
+  const description = t("wrapped.shareCards.teaser.description");
   const ogImage = `${await siteOrigin()}${publicShareImagePath(token, "og", lang, share.card)}`;
   return {
     title,
+    description,
     robots: { index: false, follow: false },
     openGraph: {
       title,
+      description,
       type: "website",
       images: [{ url: ogImage, width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image", title, images: [ogImage] },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
   };
 }
 

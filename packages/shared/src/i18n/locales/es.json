@@ -2807,6 +2807,7 @@
       "teaser": {
         "title": "Mi {{festival}} en ProstCounter",
         "cta": "Conseguí tu propio Wrapped",
+        "description": "Mi fiesta en cervezas, días y carpas. Registrá la tuya en ProstCounter y conseguí tu propio Wrapped.",
         "unavailable": "Este Wrapped ya no se comparte",
         "imageAlt": "Una tarjeta Wrapped de ProstCounter de {{festival}}"
       }

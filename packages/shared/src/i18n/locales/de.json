@@ -2972,6 +2972,7 @@
       "teaser": {
         "title": "Mein {{festival}} auf ProstCounter",
         "cta": "Hol dir deinen eigenen Rückblick",
+        "description": "Mein Fest in Bieren, Tagen und Zelten. Trag deins auf ProstCounter ein und hol dir deinen eigenen Rückblick.",
         "unavailable": "Dieser Rückblick wird nicht mehr geteilt",
         "imageAlt": "Eine ProstCounter-Rückblick-Karte zum {{festival}}"
       }

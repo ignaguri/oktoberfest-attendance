@@ -2747,6 +2747,7 @@
       "teaser": {
         "title": "My {{festival}} on ProstCounter",
         "cta": "Get your own Wrapped",
+        "description": "My festival in beers, days and tents. Log yours on ProstCounter and get your own Wrapped.",
         "unavailable": "This Wrapped isn't shared anymore",
         "imageAlt": "A ProstCounter Wrapped card for {{festival}}"
       }

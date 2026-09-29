@@ -675,6 +675,8 @@ export function ogLayout(
           display: "flex",
           flexDirection: "column",
           marginLeft: 70,
+          // X lays the page title over the bottom of the image, so sit above it
+          marginBottom: 110,
           flex: 1,
         }}
       >
