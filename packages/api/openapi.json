@@ -8679,6 +8679,276 @@
         }
       }
     },
+    "/v1/wrapped/{festivalId}/share-links": {
+      "get": {
+        "tags": [
+          "wrapped"
+        ],
+        "summary": "List the caller's live Wrapped share links",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": false,
+            "name": "lang",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Live links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "numbers",
+                              "persona",
+                              "rhythm",
+                              "city"
+                            ]
+                          },
+                          "token": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "token",
+                          "url"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "links"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "wrapped"
+        ],
+        "summary": "Create or reuse the public link for one share card",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "numbers",
+                      "persona",
+                      "rhythm",
+                      "city"
+                    ]
+                  },
+                  "lang": {
+                    "type": "string",
+                    "enum": [
+                      "en",
+                      "de",
+                      "es"
+                    ]
+                  }
+                },
+                "required": [
+                  "kind",
+                  "lang"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The link",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "enum": [
+                        "numbers",
+                        "persona",
+                        "rhythm",
+                        "city"
+                      ]
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "token",
+                    "url"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Card cannot be linked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Wrapped or card not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/wrapped/share-links/{token}": {
+      "delete": {
+        "tags": [
+          "wrapped"
+        ],
+        "summary": "Stop sharing a Wrapped link",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "token",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Link not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/wrapped": {
       "get": {
         "tags": [
@@ -8834,13 +9104,17 @@
                                 "location": {
                                   "type": "string",
                                   "nullable": true
+                                },
+                                "festivalType": {
+                                  "type": "string"
                                 }
                               },
                               "required": [
                                 "name",
                                 "startDate",
                                 "endDate",
-                                "location"
+                                "location",
+                                "festivalType"
                               ]
                             },
                             "basicStats": {
@@ -9008,13 +9282,17 @@
                                       },
                                       "attendanceDate": {
                                         "type": "string"
+                                      },
+                                      "socialScore": {
+                                        "type": "number"
                                       }
                                     },
                                     "required": [
                                       "id",
                                       "pictureUrl",
                                       "createdAt",
-                                      "attendanceDate"
+                                      "attendanceDate",
+                                      "socialScore"
                                     ]
                                   }
                                 }
@@ -9160,6 +9438,9 @@
                                     },
                                     "daysPercentile": {
                                       "type": "number"
+                                    },
+                                    "attendeeCount": {
+                                      "type": "number"
                                     }
                                   },
                                   "required": [
@@ -9170,7 +9451,8 @@
                                     "medianBeers",
                                     "medianDays",
                                     "beersPercentile",
-                                    "daysPercentile"
+                                    "daysPercentile",
+                                    "attendeeCount"
                                   ]
                                 },
                                 "vsLastYear": {
@@ -9267,6 +9549,37 @@
                                 "topDrinkType",
                                 "breakdown"
                               ]
+                            },
+                            "timing": {
+                              "type": "object",
+                              "properties": {
+                                "timedDays": {
+                                  "type": "number"
+                                },
+                                "medianFirstHour": {
+                                  "type": "number",
+                                  "nullable": true
+                                },
+                                "medianLastHour": {
+                                  "type": "number",
+                                  "nullable": true
+                                },
+                                "peakHour": {
+                                  "type": "number",
+                                  "nullable": true
+                                },
+                                "weekendShare": {
+                                  "type": "number",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "timedDays",
+                                "medianFirstHour",
+                                "medianLastHour",
+                                "peakHour",
+                                "weekendShare"
+                              ]
                             }
                           },
                           "required": [
@@ -9281,13 +9594,87 @@
                             "timeline",
                             "comparisons",
                             "personality",
-                            "drinkStats"
+                            "drinkStats",
+                            "timing"
+                          ]
+                        },
+                        "officialStats": {
+                          "type": "object",
+                          "nullable": true,
+                          "properties": {
+                            "year": {
+                              "type": "integer"
+                            },
+                            "isCurrentFestival": {
+                              "type": "boolean"
+                            },
+                            "visitors": {
+                              "type": "number",
+                              "nullable": true
+                            },
+                            "massServed": {
+                              "type": "number",
+                              "nullable": true
+                            },
+                            "mugsConfiscated": {
+                              "type": "number",
+                              "nullable": true
+                            },
+                            "lostItems": {
+                              "type": "number",
+                              "nullable": true
+                            },
+                            "curiousFinds": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "de": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 80
+                                  },
+                                  "en": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 80
+                                  },
+                                  "es": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "maxLength": 80
+                                  }
+                                },
+                                "required": [
+                                  "de",
+                                  "en",
+                                  "es"
+                                ]
+                              },
+                              "maxItems": 3
+                            },
+                            "sourceUrl": {
+                              "type": "string",
+                              "nullable": true,
+                              "format": "uri"
+                            }
+                          },
+                          "required": [
+                            "year",
+                            "isCurrentFestival",
+                            "visitors",
+                            "massServed",
+                            "mugsConfiscated",
+                            "lostItems",
+                            "curiousFinds",
+                            "sourceUrl"
                           ]
                         }
                       },
                       "required": [
                         "status",
-                        "wrapped"
+                        "wrapped",
+                        "officialStats"
                       ]
                     },
                     {
@@ -20494,6 +20881,354 @@
                   },
                   "required": [
                     "entries"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/festivals/{festivalId}/official-stats": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Get a festival's official stats (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Official stats, or null when none are stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stats": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "festivalId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "visitors": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "massServed": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "mugsConfiscated": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "lostItems": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "curiousFinds": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "de": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              },
+                              "en": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              },
+                              "es": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              }
+                            },
+                            "required": [
+                              "de",
+                              "en",
+                              "es"
+                            ]
+                          },
+                          "maxItems": 3
+                        },
+                        "sourceUrl": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "festivalId",
+                        "visitors",
+                        "massServed",
+                        "mugsConfiscated",
+                        "lostItems",
+                        "curiousFinds",
+                        "sourceUrl",
+                        "updatedAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "stats"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Save a festival's official stats (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "festivalId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "visitors": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0
+                  },
+                  "massServed": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0
+                  },
+                  "mugsConfiscated": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0
+                  },
+                  "lostItems": {
+                    "type": "integer",
+                    "nullable": true,
+                    "minimum": 0
+                  },
+                  "curiousFinds": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "de": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "en": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        },
+                        "es": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 80
+                        }
+                      },
+                      "required": [
+                        "de",
+                        "en",
+                        "es"
+                      ]
+                    },
+                    "maxItems": 3
+                  },
+                  "sourceUrl": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "visitors",
+                  "massServed",
+                  "mugsConfiscated",
+                  "lostItems",
+                  "curiousFinds",
+                  "sourceUrl"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Official stats saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "festivalId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "visitors": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "massServed": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "mugsConfiscated": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "lostItems": {
+                          "type": "integer",
+                          "nullable": true,
+                          "minimum": 0
+                        },
+                        "curiousFinds": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "de": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              },
+                              "en": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              },
+                              "es": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 80
+                              }
+                            },
+                            "required": [
+                              "de",
+                              "en",
+                              "es"
+                            ]
+                          },
+                          "maxItems": 3
+                        },
+                        "sourceUrl": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "festivalId",
+                        "visitors",
+                        "massServed",
+                        "mugsConfiscated",
+                        "lostItems",
+                        "curiousFinds",
+                        "sourceUrl",
+                        "updatedAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "stats"
                   ]
                 }
               }

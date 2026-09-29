@@ -14,20 +14,20 @@ export function WrappedStateScreen({ title, description, onClose }: WrappedState
   const { t } = useTranslation();
 
   return (
-    <View className="flex-1 items-center justify-center bg-yellow-50 p-6">
+    <View className="flex-1 items-center justify-center bg-wrapped-paper p-6">
       <VStack space="md" className="items-center">
-        <Text className="text-center text-xl font-bold text-typography-900">{title}</Text>
+        <Text className="text-center text-xl font-wrapped font-bold text-wrapped-ink">{title}</Text>
         {description ? (
-          <Text className="text-center text-base text-typography-600">{description}</Text>
+          <Text className="text-center text-base text-wrapped-ink/70">{description}</Text>
         ) : null}
         <Pressable
           onPress={onClose}
-          className="rounded-lg bg-primary-500 px-6 py-3"
+          className="rounded-lg bg-wrapped-ink px-6 py-3"
           accessibilityRole="button"
           accessibilityLabel={t("wrapped.close")}
-          accessibilityHint={t("wrapped.close")}
+          accessibilityHint={t("wrapped.story.a11y.closeHint")}
         >
-          <Text className="font-semibold text-white">{t("wrapped.close")}</Text>
+          <Text className="font-semibold text-wrapped-paper">{t("wrapped.close")}</Text>
         </Pressable>
       </VStack>
     </View>

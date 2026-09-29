@@ -290,6 +290,28 @@ export default function AdminFestivalDetailScreen() {
             </Card>
           </Pressable>
 
+          {/* Official stats */}
+          <Pressable
+            onPress={() => router.push(`/admin/festival/${id}/official-stats`)}
+            accessibilityRole="button"
+            accessibilityLabel={t("admin.mobile.festivalDetail.officialStatsLink")}
+            accessibilityHint={t("admin.mobile.festivalDetail.officialStatsLinkHint")}
+          >
+            <Card size="md" variant="elevated">
+              <HStack className="items-center justify-between">
+                <VStack className="flex-1 pr-3">
+                  <Text className="text-typography-900">
+                    {t("admin.mobile.festivalDetail.officialStatsLink")}
+                  </Text>
+                  <Text className="text-sm text-typography-500">
+                    {t("admin.mobile.festivalDetail.officialStatsLinkHint")}
+                  </Text>
+                </VStack>
+                <ChevronRight size={20} color={IconColors.muted} />
+              </HStack>
+            </Card>
+          </Pressable>
+
           {/* Delete */}
           <Card size="md" variant="outline" className="border-error-300">
             <VStack space="sm">

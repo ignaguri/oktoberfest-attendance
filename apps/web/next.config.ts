@@ -24,6 +24,14 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@prostcounter/ui"],
   // Exclude test-only packages from server bundles to prevent ESM/CommonJS issues
   serverExternalPackages: ["esbuild-wasm", "esbuild", "@esbuild/darwin-arm64"],
+  // The share-card renderer reads these with fs at request time, so the API
+  // function has to carry them (packages/api/src/share-cards/assets.ts).
+  outputFileTracingIncludes: {
+    "/api/[[...route]]": [
+      "./public/wrapped/fonts/**",
+      "./public/wrapped/crests/**",
+    ],
+  },
   // Turbopack configuration
   turbopack: {
     resolveAlias: {

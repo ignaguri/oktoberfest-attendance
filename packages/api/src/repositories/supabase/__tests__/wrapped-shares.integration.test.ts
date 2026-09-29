@@ -1,0 +1,233 @@
+// Integration test: requires a running local Supabase with migrations applied.
+// Run with: pnpm --filter=@prostcounter/api test:integration wrapped-shares
+import { randomUUID } from "crypto";
+import type { Database } from "@prostcounter/db";
+import {
+  buildShareCards,
+  type LinkableShareCardKind,
+  type ShareCard,
+} from "@prostcounter/shared/wrapped/server";
+import {
+  makeOfficialStats,
+  makeWrapped,
+} from "@prostcounter/shared/wrapped/testing";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+import { deleteTestUsersAndFestivals } from "../../../__tests__/helpers/test-cleanup";
+import {
+  createTestSupabaseAdmin,
+  createTestSupabaseAnon,
+  createTestSupabaseWithAuth,
+} from "../../../__tests__/helpers/test-supabase";
+import { SupabaseWrappedShareRepository } from "../wrapped-share.repository";
+
+let admin: SupabaseClient<Database>;
+let festivalId: string;
+const users: { id: string; token: string }[] = [];
+const cards = buildShareCards(makeWrapped(), makeOfficialStats());
+const cardOf = (kind: LinkableShareCardKind): ShareCard =>
+  cards.find((candidate) => candidate.kind === kind)!;
+
+/** Reads as the user (RLS), writes as the API's service-role client. */
+function ownerRepo(token: string) {
+  return new SupabaseWrappedShareRepository(
+    createTestSupabaseWithAuth(token),
+    admin,
+  );
+}
+
+async function signUp(suffix: string) {
+  const { data, error } = await createTestSupabaseAnon().auth.signUp({
+    email: `wrapped-shares-${suffix}@integration-test.com`,
+    password: "test-password-123!",
+  });
+  if (error || !data.user || !data.session) {
+    throw new Error(
+      `signUp failed (is email confirmation off locally?): ${error?.message}`,
+    );
+  }
+  return { id: data.user.id, token: data.session.access_token };
+}
+
+describe("wrapped_shares", () => {
+  beforeAll(async () => {
+    admin = createTestSupabaseAdmin();
+    const suffix = randomUUID();
+    const { data: festival, error } = await admin
+      .from("festivals")
+      .insert({
+        name: `Wrapped Shares ${suffix}`,
+        short_name: `wrapped-shares-${suffix}`.slice(0, 40),
+        festival_type: "oktoberfest",
+        start_date: "2026-09-19",
+        end_date: "2026-10-04",
+        beer_cost: 15.8,
+        location: "Test Location",
+        timezone: "Europe/Berlin",
+        is_active: false,
+        status: "ended",
+      })
+      .select("id")
+      .single();
+    if (error || !festival) {
+      throw new Error(`festival insert failed: ${error?.message}`);
+    }
+    festivalId = festival.id;
+    users.push(await signUp(`a-${suffix}`), await signUp(`b-${suffix}`));
+  });
+
+  afterAll(async () => {
+    await deleteTestUsersAndFestivals(admin, {
+      userIds: users.map((user) => user.id),
+      festivalIds: [festivalId].filter(Boolean),
+    });
+  });
+
+  it("creates a link, reuses it, and hides it from other users", async () => {
+    const [owner, other] = users;
+    const repo = ownerRepo(owner.token);
+    const first = await repo.upsertLive(
+      owner.id,
+      festivalId,
+      "numbers",
+      cardOf("numbers"),
+    );
+    const second = await repo.upsertLive(
+      owner.id,
+      festivalId,
+      "numbers",
+      cardOf("numbers"),
+    );
+    expect(first).toMatch(/^[A-Za-z0-9_-]{22}$/);
+    expect(second).toBe(first);
+    expect(await repo.listLive(owner.id, festivalId)).toEqual([
+      { token: first, kind: "numbers" },
+    ]);
+
+    const otherRepo = ownerRepo(other.token);
+    expect(await otherRepo.listLive(owner.id, festivalId)).toEqual([]);
+    expect(await otherRepo.revoke(other.id, first)).toBe(false);
+  });
+
+  it("serves a live link to anon and stops after revoke", async () => {
+    const [owner] = users;
+    const repo = ownerRepo(owner.token);
+    const token = await repo.upsertLive(
+      owner.id,
+      festivalId,
+      "persona",
+      cardOf("persona"),
+    );
+    const publicRepo = new SupabaseWrappedShareRepository(
+      createTestSupabaseAnon(),
+    );
+    expect(await publicRepo.getPublic(token)).toMatchObject({
+      kind: "persona",
+      festivalName: expect.stringContaining("Wrapped Shares"),
+    });
+
+    expect(await repo.revoke(owner.id, token)).toBe(true);
+    expect(await publicRepo.getPublic(token)).toBeNull();
+    expect(await repo.revoke(owner.id, token)).toBe(false);
+
+    const fresh = await repo.upsertLive(
+      owner.id,
+      festivalId,
+      "persona",
+      cardOf("persona"),
+    );
+    expect(fresh).not.toBe(token);
+  });
+
+  it("keeps anon out of the table itself", async () => {
+    const { data } = await createTestSupabaseAnon()
+      .from("wrapped_shares")
+      .select("token");
+    expect(data ?? []).toEqual([]);
+  });
+
+  it("rejects a second live link and a photos link at the database", async () => {
+    const [owner] = users;
+    await ownerRepo(owner.token).upsertLive(
+      owner.id,
+      festivalId,
+      "rhythm",
+      cardOf("rhythm"),
+    );
+    const duplicate = await admin.from("wrapped_shares").insert({
+      user_id: owner.id,
+      festival_id: festivalId,
+      card_kind: "rhythm",
+      card_data: {},
+    });
+    expect(duplicate.error?.code).toBe("23505");
+    const photos = await admin.from("wrapped_shares").insert({
+      user_id: owner.id,
+      festival_id: festivalId,
+      card_kind: "photos",
+      card_data: {},
+    });
+    expect(photos.error?.code).toBe("23514");
+  });
+
+  it("reuses the live link when two inserts race", async () => {
+    const [owner] = users;
+    const repo = ownerRepo(owner.token);
+    const [a, b] = await Promise.all([
+      repo.upsertLive(owner.id, festivalId, "city", cardOf("city")),
+      repo.upsertLive(owner.id, festivalId, "city", cardOf("city")),
+    ]);
+    expect(a).toBe(b);
+  });
+
+  it("never lets a user write a card snapshot directly", async () => {
+    const [owner] = users;
+    const client = createTestSupabaseWithAuth(owner.token);
+    const insert = await client.from("wrapped_shares").insert({
+      user_id: owner.id,
+      festival_id: festivalId,
+      card_kind: "numbers",
+      card_data: { kind: "numbers", forged: true },
+    });
+    expect(insert.error?.code).toBe("42501");
+
+    const token = await ownerRepo(owner.token).upsertLive(
+      owner.id,
+      festivalId,
+      "numbers",
+      cardOf("numbers"),
+    );
+    const forge = await client
+      .from("wrapped_shares")
+      .update({ card_data: { kind: "numbers", forged: true } })
+      .eq("token", token);
+    expect(forge.error?.code).toBe("42501");
+
+    await ownerRepo(owner.token).revoke(owner.id, token);
+    const revive = await client
+      .from("wrapped_shares")
+      .update({ revoked_at: null })
+      .eq("token", token)
+      .select("id");
+    expect(revive.data ?? []).toEqual([]);
+  });
+
+  it("serves nothing when a snapshot does not match its card kind", async () => {
+    const [, other] = users;
+    const { data } = await admin
+      .from("wrapped_shares")
+      .insert({
+        user_id: other.id,
+        festival_id: festivalId,
+        card_kind: "numbers",
+        card_data: cardOf("persona") as never,
+      })
+      .select("token")
+      .single();
+    const publicRepo = new SupabaseWrappedShareRepository(
+      createTestSupabaseAnon(),
+    );
+    expect(await publicRepo.getPublic(data!.token)).toBeNull();
+  });
+});

@@ -9,6 +9,7 @@ import { requireAdmin } from "./middleware/require-admin";
 import achievementRoute from "./routes/achievement.route";
 import adminRoute from "./routes/admin.route";
 import adminAnalyticsRoute from "./routes/admin-analytics.route";
+import adminOfficialStatsRoute from "./routes/admin-official-stats.route";
 import activityFeedRoute from "./routes/activity-feed.route";
 import attendanceRoute from "./routes/attendance.route";
 import calendarRoute from "./routes/calendar.route";
@@ -31,9 +32,11 @@ import photoRoute from "./routes/photo.route";
 import photoSocialRoute from "./routes/photo-social.route";
 import photoTagRoute from "./routes/photo-tag.route";
 import profileRoute from "./routes/profile.route";
+import publicWrappedShareRoute from "./routes/public-wrapped-share.route";
 import reservationRoute from "./routes/reservation.route";
 import tentRoute from "./routes/tent.route";
 import wrappedRoute from "./routes/wrapped.route";
+import wrappedShareRoute from "./routes/wrapped-share.route";
 
 // Create the main Hono app with OpenAPI support
 export const app = new OpenAPIHono();
@@ -56,6 +59,9 @@ app.get("/app-version", (c) => {
   c.header("Cache-Control", "public, max-age=3600, s-maxage=3600");
   return c.json(getAppVersions());
 });
+
+// Public: images of Wrapped share links, fetched by link previews and the teaser page.
+app.route("/public", publicWrappedShareRoute);
 
 // Mount API v1 routes with authentication
 const apiV1 = new OpenAPIHono();
@@ -83,6 +89,7 @@ apiV1.route("/", groupMessageRoute);
 apiV1.route("/", leaderboardRoute);
 apiV1.route("/", achievementRoute);
 apiV1.route("/", notificationRoute);
+apiV1.route("/", wrappedShareRoute);
 apiV1.route("/", wrappedRoute);
 apiV1.route("/", reservationRoute);
 apiV1.route("/", dayPlanRoute);
@@ -97,6 +104,7 @@ apiV1.route("/", crowdReportRoute);
 apiV1.route("/", feedbackRoute);
 apiV1.route("/", eventsRoute);
 apiV1.route("/", adminRoute);
+apiV1.route("/", adminOfficialStatsRoute);
 apiV1.route("/", adminAnalyticsRoute);
 
 // Mount v1 routes under /v1 prefix

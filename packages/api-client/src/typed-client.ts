@@ -11,6 +11,7 @@ import type {
   AddAllAdminFestivalTentsInput,
   AdminAttendance,
   AdminFestival,
+  AdminFestivalOfficialStats,
   AdminFestivalTent,
   AdminFestivalTentStats,
   AdminGroup,
@@ -41,6 +42,7 @@ import type {
   CreateMessageResponse,
   CreateAdminFestivalInput,
   CreateAdminTentInput,
+  CreateWrappedShareLinkBody,
   CrowdLevel,
   DayPlanResponse,
   DeleteAttendanceResponse,
@@ -90,6 +92,7 @@ import type {
   ListGroupsResponse,
   ListInvitableUsersResponse,
   ListSentGroupInvitationsResponse,
+  ListWrappedShareLinksResponse,
   LogConsumptionInput,
   LogConsumptionResponse,
   MarkUnlocksSeenResponse,
@@ -101,12 +104,14 @@ import type {
   ProfileShort,
   PublicProfile,
   SearchUsersResponse,
+  ShareLang,
   SubmitCrowdReportResponse,
   SubmitFeedbackBody,
   SubmitFeedbackResponse,
   TutorialStatus,
   UpdateAdminAttendanceInput,
   UpdateAdminFestivalInput,
+  UpdateAdminFestivalOfficialStatsInput,
   UpdateAdminGroupInput,
   UpdateAdminTentInput,
   UpdateAdminUserAuthInput,
@@ -117,8 +122,10 @@ import type {
   WinningCriteriaListResponse,
   WinningCriterion,
   WrappedAccessResult,
+  WrappedShareLink,
 } from "@prostcounter/shared/schemas";
 import type { RecordEventsBody } from "@prostcounter/shared/analytics";
+import type { ShareCardKind } from "@prostcounter/shared/wrapped";
 
 /**
  * Headers type compatible with both browser and Node.js environments
@@ -2026,6 +2033,62 @@ export function createTypedApiClient(config: ApiClientConfig) {
         }
         return parseJsonResponse(response);
       },
+
+      /**
+       * URL and auth headers for a card's JPEG; apps download it directly (binary, off the typed client).
+       * `version` (the card's fingerprint) keys the URL, so a cached response never outlives the card.
+       */
+      async shareCardRequest(
+        festivalId: string,
+        kind: ShareCardKind,
+        lang: ShareLang,
+        version: string,
+      ): Promise<{ url: string; headers: Record<string, string> }> {
+        const headers = await getAuthHeaders();
+        const authOnly: Record<string, string> = headers.Authorization ? { Authorization: headers.Authorization } : {};
+        return {
+          url: `${baseUrl}/v1/wrapped/${festivalId}/share-cards/${kind}?lang=${lang}&v=${version}`,
+          headers: authOnly,
+        };
+      },
+
+      shareLinks: {
+        async list(festivalId: string, lang: ShareLang): Promise<ListWrappedShareLinksResponse> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped/${festivalId}/share-links?lang=${lang}`, {
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch share links");
+          }
+          return parseJsonResponse(response);
+        },
+
+        async create(festivalId: string, body: CreateWrappedShareLinkBody): Promise<WrappedShareLink> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("POST", `${baseUrl}/v1/wrapped/${festivalId}/share-links`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(body),
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to create share link");
+          }
+          return parseJsonResponse(response);
+        },
+
+        async revoke(token: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("DELETE", `${baseUrl}/v1/wrapped/share-links/${token}`, {
+            method: "DELETE",
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to stop sharing");
+          }
+          return parseJsonResponse(response);
+        },
+      },
     },
 
     /**
@@ -3245,6 +3308,35 @@ export function createTypedApiClient(config: ApiClientConfig) {
             await extractApiError(response, "Failed to update festival");
           }
           return parseJsonResponse<{ festival: AdminFestival }>(response);
+        },
+
+        async getOfficialStats(festivalId: string): Promise<{ stats: AdminFestivalOfficialStats | null }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/official-stats`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch official stats");
+          }
+          return parseJsonResponse<{ stats: AdminFestivalOfficialStats | null }>(response);
+        },
+
+        async updateOfficialStats(
+          festivalId: string,
+          data: UpdateAdminFestivalOfficialStatsInput,
+        ): Promise<{ stats: AdminFestivalOfficialStats }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PUT",
+            `${baseUrl}/v1/admin/festivals/${festivalId}/official-stats`,
+            { method: "PUT", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to save official stats");
+          }
+          return parseJsonResponse<{ stats: AdminFestivalOfficialStats }>(response);
         },
 
         async delete(festivalId: string): Promise<{ success: boolean }> {

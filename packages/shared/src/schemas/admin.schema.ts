@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { CuriousFindSchema } from "./wrapped.schema";
+
 /**
  * Admin API schemas
  *
@@ -468,3 +470,29 @@ export const AdminWrappedCacheEntrySchema = z.object({
 });
 
 export type AdminWrappedCacheEntry = z.infer<typeof AdminWrappedCacheEntrySchema>;
+
+/**
+ * Official end-of-festival numbers as the admin edits them.
+ * GET/PUT /api/v1/admin/festivals/:festivalId/official-stats
+ */
+export const AdminFestivalOfficialStatsSchema = z.object({
+  festivalId: z.uuid(),
+  visitors: z.number().int().nonnegative().nullable(),
+  massServed: z.number().int().nonnegative().nullable(),
+  mugsConfiscated: z.number().int().nonnegative().nullable(),
+  lostItems: z.number().int().nonnegative().nullable(),
+  curiousFinds: z.array(CuriousFindSchema).max(3),
+  sourceUrl: z.url({ protocol: /^https?$/ }).nullable(),
+  updatedAt: z.string().nullable(),
+});
+
+export type AdminFestivalOfficialStats = z.infer<typeof AdminFestivalOfficialStatsSchema>;
+
+export const UpdateAdminFestivalOfficialStatsSchema = AdminFestivalOfficialStatsSchema.omit({
+  festivalId: true,
+  updatedAt: true,
+});
+
+export type UpdateAdminFestivalOfficialStatsInput = z.infer<
+  typeof UpdateAdminFestivalOfficialStatsSchema
+>;

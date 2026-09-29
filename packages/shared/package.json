@@ -18,6 +18,8 @@
     "./constants": "./src/constants/index.ts",
     "./contexts": "./src/contexts/index.ts",
     "./wrapped": "./src/wrapped/index.ts",
+    "./wrapped/server": "./src/wrapped/server.ts",
+    "./wrapped/testing": "./src/wrapped/story/story-fixtures.ts",
     "./achievements": "./src/achievements/index.ts",
     "./analytics": "./src/analytics/index.ts",
     "./analytics/react": "./src/analytics/react.tsx"

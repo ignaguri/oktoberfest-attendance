@@ -302,7 +302,7 @@ async function seedCacheRow(userId: string, festivalId: string) {
   const { error } = await admin
     .from("wrapped_data_cache")
     .upsert(
-      { user_id: userId, festival_id: festivalId, wrapped_data: {}, data_version: 2 },
+      { user_id: userId, festival_id: festivalId, wrapped_data: {}, data_version: 1 },
       { onConflict: "user_id,festival_id" },
     );
   if (error) {
@@ -428,6 +428,7 @@ describe("repository against the real RPC", () => {
     const wrapped = await repo.getWrapped(user.id, festivalId);
     expect(wrapped.basicStats.totalBeers).toBe(2);
     expect(wrapped.drinkStats.breakdown[0]?.drinkType).toBe("beer");
+    expect(wrapped.festivalInfo.festivalType).toBe("oktoberfest");
 
     const festivals = await repo.listFestivals();
     expect(festivals.map((festival) => festival.festivalId)).toContain(festivalId);
@@ -445,5 +446,199 @@ describe("unlock gate cannot be bypassed", () => {
     });
     expect(data).toBeNull();
     expect(error?.code).toBe("42501");
+  });
+});
+
+async function drinkAt(attendanceId: string, recordedAt: string, drinkType: "beer" | "radler" = "beer") {
+  const { error } = await admin.from("consumptions").insert({
+    attendance_id: attendanceId,
+    drink_type: drinkType,
+    base_price_cents: 1500,
+    price_paid_cents: 1500,
+    recorded_at: recordedAt,
+  });
+  if (error) {
+    throw new Error(`consumption insert failed: ${error.message}`);
+  }
+}
+
+async function wrappedDataAsAdmin(userId: string, festivalId: string) {
+  const { data, error } = await admin.rpc("get_wrapped_data", {
+    p_user_id: userId,
+    p_festival_id: festivalId,
+  });
+  if (error) {
+    throw new Error(`get_wrapped_data failed: ${error.message}`);
+  }
+  return data as {
+    timing: {
+      timed_days: number;
+      median_first_hour: number | null;
+      median_last_hour: number | null;
+      peak_hour: number | null;
+      weekend_share: number | null;
+    };
+    comparisons: { vs_festival_avg: { attendee_count: number } };
+  };
+}
+
+describe("wrapped timing", () => {
+  it("computes local first/last hours, the after-midnight shift and weekend share", async () => {
+    const user = await createSignedInUser("timing");
+    // June 2025: Europe/Berlin is UTC+2
+    const festivalId = await createFestival(`Timing ${suffix} 2025`, "2025-06-10", "2025-06-20");
+    const thursday = await attend(user.id, festivalId, "2025-06-12", 0);
+    const saturday = await attend(user.id, festivalId, "2025-06-14", 0);
+    await drinkAt(thursday, "2025-06-12T10:00:00Z"); // 12:00 local
+    await drinkAt(thursday, "2025-06-12T21:00:00Z"); // 23:00 local
+    await drinkAt(saturday, "2025-06-14T09:30:00Z"); // 11:30 local
+    await drinkAt(saturday, "2025-06-14T23:30:00Z"); // 01:30 local next day, counts as 25.5
+
+    const data = await wrappedDataAsAdmin(user.id, festivalId);
+
+    expect(data.timing.timed_days).toBe(2);
+    expect(Number(data.timing.median_first_hour)).toBeCloseTo(11.75, 2);
+    expect(Number(data.timing.median_last_hour)).toBeCloseTo(24.25, 2);
+    expect(data.timing.peak_hour).toBe(11);
+    expect(Number(data.timing.weekend_share)).toBeCloseTo(0.5, 2);
+  });
+
+  it("uses the winter offset after the DST switch", async () => {
+    const user = await createSignedInUser("timing-dst");
+    // 2025-10-26: Europe/Berlin switches to UTC+1 at 01:00 UTC
+    const festivalId = await createFestival(`Timing DST ${suffix} 2025`, "2025-10-20", "2025-10-30");
+    const sunday = await attend(user.id, festivalId, "2025-10-26", 0);
+    await drinkAt(sunday, "2025-10-26T10:00:00Z"); // 11:00 local (CET)
+    await drinkAt(sunday, "2025-10-26T19:00:00Z"); // 20:00 local
+
+    const data = await wrappedDataAsAdmin(user.id, festivalId);
+
+    expect(Number(data.timing.median_first_hour)).toBeCloseTo(11, 2);
+    expect(Number(data.timing.median_last_hour)).toBeCloseTo(20, 2);
+    expect(Number(data.timing.weekend_share)).toBeCloseTo(1, 2);
+  });
+
+  it("returns nulls when no drinks were logged", async () => {
+    const user = await createSignedInUser("timing-empty");
+    const festivalId = await createFestival(`Timing empty ${suffix} 2025`, "2025-06-10", "2025-06-20");
+    await attend(user.id, festivalId, "2025-06-11", 0);
+
+    const data = await wrappedDataAsAdmin(user.id, festivalId);
+
+    expect(data.timing.timed_days).toBe(0);
+    expect(data.timing.median_first_hour).toBeNull();
+    expect(data.timing.median_last_hour).toBeNull();
+    expect(data.timing.peak_hour).toBeNull();
+    expect(Number(data.timing.weekend_share)).toBeCloseTo(0, 2);
+  });
+
+  it("ignores backfilled days, whose drinks all share one timestamp", async () => {
+    const user = await createSignedInUser("timing-backfill");
+    const festivalId = await createFestival(`Timing backfill ${suffix} 2025`, "2025-06-10", "2025-06-20");
+    const backfilled = await attend(user.id, festivalId, "2025-06-12", 0);
+    const logged = await attend(user.id, festivalId, "2025-06-13", 0);
+    await drinkAt(backfilled, "2025-06-13T00:00:00Z"); // 02:00 local, twice
+    await drinkAt(backfilled, "2025-06-13T00:00:00Z");
+    await drinkAt(logged, "2025-06-13T12:00:00Z"); // 14:00 local
+    await drinkAt(logged, "2025-06-13T18:00:00Z"); // 20:00 local
+
+    const data = await wrappedDataAsAdmin(user.id, festivalId);
+
+    expect(data.timing.timed_days).toBe(1);
+    expect(Number(data.timing.median_first_hour)).toBeCloseTo(14, 2);
+    expect(Number(data.timing.median_last_hour)).toBeCloseTo(20, 2);
+    expect(data.timing.peak_hour).toBe(14);
+  });
+
+  it("counts the festival's attendees", async () => {
+    const first = await createSignedInUser("count-a");
+    const second = await createSignedInUser("count-b");
+    const festivalId = await createFestival(`Count ${suffix} 2025`, "2025-06-10", "2025-06-20");
+    await attend(first.id, festivalId, "2025-06-11", 1);
+    await attend(second.id, festivalId, "2025-06-12", 2);
+
+    const data = await wrappedDataAsAdmin(first.id, festivalId);
+
+    expect(data.comparisons.vs_festival_avg.attendee_count).toBe(2);
+  });
+
+  it("reports data version 3", async () => {
+    const { data } = await admin.rpc("wrapped_data_version");
+    expect(data).toBe(3);
+  });
+});
+
+describe("festival official stats", () => {
+  const finds = [{ de: "ein Akkordeon", en: "an accordion", es: "un acordeón" }];
+
+  it("lets a signed-in user read but not write", async () => {
+    const user = await createSignedInUser("stats-reader");
+    const festivalId = await createFestival(`Stats read ${suffix} 2025`, "2025-06-10", "2025-06-20");
+    await admin.from("festival_official_stats").insert({ festival_id: festivalId, visitors: 100 });
+
+    const { data, error } = await user.client
+      .from("festival_official_stats")
+      .select("visitors")
+      .eq("festival_id", festivalId)
+      .single();
+    expect(error).toBeNull();
+    expect(data?.visitors).toBe(100);
+
+    const { error: writeError } = await user.client
+      .from("festival_official_stats")
+      .update({ visitors: 1 })
+      .eq("festival_id", festivalId)
+      .select();
+    const { data: after } = await admin
+      .from("festival_official_stats")
+      .select("visitors")
+      .eq("festival_id", festivalId)
+      .single();
+    // RLS turns a forbidden update into zero affected rows, not an error
+    expect(writeError).toBeNull();
+    expect(after?.visitors).toBe(100);
+  });
+
+  it("lets a super admin write", async () => {
+    const adminUser = await createSignedInUser("stats-admin");
+    await admin.from("profiles").update({ is_super_admin: true }).eq("id", adminUser.id);
+    const festivalId = await createFestival(`Stats write ${suffix} 2025`, "2025-06-10", "2025-06-20");
+
+    const { error } = await adminUser.client
+      .from("festival_official_stats")
+      .insert({ festival_id: festivalId, visitors: 42, curious_finds: finds });
+
+    expect(error).toBeNull();
+  });
+
+  it("rejects more than three curious finds", async () => {
+    const festivalId = await createFestival(`Stats check ${suffix} 2025`, "2025-06-10", "2025-06-20");
+    const { error } = await admin
+      .from("festival_official_stats")
+      .insert({ festival_id: festivalId, curious_finds: [...finds, ...finds, ...finds, ...finds] });
+    expect(error).not.toBeNull();
+  });
+
+  it("falls back to the latest earlier festival of the same series", async () => {
+    const user = await createSignedInUser("stats-series");
+    const series = `Serie ${suffix}`;
+    const lastYear = await createFestival(`${series} 2025`, "2025-06-10", "2025-06-20");
+    const thisYear = await createFestival(`${series} 2026`, "2026-06-10", "2026-06-20");
+    const unrelated = await createFestival(`Other ${suffix} 2026`, "2026-06-10", "2026-06-20");
+    await admin
+      .from("festival_official_stats")
+      .insert({ festival_id: lastYear, visitors: 500, curious_finds: finds });
+
+    const fallback = await user.client.rpc("get_festival_official_stats", { p_festival_id: thisYear });
+    expect(fallback.error).toBeNull();
+    expect(fallback.data?.[0]?.source_festival_id).toBe(lastYear);
+    expect(fallback.data?.[0]?.stats_year).toBe(2025);
+    expect(fallback.data?.[0]?.visitors).toBe(500);
+
+    const own = await user.client.rpc("get_festival_official_stats", { p_festival_id: lastYear });
+    expect(own.data?.[0]?.source_festival_id).toBe(lastYear);
+
+    const none = await user.client.rpc("get_festival_official_stats", { p_festival_id: unrelated });
+    expect(none.data ?? []).toHaveLength(0);
   });
 });

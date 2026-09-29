@@ -93,6 +93,8 @@ export class QueryKeys {
   static wrappedFestivals = () => ["wrapped", "festivals"] as const;
   /** Prefix covering every Wrapped read, for invalidation after a regeneration. */
   static wrappedAll = () => ["wrapped"] as const;
+  static wrappedShareLinks = (festivalId: string, lang: string) =>
+    ["wrapped-share-links", festivalId, lang] as const;
 
   // Calendar queries
   static personalCalendar = (festivalId: string) => ["calendar", "personal", festivalId] as const;
@@ -178,6 +180,8 @@ export class QueryKeys {
    * still showing its Active badge.
    */
   static adminFestivalAll = () => ["admin", "festival"] as const;
+  static adminFestivalOfficialStats = (festivalId: string) =>
+    ["admin", "festival", festivalId, "official-stats"] as const;
   static adminGroups = () => ["admin", "groups"] as const;
   static adminGroup = (groupId: string) => ["admin", "group", groupId] as const;
   static adminGroupMembers = (groupId: string) => ["admin", "group", groupId, "members"] as const;

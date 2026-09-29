@@ -104,4 +104,55 @@ describe("Wrapped cache and photos", () => {
     expect(error).toBeNull();
     expect(await cacheRowCount()).toBe(0);
   });
+
+  // Reactions and comments share the trigger function; a tag needs no group to set up.
+  it("drops the cached Wrapped when a photo is tagged or untagged", async () => {
+    const { data: picture, error } = await admin
+      .from("beer_pictures")
+      .insert({ user_id: userId, attendance_id: attendanceId, picture_url: "to-tag.jpg" })
+      .select("id")
+      .single();
+    if (error || !picture) {
+      throw new Error(`picture insert failed: ${error?.message}`);
+    }
+
+    await seedCache();
+    expect((await admin.from("photo_tags").insert({ photo_id: picture.id, tagged_user_id: userId })).error).toBeNull();
+    expect(await cacheRowCount()).toBe(0);
+
+    await seedCache();
+    expect((await admin.from("photo_tags").delete().eq("photo_id", picture.id)).error).toBeNull();
+    expect(await cacheRowCount()).toBe(0);
+
+    await admin.from("beer_pictures").delete().eq("id", picture.id);
+  });
+
+  it("scores each photo by engagement, a tag counting double", async () => {
+    const { data: pictures, error } = await admin
+      .from("beer_pictures")
+      .insert([
+        { user_id: userId, attendance_id: attendanceId, picture_url: "tagged.jpg" },
+        { user_id: userId, attendance_id: attendanceId, picture_url: "plain.jpg" },
+      ])
+      .select("id, picture_url");
+    expect(error).toBeNull();
+    const tagged = pictures?.find((picture) => picture.picture_url === "tagged.jpg");
+    if (!tagged) {
+      throw new Error("tagged picture was not inserted");
+    }
+    const { error: tagError } = await admin.from("photo_tags").insert({ photo_id: tagged.id, tagged_user_id: userId });
+    expect(tagError).toBeNull();
+
+    const { data, error: rpcError } = await admin.rpc("get_wrapped_data", {
+      p_user_id: userId,
+      p_festival_id: festivalId,
+    });
+    expect(rpcError).toBeNull();
+    const scores = Object.fromEntries(
+      (data as { social_stats: { pictures: { picture_url: string; social_score: number }[] } }).social_stats.pictures.map(
+        (picture) => [picture.picture_url, picture.social_score],
+      ),
+    );
+    expect(scores).toEqual({ "tagged.jpg": 2, "plain.jpg": 0 });
+  });
 });

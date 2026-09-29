@@ -19,3 +19,4 @@ export * from "./photo-tag.repository";
 export * from "./reservation.repository";
 export * from "./tent.repository";
 export * from "./wrapped.repository";
+export * from "./wrapped-share.repository";

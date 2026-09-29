@@ -22,6 +22,8 @@ export const WrappedDataSchema = z.object({
     startDate: z.string(),
     endDate: z.string(),
     location: z.string().nullable(),
+    // festivals.festival_type. A plain string: admin.schema's enum imports this file.
+    festivalType: z.string(),
   }),
   basicStats: z.object({
     totalBeers: z.number(),
@@ -59,6 +61,8 @@ export const WrappedDataSchema = z.object({
         pictureUrl: z.string(),
         createdAt: z.string(),
         attendanceDate: z.string(),
+        /** Reactions + comments + 2x tags: how much friends engaged with it. */
+        socialScore: z.number(),
       }),
     ),
   }),
@@ -98,6 +102,7 @@ export const WrappedDataSchema = z.object({
       medianDays: z.number(),
       beersPercentile: z.number(),
       daysPercentile: z.number(),
+      attendeeCount: z.number(),
     }),
     vsLastYear: z
       .object({
@@ -118,16 +123,53 @@ export const WrappedDataSchema = z.object({
       z.object({ drinkType: z.string(), count: z.number(), percentage: z.number() }),
     ),
   }),
+  timing: z.object({
+    timedDays: z.number(),
+    medianFirstHour: z.number().nullable(),
+    medianLastHour: z.number().nullable(),
+    peakHour: z.number().nullable(),
+    weekendShare: z.number().nullable(),
+  }),
 });
 
 export type WrappedData = z.infer<typeof WrappedDataSchema>;
+
+/** One lost-and-found curiosity, a complete phrase in each locale. */
+export const CuriousFindSchema = z.object({
+  de: z.string().min(1).max(80),
+  en: z.string().min(1).max(80),
+  es: z.string().min(1).max(80),
+});
+
+export type CuriousFind = z.infer<typeof CuriousFindSchema>;
+
+/**
+ * The festival's official numbers, or last year's of the same series
+ * (isCurrentFestival false). Read outside the Wrapped cache.
+ */
+export const WrappedOfficialStatsSchema = z.object({
+  year: z.number().int(),
+  isCurrentFestival: z.boolean(),
+  visitors: z.number().nullable(),
+  massServed: z.number().nullable(),
+  mugsConfiscated: z.number().nullable(),
+  lostItems: z.number().nullable(),
+  curiousFinds: z.array(CuriousFindSchema).max(3),
+  sourceUrl: z.url({ protocol: /^https?$/ }).nullable(),
+});
+
+export type WrappedOfficialStats = z.infer<typeof WrappedOfficialStatsSchema>;
 
 /**
  * GET /api/v1/wrapped/:festivalId
  * 200 in every case; `status` says which. `unlocksAt` is an ISO string (Z).
  */
 export const GetWrappedResponseSchema = z.discriminatedUnion("status", [
-  z.object({ status: z.literal("ready"), wrapped: WrappedDataSchema }),
+  z.object({
+    status: z.literal("ready"),
+    wrapped: WrappedDataSchema,
+    officialStats: WrappedOfficialStatsSchema.nullable(),
+  }),
   z.object({ status: z.literal("locked"), unlocksAt: z.string() }),
   z.object({ status: z.literal("not_attended") }),
 ]);

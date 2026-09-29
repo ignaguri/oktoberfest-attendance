@@ -1595,7 +1595,30 @@
         "deactivateConfirm": "This leaves no active festival, so the app has no default for anyone. Continue?",
         "deleteBlockedHint": "A festival with attendances, groups or tent visits cannot be deleted. Set it to Ended instead.",
         "updateError": "Could not save the change",
-        "deleteError": "Could not delete"
+        "deleteError": "Could not delete",
+        "officialStatsLink": "Official Wiesn figures",
+        "officialStatsLinkHint": "Opens the official visitor and Maß numbers shown in Wrapped",
+        "officialStats": {
+          "title": "Official figures",
+          "hint": "Shown in Wrapped. Enter them from the festival's final report (Wiesn-Bilanz).",
+          "visitors": "Visitors",
+          "massServed": "Maß served",
+          "mugsConfiscated": "Mugs collected at the exit",
+          "lostItems": "Lost-and-found items",
+          "sourceUrl": "Source URL",
+          "finds": "Curious finds (up to 3)",
+          "find": "Find {{number}}",
+          "localeDe": "German",
+          "localeEn": "English",
+          "localeEs": "Spanish",
+          "save": "Save",
+          "saveError": "Could not save the figures",
+          "saved": "Figures saved. Wrapped picks them up on the next open.",
+          "invalidNumber": "Use whole numbers only",
+          "incompleteFind": "Fill in all three languages or leave the find empty",
+          "invalidUrl": "Use a full link starting with http:// or https://",
+          "saveHint": "Saves the official figures for this festival"
+        }
       },
       "groups": {
         "loading": "Loading groups...",
@@ -2374,6 +2397,200 @@
       "title": "No Wrapped for this festival",
       "description": "Log at least one day at a festival to get your Wrapped."
     },
+    "story": {
+      "units": {
+        "beers_one": "{{count, number}} beer",
+        "beers_other": "{{count, number}} beers"
+      },
+      "a11y": {
+        "next": "Next",
+        "nextHint": "Shows the next part of your Wrapped",
+        "prev": "Previous",
+        "prevHint": "Goes back one slide",
+        "closeHint": "Leaves your Wrapped",
+        "progress": "Slide {{current}} of {{total}}"
+      },
+      "servus": {
+        "title": "Servus, {{name}}!",
+        "titleNoName": "Servus!",
+        "subtitle": "Grab a Maß, let's relive your {{festival}} round by round"
+      },
+      "bigNumber": {
+        "kicker": "At {{festival}} you had",
+        "unit_one": "beer",
+        "unit_other": "beers",
+        "tagline": {
+          "normal_one": "in a single day.",
+          "normal_other": "over {{count}} days.",
+          "low": "Quality over quantity.",
+          "zero": "Zero beers, full Wiesn. Respect.",
+          "zeroGeneric": "Zero beers, full festival. Respect."
+        },
+        "comparison": {
+          "percentile": "More than {{pct, number(maximumFractionDigits: 0)}}% of ProstCounter.",
+          "median": "The typical ProstCounter Wiesn-goer had {{median, number(maximumFractionDigits: 1)}}.",
+          "medianGeneric": "The typical ProstCounter festival-goer had {{median, number(maximumFractionDigits: 1)}}."
+        }
+      },
+      "drinks": {
+        "title": "How you drank",
+        "top": {
+          "beer": "Mostly beer. A classic.",
+          "radler": "Mostly Radler. Pacing like a pro.",
+          "alcohol_free": "Mostly alcohol-free. Your liver says thanks.",
+          "wine": "Mostly wine. At the Wiesn. Bold.",
+          "wineGeneric": "Mostly wine. At a beer festival. Bold.",
+          "soft_drink": "Mostly soft drinks. Designated driver energy.",
+          "other": "A bit of everything."
+        },
+        "spent": "{{amount, number(minimumFractionDigits: 2; maximumFractionDigits: 2)}} € well spent."
+      },
+      "drinkTypes": {
+        "beer": "Beer",
+        "radler": "Radler",
+        "alcohol_free": "Alcohol-free",
+        "wine": "Wine",
+        "soft_drink": "Soft drinks",
+        "other": "Other"
+      },
+      "days": {
+        "title": "Your days",
+        "best": "Best day: $t(wrapped.story.units.beers, {\"count\": {{beers}} })",
+        "bestDetails_one": "in {{count}} tent",
+        "bestDetails_other": "across {{count}} tents"
+      },
+      "tents": {
+        "title": "Your tents",
+        "favorite": "Home base: {{tent}}",
+        "count_one": "{{count}} tent",
+        "count_other": "{{count}} different tents",
+        "share": "That's {{pct, number(maximumFractionDigits: 0)}}% of the tents."
+      },
+      "people": {
+        "title": "Your people",
+        "groups_one": "{{count}} group",
+        "groups_other": "{{count}} groups",
+        "bestPlacing": "#{{position}} in {{group}}",
+        "photosLabel": "Your Wiesn in pictures",
+        "photosLabelGeneric": "Your festival in pictures"
+      },
+      "compare": {
+        "title": "You vs. everyone else",
+        "vsAvg": {
+          "more": { "stat": "+{{pct, number(maximumFractionDigits: 0)}}%", "caption": "more beers than the average ProstCounter user" },
+          "less": { "stat": "−{{pct, number(maximumFractionDigits: 0)}}%", "caption": "fewer beers than the average. Sensible" },
+          "same": { "stat": "±0%", "caption": "right on the average. Perfectly balanced" }
+        },
+        "vsLastYear": {
+          "up": { "stat": "+{{diff, number(maximumFractionDigits: 1)}}", "caption": "more than at {{festival}}" },
+          "down": { "stat": "−{{diff, number(maximumFractionDigits: 1)}}", "caption": "fewer than at {{festival}}. Pacing yourself?" },
+          "same": { "stat": "±0", "caption": "exactly as many as at {{festival}}. Consistent" }
+        },
+        "global": {
+          "days_attended": { "stat": "#{{position}}", "caption": "on the global leaderboard for days" },
+          "total_beers": { "stat": "#{{position}}", "caption": "on the global leaderboard for beers" },
+          "avg_beers": { "stat": "#{{position}}", "caption": "on the global leaderboard for beers per day" }
+        }
+      },
+      "wiesnAndYou": {
+        "kicker": {
+          "current": "The Wiesn {{year}} in numbers",
+          "lastYear": "Last year's Wiesn ({{year}})"
+        },
+        "visitorsStat": "{{visitors, number}}",
+        "visitors": {
+          "current": "visitors. You were one of them",
+          "lastYear": "visitors. You'd have been one in the crowd"
+        },
+        "checkBack": "This year's official numbers are on their way. Check back in a few days.",
+        "shareStat": "1 in {{every, number(maximumSignificantDigits: 2)}}",
+        "share": {
+          "current_one": "Maß poured was your one beer",
+          "current_other": "Maß poured was one of your {{count, number(maximumFractionDigits: 1)}} beers",
+          "lastYear_one": "Maß last year would have been your one beer",
+          "lastYear_other": "Maß last year would have been one of your {{count, number(maximumFractionDigits: 1)}}"
+        },
+        "mugsStat": "{{mugs, number}}",
+        "mugs": "Maß mugs tried to sneak out",
+        "lostStat": "{{count, number}}",
+        "lost_one": "thing handed in at the lost-and-found",
+        "lost_other": "things handed in at the lost-and-found",
+        "findsLabel": "Among the finds"
+      },
+      "source": {
+        "withHost": "Source: {{host}}, {{year}}",
+        "plain": "Official figures, {{year}}"
+      },
+      "badges": {
+        "title": "Your badges",
+        "countStat": "{{count, number}}",
+        "earned_one": "badge earned",
+        "earned_other": "badges earned",
+        "more_one": "+{{count}} more in your collection",
+        "more_other": "+{{count}} more in your collection"
+      },
+      "persona": {
+        "kicker": "Your Wiesn persona",
+        "kickerGeneric": "Your festival persona",
+        "runnerUp": "with a dash of {{name}}",
+        "einmalAberRichtig": {
+          "description": "One day, zero regrets.",
+          "because": "Because you showed up once and made it count: {{beers, number(maximumFractionDigits: 1)}} beers in a single day."
+        },
+        "massMeister": {
+          "description": "The Maß fears you.",
+          "because": "Because you averaged {{avg, number(maximumFractionDigits: 1)}} beers every day you went.",
+          "becauseGeneric": "Because you averaged {{avg, number(maximumFractionDigits: 1)}} beers every day you went."
+        },
+        "marathoner": {
+          "description": "The Wiesn is your second home.",
+          "descriptionGeneric": "The festival grounds are your second home.",
+          "because": "Because you were there {{days}} of the {{festivalDays}} days."
+        },
+        "zeltwanderer": {
+          "description": "Never met a tent you didn't want to try.",
+          "because": "Because you tried {{tents}} of the {{totalTents}} tents."
+        },
+        "stammgast": {
+          "description": "Why change a winning table?",
+          "because": "Because {{tent}} was your tent {{visits}} times."
+        },
+        "fruehschoppen": {
+          "description": "The first Maß tastes best before noon.",
+          "because": "Because your first drink usually landed at {{time}}."
+        },
+        "nachteule": {
+          "description": "The one who turns off the tent lights.",
+          "because": "Because your last drink usually came around {{time}}."
+        },
+        "radlerDiplomat": {
+          "description": "Half the beer, all the fun.",
+          "because": "Because {{pct}}% of your drinks were Radler or alcohol-free."
+        },
+        "wochenendKrieger": {
+          "description": "Weekdays are for recovery.",
+          "because_one": "Because your one day was on a weekend.",
+          "because_other": "Because all {{count}} of your days were on a weekend."
+        },
+        "geniesser": {
+          "description": "Here for the vibes, at your own pace.",
+          "because_one": "Because one day and $t(wrapped.story.units.beers, {\"count\": {{beers}} }) was exactly enough.",
+          "because_other": "Because {{count}} days and $t(wrapped.story.units.beers, {\"count\": {{beers}} }) was exactly enough."
+        }
+      },
+      "prost": {
+        "title": "Prost!",
+        "summary": "See you at the next {{series}}.",
+        "replay": "Watch again",
+        "replayHint": "Starts your Wrapped from the beginning",
+        "recap": {
+          "days_one": "{{count, number}} day",
+          "days_other": "{{count, number}} days",
+          "tents_one": "{{count, number}} tent",
+          "tents_other": "{{count, number}} tents"
+        }
+      }
+    },
     "title": "Your Year in Review",
     "generating": "Generating your wrapped...",
     "loading": "Preparing your wrapped...",
@@ -2523,7 +2740,7 @@
       "madeWith": "Made with ❤️ and some 🍺 by ProstCounter",
       "title": "Thanks for the memories!",
       "subtitle": "See you next year",
-      "share": "Share Your Wrapped",
+      "share": "Share your Wrapped",
       "sharing": "Creating your share image...",
       "summary": {
         "beers": "{{count}} beers",
@@ -2567,6 +2784,76 @@
       "title": "My {{festivalName}} Wrapped",
       "stats": "{{beers}} beers across {{days}} days!",
       "personality": "Festival personality: {{type}}"
+    },
+    "shareCards": {
+      "kicker": "My {{festival}}",
+      "numbers": {
+        "boxStat": "{{value, number}}",
+        "days_one": "day",
+        "days_other": "days",
+        "tents_one": "tent",
+        "tents_other": "tents",
+        "homeTent": "Home tent: {{tent}}"
+      },
+      "rhythm": {
+        "title_one": "{{count}} day on the Wiesn",
+        "title_other": "{{count}} days on the Wiesn",
+        "titleGeneric_one": "{{count}} day at the festival",
+        "titleGeneric_other": "{{count}} days at the festival",
+        "best": "Best day: {{date}}"
+      },
+      "city": {
+        "visitors": {
+          "current": "visitors. I was one of them",
+          "lastYear": "visitors last year. I'd have been one of them"
+        },
+        "share": {
+          "current_one": "Maß poured was my one beer",
+          "current_other": "Maß poured was one of my {{count, number(maximumFractionDigits: 1)}} beers",
+          "lastYear_one": "Maß last year would have been my one beer",
+          "lastYear_other": "Maß last year would have been one of my {{count, number(maximumFractionDigits: 1)}} beers"
+        }
+      },
+      "photos": {
+        "title": "With my people"
+      },
+      "og": {
+        "title": "My {{festival}} on ProstCounter",
+        "tagline": "Get your own Wrapped"
+      },
+      "caption": {
+        "title": "My {{festival}} Wrapped",
+        "stats_one": "{{beers}} across {{count}} day!",
+        "stats_other": "{{beers}} across {{count}} days!",
+        "persona": "Festival persona: {{name}}"
+      },
+      "carousel": {
+        "title": "Pick your card",
+        "description": "Swipe to pick a card, then share it or copy its link.",
+        "share": "Share this card",
+        "shareHint": "Opens the share sheet with this card",
+        "copyLink": "Copy link",
+        "copyLinkHint": "Copies a public link to this card",
+        "linkCopied": "Link copied",
+        "stopSharing": "Stop sharing",
+        "stopSharingTitle": "Stop sharing this link?",
+        "stopSharingMessage": "The link stops working for everyone who has it.",
+        "loading1": "Pouring your card…",
+        "loading2": "Tapping the keg…",
+        "loading3": "Polishing the Maß…",
+        "error": "Couldn't pour this one",
+        "offline": "You're offline. Connect to get your card.",
+        "retry": "Retry",
+        "close": "Close",
+        "cardLabel": "Card {{index}} of {{total}}"
+      },
+      "teaser": {
+        "title": "My {{festival}} on ProstCounter",
+        "cta": "Get your own Wrapped",
+        "description": "My festival in beers, days and tents. Log yours on ProstCounter and get your own Wrapped.",
+        "unavailable": "This Wrapped isn't shared anymore",
+        "imageAlt": "A ProstCounter Wrapped card for {{festival}}"
+      }
     },
     "cta": {
       "preparingFooter": "Don't forget to log your final day! 📝",

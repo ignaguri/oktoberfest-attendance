@@ -2275,6 +2275,50 @@ export type Database = {
           },
         ]
       }
+      wrapped_shares: {
+        Row: {
+          card_data: Json
+          card_kind: string
+          created_at: string
+          festival_id: string
+          id: string
+          revoked_at: string | null
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_data: Json
+          card_kind: string
+          created_at?: string
+          festival_id: string
+          id?: string
+          revoked_at?: string | null
+          token?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_data?: Json
+          card_kind?: string
+          created_at?: string
+          festival_id?: string
+          id?: string
+          revoked_at?: string | null
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wrapped_shares_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wrapped_views: {
         Row: {
           festival_id: string
@@ -2953,6 +2997,14 @@ export type Database = {
           start_date: string
           unlocks_at: string
           viewed: boolean
+        }[]
+      }
+      get_wrapped_share: {
+        Args: { p_token: string }
+        Returns: {
+          card_data: Json
+          card_kind: string
+          festival_name: string
         }[]
       }
       get_wrapped_status: {

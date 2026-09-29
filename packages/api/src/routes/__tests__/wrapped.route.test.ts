@@ -78,7 +78,7 @@ describe("Wrapped routes", () => {
 
   it("GET /wrapped/{id} returns ready with camelCase data", async () => {
     mockService.getWrapped.mockResolvedValue({
-      result: { status: "ready", wrapped: mapToWrappedData(full) },
+      result: { status: "ready", wrapped: mapToWrappedData(full), officialStats: null },
       viewRecorded: true,
     });
     const res = await app.request(createAuthRequest(`/wrapped/${festivalId}`));
@@ -102,7 +102,7 @@ describe("Wrapped routes", () => {
 
   it("GET /wrapped/{id} skips achievement evaluation for a preview", async () => {
     mockService.getWrapped.mockResolvedValue({
-      result: { status: "ready", wrapped: mapToWrappedData(full) },
+      result: { status: "ready", wrapped: mapToWrappedData(full), officialStats: null },
       viewRecorded: false,
     });
     const res = await app.request(createAuthRequest(`/wrapped/${festivalId}`));

@@ -17,14 +17,16 @@ import {
 interface ConfirmAlertDialogProps {
   dialog: AlertDialogState;
   onClose: () => void;
+  /** Render in its own native modal, for use on top of a React Native Modal. */
+  useRNModal?: boolean;
 }
 
-export function ConfirmAlertDialog({ dialog, onClose }: ConfirmAlertDialogProps) {
+export function ConfirmAlertDialog({ dialog, onClose, useRNModal }: ConfirmAlertDialogProps) {
   const { t } = useTranslation();
   const isDestructive = dialog.type === "destructive";
 
   return (
-    <AlertDialog isOpen={dialog.isOpen} onClose={onClose} size="md">
+    <AlertDialog isOpen={dialog.isOpen} onClose={onClose} size="md" useRNModal={useRNModal}>
       <AlertDialogBackdrop />
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -23,6 +23,7 @@ export function mapToWrappedData(raw: any): WrappedData {
       startDate: raw.festival_info.start_date,
       endDate: raw.festival_info.end_date,
       location: raw.festival_info.location,
+      festivalType: raw.festival_info.festival_type,
     },
     basicStats: {
       totalBeers: raw.basic_stats.total_beers,
@@ -67,6 +68,7 @@ export function mapToWrappedData(raw: any): WrappedData {
         pictureUrl: picture.picture_url,
         createdAt: picture.created_at,
         attendanceDate: picture.attendance_date,
+        socialScore: picture.social_score,
       })),
     },
     globalLeaderboardPositions: {
@@ -101,6 +103,7 @@ export function mapToWrappedData(raw: any): WrappedData {
         medianDays: vsAvg.median_days,
         beersPercentile: vsAvg.beers_percentile,
         daysPercentile: vsAvg.days_percentile,
+        attendeeCount: vsAvg.attendee_count,
       },
       vsLastYear: vsLastYear
         ? {
@@ -127,6 +130,13 @@ export function mapToWrappedData(raw: any): WrappedData {
         count: drink.count,
         percentage: drink.percentage,
       })),
+    },
+    timing: {
+      timedDays: raw.timing.timed_days,
+      medianFirstHour: raw.timing.median_first_hour,
+      medianLastHour: raw.timing.median_last_hour,
+      peakHour: raw.timing.peak_hour,
+      weekendShare: raw.timing.weekend_share,
     },
   });
 }
