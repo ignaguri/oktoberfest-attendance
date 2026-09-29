@@ -20,6 +20,8 @@ const LOCALES = NON_DEFAULT_LOCALES.join("|");
 const LANDING_PATH = new RegExp(`^/(${LOCALES})?$`);
 /** Localized marketing pages: /de, /es, /de/download, /es/download */
 const LOCALIZED_MARKETING_PATH = new RegExp(`^/(${LOCALES})(/download)?$`);
+/** Wrapped share teasers: /w/abc, /de/w/abc, /es/w/abc */
+const WRAPPED_SHARE_PATH = new RegExp(`^/((${LOCALES})/)?w/[^/]+$`);
 
 // Locale prefixing onto the internal `app/[lang]/` routes is a rewrite in
 // next.config.ts, not something this file does. Rewrites run after middleware,
@@ -114,6 +116,7 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/blog") || // Blog pages (marketing)
     request.nextUrl.pathname.startsWith("/download") || // Download page (marketing)
     LOCALIZED_MARKETING_PATH.test(request.nextUrl.pathname) ||
+    WRAPPED_SHARE_PATH.test(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith("/r/") ||
     request.nextUrl.pathname.startsWith("/api/") || // API routes handle their own auth
     request.nextUrl.pathname.startsWith("/serwist/") || // Service worker assets
