@@ -142,6 +142,16 @@ column should describe shape and nothing else.
   drinks at 22px, and it is worth bending the duotone rule for: in one hue the
   three shapes are just three containers of the same liquid.
 
+## Loader mug
+
+The filling-mug loader draws two layers, `mug-empty.png` under `mug-full.png`, and
+reveals the full one bottom-up. `./loader.sh` exports both into
+`apps/mobile/assets/loading/` and `apps/web/public/loading/`. The full layer is the
+committed `masskrug` glyph as is. The empty one is derived from it by
+`mug-empty.py` rather than generated, because the layers must be pixel aligned and a
+new generation redraws the shape. Re-run `./loader.sh` if `masskrug` is ever redrawn;
+the rim position and wall bounds in `mug-empty.py` are measured on the current art.
+
 ## History
 
 An earlier generated PNG set was replaced by hand-drawn SVG paths, which were
