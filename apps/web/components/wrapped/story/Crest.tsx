@@ -1,14 +1,24 @@
 "use client";
 
 import { PERSONA_CREST_FILES, type PersonaId } from "@prostcounter/shared/wrapped";
+import { cn } from "@prostcounter/ui";
 import Image from "next/image";
 import { useState } from "react";
 
-/** lg is the persona reveal; sm sits in the Prost recap card. */
-const CREST_PX = { lg: 288, sm: 64 } as const;
+/** lg is the persona reveal, md a collection card, sm the Prost recap card, xs a collection thumbnail. */
+const CREST_PX = { lg: 288, md: 160, sm: 64, xs: 36 } as const;
 
 /** The persona's crest PNG, or a plain stamped shield when it is missing. */
-export function Crest({ personaId, size = "lg" }: { personaId: PersonaId; size?: "lg" | "sm" }) {
+export function Crest({
+  personaId,
+  size = "lg",
+  silhouette = false,
+}: {
+  personaId: PersonaId;
+  size?: keyof typeof CREST_PX;
+  /** A locked collection card: the shield's outline in faint ink */
+  silhouette?: boolean;
+}) {
   const [failed, setFailed] = useState(false);
   if (!failed) {
     return (
@@ -18,12 +28,13 @@ export function Crest({ personaId, size = "lg" }: { personaId: PersonaId; size?:
         width={CREST_PX[size]}
         height={CREST_PX[size]}
         aria-hidden="true"
+        className={cn(silhouette && "opacity-20 brightness-0")}
         onError={() => setFailed(true)}
       />
     );
   }
   return (
-    <svg width={(CREST_PX[size] * 7) / 8} height={CREST_PX[size]} viewBox="0 0 132 150" aria-hidden="true">
+    <svg width={(CREST_PX[size] * 7) / 8} height={CREST_PX[size]} viewBox="0 0 132 150" aria-hidden="true" className={cn(silhouette && "opacity-20")}>
       <path
         d="M66 4 L124 22 V74 C124 110 98 134 66 146 C34 134 8 110 8 74 V22 Z"
         fill="#FFFFFF"
