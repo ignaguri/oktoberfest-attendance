@@ -23,6 +23,10 @@ export function WrappedArchiveSection() {
 
   const { target } = summary;
   const label = t("profile.wrappedArchive.row", { count: summary.count });
+  const accessibilityLabel =
+    summary.newCount > 0
+      ? `${label}, ${t("profile.wrappedArchive.newCount", { count: summary.newCount })}`
+      : label;
 
   return (
     <Card size="md" variant="elevated">
@@ -34,7 +38,7 @@ export function WrappedArchiveSection() {
             : router.push("/wrapped/archive")
         }
         accessibilityRole="button"
-        accessibilityLabel={label}
+        accessibilityLabel={accessibilityLabel}
         accessibilityHint={
           target.kind === "festival"
             ? t("profile.wrappedArchive.openHint")
