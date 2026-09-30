@@ -1481,6 +1481,24 @@ export type Database = {
           },
         ]
       }
+      persona_card_opens: {
+        Row: {
+          opened_at: string
+          persona_id: string
+          user_id: string
+        }
+        Insert: {
+          opened_at?: string
+          persona_id: string
+          user_id: string
+        }
+        Update: {
+          opened_at?: string
+          persona_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       photo_comments: {
         Row: {
           content: string
