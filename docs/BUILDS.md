@@ -13,7 +13,7 @@ The `production-apk` profile produces an APK (not AAB) using production env valu
 
 ## Critical: Rename `.env.local` Before Any EAS Artifact
 
-**Always rename `apps/mobile/.env.local` (and `.env`, which also points at localhost) before running `eas build --local` or a local `expo export`.** Metro loads them during the bundle phase and they win over EAS-injected env vars, silently baking local values (e.g. `EXPO_PUBLIC_API_URL=http://localhost:3001`) into production artifacts. `eas update --environment` does not load them, but it has its own env trap: see [OTA Updates](#ota-updates-eas-update).
+**Always rename `apps/mobile/.env.local` (and `.env`, which also points at localhost) before running `eas build` (cloud or `--local`) or a local `expo export`.** Cloud builds are not exempt: `.easignore` replaces `.gitignore` for the upload and doesn't list the env files, so they ride along in the archive. Metro loads them during the bundle phase and they win over EAS-injected env vars, silently baking local values (e.g. `EXPO_PUBLIC_API_URL=http://localhost:3001`) into production artifacts. `eas update --environment` does not load them, but it has its own env trap: see [OTA Updates](#ota-updates-eas-update).
 
 ```bash
 mv apps/mobile/.env.local apps/mobile/.env.local.bkp
@@ -172,5 +172,22 @@ Note that supply commits its edit at the very end, so a failure like that publis
 ## iOS Local Build & App Store Submit
 
 Use `eas build --local` to bypass EAS cloud build credits. See personal memory `eas-local-ios-build.md` for the full fastlane + Xcode submit flow.
+
+### Run a production prebuild first
+
+EAS never runs `expo prebuild` for iOS here. `ios/ProstCounter/Info.plist` is committed, so the `ios/` directory always exists and the build log says `Skipped running "expo prebuild" because the "ios" directory already exists`. The native project that ships is whatever your last local prebuild left behind, and a `pnpm ios` / `pnpm ios:clean` against local Supabase leaves the watch without production keys: `WATCH_SUPABASE_URL` / `WATCH_SUPABASE_ANON_KEY` end up pointing at localhost, or missing if you reverted `targets/watch/Info.plist` as described above. The watch can't refresh its session without them. The JS bundle is unaffected, since Metro inlines env at bundle time.
+
+So before every iOS store build, with `.env` and `.env.local` moved aside, regenerate the native project from the EAS production env:
+
+```bash
+cd apps/mobile
+npx eas-cli env:exec production "npx expo prebuild --clean --platform ios"
+eas build --platform ios --profile production --local
+git checkout -- targets/watch/Info.plist targets/watch/Assets.xcassets/AppIcon.appiconset/Contents.json
+```
+
+The prebuild writes the production anon key into `targets/watch/Info.plist`. It has to be there while the build runs and must never be committed, hence the checkout afterwards. To confirm what shipped, unzip the `.ipa` and read `Payload/ProstCounter.app/Watch/ProstCounter Watch.app/Info.plist`.
+
+Android is not affected: `.easignore` excludes `android/`, and the production profile's `prebuildCommand` regenerates it on the build machine with the EAS env.
 
 `eas submit --platform ios` uploads to App Store Connect and the build lands in TestFlight. It does **not** release to the App Store: that still needs the version created in ASC and submitted for review by hand.
