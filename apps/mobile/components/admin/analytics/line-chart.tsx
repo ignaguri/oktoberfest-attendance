@@ -120,6 +120,7 @@ export function LineChart<K extends string>({
             key={line.key}
             label={t(line.labelKey)}
             selected={visibleKeys.includes(line.key)}
+            color={line.color}
             onPress={() => setVisibleKeys(toggleSeries(visibleKeys, line.key, allKeys))}
             accessibilityHint={t("admin.analytics.chart.toggleHint")}
           />
