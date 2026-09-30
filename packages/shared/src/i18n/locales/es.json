@@ -2458,6 +2458,33 @@
     "progress": "Paso {{current}} de {{total}}"
   },
   "wrapped": {
+    "personas": {
+      "title": "Colección de personas",
+      "entry": "Colección de personas · {{collected}}/{{total}}",
+      "entryNoCount": "Colección de personas",
+      "entryHint": "Abre tu colección de personas del Wrapped",
+      "progress": "{{collected}} de {{total}} coleccionadas",
+      "seeAll": "Ver todas las personas",
+      "new": "Nueva",
+      "tapToOpen": "Tocá para abrirla",
+      "tapToFlip": "Tocá para darla vuelta",
+      "howToEarn": "Cómo conseguirla",
+      "collectedAt": "Conseguida en",
+      "number": "N.º {{number}}",
+      "numberOfTotal": "N.º {{number}} de {{total}}",
+      "lockedName": "? ? ?",
+      "previous": "Carta anterior",
+      "next": "Carta siguiente",
+      "loadError": "No pudimos cargar tus personas",
+      "a11y": {
+        "locked": "Carta {{number}}, bloqueada. Cómo conseguirla: {{hint}}",
+        "unopened": "Carta {{number}}, carta nueva, todavía sin abrir",
+        "opened": "Carta {{number}}, {{name}}",
+        "openHint": "Da vuelta la carta y muestra la persona",
+        "flipHint": "Da vuelta la carta",
+        "thumbnailHint": "Muestra esta carta"
+      }
+    },
     "errorTitle": "¡Uy!",
     "locked": {
       "title": "Tu resumen está en camino",
@@ -2604,45 +2631,55 @@
         "kickerGeneric": "Tu persona del festival",
         "runnerUp": "con un toque de {{name}}",
         "einmalAberRichtig": {
+          "hint": "Andá una sola vez y tomá 2+ cervezas",
           "description": "Un día, cero arrepentimientos.",
           "because": "Porque fuiste una vez y la hiciste valer: {{beers, number(maximumFractionDigits: 1)}} cervezas en un solo día."
         },
         "massMeister": {
+          "hint": "Promediá 4+ cervezas por cada día que vas",
           "description": "La Maß te tiene miedo.",
           "because": "Porque promediaste {{avg, number(maximumFractionDigits: 1)}} cervezas cada día que fuiste.",
           "becauseGeneric": "Porque promediaste {{avg, number(maximumFractionDigits: 1)}} cervezas cada día que fuiste."
         },
         "marathoner": {
+          "hint": "Andá 5+ días, al menos el 30 % de la fiesta",
           "description": "La Wiesn es tu segunda casa.",
           "descriptionGeneric": "El predio del festival es tu segunda casa.",
           "because": "Porque estuviste {{days}} de los {{festivalDays}} días."
         },
         "zeltwanderer": {
+          "hint": "Tomá en 4+ carpas distintas",
           "description": "No hay carpa que se te resista.",
           "because": "Porque probaste {{tents}} de las {{totalTents}} carpas."
         },
         "stammgast": {
+          "hint": "Pasá el 60 % de tus visitas en una misma carpa (3+ visitas)",
           "description": "¿Para qué cambiar de mesa si ganás?",
           "because": "Porque {{tent}} fue tu carpa {{visits}} veces."
         },
         "fruehschoppen": {
+          "hint": "Arrancá casi siempre antes de las 13:00",
           "description": "La primera Maß sabe mejor antes del mediodía.",
           "because": "Porque tu primera bebida solía caer a las {{time}}."
         },
         "nachteule": {
+          "hint": "Seguí ahí casi siempre después de las 21:30",
           "description": "El que apaga la luz de la carpa.",
           "because": "Porque tu última bebida solía llegar cerca de las {{time}}."
         },
         "radlerDiplomat": {
+          "hint": "Que el 30 %+ de tus bebidas sean radler o sin alcohol",
           "description": "Media cerveza, toda la diversión.",
           "because": "Porque el {{pct}} % de tus bebidas fueron Radler o sin alcohol."
         },
         "wochenendKrieger": {
+          "hint": "Andá solo los fines de semana",
           "description": "Entre semana se descansa.",
           "because_one": "Porque tu único día fue en fin de semana.",
           "because_other": "Porque tus {{count}} días fueron en fin de semana."
         },
         "geniesser": {
+          "hint": "Tomalo con calma: no encajes en ninguna otra",
           "description": "Por el ambiente, a tu ritmo.",
           "because_one": "Porque un día y $t(wrapped.story.units.beers, {\"count\": {{beers}} }) fueron justo lo necesario.",
           "because_other": "Porque {{count}} días y $t(wrapped.story.units.beers, {\"count\": {{beers}} }) fueron justo lo necesario."
