@@ -11,6 +11,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "react-native";
 
+import { saveToPhotoLibrary } from "@/lib/media/save-to-photo-library";
+
 export type ImageSource = "camera" | "library";
 
 export interface CompressOptions {
@@ -42,6 +44,8 @@ export interface UseImageUploadOptions {
   allowEditing?: boolean;
   /** Aspect ratio for cropping [width, height] - only used when allowEditing is true */
   aspect?: [number, number];
+  /** Also save photos taken with the camera to the device photo library (defaults to false) */
+  saveToLibrary?: boolean;
 }
 
 /** Raw picked image before compression */
@@ -88,6 +92,7 @@ export function useImageUpload({
   errorMessageKey = "imageUpload.errors.uploadFailed",
   allowEditing,
   aspect = [1, 1],
+  saveToLibrary = false,
 }: UseImageUploadOptions = {}): UseImageUploadReturn {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
@@ -126,6 +131,10 @@ export function useImageUpload({
         return null;
       }
 
+      if (saveToLibrary && source === "camera") {
+        await saveToPhotoLibrary(result.assets[0].uri);
+      }
+
       // Process all selected images
       const processedImages = await Promise.all(
         result.assets.map((asset) => processImage(asset.uri, compressOptions)),
@@ -161,6 +170,10 @@ export function useImageUpload({
       });
       if (result.canceled || !result.assets?.length) {
         return null;
+      }
+
+      if (saveToLibrary && source === "camera") {
+        await saveToPhotoLibrary(result.assets[0].uri);
       }
 
       // Return raw images without processing

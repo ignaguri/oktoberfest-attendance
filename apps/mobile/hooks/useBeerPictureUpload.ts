@@ -48,6 +48,7 @@ export function useBeerPictureUpload({
     onError,
     allowMultiple: true,
     allowEditing: false, // Keep original aspect ratio for beer pictures
+    saveToLibrary: true,
     errorMessageKey: "imageUpload.errors.photoUploadFailed",
   });
 

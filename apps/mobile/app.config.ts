@@ -113,6 +113,16 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         microphonePermission: false,
       },
     ],
+    [
+      "expo-media-library",
+      {
+        // Write-only: we save camera shots, so the plugin must add no READ_MEDIA_* permission
+        photosPermission: false,
+        savePhotosPermission:
+          "ProstCounter saves the photos you take of your beers to your photo library so you keep a copy on your phone.",
+        granularPermissions: [],
+      },
+    ],
     "expo-font",
     [
       "expo-notifications",

@@ -267,6 +267,9 @@ importers:
       expo-maps:
         specifier: ~57.0.2
         version: 57.0.2(expo@57.0.20)(react-native@0.86.3(patch_hash=7b8208dd1323ccabd5a2c934664f26c1c9f97b85aa0774b968aaa8cb717f3d58)(@babel/core@7.29.7)(@react-native-community/cli@20.2.0(typescript@5.9.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)
+      expo-media-library:
+        specifier: ~57.0.5
+        version: 57.0.5(expo@57.0.20)(react-native@0.86.3(patch_hash=7b8208dd1323ccabd5a2c934664f26c1c9f97b85aa0774b968aaa8cb717f3d58)(@babel/core@7.29.7)(@react-native-community/cli@20.2.0(typescript@5.9.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.8))
       expo-notifications:
         specifier: ^57.0.17
         version: 57.0.17(expo@57.0.20)(react-native@0.86.3(patch_hash=7b8208dd1323ccabd5a2c934664f26c1c9f97b85aa0774b968aaa8cb717f3d58)(@babel/core@7.29.7)(@react-native-community/cli@20.2.0(typescript@5.9.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
@@ -7192,6 +7195,12 @@ packages:
     peerDependencies:
       expo: '*'
       react: 19.2.8
+      react-native: '*'
+
+  expo-media-library@57.0.5:
+    resolution: {integrity: sha512-amSLrLsS7Gl4nCqbc2PlVbHj5jK9kQLsSOQgJ2QasHCSHzYXw6Ui7aolxX5APg9P4TgYPE0yWn46ndifh52bRw==}
+    peerDependencies:
+      expo: '*'
       react-native: '*'
 
   expo-modules-autolinking@57.0.12:
@@ -17619,6 +17628,11 @@ snapshots:
     dependencies:
       expo: 57.0.20(adba474a349d2ee2187f720f2dd5ff77)
       react: 19.2.8
+      react-native: 0.86.3(patch_hash=7b8208dd1323ccabd5a2c934664f26c1c9f97b85aa0774b968aaa8cb717f3d58)(@babel/core@7.29.7)(@react-native-community/cli@20.2.0(typescript@5.9.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.8)
+
+  expo-media-library@57.0.5(expo@57.0.20)(react-native@0.86.3(patch_hash=7b8208dd1323ccabd5a2c934664f26c1c9f97b85aa0774b968aaa8cb717f3d58)(@babel/core@7.29.7)(@react-native-community/cli@20.2.0(typescript@5.9.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.8)):
+    dependencies:
+      expo: 57.0.20(adba474a349d2ee2187f720f2dd5ff77)
       react-native: 0.86.3(patch_hash=7b8208dd1323ccabd5a2c934664f26c1c9f97b85aa0774b968aaa8cb717f3d58)(@babel/core@7.29.7)(@react-native-community/cli@20.2.0(typescript@5.9.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.8)
 
   expo-modules-autolinking@57.0.12(typescript@5.9.3):
