@@ -96,15 +96,16 @@ export function MugLoader({
   });
 
   // Accessibility lives on a plain View: Skia's native view on Android does not
-  // expose aria-label/role to TalkBack.
+  // expose aria-label/role to TalkBack. The box is 48px rather than size-12,
+  // which is 42pt on native (NativeWind's 14px rem) and would clip the art.
   return (
     <View
-      className={cn("size-12", className)}
+      className={cn("size-[48px]", className)}
       accessible
       role="progressbar"
       aria-label={ariaLabel}
     >
-      <Canvas className="size-12">
+      <Canvas className="size-[48px]">
         {!reduceMotion && empty && (
           <SkiaImage image={empty} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />
         )}

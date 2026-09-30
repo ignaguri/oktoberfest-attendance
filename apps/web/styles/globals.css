@@ -423,7 +423,7 @@
  * wave SVG twice the element's height. With mask-size 200% the surface sits at
  * (1 - y) of the height for mask-position-y = y, and x = -150% moves it one wave
  * period (60% of the width) sideways. These restate MUG_LOADER in
- * packages/shared/src/loading/mug-loader.ts: empty 0.84 -> 16%, full 0.04 -> 96%,
+ * packages/shared/src/loading/mug-loader.ts: empty 0.96 -> 4%, full 0.04 -> 96%,
  * full at 50%, drain from 70%, 2400ms, two periods of drift per loop. */
 .mug-loader {
   position: relative;
@@ -457,14 +457,14 @@
 
 @keyframes mug-loader {
   0% {
-    mask-position: 0% 16%;
+    mask-position: 0% 4%;
   }
   50%,
   70% {
     mask-position: -150% 96%;
   }
   100% {
-    mask-position: -300% 16%;
+    mask-position: -300% 4%;
   }
 }
 

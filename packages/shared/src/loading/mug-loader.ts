@@ -19,10 +19,11 @@ export const MUG_LOADER = {
   /** cubic-bezier control points for the fill and for the drain. */
   easing: [0.45, 0, 0.35, 1] as const,
   /**
-   * Surface height as a fraction of the frame from the top. Empty sits just
-   * under the glass bottom; full clears the top of the foam cloud.
+   * Surface height as a fraction of the frame from the top. Empty puts the
+   * wave crests below the art (which ends at 0.92), so no amber from the full
+   * layer's glass base shows; full clears the top of the foam cloud.
    */
-  emptySurface: 0.84,
+  emptySurface: 0.96,
   fullSurface: 0.04,
   /** Wave period as a fraction of the frame width, and its half-height as a fraction of the frame height. */
   wavePeriod: 0.6,
