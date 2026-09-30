@@ -13,17 +13,10 @@ import {
   Users,
 } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Linking,
-  Platform,
-  RefreshControl,
-  ScrollView,
-  View,
-} from "react-native";
+import { Alert, Linking, Platform, RefreshControl, ScrollView, View } from "react-native";
 
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
@@ -158,7 +151,7 @@ export default function NotificationSettingsScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <ActivityIndicator size="large" color={Colors.primary[500]} />
+        <MugLoader />
       </View>
     );
   }

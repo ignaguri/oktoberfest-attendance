@@ -19,6 +19,7 @@ import {
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
@@ -188,7 +189,7 @@ export function FailedOperationsSheet({ isOpen, onClose }: FailedOperationsSheet
 
           {isLoading ? (
             <VStack className="items-center py-8">
-              <Spinner size="large" color={Colors.primary[500]} />
+              <MugLoader />
             </VStack>
           ) : failedOps.length === 0 ? (
             <VStack className="items-center py-8">

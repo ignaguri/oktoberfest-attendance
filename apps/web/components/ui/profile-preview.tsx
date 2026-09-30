@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { AvatarViewerDialog } from "./avatar-viewer-dialog";
 import { Card, CardHeader, CardTitle } from "./card";
 import { Dialog, DialogContent, DialogTrigger } from "./dialog";
+import { MugLoader } from "./mug-loader";
 
 interface ProfilePreviewProps {
   /** User ID for fetching profile with stats */
@@ -71,7 +72,7 @@ export function ProfilePreview({
             <CardHeader className="pb-4 text-center">
               {loading ? (
                 <div className="flex flex-col items-center gap-3 py-4">
-                  <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+                  <MugLoader />
                   <p className="text-sm text-gray-500">{t("common.status.loading")}</p>
                 </div>
               ) : (

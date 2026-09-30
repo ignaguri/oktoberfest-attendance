@@ -22,10 +22,10 @@ import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from "@/comp
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { LabeledSwitchRow } from "@/components/ui/labeled-switch-row";
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { Colors, IconColors } from "@/lib/constants/colors";
+import { IconColors } from "@/lib/constants/colors";
 import { useAdaptedGroups } from "@/lib/database/adapted-hooks";
 
 interface Group {
@@ -124,7 +124,7 @@ export function GroupSelectorSheet({
 
           {loading ? (
             <VStack className="items-center py-8">
-              <Spinner size="large" color={Colors.primary[500]} />
+              <MugLoader />
             </VStack>
           ) : groups.length === 0 ? (
             <VStack space="sm" className="items-center py-8">

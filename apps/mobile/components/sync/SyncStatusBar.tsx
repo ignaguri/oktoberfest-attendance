@@ -2,7 +2,7 @@
  * SyncStatusBar Component
  *
  * A persistent banner showing sync state:
- * - Syncing: Shows spinner with "Syncing..."
+ * - Syncing: Shows the filling mug with "Syncing..."
  * - Error: Shows error icon with tap to retry
  * - Offline: Shows offline indicator
  * - Pending: Shows pending count badge
@@ -16,7 +16,7 @@ import { Platform, Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HStack } from "@/components/ui/hstack";
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { useOfflineSafe } from "@/lib/database/offline-provider";
@@ -72,7 +72,10 @@ export function SyncStatusBar({ onViewErrors, alwaysShow = false }: SyncStatusBa
   let borderColor = "border border-background-200";
 
   if (isSyncing) {
-    icon = <Spinner size="small" color={Colors.primary[500]} />;
+    // 32pt mug hanging 6pt into the vertical padding: its art is ~27pt tall, so
+    // it fits inside the border and the pill stays as tall as it was with the
+    // 20pt spinner.
+    icon = <MugLoader size={32} className="-mx-[5px] -my-[6px]" />;
     statusText = t("sync.status.syncing");
     bgColor = "bg-primary-50";
     textColor = "text-primary-700";

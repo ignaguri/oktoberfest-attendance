@@ -15,7 +15,7 @@ import { useNotificationAsk } from "@/components/notifications/NotificationAskPr
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
@@ -75,7 +75,7 @@ export default function FriendSearchScreen() {
 
       {loading && debouncedQuery.length >= 1 && (
         <VStack className="items-center py-8">
-          <Spinner size="large" />
+          <MugLoader />
         </VStack>
       )}
 

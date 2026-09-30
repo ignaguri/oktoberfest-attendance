@@ -29,6 +29,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PhotoTagsSection } from "@/components/photo-tags/photo-tags-section";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -226,7 +227,7 @@ export function PhotoDetailModal({
           <View className="items-center bg-black">
             {imageLoading && (
               <View className="absolute inset-0 items-center justify-center">
-                <ActivityIndicator size="large" color={Colors.white} />
+                <MugLoader />
               </View>
             )}
             <Image

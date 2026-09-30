@@ -9,6 +9,7 @@ import { ActivityIndicator, FlatList, Image, RefreshControl, View } from "react-
 import Swipeable, { type SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, { interpolate, useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors } from "@/lib/constants/colors";
@@ -215,7 +216,7 @@ export function NotificationInbox({ onNotificationPress }: NotificationInboxProp
   if (isLoading && !notifications) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color={Colors.primary[500]} />
+        <MugLoader />
       </View>
     );
   }

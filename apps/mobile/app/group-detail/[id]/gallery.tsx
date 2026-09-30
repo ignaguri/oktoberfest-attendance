@@ -15,7 +15,7 @@ import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar"
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -175,7 +175,7 @@ export default function GroupGalleryScreen() {
             title: t("groups.gallery.title"),
           }}
         />
-        <Spinner size="large" />
+        <MugLoader />
       </View>
     );
   }

@@ -9,7 +9,7 @@ export function WrappedLoading() {
   return (
     <div className="wrapped-paper flex h-screen items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <LoadingSpinner size={48} />
+        <LoadingSpinner />
         <p className="text-xl font-semibold text-wrapped-ink">{t("wrapped.loading")}</p>
       </div>
     </div>

@@ -3,11 +3,12 @@
 import { DEFAULT_AVATAR_URL } from "@prostcounter/shared/constants";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { Loader2, MapPin, Users } from "lucide-react";
+import { MapPin, Users } from "lucide-react";
 import { useMemo } from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { useNearbyGroupMembers } from "@/hooks/useLocationSharing";
 
 interface GroupMembersMapProps {
@@ -72,7 +73,7 @@ export const GroupMembersMap = ({ className, radiusMeters = 500 }: GroupMembersM
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin" />
+            <MugLoader />
             <span className="ml-2">
               {t("location.map.loading", {
                 defaultValue: "Finding nearby members...",

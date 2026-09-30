@@ -49,6 +49,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  MugLoader,
   Progress,
   ProgressFilledTrack,
   Select,
@@ -63,6 +64,7 @@ import {
   SelectTrigger,
   Skeleton,
   SkeletonText,
+  Spinner,
   Switch,
   Text,
   Textarea,
@@ -87,6 +89,7 @@ type ComponentType =
   | "cards"
   | "textarea"
   | "progress"
+  | "loaders"
   | "select"
   | "divider"
   | "actionsheet"
@@ -106,6 +109,7 @@ const COMPONENT_OPTIONS: { label: string; value: ComponentType }[] = [
   { label: "Cards", value: "cards" },
   { label: "Textarea", value: "textarea" },
   { label: "Progress", value: "progress" },
+  { label: "Loaders", value: "loaders" },
   { label: "Select", value: "select" },
   { label: "Divider", value: "divider" },
   { label: "ActionSheet", value: "actionsheet" },
@@ -491,6 +495,31 @@ const ProgressShowcase = () => (
         <Progress value={100} size="xl">
           <ProgressFilledTrack />
         </Progress>
+      </VStack>
+    </VStack>
+  </Section>
+);
+
+const LoadersShowcase = () => (
+  <Section title="Loaders">
+    <VStack space="md">
+      <VStack space="xs">
+        <Text bold className="text-xs uppercase text-gray-600">
+          MugLoader (48, page and section)
+        </Text>
+        <MugLoader />
+      </VStack>
+      <VStack space="xs">
+        <Text bold className="text-xs uppercase text-gray-600">
+          MugLoader size 32 (sync pill)
+        </Text>
+        <MugLoader size={32} />
+      </VStack>
+      <VStack space="xs">
+        <Text bold className="text-xs uppercase text-gray-600">
+          Spinner small (inline and buttons)
+        </Text>
+        <Spinner size="small" className="self-start" />
       </VStack>
     </VStack>
   </Section>
@@ -962,6 +991,8 @@ const renderComponent = (component: ComponentType) => {
       return <TextareaShowcase />;
     case "progress":
       return <ProgressShowcase />;
+    case "loaders":
+      return <LoadersShowcase />;
     case "select":
       return <SelectShowcase />;
     case "divider":

@@ -1,7 +1,8 @@
 import { X } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Dimensions, Image, Modal, Pressable, View } from "react-native";
+import { Dimensions, Image, Modal, Pressable, View } from "react-native";
 
+import { MugLoader } from "@/components/ui/mug-loader";
 import { IconColors } from "@/lib/constants/colors";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
@@ -63,7 +64,7 @@ export function ImagePreviewModal({ imageUri, onClose }: ImagePreviewModalProps)
           {/* Loading Indicator */}
           {isLoading && (
             <View style={{ position: "absolute" }}>
-              <ActivityIndicator size="large" color={IconColors.white} />
+              <MugLoader />
             </View>
           )}
 

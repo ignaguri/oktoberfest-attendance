@@ -4,7 +4,6 @@ import type { CrowdLevel } from "@prostcounter/shared/schemas";
 import { X } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   SectionList,
   type SectionListData,
   type SectionListRenderItemInfo,
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/actionsheet";
 import { Button, ButtonText } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -202,7 +202,7 @@ export function TentSelectorSheet({
         {/* Content */}
         {isLoading ? (
           <VStack className="items-center justify-center py-8">
-            <ActivityIndicator size="large" color={IconColors.default} />
+            <MugLoader />
             <Text className="mt-2 text-typography-500">{t("tentSelector.loading")}</Text>
           </VStack>
         ) : error ? (

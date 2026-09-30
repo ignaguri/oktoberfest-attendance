@@ -25,11 +25,11 @@ import {
   ModalContent,
   ModalHeader,
 } from "@/components/ui/modal";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
-import { Colors, IconColors } from "@/lib/constants/colors";
+import { IconColors } from "@/lib/constants/colors";
 import { getAvatarUrl } from "@/lib/utils";
 
 export interface UserProfileData {
@@ -105,7 +105,7 @@ export function UserProfileModal({
           <ModalBody className="pb-6">
             {loading ? (
               <VStack className="items-center py-8">
-                <Spinner size="large" color={Colors.primary[500]} />
+                <MugLoader />
                 <Text className="mt-2 text-typography-500">{t("common.loading")}</Text>
               </VStack>
             ) : profile ? (

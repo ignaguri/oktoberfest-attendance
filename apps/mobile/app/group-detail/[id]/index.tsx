@@ -56,6 +56,7 @@ import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
@@ -217,7 +218,7 @@ export default function GroupDetailScreen() {
   if (isLoading && !group) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <Spinner size="large" />
+        <MugLoader />
       </View>
     );
   }

@@ -24,6 +24,7 @@ import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar"
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
 import { ScrollView } from "@/components/ui/scroll-view";
 import { Spinner } from "@/components/ui/spinner";
@@ -108,7 +109,7 @@ export default function UserProfileScreen() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
-        <Spinner size="large" color={Colors.primary[500]} />
+        <MugLoader />
       </View>
     );
   }
