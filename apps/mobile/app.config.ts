@@ -116,8 +116,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       "expo-media-library",
       {
-        // Write-only: we save camera shots, so the plugin must add no READ_MEDIA_* permission
-        photosPermission: false,
+        // Write-only: we save camera shots, so granularPermissions: [] keeps READ_MEDIA_* off Android.
+        // Don't set photosPermission: false, it makes expo-image-picker replace our iOS purpose string.
         savePhotosPermission:
           "ProstCounter saves the photos you take of your beers to your photo library so you keep a copy on your phone.",
         granularPermissions: [],
