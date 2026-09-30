@@ -3,7 +3,14 @@
 import { useAdminAnalyticsOverview } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AnalyticsPlatform } from "@prostcounter/shared/schemas";
-import { formatPercent, summarizeOverview } from "@prostcounter/shared/utils";
+import {
+  formatChartDayTick,
+  formatChartValue,
+  formatPercent,
+  OVERVIEW_SERIES,
+  overviewChartRows,
+  summarizeOverview,
+} from "@prostcounter/shared/utils";
 import {
   CartesianGrid,
   Line,
@@ -22,14 +29,13 @@ interface OverviewSectionProps {
   platform?: AnalyticsPlatform;
 }
 
-const LINE_COLORS = { dau: "#F59E0B", wau: "#D97706", mau: "#78716C" } as const;
-
 export default function OverviewSection({ from, to, platform }: OverviewSectionProps) {
   const { t } = useTranslation();
   const { data, loading, error, refetch } = useAdminAnalyticsOverview({ from, to, platform });
 
   const series = data?.series ?? [];
   const summary = summarizeOverview(series);
+  const chartRows = overviewChartRows(series);
   const tiles = [
     { key: "dau", value: String(summary.dau) },
     { key: "wau", value: String(summary.wau) },
@@ -60,18 +66,25 @@ export default function OverviewSection({ from, to, platform }: OverviewSectionP
       <p className="mt-4 mb-2 text-sm font-medium">{t("admin.analytics.overview.chartTitle")}</p>
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={series}>
+          <LineChart data={chartRows}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" fontSize={12} />
+            <XAxis
+              dataKey="x"
+              fontSize={12}
+              tickFormatter={(day: string) => formatChartDayTick(day)}
+            />
             <YAxis allowDecimals={false} fontSize={12} />
-            <Tooltip />
-            {(["dau", "wau", "mau"] as const).map((metric) => (
+            <Tooltip
+              labelFormatter={(day) => formatChartDayTick(String(day))}
+              formatter={(value) => formatChartValue(Number(value), "count")}
+            />
+            {OVERVIEW_SERIES.map((line) => (
               <Line
-                key={metric}
+                key={line.key}
                 type="monotone"
-                dataKey={metric}
-                name={t(`admin.analytics.overview.${metric}`)}
-                stroke={LINE_COLORS[metric]}
+                dataKey={line.key}
+                name={t(line.labelKey)}
+                stroke={line.color}
                 dot={false}
               />
             ))}

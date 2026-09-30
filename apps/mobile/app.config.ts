@@ -4,12 +4,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "ProstCounter",
   slug: "prostcounter",
-  version: "1.9.1",
+  version: "1.10.0",
   orientation: "portrait",
   scheme: "prostcounter",
   icon: "./assets/images/logo.png",
   userInterfaceStyle: "automatic",
-  runtimeVersion: "1.8.0-a",
+  runtimeVersion: "1.10.0-a",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
@@ -111,6 +111,17 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       "expo-image-picker",
       {
         microphonePermission: false,
+      },
+    ],
+    [
+      "expo-media-library",
+      {
+        // Write-only: we save camera shots, so granularPermissions: [] keeps READ_MEDIA_IMAGES/VIDEO/AUDIO
+        // off Android. The plugin still always adds READ_MEDIA_VISUAL_USER_SELECTED and READ/WRITE_EXTERNAL_STORAGE.
+        // Don't set photosPermission: false, it makes expo-image-picker replace our iOS purpose string.
+        savePhotosPermission:
+          "ProstCounter saves the photos you take of your beers to your photo library so you keep a copy on your phone.",
+        granularPermissions: [],
       },
     ],
     "expo-font",

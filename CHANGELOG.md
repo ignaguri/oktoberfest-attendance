@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.14.0] - 2026-09-30
+
+### ✨ Features
+
+- interactive analytics charts on mobile (#373)
+- save camera beer photos to the phone's gallery (#373)
+- Wrapped retention (ready push, Home countdown, Profile archive) (#374)
+- Wrapped story and share cards (#372)
+- drill into admin analytics numbers and user timelines (#371)
+- feature scorecard and signup cohorts in admin analytics (#370)
+- track in-app usage events (#369)
+- Wrapped foundation (date unlock, fresh cache, API path, archive) (#368)
+- tag people in photos (#364)
+- notify the uploader when someone reacts to their photo (#363)
+- endless Home feed with roomier, tappable items (#362)
+
+### 🐛 Bug Fixes
+
+- generate usernames at signup and save Apple's name (#367)
+- keep offline fetch failures out of Sentry, friendly banner (#366)
+- only create a photo once its file is in storage (#365)
+- Marstall on the map, crowd in tent list, tappable avatars (#361)
+
+### 🔧 Maintenance
+
+- Expo 57 patches, Sentry RN 8.28, Vexo 1.12, security pins (#373)
+- per-shot Instagram frames and the single-post log
+
 ## [0.13.1] - 2026-09-25
 
 ### ✨ Features

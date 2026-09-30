@@ -152,3 +152,31 @@ export {
   timelinePropsText,
 } from "./analytics-drilldown";
 export type { CohortMemberFlag, ScorecardMemberFlag, TimelineDay } from "./analytics-drilldown";
+export {
+  CHART_COLORS,
+  COHORT_SERIES,
+  cohortChartRows,
+  countTickCount,
+  formatChartDayTick,
+  formatChartMonthTick,
+  formatChartValue,
+  formatCohortReadout,
+  OVERVIEW_SERIES,
+  overviewChartRows,
+  readoutIndex,
+  RETENTION_SERIES,
+  retentionChartRows,
+  shortFestivalLabel,
+  toggleSeries,
+  xTickIndices,
+} from "./analytics-charts";
+export type {
+  ChartSeries,
+  ChartYFormat,
+  CohortChartRow,
+  CohortSeriesKey,
+  OverviewChartRow,
+  OverviewSeriesKey,
+  RetentionChartRow,
+  RetentionSeriesKey,
+} from "./analytics-charts";

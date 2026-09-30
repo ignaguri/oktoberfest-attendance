@@ -8,7 +8,7 @@ import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
-import { barFraction } from "@/lib/charts/sparkline-path";
+import { barFraction } from "@/lib/charts/bar-fraction";
 import { Colors } from "@/lib/constants/colors";
 
 const BAR_HEIGHT = 8;
@@ -57,7 +57,9 @@ export function BarList({ items, max }: BarListProps) {
               >
                 {item.label}
               </Text>
-              <Text className="text-sm text-typography-500">{item.detail ?? String(item.value)}</Text>
+              <Text className="text-sm text-typography-500">
+                {item.detail ?? String(item.value)}
+              </Text>
             </HStack>
             <View className="w-full" onLayout={index === 0 ? handleTrackLayout : undefined}>
               <Svg width="100%" height={BAR_HEIGHT}>

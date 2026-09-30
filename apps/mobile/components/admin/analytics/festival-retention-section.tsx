@@ -2,7 +2,10 @@ import { useAdminAnalyticsFestivalRetention } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   formatPercent,
+  RETENTION_SERIES,
+  retentionChartRows,
   retentionRates,
+  shortFestivalLabel,
   visibleFestivalRetentionRows,
 } from "@prostcounter/shared/utils";
 
@@ -11,6 +14,7 @@ import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 
+import { LineChart } from "./line-chart";
 import { SectionState } from "./section-state";
 
 export function FestivalRetentionSection() {
@@ -30,6 +34,13 @@ export function FestivalRetentionSection() {
     >
       <VStack space="md">
         <Text className="text-sm text-typography-500">{t("admin.analytics.retention.hint")}</Text>
+        <LineChart
+          rows={retentionChartRows(festivals)}
+          series={RETENTION_SERIES}
+          formatXTick={shortFestivalLabel}
+          formatXLabel={(festivalName) => festivalName}
+          maxXTicks={4}
+        />
         {festivals.map((festival) => {
           const rates = retentionRates(festival);
           return (
