@@ -2,7 +2,7 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { PERSONA_NAMES, type PersonaCardEntry, type PersonaId } from "@prostcounter/shared/wrapped";
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -38,13 +38,29 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
   const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
   const [turned, setTurned] = useState(false);
-  // A card dealt face-down lands on its front at 180°; keep that side the front
+  // A card revealed here lands on its front at 180°; keep that side the front
   // after the cache marks it opened, or it would jump to the back.
-  const [dealtFaceDown] = useState(card.state === "unopened");
+  const [revealedHere, setRevealedHere] = useState(false);
+  const [previousState, setPreviousState] = useState(card.state);
+  if (card.state !== previousState) {
+    setPreviousState(card.state);
+    // The open failed and the cache rolled back: deal the card face-down again
+    if (previousState === "opened" && card.state === "unopened") {
+      setTurned(false);
+      setRevealedHere(false);
+    }
+  }
   const rotation = useSharedValue(0);
   const height = (width * 7) / 5;
   const name = PERSONA_NAMES[card.personaId];
   const hint = t(`wrapped.story.persona.${card.personaId}.hint`);
+
+  const isFaceDown = card.state === "unopened" && !turned;
+  useEffect(() => {
+    if (isFaceDown) {
+      rotation.value = reduceMotion ? 0 : withTiming(0, { duration: FLIP_MS });
+    }
+  }, [isFaceDown, reduceMotion, rotation]);
 
   const zeroStyle = useAnimatedStyle(() => ({
     backfaceVisibility: "hidden",
@@ -144,7 +160,7 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
   if (isUnopened) {
     zeroFace = faceDown;
     halfFace = front;
-  } else if (dealtFaceDown) {
+  } else if (revealedHere) {
     zeroFace = back;
     halfFace = front;
   }
@@ -160,6 +176,7 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
         return;
       }
       setTurned(true);
+      setRevealedHere(true);
       if (reduceMotion) {
         notifyOpened();
         return;

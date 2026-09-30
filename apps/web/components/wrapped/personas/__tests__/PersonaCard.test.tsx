@@ -63,6 +63,24 @@ describe("PersonaCard", () => {
     expect(screen.getByText("The one who turns off the tent lights.")).toBeTruthy();
   });
 
+  it("turns face-down again and can be retried when the open is rolled back", () => {
+    const onOpen = vi.fn();
+    const { rerender } = render(<PersonaCard card={card("unopened")} total={10} onOpen={onOpen} />);
+    fireEvent.click(screen.getByRole("button"));
+    rerender(<PersonaCard card={card("opened")} total={10} onOpen={onOpen} />);
+    rerender(<PersonaCard card={card("unopened")} total={10} onOpen={onOpen} />);
+    expect(screen.getByText("New")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button"));
+    expect(onOpen).toHaveBeenCalledTimes(2);
+  });
+
+  it("shows the front of a card that became opened without being flipped here", () => {
+    const { rerender } = render(<PersonaCard card={card("unopened")} total={10} onOpen={vi.fn()} />);
+    rerender(<PersonaCard card={card("opened")} total={10} onOpen={vi.fn()} />);
+    expect(screen.getByText("Oktoberfest 2026")).toBeTruthy();
+    expect(screen.queryByText("The one who turns off the tent lights.")).toBeNull();
+  });
+
   it("flips an opened card to the back and back again", () => {
     render(<PersonaCard card={card("opened")} total={10} onOpen={vi.fn()} />);
     expect(screen.getAllByText("Nachteule").length).toBeGreaterThan(0);

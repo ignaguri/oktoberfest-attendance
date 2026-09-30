@@ -28,9 +28,18 @@ export function PersonaCard({ card, total, onOpen }: PersonaCardProps) {
   const { t } = useTranslation();
   const reduceMotion = useReducedMotion() ?? false;
   const [turned, setTurned] = useState(false);
-  // A card dealt face-down lands on its front at 180°; keep that side the front
+  // A card revealed here lands on its front at 180°; keep that side the front
   // after the cache marks it opened, or it would jump to the back.
-  const [dealtFaceDown] = useState(card.state === "unopened");
+  const [revealedHere, setRevealedHere] = useState(false);
+  const [previousState, setPreviousState] = useState(card.state);
+  if (card.state !== previousState) {
+    setPreviousState(card.state);
+    // The open failed and the cache rolled back: deal the card face-down again
+    if (previousState === "opened" && card.state === "unopened") {
+      setTurned(false);
+      setRevealedHere(false);
+    }
+  }
   const name = PERSONA_NAMES[card.personaId];
   const hint = t(`wrapped.story.persona.${card.personaId}.hint`);
 
@@ -109,7 +118,7 @@ export function PersonaCard({ card, total, onOpen }: PersonaCardProps) {
   if (isUnopened) {
     zeroFace = faceDown;
     halfFace = front;
-  } else if (dealtFaceDown) {
+  } else if (revealedHere) {
     zeroFace = back;
     halfFace = front;
   }
@@ -120,6 +129,7 @@ export function PersonaCard({ card, total, onOpen }: PersonaCardProps) {
         return;
       }
       setTurned(true);
+      setRevealedHere(true);
       if (reduceMotion) {
         onOpen(card.personaId);
       }
