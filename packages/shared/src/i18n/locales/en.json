@@ -2223,6 +2223,7 @@
           "tutorial_step": "Tutorial step",
           "empty_state_seen": "Saw an empty screen",
           "error_shown": "Saw an error",
+          "persona_collection_opened": "Opened the persona collection",
           "unknown": "Event: {{name}}"
         }
       }

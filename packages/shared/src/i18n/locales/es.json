@@ -2283,6 +2283,7 @@
           "tutorial_step": "Paso del tutorial",
           "empty_state_seen": "Vio una pantalla vacía",
           "error_shown": "Vio un error",
+          "persona_collection_opened": "Abrió la colección de personas",
           "unknown": "Evento: {{name}}"
         }
       }
