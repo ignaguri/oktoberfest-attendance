@@ -16,7 +16,13 @@ export function PersonaStrip({ cards, selectedIndex, onSelect }: PersonaStripPro
   const { t } = useTranslation();
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-2 px-4 py-1">
+    // A ScrollView grows by default; the album gives that space to the card
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      className="grow-0"
+      contentContainerClassName="gap-2 px-4 py-1"
+    >
       {cards.map((card, index) => (
         <Pressable
           key={card.personaId}

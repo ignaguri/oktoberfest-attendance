@@ -3,8 +3,9 @@ import { PERSONA_NAMES, type PersonaCardEntry, type PersonaId } from "@prostcoun
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { type ReactNode, useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { Image, Pressable, View } from "react-native";
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
@@ -18,14 +19,26 @@ import { VStack } from "@/components/ui/vstack";
 
 import { Crest } from "../story/crest";
 
-const FLIP_MS = 500;
-const FACE = "absolute inset-0 rounded-xl border-[3px] border-wrapped-ink p-3";
+const FLIP_MS = 600;
+const FLIP_EASING = Easing.inOut(Easing.cubic);
+/** How much the card lifts toward the viewer at the middle of a flip */
+const FLIP_LIFT = 0.08;
+const FACE = "absolute inset-0 overflow-hidden rounded-2xl border-[3px] border-wrapped-ink p-4";
+// The story's rhombus paper as an image tile: an Svg pattern mounted inside
+// the turned face renders only a corner of itself on iOS
+const RHOMBUS_TILE = require("@/assets/wrapped/rhombus-tile.png");
+/** A locked card also fits the hint, which can run to two lines */
+const LOCKED_CREST_SCALE = 0.8;
+const SHADOW = "absolute inset-0 translate-x-1.5 translate-y-1.5 rounded-2xl";
+/** An ink shadow disappears into a navy face, so dark faces cast amber */
+const PAPER_SHADOW = cn(SHADOW, "bg-wrapped-ink");
+const INK_SHADOW = cn(SHADOW, "bg-wrapped-amber");
 
 interface PersonaCardProps {
   card: PersonaCardEntry;
   total: number;
-  /** Card width in px; height is width * 7 / 5 */
-  width: number;
+  /** From personaCardSize: the card and its crest in px */
+  size: { width: number; height: number; crest: number };
   onOpen: (personaId: PersonaId) => void;
 }
 
@@ -34,7 +47,7 @@ interface PersonaCardProps {
  * face-down with a NEW ribbon; pressing flips it face-up and calls onOpen
  * when the flip lands. Opened: pressing flips between front and back.
  */
-export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
+export function PersonaCard({ card, total, size, onOpen }: PersonaCardProps) {
   const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
   const [turned, setTurned] = useState(false);
@@ -51,24 +64,34 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
     }
   }
   const rotation = useSharedValue(0);
-  const height = (width * 7) / 5;
+  const { width, height } = size;
   const name = PERSONA_NAMES[card.personaId];
   const hint = t(`wrapped.story.persona.${card.personaId}.hint`);
 
   const isFaceDown = card.state === "unopened" && !turned;
   useEffect(() => {
     if (isFaceDown) {
-      rotation.value = reduceMotion ? 0 : withTiming(0, { duration: FLIP_MS });
+      rotation.value = reduceMotion ? 0 : withTiming(0, { duration: FLIP_MS, easing: FLIP_EASING });
     }
   }, [isFaceDown, reduceMotion, rotation]);
 
+  // iOS still draws a face's children past 90° even with backfaceVisibility
+  // hidden, so each face is shown only while it faces the viewer.
   const zeroStyle = useAnimatedStyle(() => ({
-    backfaceVisibility: "hidden",
-    transform: [{ perspective: 1200 }, { rotateY: `${rotation.value}deg` }],
+    opacity: rotation.value < 90 ? 1 : 0,
+    transform: [
+      { perspective: 1000 },
+      { scale: 1 + FLIP_LIFT * Math.sin((rotation.value * Math.PI) / 180) },
+      { rotateY: `${rotation.value}deg` },
+    ],
   }));
   const halfStyle = useAnimatedStyle(() => ({
-    backfaceVisibility: "hidden",
-    transform: [{ perspective: 1200 }, { rotateY: `${rotation.value + 180}deg` }],
+    opacity: rotation.value < 90 ? 0 : 1,
+    transform: [
+      { perspective: 1000 },
+      { scale: 1 + FLIP_LIFT * Math.sin((rotation.value * Math.PI) / 180) },
+      { rotateY: `${rotation.value + 180}deg` },
+    ],
   }));
 
   if (card.state === "locked") {
@@ -77,23 +100,30 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
         style={{ width, height }}
         accessible
         accessibilityRole="image"
-        accessibilityLabel={t("wrapped.personas.a11y.locked", { number: card.number, hint })}
+        accessibilityLabel={t("wrapped.personas.a11y.locked", {
+          number: card.number,
+          hint,
+        })}
       >
         <View className={cn(FACE, "items-center border-dashed bg-wrapped-paper")}>
-          <Text className="self-start text-xs font-bold text-wrapped-ink">
+          <Text className="self-start text-sm font-bold text-wrapped-ink/60">
             {t("wrapped.personas.number", { number: card.number })}
           </Text>
-          <View className="my-2">
-            <Crest personaId={card.personaId} size="md" silhouette />
+          <View className="flex-1 items-center justify-center">
+            <Crest
+              personaId={card.personaId}
+              width={Math.round(size.crest * LOCKED_CREST_SCALE)}
+              silhouette
+            />
           </View>
-          <Text className="rounded border border-dashed border-wrapped-ink px-3 py-1 text-sm font-bold text-wrapped-ink">
+          <Text className="rounded-md border-2 border-dashed border-wrapped-ink/60 px-4 py-1 font-wrapped text-xl font-bold text-wrapped-ink/60">
             {t("wrapped.personas.lockedName")}
           </Text>
-          <VStack className="mt-auto items-center">
-            <Text className="text-[10px] font-extrabold uppercase tracking-wider text-wrapped-ink/60">
+          <VStack space="xs" className="mt-4 items-center">
+            <Text className="text-xs font-extrabold uppercase tracking-wider text-wrapped-ink/60">
               {t("wrapped.personas.howToEarn")}
             </Text>
-            <Text className="text-center text-sm font-bold text-wrapped-ink">{hint}</Text>
+            <Text className="text-center text-base font-bold text-wrapped-ink">{hint}</Text>
           </VStack>
         </View>
       </View>
@@ -101,57 +131,80 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
   }
 
   const front: ReactNode = (
-    <View className={cn(FACE, "items-center bg-wrapped-paper")}>
-      <Text className="self-start text-xs font-bold text-wrapped-ink">
-        {t("wrapped.personas.number", { number: card.number })}
-      </Text>
-      <View className="my-2">
-        <Crest personaId={card.personaId} size="md" />
+    <>
+      <View className={PAPER_SHADOW} />
+      <View className={cn(FACE, "items-center bg-wrapped-paper")}>
+        <Image
+          source={RHOMBUS_TILE}
+          resizeMode="repeat"
+          className="absolute inset-0 h-full w-full"
+          alt=""
+          aria-hidden
+          importantForAccessibility="no"
+        />
+        <Text className="self-start text-sm font-bold text-wrapped-ink">
+          {t("wrapped.personas.number", { number: card.number })}
+        </Text>
+        <View className="flex-1 items-center justify-center">
+          <Crest personaId={card.personaId} width={size.crest} />
+        </View>
+        <Text className="-rotate-2 rounded-md bg-wrapped-ink px-5 py-1.5 font-wrapped text-2xl font-extrabold text-wrapped-paper">
+          {name}
+        </Text>
+        <Text className="mt-4 text-sm font-semibold text-wrapped-blue">
+          {card.festivals[0]?.name}
+        </Text>
       </View>
-      <Text className="rounded bg-wrapped-ink px-3 py-1 text-sm font-bold text-wrapped-paper">{name}</Text>
-      <Text className="mt-auto text-xs font-semibold text-wrapped-blue">{card.festivals[0]?.name}</Text>
-    </View>
+    </>
   );
 
   const back: ReactNode = (
-    <VStack space="sm" className={cn(FACE, "bg-wrapped-ink")}>
-      <Text className="font-wrapped text-lg font-extrabold text-wrapped-paper">{name}</Text>
-      <Text className="font-wrapped text-sm italic text-wrapped-paper/90">
-        {t(`wrapped.story.persona.${card.personaId}.description`)}
-      </Text>
-      <Text className="text-[10px] font-extrabold uppercase tracking-wider text-wrapped-amber">
-        {t("wrapped.personas.howToEarn")}
-      </Text>
-      <Text className="text-sm font-semibold text-wrapped-paper">{hint}</Text>
-      <Text className="text-[10px] font-extrabold uppercase tracking-wider text-wrapped-amber">
-        {t("wrapped.personas.collectedAt")}
-      </Text>
-      <HStack space="xs" className="flex-wrap">
-        {card.festivals.map((festival) => (
-          <Text
-            key={festival.festivalId}
-            className="rounded-full bg-wrapped-paper/15 px-2 py-0.5 text-xs font-semibold text-wrapped-paper"
-          >
-            {festival.name}
-          </Text>
-        ))}
-      </HStack>
-      <Text className="mt-auto text-center text-xs font-bold text-wrapped-paper/60">
-        {t("wrapped.personas.numberOfTotal", { number: card.number, total })}
-      </Text>
-    </VStack>
+    <>
+      <View className={INK_SHADOW} />
+      <VStack space="md" className={cn(FACE, "bg-wrapped-ink p-5")}>
+        <Text className="font-wrapped text-3xl font-extrabold text-wrapped-paper">{name}</Text>
+        <Text className="font-wrapped text-lg italic text-wrapped-paper/90">
+          {t(`wrapped.story.persona.${card.personaId}.description`)}
+        </Text>
+        <Text className="mt-2 text-xs font-extrabold uppercase tracking-wider text-wrapped-amber">
+          {t("wrapped.personas.howToEarn")}
+        </Text>
+        <Text className="text-base font-semibold text-wrapped-paper">{hint}</Text>
+        <Text className="mt-2 text-xs font-extrabold uppercase tracking-wider text-wrapped-amber">
+          {t("wrapped.personas.collectedAt")}
+        </Text>
+        <HStack space="xs" className="flex-wrap">
+          {card.festivals.map((festival) => (
+            <Text
+              key={festival.festivalId}
+              className="rounded-full bg-wrapped-paper/15 px-3 py-1 text-sm font-semibold text-wrapped-paper"
+            >
+              {festival.name}
+            </Text>
+          ))}
+        </HStack>
+        <Text className="mt-auto text-center text-sm font-bold text-wrapped-paper/60">
+          {t("wrapped.personas.numberOfTotal", { number: card.number, total })}
+        </Text>
+      </VStack>
+    </>
   );
 
   const faceDown: ReactNode = (
-    <View className={cn(FACE, "items-center justify-center bg-wrapped-ink")}>
-      <Text className="absolute -right-2 top-3 rotate-6 rounded-sm bg-wrapped-amber px-2 py-0.5 text-xs font-black uppercase tracking-wider text-wrapped-ink">
-        {t("wrapped.personas.new")}
-      </Text>
-      <View className="h-14 w-14 items-center justify-center rounded-full border-[3px] border-wrapped-paper bg-wrapped-amber">
-        <Text className="text-2xl font-black text-wrapped-ink">?</Text>
+    <>
+      <View className={INK_SHADOW} />
+      <View className={cn(FACE, "items-center justify-center bg-wrapped-ink")}>
+        <Text className="absolute right-3 top-4 rotate-6 rounded-sm bg-wrapped-amber px-2.5 py-1 text-sm font-black uppercase tracking-wider text-wrapped-ink">
+          {t("wrapped.personas.new")}
+        </Text>
+        <View className="h-24 w-24 items-center justify-center rounded-full border-4 border-wrapped-paper bg-wrapped-amber">
+          <Text className="text-5xl font-black text-wrapped-ink">?</Text>
+        </View>
+        <Text className="absolute bottom-5 text-base font-bold text-wrapped-paper">
+          {t("wrapped.personas.tapToOpen")}
+        </Text>
       </View>
-      <Text className="absolute bottom-3 text-xs font-bold text-wrapped-paper">{t("wrapped.personas.tapToOpen")}</Text>
-    </View>
+    </>
   );
 
   const isUnopened = card.state === "unopened";
@@ -181,7 +234,7 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
         notifyOpened();
         return;
       }
-      rotation.value = withTiming(180, { duration: FLIP_MS }, (finished) => {
+      rotation.value = withTiming(180, { duration: FLIP_MS, easing: FLIP_EASING }, (finished) => {
         if (finished) {
           scheduleOnRN(notifyOpened);
         }
@@ -191,7 +244,10 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
     const next = !turned;
     setTurned(next);
     if (!reduceMotion) {
-      rotation.value = withTiming(next ? 180 : 0, { duration: FLIP_MS });
+      rotation.value = withTiming(next ? 180 : 0, {
+        duration: FLIP_MS,
+        easing: FLIP_EASING,
+      });
     }
   };
 
@@ -205,13 +261,16 @@ export function PersonaCard({ card, total, width, onOpen }: PersonaCardProps) {
           ? t("wrapped.personas.a11y.unopened", { number: card.number })
           : t("wrapped.personas.a11y.opened", { number: card.number, name })
       }
-      accessibilityHint={isUnopened ? t("wrapped.personas.a11y.openHint") : t("wrapped.personas.a11y.flipHint")}
+      accessibilityHint={
+        isUnopened ? t("wrapped.personas.a11y.openHint") : t("wrapped.personas.a11y.flipHint")
+      }
     >
-      <View className="absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-wrapped-ink" />
       {reduceMotion ? (
         <View className="absolute inset-0">{turned ? halfFace : zeroFace}</View>
       ) : (
         <>
+          {/* Each face carries its own shadow so it turns with the card. The
+              half face ends at 360°, unmirrored, so its shadow sits the same way. */}
           <Animated.View className="absolute inset-0" style={zeroStyle}>
             {zeroFace}
           </Animated.View>
