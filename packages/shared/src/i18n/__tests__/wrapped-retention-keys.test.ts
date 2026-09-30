@@ -38,3 +38,17 @@ describe("Wrapped retention i18n keys", () => {
     });
   }
 });
+
+const REMOVED_KEYS = [
+  "wrapped.cta.preparing",
+  "wrapped.cta.preparingDescription",
+  "wrapped.cta.preparingFooter",
+];
+
+describe("retired Wrapped CTA keys", () => {
+  for (const [locale, bundle] of Object.entries(BUNDLES)) {
+    it(`${locale} no longer has the last-day preparing copy`, () => {
+      expect(REMOVED_KEYS.filter((key) => lookup(bundle, key) !== undefined)).toEqual([]);
+    });
+  }
+});

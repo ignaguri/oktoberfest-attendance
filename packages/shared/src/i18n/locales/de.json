@@ -3086,11 +3086,8 @@
       }
     },
     "cta": {
-      "preparingFooter": "Vergiss nicht, deinen letzten Tag einzutragen! 📝",
       "ready": "Dein Rückblick ist fertig!",
-      "preparing": "Dein Festival wird zusammengefasst!",
       "readyDescription": "Siehe deine personalisierte {{festivalName}}-Geschichte",
-      "preparingDescription": "Wir bereiten deine personalisierte {{festivalName}}-Geschichte vor. Lade deine letzte Teilnahme hoch!",
       "viewButton": "Deinen Rückblick ansehen",
       "countdown_one": "Dein Rückblick kommt morgen",
       "countdown_other": "Dein Rückblick kommt in {{count}} Tagen",

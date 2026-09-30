@@ -2921,11 +2921,8 @@
       }
     },
     "cta": {
-      "preparingFooter": "¡No te olvides de registrar tu último día! 📝",
       "ready": "¡Tu Wrapped está listo!",
-      "preparing": "¡Preparando tu festival!",
       "readyDescription": "Mirá tu historia personalizada de {{festivalName}}",
-      "preparingDescription": "Estamos preparando tu historia personalizada de {{festivalName}}. ¡Subí tu asistencia final!",
       "viewButton": "Ver Tu Wrapped",
       "countdown_one": "Tu Wrapped llega mañana",
       "countdown_other": "Tu Wrapped llega en {{count}} días",

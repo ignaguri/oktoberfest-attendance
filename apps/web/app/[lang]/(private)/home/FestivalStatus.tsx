@@ -48,19 +48,22 @@ export default function FestivalStatus() {
 
   if (countdown.phase === "live") {
     return (
-      <Alert variant="successLight" className="w-fit">
-        <AlertDescription className="flex items-center gap-2">
-          <PartyPopper className="size-5" />
-          <span className="font-semibold">
-            {t("home.festivalStatus.live", {
-              currentDay: countdown.currentDay,
-              totalDays: countdown.totalDays,
-            })}
-          </span>
-          <span className="text-muted-foreground">•</span>
-          <span className="font-bold">{currentFestival.name}</span>
-        </AlertDescription>
-      </Alert>
+      <div className="flex flex-col items-center gap-2">
+        <Alert variant="successLight" className="w-fit">
+          <AlertDescription className="flex items-center gap-2">
+            <PartyPopper className="size-5" />
+            <span className="font-semibold">
+              {t("home.festivalStatus.live", {
+                currentDay: countdown.currentDay,
+                totalDays: countdown.totalDays,
+              })}
+            </span>
+            <span className="text-muted-foreground">•</span>
+            <span className="font-bold">{currentFestival.name}</span>
+          </AlertDescription>
+        </Alert>
+        <WrappedCTA />
+      </div>
     );
   }
 

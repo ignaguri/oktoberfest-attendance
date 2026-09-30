@@ -2861,11 +2861,8 @@
       }
     },
     "cta": {
-      "preparingFooter": "Don't forget to log your final day! 📝",
       "ready": "Your Wrapped is ready!",
-      "preparing": "Wrapping up your festival!",
       "readyDescription": "See your personalized {{festivalName}} story",
-      "preparingDescription": "We're preparing your personalized {{festivalName}} story. Upload your final attendance!",
       "viewButton": "View Your Wrapped",
       "countdown_one": "Your Wrapped drops tomorrow",
       "countdown_other": "Your Wrapped drops in {{count}} days",
