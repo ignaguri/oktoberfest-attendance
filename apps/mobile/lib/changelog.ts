@@ -1,4 +1,10 @@
 export const changelog: Record<string, string[]> = {
+  "1.10.0": [
+    "Your festival Wrapped: relive it as a story and share the cards, with a countdown on Home and past ones in your Profile",
+    "Tag friends in your photos, and get notified when someone reacts to yours",
+    "Beer photos you take in the app are also saved to your phone's gallery",
+    "An endless Home feed with bigger, tappable items",
+  ],
   "1.9.1": [
     "Your festival progress on Home: streak, tents, photos and how you compare with your last festival",
     "The Groups tab is now Social, and the feed shows friends' day plans and tent reservations",

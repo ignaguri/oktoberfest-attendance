@@ -1,4 +1,9 @@
 export const changelog: Record<string, string[]> = {
+  "1.6.0": [
+    "🎁 Your festival Wrapped: relive it as a story and share the cards",
+    "🏷️ Tag friends in your photos",
+    "🔔 Get notified when someone reacts to your photo",
+  ],
   "1.5.1": [
     "📈 Your festival progress on Home, and how it compares with your last festival",
     "📅 See friends' day plans and tent reservations in the activity feed",
