@@ -29,6 +29,8 @@ describe("Wrapped routes", () => {
     listFestivals: ReturnType<typeof vi.fn>;
     checkAccessLegacy: ReturnType<typeof vi.fn>;
     regenerateCache: ReturnType<typeof vi.fn>;
+    getPersonaCollection: ReturnType<typeof vi.fn>;
+    openPersonaCard: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(() => {
@@ -40,6 +42,8 @@ describe("Wrapped routes", () => {
       listFestivals: vi.fn(),
       checkAccessLegacy: vi.fn(),
       regenerateCache: vi.fn(),
+      getPersonaCollection: vi.fn(),
+      openPersonaCard: vi.fn(),
     };
     vi.mocked(WrappedService).mockImplementation(function () {
       return mockService as never;
@@ -114,5 +118,36 @@ describe("Wrapped routes", () => {
     mockService.checkAccessLegacy.mockResolvedValue({ allowed: false, reason: "not_ended" });
     const res = await app.request(createAuthRequest(`/wrapped/${festivalId}/access`));
     expect(await res.json()).toEqual({ allowed: false, reason: "not_ended" });
+  });
+
+  it("GET /wrapped/personas returns the collection (not shadowed by /wrapped/{festivalId})", async () => {
+    mockService.getPersonaCollection.mockResolvedValue({
+      earned: [{ personaId: "nachteule", festivals: [{ festivalId, name: "Oktoberfest 2026" }], opened: false }],
+    });
+    const res = await app.request(createAuthRequest("/wrapped/personas"));
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { earned: { personaId: string }[] };
+    expect(body.earned[0].personaId).toBe("nachteule");
+    expect(mockService.getPersonaCollection).toHaveBeenCalledWith("test-user-id");
+    expect(mockService.getWrapped).not.toHaveBeenCalled();
+  });
+
+  it("POST /wrapped/personas/{personaId}/open records the open", async () => {
+    mockService.openPersonaCard.mockResolvedValue(undefined);
+    const res = await app.request(createAuthRequest("/wrapped/personas/nachteule/open", { method: "POST" }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ success: true });
+    expect(mockService.openPersonaCard).toHaveBeenCalledWith("test-user-id", "nachteule");
+  });
+
+  it("POST /wrapped/personas/{personaId}/open rejects an unknown persona", async () => {
+    const res = await app.request(createAuthRequest("/wrapped/personas/notAPersona/open", { method: "POST" }));
+    expect(res.status).toBe(400);
+    expect(mockService.openPersonaCard).not.toHaveBeenCalled();
+  });
+
+  it("GET /wrapped/personas requires auth", async () => {
+    const res = await app.request("/wrapped/personas");
+    expect(res.status).toBe(401);
   });
 });
