@@ -8,6 +8,7 @@ import { createClient } from "@/utils/supabase/server";
 import { processAchievementNotifications } from "./achievements";
 import { processFestivalOpeningNotifications } from "./festival-opening";
 import { processReservationNotifications } from "./reservations";
+import { processWrappedReadyNotifications } from "./wrapped-ready";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,17 @@ async function runScheduler() {
     hasFailure = true;
     logger.error(
       "Festival opening notifications failed",
+      logger.apiRoute("cron/scheduler"),
+      error as Error,
+    );
+  }
+
+  try {
+    await processWrappedReadyNotifications(supabase, notifications, new Date());
+  } catch (error) {
+    hasFailure = true;
+    logger.error(
+      "Wrapped ready notifications failed",
       logger.apiRoute("cron/scheduler"),
       error as Error,
     );
