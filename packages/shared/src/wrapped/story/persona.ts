@@ -137,6 +137,10 @@ const cap = (value: number) => Math.min(value, 2);
  * 2026) so that no persona takes more than ~35% of attendees and Der Genießer
  * stays under ~30%. Most people come 1-3 days and drink 2-4 a day, which is
  * why the bars sit lower than the names suggest.
+ *
+ * The persona collection shows each rule as copy
+ * (wrapped.story.persona.<id>.hint in all three locales). Change a threshold
+ * here and that hint must change with it.
  */
 const RULES: { id: Exclude<PersonaId, "geniesser">; strength: (s: PersonaSignals) => number | null }[] = [
   {
