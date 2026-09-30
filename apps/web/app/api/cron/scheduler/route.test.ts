@@ -1,12 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const processReservationNotifications = vi.fn().mockResolvedValue(undefined);
 const processAchievementNotifications = vi.fn().mockResolvedValue(undefined);
 const processFestivalOpeningNotifications = vi.fn().mockResolvedValue(undefined);
 
-vi.mock("./reservations", () => ({
-  processReservationNotifications: (...args: unknown[]) => processReservationNotifications(...args),
-}));
 vi.mock("./achievements", () => ({
   processAchievementNotifications: (...args: unknown[]) => processAchievementNotifications(...args),
 }));
@@ -56,7 +52,6 @@ describe("cron scheduler route", () => {
       );
 
       expect(res.status).toBe(200);
-      expect(processReservationNotifications).toHaveBeenCalledTimes(1);
       expect(processAchievementNotifications).toHaveBeenCalledTimes(1);
       expect(processFestivalOpeningNotifications).toHaveBeenCalledTimes(1);
       expect(processWrappedReadyNotifications).toHaveBeenCalledTimes(1);
@@ -83,7 +78,6 @@ describe("cron scheduler route", () => {
       const res = await GET(new Request("http://localhost/api/cron/scheduler"));
 
       expect(res.status).toBe(401);
-      expect(processReservationNotifications).not.toHaveBeenCalled();
       expect(processAchievementNotifications).not.toHaveBeenCalled();
       expect(processFestivalOpeningNotifications).not.toHaveBeenCalled();
     });
@@ -118,7 +112,7 @@ describe("cron scheduler route", () => {
       );
 
       expect(res.status).toBe(401);
-      expect(processReservationNotifications).not.toHaveBeenCalled();
+      expect(processAchievementNotifications).not.toHaveBeenCalled();
     });
 
     it("returns 401 when only the x-cron-secret header is sent (no Bearer)", async () => {
@@ -132,7 +126,7 @@ describe("cron scheduler route", () => {
       );
 
       expect(res.status).toBe(401);
-      expect(processReservationNotifications).not.toHaveBeenCalled();
+      expect(processAchievementNotifications).not.toHaveBeenCalled();
     });
 
     it("returns 401 when CRON_SECRET is unset, even with an Authorization header", async () => {
@@ -146,7 +140,7 @@ describe("cron scheduler route", () => {
       );
 
       expect(res.status).toBe(401);
-      expect(processReservationNotifications).not.toHaveBeenCalled();
+      expect(processAchievementNotifications).not.toHaveBeenCalled();
     });
   });
 
@@ -163,7 +157,6 @@ describe("cron scheduler route", () => {
       );
 
       expect(res.status).toBe(200);
-      expect(processReservationNotifications).toHaveBeenCalledTimes(1);
       expect(processAchievementNotifications).toHaveBeenCalledTimes(1);
       expect(processFestivalOpeningNotifications).toHaveBeenCalledTimes(1);
     });
@@ -200,7 +193,7 @@ describe("cron scheduler route", () => {
       );
 
       expect(res.status).toBe(401);
-      expect(processReservationNotifications).not.toHaveBeenCalled();
+      expect(processAchievementNotifications).not.toHaveBeenCalled();
     });
   });
 });

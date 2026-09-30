@@ -1,4 +1,3 @@
-import { DEV_URL, IS_PROD, PROD_URL } from "@prostcounter/shared/constants";
 import { NextResponse } from "next/server";
 
 import { logger } from "@/lib/logger";
@@ -7,7 +6,6 @@ import { createClient } from "@/utils/supabase/server";
 
 import { processAchievementNotifications } from "./achievements";
 import { processFestivalOpeningNotifications } from "./festival-opening";
-import { processReservationNotifications } from "./reservations";
 import { processWrappedReadyNotifications } from "./wrapped-ready";
 
 export const runtime = "nodejs";
@@ -16,11 +14,7 @@ async function runScheduler() {
   const supabase = await createClient(true);
   const notifications = createNotificationService();
 
-  const nowIso = new Date().toISOString();
-  const baseUrl = IS_PROD ? PROD_URL : DEV_URL;
-
-  await processReservationNotifications(supabase, notifications, baseUrl, nowIso);
-
+  // Reservation reminders run every 5 minutes from /api/cron/reservations.
   await processAchievementNotifications(supabase, notifications);
 
   let hasFailure = false;
