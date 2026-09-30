@@ -1,7 +1,9 @@
 "use client";
 
+import { useTrack } from "@prostcounter/shared/analytics/react";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { type StorySlideOf, useStoryCopy } from "@prostcounter/shared/wrapped";
+import { Link } from "next-view-transitions";
 
 import { Crest } from "../Crest";
 import { Reveal } from "../Reveal";
@@ -18,6 +20,7 @@ interface ProstSlideProps {
 export function ProstSlide({ slide, animate, onShare, onReplay, onClose }: ProstSlideProps) {
   const { t } = useTranslation();
   const copy = useStoryCopy();
+  const track = useTrack();
 
   return (
     <div className="flex flex-1 flex-col justify-center gap-6">
@@ -47,6 +50,13 @@ export function ProstSlide({ slide, animate, onShare, onReplay, onClose }: Prost
         >
           {t("wrapped.outro.share")}
         </button>
+        <Link
+          href="/wrapped/personas"
+          onClick={() => track("persona_collection_opened", { source: "prost_slide" })}
+          className="pointer-events-auto text-center text-sm font-bold text-wrapped-ink underline underline-offset-4"
+        >
+          {t("wrapped.personas.seeAll")}
+        </Link>
         <button
           type="button"
           onClick={onReplay}
