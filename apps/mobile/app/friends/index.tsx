@@ -36,8 +36,8 @@ import {
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { TrackOnScreen } from "@/lib/analytics/TrackOnScreen";
@@ -348,7 +348,7 @@ function MyFriendsTab({
   if (isLoading && !isRefreshing) {
     return (
       <View className="flex-1 items-center justify-center">
-        <Spinner size="large" color={Colors.primary[500]} />
+        <MugLoader />
       </View>
     );
   }
@@ -559,7 +559,7 @@ function RequestsTab({
   if (isLoading && !isRefreshing) {
     return (
       <View className="flex-1 items-center justify-center">
-        <Spinner size="large" color={Colors.primary[500]} />
+        <MugLoader />
       </View>
     );
   }

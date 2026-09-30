@@ -1,5 +1,4 @@
 import { MUG_LOADER } from "@prostcounter/shared/loading";
-import { cn } from "@prostcounter/ui";
 import {
   Canvas,
   Group,
@@ -21,9 +20,6 @@ import {
 
 cssInterop(Canvas, { className: "style" });
 
-const SIZE = MUG_LOADER.sizePx;
-const PERIOD = MUG_LOADER.wavePeriod * SIZE;
-const AMPLITUDE = MUG_LOADER.waveAmplitude * SIZE;
 const HALF_DRIFT = MUG_LOADER.waveDriftPeriods / 2;
 const [X1, Y1, X2, Y2] = MUG_LOADER.easing;
 const ease = Easing.bezierFn(X1, Y1, X2, Y2);
@@ -31,19 +27,25 @@ const ease = Easing.bezierFn(X1, Y1, X2, Y2);
 const EMPTY_SOURCE = require("@/assets/loading/mug-empty.png");
 const FULL_SOURCE = require("@/assets/loading/mug-full.png");
 
-/**
- * The filling-mug loader behind `<Spinner size="large" />`. The full mug is
- * drawn over the empty one, clipped below a wavy surface that rises, holds and
- * drains once per loop (timing and geometry in MUG_LOADER). The two PNGs are
- * exported by scripts/glyphs/loader.sh and are pixel aligned.
- */
-export function MugLoader({
-  className,
-  "aria-label": ariaLabel,
-}: {
+interface MugLoaderProps {
+  /** Box size in points. The art fills about 84% of its height and 63% of its width. */
+  size?: number;
   className?: string;
   "aria-label"?: string;
-}) {
+}
+
+/**
+ * The filling-mug loader for page and section loading. The full mug is drawn
+ * over the empty one, clipped below a wavy surface that rises, holds and
+ * drains once per loop (timing and geometry in MUG_LOADER). The two PNGs are
+ * exported by scripts/glyphs/loader.sh and are pixel aligned. Below ~28pt the
+ * fill stops being readable; inline and button loading keeps `Spinner`.
+ */
+export function MugLoader({
+  size = MUG_LOADER.sizePx,
+  className,
+  "aria-label": ariaLabel = "loading",
+}: MugLoaderProps) {
   const reduceMotion = useReducedMotion();
   const empty = useImage(EMPTY_SOURCE);
   const full = useImage(FULL_SOURCE);
@@ -60,6 +62,9 @@ export function MugLoader({
       cancelAnimation(progress);
     };
   }, [progress, reduceMotion]);
+
+  const period = MUG_LOADER.wavePeriod * size;
+  const amplitude = MUG_LOADER.waveAmplitude * size;
 
   const surface = usePathValue((builder) => {
     "worklet";
@@ -82,35 +87,37 @@ export function MugLoader({
       level = fullSurface + (emptySurface - fullSurface) * t;
       drift = HALF_DRIFT * (1 + t);
     }
-    const y = level * SIZE;
-    let x = -((drift * PERIOD) % PERIOD) - PERIOD;
+    const y = level * size;
+    let x = -((drift * period) % period) - period;
     builder.moveTo(x, y);
-    while (x < SIZE) {
-      builder.quadTo(x + PERIOD / 4, y - 2 * AMPLITUDE, x + PERIOD / 2, y);
-      builder.quadTo(x + (3 * PERIOD) / 4, y + 2 * AMPLITUDE, x + PERIOD, y);
-      x += PERIOD;
+    while (x < size) {
+      builder.quadTo(x + period / 4, y - 2 * amplitude, x + period / 2, y);
+      builder.quadTo(x + (3 * period) / 4, y + 2 * amplitude, x + period, y);
+      x += period;
     }
-    builder.lineTo(x, SIZE);
-    builder.lineTo(-2 * PERIOD, SIZE);
+    builder.lineTo(x, size);
+    builder.lineTo(-2 * period, size);
     builder.close();
   });
 
   // Accessibility lives on a plain View: Skia's native view on Android does not
-  // expose aria-label/role to TalkBack. The box is 48px rather than size-12,
-  // which is 42pt on native (NativeWind's 14px rem) and would clip the art.
+  // expose aria-label/role to TalkBack. The box is sized in points from `size`
+  // (a runtime value, so it can't be a class); the Skia drawing uses the same
+  // number, so the two always agree.
   return (
     <View
-      className={cn("size-[48px]", className)}
+      className={className}
+      style={{ width: size, height: size }}
       accessible
-      role="progressbar"
+      accessibilityRole="progressbar"
       aria-label={ariaLabel}
     >
-      <Canvas className="size-[48px]">
+      <Canvas className="flex-1">
         {!reduceMotion && empty && (
-          <SkiaImage image={empty} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />
+          <SkiaImage image={empty} x={0} y={0} width={size} height={size} fit="contain" />
         )}
         <Group clip={reduceMotion ? undefined : surface}>
-          {full && <SkiaImage image={full} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />}
+          {full && <SkiaImage image={full} x={0} y={0} width={size} height={size} fit="contain" />}
         </Group>
       </Canvas>
     </View>

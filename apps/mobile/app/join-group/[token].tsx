@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
@@ -115,7 +115,7 @@ export default function JoinGroupByTokenScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <VStack space="lg" className="items-center">
-          <Spinner size="large" />
+          <MugLoader />
           <Text className="text-center text-typography-500">{t("groups.deepLink.joining")}</Text>
         </VStack>
       </View>

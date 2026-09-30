@@ -15,7 +15,7 @@ import {
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
@@ -84,7 +84,7 @@ export function QRCodeSheet({
           <VStack className="items-center rounded-2xl bg-white p-6">
             {isGenerating ? (
               <VStack className="h-52 w-52 items-center justify-center">
-                <Spinner size="large" />
+                <MugLoader />
                 <Text className="mt-2 text-sm text-typography-500">
                   {t("groups.qrCode.generating")}
                 </Text>

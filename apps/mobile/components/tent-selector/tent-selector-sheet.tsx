@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/actionsheet";
 import { Button, ButtonText } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
@@ -202,7 +202,7 @@ export function TentSelectorSheet({
         {/* Content */}
         {isLoading ? (
           <VStack className="items-center justify-center py-8">
-            <Spinner size="large" />
+            <MugLoader />
             <Text className="mt-2 text-typography-500">{t("tentSelector.loading")}</Text>
           </VStack>
         ) : error ? (

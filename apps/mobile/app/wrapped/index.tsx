@@ -7,7 +7,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
 import { View } from "react-native";
 
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { StoryShell } from "@/components/wrapped/story/story-shell";
@@ -52,7 +52,7 @@ export default function WrappedScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-wrapped-paper">
         <VStack space="md" className="items-center">
-          <Spinner size="large" />
+          <MugLoader />
           <Text className="text-base text-wrapped-ink">{t("wrapped.loading")}</Text>
         </VStack>
       </View>

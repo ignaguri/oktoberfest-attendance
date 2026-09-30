@@ -16,7 +16,7 @@ import { useCallback, useState } from "react";
 import { Alert, Linking, Platform, RefreshControl, ScrollView, View } from "react-native";
 
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
@@ -151,7 +151,7 @@ export default function NotificationSettingsScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <Spinner size="large" />
+        <MugLoader />
       </View>
     );
   }

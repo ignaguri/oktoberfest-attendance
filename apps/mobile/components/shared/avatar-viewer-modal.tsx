@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Image, Modal, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { View } from "@/components/ui/view";
 import { Colors } from "@/lib/constants/colors";
 
@@ -40,7 +40,7 @@ export function AvatarViewerModal({ visible, imageUrl, name, onClose }: AvatarVi
       <Pressable className="flex-1 bg-black" onPress={onClose} accessible={false}>
         {isLoading && (
           <View className="absolute inset-0 items-center justify-center">
-            <Spinner size="large" />
+            <MugLoader />
           </View>
         )}
         <Image

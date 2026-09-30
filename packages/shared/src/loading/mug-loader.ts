@@ -1,5 +1,5 @@
 /**
- * The filling-mug loader, shared by both apps' Spinner.
+ * The filling-mug loader, shared by both apps' MugLoader.
  *
  * Two layers, `mug-empty.png` under `mug-full.png` (exported by
  * scripts/glyphs/loader.sh), with the full layer revealed below a wavy
@@ -9,7 +9,7 @@
  * `mug-loader` keyframes in apps/web/styles restate them; keep both in step.
  */
 export const MUG_LOADER = {
-  /** Rendered size of the `large` spinner. Below ~32px the fill is illegible. */
+  /** Default loader size. Below ~28px the fill stops being readable. */
   sizePx: 48,
   /** One fill, hold, drain loop. */
   durationMs: 2400,

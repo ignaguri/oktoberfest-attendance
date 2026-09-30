@@ -17,8 +17,8 @@ import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar"
 import { Button, ButtonText } from "@/components/ui/button";
 import { Checkbox, CheckboxIcon, CheckboxIndicator, CheckboxLabel } from "@/components/ui/checkbox";
 import { HStack } from "@/components/ui/hstack";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Pressable } from "@/components/ui/pressable";
-import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
@@ -113,7 +113,7 @@ export function CompanionPickerSheet({
 
         {isLoading && !options && (
           <VStack className="items-center justify-center py-8">
-            <Spinner size="large" />
+            <MugLoader />
           </VStack>
         )}
 

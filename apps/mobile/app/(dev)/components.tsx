@@ -49,6 +49,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  MugLoader,
   Progress,
   ProgressFilledTrack,
   Select,
@@ -88,7 +89,7 @@ type ComponentType =
   | "cards"
   | "textarea"
   | "progress"
-  | "spinner"
+  | "loaders"
   | "select"
   | "divider"
   | "actionsheet"
@@ -108,7 +109,7 @@ const COMPONENT_OPTIONS: { label: string; value: ComponentType }[] = [
   { label: "Cards", value: "cards" },
   { label: "Textarea", value: "textarea" },
   { label: "Progress", value: "progress" },
-  { label: "Spinner", value: "spinner" },
+  { label: "Loaders", value: "loaders" },
   { label: "Select", value: "select" },
   { label: "Divider", value: "divider" },
   { label: "ActionSheet", value: "actionsheet" },
@@ -499,18 +500,24 @@ const ProgressShowcase = () => (
   </Section>
 );
 
-const SpinnerShowcase = () => (
-  <Section title="Spinner">
+const LoadersShowcase = () => (
+  <Section title="Loaders">
     <VStack space="md">
       <VStack space="xs">
         <Text bold className="text-xs uppercase text-gray-600">
-          Large (filling mug)
+          MugLoader (48, page and section)
         </Text>
-        <Spinner size="large" />
+        <MugLoader />
       </VStack>
       <VStack space="xs">
         <Text bold className="text-xs uppercase text-gray-600">
-          Small
+          MugLoader size 32 (sync pill)
+        </Text>
+        <MugLoader size={32} />
+      </VStack>
+      <VStack space="xs">
+        <Text bold className="text-xs uppercase text-gray-600">
+          Spinner small (inline and buttons)
         </Text>
         <Spinner size="small" className="self-start" />
       </VStack>
@@ -984,8 +991,8 @@ const renderComponent = (component: ComponentType) => {
       return <TextareaShowcase />;
     case "progress":
       return <ProgressShowcase />;
-    case "spinner":
-      return <SpinnerShowcase />;
+    case "loaders":
+      return <LoadersShowcase />;
     case "select":
       return <SelectShowcase />;
     case "divider":

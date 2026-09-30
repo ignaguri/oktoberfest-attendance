@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, RefreshControl, ScrollView, View } from "react-native";
 
-import { Spinner } from "@/components/ui/spinner";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { apiClient } from "@/lib/api-client";
@@ -142,7 +142,7 @@ export default function PhotoPrivacyScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <Spinner size="large" />
+        <MugLoader />
       </View>
     );
   }
