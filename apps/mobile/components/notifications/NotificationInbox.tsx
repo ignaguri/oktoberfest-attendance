@@ -10,6 +10,7 @@ import Swipeable, { type SwipeableMethods } from "react-native-gesture-handler/R
 import Animated, { interpolate, useAnimatedStyle, type SharedValue } from "react-native-reanimated";
 
 import { Pressable } from "@/components/ui/pressable";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors } from "@/lib/constants/colors";
 import { canRenderInboxAvatar } from "@/lib/notifications/inbox-avatar";
@@ -215,7 +216,7 @@ export function NotificationInbox({ onNotificationPress }: NotificationInboxProp
   if (isLoading && !notifications) {
     return (
       <View className="flex-1 items-center justify-center">
-        <ActivityIndicator size="large" color={Colors.primary[500]} />
+        <Spinner size="large" />
       </View>
     );
   }

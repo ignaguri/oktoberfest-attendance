@@ -3,15 +3,15 @@ import { useTranslation } from "@prostcounter/shared/i18n";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { CheckCircle, Users, XCircle } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { ActivityIndicator } from "react-native";
 
 import { useNotificationAsk } from "@/components/notifications/NotificationAskProvider";
 import { Button, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
-import { Colors, IconColors } from "@/lib/constants/colors";
+import { IconColors } from "@/lib/constants/colors";
 
 type JoinStatus = "loading" | "success" | "error" | "already_member";
 
@@ -115,7 +115,7 @@ export default function JoinGroupByTokenScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-background-50 p-6">
         <VStack space="lg" className="items-center">
-          <ActivityIndicator size="large" color={Colors.primary[500]} />
+          <Spinner size="large" />
           <Text className="text-center text-typography-500">{t("groups.deepLink.joining")}</Text>
         </VStack>
       </View>

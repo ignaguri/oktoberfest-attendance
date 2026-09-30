@@ -1,9 +1,10 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { X } from "lucide-react-native";
 import { useState } from "react";
-import { ActivityIndicator, Image, Modal, Pressable } from "react-native";
+import { Image, Modal, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Spinner } from "@/components/ui/spinner";
 import { View } from "@/components/ui/view";
 import { Colors } from "@/lib/constants/colors";
 
@@ -39,7 +40,7 @@ export function AvatarViewerModal({ visible, imageUrl, name, onClose }: AvatarVi
       <Pressable className="flex-1 bg-black" onPress={onClose} accessible={false}>
         {isLoading && (
           <View className="absolute inset-0 items-center justify-center">
-            <ActivityIndicator size="large" color={Colors.white} />
+            <Spinner size="large" />
           </View>
         )}
         <Image

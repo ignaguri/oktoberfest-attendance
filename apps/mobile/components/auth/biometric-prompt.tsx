@@ -1,10 +1,11 @@
 import { Fingerprint, ScanFace } from "lucide-react-native";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
 import { Button, ButtonText } from "@/components/ui/button";
 import { Modal, ModalBackdrop, ModalBody, ModalContent, ModalFooter } from "@/components/ui/modal";
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 
 interface BiometricPromptProps {
@@ -49,7 +50,7 @@ export function BiometricPrompt({
         <ModalBody className="pt-6">
           <View className="items-center">
             {isAuthenticating ? (
-              <ActivityIndicator size="large" color="#F59E0B" className="my-4" />
+              <Spinner size="large" className="my-4" />
             ) : (
               <View className="mb-4 rounded-full bg-primary-100 p-4">
                 <BiometricIcon size={48} className="text-primary-600" />

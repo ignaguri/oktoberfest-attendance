@@ -5,13 +5,13 @@ import { formatLocalized } from "@prostcounter/shared/utils";
 import { buildWrappedStory, resolveWrappedFestivalId } from "@prostcounter/shared/wrapped";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { View } from "react-native";
 
+import { Spinner } from "@/components/ui/spinner";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { StoryShell } from "@/components/wrapped/story/story-shell";
 import { WrappedStateScreen } from "@/components/wrapped/wrapped-state-screen";
-import { Colors } from "@/lib/constants/colors";
 
 export default function WrappedScreen() {
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export default function WrappedScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-wrapped-paper">
         <VStack space="md" className="items-center">
-          <ActivityIndicator size="large" color={Colors.primary[500]} />
+          <Spinner size="large" />
           <Text className="text-base text-wrapped-ink">{t("wrapped.loading")}</Text>
         </VStack>
       </View>

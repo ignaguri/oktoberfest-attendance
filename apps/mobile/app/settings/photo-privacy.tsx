@@ -3,8 +3,9 @@ import { cn } from "@prostcounter/ui";
 import { Eye, EyeOff, Info, Users } from "lucide-react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Alert, RefreshControl, ScrollView, View } from "react-native";
+import { Alert, RefreshControl, ScrollView, View } from "react-native";
 
+import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { apiClient } from "@/lib/api-client";
@@ -141,7 +142,7 @@ export default function PhotoPrivacyScreen() {
   if (isLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-background-50">
-        <ActivityIndicator size="large" color={Colors.primary[500]} />
+        <Spinner size="large" />
       </View>
     );
   }
