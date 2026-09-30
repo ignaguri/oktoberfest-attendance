@@ -1,31 +1,68 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useWrappedFestivals } from "@prostcounter/shared/hooks";
+import { useHighlights, useWrappedFestivals } from "@prostcounter/shared/hooks";
+import { getWrappedHomeState } from "@prostcounter/shared/utils";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useTranslation } from "@/lib/i18n/client";
+import { Trans, useTranslation } from "@/lib/i18n/client";
 
-export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: boolean }) {
+/** Countdown over the festival's last days, then the way into the Wrapped until it's viewed */
+export function WrappedCTA() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
   const { data: festivals, loading } = useWrappedFestivals();
+  const { data: highlights } = useHighlights(currentFestival?.id);
 
   if (loading || !currentFestival) {
     return null;
   }
 
-  const isUnlocked = festivals?.some((festival) => festival.festivalId === currentFestival.id) ?? false;
-
-  if (!isLastDayOfFestival && !isUnlocked) {
+  const state = getWrappedHomeState(currentFestival, new Date(), festivals ?? undefined);
+  if (!state) {
     return null;
   }
 
   const festivalName = currentFestival.name;
+  const teaser = !highlights
+    ? null
+    : highlights.totalDays === 0
+      ? t("wrapped.cta.teaserEmpty")
+      : t("wrapped.cta.teaser", {
+          beers: t("wrapped.story.units.beers", { count: highlights.totalBeers }),
+          days: t("wrapped.cta.days", { count: highlights.totalDays }),
+        });
+
+  if (state.kind === "countdown") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="border border-yellow-300 bg-yellow-50 px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Sparkles className="size-5 shrink-0 text-yellow-600" />
+            <div className="min-w-0 text-left">
+              <p className="text-base font-semibold text-gray-800">
+                <Trans
+                  t={t}
+                  i18nKey="wrapped.cta.countdown"
+                  count={state.daysUntilUnlock}
+                  components={{ when: <span className="font-bold text-yellow-700" /> }}
+                />
+              </p>
+              {teaser && <p className="text-sm text-gray-600">{teaser}</p>}
+            </div>
+          </div>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -40,33 +77,23 @@ export function WrappedCTA({ isLastDayOfFestival }: { isLastDayOfFestival?: bool
               animate={{ rotate: [0, 10, -10, 10, 0], scale: [1, 1.1, 1, 1.1, 1] }}
               transition={{ duration: 2, repeat: 3, repeatDelay: 3 }}
             >
-              <h3 className="text-xl font-bold text-gray-800">
-                {isLastDayOfFestival ? t("wrapped.cta.preparing") : t("wrapped.cta.ready")}
-              </h3>
+              <h3 className="text-xl font-bold text-gray-800">{t("wrapped.cta.ready")}</h3>
             </motion.div>
 
             <p className="text-sm text-gray-600">
-              {isLastDayOfFestival
-                ? t("wrapped.cta.preparingDescription", { festivalName })
-                : t("wrapped.cta.readyDescription", { festivalName })}
+              {t("wrapped.cta.readyDescription", { festivalName })}
             </p>
-
-            {!isLastDayOfFestival && (
-              <Button
-                asChild
-                size="lg"
-                className="bg-yellow-500 font-semibold text-white shadow-md transition-all hover:bg-yellow-600 hover:shadow-lg"
-              >
-                <Link href={`/wrapped?festivalId=${currentFestival.id}`}>
-                  <Sparkles className="mr-2 size-5" />
-                  {t("wrapped.cta.viewButton")}
-                </Link>
-              </Button>
-            )}
-
-            <p className="text-xs text-gray-500">
-              {isLastDayOfFestival ? t("wrapped.cta.preparingFooter") : t("home.wrappedReady.footer")}
-            </p>
+            <Button
+              asChild
+              size="lg"
+              className="bg-yellow-500 font-semibold text-white shadow-md transition-all hover:bg-yellow-600 hover:shadow-lg"
+            >
+              <Link href={`/wrapped?festivalId=${currentFestival.id}`}>
+                <Sparkles className="mr-2 size-5" />
+                {t("wrapped.cta.viewButton")}
+              </Link>
+            </Button>
+            <p className="text-xs text-gray-500">{t("home.wrappedReady.footer")}</p>
           </div>
         </CardContent>
       </Card>

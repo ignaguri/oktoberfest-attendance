@@ -1,41 +1,71 @@
 import { Motion } from "@legendapp/motion";
 import { useFestival } from "@prostcounter/shared/contexts";
-import { useWrappedFestivals } from "@prostcounter/shared/hooks";
-import { useTranslation } from "@prostcounter/shared/i18n";
+import { useHighlights, useWrappedFestivals } from "@prostcounter/shared/hooks";
+import { Trans, useTranslation } from "@prostcounter/shared/i18n";
+import { getWrappedHomeState } from "@prostcounter/shared/utils";
 import { useRouter } from "expo-router";
 import { Sparkles } from "lucide-react-native";
 import { Pressable } from "react-native";
 
 import { Card } from "@/components/ui/card";
+import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
-interface WrappedCTAProps {
-  isLastDayOfFestival?: boolean;
-}
-
-export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
+/** Countdown over the festival's last days, then the way into the Wrapped until it's viewed */
+export function WrappedCTA() {
   const { t } = useTranslation();
   const router = useRouter();
   const { currentFestival } = useFestival();
   const { data: festivals, loading } = useWrappedFestivals();
+  const { data: highlights } = useHighlights(currentFestival?.id);
 
-  // Don't show if loading or no current festival
   if (loading || !currentFestival) {
     return null;
   }
 
-  const isUnlocked =
-    festivals?.some((festival) => festival.festivalId === currentFestival.id) ?? false;
-
-  // Don't show if not last day and access not allowed
-  if (!isLastDayOfFestival && !isUnlocked) {
+  const state = getWrappedHomeState(currentFestival, new Date(), festivals ?? undefined);
+  if (!state) {
     return null;
   }
 
   const festivalName = currentFestival.name;
-  const isReady = !isLastDayOfFestival && isUnlocked;
+  const teaser = !highlights
+    ? null
+    : highlights.totalDays === 0
+      ? t("wrapped.cta.teaserEmpty")
+      : t("wrapped.cta.teaser", {
+          beers: t("wrapped.story.units.beers", { count: highlights.totalBeers }),
+          days: t("wrapped.cta.days", { count: highlights.totalDays }),
+        });
+
+  if (state.kind === "countdown") {
+    return (
+      <Motion.View
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "timing", duration: 500 }}
+      >
+        <Card size="md" className="border border-yellow-300 bg-yellow-50 p-3">
+          <HStack space="md" className="items-center">
+            <Sparkles size={20} color={IconColors.default} />
+            <VStack className="flex-1">
+              <Text className="text-base font-semibold text-gray-800">
+                <Trans
+                  t={t}
+                  i18nKey="wrapped.cta.countdown"
+                  count={state.daysUntilUnlock}
+                  components={{ when: <Text className="font-bold text-yellow-700" /> }}
+                />
+              </Text>
+              {teaser && <Text className="text-sm text-gray-600">{teaser}</Text>}
+            </VStack>
+          </HStack>
+        </Card>
+      </Motion.View>
+    );
+  }
 
   return (
     <Motion.View
@@ -52,28 +82,23 @@ export function WrappedCTA({ isLastDayOfFestival }: WrappedCTAProps) {
           <Sparkles size={28} color={IconColors.default} />
 
           <Text className="text-center text-lg font-bold text-gray-800">
-            {isReady ? t("wrapped.cta.ready") : t("wrapped.cta.preparing")}
+            {t("wrapped.cta.ready")}
           </Text>
 
           <Text className="text-center text-sm text-gray-600">
-            {isReady
-              ? t("wrapped.cta.readyDescription", { festivalName })
-              : t("wrapped.cta.preparingDescription", { festivalName })}
+            {t("wrapped.cta.readyDescription", { festivalName })}
           </Text>
-
-          {isReady && (
-            <Pressable
-              onPress={() =>
-                router.push({ pathname: "/wrapped", params: { festivalId: currentFestival.id } })
-              }
-              className="mt-1 rounded-lg bg-yellow-500 px-6 py-3"
-              accessibilityLabel={t("wrapped.cta.viewButton")}
-              accessibilityHint={t("profile.wrappedArchive.openHint")}
-              accessibilityRole="button"
-            >
-              <Text className="font-semibold text-white">{t("wrapped.cta.viewButton")}</Text>
-            </Pressable>
-          )}
+          <Pressable
+            onPress={() =>
+              router.push({ pathname: "/wrapped", params: { festivalId: currentFestival.id } })
+            }
+            className="mt-1 rounded-lg bg-yellow-500 px-6 py-3"
+            accessibilityLabel={t("wrapped.cta.viewButton")}
+            accessibilityHint={t("profile.wrappedArchive.openHint")}
+            accessibilityRole="button"
+          >
+            <Text className="font-semibold text-white">{t("wrapped.cta.viewButton")}</Text>
+          </Pressable>
         </VStack>
       </Card>
     </Motion.View>

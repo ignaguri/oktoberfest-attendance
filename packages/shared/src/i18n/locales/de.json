@@ -1541,7 +1541,12 @@
     "wrappedArchive": {
       "title": "Deine Rückblicke",
       "new": "Neu",
-      "openHint": "Öffnet deinen Rückblick für dieses Festival"
+      "openHint": "Öffnet deinen Rückblick für dieses Festival",
+      "row_one": "Deine Rückblicke · {{count}} Festival",
+      "row_other": "Deine Rückblicke · {{count}} Festivals",
+      "newCount_one": "{{count}} neu",
+      "newCount_other": "{{count}} neu",
+      "listHint": "Öffnet die Liste deiner Rückblicke"
     },
     "pageTitle": "dein Profil",
     "appleWatch": {
@@ -3081,12 +3086,15 @@
       }
     },
     "cta": {
-      "preparingFooter": "Vergiss nicht, deinen letzten Tag einzutragen! 📝",
       "ready": "Dein Rückblick ist fertig!",
-      "preparing": "Dein Festival wird zusammengefasst!",
       "readyDescription": "Siehe deine personalisierte {{festivalName}}-Geschichte",
-      "preparingDescription": "Wir bereiten deine personalisierte {{festivalName}}-Geschichte vor. Lade deine letzte Teilnahme hoch!",
-      "viewButton": "Deinen Rückblick ansehen"
+      "viewButton": "Deinen Rückblick ansehen",
+      "countdown_one": "Dein Rückblick kommt <when>morgen</when>",
+      "countdown_other": "Dein Rückblick kommt <when>in {{count}} Tagen</when>",
+      "teaser": "Bisher {{beers}} an {{days}}. Weiter so!",
+      "teaserEmpty": "Trag einen Tag ein, damit du einen Rückblick bekommst",
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tagen"
     },
     "intro": {
       "title": "Festival-Rückblick",

@@ -269,6 +269,47 @@ export class NotificationService {
   }
 
   /**
+   * The "your Wrapped is ready" push, sent by the daily cron on unlock day to
+   * everyone who attended the festival. Same chunking, dedup and failure
+   * handling as notifyFestivalOpening.
+   */
+  async notifyWrappedReady(
+    recipientIds: string[],
+    festival: { id: string; name: string },
+  ): Promise<void> {
+    const BULK_TRIGGER_LIMIT = 100;
+    const totalChunks = Math.ceil(recipientIds.length / BULK_TRIGGER_LIMIT);
+    let failedChunkCount = 0;
+
+    for (let chunkStart = 0; chunkStart < recipientIds.length; chunkStart += BULK_TRIGGER_LIMIT) {
+      const chunk = recipientIds.slice(chunkStart, chunkStart + BULK_TRIGGER_LIMIT);
+      try {
+        await this.novu.triggerBulk({
+          events: chunk.map((userId) => ({
+            workflowId: NOTIFICATION_WORKFLOWS.WRAPPED_READY,
+            to: userId,
+            transactionId: `wrapped-ready:${festival.id}:${userId}`,
+            payload: {
+              type: "wrapped-ready",
+              festivalId: festival.id,
+              festivalName: festival.name,
+              title: `Your ${festival.name} Wrapped is here 🍻`,
+              body: "Your persona, your top tent and your numbers. Tap to open it.",
+            },
+          })),
+        });
+      } catch (error) {
+        reportNotificationException("notifyWrappedReady", error as Error);
+        failedChunkCount += 1;
+      }
+    }
+
+    if (failedChunkCount > 0) {
+      throw new Error(`Wrapped ready push failed for ${failedChunkCount} of ${totalChunks} chunk(s)`);
+    }
+  }
+
+  /**
    * Notify group admin when someone joins their group
    */
   async notifyGroupJoin(groupId: string, newUserId: string): Promise<void> {

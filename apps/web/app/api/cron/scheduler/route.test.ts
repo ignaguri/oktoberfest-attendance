@@ -15,6 +15,13 @@ vi.mock("./festival-opening", () => ({
     processFestivalOpeningNotifications(...args),
 }));
 
+const processWrappedReadyNotifications = vi.fn().mockResolvedValue(undefined);
+
+vi.mock("./wrapped-ready", () => ({
+  processWrappedReadyNotifications: (...args: unknown[]) =>
+    processWrappedReadyNotifications(...args),
+}));
+
 const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
 const eq = vi.fn(() => ({ maybeSingle }));
 const select = vi.fn(() => ({ eq }));
@@ -52,6 +59,21 @@ describe("cron scheduler route", () => {
       expect(processReservationNotifications).toHaveBeenCalledTimes(1);
       expect(processAchievementNotifications).toHaveBeenCalledTimes(1);
       expect(processFestivalOpeningNotifications).toHaveBeenCalledTimes(1);
+      expect(processWrappedReadyNotifications).toHaveBeenCalledTimes(1);
+    });
+
+    it("returns 500 when the Wrapped ready job throws", async () => {
+      vi.stubEnv("CRON_SECRET", "test-secret");
+      processWrappedReadyNotifications.mockRejectedValueOnce(new Error("novu down"));
+      const { GET } = await import("./route");
+
+      const res = await GET(
+        new Request("http://localhost/api/cron/scheduler", {
+          headers: { authorization: "Bearer test-secret" },
+        }),
+      );
+
+      expect(res.status).toBe(500);
     });
 
     it("returns 401 and runs no jobs when no authorization header is sent", async () => {

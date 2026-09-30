@@ -34,6 +34,7 @@ export const NOTIFICATION_WORKFLOWS = {
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
   PHOTO_REACTION: "photo-reaction",
   PHOTO_TAG: "photo-tag",
+  WRAPPED_READY: "wrapped-ready",
 } as const;
 
 export type NotificationWorkflowId =
@@ -62,6 +63,7 @@ export const NOTIFICATION_PUSH_TYPES = {
   GROUP_INVITATION_ACCEPTED: "group-invitation-accepted",
   PHOTO_REACTION: "photo-reaction",
   PHOTO_TAG: "photo-tag",
+  WRAPPED_READY: "wrapped-ready",
 } as const;
 
 export type NotificationPushType =
@@ -184,6 +186,9 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
       // person's "Photos of you" strip on Social does
       case NOTIFICATION_PUSH_TYPES.PHOTO_TAG:
         return payload.groupId ? buildGalleryRoute(payload.groupId, payload.photoId) : "/groups";
+
+      case NOTIFICATION_PUSH_TYPES.WRAPPED_READY:
+        return payload.festivalId ? `/wrapped?festivalId=${payload.festivalId}` : "/wrapped";
     }
   }
 
