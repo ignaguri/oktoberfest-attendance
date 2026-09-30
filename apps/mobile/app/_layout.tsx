@@ -24,6 +24,7 @@ import { NotificationAskProvider } from "@/components/notifications/Notification
 import { NotificationPermissionPrompt } from "@/components/notifications/NotificationPermissionPrompt";
 import { NovuAutoSubscriber } from "@/components/notifications/NovuAutoSubscriber";
 import { FestivalSwitchPrompt } from "@/components/shared/festival-switch-prompt";
+import { AndroidBrandedSplash, hideNativeSplash } from "@/components/splash/android-branded-splash";
 import { SyncStatusBar } from "@/components/sync";
 import { TutorialOverlay } from "@/components/tutorial";
 import { GluestackUIProvider } from "@/components/ui";
@@ -425,15 +426,25 @@ export default function RootLayout() {
         logger.error("Failed to initialize app", { error });
       } finally {
         setIsReady(true);
-        if (Platform.OS !== "web") {
-          const SplashScreen = require("expo-splash-screen");
-          SplashScreen.hideAsync().catch(() => {});
+        // Android hides the native splash from AndroidBrandedSplash once the poster is drawn
+        if (Platform.OS === "ios") {
+          hideNativeSplash();
         }
       }
     }
 
     prepare();
   }, []);
+
+  // Safety net: never leave the native splash up if the branded overlay fails to
+  // mount. Only starts once the tree renders, so it can't expose the blank root.
+  useEffect(() => {
+    if (Platform.OS !== "android" || !isReady) {
+      return;
+    }
+    const fallbackTimerId = setTimeout(hideNativeSplash, 4000);
+    return () => clearTimeout(fallbackTimerId);
+  }, [isReady]);
 
   // Setup notification listeners
   useEffect(() => {
@@ -554,6 +565,7 @@ export default function RootLayout() {
                                           {/* Last so confetti paints over the sync pill; it is
                                               inset-0 but pointerEvents="none", so it blocks nothing. */}
                                           <UnlockToastHost />
+                                          <AndroidBrandedSplash />
                                         </NavigationGuard>
                                       </NotificationAskProvider>
                                     </LocationProvider>

@@ -99,6 +99,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         backgroundColor: "#FBBF24",
         resizeMode: "cover",
         enableFullScreenImage_legacy: true,
+        // Android 12+ shows the image as a small circular icon and ignores
+        // resizeMode, so the full-screen poster shrinks to a speck. Use a padded icon.
+        android: {
+          image: "./assets/images/splash-icon-android.png",
+          backgroundColor: "#FBBF24",
+          imageWidth: 288,
+          resizeMode: "contain",
+        },
       },
     ],
     "expo-router",
