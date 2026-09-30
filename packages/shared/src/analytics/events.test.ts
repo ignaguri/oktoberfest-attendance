@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   EVENT_NAMES,
+  EVENT_PROPS_SCHEMAS,
   MAX_EVENT_PROPS_CHARS,
   parseTrackedEvent,
   RecordEventsBodySchema,
@@ -55,6 +56,7 @@ describe("parseTrackedEvent", () => {
         "empty_state_seen",
         "error_shown",
         "notification_opened",
+        "persona_collection_opened",
         "prompt_answered",
         "screen_viewed",
         "sheet_abandoned",
@@ -85,5 +87,17 @@ describe("toEventCode", () => {
     expect(toEventCode("not-found")).toBe("NOT_FOUND");
     expect(toEventCode(undefined)).toBe("UNKNOWN");
     expect(toEventCode("x".repeat(80))).toHaveLength(40);
+  });
+});
+
+describe("persona_collection_opened", () => {
+  it("accepts the three entry points and nothing else", () => {
+    expect(EVENT_PROPS_SCHEMAS.persona_collection_opened.safeParse({ source: "prost_slide" }).success).toBe(true);
+    expect(EVENT_PROPS_SCHEMAS.persona_collection_opened.safeParse({ source: "archive" }).success).toBe(true);
+    expect(EVENT_PROPS_SCHEMAS.persona_collection_opened.safeParse({ source: "profile" }).success).toBe(true);
+    expect(EVENT_PROPS_SCHEMAS.persona_collection_opened.safeParse({ source: "home" }).success).toBe(false);
+    expect(
+      EVENT_PROPS_SCHEMAS.persona_collection_opened.safeParse({ source: "profile", personaId: "x" }).success,
+    ).toBe(false);
   });
 });
