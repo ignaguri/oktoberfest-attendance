@@ -27,6 +27,10 @@ export const MUG_LOADER = {
   /** Wave period as a fraction of the frame width, and its half-height as a fraction of the frame height. */
   wavePeriod: 0.6,
   waveAmplitude: 0.0375,
-  /** Whole wave periods the surface drifts sideways per loop, so the loop is seamless. */
+  /**
+   * Whole wave periods the surface drifts sideways per loop (half while
+   * filling, half while draining), so the loop is seamless.
+   * The CSS keyframes restate it as the -300% end position.
+   */
   waveDriftPeriods: 2,
 } as const;

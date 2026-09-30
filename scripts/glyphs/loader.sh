@@ -12,7 +12,7 @@ WEB="../../apps/web/public/loading"
 mkdir -p "$MOBILE" "$WEB"
 
 magick "$SRC" -strip "$MOBILE/mug-full.png"
-python3 mug-empty.py "$MOBILE/mug-full.png" "$MOBILE/mug-empty.png"
+uv run --with pillow python mug-empty.py "$MOBILE/mug-full.png" "$MOBILE/mug-empty.png"
 magick "$MOBILE/mug-empty.png" -strip "$MOBILE/mug-empty.png"
 cp "$MOBILE/mug-full.png" "$MOBILE/mug-empty.png" "$WEB/"
 echo "exported loader mug to both apps"

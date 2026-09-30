@@ -30,7 +30,7 @@ const Spinner = React.forwardRef<
   // keeps the native spinner, since the mug is illegible that small and its art
   // cannot take `color`.
   if (size === "large") {
-    return <MugLoader className={className} />;
+    return <MugLoader className={className} aria-label={ariaLabel} />;
   }
 
   return (

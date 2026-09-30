@@ -9,6 +9,7 @@ import {
 } from "@shopify/react-native-skia";
 import { cssInterop } from "nativewind";
 import React, { useEffect } from "react";
+import { View } from "react-native";
 import {
   cancelAnimation,
   Easing,
@@ -23,6 +24,7 @@ cssInterop(Canvas, { className: "style" });
 const SIZE = MUG_LOADER.sizePx;
 const PERIOD = MUG_LOADER.wavePeriod * SIZE;
 const AMPLITUDE = MUG_LOADER.waveAmplitude * SIZE;
+const HALF_DRIFT = MUG_LOADER.waveDriftPeriods / 2;
 const [X1, Y1, X2, Y2] = MUG_LOADER.easing;
 const ease = Easing.bezierFn(X1, Y1, X2, Y2);
 
@@ -35,7 +37,13 @@ const FULL_SOURCE = require("@/assets/loading/mug-full.png");
  * drains once per loop (timing and geometry in MUG_LOADER). The two PNGs are
  * exported by scripts/glyphs/loader.sh and are pixel aligned.
  */
-export function MugLoader({ className }: { className?: string }) {
+export function MugLoader({
+  className,
+  "aria-label": ariaLabel,
+}: {
+  className?: string;
+  "aria-label"?: string;
+}) {
   const reduceMotion = useReducedMotion();
   const empty = useImage(EMPTY_SOURCE);
   const full = useImage(FULL_SOURCE);
@@ -57,21 +65,22 @@ export function MugLoader({ className }: { className?: string }) {
     "worklet";
     const p = progress.get();
     const { fullAt, drainAt, emptySurface, fullSurface } = MUG_LOADER;
-    // level runs empty -> full -> hold -> empty; drift moves the wave one
-    // period while filling and one while draining, so the loop is seamless
+    // level runs empty -> full -> hold -> empty; drift moves the wave half of
+    // waveDriftPeriods while filling and half while draining, so the loop is
+    // seamless
     let level: number;
     let drift: number;
     if (p < fullAt) {
       const t = ease(p / fullAt);
       level = emptySurface + (fullSurface - emptySurface) * t;
-      drift = t;
+      drift = t * HALF_DRIFT;
     } else if (p < drainAt) {
       level = fullSurface;
-      drift = 1;
+      drift = HALF_DRIFT;
     } else {
       const t = ease((p - drainAt) / (1 - drainAt));
       level = fullSurface + (emptySurface - fullSurface) * t;
-      drift = 1 + t;
+      drift = HALF_DRIFT * (1 + t);
     }
     const y = level * SIZE;
     let x = -((drift * PERIOD) % PERIOD) - PERIOD;
@@ -86,20 +95,23 @@ export function MugLoader({ className }: { className?: string }) {
     builder.close();
   });
 
-  if (reduceMotion) {
-    return (
-      <Canvas className={cn("size-12", className)}>
-        {full && <SkiaImage image={full} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />}
-      </Canvas>
-    );
-  }
-
+  // Accessibility lives on a plain View: Skia's native view on Android does not
+  // expose aria-label/role to TalkBack.
   return (
-    <Canvas className={cn("size-12", className)}>
-      {empty && <SkiaImage image={empty} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />}
-      <Group clip={surface}>
-        {full && <SkiaImage image={full} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />}
-      </Group>
-    </Canvas>
+    <View
+      className={cn("size-12", className)}
+      accessible
+      role="progressbar"
+      aria-label={ariaLabel}
+    >
+      <Canvas className="size-12">
+        {!reduceMotion && empty && (
+          <SkiaImage image={empty} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />
+        )}
+        <Group clip={reduceMotion ? undefined : surface}>
+          {full && <SkiaImage image={full} x={0} y={0} width={SIZE} height={SIZE} fit="contain" />}
+        </Group>
+      </Canvas>
+    </View>
   );
 }
