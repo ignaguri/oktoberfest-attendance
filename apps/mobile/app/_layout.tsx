@@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from "react";
 import { Linking, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { vexo } from "vexo-analytics";
 
 import { UnlockToastHost } from "@/components/achievements/unlock-toast-host";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -82,7 +83,6 @@ if (Platform.OS !== "web") {
 
 // Initialize Vexo analytics (native only, production only)
 if (Platform.OS !== "web" && !__DEV__) {
-  const { vexo } = require("vexo-analytics");
   const vexoApiKey = process.env.EXPO_PUBLIC_VEXO_API_KEY;
   if (vexoApiKey) {
     vexo(vexoApiKey);
