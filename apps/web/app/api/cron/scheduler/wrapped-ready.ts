@@ -11,8 +11,8 @@ import { listOptedOutUserIds } from "./preferences";
 // Supabase caps a single response at max_rows=1000
 const ATTENDANCE_PAGE_SIZE = 1000;
 
-function dayAfter(date: string): string {
-  return format(addDays(parseISO(date), 1), "yyyy-MM-dd");
+function shiftDays(date: string, days: number): string {
+  return format(addDays(parseISO(date), days), "yyyy-MM-dd");
 }
 
 /** Everyone with at least one attendance at the festival; null when it can't be read. */
@@ -61,9 +61,14 @@ export async function processWrappedReadyNotifications(
   notifications: NotificationService,
   now: Date,
 ) {
+  // A local date is within a day of the UTC one, so unlocking today (end_date + 1
+  // locally) means end_date falls in the last two UTC days
+  const utcToday = now.toISOString().slice(0, 10);
   const { data: festivals, error: festivalsError } = await supabase
     .from("festivals")
-    .select("id, name, end_date, timezone");
+    .select("id, name, end_date, timezone")
+    .gte("end_date", shiftDays(utcToday, -2))
+    .lte("end_date", utcToday);
 
   if (festivalsError) {
     logger.error(
@@ -71,11 +76,12 @@ export async function processWrappedReadyNotifications(
       logger.apiRoute("cron/scheduler"),
       festivalsError,
     );
-    return;
+    throw new Error("Wrapped ready push could not load festivals");
   }
 
   const unlockedToday = (festivals ?? []).filter(
-    (festival) => dayAfter(festival.end_date) === formatDateForDatabase(now, festival.timezone),
+    (festival) =>
+      shiftDays(festival.end_date, 1) === formatDateForDatabase(now, festival.timezone),
   );
 
   if (unlockedToday.length === 0) {
@@ -85,7 +91,7 @@ export async function processWrappedReadyNotifications(
   // Preferences can't be read: skip rather than notify people who opted out.
   const optedOutUserIds = await listOptedOutUserIds(supabase, "Wrapped ready push");
   if (!optedOutUserIds) {
-    return;
+    throw new Error("Wrapped ready push could not load notification preferences");
   }
   const optedOutUserIdSet = new Set(optedOutUserIds);
 
@@ -94,6 +100,7 @@ export async function processWrappedReadyNotifications(
   for (const festival of unlockedToday) {
     const attendeeIds = await listAttendeeIds(supabase, festival.id);
     if (!attendeeIds) {
+      failedFestivalCount += 1;
       continue;
     }
     const recipientIds = attendeeIds.filter((userId) => !optedOutUserIdSet.has(userId));

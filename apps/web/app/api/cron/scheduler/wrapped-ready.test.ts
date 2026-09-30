@@ -19,6 +19,7 @@ type Page = { data: Record<string, unknown>[] | null; error: unknown };
 // consumes the next page for that table, in order.
 function createMockSupabase(options: {
   festivals: (typeof oktoberfest)[];
+  festivalsError?: unknown;
   attendancePages: Page[];
   optedOutPages?: Page[];
 }) {
@@ -27,11 +28,18 @@ function createMockSupabase(options: {
     user_notification_preferences: options.optedOutPages ?? [{ data: [], error: null }],
   };
   const pageIndexByTable: Record<string, number> = {};
+  const festivalsLte = vi.fn().mockResolvedValue({
+    data: options.festivalsError ? null : options.festivals,
+    error: options.festivalsError ?? null,
+  });
+  const festivalsGte = vi.fn().mockReturnValue({ lte: festivalsLte });
 
   return {
+    festivalsGte,
+    festivalsLte,
     from: vi.fn((table: string) => {
       if (table === "festivals") {
-        return { select: vi.fn().mockResolvedValue({ data: options.festivals, error: null }) };
+        return { select: vi.fn().mockReturnValue({ gte: festivalsGte }) };
       }
       const range = vi.fn().mockImplementation(() => {
         const index = pageIndexByTable[table] ?? 0;
@@ -129,7 +137,26 @@ describe("processWrappedReadyNotifications", () => {
     expect(recipientIds).toContain("late-user");
   });
 
-  it("notifies nobody when preferences can't be read", async () => {
+  it("only asks for festivals that could unlock today in some timezone", async () => {
+    const supabase = createMockSupabase({ festivals: [], attendancePages: [] });
+
+    await run(supabase, createMockNotifications(), "2026-10-05T09:00:00Z");
+
+    expect(supabase.festivalsGte).toHaveBeenCalledWith("end_date", "2026-10-03");
+    expect(supabase.festivalsLte).toHaveBeenCalledWith("end_date", "2026-10-05");
+  });
+
+  it("rejects when festivals can't be read", async () => {
+    const supabase = createMockSupabase({
+      festivals: [],
+      festivalsError: { message: "boom" },
+      attendancePages: [],
+    });
+
+    await expect(run(supabase, createMockNotifications(), "2026-10-05T09:00:00Z")).rejects.toThrow();
+  });
+
+  it("notifies nobody and rejects when preferences can't be read", async () => {
     const supabase = createMockSupabase({
       festivals: [oktoberfest],
       attendancePages: [{ data: [{ user_id: "u1" }], error: null }],
@@ -137,9 +164,27 @@ describe("processWrappedReadyNotifications", () => {
     });
     const notifications = createMockNotifications();
 
-    await run(supabase, notifications, "2026-10-05T09:00:00Z");
-
+    await expect(run(supabase, notifications, "2026-10-05T09:00:00Z")).rejects.toThrow();
     expect(notifications.notifyWrappedReady).not.toHaveBeenCalled();
+  });
+
+  it("still notifies later festivals when one festival's attendees can't be read, then rejects", async () => {
+    const otherFestival = { ...oktoberfest, id: "fest-other", name: "Other Fest" };
+    const supabase = createMockSupabase({
+      festivals: [oktoberfest, otherFestival],
+      attendancePages: [
+        { data: null, error: { message: "boom" } },
+        { data: [{ user_id: "u2" }], error: null },
+      ],
+    });
+    const notifications = createMockNotifications();
+
+    await expect(run(supabase, notifications, "2026-10-05T09:00:00Z")).rejects.toThrow();
+    expect(notifications.notifyWrappedReady).toHaveBeenCalledTimes(1);
+    expect(notifications.notifyWrappedReady).toHaveBeenCalledWith(["u2"], {
+      id: "fest-other",
+      name: "Other Fest",
+    });
   });
 
   it("still notifies later festivals when one send fails, then rejects", async () => {
