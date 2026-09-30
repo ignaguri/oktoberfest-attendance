@@ -40,6 +40,12 @@ export function AndroidBrandedSplash() {
     return () => clearTimeout(minTimerId);
   }, [isPosterLoaded]);
 
+  // Fail open: without a poster there is nothing to show, so reveal the app
+  const handlePosterError = () => {
+    hideNativeSplash();
+    setIsDismissed(true);
+  };
+
   const canDismiss = isPosterLoaded && hasMinTimeElapsed && !isLoading;
 
   useEffect(() => {
@@ -69,7 +75,8 @@ export function AndroidBrandedSplash() {
           alt=""
           resizeMode="cover"
           className="h-full w-full"
-          onLoadEnd={() => setIsPosterLoaded(true)}
+          onLoad={() => setIsPosterLoaded(true)}
+          onError={handlePosterError}
         />
       </Animated.View>
     </View>
