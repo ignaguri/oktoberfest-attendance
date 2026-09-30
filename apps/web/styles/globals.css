@@ -416,3 +416,67 @@
     linear-gradient(45deg, transparent 75%, rgb(58 122 196 / 0.1) 75%);
   background-size: 28px 28px;
 }
+
+/* Filling-mug loader (components/ui/mug-loader.tsx).
+ *
+ * The full mug is revealed over the empty one below a wavy surface, masked by a
+ * wave SVG twice the element's height. With mask-size 200% the surface sits at
+ * (1 - y) of the height for mask-position-y = y, and x = -150% moves it one wave
+ * period (60% of the width) sideways. These restate MUG_LOADER in
+ * packages/shared/src/loading/mug-loader.ts: empty 0.84 -> 16%, full 0.04 -> 96%,
+ * full at 50%, drain from 70%, 2400ms, two periods of drift per loop. */
+.mug-loader {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+
+.mug-loader::before,
+.mug-loader::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.mug-loader::before {
+  background-image: url("/loading/mug-empty.png");
+}
+
+.mug-loader::after {
+  background-image: url("/loading/mug-full.png");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 400' preserveAspectRatio='none'%3E%3Cpath d='M0 200 Q50 185 100 200 T200 200 V400 H0Z'/%3E%3C/svg%3E");
+  mask-repeat: repeat-x;
+  mask-size: 60% 200%;
+  animation: mug-loader 2400ms cubic-bezier(0.45, 0, 0.35, 1) infinite;
+}
+
+@keyframes mug-loader {
+  0% {
+    mask-position: 0% 16%;
+  }
+  50%,
+  70% {
+    mask-position: -150% 96%;
+  }
+  100% {
+    mask-position: -300% 16%;
+  }
+}
+
+@keyframes mug-loader-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mug-loader::after {
+    mask-image: none;
+    animation: mug-loader-pulse 1600ms ease-in-out infinite;
+  }
+}

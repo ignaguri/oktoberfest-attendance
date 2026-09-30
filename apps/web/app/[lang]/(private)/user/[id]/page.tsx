@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AvatarViewerDialog } from "@/components/ui/avatar-viewer-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { FriendshipBadge } from "@/components/ui/profile-preview";
 import { useTranslation } from "@/lib/i18n/client";
 import { getAvatarUrl } from "@/lib/utils";
@@ -97,7 +98,7 @@ export default function UserProfilePage() {
   if (loading) {
     return (
       <div className="container mx-auto flex justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+        <MugLoader />
       </div>
     );
   }

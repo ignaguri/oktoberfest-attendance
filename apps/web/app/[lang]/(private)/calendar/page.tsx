@@ -1,10 +1,10 @@
 "use client";
 
 import { useFestival } from "@prostcounter/shared/contexts";
-import { Loader2 } from "lucide-react";
 
 import { EventCalendar } from "@/components/calendar/EventCalendar";
 import { ReservationDialog } from "@/components/reservations/ReservationDialog";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { usePersonalCalendar } from "@/hooks/useCalendar";
 import { useTranslation } from "@/lib/i18n/client";
 
@@ -20,7 +20,7 @@ export default function PersonalCalendarPage() {
   if (isLoading) {
     return (
       <div className="container flex min-h-[50vh] flex-col items-center justify-center p-4">
-        <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+        <MugLoader />
         <p className="text-muted-foreground mt-2">{t("calendar.loading")}</p>
       </div>
     );

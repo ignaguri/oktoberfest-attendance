@@ -25,7 +25,7 @@ export default function JoinGroupPage() {
   return (
     <div className="flex min-h-screen items-start justify-center bg-gray-50">
       <div className="text-center">
-        <LoadingSpinner size={32} />
+        <LoadingSpinner />
         <p className="text-gray-600">{t("joinGroup.processing")}</p>
       </div>
     </div>

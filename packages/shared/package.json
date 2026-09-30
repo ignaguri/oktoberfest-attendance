@@ -21,6 +21,7 @@
     "./wrapped/server": "./src/wrapped/server.ts",
     "./wrapped/testing": "./src/wrapped/story/story-fixtures.ts",
     "./achievements": "./src/achievements/index.ts",
+    "./loading": "./src/loading/index.ts",
     "./analytics": "./src/analytics/index.ts",
     "./analytics/react": "./src/analytics/react.tsx"
   },

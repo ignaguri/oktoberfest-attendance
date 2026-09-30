@@ -2,12 +2,12 @@
 
 import { usePlanCompanionOptions } from "@prostcounter/shared/hooks";
 import { PHOTO_TAG_LIMIT } from "@prostcounter/shared/schemas";
-import { Loader2 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { MugLoader } from "@/components/ui/mug-loader";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useTranslation } from "@/lib/i18n/client";
 import { getAvatarUrl } from "@/lib/utils";
@@ -48,7 +48,7 @@ export function PhotoTagPicker({
 
         {loading && !options && (
           <div className="flex justify-center py-6">
-            <Loader2 className="size-6 animate-spin text-gray-400" />
+            <MugLoader />
           </div>
         )}
 
