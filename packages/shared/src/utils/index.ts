@@ -75,6 +75,9 @@ export {
   type FestivalDates,
 } from "./festival-countdown";
 
+// Wrapped Home card and Profile archive
+export { getWrappedHomeState, WRAPPED_COUNTDOWN_DAYS, type WrappedHomeState } from "./wrapped-home";
+
 // Home audience (solo vs social)
 export {
   classifyHomeAudience,
