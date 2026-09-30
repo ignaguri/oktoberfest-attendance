@@ -2845,7 +2845,7 @@
           "because": "Weil dein letztes Getränk meistens gegen {{time}} kam."
         },
         "radlerDiplomat": {
-          "hint": "30 %+ deiner Getränke als Radler oder alkoholfrei",
+          "hint": "30 %+ deiner Getränke als Radler oder alkoholfrei (ab 3 Getränken)",
           "description": "Halbes Bier, voller Spaß.",
           "because": "Weil {{pct}} % deiner Getränke Radler oder alkoholfrei waren."
         },

@@ -2668,7 +2668,7 @@
           "because": "Porque tu última bebida solía llegar cerca de las {{time}}."
         },
         "radlerDiplomat": {
-          "hint": "Que el 30 %+ de tus bebidas sean radler o sin alcohol",
+          "hint": "Que el 30 %+ de tus bebidas sean radler o sin alcohol (3+ bebidas)",
           "description": "Media cerveza, toda la diversión.",
           "because": "Porque el {{pct}} % de tus bebidas fueron Radler o sin alcohol."
         },

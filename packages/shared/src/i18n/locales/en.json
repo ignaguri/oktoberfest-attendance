@@ -2608,7 +2608,7 @@
           "because": "Because your last drink usually came around {{time}}."
         },
         "radlerDiplomat": {
-          "hint": "Make 30%+ of your drinks radler or alcohol-free",
+          "hint": "Make 30%+ of your drinks radler or alcohol-free (3+ drinks)",
           "description": "Half the beer, all the fun.",
           "because": "Because {{pct}}% of your drinks were Radler or alcohol-free."
         },
