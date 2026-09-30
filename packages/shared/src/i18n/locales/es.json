@@ -1364,7 +1364,12 @@
     "wrappedArchive": {
       "title": "Tus resúmenes",
       "new": "Nuevo",
-      "openHint": "Abre tu resumen de este festival"
+      "openHint": "Abre tu resumen de este festival",
+      "row_one": "Tus resúmenes · {{count}} festival",
+      "row_other": "Tus resúmenes · {{count}} festivales",
+      "newCount_one": "{{count}} nuevo",
+      "newCount_other": "{{count}} nuevos",
+      "listHint": "Abre la lista de tus resúmenes"
     },
     "pageTitle": "Tu perfil",
     "appleWatch": {
@@ -2921,7 +2926,13 @@
       "preparing": "¡Preparando tu festival!",
       "readyDescription": "Mirá tu historia personalizada de {{festivalName}}",
       "preparingDescription": "Estamos preparando tu historia personalizada de {{festivalName}}. ¡Subí tu asistencia final!",
-      "viewButton": "Ver Tu Wrapped"
+      "viewButton": "Ver Tu Wrapped",
+      "countdown_one": "Tu Wrapped llega mañana",
+      "countdown_other": "Tu Wrapped llega en {{count}} días",
+      "teaser": "Llevás {{beers}} en {{days}}. ¡Seguí así!",
+      "teaserEmpty": "Registrá un día para tener tu Wrapped",
+      "days_one": "{{count}} día",
+      "days_other": "{{count}} días"
     }
   },
   "reservation": {

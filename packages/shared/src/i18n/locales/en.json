@@ -1304,7 +1304,12 @@
     "wrappedArchive": {
       "title": "Your Wrapped",
       "new": "New",
-      "openHint": "Opens your Wrapped for this festival"
+      "openHint": "Opens your Wrapped for this festival",
+      "row_one": "Your Wrapped · {{count}} festival",
+      "row_other": "Your Wrapped · {{count}} festivals",
+      "newCount_one": "{{count}} new",
+      "newCount_other": "{{count}} new",
+      "listHint": "Opens the list of your Wrapped"
     },
     "pageTitle": "Your Profile",
     "appleWatch": {
@@ -2861,7 +2866,13 @@
       "preparing": "Wrapping up your festival!",
       "readyDescription": "See your personalized {{festivalName}} story",
       "preparingDescription": "We're preparing your personalized {{festivalName}} story. Upload your final attendance!",
-      "viewButton": "View Your Wrapped"
+      "viewButton": "View Your Wrapped",
+      "countdown_one": "Your Wrapped drops tomorrow",
+      "countdown_other": "Your Wrapped drops in {{count}} days",
+      "teaser": "{{beers}} across {{days}} so far. Keep going!",
+      "teaserEmpty": "Log a day to get your Wrapped",
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days"
     }
   },
   "reservation": {
