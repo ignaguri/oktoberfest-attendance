@@ -7,7 +7,7 @@ import {
   xTickIndices,
 } from "@prostcounter/shared/utils";
 import { Line as SkiaLine, matchFont, vec } from "@shopify/react-native-skia";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { type SharedValue, useAnimatedReaction, useDerivedValue } from "react-native-reanimated";
 import Svg, { Circle } from "react-native-svg";
@@ -59,13 +59,17 @@ export function LineChart<K extends string>({
   const allKeys = series.map((line) => line.key);
   const [visibleKeys, setVisibleKeys] = useState<K[]>(allKeys);
   const [pressedIndex, setPressedIndex] = useState<number | null>(null);
+  // Stable across press re-renders: Victory resets the press whenever its data changes identity.
+  const visibleSeries = useMemo(
+    () => series.filter((line) => visibleKeys.includes(line.key)),
+    [series, visibleKeys],
+  );
 
   const shownIndex = readoutIndex(rows.length, pressedIndex);
   if (shownIndex === null) {
     return null;
   }
   const shownRow = rows[shownIndex];
-  const visibleSeries = series.filter((line) => visibleKeys.includes(line.key));
 
   const valueText = (key: K) => {
     if (formatValue) {
@@ -144,13 +148,15 @@ function ChartCanvas<K extends string>({
   const keys: string[] = series.map((line) => line.key);
   const format = series[0]?.format ?? "count";
   const isPercent = format === "percent";
-  const data = rows.map((row, index) => {
-    const point: CanvasPoint = { index };
-    for (const line of series) {
-      point[line.key] = row[line.key];
-    }
-    return point;
-  });
+  // Memoized: CartesianChart resets its press state whenever `data` changes identity.
+  const data = useMemo(
+    (): CanvasPoint[] =>
+      rows.map((row, index) => ({
+        ...Object.fromEntries(series.map((line) => [line.key, row[line.key]])),
+        index,
+      })),
+    [rows, series],
+  );
   const initialY = Object.fromEntries(keys.map((key) => [key, 0])) as Record<string, number>;
   // A count axis with no positive value would collapse to a zero-height scale.
   const hasPositiveValue = data.some((point) => keys.some((key) => (point[key] ?? 0) > 0));
