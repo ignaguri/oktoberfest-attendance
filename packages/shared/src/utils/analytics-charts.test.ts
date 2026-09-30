@@ -8,6 +8,7 @@ import type {
 import {
   COHORT_SERIES,
   cohortChartRows,
+  countTickCount,
   formatChartDayTick,
   formatChartMonthTick,
   formatChartValue,
@@ -265,5 +266,23 @@ describe("axis labels", () => {
   it("keeps a bare year and cuts a name without one", () => {
     expect(shortFestivalLabel("2024")).toBe("2024");
     expect(shortFestivalLabel("Starkbierfest")).toBe("Starkbie");
+  });
+});
+
+describe("countTickCount", () => {
+  it("never asks for fewer than one tick", () => {
+    expect(countTickCount(0)).toBe(1);
+    expect(countTickCount(0.4)).toBe(1);
+    expect(countTickCount(1)).toBe(1);
+  });
+
+  it("gives one tick per whole unit on a small axis", () => {
+    expect(countTickCount(2)).toBe(2);
+    expect(countTickCount(3)).toBe(3);
+  });
+
+  it("caps at the preferred count", () => {
+    expect(countTickCount(12)).toBe(4);
+    expect(countTickCount(12, 6)).toBe(6);
   });
 });

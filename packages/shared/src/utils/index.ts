@@ -156,6 +156,7 @@ export {
   CHART_COLORS,
   COHORT_SERIES,
   cohortChartRows,
+  countTickCount,
   formatChartDayTick,
   formatChartMonthTick,
   formatChartValue,

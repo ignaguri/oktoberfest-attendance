@@ -1,6 +1,7 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   type ChartSeries,
+  countTickCount,
   formatChartValue,
   readoutIndex,
   toggleSeries,
@@ -161,6 +162,10 @@ function ChartCanvas<K extends string>({
   const initialY = Object.fromEntries(keys.map((key) => [key, 0])) as Record<string, number>;
   // A count axis with no positive value would collapse to a zero-height scale.
   const hasPositiveValue = data.some((point) => keys.some((key) => (point[key] ?? 0) > 0));
+  const maxVisibleValue = Math.max(
+    0,
+    ...data.flatMap((point) => keys.map((key) => point[key] ?? 0)),
+  );
   const yDomain: [number] | [number, number] = isPercent || !hasPositiveValue ? [0, 1] : [0];
   const { state, isActive } = useChartPressState({ x: 0, y: initialY });
 
@@ -189,7 +194,7 @@ function ChartCanvas<K extends string>({
       yAxis={[
         {
           font: AXIS_FONT,
-          tickCount: 4,
+          tickCount: format === "count" ? countTickCount(maxVisibleValue) : 4,
           domain: yDomain,
           formatYLabel: (value) => formatChartValue(Number(value), format),
           labelColor: Colors.gray[500],

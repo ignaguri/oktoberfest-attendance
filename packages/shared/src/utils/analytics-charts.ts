@@ -204,6 +204,14 @@ export function toggleSeries<K extends string>(
   return allKeys.filter((candidate) => candidate === key || visible.includes(candidate));
 }
 
+/**
+ * Tick count for a count axis. Counts are whole numbers, so a small axis gets at
+ * most one tick per unit; otherwise d3 picks fractions that round to duplicate labels.
+ */
+export function countTickCount(maxValue: number, preferred = 4): number {
+  return Math.max(1, Math.min(preferred, Math.ceil(maxValue)));
+}
+
 export function formatChartValue(value: number | null, format: ChartYFormat): string {
   if (value === null) {
     return formatPercent(null);
