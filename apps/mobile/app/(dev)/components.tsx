@@ -63,6 +63,7 @@ import {
   SelectTrigger,
   Skeleton,
   SkeletonText,
+  Spinner,
   Switch,
   Text,
   Textarea,
@@ -87,6 +88,7 @@ type ComponentType =
   | "cards"
   | "textarea"
   | "progress"
+  | "spinner"
   | "select"
   | "divider"
   | "actionsheet"
@@ -106,6 +108,7 @@ const COMPONENT_OPTIONS: { label: string; value: ComponentType }[] = [
   { label: "Cards", value: "cards" },
   { label: "Textarea", value: "textarea" },
   { label: "Progress", value: "progress" },
+  { label: "Spinner", value: "spinner" },
   { label: "Select", value: "select" },
   { label: "Divider", value: "divider" },
   { label: "ActionSheet", value: "actionsheet" },
@@ -491,6 +494,25 @@ const ProgressShowcase = () => (
         <Progress value={100} size="xl">
           <ProgressFilledTrack />
         </Progress>
+      </VStack>
+    </VStack>
+  </Section>
+);
+
+const SpinnerShowcase = () => (
+  <Section title="Spinner">
+    <VStack space="md">
+      <VStack space="xs">
+        <Text bold className="text-xs uppercase text-gray-600">
+          Large (filling mug)
+        </Text>
+        <Spinner size="large" />
+      </VStack>
+      <VStack space="xs">
+        <Text bold className="text-xs uppercase text-gray-600">
+          Small
+        </Text>
+        <Spinner size="small" className="self-start" />
       </VStack>
     </VStack>
   </Section>
@@ -962,6 +984,8 @@ const renderComponent = (component: ComponentType) => {
       return <TextareaShowcase />;
     case "progress":
       return <ProgressShowcase />;
+    case "spinner":
+      return <SpinnerShowcase />;
     case "select":
       return <SelectShowcase />;
     case "divider":
