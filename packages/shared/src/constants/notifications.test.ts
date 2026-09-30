@@ -184,3 +184,18 @@ describe("getNotificationRoute for photo tags", () => {
     expect(getNotificationRoute({ taggerName: "user2" })).toBe("/groups");
   });
 });
+
+describe("getNotificationRoute for Wrapped ready", () => {
+  it("opens that festival's Wrapped", () => {
+    expect(
+      getNotificationRoute({
+        type: NOTIFICATION_PUSH_TYPES.WRAPPED_READY,
+        festivalId: "festival-1",
+      }),
+    ).toBe("/wrapped?festivalId=festival-1");
+  });
+
+  it("opens the default Wrapped without a festival", () => {
+    expect(getNotificationRoute({ type: NOTIFICATION_PUSH_TYPES.WRAPPED_READY })).toBe("/wrapped");
+  });
+});
