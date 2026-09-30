@@ -1,6 +1,8 @@
+import { useTrack } from "@prostcounter/shared/analytics/react";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { type StorySlideOf, useStoryCopy } from "@prostcounter/shared/wrapped";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { useCallback } from "react";
 import { Pressable, View } from "react-native";
 
@@ -23,6 +25,13 @@ interface ProstSlideProps {
 export function ProstSlide({ slide, animate, onShare, onReplay, onClose }: ProstSlideProps) {
   const { t } = useTranslation();
   const copy = useStoryCopy();
+  const track = useTrack();
+  const router = useRouter();
+
+  const onSeeAllPress = useCallback(() => {
+    track("persona_collection_opened", { source: "prost_slide" });
+    router.push("/wrapped/personas");
+  }, [track, router]);
 
   const onSharePress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -65,6 +74,15 @@ export function ProstSlide({ slide, animate, onShare, onReplay, onClose }: Prost
           accessibilityHint={t("wrapped.outro.shareHint")}
         >
           <Text className="text-base font-bold text-wrapped-ink">{t("wrapped.outro.share")}</Text>
+        </Pressable>
+        <Pressable
+          onPress={onSeeAllPress}
+          className="items-center px-6 py-1"
+          accessibilityRole="link"
+          accessibilityLabel={t("wrapped.personas.seeAll")}
+          accessibilityHint={t("wrapped.personas.entryHint")}
+        >
+          <Text className="text-sm font-bold text-wrapped-ink underline">{t("wrapped.personas.seeAll")}</Text>
         </Pressable>
         <Pressable
           onPress={onReplay}

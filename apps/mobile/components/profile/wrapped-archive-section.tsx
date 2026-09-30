@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Pressable } from "@/components/ui/pressable";
 import { Text } from "@/components/ui/text";
 import { View } from "@/components/ui/view";
+import { VStack } from "@/components/ui/vstack";
+import { PersonaCollectionEntry } from "@/components/wrapped/personas/persona-collection-entry";
 import { IconColors } from "@/lib/constants/colors";
 
 /** One row for every Wrapped, however many festivals: the list lives on /wrapped/archive */
@@ -29,35 +31,40 @@ export function WrappedArchiveSection() {
       : label;
 
   return (
-    <Card size="md" variant="elevated">
-      <Pressable
-        className="flex-row items-center justify-between"
-        onPress={() =>
-          target.kind === "festival"
-            ? router.push({ pathname: "/wrapped", params: { festivalId: target.festivalId } })
-            : router.push("/wrapped/archive")
-        }
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
-        accessibilityHint={
-          target.kind === "festival"
-            ? t("profile.wrappedArchive.openHint")
-            : t("profile.wrappedArchive.listHint")
-        }
-      >
-        <View className="flex-row items-center gap-3">
-          <Sparkles size={20} color={IconColors.default} />
-          <Text className="font-semibold text-typography-900">{label}</Text>
-          {summary.newCount > 0 ? (
-            <View className="rounded-full bg-primary-500 px-2 py-0.5">
-              <Text className="text-xs font-semibold text-white">
-                {t("profile.wrappedArchive.newCount", { count: summary.newCount })}
-              </Text>
-            </View>
-          ) : null}
-        </View>
-        <ChevronRight size={20} color={IconColors.muted} />
-      </Pressable>
-    </Card>
+    <VStack space="md">
+      <Card size="md" variant="elevated">
+        <Pressable
+          className="flex-row items-center justify-between"
+          onPress={() =>
+            target.kind === "festival"
+              ? router.push({ pathname: "/wrapped", params: { festivalId: target.festivalId } })
+              : router.push("/wrapped/archive")
+          }
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+          accessibilityHint={
+            target.kind === "festival"
+              ? t("profile.wrappedArchive.openHint")
+              : t("profile.wrappedArchive.listHint")
+          }
+        >
+          <View className="flex-row items-center gap-3">
+            <Sparkles size={20} color={IconColors.default} />
+            <Text className="font-semibold text-typography-900">{label}</Text>
+            {summary.newCount > 0 ? (
+              <View className="rounded-full bg-primary-500 px-2 py-0.5">
+                <Text className="text-xs font-semibold text-white">
+                  {t("profile.wrappedArchive.newCount", { count: summary.newCount })}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+          <ChevronRight size={20} color={IconColors.muted} />
+        </Pressable>
+      </Card>
+      <Card size="md" variant="elevated">
+        <PersonaCollectionEntry source="profile" />
+      </Card>
+    </VStack>
   );
 }
