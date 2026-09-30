@@ -181,13 +181,12 @@ export function getNotificationRoute(payload: NotificationPayload): string | nul
       // The group the reaction was made in; its gallery shows the photo
       case NOTIFICATION_PUSH_TYPES.PHOTO_REACTION:
         return payload.groupId ? buildGalleryRoute(payload.groupId, payload.photoId) : "/groups";
-      case NOTIFICATION_PUSH_TYPES.WRAPPED_READY:
-        return payload.festivalId ? `/wrapped?festivalId=${payload.festivalId}` : "/wrapped";
 
       // The tagger's shared group shows the photo; without one, the tagged
       // person's "Photos of you" strip on Social does
       case NOTIFICATION_PUSH_TYPES.PHOTO_TAG:
         return payload.groupId ? buildGalleryRoute(payload.groupId, payload.photoId) : "/groups";
+
       case NOTIFICATION_PUSH_TYPES.WRAPPED_READY:
         return payload.festivalId ? `/wrapped?festivalId=${payload.festivalId}` : "/wrapped";
     }
