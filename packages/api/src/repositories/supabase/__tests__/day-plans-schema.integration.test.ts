@@ -154,7 +154,8 @@ describe("day_plans schema (Local DB)", () => {
         date: dayFromToday(6),
         kind: "reservation",
         tent_id: tent.id,
-        start_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        // Due 5 minutes ago with the 30-minute offset.
+        start_at: new Date(Date.now() + 25 * 60 * 1000).toISOString(),
         status: "pending",
         reminder_offset_minutes: 30,
         auto_checkin: false,
@@ -173,6 +174,59 @@ describe("day_plans schema (Local DB)", () => {
       expect(ids).not.toContain(plan.data!.id);
     });
 
+    it("skips a reservation that has already started", async () => {
+      const started = await insertRow({
+        date: dayFromToday(20),
+        kind: "reservation",
+        tent_id: tent.id,
+        start_at: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+        status: "pending",
+        reminder_offset_minutes: 30,
+        auto_checkin: false,
+      });
+      expect(started.error).toBeNull();
+
+      const { data, error } = await admin.rpc("rpc_due_reservation_reminders", {
+        p_now: new Date().toISOString(),
+      });
+
+      expect(error).toBeNull();
+      expect((data ?? []).map((row) => row.id)).not.toContain(started.data!.id);
+    });
+
+    it("skips an offset of 0 (no reminder) and a reminder long past its due time", async () => {
+      const noReminder = await insertRow({
+        date: dayFromToday(23),
+        kind: "reservation",
+        tent_id: tent.id,
+        start_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        status: "pending",
+        reminder_offset_minutes: 0,
+        auto_checkin: false,
+      });
+      // Due 30 minutes ago (1 day before a start that is ~23.5h away).
+      const overdue = await insertRow({
+        date: dayFromToday(24),
+        kind: "reservation",
+        tent_id: tent.id,
+        start_at: new Date(Date.now() + (1440 - 30) * 60 * 1000).toISOString(),
+        status: "pending",
+        reminder_offset_minutes: 1440,
+        auto_checkin: false,
+      });
+      expect(noReminder.error).toBeNull();
+      expect(overdue.error).toBeNull();
+
+      const { data, error } = await admin.rpc("rpc_due_reservation_reminders", {
+        p_now: new Date().toISOString(),
+      });
+
+      expect(error).toBeNull();
+      const ids = (data ?? []).map((row) => row.id);
+      expect(ids).not.toContain(noReminder.data!.id);
+      expect(ids).not.toContain(overdue.data!.id);
+    });
+
     it("cannot be called with a user token", async () => {
       const { error } = await createTestSupabaseWithAuth(owner.token).rpc(
         "rpc_due_reservation_reminders",
@@ -180,6 +234,44 @@ describe("day_plans schema (Local DB)", () => {
       );
 
       expect(error?.code).toBe("42501");
+    });
+  });
+
+  describe("reservation check-in prompt RPC", () => {
+    it("prompts for a reservation that started recently, not one from hours ago", async () => {
+      await admin
+        .from("user_notification_preferences")
+        .upsert({ user_id: owner.id, reminders_enabled: true }, { onConflict: "user_id" });
+
+      const recent = await insertRow({
+        date: dayFromToday(21),
+        kind: "reservation",
+        tent_id: tent.id,
+        start_at: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+        status: "pending",
+        reminder_offset_minutes: 30,
+        auto_checkin: false,
+      });
+      const stale = await insertRow({
+        date: dayFromToday(22),
+        kind: "reservation",
+        tent_id: tent.id,
+        start_at: new Date(Date.now() - 7 * 60 * 60 * 1000).toISOString(),
+        status: "pending",
+        reminder_offset_minutes: 30,
+        auto_checkin: false,
+      });
+      expect(recent.error).toBeNull();
+      expect(stale.error).toBeNull();
+
+      const { data, error } = await admin.rpc("rpc_due_reservation_prompts", {
+        p_now: new Date().toISOString(),
+      });
+
+      expect(error).toBeNull();
+      const ids = (data ?? []).map((row) => row.id);
+      expect(ids).toContain(recent.data!.id);
+      expect(ids).not.toContain(stale.data!.id);
     });
   });
 

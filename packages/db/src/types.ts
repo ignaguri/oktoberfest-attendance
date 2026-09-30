@@ -3128,6 +3128,7 @@ export type Database = {
         Args: { p_tier: number }
         Returns: Database["public"]["Enums"]["achievement_rarity_enum"]
       }
+      trigger_reservation_notifications: { Args: never; Returns: undefined }
       update_personal_attendance_with_tents: {
         Args: {
           p_attendance_id?: string
