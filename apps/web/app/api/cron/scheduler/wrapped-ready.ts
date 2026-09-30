@@ -89,6 +89,8 @@ export async function processWrappedReadyNotifications(
   }
   const optedOutUserIdSet = new Set(optedOutUserIds);
 
+  // Unlock day matches only once, so one festival's failure must not skip the rest
+  let failedFestivalCount = 0;
   for (const festival of unlockedToday) {
     const attendeeIds = await listAttendeeIds(supabase, festival.id);
     if (!attendeeIds) {
@@ -98,6 +100,19 @@ export async function processWrappedReadyNotifications(
     if (recipientIds.length === 0) {
       continue;
     }
-    await notifications.notifyWrappedReady(recipientIds, { id: festival.id, name: festival.name });
+    try {
+      await notifications.notifyWrappedReady(recipientIds, {
+        id: festival.id,
+        name: festival.name,
+      });
+    } catch {
+      failedFestivalCount += 1;
+    }
+  }
+
+  if (failedFestivalCount > 0) {
+    throw new Error(
+      `Wrapped ready push failed for ${failedFestivalCount} of ${unlockedToday.length} festival(s)`,
+    );
   }
 }

@@ -142,6 +142,26 @@ describe("processWrappedReadyNotifications", () => {
     expect(notifications.notifyWrappedReady).not.toHaveBeenCalled();
   });
 
+  it("still notifies later festivals when one send fails, then rejects", async () => {
+    const otherFestival = { ...oktoberfest, id: "fest-other", name: "Other Fest" };
+    const supabase = createMockSupabase({
+      festivals: [oktoberfest, otherFestival],
+      attendancePages: [
+        { data: [{ user_id: "u1" }], error: null },
+        { data: [{ user_id: "u2" }], error: null },
+      ],
+    });
+    const notifications = createMockNotifications();
+    notifications.notifyWrappedReady.mockRejectedValueOnce(new Error("novu unavailable"));
+
+    await expect(run(supabase, notifications, "2026-10-05T09:00:00Z")).rejects.toThrow();
+    expect(notifications.notifyWrappedReady).toHaveBeenCalledTimes(2);
+    expect(notifications.notifyWrappedReady).toHaveBeenLastCalledWith(["u2"], {
+      id: "fest-other",
+      name: "Other Fest",
+    });
+  });
+
   it("does not call Novu when nobody qualifies", async () => {
     const supabase = createMockSupabase({
       festivals: [oktoberfest],
