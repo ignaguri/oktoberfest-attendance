@@ -20,7 +20,7 @@ interface ReminderOption {
 }
 
 const reminderOptions: ReminderOption[] = [
-  { label: "At time of event", minutes: 0 },
+  { label: "No reminder", minutes: 0 },
   { label: "5 minutes before", minutes: 5 },
   { label: "10 minutes before", minutes: 10 },
   { label: "15 minutes before", minutes: 15 },

@@ -2,8 +2,10 @@
 -- cron (09:00 UTC, the Hobby plan's limit), so anything due after that went out
 -- the next morning. pg_cron now calls a dedicated endpoint every 5 minutes.
 
--- 1. Never send a stale notification. A "starts in 30 minutes" reminder after
---    the reservation began is noise, and so is a check-in prompt hours later.
+-- 1. Never send a stale notification. A reminder more than 15 minutes past its
+--    due time (or after the reservation began) is noise, and so is a check-in
+--    prompt hours later. An offset of 0 means "No reminder" (the mobile form's
+--    label), so those rows never get one.
 
 CREATE OR REPLACE FUNCTION public.rpc_due_reservation_reminders(p_now timestamp with time zone)
 RETURNS TABLE(id uuid, user_id uuid, festival_id uuid, tent_id uuid, start_at timestamp with time zone, reminder_offset_minutes integer)
@@ -19,7 +21,9 @@ BEGIN
     AND r.status IN ('pending', 'confirmed')
     AND p.reminders_enabled = true
     AND r.reminder_sent_at IS NULL
+    AND r.reminder_offset_minutes > 0
     AND (r.start_at - make_interval(mins => r.reminder_offset_minutes)) <= p_now
+    AND (r.start_at - make_interval(mins => r.reminder_offset_minutes)) > p_now - interval '15 minutes'
     AND r.start_at > p_now;
 END;
 $$;

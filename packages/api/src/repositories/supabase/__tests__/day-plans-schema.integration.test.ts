@@ -154,7 +154,8 @@ describe("day_plans schema (Local DB)", () => {
         date: dayFromToday(6),
         kind: "reservation",
         tent_id: tent.id,
-        start_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        // Due 5 minutes ago with the 30-minute offset.
+        start_at: new Date(Date.now() + 25 * 60 * 1000).toISOString(),
         status: "pending",
         reminder_offset_minutes: 30,
         auto_checkin: false,
@@ -191,6 +192,39 @@ describe("day_plans schema (Local DB)", () => {
 
       expect(error).toBeNull();
       expect((data ?? []).map((row) => row.id)).not.toContain(started.data!.id);
+    });
+
+    it("skips an offset of 0 (no reminder) and a reminder long past its due time", async () => {
+      const noReminder = await insertRow({
+        date: dayFromToday(23),
+        kind: "reservation",
+        tent_id: tent.id,
+        start_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        status: "pending",
+        reminder_offset_minutes: 0,
+        auto_checkin: false,
+      });
+      // Due 30 minutes ago (1 day before a start that is ~23.5h away).
+      const overdue = await insertRow({
+        date: dayFromToday(24),
+        kind: "reservation",
+        tent_id: tent.id,
+        start_at: new Date(Date.now() + (1440 - 30) * 60 * 1000).toISOString(),
+        status: "pending",
+        reminder_offset_minutes: 1440,
+        auto_checkin: false,
+      });
+      expect(noReminder.error).toBeNull();
+      expect(overdue.error).toBeNull();
+
+      const { data, error } = await admin.rpc("rpc_due_reservation_reminders", {
+        p_now: new Date().toISOString(),
+      });
+
+      expect(error).toBeNull();
+      const ids = (data ?? []).map((row) => row.id);
+      expect(ids).not.toContain(noReminder.data!.id);
+      expect(ids).not.toContain(overdue.data!.id);
     });
 
     it("cannot be called with a user token", async () => {
