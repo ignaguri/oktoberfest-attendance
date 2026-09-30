@@ -17,6 +17,14 @@ export default function WrappedLayout() {
           title: t("profile.wrappedArchive.title"),
         }}
       />
+      <Stack.Screen
+        name="personas"
+        options={{
+          ...defaultScreenOptions,
+          headerShown: true,
+          title: t("wrapped.personas.title"),
+        }}
+      />
     </Stack>
   );
 }
