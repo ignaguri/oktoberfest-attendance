@@ -10,6 +10,7 @@ import {
   AdminAddTentToFestivalFormSchema,
   type AdminCopyTentsForm,
   AdminCopyTentsFormSchema,
+  TENT_CATEGORIES,
 } from "@prostcounter/shared/schemas";
 import { Copy, Edit, Euro, Plus, Tent, Trash2 } from "lucide-react";
 import { startTransition, useCallback, useEffect, useState } from "react";
@@ -53,15 +54,6 @@ import {
   type TentWithPrice,
   updateTentPrice,
 } from "../tentActions";
-
-const TENT_CATEGORIES = [
-  "Beer Halls",
-  "Beer Gardens",
-  "Traditional",
-  "Modern",
-  "Food Stands",
-  "Other",
-];
 
 export default function TentManagement() {
   const { t } = useTranslation();
@@ -239,11 +231,11 @@ export default function TentManagement() {
   const getCategoryBadgeVariant = (category: string | null) => {
     if (!category) return "secondary";
     switch (category) {
-      case "Beer Halls":
+      case "large":
         return "default";
-      case "Beer Gardens":
+      case "small":
         return "outline";
-      case "Traditional":
+      case "old":
         return "secondary";
       default:
         return "outline";
@@ -367,7 +359,7 @@ export default function TentManagement() {
                         <SelectContent>
                           {TENT_CATEGORIES.map((category) => (
                             <SelectItem key={category} value={category}>
-                              {category}
+                              {t(`admin.mobile.tents.category.${category}`)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -526,7 +518,7 @@ export default function TentManagement() {
                           <h4 className="font-medium">{tent.name}</h4>
                           {tent.category && (
                             <Badge variant={getCategoryBadgeVariant(tent.category)}>
-                              {tent.category}
+                              {t(`admin.mobile.tents.category.${tent.category}`)}
                             </Badge>
                           )}
                         </div>
@@ -579,7 +571,9 @@ function TentCard({
       <div className="flex items-start justify-between">
         <div className="space-y-1">
           <h4 className="font-medium">{tent.name}</h4>
-          {tent.category && <Badge variant="secondary">{tent.category}</Badge>}
+          {tent.category && (
+            <Badge variant="secondary">{t(`admin.mobile.tents.category.${tent.category}`)}</Badge>
+          )}
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="ghost" onClick={() => setIsEditing(!isEditing)}>
@@ -718,7 +712,7 @@ function CopyTentsDialog({
                     <div className="flex items-center gap-2">
                       {tent.category && (
                         <Badge variant="outline" className="text-xs">
-                          {tent.category}
+                          {t(`admin.mobile.tents.category.${tent.category}`)}
                         </Badge>
                       )}
                       <span className="text-muted-foreground text-sm">

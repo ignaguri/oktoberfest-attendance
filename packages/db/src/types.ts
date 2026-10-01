@@ -2000,7 +2000,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
-          id: string
+          id?: string
           latitude?: number | null
           location?: unknown
           longitude?: number | null
