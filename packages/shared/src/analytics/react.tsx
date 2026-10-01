@@ -4,11 +4,13 @@
  * TrackerContextProvider; components only ever call useTrack().
  *
  * Signed out, or outside a provider, the tracker is a no-op, so call sites
- * never check auth.
+ * never check auth. Until the first tracker exists, events wait in a short
+ * pre-tracker buffer instead (see ./pre-tracker-buffer).
  */
-import { createContext, type ReactNode, useContext, useEffect, useRef } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import type { EventName, EventProps, TrackedSheet } from "./events";
+import { createPreTrackerBuffer } from "./pre-tracker-buffer";
 import { sheetTransition } from "./sheet-transition";
 import { NOOP_TRACKER, type Tracker } from "./tracker";
 
@@ -21,8 +23,16 @@ export function TrackerContextProvider({
   tracker: Tracker | null;
   children: ReactNode;
 }) {
+  const [preTrackerBuffer] = useState(() => createPreTrackerBuffer());
+
+  useEffect(() => {
+    if (tracker) {
+      preTrackerBuffer.drainInto(tracker);
+    }
+  }, [tracker, preTrackerBuffer]);
+
   return (
-    <TrackerContext.Provider value={tracker ?? NOOP_TRACKER}>{children}</TrackerContext.Provider>
+    <TrackerContext.Provider value={tracker ?? preTrackerBuffer}>{children}</TrackerContext.Provider>
   );
 }
 
