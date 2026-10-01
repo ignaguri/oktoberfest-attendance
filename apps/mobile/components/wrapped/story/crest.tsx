@@ -1,21 +1,47 @@
 import { type PersonaId, WRAPPED_STORY_THEME } from "@prostcounter/shared/wrapped";
+import { cn } from "@prostcounter/ui";
 import { Image } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
 import { getCrestImage } from "./crest-images";
 
-/** lg is the persona reveal; sm sits in the Prost recap card. */
-const CREST_CLASSES = { lg: "h-72 w-72", sm: "h-16 w-16" } as const;
-const FALLBACK_PX = { lg: { width: 252, height: 288 }, sm: { width: 56, height: 64 } } as const;
+/** lg is the persona reveal, md a collection card, sm the Prost recap card, xs a collection thumbnail. */
+const CREST_CLASSES = {
+  lg: "h-72 w-72",
+  md: "h-40 w-40",
+  sm: "h-16 w-16",
+  xs: "h-9 w-9",
+} as const;
+const FALLBACK_PX = {
+  lg: { width: 252, height: 288 },
+  md: { width: 140, height: 160 },
+  sm: { width: 56, height: 64 },
+  xs: { width: 32, height: 36 },
+} as const;
 
 /** The persona's crest PNG, or a plain stamped shield until one exists. */
-export function Crest({ personaId, size = "lg" }: { personaId: PersonaId; size?: "lg" | "sm" }) {
+export function Crest({
+  personaId,
+  size = "lg",
+  silhouette = false,
+  width,
+}: {
+  personaId: PersonaId;
+  size?: keyof typeof CREST_CLASSES;
+  /** A locked collection card: the shield's shape in faint ink */
+  silhouette?: boolean;
+  /** Pixel width that overrides size, for a crest that scales with its card */
+  width?: number;
+}) {
   const source = getCrestImage(personaId);
+  const fallbackPx = width ? { width, height: (width * 150) / 132 } : FALLBACK_PX[size];
   if (source) {
     return (
       <Image
         source={source}
-        className={CREST_CLASSES[size]}
+        className={cn(!width && CREST_CLASSES[size], silhouette && "opacity-20")}
+        style={width ? { width, height: width } : undefined}
+        tintColor={silhouette ? WRAPPED_STORY_THEME.ink : undefined}
         // Decorative: the persona name is always rendered next to the crest.
         // alt alone makes RN treat the image as accessible/focusable, so it
         // must be paired with aria-hidden to actually hide it from a11y.
@@ -28,9 +54,10 @@ export function Crest({ personaId, size = "lg" }: { personaId: PersonaId; size?:
   }
   return (
     <Svg
-      width={FALLBACK_PX[size].width}
-      height={FALLBACK_PX[size].height}
+      width={fallbackPx.width}
+      height={fallbackPx.height}
       viewBox="0 0 132 150"
+      opacity={silhouette ? 0.2 : 1}
       // Decorative: the persona name is always rendered next to the crest.
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
@@ -46,7 +73,12 @@ export function Crest({ personaId, size = "lg" }: { personaId: PersonaId; size?:
         fill={WRAPPED_STORY_THEME.patternBlue}
         fillOpacity={0.14}
       />
-      <Path d="M40 74 H92" stroke={WRAPPED_STORY_THEME.stampAmber} strokeWidth={6} strokeLinecap="round" />
+      <Path
+        d="M40 74 H92"
+        stroke={WRAPPED_STORY_THEME.stampAmber}
+        strokeWidth={6}
+        strokeLinecap="round"
+      />
     </Svg>
   );
 }

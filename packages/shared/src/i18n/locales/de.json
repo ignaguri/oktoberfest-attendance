@@ -2460,6 +2460,7 @@
           "tutorial_step": "Tutorial-Schritt",
           "empty_state_seen": "Leeren Bildschirm gesehen",
           "error_shown": "Fehler gesehen",
+          "persona_collection_opened": "Persona-Sammlung geöffnet",
           "unknown": "Ereignis: {{name}}"
         }
       }
@@ -2634,6 +2635,33 @@
     "progress": "Schritt {{current}} von {{total}}"
   },
   "wrapped": {
+    "personas": {
+      "title": "Persona-Sammlung",
+      "entry": "Persona-Sammlung · {{collected}}/{{total}}",
+      "entryNoCount": "Persona-Sammlung",
+      "entryHint": "Öffnet deine Sammlung der Wrapped-Personas",
+      "progress": "{{collected}} von {{total}} gesammelt",
+      "seeAll": "Alle Personas ansehen",
+      "new": "Neu",
+      "tapToOpen": "Zum Öffnen tippen",
+      "tapToFlip": "Zum Umdrehen tippen",
+      "howToEarn": "So bekommst du sie",
+      "collectedAt": "Gesammelt bei",
+      "number": "Nr. {{number}}",
+      "numberOfTotal": "Nr. {{number}} von {{total}}",
+      "lockedName": "? ? ?",
+      "previous": "Vorherige Karte",
+      "next": "Nächste Karte",
+      "loadError": "Deine Personas konnten nicht geladen werden",
+      "a11y": {
+        "locked": "Karte {{number}}, gesperrt. So bekommst du sie: {{hint}}",
+        "unopened": "Karte {{number}}, neue Karte, noch nicht geöffnet",
+        "opened": "Karte {{number}}, {{name}}",
+        "openHint": "Dreht die Karte um und zeigt die Persona",
+        "flipHint": "Dreht die Karte um",
+        "thumbnailHint": "Zeigt diese Karte"
+      }
+    },
     "errorTitle": "Hoppla!",
     "locked": {
       "title": "Dein Rückblick ist unterwegs",
@@ -2780,45 +2808,55 @@
         "kickerGeneric": "Deine Fest-Persona",
         "runnerUp": "mit einem Schuss {{name}}",
         "einmalAberRichtig": {
+          "hint": "Nur einmal hingehen und 2+ Bier trinken",
           "description": "Ein Tag, null Reue.",
           "because": "Weil du einmal da warst und es richtig gemacht hast: {{beers, number(maximumFractionDigits: 1)}} Biere an einem Tag."
         },
         "massMeister": {
+          "hint": "Im Schnitt 4+ Bier an jedem Tag, an dem du hingehst",
           "description": "Die Maß hat Respekt vor dir.",
           "because": "Weil du an jedem Wiesntag im Schnitt {{avg, number(maximumFractionDigits: 1)}} Biere hattest.",
           "becauseGeneric": "Weil du an jedem Festtag im Schnitt {{avg, number(maximumFractionDigits: 1)}} Biere hattest."
         },
         "marathoner": {
+          "hint": "5+ Tage hingehen, mindestens 30 % des Festes",
           "description": "Die Wiesn ist dein zweites Zuhause.",
           "descriptionGeneric": "Der Festplatz ist dein zweites Zuhause.",
           "because": "Weil du an {{days}} von {{festivalDays}} Tagen da warst."
         },
         "zeltwanderer": {
+          "hint": "In 4+ verschiedenen Zelten trinken",
           "description": "Kein Zelt ist vor dir sicher.",
           "because": "Weil du {{tents}} von {{totalTents}} Zelten ausprobiert hast."
         },
         "stammgast": {
+          "hint": "60 % deiner Zeltbesuche im selben Zelt (3+ Besuche)",
           "description": "Warum den Stammtisch wechseln?",
           "because": "Weil {{tent}} {{visits}}-mal dein Zelt war."
         },
         "fruehschoppen": {
+          "hint": "Meistens vor 13:00 anfangen",
           "description": "Die erste Maß schmeckt vor zwölf am besten.",
           "because": "Weil dein erstes Getränk meistens um {{time}} kam."
         },
         "nachteule": {
+          "hint": "Meistens nach 21:30 noch da sein",
           "description": "Macht das Licht im Zelt aus.",
           "because": "Weil dein letztes Getränk meistens gegen {{time}} kam."
         },
         "radlerDiplomat": {
+          "hint": "30 %+ deiner Getränke als Radler oder alkoholfrei (ab 3 Getränken)",
           "description": "Halbes Bier, voller Spaß.",
           "because": "Weil {{pct}} % deiner Getränke Radler oder alkoholfrei waren."
         },
         "wochenendKrieger": {
+          "hint": "Nur am Wochenende hingehen",
           "description": "Unter der Woche wird regeneriert.",
           "because_one": "Weil dein einziger Tag am Wochenende war.",
           "because_other": "Weil alle {{count}} deiner Tage am Wochenende waren."
         },
         "geniesser": {
+          "hint": "Ganz entspannt: zu keiner anderen passen",
           "description": "Für die Stimmung da, im eigenen Tempo.",
           "because_one": "Weil ein Tag und $t(wrapped.story.units.beers, {\"count\": {{beers}} }) genau richtig waren.",
           "because_other": "Weil {{count}} Tage und $t(wrapped.story.units.beers, {\"count\": {{beers}} }) genau richtig waren."

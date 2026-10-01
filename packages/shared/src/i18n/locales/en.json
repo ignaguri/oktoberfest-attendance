@@ -2223,6 +2223,7 @@
           "tutorial_step": "Tutorial step",
           "empty_state_seen": "Saw an empty screen",
           "error_shown": "Saw an error",
+          "persona_collection_opened": "Opened the persona collection",
           "unknown": "Event: {{name}}"
         }
       }
@@ -2397,6 +2398,33 @@
     "progress": "Step {{current}} of {{total}}"
   },
   "wrapped": {
+    "personas": {
+      "title": "Persona collection",
+      "entry": "Persona collection · {{collected}}/{{total}}",
+      "entryNoCount": "Persona collection",
+      "entryHint": "Opens your collection of Wrapped personas",
+      "progress": "{{collected}} of {{total}} collected",
+      "seeAll": "See all personas",
+      "new": "New",
+      "tapToOpen": "Tap to open",
+      "tapToFlip": "Tap to flip",
+      "howToEarn": "How to earn it",
+      "collectedAt": "Collected at",
+      "number": "No. {{number}}",
+      "numberOfTotal": "No. {{number}} of {{total}}",
+      "lockedName": "? ? ?",
+      "previous": "Previous card",
+      "next": "Next card",
+      "loadError": "Could not load your personas",
+      "a11y": {
+        "locked": "Card {{number}}, locked. How to earn it: {{hint}}",
+        "unopened": "Card {{number}}, new card, not opened yet",
+        "opened": "Card {{number}}, {{name}}",
+        "openHint": "Flips the card to reveal the persona",
+        "flipHint": "Flips the card",
+        "thumbnailHint": "Shows this card"
+      }
+    },
     "errorTitle": "Oops!",
     "locked": {
       "title": "Your Wrapped is on its way",
@@ -2543,45 +2571,55 @@
         "kickerGeneric": "Your festival persona",
         "runnerUp": "with a dash of {{name}}",
         "einmalAberRichtig": {
+          "hint": "Go just once and have 2+ beers",
           "description": "One day, zero regrets.",
           "because": "Because you showed up once and made it count: {{beers, number(maximumFractionDigits: 1)}} beers in a single day."
         },
         "massMeister": {
+          "hint": "Average 4+ beers a day you go",
           "description": "The Maß fears you.",
           "because": "Because you averaged {{avg, number(maximumFractionDigits: 1)}} beers every day you went.",
           "becauseGeneric": "Because you averaged {{avg, number(maximumFractionDigits: 1)}} beers every day you went."
         },
         "marathoner": {
+          "hint": "Go 5+ days, at least 30% of the festival",
           "description": "The Wiesn is your second home.",
           "descriptionGeneric": "The festival grounds are your second home.",
           "because": "Because you were there {{days}} of the {{festivalDays}} days."
         },
         "zeltwanderer": {
+          "hint": "Drink in 4+ different tents",
           "description": "Never met a tent you didn't want to try.",
           "because": "Because you tried {{tents}} of the {{totalTents}} tents."
         },
         "stammgast": {
+          "hint": "Spend 60% of your tent visits in one tent (3+ visits)",
           "description": "Why change a winning table?",
           "because": "Because {{tent}} was your tent {{visits}} times."
         },
         "fruehschoppen": {
+          "hint": "Usually start before 13:00",
           "description": "The first Maß tastes best before noon.",
           "because": "Because your first drink usually landed at {{time}}."
         },
         "nachteule": {
+          "hint": "Usually still there after 21:30",
           "description": "The one who turns off the tent lights.",
           "because": "Because your last drink usually came around {{time}}."
         },
         "radlerDiplomat": {
+          "hint": "Make 30%+ of your drinks radler or alcohol-free (3+ drinks)",
           "description": "Half the beer, all the fun.",
           "because": "Because {{pct}}% of your drinks were Radler or alcohol-free."
         },
         "wochenendKrieger": {
+          "hint": "Only go on weekends",
           "description": "Weekdays are for recovery.",
           "because_one": "Because your one day was on a weekend.",
           "because_other": "Because all {{count}} of your days were on a weekend."
         },
         "geniesser": {
+          "hint": "Take it easy: fit none of the others",
           "description": "Here for the vibes, at your own pace.",
           "because_one": "Because one day and $t(wrapped.story.units.beers, {\"count\": {{beers}} }) was exactly enough.",
           "because_other": "Because {{count}} days and $t(wrapped.story.units.beers, {\"count\": {{beers}} }) was exactly enough."

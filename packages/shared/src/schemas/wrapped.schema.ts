@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { PERSONA_IDS } from "../wrapped/story/persona";
 import { AchievementCategorySchema } from "./achievement.schema";
 
 /**
@@ -195,6 +196,32 @@ export const GetWrappedFestivalsResponseSchema = z.object({
 });
 
 export type GetWrappedFestivalsResponse = z.infer<typeof GetWrappedFestivalsResponseSchema>;
+
+/**
+ * GET /api/v1/wrapped/personas: personas earned in unlocked Wrapped festivals.
+ * Locked personas are not returned; clients fill them in from PERSONA_IDS.
+ */
+export const PersonaIdSchema = z.enum(PERSONA_IDS);
+
+export const EarnedPersonaSchema = z.object({
+  personaId: PersonaIdSchema,
+  /** Newest first. isWiesn: an Oktoberfest, where Wiesn-specific names and copy apply */
+  festivals: z.array(z.object({ festivalId: z.uuid(), name: z.string(), isWiesn: z.boolean() })),
+  opened: z.boolean(),
+});
+
+export type EarnedPersona = z.infer<typeof EarnedPersonaSchema>;
+
+export const GetPersonaCollectionResponseSchema = z.object({
+  earned: z.array(EarnedPersonaSchema),
+});
+
+export type GetPersonaCollectionResponse = z.infer<typeof GetPersonaCollectionResponseSchema>;
+
+/** POST /api/v1/wrapped/personas/:personaId/open */
+export const OpenPersonaCardResponseSchema = z.object({ success: z.boolean() });
+
+export type OpenPersonaCardResponse = z.infer<typeof OpenPersonaCardResponseSchema>;
 
 /**
  * GET /api/v1/wrapped/:festivalId/access

@@ -28,6 +28,12 @@ export interface IWrappedRepository {
    */
   markViewed(userId: string, festivalId: string): Promise<void>;
 
+  /** persona_id of every persona card the user has opened in the collection. */
+  listOpenedPersonas(userId: string): Promise<string[]>;
+
+  /** Record that the user opened a persona card (no-op if already opened). */
+  markPersonaOpened(userId: string, personaId: string): Promise<void>;
+
   /** Drop cached rows for a user (and festival, if given). */
   invalidateCache(userId: string, festivalId?: string): Promise<void>;
 

@@ -67,6 +67,7 @@ import type {
   GetGroupMessagesResponse,
   GetMessageFeedResponse,
   GetPendingUnlocksResponse,
+  GetPersonaCollectionResponse,
   GetTaggedPhotosResponse,
   GetTentCrowdReportsResponse,
   GetWrappedFestivalsResponse,
@@ -97,6 +98,7 @@ import type {
   LogConsumptionResponse,
   MarkUnlocksSeenResponse,
   MissingProfileFields,
+  OpenPersonaCardResponse,
   PhotoTagsResponse,
   Profile,
   ProfileDayRow,
@@ -125,7 +127,7 @@ import type {
   WrappedShareLink,
 } from "@prostcounter/shared/schemas";
 import type { RecordEventsBody } from "@prostcounter/shared/analytics";
-import type { ShareCardKind } from "@prostcounter/shared/wrapped";
+import type { PersonaId, ShareCardKind } from "@prostcounter/shared/wrapped";
 
 /**
  * Headers type compatible with both browser and Node.js environments
@@ -2050,6 +2052,29 @@ export function createTypedApiClient(config: ApiClientConfig) {
           url: `${baseUrl}/v1/wrapped/${festivalId}/share-cards/${kind}?lang=${lang}&v=${version}`,
           headers: authOnly,
         };
+      },
+
+      personas: {
+        async get(): Promise<GetPersonaCollectionResponse> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("GET", `${baseUrl}/v1/wrapped/personas`, { headers });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch your persona collection");
+          }
+          return parseJsonResponse(response);
+        },
+
+        async open(personaId: PersonaId): Promise<OpenPersonaCardResponse> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging("POST", `${baseUrl}/v1/wrapped/personas/${personaId}/open`, {
+            method: "POST",
+            headers,
+          });
+          if (!response.ok) {
+            await extractApiError(response, "Failed to open the persona card");
+          }
+          return parseJsonResponse(response);
+        },
       },
 
       shareLinks: {

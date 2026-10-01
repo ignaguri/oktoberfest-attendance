@@ -5609,6 +5609,127 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/wrapped/personas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the user's persona collection
+         * @description Personas earned in the user's unlocked Wrapped festivals, each with its festivals (newest first) and whether the card was opened. Records no Wrapped view.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Persona collection */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            earned: {
+                                /** @enum {string} */
+                                personaId: "einmalAberRichtig" | "massMeister" | "marathoner" | "zeltwanderer" | "stammgast" | "fruehschoppen" | "nachteule" | "radlerDiplomat" | "wochenendKrieger" | "geniesser";
+                                festivals: {
+                                    /** Format: uuid */
+                                    festivalId: string;
+                                    name: string;
+                                    isWiesn: boolean;
+                                }[];
+                                opened: boolean;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/wrapped/personas/{personaId}/open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark a persona card as opened
+         * @description Idempotent. Does not check that the persona is earned.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    personaId: "einmalAberRichtig" | "massMeister" | "marathoner" | "zeltwanderer" | "stammgast" | "fruehschoppen" | "nachteule" | "radlerDiplomat" | "wochenendKrieger" | "geniesser";
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Card marked as opened */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Unknown persona */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/wrapped/{festivalId}": {
         parameters: {
             query?: never;

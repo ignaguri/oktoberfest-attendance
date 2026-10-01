@@ -90,6 +90,32 @@ export class SupabaseWrappedRepository implements IWrappedRepository {
     }
   }
 
+  async listOpenedPersonas(userId: string): Promise<string[]> {
+    const { data, error } = await this.supabase
+      .from("persona_card_opens")
+      .select("persona_id")
+      .eq("user_id", userId);
+
+    if (error) {
+      throw new DatabaseError(`Failed to fetch opened persona cards: ${error.message}`);
+    }
+
+    return (data ?? []).map((row) => row.persona_id);
+  }
+
+  async markPersonaOpened(userId: string, personaId: string): Promise<void> {
+    const { error } = await this.supabase
+      .from("persona_card_opens")
+      .upsert(
+        { user_id: userId, persona_id: personaId },
+        { onConflict: "user_id,persona_id", ignoreDuplicates: true },
+      );
+
+    if (error) {
+      throw new DatabaseError(`Failed to record opened persona card: ${error.message}`);
+    }
+  }
+
   async invalidateCache(userId: string, festivalId?: string): Promise<void> {
     const { error } = await this.supabase.rpc("invalidate_wrapped_cache", {
       p_user_id: userId,

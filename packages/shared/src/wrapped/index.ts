@@ -31,6 +31,12 @@ export type {
   WiesnAndYouSlide,
 } from "./story/types";
 export type { WrappedOfficialStats, CuriousFind } from "../schemas/wrapped.schema";
+export {
+  buildPersonaCollection,
+  type PersonaCardEntry,
+  type PersonaCardState,
+  type PersonaCollection,
+} from "./persona-collection";
 export { buildWrappedStory, TINY_FESTIVAL_ATTENDEES } from "./story/build-story";
 export type { Persona, PersonaId, PersonaSignals } from "./story/persona";
 export {

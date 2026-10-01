@@ -1,7 +1,10 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  GetPersonaCollectionResponseSchema,
   GetWrappedFestivalsResponseSchema,
   GetWrappedResponseSchema,
+  OpenPersonaCardResponseSchema,
+  PersonaIdSchema,
   RegenerateWrappedCacheBodySchema,
   RegenerateWrappedCacheResponseSchema,
   WrappedAccessResultSchema,
@@ -49,6 +52,66 @@ app.openapi(listFestivalsRoute, async (c) => {
   const festivals = await wrappedService.listFestivals();
 
   return c.json({ festivals }, 200);
+});
+
+// GET /wrapped/personas - the persona collection.
+// Registered before /wrapped/{festivalId} so "personas" is never read as an id.
+const personaCollectionRoute = createRoute({
+  method: "get",
+  path: "/wrapped/personas",
+  tags: ["wrapped"],
+  summary: "Get the user's persona collection",
+  description:
+    "Personas earned in the user's unlocked Wrapped festivals, each with its festivals (newest first) and whether the card was opened. Records no Wrapped view.",
+  responses: {
+    200: {
+      description: "Persona collection",
+      content: { "application/json": { schema: GetPersonaCollectionResponseSchema } },
+    },
+    401: unauthorized,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(personaCollectionRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase), new SupabaseOfficialStatsRepository(supabase));
+
+  const result = await wrappedService.getPersonaCollection(user.id);
+
+  return c.json(result, 200);
+});
+
+// POST /wrapped/personas/:personaId/open - first flip of a persona card
+const openPersonaCardRoute = createRoute({
+  method: "post",
+  path: "/wrapped/personas/{personaId}/open",
+  tags: ["wrapped"],
+  summary: "Mark a persona card as opened",
+  description: "Idempotent. Does not check that the persona is earned.",
+  request: { params: z.object({ personaId: PersonaIdSchema }) },
+  responses: {
+    200: {
+      description: "Card marked as opened",
+      content: { "application/json": { schema: OpenPersonaCardResponseSchema } },
+    },
+    400: {
+      description: "Unknown persona",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+    401: unauthorized,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(openPersonaCardRoute, async (c) => {
+  const { user, supabase } = c.var;
+  const { personaId } = c.req.valid("param");
+  const wrappedService = new WrappedService(new SupabaseWrappedRepository(supabase), new SupabaseOfficialStatsRepository(supabase));
+
+  await wrappedService.openPersonaCard(user.id, personaId);
+
+  return c.json({ success: true }, 200);
 });
 
 // GET /wrapped/:festivalId - the Wrapped, or why it is not available

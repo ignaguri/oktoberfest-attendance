@@ -3,8 +3,23 @@
  * view (wrapped_viewed achievement, wrapped_views analytics) on status=ready.
  */
 
-import { QueryKeys, useApiClient, useInvalidateQueries, useQuery } from "../data";
-import type { GetWrappedResponse, WrappedFestival } from "../schemas/wrapped.schema";
+import {
+  QueryKeys,
+  useApiClient,
+  useCancelQueries,
+  useGetQueryData,
+  useInvalidateQueries,
+  useMutation,
+  useQuery,
+  useSetQueryData,
+} from "../data";
+import type {
+  GetPersonaCollectionResponse,
+  GetWrappedResponse,
+  OpenPersonaCardResponse,
+  WrappedFestival,
+} from "../schemas/wrapped.schema";
+import type { PersonaId } from "../wrapped/story/persona";
 
 /**
  * Only a ready Wrapped is worth keeping: a locked answer has to be refetched
@@ -52,6 +67,62 @@ export function useWrappedFestivals() {
     {
       staleTime: 5 * 60 * 1000,
       gcTime: 15 * 60 * 1000,
+    },
+  );
+}
+
+/** Earned personas with their festivals and opened flags (GET /wrapped/personas). */
+export function usePersonaCollection() {
+  const apiClient = useApiClient();
+
+  return useQuery(
+    QueryKeys.wrappedPersonas(),
+    async (): Promise<GetPersonaCollectionResponse> => apiClient.wrapped.personas.get(),
+    {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 15 * 60 * 1000,
+    },
+  );
+}
+
+/**
+ * First flip of a persona card. Optimistic: the card is opened in the cache
+ * at once and rolled back (face-down again) if the request fails.
+ */
+export function useOpenPersonaCard() {
+  const apiClient = useApiClient();
+  const invalidateQueries = useInvalidateQueries();
+  const setQueryData = useSetQueryData();
+  const getQueryData = useGetQueryData();
+  const cancelQueries = useCancelQueries();
+
+  return useMutation<
+    OpenPersonaCardResponse,
+    PersonaId,
+    { previous: GetPersonaCollectionResponse | undefined }
+  >(
+    async (personaId) => apiClient.wrapped.personas.open(personaId),
+    {
+      onMutate: async (personaId) => {
+        await cancelQueries(QueryKeys.wrappedPersonas());
+        const previous = getQueryData<GetPersonaCollectionResponse>(QueryKeys.wrappedPersonas());
+        if (previous) {
+          setQueryData<GetPersonaCollectionResponse>(QueryKeys.wrappedPersonas(), {
+            earned: previous.earned.map((entry) =>
+              entry.personaId === personaId ? { ...entry, opened: true } : entry,
+            ),
+          });
+        }
+        return { previous };
+      },
+      onError: (_error, _personaId, context) => {
+        if (context?.previous) {
+          setQueryData<GetPersonaCollectionResponse>(QueryKeys.wrappedPersonas(), context.previous);
+        }
+      },
+      onSettled: () => {
+        invalidateQueries(QueryKeys.wrappedPersonas());
+      },
     },
   );
 }

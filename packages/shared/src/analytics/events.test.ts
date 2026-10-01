@@ -55,6 +55,7 @@ describe("parseTrackedEvent", () => {
         "empty_state_seen",
         "error_shown",
         "notification_opened",
+        "persona_collection_opened",
         "prompt_answered",
         "screen_viewed",
         "sheet_abandoned",

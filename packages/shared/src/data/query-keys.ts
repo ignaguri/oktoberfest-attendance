@@ -91,6 +91,8 @@ export class QueryKeys {
   // Wrapped queries
   static wrapped = (festivalId: string) => ["wrapped", festivalId] as const;
   static wrappedFestivals = () => ["wrapped", "festivals"] as const;
+  /** Under the wrappedAll prefix on purpose: a regeneration can change personas. */
+  static wrappedPersonas = () => ["wrapped", "personas"] as const;
   /** Prefix covering every Wrapped read, for invalidation after a regeneration. */
   static wrappedAll = () => ["wrapped"] as const;
   static wrappedShareLinks = (festivalId: string, lang: string) =>

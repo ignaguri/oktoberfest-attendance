@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 
-import type { WrappedOfficialStats } from "@prostcounter/shared";
+import type { WrappedData, WrappedFestival, WrappedOfficialStats } from "@prostcounter/shared";
+import { derivePersona } from "@prostcounter/shared/wrapped/server";
+import { makeWrapped } from "@prostcounter/shared/wrapped/testing";
 
 import type { IWrappedRepository } from "../../repositories/interfaces";
 import { WrappedService } from "../wrapped.service";
@@ -14,6 +16,8 @@ function repo(overrides: Partial<IWrappedRepository>): IWrappedRepository {
     invalidateCache: vi.fn(),
     regenerateCache: vi.fn(),
     isAdmin: vi.fn(),
+    listOpenedPersonas: vi.fn().mockResolvedValue([]),
+    markPersonaOpened: vi.fn(),
     ...overrides,
   } as IWrappedRepository;
 }
@@ -123,5 +127,127 @@ describe("WrappedService.checkAccessLegacy", () => {
   ])("maps %o", async (status, expected) => {
     const wrappedRepo = repo({ getStatus: vi.fn().mockResolvedValue(status) });
     expect(await new WrappedService(wrappedRepo, statsRepo()).checkAccessLegacy("f")).toEqual(expected);
+  });
+});
+
+/** Qualifies for no rule, so Der Genießer (same shape as persona.test.ts). */
+function neutral(mutate?: (data: WrappedData) => void): WrappedData {
+  return makeWrapped((data) => {
+    data.basicStats.daysAttended = 3;
+    data.basicStats.totalBeers = 6;
+    data.basicStats.avgBeers = 2;
+    data.tentStats.uniqueTents = 2;
+    data.tentStats.tentDiversityPct = 10;
+    data.tentStats.tentBreakdown = [
+      { tentName: "Schottenhamel", visitCount: 2 },
+      { tentName: "Hacker-Festzelt", visitCount: 2 },
+    ];
+    data.drinkStats.totalDrinks = 6;
+    data.drinkStats.breakdown = [{ drinkType: "beer", count: 6, percentage: 100 }];
+    data.timing = { timedDays: 3, medianFirstHour: 14, medianLastHour: 20, peakHour: 17, weekendShare: 0.33 };
+    mutate?.(data);
+  });
+}
+
+const nightOwl = () =>
+  neutral((data) => {
+    data.timing.medianLastHour = 23;
+  });
+
+/** makeWrapped defaults to an Oktoberfest */
+const atFruehlingsfest = (data: WrappedData): WrappedData => {
+  data.festivalInfo.festivalType = "fruehlingsfest";
+  return data;
+};
+
+function festival(festivalId: string, name: string): WrappedFestival {
+  return { festivalId, name, startDate: "2026-09-19", endDate: "2026-10-04", unlocksAt: "2026-10-04T22:00:00.000Z", viewed: true };
+}
+
+const okt26 = festival("11111111-1111-4111-8111-111111111111", "Oktoberfest 2026");
+const fruehling26 = festival("22222222-2222-4222-8222-222222222222", "Frühlingsfest 2026");
+const okt25 = festival("33333333-3333-4333-8333-333333333333", "Oktoberfest 2025");
+
+describe("WrappedService.getPersonaCollection", () => {
+  it("fixtures derive the personas the tests rely on", () => {
+    expect(derivePersona(neutral()).id).toBe("geniesser");
+    expect(derivePersona(nightOwl()).id).toBe("nachteule");
+  });
+
+  it("groups festivals by persona in PERSONA_IDS order, newest first, with opened flags", async () => {
+    const byFestival: Record<string, WrappedData> = {
+      [okt26.festivalId]: nightOwl(),
+      [fruehling26.festivalId]: atFruehlingsfest(neutral()),
+      [okt25.festivalId]: nightOwl(),
+    };
+    const wrappedRepo = repo({
+      listFestivals: vi.fn().mockResolvedValue([okt26, fruehling26, okt25]),
+      getWrapped: vi.fn((_userId: string, festivalId: string) => Promise.resolve(byFestival[festivalId])),
+      listOpenedPersonas: vi.fn().mockResolvedValue(["nachteule"]),
+    });
+
+    const result = await new WrappedService(wrappedRepo, statsRepo()).getPersonaCollection("u");
+
+    expect(result).toEqual({
+      earned: [
+        {
+          personaId: "nachteule",
+          festivals: [
+            { festivalId: okt26.festivalId, name: "Oktoberfest 2026", isWiesn: true },
+            { festivalId: okt25.festivalId, name: "Oktoberfest 2025", isWiesn: true },
+          ],
+          opened: true,
+        },
+        {
+          personaId: "geniesser",
+          festivals: [{ festivalId: fruehling26.festivalId, name: "Frühlingsfest 2026", isWiesn: false }],
+          opened: false,
+        },
+      ],
+    });
+    expect(wrappedRepo.getWrapped).toHaveBeenCalledWith("u", okt26.festivalId);
+    expect(wrappedRepo.listOpenedPersonas).toHaveBeenCalledWith("u");
+  });
+
+  it("skips a festival whose Wrapped fails to load and returns the rest", async () => {
+    const wrappedRepo = repo({
+      listFestivals: vi.fn().mockResolvedValue([okt26, fruehling26]),
+      getWrapped: vi.fn((_userId: string, festivalId: string) =>
+        festivalId === okt26.festivalId ? Promise.reject(new Error("rpc down")) : Promise.resolve(atFruehlingsfest(neutral())),
+      ),
+    });
+
+    const result = await new WrappedService(wrappedRepo, statsRepo()).getPersonaCollection("u");
+
+    expect(result.earned).toEqual([
+      {
+        personaId: "geniesser",
+        festivals: [{ festivalId: fruehling26.festivalId, name: "Frühlingsfest 2026", isWiesn: false }],
+        opened: false,
+      },
+    ]);
+  });
+
+  it("never records a Wrapped view", async () => {
+    const wrappedRepo = repo({
+      listFestivals: vi.fn().mockResolvedValue([okt26]),
+      getWrapped: vi.fn().mockResolvedValue(neutral()),
+    });
+    await new WrappedService(wrappedRepo, statsRepo()).getPersonaCollection("u");
+    expect(wrappedRepo.markViewed).not.toHaveBeenCalled();
+  });
+
+  it("returns nothing earned when the user has no unlocked Wrapped", async () => {
+    const wrappedRepo = repo({ listFestivals: vi.fn().mockResolvedValue([]) });
+    const result = await new WrappedService(wrappedRepo, statsRepo()).getPersonaCollection("u");
+    expect(result).toEqual({ earned: [] });
+  });
+});
+
+describe("WrappedService.openPersonaCard", () => {
+  it("records the open", async () => {
+    const wrappedRepo = repo({ markPersonaOpened: vi.fn().mockResolvedValue(undefined) });
+    await new WrappedService(wrappedRepo, statsRepo()).openPersonaCard("u", "nachteule");
+    expect(wrappedRepo.markPersonaOpened).toHaveBeenCalledWith("u", "nachteule");
   });
 });

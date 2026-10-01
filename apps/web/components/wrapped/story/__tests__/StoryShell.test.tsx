@@ -3,6 +3,7 @@ import { initI18n } from "@prostcounter/shared/i18n/core";
 import { buildWrappedStory } from "@prostcounter/shared/wrapped";
 import { makeOfficialStats, makeWrapped } from "@prostcounter/shared/wrapped/testing";
 import { act, fireEvent, render, screen } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/image", () => ({
@@ -22,6 +23,15 @@ vi.mock("../../share/ShareCarousel", () => ({
 // Vitest, so stub the one export that chain actually needs.
 vi.mock("@/lib/data", () => ({
   useCurrentProfile: () => ({ data: null, loading: false, error: null, refetch: vi.fn() }),
+}));
+
+// next-view-transitions imports next/link by a path Vitest cannot resolve
+vi.mock("next-view-transitions", () => ({
+  Link: ({ href, children, className }: { href: string; children: ReactNode; className?: string }) => (
+    <a href={href} className={className}>
+      {children}
+    </a>
+  ),
 }));
 
 import { StoryShell } from "../StoryShell";

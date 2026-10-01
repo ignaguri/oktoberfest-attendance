@@ -219,7 +219,7 @@ export {
 } from "./useFeedback";
 
 // Wrapped hooks
-export { useWrapped, useWrappedFestivals } from "./useWrapped";
+export { useOpenPersonaCard, usePersonaCollection, useWrapped, useWrappedFestivals } from "./useWrapped";
 export {
   useCreateWrappedShareLink,
   useRevokeWrappedShareLink,

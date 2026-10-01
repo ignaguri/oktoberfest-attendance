@@ -9025,6 +9025,177 @@
         }
       }
     },
+    "/v1/wrapped/personas": {
+      "get": {
+        "tags": [
+          "wrapped"
+        ],
+        "summary": "Get the user's persona collection",
+        "description": "Personas earned in the user's unlocked Wrapped festivals, each with its festivals (newest first) and whether the card was opened. Records no Wrapped view.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Persona collection",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "earned": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "personaId": {
+                            "type": "string",
+                            "enum": [
+                              "einmalAberRichtig",
+                              "massMeister",
+                              "marathoner",
+                              "zeltwanderer",
+                              "stammgast",
+                              "fruehschoppen",
+                              "nachteule",
+                              "radlerDiplomat",
+                              "wochenendKrieger",
+                              "geniesser"
+                            ]
+                          },
+                          "festivals": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "festivalId": {
+                                  "type": "string",
+                                  "format": "uuid"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "isWiesn": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "festivalId",
+                                "name",
+                                "isWiesn"
+                              ]
+                            }
+                          },
+                          "opened": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "personaId",
+                          "festivals",
+                          "opened"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "earned"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/wrapped/personas/{personaId}/open": {
+      "post": {
+        "tags": [
+          "wrapped"
+        ],
+        "summary": "Mark a persona card as opened",
+        "description": "Idempotent. Does not check that the persona is earned.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "einmalAberRichtig",
+                "massMeister",
+                "marathoner",
+                "zeltwanderer",
+                "stammgast",
+                "fruehschoppen",
+                "nachteule",
+                "radlerDiplomat",
+                "wochenendKrieger",
+                "geniesser"
+              ]
+            },
+            "required": true,
+            "name": "personaId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Card marked as opened",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown persona",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/wrapped/{festivalId}": {
       "get": {
         "tags": [

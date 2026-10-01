@@ -21,6 +21,6 @@ export {
   SHARE_CARD_RENDER_VERSION,
   shareCardFingerprint,
 } from "./share/build-share-cards";
-export { PERSONA_CREST_FILES, type PersonaId } from "./story/persona";
+export { derivePersona, PERSONA_CREST_FILES, PERSONA_IDS, type PersonaId } from "./story/persona";
 export { WRAPPED_STORY_THEME } from "./story/theme";
 export type { CopyRef, StatCard } from "./story/types";

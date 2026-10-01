@@ -35,6 +35,11 @@ export type TrackedPrompt = (typeof TRACKED_PROMPTS)[number];
 
 export const TRACKED_EMPTY_STATES = ["groups", "friends", "leaderboard"] as const;
 
+/** Where the Wrapped persona collection was opened from. */
+export const PERSONA_COLLECTION_SOURCES = ["prost_slide", "archive", "profile"] as const;
+
+export type PersonaCollectionSource = (typeof PERSONA_COLLECTION_SOURCES)[number];
+
 const PUSH_TYPES = Object.values(NOTIFICATION_PUSH_TYPES) as [
   NotificationPushType,
   ...NotificationPushType[],
@@ -61,6 +66,7 @@ export const EVENT_PROPS_SCHEMAS = {
     })
     .strict(),
   empty_state_seen: z.object({ screen: z.enum(TRACKED_EMPTY_STATES) }).strict(),
+  persona_collection_opened: z.object({ source: z.enum(PERSONA_COLLECTION_SOURCES) }).strict(),
   error_shown: z
     .object({
       screen: ScreenSchema,
