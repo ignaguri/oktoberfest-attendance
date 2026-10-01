@@ -273,7 +273,11 @@ export async function retryOperation(
   db: SQLite.SQLiteDatabase,
   operationId: string,
 ): Promise<void> {
-  await db.runAsync(`UPDATE _sync_queue SET status = 'pending' WHERE id = ?`, [operationId]);
+  // A fresh retry budget: the processor skips any op already at the limit, so
+  // resetting only the status left a manual retry doing nothing.
+  await db.runAsync(`UPDATE _sync_queue SET status = 'pending', retry_count = 0 WHERE id = ?`, [
+    operationId,
+  ]);
 }
 
 /**

@@ -21,7 +21,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CREATE_TABLES_SQL } from "../schema";
 import { SyncManager } from "../sync/sync-manager";
-import { enqueueOperation } from "../sync-queue";
+import { enqueueOperation, retryOperation } from "../sync-queue";
 
 const LOCAL_ID = "local-attendance";
 const SERVER_ID = "server-attendance";
@@ -170,5 +170,38 @@ describe("pushing an attendance the server already had under another id", () => 
 
     expect(uploadedAgainst).toEqual([LOCAL_ID]);
     expect(database.prepare("SELECT id FROM attendances").all()).toEqual([{ id: LOCAL_ID }]);
+  });
+});
+
+describe("retrying a photo that ran out of retries", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    uploadedAgainst.length = 0;
+    database = new Database(":memory:");
+    database.pragma("foreign_keys = ON");
+    for (const sql of Object.values(CREATE_TABLES_SQL)) {
+      database.exec(sql);
+    }
+  });
+
+  // Photos already stuck by the id mismatch above: the pull has since moved
+  // them to the server id, but their op is out of retries, and the processor
+  // skips any op at the limit. The Retry button has to give it a fresh budget.
+  it("uploads it on the next push", async () => {
+    const db = createDb(database);
+    updatePersonal.mockResolvedValue({ attendanceId: LOCAL_ID, tentsAdded: [], tentsRemoved: [] });
+    await seedOfflineDayWithPhoto(db);
+    database.prepare(`UPDATE _sync_queue SET status = 'completed' WHERE operation = 'INSERT'`).run();
+    const { id: uploadOpId } = database
+      .prepare(`SELECT id FROM _sync_queue WHERE operation = 'UPLOAD_FILE'`)
+      .get() as { id: string };
+    database
+      .prepare(`UPDATE _sync_queue SET status = 'failed', retry_count = 3 WHERE id = ?`)
+      .run(uploadOpId);
+
+    await retryOperation(db, uploadOpId);
+    await new SyncManager(db).pushAll();
+
+    expect(uploadedAgainst).toEqual([LOCAL_ID]);
   });
 });
