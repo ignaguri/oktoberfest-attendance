@@ -14,6 +14,7 @@ import {
 } from "../../../__tests__/helpers/day-plan-fixtures";
 import {
   createTestSupabaseAdmin,
+  createTestSupabaseAnon,
   createTestSupabaseWithAuth,
 } from "../../../__tests__/helpers/test-supabase";
 import { SupabaseAdminRepository } from "../admin.repository";
@@ -25,6 +26,7 @@ import { SupabaseAdminRepository } from "../admin.repository";
 describe("admin writes are atomic (Local DB)", () => {
   let admin: SupabaseClient<Database>;
   let superAdmin: TestUser;
+  let ordinaryUser: TestUser;
   let repo: SupabaseAdminRepository;
   let festival: TestFestival;
   let otherFestival: TestFestival;
@@ -61,6 +63,7 @@ describe("admin writes are atomic (Local DB)", () => {
     superAdmin = await createTestUser("atomic-admin");
     await admin.from("profiles").update({ is_super_admin: true }).eq("id", superAdmin.id);
     repo = new SupabaseAdminRepository(createTestSupabaseWithAuth(superAdmin.token));
+    ordinaryUser = await createTestUser("atomic-user");
 
     festival = await createLiveFestival(admin);
     otherFestival = await createLiveFestival(admin);
@@ -79,7 +82,7 @@ describe("admin writes are atomic (Local DB)", () => {
     await cleanupDayPlanFixtures(admin, {
       festivalIds: [festival.id, otherFestival.id],
       tentIds: [tent.id],
-      userIds: [superAdmin.id],
+      userIds: [superAdmin.id, ordinaryUser.id],
     });
   });
 
@@ -119,6 +122,54 @@ describe("admin writes are atomic (Local DB)", () => {
       beerPrice: null,
       beerPriceCents: null,
       canonicalCents: null,
+    });
+  });
+
+  // Both functions are reachable straight from a client. anon has no EXECUTE,
+  // and for a signed-in non-admin RLS is the gate (they are SECURITY INVOKER).
+  describe("callers who are not super admins", () => {
+    it.each(["set_active_festival", "set_festival_tent_beer_price"] as const)(
+      "anonymous callers cannot run %s",
+      async (fn) => {
+        const args =
+          fn === "set_active_festival"
+            ? { p_festival_id: festival.id }
+            : { p_festival_id: festival.id, p_tent_id: tent.id, p_beer_price: 99 };
+
+        const { error } = await createTestSupabaseAnon().rpc(fn, args as never);
+
+        expect(error?.code).toBe("42501");
+      },
+    );
+
+    it("an ordinary user cannot change the active festival", async () => {
+      const before = await activeFestivalIds();
+
+      const { error } = await createTestSupabaseWithAuth(ordinaryUser.token).rpc(
+        "set_active_festival",
+        { p_festival_id: festival.id },
+      );
+
+      // RLS hides the row from the update, so it reads as not found
+      expect(error?.code).toBe("P0002");
+      expect(await activeFestivalIds()).toEqual(before);
+    });
+
+    it("an ordinary user cannot change a tent price", async () => {
+      await repo.updateFestivalTentPrice(festival.id, tent.id, 16.8);
+
+      const { data, error } = await createTestSupabaseWithAuth(ordinaryUser.token).rpc(
+        "set_festival_tent_beer_price",
+        { p_festival_id: festival.id, p_tent_id: tent.id, p_beer_price: 99 },
+      );
+
+      expect(error).toBeNull();
+      expect(data).toBeNull();
+      expect(await tentPrices()).toEqual({
+        beerPrice: 16.8,
+        beerPriceCents: 1680,
+        canonicalCents: 1680,
+      });
     });
   });
 });
