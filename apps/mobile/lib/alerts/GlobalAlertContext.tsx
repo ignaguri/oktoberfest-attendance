@@ -73,7 +73,7 @@ interface GlobalAlertProviderProps {
  * Global alert provider that renders alerts in a native Modal layer.
  *
  * Uses React Native's Modal component to ensure alerts appear above
- * everything, including other native Modals (like LocationMapModal).
+ * everything, including other native Modals.
  *
  * @example
  * ```tsx
