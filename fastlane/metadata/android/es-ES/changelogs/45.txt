@@ -1,4 +1,3 @@
-- Arreglamos que la app se quedara trabada en la pantalla de inicio después de actualizar en algunos teléfonos.
-- Nueva colección de personas: juntá todas las personas de tu Wrapped.
-- Las fotos ya no se quedan trabadas al subirlas, y unirte a un grupo es más confiable.
+- Nuevo: la colección de personas. Cada persona del Wrapped es una figurita esperando que la encuentres. Desbloqueala, dala vuelta y completá tu álbum. ¿Las tenés todas?
+- Arreglamos que la app se quedara trabada en la pantalla de inicio después de actualizar.
 ¡Prost!
