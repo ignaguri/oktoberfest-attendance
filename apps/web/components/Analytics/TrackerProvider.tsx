@@ -62,7 +62,8 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <TrackerContextProvider tracker={tracker}>
+    // Only rendered in the signed-in area, so a tracker is always on its way
+    <TrackerContextProvider tracker={tracker} awaitingTracker>
       <ScreenViewTracker tracker={tracker} />
       {children}
     </TrackerContextProvider>

@@ -4,11 +4,13 @@
  * TrackerContextProvider; components only ever call useTrack().
  *
  * Signed out, or outside a provider, the tracker is a no-op, so call sites
- * never check auth.
+ * never check auth. Until the first tracker exists, events wait in a short
+ * pre-tracker buffer instead (see ./pre-tracker-buffer).
  */
-import { createContext, type ReactNode, useContext, useEffect, useRef } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import type { EventName, EventProps, TrackedSheet } from "./events";
+import { createPreTrackerBuffer } from "./pre-tracker-buffer";
 import { sheetTransition } from "./sheet-transition";
 import { NOOP_TRACKER, type Tracker } from "./tracker";
 
@@ -16,14 +18,48 @@ const TrackerContext = createContext<Tracker>(NOOP_TRACKER);
 
 export function TrackerContextProvider({
   tracker,
+  awaitingTracker,
   children,
 }: {
   tracker: Tracker | null;
+  /**
+   * True while a tracker may still arrive (auth loading, or signed in with the
+   * tracker not created yet). False with no tracker means signed out: anything
+   * buffered is dropped, so it never reaches the account that signs in next.
+   */
+  awaitingTracker: boolean;
   children: ReactNode;
 }) {
-  return (
-    <TrackerContext.Provider value={tracker ?? NOOP_TRACKER}>{children}</TrackerContext.Provider>
-  );
+  const [preTrackerBuffer] = useState(() => createPreTrackerBuffer());
+  // The tracker the buffer handed off to. While it is current the context keeps
+  // the buffer, which now forwards to it, so the hand-off is not an identity change.
+  const [attachedTracker, setAttachedTracker] = useState<Tracker | null>(null);
+  const [isBufferClosed, setIsBufferClosed] = useState(false);
+
+  useEffect(() => {
+    if (isBufferClosed) {
+      return;
+    }
+    if (tracker) {
+      preTrackerBuffer.attach(tracker);
+      setAttachedTracker(tracker);
+      setIsBufferClosed(true);
+    } else if (!awaitingTracker) {
+      preTrackerBuffer.discard();
+      setIsBufferClosed(true);
+    }
+  }, [tracker, awaitingTracker, isBufferClosed, preTrackerBuffer]);
+
+  let value: Tracker;
+  if (!isBufferClosed) {
+    value = tracker || awaitingTracker ? preTrackerBuffer : NOOP_TRACKER;
+  } else if (tracker && tracker === attachedTracker) {
+    value = preTrackerBuffer;
+  } else {
+    value = tracker ?? NOOP_TRACKER;
+  }
+
+  return <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>;
 }
 
 export function useTracker(): Tracker {

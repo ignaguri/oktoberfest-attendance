@@ -36,7 +36,7 @@ export function useCurrentScreen(): string | null {
 }
 
 export function TrackerProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const screen = screenFromSegments(useSegments());
   const userId = user?.id ?? null;
   const [tracker, setTracker] = useState<Tracker | null>(null);
@@ -73,7 +73,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
   }, [userId]);
 
   return (
-    <TrackerContextProvider tracker={tracker}>
+    <TrackerContextProvider tracker={tracker} awaitingTracker={isAuthLoading || userId !== null}>
       <CurrentScreenContext.Provider value={screen}>
         <ScreenViewTracker tracker={tracker} screen={screen} />
         {children}
