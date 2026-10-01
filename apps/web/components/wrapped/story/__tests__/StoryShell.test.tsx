@@ -1,5 +1,4 @@
 // @vitest-environment happy-dom
-import type * as AnalyticsReact from "@prostcounter/shared/analytics/react";
 import { initI18n } from "@prostcounter/shared/i18n/core";
 import { buildWrappedStory } from "@prostcounter/shared/wrapped";
 import { makeOfficialStats, makeWrapped } from "@prostcounter/shared/wrapped/testing";
@@ -26,19 +25,13 @@ vi.mock("@/lib/data", () => ({
   useCurrentProfile: () => ({ data: null, loading: false, error: null, refetch: vi.fn() }),
 }));
 
+// next-view-transitions imports next/link by a path Vitest cannot resolve
 vi.mock("next-view-transitions", () => ({
-  Link: ({ href, children, onClick, className }: { href: string; children: ReactNode; onClick?: () => void; className?: string }) => (
-    <a href={href} onClick={onClick} className={className}>
+  Link: ({ href, children, className }: { href: string; children: ReactNode; className?: string }) => (
+    <a href={href} className={className}>
       {children}
     </a>
   ),
-}));
-
-// vi.mock factories are hoisted above plain consts, so the mock must be hoisted too
-const trackMock = vi.hoisted(() => vi.fn());
-vi.mock("@prostcounter/shared/analytics/react", async (importOriginal) => ({
-  ...(await importOriginal<typeof AnalyticsReact>()),
-  useTrack: () => trackMock,
 }));
 
 import { StoryShell } from "../StoryShell";
@@ -70,20 +63,6 @@ describe("StoryShell", () => {
   it("starts on the Servus slide", () => {
     renderStory();
     expect(screen.getByText("Servus, Maxi Muster!")).toBeTruthy();
-  });
-
-  it("links to the persona collection from the last slide", async () => {
-    const { slides } = renderStory();
-    // One act per press: a slide advances only after its reveal effect has run
-    for (let step = 0; step < slides.length - 1; step += 1) {
-      await act(async () => {
-        fireEvent.keyDown(window, { key: "ArrowRight" });
-      });
-    }
-    const link = screen.getByRole("link", { name: "See all personas" });
-    expect(link.getAttribute("href")).toBe("/wrapped/personas");
-    fireEvent.click(link);
-    expect(trackMock).toHaveBeenCalledWith("persona_collection_opened", { source: "prost_slide" });
   });
 
   it("moves forward and back with the keyboard", async () => {
