@@ -12,6 +12,7 @@ import {
 } from "react";
 import { identifyDevice } from "vexo-analytics";
 
+import { refetchFailedQueries } from "@/lib/data/query-client";
 import { clearAllData } from "@/lib/database/debug";
 import { getDatabase } from "@/lib/database/init";
 import { logger } from "@/lib/logger";
@@ -138,6 +139,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       setSession(session);
+
+      if (event === "SIGNED_IN") {
+        // Queries mounted before sign-in failed for lack of a session, and
+        // nothing retries them; on a first install that leaves no festival
+        refetchFailedQueries(queryClient).catch(() => {});
+      }
 
       // Set Sentry user context for error tracking
       if (session?.user) {

@@ -24,6 +24,18 @@ export function shouldRetryMutation(failureCount: number, error: unknown): boole
   return failureCount < MAX_RETRIES;
 }
 
+/**
+ * Refetches the mounted queries that are in an error state. Providers above the
+ * auth gate (festivals) query before sign-in and fail with AuthRequiredError,
+ * which is never retried, so without this a first session stays empty.
+ */
+export function refetchFailedQueries(queryClient: QueryClient): Promise<void> {
+  return queryClient.refetchQueries({
+    type: "active",
+    predicate: (query) => query.state.status === "error",
+  });
+}
+
 function createQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
