@@ -1814,6 +1814,9 @@
         "loading": "Festivals werden geladen...",
         "empty": "Keine Festivals gefunden",
         "openHint": "Öffnet die Details dieses Festivals",
+        "newHint": "Öffnet das Formular zum Anlegen eines Festivals",
+        "createError": "Das Festival konnte nicht angelegt werden",
+        "endBeforeStart": "Das Enddatum darf nicht vor dem Startdatum liegen",
         "activeBadge": "Aktiv",
         "status": {
           "upcoming": "Bevorstehend",
@@ -2115,7 +2118,7 @@
       "types": {
         "oktoberfest": "Oktoberfest",
         "starkbierfest": "Starkbierfest",
-        "fruhlingsfest": "Frühlingsfest",
+        "fruehlingsfest": "Frühlingsfest",
         "other": "Sonstiges"
       },
       "statuses": {

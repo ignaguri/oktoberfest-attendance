@@ -84,6 +84,12 @@ export default function AdminLayout() {
         }}
       />
       <Stack.Screen
+        name="festival/new"
+        options={{
+          title: t("admin.festivals.newFestival"),
+        }}
+      />
+      <Stack.Screen
         name="festival/[id]/index"
         options={{
           title: t("admin.mobile.festivalDetail.title"),

@@ -1637,6 +1637,9 @@
         "loading": "Cargando festivales...",
         "empty": "No se encontraron festivales",
         "openHint": "Abre los detalles de este festival",
+        "newHint": "Abre el formulario para crear un festival",
+        "createError": "No se pudo crear el festival",
+        "endBeforeStart": "La fecha de fin no puede ser anterior a la de inicio",
         "activeBadge": "Activo",
         "status": {
           "upcoming": "Próximo",
@@ -2002,7 +2005,7 @@
       "types": {
         "oktoberfest": "Oktoberfest",
         "starkbierfest": "Starkbierfest",
-        "fruhlingsfest": "Frühlingsfest",
+        "fruehlingsfest": "Frühlingsfest",
         "other": "Otro"
       },
       "statuses": {
