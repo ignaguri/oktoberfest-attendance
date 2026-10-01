@@ -753,13 +753,18 @@ export class SupabaseProfileRepository {
 
     const progress = await progressPromise;
 
+    const totalBeers = Number(userStats?.total_beers) || 0;
+    const totalDays = Number(userStats?.days_attended) || 0;
+
     return {
-      totalBeers: Number(userStats?.total_beers) || 0,
-      totalDays: Number(userStats?.days_attended) || 0,
+      totalBeers,
+      totalDays,
       totalSpent: Number(spendingStats?.total_spent_cents) || 0,
       totalBaseCents: Number(spendingStats?.total_base_cents) || 0,
       totalTipCents: Number(spendingStats?.total_tips_cents) || 0,
-      avgBeersPerDay: Number(userStats?.avg_beers) || 0,
+      // The RPC returns no avg_beers; rounded like the SQL avg_beers columns
+      avgBeersPerDay:
+        totalDays > 0 ? Math.round((totalBeers / totalDays) * 100) / 100 : 0,
       favoriteDay: null, // Could be calculated if needed
       favoriteTent,
       groupPositions,
