@@ -91,6 +91,22 @@ const MIGRATIONS: MigrationFn[] = [
   async (db) => {
     await rebuildLegacyAchievementsTable(db);
   },
+
+  // v4 -> v5: One more go for photos stranded by the attendance id mismatch.
+  //
+  // Before the push adopted the server's id for a day the server already had,
+  // a photo queued behind it uploaded against an id the server never stored,
+  // got this 403 on every try and ran out of retries. The pull has since moved
+  // those photos to the right day, but an op past its retry limit is never
+  // attempted again. A migration runs once per device, so a photo that fails
+  // again for some other reason is not revived on every launch.
+  async (db) => {
+    await db.runAsync(
+      `UPDATE _sync_queue SET status = 'pending', retry_count = 0
+       WHERE operation = 'UPLOAD_FILE' AND status = 'failed'
+         AND last_error = 'Attendance not found or access denied'`,
+    );
+  },
 ];
 
 /**
