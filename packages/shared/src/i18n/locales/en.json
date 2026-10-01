@@ -1577,6 +1577,9 @@
         "loading": "Loading festivals...",
         "empty": "No festivals found",
         "openHint": "Opens this festival's details",
+        "newHint": "Opens the form to create a festival",
+        "createError": "Could not create the festival",
+        "endBeforeStart": "End date can't be before the start date",
         "activeBadge": "Active",
         "status": {
           "upcoming": "Upcoming",
@@ -1942,7 +1945,7 @@
       "types": {
         "oktoberfest": "Oktoberfest",
         "starkbierfest": "Starkbierfest",
-        "fruhlingsfest": "Frühlingsfest",
+        "fruehlingsfest": "Frühlingsfest",
         "other": "Other"
       },
       "statuses": {
@@ -3694,6 +3697,7 @@
     "DATE_OUTSIDE_FESTIVAL": "Date must be within the festival dates.",
     "PRICE_BELOW_BASE": "Price paid cannot be less than base price.",
     "FESTIVAL_NOT_FOUND": "Festival not found.",
+    "FESTIVAL_SHORT_NAME_TAKEN": "A festival with this short name already exists.",
     "NO_ACTIVE_FESTIVAL": "No active festival found.",
     "FESTIVAL_ENDED": "That festival has already ended.",
     "TENT_NOT_FOUND": "Tent not found.",

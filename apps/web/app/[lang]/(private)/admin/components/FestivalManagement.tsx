@@ -248,7 +248,7 @@ export default function FestivalManagement() {
                         {t("admin.festivals.types.starkbierfest")}
                       </SelectItem>
                       <SelectItem value="fruehlingsfest">
-                        {t("admin.festivals.types.fruhlingsfest")}
+                        {t("admin.festivals.types.fruehlingsfest")}
                       </SelectItem>
                       <SelectItem value="other">{t("admin.festivals.types.other")}</SelectItem>
                     </SelectContent>

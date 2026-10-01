@@ -1,10 +1,11 @@
 import { useAdminFestivals } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { useRouter } from "expo-router";
-import { CalendarDays, ChevronRight } from "lucide-react-native";
+import { CalendarDays, ChevronRight, Plus } from "lucide-react-native";
 import { RefreshControl } from "react-native";
 
 import { Badge, BadgeText } from "@/components/ui/badge";
+import { Button, ButtonText } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { HStack } from "@/components/ui/hstack";
@@ -32,6 +33,15 @@ export default function AdminFestivalsScreen() {
       refreshControl={<RefreshControl refreshing={isRefetching ?? false} onRefresh={refetch} />}
     >
       <VStack space="md">
+        <Button
+          onPress={() => router.push("/admin/festival/new")}
+          accessibilityLabel={t("admin.festivals.newFestival")}
+          accessibilityHint={t("admin.mobile.festivals.newHint")}
+        >
+          <Plus size={16} color={IconColors.white} />
+          <ButtonText>{t("admin.festivals.newFestival")}</ButtonText>
+        </Button>
+
         {isLoading && (
           <Text className="text-typography-500">{t("admin.mobile.festivals.loading")}</Text>
         )}
