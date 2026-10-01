@@ -814,28 +814,6 @@ export class SupabaseAdminRepository {
   }
 
   /**
-   * Clears is_active on every other festival.
-   *
-   * `idx_festivals_single_active` is a unique partial index over
-   * `is_active WHERE is_active = true`, so marking a second festival active
-   * fails with a constraint violation unless the previous one is cleared first.
-   * The web panel does not do this, so activating a festival there errors.
-   */
-  private async deactivateOtherFestivals(exceptFestivalId?: string): Promise<void> {
-    let query = this.supabase.from("festivals").update({ is_active: false }).eq("is_active", true);
-
-    if (exceptFestivalId) {
-      query = query.neq("id", exceptFestivalId);
-    }
-
-    const { error } = await query;
-
-    if (error) {
-      throw new Error(`Error deactivating current festival: ${error.message}`);
-    }
-  }
-
-  /**
    * Creates a festival, activating it last.
    *
    * Inserted inactive and then activated, rather than sweeping first: none of
@@ -865,20 +843,15 @@ export class SupabaseAdminRepository {
   }
 
   /**
-   * Clears every other festival's flag, then sets this one's.
-   *
-   * Both halves are needed because `idx_festivals_single_active` is a unique
-   * partial index: the set fails outright while another row is still active.
+   * Clears every other festival's flag and sets this one's, in one transaction
+   * (`set_active_festival`). `idx_festivals_single_active` is a unique partial
+   * index, so the others must be cleared first; as two requests, a failure in
+   * between left no active festival at all.
    */
   private async setActiveFestival(festivalId: string): Promise<AdminFestival> {
-    await this.deactivateOtherFestivals(festivalId);
-
-    const { data, error } = await this.supabase
-      .from("festivals")
-      .update({ is_active: true })
-      .eq("id", festivalId)
-      .select()
-      .single();
+    const { data, error } = await this.supabase.rpc("set_active_festival", {
+      p_festival_id: festivalId,
+    });
 
     if (error || !data) {
       throw new Error(`Error activating festival: ${error?.message}`);
@@ -1394,26 +1367,36 @@ export class SupabaseAdminRepository {
     tentId: string,
     beerPrice: number | null,
   ): Promise<AdminFestivalTent | null> {
-    const priceCents = toCents(beerPrice);
-
-    const { data, error } = await this.supabase
-      .from("festival_tents")
-      .update({ beer_price: beerPrice, beer_price_cents: priceCents })
-      .eq("festival_id", festivalId)
-      .eq("tent_id", tentId)
-      .select("id, beer_price, tent:tents!inner(id, name, category)")
-      .maybeSingle();
+    // Both columns and the canonical drink_type_prices row, in one transaction
+    const { data: festivalTentId, error } = await this.supabase.rpc(
+      "set_festival_tent_beer_price",
+      {
+        p_festival_id: festivalId,
+        p_tent_id: tentId,
+        // null clears the price; generated function arg types never allow null
+        p_beer_price: beerPrice as number,
+      },
+    );
 
     if (error) {
       throw new Error(`Error updating tent price: ${error.message}`);
     }
 
-    if (!data) {
+    if (!festivalTentId) {
       return null;
     }
 
+    const { data, error: readError } = await this.supabase
+      .from("festival_tents")
+      .select("id, beer_price, tent:tents!inner(id, name, category)")
+      .eq("id", festivalTentId)
+      .single();
+
+    if (readError || !data) {
+      throw new Error(`Error reading updated tent price: ${readError?.message}`);
+    }
+
     const row = data as unknown as FestivalTentRow;
-    await this.syncTentBeerPrices([{ festivalTentId: row.id, priceCents }]);
 
     return {
       festival_tent_id: row.id,
