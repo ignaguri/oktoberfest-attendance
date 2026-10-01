@@ -14,6 +14,7 @@ import { pullGroups } from "../sync/pull-groups";
 import { pullAchievements, pullFestivals, pullTents } from "../sync/pull-reference";
 import { pullAttendances, pullProfile } from "../sync/pull-user-data";
 import { createSyncManager, SyncManager } from "../sync/sync-manager";
+import type * as SyncQueue from "../sync-queue";
 import { hasPendingDelete } from "../sync-queue";
 
 // Mock the API client
@@ -150,7 +151,9 @@ vi.mock("../photo-queue", () => ({
 }));
 
 // Mock the sync-queue module
-vi.mock("../sync-queue", () => ({
+vi.mock("../sync-queue", async (importOriginal) => ({
+  // Real SQL: the pull tests assert the remap statements it issues.
+  remapAttendanceId: (await importOriginal<typeof SyncQueue>()).remapAttendanceId,
   getSyncMetadata: vi.fn().mockResolvedValue(null),
   updateLastSyncAt: vi.fn().mockResolvedValue(undefined),
   enqueueOperation: vi.fn().mockResolvedValue("op-1"),

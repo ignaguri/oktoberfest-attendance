@@ -139,6 +139,17 @@ describe("pushInsert", () => {
     expect(logTentVisit).not.toHaveBeenCalled();
   });
 
+  it("resolves to the id the server holds the day under", async () => {
+    // The server keeps an existing day's id over the one sent, and the sync
+    // manager needs it to move the local rows across.
+    const serverId = await pushInsert("attendances", "local-att-id", {
+      festival_id: "festival-1",
+      date: "2026-09-23",
+    });
+
+    expect(serverId).toBe("att-1");
+  });
+
   it("warns instead of throwing for a table with no handler", async () => {
     await pushInsert("beer_pictures", "local-id", {});
 

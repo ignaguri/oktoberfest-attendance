@@ -12,8 +12,9 @@ import { logger } from "@/lib/logger";
 import { apiClient } from "../../api-client";
 import { runUploadFileOp } from "../photo-queue";
 import { type ProcessorResult, QueueProcessor } from "../queue-processor";
-import { MUTABLE_TABLES } from "../schema";
+import { MUTABLE_TABLES, type SyncQueueItem } from "../schema";
 import {
+  adoptServerAttendanceId,
   cleanupOrphanConsumptions,
   cleanupOrphanTentVisits,
   getQueueStats,
@@ -182,13 +183,26 @@ export class SyncManager {
       signal: this.abortController?.signal ?? undefined,
     });
 
+    // A day the server already had keeps the server's id. Adopting it here,
+    // before the next op runs, is what lets a photo queued behind this push
+    // upload against a day the server knows (see adoptServerAttendanceId).
+    // Pointing the op at the new id lets the processor mark the moved row clean.
+    const adoptServerId = async (op: SyncQueueItem, serverId: string | undefined) => {
+      if (op.table_name === "attendances" && serverId && serverId !== op.record_id) {
+        await adoptServerAttendanceId(this.db, op.record_id, serverId);
+        op.record_id = serverId;
+      }
+    };
+
     processor.registerHandler("INSERT", async (op) => {
       const payload = JSON.parse(op.payload);
-      await pushInsert(op.table_name, op.record_id, payload, op.idempotency_key);
+      const serverId = await pushInsert(op.table_name, op.record_id, payload, op.idempotency_key);
+      await adoptServerId(op, serverId);
     });
     processor.registerHandler("UPDATE", async (op) => {
       const payload = JSON.parse(op.payload);
-      await pushUpdate(op.table_name, op.record_id, payload, op.idempotency_key);
+      const serverId = await pushUpdate(op.table_name, op.record_id, payload, op.idempotency_key);
+      await adoptServerId(op, serverId);
     });
     processor.registerHandler("DELETE", async (op) => {
       await pushDelete(op.table_name, op.record_id);

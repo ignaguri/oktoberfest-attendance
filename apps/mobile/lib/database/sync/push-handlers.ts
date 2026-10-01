@@ -11,28 +11,32 @@ import { apiClient } from "../../api-client";
 
 /**
  * Push an INSERT operation to server
+ *
+ * For attendances, resolves to the id the server holds the day under, which
+ * differs from `recordId` when the day already existed there.
  */
 export async function pushInsert(
   tableName: string,
   recordId: string,
   payload: Record<string, unknown>,
   idempotencyKey?: string | null,
-): Promise<void> {
+): Promise<string | undefined> {
   switch (tableName) {
     // Passing the local row's id for the same reason as consumptions and
     // tent_visits below: the server used to mint its own, so a DELETE queued
     // before the next pull reconciled the two carried an id the server had
     // never seen - and the delete route reads an unknown id as idempotent
     // success, so the day was never removed and came back on the next pull.
-    case "attendances":
-      await apiClient.attendance.updatePersonal({
+    case "attendances": {
+      const result = await apiClient.attendance.updatePersonal({
         festivalId: payload.festival_id as string,
         date: payload.date as string,
         amount: 0,
         tents: payload.tents as string[] | undefined,
         attendanceId: recordId,
       });
-      break;
+      return result.attendanceId;
+    }
     // Passing the local row's id, for the same reason tent_visits does below:
     // the server used to mint its own, so the pull met an id it had never seen
     // and inserted the server's row alongside the local one - one drink, counted
@@ -78,16 +82,18 @@ export async function pushInsert(
 
 /**
  * Push an UPDATE operation to server
+ *
+ * For attendances, resolves to the server's id for the day, as pushInsert does.
  */
 export async function pushUpdate(
   tableName: string,
   recordId: string,
   payload: Record<string, unknown>,
   idempotencyKey?: string | null,
-): Promise<void> {
+): Promise<string | undefined> {
   switch (tableName) {
-    case "attendances":
-      await apiClient.attendance.updatePersonal({
+    case "attendances": {
+      const result = await apiClient.attendance.updatePersonal({
         festivalId: payload.festival_id as string,
         date: payload.date as string,
         amount: 0,
@@ -96,7 +102,8 @@ export async function pushUpdate(
         // server for a day created offline, in which case it creates the row.
         attendanceId: recordId,
       });
-      break;
+      return result.attendanceId;
+    }
     case "consumptions": {
       // For consumptions, we update by deleting and re-creating
       // since the API doesn't have an update endpoint

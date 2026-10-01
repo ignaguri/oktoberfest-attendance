@@ -679,6 +679,64 @@ export async function createOrResurrectLocalAttendance(
   return attendanceId;
 }
 
+/**
+ * Points everything that referenced a local attendance id at the server's id.
+ *
+ * Covers the dependent rows and the sync queue, not the attendance row itself:
+ * the callers differ in what else they write to it. Must run inside a
+ * transaction so a half-remapped row is never visible.
+ */
+export async function remapAttendanceId(
+  db: SQLite.SQLiteDatabase,
+  oldId: string,
+  newId: string,
+): Promise<void> {
+  await db.runAsync(`UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`, [
+    newId,
+    oldId,
+  ]);
+
+  await db.runAsync(`UPDATE beer_pictures SET attendance_id = ? WHERE attendance_id = ?`, [
+    newId,
+    oldId,
+  ]);
+
+  await db.runAsync(
+    `UPDATE _sync_queue SET record_id = ? WHERE record_id = ? AND table_name = 'attendances' AND status IN ('pending', 'failed')`,
+    [newId, oldId],
+  );
+}
+
+/**
+ * Moves a day created offline onto the id the server stored it under.
+ *
+ * The attendance push sends the local id, but the server only honours it when
+ * the call creates the day. If something else got there first (a tent visit or
+ * a drink pushed ahead of it, a reservation check-in, another device) the push
+ * answers with the existing id, and every row still on the local one is
+ * unknown to the server: a queued photo then 403s on /photos/upload-url until
+ * it runs out of retries. Adopting the id during the push, before the ops that
+ * depend on it run, is what lets them reach the right day.
+ *
+ * Unlike the pull, the push runs with foreign keys on, and beer_pictures and
+ * consumptions reference attendances(id). Moving either end first breaks the
+ * reference until the other follows, so the check is deferred to the commit,
+ * where everything points at the server id again.
+ */
+export async function adoptServerAttendanceId(
+  db: SQLite.SQLiteDatabase,
+  localId: string,
+  serverId: string,
+): Promise<void> {
+  await db.withTransactionAsync(async () => {
+    await db.execAsync("PRAGMA defer_foreign_keys = ON");
+    await remapAttendanceId(db, localId, serverId);
+    await db.runAsync(`UPDATE attendances SET id = ? WHERE id = ?`, [serverId, localId]);
+  });
+
+  logger.info(`[SyncQueue] Adopted server attendance ID: ${localId} → ${serverId}`);
+}
+
 // =============================================================================
 // Consumption Write Helpers
 // =============================================================================
