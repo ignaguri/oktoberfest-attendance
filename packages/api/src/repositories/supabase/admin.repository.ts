@@ -853,6 +853,11 @@ export class SupabaseAdminRepository {
       .select()
       .single();
 
+    // `festivals.short_name` is UNIQUE, so a taken one is a 409, not a 500
+    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+      throw new ConflictError(ErrorCodes.FESTIVAL_SHORT_NAME_TAKEN);
+    }
+
     if (error || !data) {
       throw new Error(`Error creating festival: ${error?.message}`);
     }

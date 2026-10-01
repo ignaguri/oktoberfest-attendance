@@ -3757,6 +3757,7 @@
     "DATE_OUTSIDE_FESTIVAL": "La fecha debe estar dentro de las fechas del festival.",
     "PRICE_BELOW_BASE": "El precio pagado no puede ser menor al precio base.",
     "FESTIVAL_NOT_FOUND": "Festival no encontrado.",
+    "FESTIVAL_SHORT_NAME_TAKEN": "Ya existe un festival con este nombre corto.",
     "NO_ACTIVE_FESTIVAL": "No se encontró ningún festival activo.",
     "FESTIVAL_ENDED": "Ese festival ya terminó.",
     "TENT_NOT_FOUND": "Carpa no encontrada.",

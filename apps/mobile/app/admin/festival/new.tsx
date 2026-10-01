@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { formatDateForDatabase } from "@prostcounter/shared";
+import { ApiError } from "@prostcounter/api-client";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useCreateAdminFestival } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { format } from "date-fns";
 import { useRouter } from "expo-router";
 import { CalendarDays } from "lucide-react-native";
 import { useCallback, useState } from "react";
@@ -29,19 +31,23 @@ import { View } from "@/components/ui/view";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
+// maxLength mirrors the schema, so only "required" can fail validation
 const TEXT_FIELDS = [
   {
     name: "name",
+    maxLength: 255,
     label: "admin.festivals.form.name",
     placeholder: "admin.festivals.form.namePlaceholder",
   },
   {
     name: "short_name",
+    maxLength: 100,
     label: "admin.festivals.form.shortName",
     placeholder: "admin.festivals.form.shortNamePlaceholder",
   },
   {
     name: "location",
+    maxLength: 255,
     label: "admin.festivals.form.location",
     placeholder: "admin.festivals.form.locationPlaceholder",
   },
@@ -58,7 +64,7 @@ export default function AdminNewFestivalScreen() {
   const { dialog, showDialog, closeDialog } = useAlertDialog();
   const createFestival = useCreateAdminFestival();
 
-  const today = formatDateForDatabase(new Date());
+  const today = format(new Date(), "yyyy-MM-dd");
   const {
     control,
     handleSubmit,
@@ -79,19 +85,14 @@ export default function AdminNewFestivalScreen() {
   const onSubmit = useCallback(
     async (data: CreateAdminFestivalInput) => {
       try {
-        const { festival } = await createFestival.mutate({
-          ...data,
-          name: data.name.trim(),
-          short_name: data.short_name.trim(),
-          location: data.location.trim(),
-        });
+        // The schema already trimmed the text fields
+        const { festival } = await createFestival.mutate(data);
         // Created inactive; the detail screen is where it gets activated and tents added
         router.replace(`/admin/festival/${festival.id}`);
       } catch (err) {
-        // A 409 carries the server's reason (e.g. a taken short name)
         const message =
-          err instanceof Error && err.message
-            ? err.message
+          err instanceof ApiError && err.code === ErrorCodes.FESTIVAL_SHORT_NAME_TAKEN
+            ? t("apiErrors.FESTIVAL_SHORT_NAME_TAKEN")
             : t("admin.mobile.festivals.createError");
         showDialog(t("common.status.error"), message);
       }
@@ -122,7 +123,10 @@ export default function AdminNewFestivalScreen() {
                           onChangeText={onChange}
                           onBlur={onBlur}
                           placeholder={t(field.placeholder)}
+                          maxLength={field.maxLength}
                           autoCapitalize={field.name === "short_name" ? "none" : "words"}
+                          // A slug: autocorrect turns "oktoberfest-2026" into "Oktoberfest-2026"
+                          autoCorrect={field.name !== "short_name"}
                           accessibilityLabel={t(field.label)}
                         />
                       </Input>
@@ -238,7 +242,10 @@ function DateField({
       if (Platform.OS === "android") {
         setShowPicker(false);
       }
-      onChange(formatDateForDatabase(picked));
+      // The calendar day on screen, read on the device's own clock. Not
+      // formatDateForDatabase: that reprojects onto Berlin, which east of it
+      // hands back the day before the one picked.
+      onChange(format(picked, "yyyy-MM-dd"));
     },
     [onChange],
   );

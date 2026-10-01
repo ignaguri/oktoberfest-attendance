@@ -3934,6 +3934,7 @@
     "DATE_OUTSIDE_FESTIVAL": "Das Datum muss innerhalb der Festivaldaten liegen.",
     "PRICE_BELOW_BASE": "Bezahlter Preis kann nicht unter dem Basispreis liegen.",
     "FESTIVAL_NOT_FOUND": "Festival nicht gefunden.",
+    "FESTIVAL_SHORT_NAME_TAKEN": "Es gibt bereits ein Festival mit diesem Kurznamen.",
     "NO_ACTIVE_FESTIVAL": "Kein aktives Festival gefunden.",
     "FESTIVAL_ENDED": "Dieses Festival ist bereits vorbei.",
     "TENT_NOT_FOUND": "Zelt nicht gefunden.",

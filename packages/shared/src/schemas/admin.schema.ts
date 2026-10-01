@@ -283,10 +283,11 @@ const festivalDateRange = {
 
 export const CreateAdminFestivalSchema = z
   .object({
-    name: z.string().min(1).max(255),
-    short_name: z.string().min(1).max(100),
+    // Trimmed before the length checks, so whitespace alone fails as missing
+    name: z.string().trim().min(1).max(255),
+    short_name: z.string().trim().min(1).max(100),
     festival_type: FestivalTypeSchema,
-    location: z.string().min(1).max(255),
+    location: z.string().trim().min(1).max(255),
     ...festivalDateRange,
     map_url: z.string().url().nullable().optional(),
     timezone: z.string().min(1).max(100).optional(),
