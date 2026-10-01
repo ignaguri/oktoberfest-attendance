@@ -3134,9 +3134,42 @@ export type Database = {
         Args: { p_addressee_id: string; p_requester_id: string }
         Returns: Json
       }
+      set_active_festival: {
+        Args: { p_festival_id: string }
+        Returns: {
+          beer_cost: number | null
+          created_at: string
+          default_beer_price_cents: number | null
+          description: string | null
+          end_date: string
+          festival_type: Database["public"]["Enums"]["festival_type_enum"]
+          id: string
+          is_active: boolean
+          latitude: number | null
+          location: string
+          longitude: number | null
+          map_url: string | null
+          name: string
+          short_name: string
+          start_date: string
+          status: Database["public"]["Enums"]["festival_status_enum"]
+          timezone: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "festivals"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_day_plan_companions: {
         Args: { p_group_ids: string[]; p_plan_id: string; p_user_ids: string[] }
         Returns: undefined
+      }
+      set_festival_tent_beer_price: {
+        Args: { p_beer_price: number; p_festival_id: string; p_tent_id: string }
+        Returns: string
       }
       set_photo_tags: {
         Args: { p_photo_id: string; p_user_ids: string[] }

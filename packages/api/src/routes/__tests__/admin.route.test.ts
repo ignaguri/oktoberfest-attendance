@@ -1014,12 +1014,11 @@ describe("Admin Routes - Unit Tests", () => {
       expect(mockSupabase.from).not.toHaveBeenCalled();
     });
 
-    // The sweep has to run before the flag can be set, because
-    // idx_festivals_single_active is a unique partial index. What must not
-    // happen is the sweep running first and the insert then failing, which
-    // would leave no active festival at all -- so the row is inserted
-    // inactive, then swept, then activated.
-    it("inserts inactive, then sweeps, then activates", async () => {
+    // What must not happen is the sweep running first and the insert then
+    // failing, which would leave no active festival at all -- so the row is
+    // inserted inactive, then set_active_festival sweeps and activates in one
+    // transaction.
+    it("inserts inactive, then activates through set_active_festival", async () => {
       const festivalRow = {
         id: FESTIVAL_ID,
         name: "New Fest",
@@ -1039,16 +1038,11 @@ describe("Admin Routes - Unit Tests", () => {
       };
 
       const insertChain = createMockChain({ data: festivalRow, error: null });
-      const sweepChain = createMockChain({ data: null, error: null });
-      const activateChain = createMockChain({
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(insertChain);
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
         data: { ...festivalRow, is_active: true },
         error: null,
-      });
-
-      vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(insertChain)
-        .mockReturnValueOnce(sweepChain)
-        .mockReturnValueOnce(activateChain);
+      } as never);
 
       const res = await app.request(
         createAuthRequest("/admin/festivals", {
@@ -1067,7 +1061,10 @@ describe("Admin Routes - Unit Tests", () => {
       );
 
       expect(res.status).toBe(201);
-      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(3);
+      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(1);
+      expect(mockSupabase.rpc).toHaveBeenCalledWith("set_active_festival", {
+        p_festival_id: FESTIVAL_ID,
+      });
       // The insert must not carry is_active: true, or it races the index
       // against the festival that is still active at that point.
       expect(insertChain.insert.mock.calls[0][0].is_active).toBe(false);
@@ -1154,14 +1151,14 @@ describe("Admin Routes - Unit Tests", () => {
   });
 
   describe("PATCH /admin/festivals/:festivalId/tents/:tentId", () => {
-    it("writes the canonical drink_type_prices row, not just the tent columns", async () => {
-      vi.mocked(mockSupabase.from)
-        // festival_tents update
-        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(9.5), error: null }))
-        // drink_type_prices read-back: no existing row
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        // drink_type_prices insert
-        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+    it("writes the price through set_festival_tent_beer_price", async () => {
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: FESTIVAL_TENT_ID,
+        error: null,
+      } as never);
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: festivalTentRow(9.5), error: null }),
+      );
 
       const res = await app.request(
         createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
@@ -1171,16 +1168,24 @@ describe("Admin Routes - Unit Tests", () => {
       );
 
       expect(res.status).toBe(200);
-      // The point of the write-through: a price that lands only in
-      // festival_tents leaves pricing.repository reading a stale value.
-      expect(mockSupabase.from).toHaveBeenCalledWith("festival_tents");
-      expect(mockSupabase.from).toHaveBeenCalledWith("drink_type_prices");
+      // One call writes both columns and the canonical drink_type_prices row,
+      // so a price can't land in festival_tents alone (covered against the real
+      // function in admin-atomic-writes.integration.test.ts)
+      expect(mockSupabase.rpc).toHaveBeenCalledWith("set_festival_tent_beer_price", {
+        p_festival_id: FESTIVAL_ID,
+        p_tent_id: TENT_ID,
+        p_beer_price: 9.5,
+      });
     });
 
-    it("clears a price by deleting the canonical row rather than storing zero", async () => {
-      vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(null), error: null }))
-        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+    it("clears a price by passing null, not zero", async () => {
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: FESTIVAL_TENT_ID,
+        error: null,
+      } as never);
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: festivalTentRow(null), error: null }),
+      );
 
       const res = await app.request(
         createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents/${TENT_ID}`, {
@@ -1190,10 +1195,12 @@ describe("Admin Routes - Unit Tests", () => {
       );
 
       expect(res.status).toBe(200);
-      // Two calls only: the update and the delete. A zero row would violate
-      // drink_type_prices_positive_price anyway.
-      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(2);
-      expect(mockSupabase.from).toHaveBeenCalledWith("drink_type_prices");
+      // The function deletes the canonical row for null; a zero row would
+      // violate drink_type_prices_positive_price anyway
+      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+        "set_festival_tent_beer_price",
+        expect.objectContaining({ p_beer_price: null }),
+      );
     });
 
     it("rejects a non-positive price, matching the database CHECK", async () => {
@@ -1319,10 +1326,12 @@ describe("Admin Routes - Unit Tests", () => {
         .mockReturnValueOnce(
           createMockChain({ data: null, error: { code: "23505", message: "duplicate key" } }),
         )
-        // falls through to the price update on the existing assignment
-        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(9.5), error: null }))
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+        // the read-back after the price update on the existing assignment
+        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(9.5), error: null }));
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
+        data: FESTIVAL_TENT_ID,
+        error: null,
+      } as never);
 
       const res = await app.request(
         createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents`, {
@@ -1334,7 +1343,10 @@ describe("Admin Routes - Unit Tests", () => {
       // Answering "added" for a request that wrote nothing is the same lie as
       // answering "failed" for one that worked.
       expect(res.status).toBe(201);
-      expect(mockSupabase.from).toHaveBeenCalledWith("drink_type_prices");
+      expect(mockSupabase.rpc).toHaveBeenCalledWith(
+        "set_festival_tent_beer_price",
+        expect.objectContaining({ p_beer_price: 9.5 }),
+      );
     });
 
     it("rejects a price the numeric(5,2) column cannot hold", async () => {
