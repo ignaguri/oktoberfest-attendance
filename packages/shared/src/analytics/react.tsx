@@ -18,22 +18,48 @@ const TrackerContext = createContext<Tracker>(NOOP_TRACKER);
 
 export function TrackerContextProvider({
   tracker,
+  awaitingTracker,
   children,
 }: {
   tracker: Tracker | null;
+  /**
+   * True while a tracker may still arrive (auth loading, or signed in with the
+   * tracker not created yet). False with no tracker means signed out: anything
+   * buffered is dropped, so it never reaches the account that signs in next.
+   */
+  awaitingTracker: boolean;
   children: ReactNode;
 }) {
   const [preTrackerBuffer] = useState(() => createPreTrackerBuffer());
+  // The tracker the buffer handed off to. While it is current the context keeps
+  // the buffer, which now forwards to it, so the hand-off is not an identity change.
+  const [attachedTracker, setAttachedTracker] = useState<Tracker | null>(null);
+  const [isBufferClosed, setIsBufferClosed] = useState(false);
 
   useEffect(() => {
-    if (tracker) {
-      preTrackerBuffer.drainInto(tracker);
+    if (isBufferClosed) {
+      return;
     }
-  }, [tracker, preTrackerBuffer]);
+    if (tracker) {
+      preTrackerBuffer.attach(tracker);
+      setAttachedTracker(tracker);
+      setIsBufferClosed(true);
+    } else if (!awaitingTracker) {
+      preTrackerBuffer.discard();
+      setIsBufferClosed(true);
+    }
+  }, [tracker, awaitingTracker, isBufferClosed, preTrackerBuffer]);
 
-  return (
-    <TrackerContext.Provider value={tracker ?? preTrackerBuffer}>{children}</TrackerContext.Provider>
-  );
+  let value: Tracker;
+  if (!isBufferClosed) {
+    value = tracker || awaitingTracker ? preTrackerBuffer : NOOP_TRACKER;
+  } else if (tracker && tracker === attachedTracker) {
+    value = preTrackerBuffer;
+  } else {
+    value = tracker ?? NOOP_TRACKER;
+  }
+
+  return <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>;
 }
 
 export function useTracker(): Tracker {

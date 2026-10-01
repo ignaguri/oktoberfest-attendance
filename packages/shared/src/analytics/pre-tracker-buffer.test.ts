@@ -29,7 +29,7 @@ describe("createPreTrackerBuffer", () => {
     buffer.track("screen_viewed", { screen: "/" });
 
     const tracker = fakeTracker();
-    buffer.drainInto(tracker);
+    buffer.attach(tracker);
 
     expect(tracker.track).toHaveBeenNthCalledWith(1, "app_opened", { source: "cold" });
     expect(tracker.track).toHaveBeenNthCalledWith(2, "screen_viewed", { screen: "/" });
@@ -43,7 +43,7 @@ describe("createPreTrackerBuffer", () => {
     }
 
     const tracker = fakeTracker();
-    buffer.drainInto(tracker);
+    buffer.attach(tracker);
 
     expect(tracker.track).toHaveBeenCalledTimes(PRE_TRACKER_MAX_EVENTS);
     expect(tracker.track).toHaveBeenLastCalledWith("screen_viewed", {
@@ -59,7 +59,7 @@ describe("createPreTrackerBuffer", () => {
     clock.advance(PRE_TRACKER_WINDOW_MS + 1);
 
     const tracker = fakeTracker();
-    buffer.drainInto(tracker);
+    buffer.attach(tracker);
 
     expect(tracker.track).not.toHaveBeenCalled();
   });
@@ -72,25 +72,49 @@ describe("createPreTrackerBuffer", () => {
     clock.advance(-PRE_TRACKER_WINDOW_MS);
 
     const tracker = fakeTracker();
-    buffer.drainInto(tracker);
+    buffer.attach(tracker);
 
     expect(tracker.track).not.toHaveBeenCalled();
   });
 
-  it("hands off only once, and buffers nothing after it", () => {
+  it("forwards to the tracker after the hand-off, past the window", () => {
     const clock = clockAt(0);
     const buffer = createPreTrackerBuffer(clock.now);
-    buffer.track("app_opened", { source: "cold" });
+    const tracker = fakeTracker();
+    buffer.attach(tracker);
+    clock.advance(PRE_TRACKER_WINDOW_MS * 10);
 
+    buffer.track("screen_viewed", { screen: "/" });
+
+    expect(tracker.track).toHaveBeenCalledWith("screen_viewed", { screen: "/" });
+  });
+
+  it("attaches only the first tracker", () => {
+    const clock = clockAt(0);
+    const buffer = createPreTrackerBuffer(clock.now);
     const first = fakeTracker();
-    buffer.drainInto(first);
-    // Signed out and back in: the next tracker starts clean
-    buffer.track("screen_viewed", { screen: "/sign-in" });
     const second = fakeTracker();
-    buffer.drainInto(second);
+    buffer.attach(first);
+    buffer.attach(second);
+
+    buffer.track("app_opened", { source: "cold" });
 
     expect(first.track).toHaveBeenCalledTimes(1);
     expect(second.track).not.toHaveBeenCalled();
+  });
+
+  it("drops what it buffered once discarded, and buffers nothing after", () => {
+    // Auth resolved to signed out: a fast sign-in must not get these events
+    const clock = clockAt(0);
+    const buffer = createPreTrackerBuffer(clock.now);
+    buffer.track("screen_viewed", { screen: "/sign-in" });
+    buffer.discard();
+    buffer.track("screen_viewed", { screen: "/sign-up" });
+
+    const tracker = fakeTracker();
+    buffer.attach(tracker);
+
+    expect(tracker.track).not.toHaveBeenCalled();
   });
 
   it("never throws from track, even when the tracker does", () => {
@@ -104,6 +128,6 @@ describe("createPreTrackerBuffer", () => {
       },
     };
 
-    expect(() => buffer.drainInto(tracker)).not.toThrow();
+    expect(() => buffer.attach(tracker)).not.toThrow();
   });
 });
