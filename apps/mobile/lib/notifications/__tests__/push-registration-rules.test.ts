@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   CONTEXTUAL_ASK_COOLDOWN_MS,
+  isPushServiceUnavailableError,
   shouldOpenPendingContextualAsk,
   shouldShowContextualAsk,
   shouldShowFestivalAlertCard,
@@ -183,5 +184,18 @@ describe("shouldOpenPendingContextualAsk", () => {
     expect(shouldOpenPendingContextualAsk({ ...pendingAskReady, isPermissionLoading: true })).toBe(
       false,
     );
+  });
+});
+
+describe("isPushServiceUnavailableError", () => {
+  it("matches an Android device that cannot register with FCM", () => {
+    expect(
+      isPushServiceUnavailableError(new Error("Fetching the token failed: FCM Registration failed!")),
+    ).toBe(true);
+  });
+
+  it("leaves any other token failure alone", () => {
+    expect(isPushServiceUnavailableError(new Error("No 'projectId' found"))).toBe(false);
+    expect(isPushServiceUnavailableError(undefined)).toBe(false);
   });
 });

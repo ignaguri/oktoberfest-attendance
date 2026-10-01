@@ -18,6 +18,18 @@ describe("isNetworkUnreachableError", () => {
     expect(isNetworkUnreachableError(new TypeError("Network request failed"))).toBe(true);
   });
 
+  it("matches the iOS transport failures, whatever the device language", () => {
+    // expo/fetch wraps the URLSession error's localized description, so the
+    // text is in the user's language; only the "fetch failed" prefix is stable.
+    for (const message of [
+      "fetch failed: UnexpectedException: The network connection was lost. (at ExpoModulesCore/Promise.swift:56)",
+      "fetch failed: UnexpectedException: La conexión de red se ha perdido. (at ExpoModulesCore/Promise.swift:56)",
+      "fetch failed: UnexpectedException: Zeitüberschreitung bei der Anforderung. (at ExpoModulesCore/Promise.swift:56)",
+    ]) {
+      expect(isNetworkUnreachableError(new Error(message))).toBe(true);
+    }
+  });
+
   it("matches the prefixed string the sync manager stores for the banner", () => {
     expect(isNetworkUnreachableError("festivals: fetch failed: Unable to resolve host")).toBe(true);
   });

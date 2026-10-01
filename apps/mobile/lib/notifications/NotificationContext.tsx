@@ -16,6 +16,7 @@ import {
   storeFCMToken as saveExpoPushToken,
 } from "@/lib/auth/secure-storage";
 import { logger } from "@/lib/logger";
+import { isPushServiceUnavailableError } from "@/lib/notifications/push-registration-rules";
 
 /**
  * Expo Project ID for push tokens
@@ -100,7 +101,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
       return tokenData.data;
     } catch (error) {
-      logger.error("Error getting Expo push token:", error);
+      if (isPushServiceUnavailableError(error)) {
+        logger.warn("Push token unavailable on this device:", { error: String(error) });
+      } else {
+        logger.error("Error getting Expo push token:", error);
+      }
       return null;
     }
   }, []);

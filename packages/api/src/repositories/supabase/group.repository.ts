@@ -195,6 +195,12 @@ export class SupabaseGroupRepository implements IGroupRepository {
       user_id: userId,
     });
 
+    // A join racing this one (a double tap, a retried request) passed the
+    // membership check too and inserted first: same outcome as the check above.
+    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
+      throw new ConflictError("User is already a member of this group");
+    }
+
     if (error) {
       throw new DatabaseError(`Failed to add member: ${error.message}`);
     }

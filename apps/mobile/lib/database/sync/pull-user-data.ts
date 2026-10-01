@@ -13,7 +13,7 @@ import { logger } from "@/lib/logger";
 import { apiClient } from "../../api-client";
 import { clearDeletedConsumptions } from "../consumptions";
 import type { LocalAttendance, LocalConsumption, LocalProfile, LocalTentVisit } from "../schema";
-import { hasPendingDelete, updateLastSyncAt } from "../sync-queue";
+import { hasPendingDelete, remapAttendanceId, updateLastSyncAt } from "../sync-queue";
 import {
   clearDeletedTentVisits,
   clearSupersededTentVisits,
@@ -180,34 +180,6 @@ export async function pullAttendances(
   }
 
   return [attendancesResult, tentVisitsResult];
-}
-
-/**
- * Points everything that referenced a local attendance id at the server's id.
- *
- * Covers the dependent rows and the sync queue, not the attendance row itself:
- * the two callers differ in what else they write to it. Must run inside a
- * transaction so a half-remapped row is never visible.
- */
-async function remapAttendanceId(
-  db: SQLite.SQLiteDatabase,
-  oldId: string,
-  newId: string,
-): Promise<void> {
-  await db.runAsync(`UPDATE consumptions SET attendance_id = ? WHERE attendance_id = ?`, [
-    newId,
-    oldId,
-  ]);
-
-  await db.runAsync(`UPDATE beer_pictures SET attendance_id = ? WHERE attendance_id = ?`, [
-    newId,
-    oldId,
-  ]);
-
-  await db.runAsync(
-    `UPDATE _sync_queue SET record_id = ? WHERE record_id = ? AND table_name = 'attendances' AND status IN ('pending', 'failed')`,
-    [newId, oldId],
-  );
 }
 
 async function processAttendances(
