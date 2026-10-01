@@ -1,5 +1,6 @@
 import type { EarnedPersona } from "../schemas/wrapped.schema";
-import { PERSONA_IDS, type PersonaId } from "./story/persona";
+import { forFestival } from "./story/build-story";
+import { PERSONA_IDS, type PersonaId, personaName } from "./story/persona";
 
 export type PersonaCardState = "locked" | "unopened" | "opened";
 
@@ -8,6 +9,10 @@ export interface PersonaCardEntry {
   /** 1-based, PERSONA_IDS order */
   number: number;
   state: PersonaCardState;
+  /** Wiesn variant only when earned at an Oktoberfest, as on the story's persona slide */
+  name: string;
+  /** i18n key for the card back's description, Generic outside the Wiesn */
+  descriptionKey: string;
   /** Newest first; empty when locked */
   festivals: EarnedPersona["festivals"];
 }
@@ -31,7 +36,16 @@ export function buildPersonaCollection(earned: readonly EarnedPersona[]): Person
     if (isEarned) {
       state = entry.opened ? "opened" : "unopened";
     }
-    return { personaId, number: index + 1, state, festivals: isEarned ? entry.festivals : [] };
+    const festivals = isEarned ? entry.festivals : [];
+    const isWiesn = festivals.some((festival) => festival.isWiesn);
+    return {
+      personaId,
+      number: index + 1,
+      state,
+      name: personaName(personaId, isWiesn),
+      descriptionKey: forFestival({ key: `wrapped.story.persona.${personaId}.description` }, isWiesn).key,
+      festivals,
+    };
   });
 
   const firstUnopened = cards.findIndex((card) => card.state === "unopened");

@@ -7,7 +7,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-const okt26 = { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026" };
+const okt26 = { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026", isWiesn: true };
 
 const collection: GetPersonaCollectionResponse = {
   earned: [

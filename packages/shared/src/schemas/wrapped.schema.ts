@@ -205,8 +205,8 @@ export const PersonaIdSchema = z.enum(PERSONA_IDS);
 
 export const EarnedPersonaSchema = z.object({
   personaId: PersonaIdSchema,
-  /** Newest first */
-  festivals: z.array(z.object({ festivalId: z.uuid(), name: z.string() })),
+  /** Newest first. isWiesn: an Oktoberfest, where Wiesn-specific names and copy apply */
+  festivals: z.array(z.object({ festivalId: z.uuid(), name: z.string(), isWiesn: z.boolean() })),
   opened: z.boolean(),
 });
 

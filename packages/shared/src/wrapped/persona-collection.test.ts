@@ -4,8 +4,8 @@ import type { EarnedPersona } from "../schemas/wrapped.schema";
 import { buildPersonaCollection } from "./persona-collection";
 import { PERSONA_IDS } from "./story/persona";
 
-const okt26 = { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026" };
-const fruehling26 = { festivalId: "22222222-2222-4222-8222-222222222222", name: "Frühlingsfest 2026" };
+const okt26 = { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026", isWiesn: true };
+const fruehling26 = { festivalId: "22222222-2222-4222-8222-222222222222", name: "Frühlingsfest 2026", isWiesn: false };
 
 describe("buildPersonaCollection", () => {
   it("returns all 10 locked cards for a user with nothing earned", () => {
@@ -54,5 +54,28 @@ describe("buildPersonaCollection", () => {
     const collection = buildPersonaCollection([{ personaId: "geniesser", festivals: [], opened: false }]);
     expect(collection.cards[9].state).toBe("locked");
     expect(collection.collectedCount).toBe(0);
+  });
+
+  it("names a marathoner earned only outside the Wiesn Fest-Marathoner, with the generic description", () => {
+    const card = buildPersonaCollection([{ personaId: "marathoner", festivals: [fruehling26], opened: true }]).cards[
+      PERSONA_IDS.indexOf("marathoner")
+    ];
+    expect(card.name).toBe("Fest-Marathoner");
+    expect(card.descriptionKey).toBe("wrapped.story.persona.marathoner.descriptionGeneric");
+  });
+
+  it("keeps Wiesn-Marathoner when any of its festivals was an Oktoberfest", () => {
+    const card = buildPersonaCollection([{ personaId: "marathoner", festivals: [fruehling26, okt26], opened: true }])
+      .cards[PERSONA_IDS.indexOf("marathoner")];
+    expect(card.name).toBe("Wiesn-Marathoner");
+    expect(card.descriptionKey).toBe("wrapped.story.persona.marathoner.description");
+  });
+
+  it("names other personas the same at any festival", () => {
+    const card = buildPersonaCollection([{ personaId: "nachteule", festivals: [fruehling26], opened: true }]).cards[
+      PERSONA_IDS.indexOf("nachteule")
+    ];
+    expect(card.name).toBe("Nachteule");
+    expect(card.descriptionKey).toBe("wrapped.story.persona.nachteule.description");
   });
 });

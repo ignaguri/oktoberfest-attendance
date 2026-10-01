@@ -9076,11 +9076,15 @@
                                 },
                                 "name": {
                                   "type": "string"
+                                },
+                                "isWiesn": {
+                                  "type": "boolean"
                                 }
                               },
                               "required": [
                                 "festivalId",
-                                "name"
+                                "name",
+                                "isWiesn"
                               ]
                             }
                           },

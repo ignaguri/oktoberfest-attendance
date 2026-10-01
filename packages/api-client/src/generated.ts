@@ -5643,6 +5643,7 @@ export interface paths {
                                     /** Format: uuid */
                                     festivalId: string;
                                     name: string;
+                                    isWiesn: boolean;
                                 }[];
                                 opened: boolean;
                             }[];

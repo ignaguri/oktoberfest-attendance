@@ -73,7 +73,11 @@ export class WrappedService {
       festivals.map(async (festival) => {
         try {
           const data = await this.wrappedRepo.getWrapped(userId, festival.festivalId);
-          return { festival, personaId: derivePersona(data).id };
+          return {
+            festival,
+            personaId: derivePersona(data).id,
+            isWiesn: data.festivalInfo.festivalType === "oktoberfest",
+          };
         } catch (error) {
           logger.warn(
             { festivalId: festival.festivalId, error: error instanceof Error ? error.message : String(error) },
@@ -85,13 +89,13 @@ export class WrappedService {
     );
 
     // listFestivals is newest first, so each persona's festivals stay newest first
-    const festivalsByPersona = new Map<PersonaId, { festivalId: string; name: string }[]>();
+    const festivalsByPersona = new Map<PersonaId, { festivalId: string; name: string; isWiesn: boolean }[]>();
     for (const row of derived) {
       if (row === null) {
         continue;
       }
       const list = festivalsByPersona.get(row.personaId) ?? [];
-      list.push({ festivalId: row.festival.festivalId, name: row.festival.name });
+      list.push({ festivalId: row.festival.festivalId, name: row.festival.name, isWiesn: row.isWiesn });
       festivalsByPersona.set(row.personaId, list);
     }
 

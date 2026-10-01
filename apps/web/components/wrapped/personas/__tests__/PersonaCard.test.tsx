@@ -27,13 +27,19 @@ beforeAll(async () => {
   }));
 });
 
-const festivals = [
-  { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026" },
-  { festivalId: "22222222-2222-4222-8222-222222222222", name: "Frühlingsfest 2026" },
-];
+const okt26 = { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026", isWiesn: true };
+const fruehling26 = { festivalId: "22222222-2222-4222-8222-222222222222", name: "Frühlingsfest 2026", isWiesn: false };
+const festivals = [okt26, fruehling26];
 
 function card(state: PersonaCardEntry["state"]): PersonaCardEntry {
-  return { personaId: "nachteule", number: 7, state, festivals: state === "locked" ? [] : festivals };
+  return {
+    personaId: "nachteule",
+    number: 7,
+    state,
+    name: "Nachteule",
+    descriptionKey: "wrapped.story.persona.nachteule.description",
+    festivals: state === "locked" ? [] : festivals,
+  };
 }
 
 describe("PersonaCard", () => {
@@ -91,5 +97,21 @@ describe("PersonaCard", () => {
     expect(screen.getByText("No. 7 of 10")).toBeTruthy();
     fireEvent.click(screen.getByRole("button"));
     expect(screen.queryByText("The one who turns off the tent lights.")).toBeNull();
+  });
+
+  it("shows the card's own name and description, generic for a marathoner earned outside the Wiesn", () => {
+    const marathoner: PersonaCardEntry = {
+      personaId: "marathoner",
+      number: 3,
+      state: "opened",
+      name: "Fest-Marathoner",
+      descriptionKey: "wrapped.story.persona.marathoner.descriptionGeneric",
+      festivals: [fruehling26],
+    };
+    render(<PersonaCard card={marathoner} total={10} onOpen={vi.fn()} />);
+    expect(screen.getAllByText("Fest-Marathoner").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Wiesn-Marathoner")).toBeNull();
+    fireEvent.click(screen.getByRole("button"));
+    expect(screen.getByText("The festival grounds are your second home.")).toBeTruthy();
   });
 });

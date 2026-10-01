@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { PERSONA_NAMES, type PersonaCardEntry, type PersonaId } from "@prostcounter/shared/wrapped";
+import type { PersonaCardEntry, PersonaId } from "@prostcounter/shared/wrapped";
 import { cn } from "@prostcounter/ui";
 import { motion, useReducedMotion } from "framer-motion";
 import { type ReactNode, useState } from "react";
@@ -49,7 +49,7 @@ export function PersonaCard({ card, total, onOpen }: PersonaCardProps) {
       setRevealedHere(false);
     }
   }
-  const name = PERSONA_NAMES[card.personaId];
+  const name = card.name;
   const hint = t(`wrapped.story.persona.${card.personaId}.hint`);
 
   if (card.state === "locked") {
@@ -110,9 +110,7 @@ export function PersonaCard({ card, total, onOpen }: PersonaCardProps) {
       <span className={INK_SHADOW} aria-hidden="true" />
       <div className={cn(FACE, "gap-3 bg-wrapped-ink p-5 text-left text-wrapped-paper")}>
         <p className="font-wrapped text-3xl font-extrabold">{name}</p>
-        <p className="font-wrapped text-lg italic opacity-90">
-          {t(`wrapped.story.persona.${card.personaId}.description`)}
-        </p>
+        <p className="font-wrapped text-lg italic opacity-90">{t(card.descriptionKey)}</p>
         <p className="mt-2 text-xs font-extrabold uppercase tracking-wider text-wrapped-amber">
           {t("wrapped.personas.howToEarn")}
         </p>

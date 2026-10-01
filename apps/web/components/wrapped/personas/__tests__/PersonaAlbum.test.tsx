@@ -26,7 +26,7 @@ beforeAll(async () => {
   }));
 });
 
-const okt26 = { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026" };
+const okt26 = { festivalId: "11111111-1111-4111-8111-111111111111", name: "Oktoberfest 2026", isWiesn: true };
 
 describe("PersonaAlbum", () => {
   it("shows 0 of 10 and a locked first card when nothing is earned", () => {

@@ -154,6 +154,12 @@ const nightOwl = () =>
     data.timing.medianLastHour = 23;
   });
 
+/** makeWrapped defaults to an Oktoberfest */
+const atFruehlingsfest = (data: WrappedData): WrappedData => {
+  data.festivalInfo.festivalType = "fruehlingsfest";
+  return data;
+};
+
 function festival(festivalId: string, name: string): WrappedFestival {
   return { festivalId, name, startDate: "2026-09-19", endDate: "2026-10-04", unlocksAt: "2026-10-04T22:00:00.000Z", viewed: true };
 }
@@ -171,7 +177,7 @@ describe("WrappedService.getPersonaCollection", () => {
   it("groups festivals by persona in PERSONA_IDS order, newest first, with opened flags", async () => {
     const byFestival: Record<string, WrappedData> = {
       [okt26.festivalId]: nightOwl(),
-      [fruehling26.festivalId]: neutral(),
+      [fruehling26.festivalId]: atFruehlingsfest(neutral()),
       [okt25.festivalId]: nightOwl(),
     };
     const wrappedRepo = repo({
@@ -187,14 +193,14 @@ describe("WrappedService.getPersonaCollection", () => {
         {
           personaId: "nachteule",
           festivals: [
-            { festivalId: okt26.festivalId, name: "Oktoberfest 2026" },
-            { festivalId: okt25.festivalId, name: "Oktoberfest 2025" },
+            { festivalId: okt26.festivalId, name: "Oktoberfest 2026", isWiesn: true },
+            { festivalId: okt25.festivalId, name: "Oktoberfest 2025", isWiesn: true },
           ],
           opened: true,
         },
         {
           personaId: "geniesser",
-          festivals: [{ festivalId: fruehling26.festivalId, name: "Frühlingsfest 2026" }],
+          festivals: [{ festivalId: fruehling26.festivalId, name: "Frühlingsfest 2026", isWiesn: false }],
           opened: false,
         },
       ],
@@ -207,7 +213,7 @@ describe("WrappedService.getPersonaCollection", () => {
     const wrappedRepo = repo({
       listFestivals: vi.fn().mockResolvedValue([okt26, fruehling26]),
       getWrapped: vi.fn((_userId: string, festivalId: string) =>
-        festivalId === okt26.festivalId ? Promise.reject(new Error("rpc down")) : Promise.resolve(neutral()),
+        festivalId === okt26.festivalId ? Promise.reject(new Error("rpc down")) : Promise.resolve(atFruehlingsfest(neutral())),
       ),
     });
 
@@ -216,7 +222,7 @@ describe("WrappedService.getPersonaCollection", () => {
     expect(result.earned).toEqual([
       {
         personaId: "geniesser",
-        festivals: [{ festivalId: fruehling26.festivalId, name: "Frühlingsfest 2026" }],
+        festivals: [{ festivalId: fruehling26.festivalId, name: "Frühlingsfest 2026", isWiesn: false }],
         opened: false,
       },
     ]);

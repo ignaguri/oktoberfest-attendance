@@ -1,5 +1,5 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
-import { PERSONA_NAMES, type PersonaCardEntry, type PersonaId } from "@prostcounter/shared/wrapped";
+import type { PersonaCardEntry, PersonaId } from "@prostcounter/shared/wrapped";
 import { cn } from "@prostcounter/ui";
 import * as Haptics from "expo-haptics";
 import { type ReactNode, useEffect, useState } from "react";
@@ -65,7 +65,7 @@ export function PersonaCard({ card, total, size, onOpen }: PersonaCardProps) {
   }
   const rotation = useSharedValue(0);
   const { width, height } = size;
-  const name = PERSONA_NAMES[card.personaId];
+  const name = card.name;
   const hint = t(`wrapped.story.persona.${card.personaId}.hint`);
 
   const isFaceDown = card.state === "unopened" && !turned;
@@ -164,7 +164,7 @@ export function PersonaCard({ card, total, size, onOpen }: PersonaCardProps) {
       <VStack space="md" className={cn(FACE, "bg-wrapped-ink p-5")}>
         <Text className="font-wrapped text-3xl font-extrabold text-wrapped-paper">{name}</Text>
         <Text className="font-wrapped text-lg italic text-wrapped-paper/90">
-          {t(`wrapped.story.persona.${card.personaId}.description`)}
+          {t(card.descriptionKey)}
         </Text>
         <Text className="mt-2 text-xs font-extrabold uppercase tracking-wider text-wrapped-amber">
           {t("wrapped.personas.howToEarn")}

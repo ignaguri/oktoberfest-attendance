@@ -48,7 +48,7 @@ const WIESN_KEYS = new Set(
   ].map((key) => `wrapped.story.${key}`),
 );
 
-const forFestival = (ref: CopyRef, isWiesn: boolean): CopyRef =>
+export const forFestival = (ref: CopyRef, isWiesn: boolean): CopyRef =>
   isWiesn || !WIESN_KEYS.has(ref.key) ? ref : { ...ref, key: `${ref.key}Generic` };
 
 const isWiesn = (data: WrappedData) => data.festivalInfo.festivalType === "oktoberfest";

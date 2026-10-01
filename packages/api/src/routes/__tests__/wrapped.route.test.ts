@@ -122,7 +122,7 @@ describe("Wrapped routes", () => {
 
   it("GET /wrapped/personas returns the collection (not shadowed by /wrapped/{festivalId})", async () => {
     mockService.getPersonaCollection.mockResolvedValue({
-      earned: [{ personaId: "nachteule", festivals: [{ festivalId, name: "Oktoberfest 2026" }], opened: false }],
+      earned: [{ personaId: "nachteule", festivals: [{ festivalId, name: "Oktoberfest 2026", isWiesn: true }], opened: false }],
     });
     const res = await app.request(createAuthRequest("/wrapped/personas"));
     expect(res.status).toBe(200);
