@@ -1,5 +1,14 @@
 type PermissionStatus = "undetermined" | "granted" | "denied";
 
+/**
+ * An Android device that cannot register with FCM (no Google Play services, or
+ * a broken install of them) fails every push token request, on every launch.
+ * Nothing in the app can fix that, so it is not worth a Sentry error.
+ */
+export function isPushServiceUnavailableError(error: unknown): boolean {
+  return error instanceof Error && /FCM Registration failed/i.test(error.message);
+}
+
 export function shouldSyncPushRegistration(input: {
   isAuthenticated: boolean;
   isPermissionLoading: boolean;

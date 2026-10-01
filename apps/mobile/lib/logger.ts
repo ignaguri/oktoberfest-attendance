@@ -93,9 +93,16 @@ function stringifyContextValues(ctx?: LogContext): LogContext | undefined {
  * A device with no connection or DNS fails every fetch at once (one Fairphone
  * sent ~10 events in a second). That is the user's network, not a bug, so it
  * stays in the console and out of Sentry.
+ *
+ * On iOS, expo/fetch reports the URLSession error's localized description
+ * ("La conexión de red se ha perdido.", "Zeitüberschreitung bei der
+ * Anforderung."), so no wording can be matched there. "fetch failed" is the
+ * prefix it puts on every transport failure, and an HTTP error status resolves
+ * instead of throwing, so the prefix alone means the request never got an
+ * answer.
  */
 const NETWORK_UNREACHABLE_PATTERN =
-  /UnknownHostException|Unable to resolve host|Network request failed/i;
+  /fetch failed|UnknownHostException|Unable to resolve host|Network request failed/i;
 
 export function isNetworkUnreachableError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : typeof error === "string" ? error : "";
