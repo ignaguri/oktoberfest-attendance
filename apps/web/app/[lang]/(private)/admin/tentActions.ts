@@ -3,7 +3,7 @@
 import "server-only";
 
 import type { Tables, TablesInsert } from "@prostcounter/db";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { v4 as uuidv4 } from "uuid";
 
 import { reportSupabaseException } from "@/utils/sentry";
@@ -132,8 +132,6 @@ export async function addTentToFestival(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents", "max");
-  revalidateTag(`festival-tents-${festivalId}`, "max");
 }
 
 /**
@@ -170,8 +168,6 @@ export async function addAllAvailableTentsToFestival(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents", "max");
-  revalidateTag(`festival-tents-${festivalId}`, "max");
 
   return { added: availableTents.length, skipped: 0 };
 }
@@ -208,8 +204,6 @@ export async function removeTentFromFestival(festivalId: string, tentId: string)
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents", "max");
-  revalidateTag(`festival-tents-${festivalId}`, "max");
 }
 
 /**
@@ -235,7 +229,6 @@ export async function updateTentPrice(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag(`festival-tents-${festivalId}`, "max");
 }
 
 /**
@@ -268,10 +261,6 @@ export async function createTent(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents", "max");
-  if (festivalId) {
-    revalidateTag(`festival-tents-${festivalId}`, "max");
-  }
 
   return tent;
 }
@@ -299,7 +288,6 @@ export async function updateTent(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents", "max");
 
   return tent;
 }
@@ -364,8 +352,6 @@ export async function copyTentsToFestival(
 
   // Invalidate caches
   revalidatePath("/admin");
-  revalidateTag("tents", "max");
-  revalidateTag(`festival-tents-${targetFestivalId}`, "max");
 }
 
 /**
