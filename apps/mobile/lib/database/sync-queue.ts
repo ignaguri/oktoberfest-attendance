@@ -257,12 +257,24 @@ export async function markOperationCompleted(
 
 /**
  * Marks an operation as failed with error message.
+ *
+ * `countsAsAttempt: false` records the failure without spending a retry, for a
+ * request that never got an answer: it says nothing about whether the op can
+ * succeed, and an op that runs out of retries is never attempted again.
  */
 export async function markOperationFailed(
   db: SQLite.SQLiteDatabase,
   operationId: string,
   error: string,
+  { countsAsAttempt = true }: { countsAsAttempt?: boolean } = {},
 ): Promise<void> {
+  if (!countsAsAttempt) {
+    await db.runAsync(`UPDATE _sync_queue SET status = 'failed', last_error = ? WHERE id = ?`, [
+      error,
+      operationId,
+    ]);
+    return;
+  }
   await updateOperationStatus(db, operationId, "failed", error);
 }
 

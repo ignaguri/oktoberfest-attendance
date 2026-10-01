@@ -10,7 +10,7 @@
 
 import type * as SQLite from "expo-sqlite";
 
-import { logger } from "@/lib/logger";
+import { isNetworkUnreachableError, logger } from "@/lib/logger";
 
 import type { SyncableTable, SyncQueueItem } from "./schema";
 import {
@@ -246,7 +246,11 @@ export class QueueProcessor {
       return { success: true };
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      await markOperationFailed(this.db, op.id, errorMsg);
+      // A request that got no answer (a flaky tent connection that still
+      // reports online) keeps its retries; only a real rejection spends one.
+      await markOperationFailed(this.db, op.id, errorMsg, {
+        countsAsAttempt: !isNetworkUnreachableError(error),
+      });
 
       // Schedule retry with backoff
       const delay = this.calculateBackoff(op.retry_count);
