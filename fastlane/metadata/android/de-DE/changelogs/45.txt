@@ -1,0 +1,4 @@
+- Behoben: Auf manchen Handys blieb die App nach dem Update auf dem Startbildschirm hängen.
+- Neu: die Persona-Sammlung mit allen Personas aus deinem Wrapped.
+- Foto-Uploads hängen nicht mehr fest, und das Beitreten zu Gruppen klappt zuverlässiger.
+Prost!

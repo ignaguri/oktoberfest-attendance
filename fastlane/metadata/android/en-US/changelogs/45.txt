@@ -1,0 +1,4 @@
+- Fixed the app getting stuck on the splash screen after updating on some phones.
+- New persona collection: collect every Wrapped persona.
+- Photo uploads no longer get stuck, and joining a group is more reliable.
+Prost!
