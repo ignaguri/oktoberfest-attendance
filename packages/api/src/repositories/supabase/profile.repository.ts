@@ -33,6 +33,15 @@ import { ConflictError, DatabaseError, NotFoundError } from "../../middleware/er
  */
 const PAGE_SIZE = 1000;
 
+/**
+ * Beers per day rounded half up to 2 decimals, like the SQL avg_beers columns.
+ * Multiplies before dividing: 11.5 / 20 * 100 lands just below 57.5 in floating
+ * point and would round down.
+ */
+export function averagePerDay(totalBeers: number, totalDays: number): number {
+  return totalDays > 0 ? Math.round((totalBeers * 100) / totalDays) / 100 : 0;
+}
+
 export class SupabaseProfileRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
 
@@ -762,9 +771,8 @@ export class SupabaseProfileRepository {
       totalSpent: Number(spendingStats?.total_spent_cents) || 0,
       totalBaseCents: Number(spendingStats?.total_base_cents) || 0,
       totalTipCents: Number(spendingStats?.total_tips_cents) || 0,
-      // The RPC returns no avg_beers; rounded like the SQL avg_beers columns
-      avgBeersPerDay:
-        totalDays > 0 ? Math.round((totalBeers / totalDays) * 100) / 100 : 0,
+      // The RPC returns no avg_beers
+      avgBeersPerDay: averagePerDay(totalBeers, totalDays),
       favoriteDay: null, // Could be calculated if needed
       favoriteTent,
       groupPositions,
