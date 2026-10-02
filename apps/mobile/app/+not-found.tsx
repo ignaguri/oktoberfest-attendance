@@ -1,8 +1,9 @@
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { Stack, useRouter } from "expo-router";
 import { Beer } from "lucide-react-native";
-import { Text, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
+import { CappedText as Text } from "@/components/ui/capped-text";
 import { Colors } from "@/lib/constants/colors";
 
 export default function NotFoundScreen() {

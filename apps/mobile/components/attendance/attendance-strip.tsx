@@ -65,6 +65,9 @@ function getWeekdayHeaders(): string[] {
  * the 1st), the day number, and the indicators. The old 48pt cell stacked the
  * same content with an absolutely positioned today bar that landed on the
  * number. Festivals span at most three or four weeks, so the height is cheap.
+ * The top-slot and indicator labels ignore the system text size: their slots
+ * are fixed, and the cell's accessibility label already carries what they say.
+ * The day number does scale, so the cell grows past 56pt when it needs to.
  */
 export function AttendanceStrip({
   festivalStartDate,
@@ -130,7 +133,7 @@ export function AttendanceStrip({
       const topSlot = resolveCellTopSlot({ isToday, isFirstOfMonth });
 
       const cellClassName = cn(
-        "h-14 flex-1 items-center justify-center rounded-lg",
+        "min-h-14 flex-1 items-center justify-center rounded-lg py-1",
         isSelected && "bg-primary-500",
         !isSelected && hasAttendance && "border border-primary-300 bg-primary-100",
         !isSelected && !hasAttendance && hasReservation && "border border-teal-300 bg-teal-100",
@@ -181,6 +184,7 @@ export function AttendanceStrip({
             <View className="h-2 justify-center">
               {topSlot === "today" && (
                 <Text
+                  allowFontScaling={false}
                   className={cn(
                     "text-[7px] font-extrabold uppercase leading-none",
                     isSelected ? "text-white" : "text-typography-900",
@@ -191,6 +195,7 @@ export function AttendanceStrip({
               )}
               {topSlot === "month" && (
                 <Text
+                  allowFontScaling={false}
                   className={cn(
                     "text-[8px] font-semibold uppercase leading-none",
                     isSelected ? "text-white" : "text-typography-500",
@@ -208,6 +213,7 @@ export function AttendanceStrip({
                 <HStack className="items-center gap-0.5">
                   <Beer size={INDICATOR_ICON_SIZE} color={indicatorColor} />
                   <Text
+                    allowFontScaling={false}
                     className={cn(
                       "text-[9px] font-semibold leading-none",
                       isSelected ? "text-white" : "text-primary-600",
@@ -236,6 +242,7 @@ export function AttendanceStrip({
                     color={isSelected ? Colors.white : IconColors.friends}
                   />
                   <Text
+                    allowFontScaling={false}
                     className={cn(
                       "text-[9px] font-semibold leading-none",
                       isSelected ? "text-white" : "text-sky-700",

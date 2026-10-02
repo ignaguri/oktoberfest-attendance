@@ -6,7 +6,9 @@ import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import { cssInterop } from "nativewind";
 import React from "react";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
+
+import { CappedText as Text } from "@/components/ui/capped-text";
 
 const SCOPE = "Radio";
 

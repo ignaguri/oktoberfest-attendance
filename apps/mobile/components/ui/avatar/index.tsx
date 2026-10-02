@@ -5,7 +5,9 @@ import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import type { AvatarSize } from "@prostcounter/ui";
 import React from "react";
-import { Image, Platform, Text, View } from "react-native";
+import { Image, Platform, View } from "react-native";
+
+import { CappedText as Text } from "@/components/ui/capped-text";
 
 const SCOPE = "AVATAR";
 

@@ -11,7 +11,9 @@ import {
 import type { ButtonAction, ButtonGroupSpace, ButtonSize, ButtonVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, View } from "react-native";
+
+import { CappedText as Text } from "@/components/ui/capped-text";
 
 const SCOPE = "BUTTON";
 

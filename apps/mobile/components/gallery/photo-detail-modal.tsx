@@ -22,12 +22,12 @@ import {
   Modal,
   Platform,
   Pressable,
-  TextInput,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PhotoTagsSection } from "@/components/photo-tags/photo-tags-section";
 import { Avatar, AvatarFallbackText, AvatarImage } from "@/components/ui/avatar";
+import { CappedTextInput as TextInput } from "@/components/ui/capped-text";
 import { HStack } from "@/components/ui/hstack";
 import { MugLoader } from "@/components/ui/mug-loader";
 import { Text } from "@/components/ui/text";

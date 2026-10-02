@@ -7,7 +7,9 @@ import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewin
 import type { InputSize, InputVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, View } from "react-native";
+
+import { CappedTextInput as TextInput } from "@/components/ui/capped-text";
 
 const SCOPE = "INPUT";
 

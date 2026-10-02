@@ -3,6 +3,8 @@ import type { VariantProps } from "@gluestack-ui/utils/nativewind-utils";
 import { cssInterop } from "nativewind";
 import React, { forwardRef, memo } from "react";
 
+import { MAX_FONT_SIZE_MULTIPLIER } from "@/components/ui/capped-text";
+
 import { headingStyle } from "./styles";
 
 type IHeadingProps = VariantProps<typeof headingStyle> &
@@ -195,12 +197,21 @@ const Heading = memo(
             highlight: highlight as boolean,
             class: className,
           })}
+          maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
           {...props}
         />
       );
     }
 
-    return <MappedHeading className={className} size={size} ref={ref} {...props} />;
+    return (
+      <MappedHeading
+        className={className}
+        size={size}
+        ref={ref}
+        maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
+        {...props}
+      />
+    );
   }),
 );
 

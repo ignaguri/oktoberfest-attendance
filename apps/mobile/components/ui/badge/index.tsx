@@ -6,8 +6,10 @@ import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewin
 import type { BadgeAction, BadgeSize, BadgeVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React, { useMemo } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import type { Svg } from "react-native-svg";
+
+import { CappedText as Text } from "@/components/ui/capped-text";
 
 // Import contract types from shared UI package
 
