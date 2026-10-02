@@ -16,11 +16,12 @@ import {
   Pressable,
   ScrollView,
   SectionList,
-  Text,
   View,
   VirtualizedList,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { CappedText as Text, MAX_FONT_SIZE_MULTIPLIER } from "@/components/ui/capped-text";
 
 type IAnimatedPressableProps = React.ComponentProps<typeof Pressable> &
   MotionComponentProps<typeof Pressable, ViewStyle, unknown, unknown, unknown>;
@@ -501,6 +502,7 @@ const ActionsheetSectionHeaderText = React.forwardRef<
         italic: italic as boolean,
         highlight: highlight as boolean,
       })}
+      maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
       ref={ref}
       {...props}
     />

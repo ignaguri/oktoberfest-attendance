@@ -4,7 +4,6 @@ import type { GroupMessageType } from "@prostcounter/shared/schemas";
 import { cn } from "@prostcounter/ui";
 import { AlertTriangle, MessageSquare, Send } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { TextInput } from "react-native";
 
 import {
   Actionsheet,
@@ -15,6 +14,7 @@ import {
   ActionsheetScrollView,
 } from "@/components/ui/actionsheet";
 import { Button, ButtonSpinner, ButtonText } from "@/components/ui/button";
+import { CappedTextInput as TextInput } from "@/components/ui/capped-text";
 import { Heading } from "@/components/ui/heading";
 import { HStack } from "@/components/ui/hstack";
 import { Pressable } from "@/components/ui/pressable";

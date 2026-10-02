@@ -14,12 +14,12 @@ import {
   Pressable,
   ScrollView,
   SectionList,
-  Text,
   View,
   VirtualizedList,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CappedText as Text, MAX_FONT_SIZE_MULTIPLIER } from "@/components/ui/capped-text";
 import { useKeyboardHeight } from "@/hooks/useKeyboardHeight";
 
 const ItemWrapper = React.forwardRef<React.ComponentRef<typeof Pressable>, PressableProps>(
@@ -505,6 +505,7 @@ const ActionsheetSectionHeaderText = React.forwardRef<
         italic: Boolean(italic),
         highlight: Boolean(highlight),
       })}
+      maxFontSizeMultiplier={MAX_FONT_SIZE_MULTIPLIER}
       ref={ref}
       {...props}
     />
