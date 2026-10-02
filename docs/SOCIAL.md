@@ -35,9 +35,17 @@ Copy key is `followInstagram` under `footer`, `marketing.footer` and `profile.ab
 | 2026-09-25 | Carousel | 8 app screenshots, 4:5, alt text per slide                             | `screenshots/instagram/en/`                        |
 | 2026-09-25 | Reel     | 20s promo remix: Maß counter hook, two-tap log, leaderboard, 90 badges | `brags/2026-09-25-162342/brag.mp4` (main checkout) |
 | 2026-09-26 | 8 posts  | One screen per post, headline + a short what-you-can-do caption        | `screenshots/instagram/en/`                        |
+| 2026-09-29 | Reel     | 18s badge hunter: Full Festival hook, Schlager track added in the app  | `brags/2026-09-25-164442-badge-hunter/brag.mp4`    |
+| 2026-10-02 | Reel     | 18s crew rivalry: Settle it hook, original Lyria bed                   | `brags/2026-09-25-164442-crew-rivalry/brag.mp4`    |
+| 2026-10-02 | Reel     | 18s tent hopper: every tent Full hook, original Lyria bed              | `brags/2026-09-25-164442-tent-hopper/brag.mp4`     |
+| 2026-10-02 | Reel     | 18s wrapped: 31 Maß, 9 days, 8 tents hook, original Lyria bed          | `brags/2026-09-25-164442-wrapped/brag.mp4`         |
 
 Links: [carousel](https://www.instagram.com/prostcounter/p/Ddt5T5tCGEQ/),
-[reel](https://www.instagram.com/prostcounter/reel/Ddt9ydwPRPC/).
+[reel](https://www.instagram.com/prostcounter/reel/Ddt9ydwPRPC/),
+[badge hunter reel](https://www.instagram.com/prostcounter/reel/Dd340vqI-yn/),
+[crew rivalry reel](https://www.instagram.com/prostcounter/reel/Dd_pzAhB4iY/),
+[tent hopper reel](https://www.instagram.com/prostcounter/reel/Dd_qKJaxiS1/),
+[wrapped reel](https://www.instagram.com/prostcounter/reel/Dd_qcV0uC4C/).
 Single posts, oldest first: [map](https://www.instagram.com/prostcounter/p/DdvyjVwCJCN/),
 [wrapped](https://www.instagram.com/prostcounter/p/DdvzpV8iOr6/),
 [badges](https://www.instagram.com/prostcounter/p/Ddv0ekwiKnd/),
@@ -58,16 +66,22 @@ Posted in reverse so the grid reads Home first.
 - **Promo videos**: `brags/` in the main checkout (gitignored, not on any branch). Each run
   folder has `brag.mp4` (1080x1920), `share-copy.txt` (the caption written for that cut),
   `brag-plan.md` and the `composition/`. `share-copy.txt` wins over the caption in
-  `brag-plan.md`, which is only the first draft. As of 2026-09-25, `155717` is the unposted
-  original, and the four `164442-*` runs are still work in progress.
+  `brag-plan.md`, which is only the first draft. `instagram/cover.jpg` is the designed cover
+  for the Reel. `155717` is the unposted original; all four `164442-*` runs are posted.
+- **Reel music**: crew-rivalry, tent-hopper and wrapped carry original beds generated with
+  Google Lyria by [scripts/music/](../scripts/music/README.md), which replaced the stock
+  "happy-beats-business-moves" tracks. The stock cuts are kept as `brag-stock.mp4`.
 
 ### Posting from the web
 
 - Feed images max out at 4:5. Pick the 4:5 crop ("Seleccionar recorte"), or Instagram
   squares them.
 - Every video post becomes a Reel. Pick "Original" in the crop step to keep 9:16.
-- The cover defaults to the first frame. The brag renders open on a poster frame, so the
-  default is fine.
+- The web can't add music, and drafts saved on the phone never reach the web. To swap in a
+  track from Instagram's library, post the whole Reel from the phone app.
+- The cover defaults to the first frame, which is dark on the `164442-*` runs. Upload the
+  run's `instagram/cover.jpg` with "Seleccionar del ordenador" under "Foto de portada" in the
+  edit step.
 - Alt text is per image, under "Accesibilidad" in the caption step. There is no visible
   per-slide caption on the web.
 - Stories can't be posted with video from the web. The mobile-web story button only takes
