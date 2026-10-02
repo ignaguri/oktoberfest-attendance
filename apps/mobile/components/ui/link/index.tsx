@@ -5,8 +5,9 @@ import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import { withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import { cssInterop } from "nativewind";
 import React from "react";
-import { Text } from "react-native";
 import { Pressable } from "react-native";
+
+import { CappedText as Text } from "@/components/ui/capped-text";
 export const UILink = createLink({
   Root: withStyleContext(Pressable),
   Text: Text,

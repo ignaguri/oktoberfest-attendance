@@ -9,7 +9,9 @@ import type { CheckboxSize } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React from "react";
 import type { TextProps, ViewProps } from "react-native";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Platform, Pressable, View } from "react-native";
+
+import { CappedText as Text } from "@/components/ui/capped-text";
 
 const IndicatorWrapper = React.forwardRef<React.ComponentRef<typeof View>, ViewProps>(
   function IndicatorWrapper({ ...props }, ref) {

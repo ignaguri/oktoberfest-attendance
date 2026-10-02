@@ -258,8 +258,9 @@ export default function GroupDetailScreen() {
           {/* Group Info Card */}
           <Card variant="elevated" size="lg" className="bg-white">
             <VStack space="md">
-              <HStack className="items-start justify-between">
-                <VStack space="xs" className="flex-1">
+              {/* Wraps the badge under the title once both no longer fit side by side */}
+              <HStack className="flex-wrap items-start justify-between gap-2">
+                <VStack space="xs" className="grow basis-48">
                   <Heading size="xl" className="text-typography-900">
                     {group.name}
                   </Heading>
@@ -272,9 +273,9 @@ export default function GroupDetailScreen() {
                     </Text>
                   </HStack>
                 </VStack>
-                <Badge action="warning" variant="solid" size="md" className="bg-primary-500">
+                <Badge action="warning" variant="solid" size="md" className="max-w-full bg-primary-500">
                   <Trophy size={12} color={IconColors.white} />
-                  <BadgeText className="ml-1 text-white">{criteriaLabel}</BadgeText>
+                  <BadgeText className="ml-1 shrink text-white">{criteriaLabel}</BadgeText>
                 </Badge>
               </HStack>
 

@@ -76,11 +76,17 @@ export function FestivalStatus() {
       <Card size="md" variant="filled" className={cn(compactConfig.bgColor, "border border-outline-200")}>
         <HStack space="sm" className="items-center justify-center">
           {compactConfig.icon}
-          <Text className={cn("text-base font-semibold", compactConfig.textColor)}>
+          {/* One line that shrinks to fit instead of overflowing the card at larger text sizes */}
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            className={cn("shrink text-base font-semibold", compactConfig.textColor)}
+          >
             {compactMessage}
+            <Text className="font-normal text-typography-400"> • </Text>
+            <Text className="font-bold text-typography-700">{currentFestival.name}</Text>
           </Text>
-          <Text className="text-typography-400">•</Text>
-          <Text className="text-base font-bold text-typography-700">{currentFestival.name}</Text>
         </HStack>
       </Card>
     );

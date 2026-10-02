@@ -8,7 +8,7 @@ import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewin
 import type { SelectSize, SelectVariant } from "@prostcounter/ui";
 import { cssInterop } from "nativewind";
 import React from "react";
-import { Pressable, TextInput, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import {
   Actionsheet,
@@ -24,6 +24,8 @@ import {
   ActionsheetSectionList,
   ActionsheetVirtualizedList,
 } from "./select-actionsheet";
+
+import { CappedTextInput as TextInput } from "@/components/ui/capped-text";
 
 const SelectTriggerWrapper = React.forwardRef<
   React.ComponentRef<typeof Pressable>,

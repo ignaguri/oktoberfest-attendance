@@ -5,7 +5,9 @@ import { tva } from "@gluestack-ui/utils/nativewind-utils";
 import { useStyleContext, withStyleContext } from "@gluestack-ui/utils/nativewind-utils";
 import type { TextareaSize, TextareaVariant } from "@prostcounter/ui";
 import React from "react";
-import { TextInput, View } from "react-native";
+import { View } from "react-native";
+
+import { CappedTextInput as TextInput } from "@/components/ui/capped-text";
 
 const SCOPE = "TEXTAREA";
 const UITextarea = createTextarea({

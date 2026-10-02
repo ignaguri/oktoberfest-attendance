@@ -35,9 +35,14 @@ export function AppHeader() {
           alt=""
           accessibilityLabel={t("app.logo")}
         />
+        {/* The wordmark is a logo, so it stays put when the system text size grows */}
         <View className="flex-row">
-          <Text className="text-3xl font-extrabold text-primary-600">{t("app.namePart1")}</Text>
-          <Text className="text-3xl font-extrabold text-primary-500">{t("app.namePart2")}</Text>
+          <Text maxFontSizeMultiplier={1} className="text-3xl font-extrabold text-primary-600">
+            {t("app.namePart1")}
+          </Text>
+          <Text maxFontSizeMultiplier={1} className="text-3xl font-extrabold text-primary-500">
+            {t("app.namePart2")}
+          </Text>
         </View>
       </View>
 
@@ -99,7 +104,7 @@ function NotificationBellWithBadge({ onPress }: { onPress: () => void }) {
             paddingHorizontal: 4,
           }}
         >
-          <Text className="text-[10px] font-bold text-white">
+          <Text maxFontSizeMultiplier={1} className="text-[10px] font-bold text-white">
             {unreadCount > 99 ? "99+" : unreadCount}
           </Text>
         </View>

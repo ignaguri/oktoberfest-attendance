@@ -8,7 +8,9 @@ import { AnimatePresence, Motion } from "@legendapp/motion";
 import { cssInterop } from "nativewind";
 import React from "react";
 import type { ViewStyle } from "react-native";
-import { AccessibilityInfo, Text, View } from "react-native";
+import { AccessibilityInfo, View } from "react-native";
+
+import { CappedText as Text } from "@/components/ui/capped-text";
 
 type IMotionViewProps = React.ComponentProps<typeof View> &
   MotionComponentProps<typeof View, ViewStyle, unknown, unknown, unknown>;
