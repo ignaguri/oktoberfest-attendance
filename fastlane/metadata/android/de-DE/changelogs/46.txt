@@ -1,0 +1,3 @@
+- Neu: die Persona-Sammlung. Jede Wrapped-Persona ist eine Sammelkarte, die nur darauf wartet, gefunden zu werden. Schalt sie frei, dreh sie um und mach dein Album voll. Hast du sie alle?
+- Behoben: Die App blieb nach dem Update auf dem Startbildschirm hängen.
+Prost!

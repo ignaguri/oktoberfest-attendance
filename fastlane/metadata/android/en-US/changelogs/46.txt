@@ -1,0 +1,3 @@
+- New: the persona collection. Every Wrapped persona is a card waiting to be found. Unlock them, flip them over and complete your album. Got 'em all?
+- Fixed the app getting stuck on the splash screen after updating.
+Prost!
