@@ -7,7 +7,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   version: "1.10.1",
   orientation: "portrait",
   scheme: "prostcounter",
-  icon: "./assets/images/logo.png",
+  // Opaque full-bleed square: iOS applies its own mask. logo.png is the rounded in-app variant.
+  icon: "./assets/images/icon.png",
   userInterfaceStyle: "automatic",
   runtimeVersion: "1.10.0-a",
   updates: {
@@ -56,7 +57,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: "#FBBF24",
+      foregroundImage: "./assets/images/adaptive-icon.png",
+      backgroundColor: "#FEC506",
     },
     package: "com.prostcounter.app",
     googleServicesFile: "./google-services.json",
