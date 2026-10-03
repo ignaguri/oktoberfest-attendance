@@ -590,10 +590,19 @@ export async function runUploadFileOp(
   },
   options: UploadPhotoOptions,
 ): Promise<void> {
-  const photo = await getPhotoById(db, payload.recordId);
+  // Read past the tombstone: a photo removed before its upload ran is a
+  // finished op, not a missing row to retry forever.
+  const photo = await db.getFirstAsync<LocalBeerPicture>(
+    "SELECT * FROM beer_pictures WHERE id = ?",
+    [payload.recordId],
+  );
 
   if (!photo) {
     throw new Error(`Photo not found for UPLOAD_FILE op: ${payload.recordId}`);
+  }
+
+  if (photo._deleted === 1) {
+    return;
   }
 
   if (photo._pending_upload === 0) {
@@ -611,6 +620,45 @@ export async function runUploadFileOp(
   if (!result.success) {
     throw new Error(result.error || "Photo upload failed");
   }
+}
+
+/**
+ * Remove photos the user dropped from a day, on the server and on this device.
+ *
+ * beer_pictures is never pulled, so this device only loses a row when it is
+ * removed here. Deleting on the server alone leaves the photo on screen for good.
+ *
+ * A photo still waiting to upload never reached the server: it only goes
+ * locally, and its queued upload then finds the tombstone and skips. An
+ * uploaded one goes on the server first and locally only once that worked, so a
+ * failed request leaves it visible rather than hiding a photo that still exists.
+ *
+ * Returns the ids that could not be removed.
+ */
+export async function removePhotos(
+  db: SQLite.SQLiteDatabase,
+  photoIds: string[],
+  options: { apiClient: { photos: { delete: (photoId: string) => Promise<unknown> } } },
+): Promise<string[]> {
+  const failed: string[] = [];
+
+  for (const photoId of photoIds) {
+    const photo = await getPhotoById(db, photoId);
+
+    if (photo?._pending_upload !== 1) {
+      try {
+        await options.apiClient.photos.delete(photoId);
+      } catch (error) {
+        logger.warn("[PhotoQueue] Failed to delete photo:", { photoId, error });
+        failed.push(photoId);
+        continue;
+      }
+    }
+
+    await deletePendingPhoto(db, photoId);
+  }
+
+  return failed;
 }
 
 // =============================================================================

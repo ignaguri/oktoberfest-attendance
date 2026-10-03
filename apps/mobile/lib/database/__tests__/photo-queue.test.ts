@@ -14,6 +14,7 @@ import {
   type PhotoQueueStats,
   type PhotoUploadResult,
   type ProcessPendingPhotosResult,
+  removePhotos,
   runUploadFileOp,
   savePendingPhoto,
 } from "../photo-queue";
@@ -600,6 +601,24 @@ describe("runUploadFileOp", () => {
     ).rejects.toThrow(/Photo not found/);
   });
 
+  it("is a no-op when the photo was removed before it uploaded", async () => {
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(createMockPhoto({ _deleted: 1 })),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 0 }),
+    };
+
+    await expect(
+      runUploadFileOp(
+        db as never,
+        { recordId: "photo-123", festivalId: "festival-1" },
+        { apiClient: baseApiClient },
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(baseApiClient.photos.getUploadUrl).not.toHaveBeenCalled();
+  });
+
   it("is a no-op when the photo is already uploaded", async () => {
     const db = {
       getFirstAsync: vi.fn().mockResolvedValue(createMockPhoto({ _pending_upload: 0 })),
@@ -735,5 +754,56 @@ describe("runUploadFileOp", () => {
     );
 
     expect(apiClient.photos.confirmUpload).toHaveBeenCalledWith(SERVER_ID, undefined);
+  });
+});
+
+describe("removePhotos", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  function tombstoned(db: ReturnType<typeof createMockDb>) {
+    return db.runAsync.mock.calls
+      .filter((c) => String(c[0]).includes("SET _deleted = 1"))
+      .map((c) => (c[1] as string[])[0]);
+  }
+
+  it("deletes an uploaded photo on the server, then locally", async () => {
+    const db = createMockDb();
+    db.getFirstAsync.mockResolvedValue(
+      createMockPhoto({ id: "pic-1", _pending_upload: 0, _local_uri: null }),
+    );
+    const apiClient = { photos: { delete: vi.fn().mockResolvedValue({ success: true }) } };
+
+    const failed = await removePhotos(db as never, ["pic-1"], { apiClient });
+
+    expect(apiClient.photos.delete).toHaveBeenCalledWith("pic-1");
+    expect(tombstoned(db)).toEqual(["pic-1"]);
+    expect(failed).toEqual([]);
+  });
+
+  it("keeps the photo locally when the server delete fails", async () => {
+    const db = createMockDb();
+    db.getFirstAsync.mockResolvedValue(
+      createMockPhoto({ id: "pic-1", _pending_upload: 0, _local_uri: null }),
+    );
+    const apiClient = { photos: { delete: vi.fn().mockRejectedValue(new Error("500")) } };
+
+    const failed = await removePhotos(db as never, ["pic-1"], { apiClient });
+
+    expect(tombstoned(db)).toEqual([]);
+    expect(failed).toEqual(["pic-1"]);
+  });
+
+  it("removes a photo still waiting to upload without calling the server", async () => {
+    const db = createMockDb();
+    db.getFirstAsync.mockResolvedValue(createMockPhoto({ id: "photo-local" }));
+    const apiClient = { photos: { delete: vi.fn() } };
+
+    const failed = await removePhotos(db as never, ["photo-local"], { apiClient });
+
+    expect(apiClient.photos.delete).not.toHaveBeenCalled();
+    expect(tombstoned(db)).toEqual(["photo-local"]);
+    expect(failed).toEqual([]);
   });
 });

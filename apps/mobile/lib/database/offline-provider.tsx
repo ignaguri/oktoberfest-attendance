@@ -274,6 +274,10 @@ export function OfflineDataProvider({
           ),
         );
 
+        // Before leaving "syncing": the bar reads idle plus a stale count as
+        // "N pending", which flashed between the mug and the bar disappearing.
+        await refreshPendingCount();
+
         if (result.success) {
           setSyncStatus("idle");
         } else if (result.errors.length === 1 && result.errors[0] === "Sync already in progress") {
@@ -282,9 +286,6 @@ export function OfflineDataProvider({
           setSyncStatus("error");
           setError(result.errors.join(", ") || "Sync failed");
         }
-
-        // Refresh pending count after sync
-        await refreshPendingCount();
 
         return result;
       } catch (err) {

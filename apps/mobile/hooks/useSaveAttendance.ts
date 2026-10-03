@@ -20,15 +20,18 @@ import { useCallback, useContext, useState } from "react";
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { OfflineContext, triggerBackgroundPush } from "@/lib/database/offline-provider";
-import { enqueuePendingPhotosForAttendance } from "@/lib/database/photo-queue";
+import { enqueuePendingPhotosForAttendance, removePhotos } from "@/lib/database/photo-queue";
 import { CONSUMPTION_WRITE_PREFIXES, invalidateLocalQueries } from "@/lib/database/query-keys";
-import { logger } from "@/lib/logger";
 
 import { type PendingPhoto } from "./useBeerPictureUpload";
 import { useDrinkPrice } from "./useDrinkPrice";
 import { useOfflineUpdateAttendance } from "./useOfflineAttendance";
 import { useOfflineDeleteConsumption, useOfflineLogConsumption } from "./useOfflineConsumption";
 import { useRatePrompt } from "./useRatePrompt";
+
+// The sheet reads pictures from local-attendances, the calendar's thumbnails
+// from local-day-summaries.
+const PHOTO_DELETE_PREFIXES = ["local-attendances", "local-day-summaries"];
 
 interface SaveAttendanceInput {
   festivalId: string;
@@ -169,21 +172,14 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           await invalidateLocalQueries(queryClient, CONSUMPTION_WRITE_PREFIXES);
         }
 
-        // Step 3: Delete photos marked for removal
+        // Step 3: Delete photos marked for removal. Failures are logged inside
+        // and leave the photo on screen; the rest of the save still goes through.
         if (photosToDelete.length > 0) {
-          await Promise.all(
-            photosToDelete.map(async (photoId) => {
-              try {
-                await apiClient.photos.delete(photoId);
-              } catch (deleteError) {
-                logger.warn("Failed to delete photo:", {
-                  photoId,
-                  deleteError,
-                });
-                // Continue with other operations even if deletion fails
-              }
-            }),
-          );
+          const db = offlineContext?.getDb?.();
+          if (db) {
+            await removePhotos(db, photosToDelete, { apiClient });
+            await invalidateLocalQueries(queryClient, PHOTO_DELETE_PREFIXES);
+          }
         }
 
         // Step 4: Enqueue photo uploads chained to the attendance push.
