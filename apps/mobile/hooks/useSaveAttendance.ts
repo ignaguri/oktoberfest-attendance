@@ -57,8 +57,13 @@ interface SaveAttendanceInput {
   existingConsumptions?: Consumption[];
 }
 
+interface SaveAttendanceResult {
+  /** Photos the server would not delete; they stay on the day */
+  failedPhotoRemovals: number;
+}
+
 interface UseSaveAttendanceReturn {
-  saveAttendance: (input: SaveAttendanceInput) => Promise<void>;
+  saveAttendance: (input: SaveAttendanceInput) => Promise<SaveAttendanceResult>;
   isSaving: boolean;
   error: Error | null;
 }
@@ -79,7 +84,7 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
   const { recordAttendanceSave } = useRatePrompt();
 
   const saveAttendance = useCallback(
-    async (input: SaveAttendanceInput) => {
+    async (input: SaveAttendanceInput): Promise<SaveAttendanceResult> => {
       const {
         festivalId,
         date,
@@ -172,12 +177,14 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
           await invalidateLocalQueries(queryClient, CONSUMPTION_WRITE_PREFIXES);
         }
 
-        // Step 3: Delete photos marked for removal. Failures are logged inside
-        // and leave the photo on screen; the rest of the save still goes through.
+        // Step 3: Delete photos marked for removal. A failure leaves the photo
+        // on the day and is reported back; the rest of the save still goes through.
+        let failedPhotoRemovals = 0;
         if (photosToDelete.length > 0) {
           const db = offlineContext?.getDb?.();
           if (db) {
-            await removePhotos(db, photosToDelete, { apiClient });
+            const failed = await removePhotos(db, photosToDelete, { apiClient });
+            failedPhotoRemovals = failed.length;
             await invalidateLocalQueries(queryClient, PHOTO_DELETE_PREFIXES);
           }
         }
@@ -214,6 +221,8 @@ export function useSaveAttendance(): UseSaveAttendanceReturn {
         // Step 7: Maybe surface a rate-the-app prompt. Fire-and-forget; never
         // block the save flow on this.
         void recordAttendanceSave();
+
+        return { failedPhotoRemovals };
       } catch (err) {
         const saveError = err instanceof Error ? err : new Error("Failed to save attendance");
         setError(saveError);

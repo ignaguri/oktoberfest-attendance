@@ -786,6 +786,8 @@
       "friends": "Friends"
     },
     "saveSuccess": "Changes saved successfully",
+    "photoRemovalFailed_one": "Your changes were saved, but {{count}} photo couldn't be removed. Try again.",
+    "photoRemovalFailed_other": "Your changes were saved, but {{count}} photos couldn't be removed. Try again.",
     "summary": {
       "title": "Festival Summary",
       "days": "Days",

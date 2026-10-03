@@ -408,6 +408,7 @@ export interface UploadPhotoOptions {
         pictureId: string,
         body?: { taggedUserIds?: string[] },
       ) => Promise<{ id: string; pictureUrl: string }>;
+      delete: (pictureId: string) => Promise<unknown>;
     };
   };
   /** Compression options */
@@ -499,6 +500,23 @@ export async function uploadPendingPhoto(
        WHERE id = ?`,
       [confirmedPhoto.id, confirmedPhoto.pictureUrl, new Date().toISOString(), photo.id],
     );
+
+    // The user may have removed the photo while this upload was in flight:
+    // removePhotos saw a pending row, tombstoned it and skipped the server, and
+    // confirmUpload has just created the server row anyway. Read after the
+    // UPDATE so a tombstone written at any point before it is caught.
+    const afterConfirm = await db.getFirstAsync<{ _deleted: number }>(
+      "SELECT _deleted FROM beer_pictures WHERE id = ?",
+      [confirmedPhoto.id],
+    );
+    if (afterConfirm?._deleted === 1) {
+      await apiClient.photos.delete(confirmedPhoto.id).catch((error) => {
+        logger.warn("[PhotoQueue] Failed to delete photo removed mid-upload:", {
+          pictureId: confirmedPhoto.id,
+          error,
+        });
+      });
+    }
 
     // 6. Clean up local file
     await cleanupLocalPhoto(photo._local_uri);
