@@ -11,7 +11,10 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { AttendanceDayList } from "@/components/attendance/attendance-day-list";
 import { AttendanceStrip } from "@/components/attendance/attendance-strip";
-import { CalendarActionSheet } from "@/components/attendance/calendar-action-sheet";
+import {
+  type AttendanceSuccessData,
+  CalendarActionSheet,
+} from "@/components/attendance/calendar-action-sheet";
 import { CheckInDialog } from "@/components/attendance/check-in-dialog";
 import { SummaryProgressStats } from "@/components/attendance/summary-progress-stats";
 import { AttendanceSkeleton } from "@/components/skeletons";
@@ -293,11 +296,21 @@ export default function AttendanceScreen() {
     // Keep selectedDate so calendar shows selection
   }, []);
 
-  const handleFormSuccess = useCallback(async () => {
-    showDialog(t("common.status.success"), t("attendance.saveSuccess"));
-    await syncAndRefresh();
-    refetchPlanData();
-  }, [syncAndRefresh, refetchPlanData, showDialog, t]);
+  const handleFormSuccess = useCallback(
+    async ({ failedPhotoRemovals = 0 }: AttendanceSuccessData) => {
+      if (failedPhotoRemovals > 0) {
+        showDialog(
+          t("common.status.error"),
+          t("attendance.photoRemovalFailed", { count: failedPhotoRemovals }),
+        );
+      } else {
+        showDialog(t("common.status.success"), t("attendance.saveSuccess"));
+      }
+      await syncAndRefresh();
+      refetchPlanData();
+    },
+    [syncAndRefresh, refetchPlanData, showDialog, t],
+  );
 
   const onRefresh = useCallback(async () => {
     await syncAndRefresh();

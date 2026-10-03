@@ -786,6 +786,8 @@
       "friends": "Amigos"
     },
     "saveSuccess": "Cambios guardados exitosamente",
+    "photoRemovalFailed_one": "Guardamos tus cambios, pero no pudimos borrar {{count}} foto. Intentá de nuevo.",
+    "photoRemovalFailed_other": "Guardamos tus cambios, pero no pudimos borrar {{count}} fotos. Intentá de nuevo.",
     "summary": {
       "title": "Resumen del festival",
       "days": "Días",

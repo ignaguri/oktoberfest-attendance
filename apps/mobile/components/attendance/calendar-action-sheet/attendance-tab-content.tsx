@@ -49,6 +49,8 @@ import { LocalDrinkStepper } from "../local-drink-stepper";
 export interface AttendanceSuccessData {
   date: Date;
   tentIds: string[];
+  /** Photos marked for removal that the server would not delete */
+  failedPhotoRemovals?: number;
 }
 
 interface AttendanceTabContentProps {
@@ -331,7 +333,7 @@ export function AttendanceTabContent({
   const onSubmit = useCallback(
     async (data: DetailedAttendanceForm) => {
       try {
-        await saveAttendance({
+        const { failedPhotoRemovals } = await saveAttendance({
           festivalId,
           date: data.date,
           amount: totalLocalDrinks,
@@ -344,7 +346,7 @@ export function AttendanceTabContent({
           existingConsumptions: consumptions,
         });
 
-        onSuccess?.({ date: data.date, tentIds: data.tents });
+        onSuccess?.({ date: data.date, tentIds: data.tents, failedPhotoRemovals });
         onClose();
       } catch (error) {
         logger.error("Failed to save attendance:", error);
