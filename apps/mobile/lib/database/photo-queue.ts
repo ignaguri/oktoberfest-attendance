@@ -115,6 +115,24 @@ export function getPendingUploadsDir(): string {
 }
 
 /**
+ * Point a stored pending-upload path at this launch's documents directory.
+ *
+ * Rows keep the absolute path the photo was saved under, but iOS can move the
+ * app's data container (a new UUID in /Containers/Data/Application/) when the
+ * app updates. The files move with it, the stored paths don't, so a photo
+ * queued before an update failed every retry with "no such file"
+ * (PROST-COUNTER-AX). Paths outside pending-uploads are returned unchanged.
+ */
+export function resolvePendingPhotoUri(storedUri: string): string {
+  const marker = `/${PENDING_UPLOADS_DIR}/`;
+  const markerIndex = storedUri.lastIndexOf(marker);
+  if (markerIndex === -1) {
+    return storedUri;
+  }
+  return `${getPendingUploadsDir()}${storedUri.slice(markerIndex + marker.length)}`;
+}
+
+/**
  * Ensure the pending uploads directory exists
  */
 export async function ensurePendingUploadsDir(): Promise<void> {
@@ -446,11 +464,13 @@ export async function uploadPendingPhoto(
     };
   }
 
+  const localUri = resolvePendingPhotoUri(photo._local_uri);
+
   try {
     onProgress?.(photo.id, 0.1);
 
     // 1. Compress image
-    const compressed = await compressPhoto(photo._local_uri, compress);
+    const compressed = await compressPhoto(localUri, compress);
     onProgress?.(photo.id, 0.3);
 
     // 2. Get signed upload URL
@@ -519,7 +539,7 @@ export async function uploadPendingPhoto(
     }
 
     // 6. Clean up local file
-    await cleanupLocalPhoto(photo._local_uri);
+    await cleanupLocalPhoto(localUri);
     onProgress?.(photo.id, 1.0);
 
     logger.debug("[PhotoQueue] Successfully uploaded photo:", {
@@ -627,6 +647,20 @@ export async function runUploadFileOp(
     return;
   }
 
+  // A file that is gone even at its resolved path will never upload, and
+  // retrying only repeats the error on every sync. Drop the photo instead of
+  // leaving a broken thumbnail on the day for good.
+  if (photo._local_uri) {
+    const fileInfo = await getInfoAsync(resolvePendingPhotoUri(photo._local_uri));
+    if (!fileInfo.exists) {
+      logger.warn("[PhotoQueue] Dropping pending photo with no file on disk:", {
+        photoId: photo.id,
+      });
+      await deletePendingPhoto(db, photo.id);
+      return;
+    }
+  }
+
   const result = await uploadPendingPhoto(
     db,
     photo,
@@ -686,7 +720,8 @@ export async function removePhotos(
 /**
  * Clean up a local photo file
  */
-export async function cleanupLocalPhoto(localUri: string): Promise<void> {
+export async function cleanupLocalPhoto(storedUri: string): Promise<void> {
+  const localUri = resolvePendingPhotoUri(storedUri);
   try {
     const fileInfo = await getInfoAsync(localUri);
     if (fileInfo.exists) {
@@ -802,7 +837,7 @@ export async function getPhotoQueueStats(db: SQLite.SQLiteDatabase): Promise<Pho
   for (const photo of pendingPhotos) {
     if (photo._local_uri) {
       try {
-        const fileInfo = await getInfoAsync(photo._local_uri);
+        const fileInfo = await getInfoAsync(resolvePendingPhotoUri(photo._local_uri));
         if (fileInfo.exists && "size" in fileInfo) {
           pendingSizeBytes += fileInfo.size as number;
         }

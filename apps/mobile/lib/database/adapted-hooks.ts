@@ -32,6 +32,7 @@ import {
 } from "./day-summaries";
 import { useLocalProfile, useLocalTents } from "./hooks";
 import { OfflineContext } from "./offline-provider";
+import { resolvePendingPhotoUri } from "./photo-queue";
 import {
   queryAttendanceByDateWithTotals,
   queryAttendancesWithTotals,
@@ -343,7 +344,10 @@ export function useAdaptedAttendanceByDate(
 
       const pictures: { id: string; pictureUrl: string }[] = [];
       for (const p of pictureRows) {
-        const pictureUrl = p._pending_upload === 1 && p._local_uri ? p._local_uri : p.picture_url;
+        const pictureUrl =
+          p._pending_upload === 1 && p._local_uri
+            ? resolvePendingPhotoUri(p._local_uri)
+            : p.picture_url;
         if (pictureUrl) pictures.push({ id: p.id, pictureUrl });
       }
 
