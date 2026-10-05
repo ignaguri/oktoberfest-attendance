@@ -5,6 +5,8 @@
  * Run with: pnpm test --filter=@prostcounter/mobile
  */
 
+import { getInfoAsync } from "expo-file-system/legacy";
+import { ImageManipulator } from "expo-image-manipulator";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
@@ -15,6 +17,7 @@ import {
   type PhotoUploadResult,
   type ProcessPendingPhotosResult,
   removePhotos,
+  resolvePendingPhotoUri,
   runUploadFileOp,
   savePendingPhoto,
 } from "../photo-queue";
@@ -140,6 +143,29 @@ describe("Photo Queue", () => {
     it("should return the pending uploads directory path", () => {
       const dir = getPendingUploadsDir();
       expect(dir).toBe("file:///mock/documents/pending-uploads/");
+    });
+  });
+
+  describe("resolvePendingPhotoUri", () => {
+    it("moves a path saved under an old app container to the current one", () => {
+      const stored =
+        "file:///var/mobile/Containers/Data/Application/OLD-UUID/Documents/pending-uploads/photo-abc.heic";
+
+      expect(resolvePendingPhotoUri(stored)).toBe(
+        "file:///mock/documents/pending-uploads/photo-abc.heic",
+      );
+    });
+
+    it("leaves a path that is already current unchanged", () => {
+      const current = `${getPendingUploadsDir()}photo-abc.jpg`;
+
+      expect(resolvePendingPhotoUri(current)).toBe(current);
+    });
+
+    it("leaves paths outside pending-uploads alone", () => {
+      const pickerUri = "file:///var/mobile/tmp/ImagePicker/photo.jpg";
+
+      expect(resolvePendingPhotoUri(pickerUri)).toBe(pickerUri);
     });
   });
 
@@ -760,6 +786,68 @@ describe("runUploadFileOp", () => {
     expect(apiClient.photos.confirmUpload).toHaveBeenCalledWith(SERVER_ID, {
       taggedUserIds: [FRIEND_ID],
     });
+  });
+
+  it("uploads from the current container when the app moved since the photo was saved", async () => {
+    const SERVER_ID = "11111111-1111-4111-8111-111111111111";
+    const localPhoto = createMockPhoto({
+      id: "photo-moved",
+      _local_uri:
+        "file:///var/mobile/Containers/Data/Application/OLD-UUID/Documents/pending-uploads/photo-moved.heic",
+    });
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(localPhoto),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+    const apiClient = {
+      photos: {
+        delete: vi.fn(),
+        getUploadUrl: vi.fn().mockResolvedValue({
+          uploadUrl: "https://storage.example.com/signed",
+          pictureId: SERVER_ID,
+        }),
+        confirmUpload: vi.fn().mockResolvedValue({ id: SERVER_ID, pictureUrl: "u/f/p.webp" }),
+      },
+    };
+    global.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({ arrayBuffer: () => Promise.resolve(new ArrayBuffer(64)) })
+      .mockResolvedValueOnce({ ok: true, status: 200 });
+
+    await runUploadFileOp(
+      db as never,
+      { recordId: localPhoto.id, festivalId: "festival-1" },
+      { apiClient },
+    );
+
+    expect(ImageManipulator.manipulate).toHaveBeenCalledWith(
+      "file:///mock/documents/pending-uploads/photo-moved.heic",
+    );
+    expect(apiClient.photos.confirmUpload).toHaveBeenCalled();
+  });
+
+  it("drops the photo instead of retrying when its file is gone", async () => {
+    vi.mocked(getInfoAsync).mockResolvedValueOnce({ exists: false } as never);
+    const localPhoto = createMockPhoto({ id: "photo-gone" });
+    const db = {
+      getFirstAsync: vi.fn().mockResolvedValue(localPhoto),
+      getAllAsync: vi.fn().mockResolvedValue([]),
+      runAsync: vi.fn().mockResolvedValue({ changes: 1 }),
+    };
+
+    await expect(
+      runUploadFileOp(
+        db as never,
+        { recordId: localPhoto.id, festivalId: "festival-1" },
+        { apiClient: baseApiClient },
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(ImageManipulator.manipulate).not.toHaveBeenCalled();
+    expect(baseApiClient.photos.getUploadUrl).not.toHaveBeenCalled();
+    const tombstone = db.runAsync.mock.calls.find((c) => String(c[0]).includes("_deleted = 1"));
+    expect(tombstone?.[1]).toEqual(["photo-gone"]);
   });
 
   it("confirms without a body when the op has no tags", async () => {
