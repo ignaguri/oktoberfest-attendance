@@ -44,9 +44,11 @@ describe("getWrappedHomeState", () => {
     });
   });
 
-  it("goes away once viewed", () => {
+  it("offers a way back in once viewed", () => {
     const list = [{ festivalId: "fest-okt-2026", viewed: true }];
-    expect(getWrappedHomeState(oktoberfest, new Date("2026-10-05T10:00:00Z"), list)).toBeNull();
+    expect(getWrappedHomeState(oktoberfest, new Date("2026-10-05T10:00:00Z"), list)).toEqual({
+      kind: "viewed",
+    });
   });
 
   it("shows nothing after the festival for someone without a Wrapped", () => {

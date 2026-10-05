@@ -4,14 +4,14 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useHighlights, useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { getWrappedHomeState } from "@prostcounter/shared/utils";
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { Link } from "next-view-transitions";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trans, useTranslation } from "@/lib/i18n/client";
 
-/** Countdown over the festival's last days, then the way into the Wrapped until it's viewed */
+/** Countdown over the festival's last days, the way into the Wrapped, then a compact pointer to the Profile */
 export function WrappedCTA() {
   const { t } = useTranslation();
   const { currentFestival } = useFestival();
@@ -61,6 +61,25 @@ export function WrappedCTA() {
           </div>
         </Card>
       </motion.div>
+    );
+  }
+
+  if (state.kind === "viewed") {
+    return (
+      <Link href="/profile" className="block">
+        <Card className="border border-yellow-300 bg-yellow-50 px-4 py-3 transition-colors hover:bg-yellow-100">
+          <div className="flex items-center gap-3 text-left">
+            <Sparkles className="size-5 shrink-0 text-yellow-600" />
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-semibold text-gray-800">
+                {t("wrapped.cta.relive", { festivalName })}
+              </p>
+              <p className="text-sm text-gray-600">{t("wrapped.cta.reliveDescription")}</p>
+            </div>
+            <ChevronRight className="size-5 shrink-0 text-gray-400" />
+          </div>
+        </Card>
+      </Link>
     );
   }
 

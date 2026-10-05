@@ -4,7 +4,7 @@ import { useHighlights, useWrappedFestivals } from "@prostcounter/shared/hooks";
 import { Trans, useTranslation } from "@prostcounter/shared/i18n";
 import { getWrappedHomeState } from "@prostcounter/shared/utils";
 import { useRouter } from "expo-router";
-import { Sparkles } from "lucide-react-native";
+import { ChevronRight, Sparkles } from "lucide-react-native";
 import { Pressable } from "react-native";
 
 import { Card } from "@/components/ui/card";
@@ -13,7 +13,7 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { IconColors } from "@/lib/constants/colors";
 
-/** Countdown over the festival's last days, then the way into the Wrapped until it's viewed */
+/** Countdown over the festival's last days, the way into the Wrapped, then a compact pointer to the Profile */
 export function WrappedCTA() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -67,6 +67,33 @@ export function WrappedCTA() {
     );
   }
 
+  const openWrapped = () =>
+    router.push({ pathname: "/wrapped", params: { festivalId: currentFestival.id } });
+
+  if (state.kind === "viewed") {
+    return (
+      <Pressable
+        onPress={() => router.navigate("/(tabs)/profile")}
+        accessibilityLabel={t("wrapped.cta.relive", { festivalName })}
+        accessibilityHint={t("wrapped.cta.reliveHint")}
+        accessibilityRole="button"
+      >
+        <Card size="md" className="border border-yellow-300 bg-yellow-50 p-3">
+          <HStack space="md" className="items-center">
+            <Sparkles size={20} color={IconColors.default} />
+            <VStack className="flex-1">
+              <Text className="text-base font-semibold text-gray-800">
+                {t("wrapped.cta.relive", { festivalName })}
+              </Text>
+              <Text className="text-sm text-gray-600">{t("wrapped.cta.reliveDescription")}</Text>
+            </VStack>
+            <ChevronRight size={20} color={IconColors.muted} />
+          </HStack>
+        </Card>
+      </Pressable>
+    );
+  }
+
   return (
     <Motion.View
       initial={{ opacity: 0, y: 20 }}
@@ -89,9 +116,7 @@ export function WrappedCTA() {
             {t("wrapped.cta.readyDescription", { festivalName })}
           </Text>
           <Pressable
-            onPress={() =>
-              router.push({ pathname: "/wrapped", params: { festivalId: currentFestival.id } })
-            }
+            onPress={openWrapped}
             className="mt-1 rounded-lg bg-yellow-500 px-6 py-3"
             accessibilityLabel={t("wrapped.cta.viewButton")}
             accessibilityHint={t("profile.wrappedArchive.openHint")}

@@ -3140,6 +3140,9 @@
       "countdown_other": "Dein Rückblick kommt <when>in {{count}} Tagen</when>",
       "teaser": "Bisher {{beers}} an {{days}}. Weiter so!",
       "teaserEmpty": "Trag einen Tag ein, damit du einen Rückblick bekommst",
+      "relive": "Erlebe deinen {{festivalName}}-Rückblick nochmal",
+      "reliveDescription": "Alle deine Rückblicke findest du in deinem Profil",
+      "reliveHint": "Öffnet dein Profil",
       "days_one": "{{count}} Tag",
       "days_other": "{{count}} Tagen"
     },
