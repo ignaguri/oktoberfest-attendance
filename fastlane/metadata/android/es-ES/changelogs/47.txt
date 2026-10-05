@@ -1,0 +1,3 @@
+- Nueva cara: ícono y pantalla de inicio renovados.
+- Las actualizaciones ahora se instalan solas, sin tener que reiniciar.
+¡Nos vemos en el Starkbierfest!

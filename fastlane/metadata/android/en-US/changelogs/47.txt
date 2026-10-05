@@ -1,0 +1,3 @@
+- New look: fresh app icon and splash screen.
+- Updates now install on their own, no more restart prompt.
+See you in the Starkbierfest!

@@ -1,0 +1,3 @@
+- Neuer Look: frisches App-Icon und neuer Startbildschirm.
+- Updates installieren sich jetzt von selbst, ohne Neustart-Hinweis.
+Wir sehen uns auf dem Starkbierfest!
