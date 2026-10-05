@@ -11,7 +11,7 @@ import { I18nextProvider } from "@prostcounter/shared/i18n";
 import { i18n } from "@prostcounter/shared/i18n";
 import { Stack, usePathname, useRootNavigationState, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ArrowUpCircle, Download } from "lucide-react-native";
+import { ArrowUpCircle } from "lucide-react-native";
 import { useEffect, useRef, useState } from "react";
 import { Linking, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -283,33 +283,10 @@ function PushRegistrationSync() {
   return null;
 }
 
-// Show update prompt when an OTA update has been downloaded
-function UpdatePromptHandler() {
-  const { isUpdateReady, applyUpdate } = useAppUpdate();
-  const [dismissed, setDismissed] = useState(false);
-  const [isRestarting, setIsRestarting] = useState(false);
-  const canShowLaunchPopups = useCanShowLaunchPopups();
-
-  const showPrompt = isUpdateReady && !dismissed && canShowLaunchPopups;
-
-  const handleUpdate = async () => {
-    setIsRestarting(true);
-    await applyUpdate();
-  };
-
-  return (
-    <UpdatePrompt
-      isOpen={showPrompt}
-      onClose={() => setDismissed(true)}
-      onUpdate={handleUpdate}
-      icon={Download}
-      titleKey="update.available.title"
-      descriptionKey="update.available.description"
-      primaryButtonKey="update.available.restartNow"
-      dismissButtonKey="update.available.later"
-      isLoading={isRestarting}
-    />
-  );
+// Download OTA updates and reload at a safe moment (see useAppUpdate)
+function OtaUpdateHandler() {
+  useAppUpdate();
+  return null;
 }
 
 // Prompt iPhone users with a paired Apple Watch (but no companion app installed)
@@ -487,7 +464,7 @@ export default function RootLayout() {
                                           <NovuAutoSubscriber />
                                           <NotificationPromptHandler />
                                           <PushRegistrationSync />
-                                          <UpdatePromptHandler />
+                                          <OtaUpdateHandler />
                                           <StoreUpdatePromptHandler />
                                           <WatchInstallPromptHandler />
                                           <FeedbackPromptHandler />
