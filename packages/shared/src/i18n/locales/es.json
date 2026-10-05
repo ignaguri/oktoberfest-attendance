@@ -2975,6 +2975,9 @@
       "countdown_other": "Tu Wrapped llega <when>en {{count}} días</when>",
       "teaser": "Llevás {{beers}} en {{days}}. ¡Seguí así!",
       "teaserEmpty": "Registrá un día para tener tu Wrapped",
+      "relive": "Reviví tu Wrapped de {{festivalName}}",
+      "reliveDescription": "Encontrá todos tus resúmenes en tu Perfil",
+      "reliveHint": "Abre tu Perfil",
       "days_one": "{{count}} día",
       "days_other": "{{count}} días"
     }

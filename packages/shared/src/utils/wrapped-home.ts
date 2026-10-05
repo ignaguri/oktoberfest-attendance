@@ -7,11 +7,13 @@ export const WRAPPED_COUNTDOWN_DAYS = 3;
 export type WrappedHomeState =
   | { kind: "countdown"; daysUntilUnlock: number }
   | { kind: "ready" }
+  | { kind: "viewed" }
   | null;
 
 /**
  * What the Home Wrapped card shows for a festival: a countdown over its last
- * days, the ready state once unlocked and unviewed, or nothing.
+ * days, the ready state once unlocked and unviewed, a way back in once
+ * viewed, or nothing.
  * wrappedFestivals is useWrappedFestivals(): only unlocked festivals the user attended.
  */
 export function getWrappedHomeState(
@@ -21,7 +23,7 @@ export function getWrappedHomeState(
 ): WrappedHomeState {
   const unlocked = wrappedFestivals?.find((entry) => entry.festivalId === festival.id);
   if (unlocked) {
-    return unlocked.viewed ? null : { kind: "ready" };
+    return unlocked.viewed ? { kind: "viewed" } : { kind: "ready" };
   }
 
   const countdown = getFestivalCountdown(festival, now);

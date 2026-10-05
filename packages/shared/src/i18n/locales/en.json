@@ -2915,6 +2915,9 @@
       "countdown_other": "Your Wrapped drops <when>in {{count}} days</when>",
       "teaser": "{{beers}} across {{days}} so far. Keep going!",
       "teaserEmpty": "Log a day to get your Wrapped",
+      "relive": "Relive your {{festivalName}} Wrapped",
+      "reliveDescription": "Find all your Wrapped in your Profile",
+      "reliveHint": "Opens your Profile",
       "days_one": "{{count}} day",
       "days_other": "{{count}} days"
     }
