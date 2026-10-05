@@ -37,7 +37,7 @@ export function useAppUpdate() {
   const isCheckingRef = useRef(false);
   const lastCheckRef = useRef(0);
   const isUpdateReadyRef = useRef(false);
-  const sessionStartedAtRef = useRef(Date.now());
+  const sessionStartedAtRef = useRef(0);
   const backgroundedAtRef = useRef<number | null>(null);
 
   const reload = useCallback(async () => {
@@ -84,11 +84,16 @@ export function useAppUpdate() {
     if (__DEV__ || Platform.OS === "web") return;
 
     // Check on mount
+    sessionStartedAtRef.current = Date.now();
     checkForUpdate();
 
     const subscription = AppState.addEventListener("change", (status: AppStateStatus) => {
       if (status === "background") {
         backgroundedAtRef.current = Date.now();
+        // Leaving the app ends the immediate-reload window. A fetch that finishes
+        // after a short trip out (system camera) must not reload; only a long
+        // background below opens a new window.
+        sessionStartedAtRef.current = 0;
         return;
       }
       if (status !== "active") {
