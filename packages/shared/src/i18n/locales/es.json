@@ -3962,12 +3962,6 @@
     "copyright": "© 2024 ProstCounter. Todos los derechos reservados."
   },
   "update": {
-    "available": {
-      "title": "Actualización disponible",
-      "description": "Una nueva versión de ProstCounter está lista. Reiniciá para obtener las últimas funciones y mejoras.",
-      "restartNow": "Reiniciar ahora",
-      "later": "Tal vez más tarde"
-    },
     "storeAvailable": {
       "title": "Nueva versión disponible",
       "description": "Una nueva versión de ProstCounter está disponible. Actualizá para obtener las últimas funciones y mejoras.",
