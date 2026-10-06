@@ -28,6 +28,11 @@ private let watchBridgeLog = Logger(subsystem: "com.prostcounter.watch", categor
 ///   JS (ExtensionStorage) → UserDefaults(suiteName:) → KVO here
 ///     → WCSession.sendMessage (if watch reachable, for real-time delivery)
 ///     → WCSession.updateApplicationContext (persistent, simulator-compatible)
+/// Mirrors RCTHost's -callFunctionOnJSModule:method:args: (see emitToJS).
+@objc private protocol JSModuleCalling {
+  func callFunctionOnJSModule(_ moduleName: String, method: String, args: [Any])
+}
+
 final class WatchSessionBridge: NSObject {
 
   static let shared = WatchSessionBridge()
@@ -145,16 +150,39 @@ final class WatchSessionBridge: NSObject {
       "isReachable": WCSession.default.isReachable,
     ]
     DispatchQueue.main.async {
-      if let bridge = RCTBridge.current() {
-        bridge.enqueueJSCall(
-          "RCTDeviceEventEmitter",
-          method: "emit",
-          args: ["watchState", payload],
-          completion: nil
-        )
+      if self.emitToJS("watchState", payload) {
         watchBridgeLog.info("dispatched watchState paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) reachable=\\(WCSession.default.isReachable, privacy: .public) to RN")
+      } else {
+        watchBridgeLog.info("no React Native host yet, watchState not dispatched")
       }
     }
+  }
+
+  /// Emits a DeviceEventEmitter event to JavaScript. Call on the main queue.
+  ///
+  /// The app runs bridgeless (New Architecture), where RCTBridge.current() is
+  /// always nil, so events go through the RCTHost the React Native factory
+  /// owns. The bridge path stays as a fallback for a legacy-arch build.
+  /// Returns false when React Native hasn't started yet.
+  ///
+  /// RCTHost is only forward-declared in the headers Swift sees, so
+  /// RCTRootViewFactory.reactHost is invisible here. Read it through KVC and
+  /// call it through JSModuleCalling, which declares the same selector.
+  @MainActor
+  private func emitToJS(_ name: String, _ body: [String: Any]) -> Bool {
+    let selector = NSSelectorFromString("callFunctionOnJSModule:method:args:")
+    if let factory = (UIApplication.shared.delegate as? AppDelegate)?.reactNativeFactory,
+       let host = factory.rootViewFactory.value(forKey: "reactHost") as? NSObject,
+       host.responds(to: selector) {
+      unsafeBitCast(host, to: JSModuleCalling.self)
+        .callFunctionOnJSModule("RCTDeviceEventEmitter", method: "emit", args: [name, body])
+      return true
+    }
+    if let bridge = RCTBridge.current() {
+      bridge.enqueueJSCall("RCTDeviceEventEmitter", method: "emit", args: [name, body], completion: nil)
+      return true
+    }
+    return false
   }
 
   private func forwardToWatch() {
@@ -258,16 +286,10 @@ extension WatchSessionBridge: WCSessionDelegate {
       payload["nonce"] = nonce
     }
     DispatchQueue.main.async {
-      if let bridge = RCTBridge.current() {
-        bridge.enqueueJSCall(
-          "RCTDeviceEventEmitter",
-          method: "emit",
-          args: ["watchRemoteEvent", payload],
-          completion: nil
-        )
+      if self.emitToJS("watchRemoteEvent", payload) {
         watchBridgeLog.info("dispatched watchRemoteEvent type=\\(type, privacy: .public) to RN")
       } else {
-        watchBridgeLog.error("no RCTBridge.current() — event dropped")
+        watchBridgeLog.error("no React Native host yet, watchRemoteEvent dropped")
       }
     }
   }
