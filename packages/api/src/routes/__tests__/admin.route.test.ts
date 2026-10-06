@@ -851,10 +851,19 @@ describe("Admin Routes - Unit Tests", () => {
   });
 
   describe("DELETE /admin/festivals/:festivalId", () => {
-    it("refuses with 409 when attendances still reference the festival", async () => {
-      vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(createMockChain({ data: [{ id: ATTENDANCE_ID }], error: null }))
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }));
+    // The guard is the foreign keys themselves, so RLS hiding other users'
+    // plans or reservations from the admin cannot let a delete through.
+    it("refuses with 409 naming the table that still references the festival", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({
+          data: null,
+          error: {
+            code: "23503",
+            message: 'update or delete on table "festivals" violates foreign key constraint',
+            details: `Key (id)=(${FESTIVAL_ID}) is still referenced from table "day_plans".`,
+          },
+        }),
+      );
 
       const res = await app.request(
         createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
@@ -862,49 +871,13 @@ describe("Admin Routes - Unit Tests", () => {
 
       expect(res.status).toBe(409);
       const body = (await res.json()) as any;
-      expect(body.error.message).toMatch(/attendance/i);
-    });
-
-    it("refuses with 409 when groups still reference the festival", async () => {
-      vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        .mockReturnValueOnce(createMockChain({ data: [{ id: GROUP_ID }], error: null }));
-
-      const res = await app.request(
-        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
-      );
-
-      expect(res.status).toBe(409);
-      const body = (await res.json()) as any;
-      expect(body.error.message).toMatch(/group/i);
-    });
-
-    // tent_visits_festival_id_fkey has no ON DELETE CASCADE either, so a
-    // festival whose attendances were already cleaned up but whose tent visits
-    // were not used to pass both guards and die on the constraint as a 500.
-    it("refuses with 409 when tent visits still reference the festival", async () => {
-      vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        .mockReturnValueOnce(
-          createMockChain({ data: [{ id: "77777777-7777-4777-8777-777777777777" }], error: null }),
-        );
-
-      const res = await app.request(
-        createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),
-      );
-
-      expect(res.status).toBe(409);
-      const body = (await res.json()) as any;
-      expect(body.error.message).toMatch(/tent visit/i);
+      expect(body.error.message).toMatch(/day plans/);
     });
 
     it("deletes when nothing references the festival", async () => {
-      vi.mocked(mockSupabase.from)
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        .mockReturnValueOnce(createMockChain({ data: [], error: null }))
-        .mockReturnValueOnce(createMockChain({ data: null, error: null }));
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
 
       const res = await app.request(
         createAuthRequest(`/admin/festivals/${FESTIVAL_ID}`, { method: "DELETE" }),

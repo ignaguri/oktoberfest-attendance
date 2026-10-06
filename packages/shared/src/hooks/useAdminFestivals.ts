@@ -116,7 +116,7 @@ export function useUpdateAdminFestival() {
 /**
  * Hook to delete a festival.
  *
- * Rejects with the server's message when attendances or groups still reference
+ * Rejects with the server's message while user data still references
  * it; callers should surface that text rather than a generic failure.
  */
 export function useDeleteAdminFestival() {

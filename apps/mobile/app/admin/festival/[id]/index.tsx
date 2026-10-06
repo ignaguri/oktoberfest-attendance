@@ -118,8 +118,8 @@ export default function AdminFestivalDetailScreen() {
           await deleteFestival.mutate(id);
           router.back();
         } catch (err) {
-          // A 409 carries the server's reason (attendances or groups still
-          // reference it); show that rather than a generic failure.
+          // A 409 carries the server's reason (user data still references
+          // it); show that rather than a generic failure.
           const message =
             err instanceof Error && err.message
               ? err.message
