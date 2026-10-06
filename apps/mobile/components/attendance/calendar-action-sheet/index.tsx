@@ -34,8 +34,9 @@ import { DayPlanner } from "../day-planner";
 import { type AttendanceSuccessData, AttendanceTabContent } from "./attendance-tab-content";
 import { FriendsWentTabContent } from "./friends-went-tab-content";
 import { ReservationTabContent } from "./reservation-tab-content";
+import { TodayTabContent } from "./today-tab-content";
 
-export type TabKey = "attendance" | "reservation" | "plan" | "friends";
+export type TabKey = "attendance" | "reservation" | "plan" | "friends" | "today";
 
 export interface CalendarActionSheetProps {
   isOpen: boolean;
@@ -70,7 +71,7 @@ const NO_FRIENDS: FriendGoing[] = [];
  * Calendar action sheet for one day.
  *
  * - Past: attendance, a read-only reservation tab, and friends who went
- * - Today: attendance and the day planner
+ * - Today: attendance, and friends out today alongside the planner
  * - Future: the day planner alone, with no segmented control
  *
  * The planner holds the day's single status (not going, planning, reserved)
@@ -102,20 +103,29 @@ export function CalendarActionSheet({
   const dayRelation = classifyFestivalDay(selectedDate, new Date(), timezone);
   const isPastDate = dayRelation === "past";
   const isFutureDate = dayRelation === "future";
+  const isToday = dayRelation === "today";
 
   const dateKey = format(selectedDate, "yyyy-MM-dd");
   const router = useRouter();
   // Set when the user taps a tab, so loading friends never moves them
   const userChoseTabRef = useRef(false);
 
-  // Friends who went, only for a past day's sheet
+  // Friends who went, for a past day or today so far. Today only loads it
+  // when the Today tab needs it: open, or deciding whether it is empty.
   const {
     data: friendsWentData,
     loading: friendsWentLoading,
     error: friendsWentError,
     refetch: refetchFriendsWent,
-  } = useFriendsWent(festivalId, dateKey, { enabled: isOpen && isPastDate });
+  } = useFriendsWent(festivalId, dateKey, {
+    enabled: isOpen && (isPastDate || (isToday && (activeTab === "today" || !canPlan))),
+    // Today changes all day, so reopening the sheet should refetch
+    staleTime: isToday ? 0 : undefined,
+  });
   const friendsWent = friendsWentData?.friends ?? null;
+  const nobodyOutToday = friendsWent !== null && friendsWent.length === 0 && friends.length === 0;
+  // Without a plan to make, the Today tab only lists friends
+  const isTodayTabEmpty = !canPlan && nobodyOutToday;
 
   const availableTabs = useMemo((): Tab[] => {
     if (isFutureDate) {
@@ -143,8 +153,11 @@ export function CalendarActionSheet({
       ];
     }
 
-    return [attendanceTab, { key: "plan", label: t("attendance.tabs.plan"), disabled: !canPlan }];
-  }, [t, isPastDate, isFutureDate, existingReservation, canPlan, friendsWent]);
+    return [
+      attendanceTab,
+      { key: "today", label: t("attendance.tabs.today"), disabled: isTodayTabEmpty },
+    ];
+  }, [t, isPastDate, isFutureDate, existingReservation, friendsWent, isTodayTabEmpty]);
 
   const determineDefaultTab = useCallback((): TabKey => {
     // Check-in mode always opens to attendance
@@ -161,12 +174,12 @@ export function CalendarActionSheet({
         hasReservation: !!existingReservation,
       });
     }
-    // Today - attendance if logged, else the plan if one exists, else attendance
+    // Today - attendance if logged, else Today if there is a plan, else attendance
     if (existingAttendance) {
       return "attendance";
     }
     if (existingPlan && canPlan) {
-      return "plan";
+      return "today";
     }
     return "attendance";
   }, [
@@ -205,6 +218,15 @@ export function CalendarActionSheet({
       });
     }
   }, [activeTab, determineDefaultTab, friendsWent]);
+
+  // Today emptied out underneath the user (plan checked in, nobody out)
+  useEffect(() => {
+    if (activeTab === "today" && isTodayTabEmpty) {
+      queueMicrotask(() => {
+        setActiveTab("attendance");
+      });
+    }
+  }, [activeTab, isTodayTabEmpty]);
 
   const handleTabChange = useCallback((key: string) => {
     userChoseTabRef.current = true;
@@ -287,7 +309,27 @@ export function CalendarActionSheet({
             />
           )}
 
-          {activeTab === "plan" && !isPastDate && canPlan && (
+          {activeTab === "today" && !isPastDate && !isFutureDate && (
+            <TodayTabContent
+              festivalId={festivalId}
+              timezone={timezone}
+              selectedDate={selectedDate}
+              existingPlan={existingPlan}
+              canPlan={canPlan}
+              plannerKey={plannerKey}
+              friendsGoing={friends}
+              friendsWent={friendsWent}
+              friendsWentLoading={friendsWentLoading}
+              friendsWentError={friendsWentError}
+              nobodyOut={nobodyOutToday}
+              onRetryFriendsWent={refetchFriendsWent}
+              onOpenGallery={handleOpenGallery}
+              onPlanSuccess={onSuccess ? handlePlanSuccess : undefined}
+              onClose={onClose}
+            />
+          )}
+
+          {activeTab === "plan" && isFutureDate && canPlan && (
             <DayPlanner
               key={plannerKey}
               festivalId={festivalId}
