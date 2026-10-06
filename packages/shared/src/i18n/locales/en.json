@@ -782,8 +782,13 @@
     "tabs": {
       "attendance": "Attendance",
       "reservation": "Reservation",
-      "plan": "Plan",
-      "friends": "Friends"
+      "friends": "Friends",
+      "today": "Today"
+    },
+    "today": {
+      "checkedIn": "Checked in today",
+      "comingLater": "Coming later",
+      "empty": "None of your friends are out yet"
     },
     "saveSuccess": "Changes saved successfully",
     "photoRemovalFailed_one": "Your changes were saved, but {{count}} photo couldn't be removed. Try again.",

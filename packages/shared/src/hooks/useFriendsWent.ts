@@ -1,5 +1,5 @@
 /**
- * Friends and group-mates who logged a past festival day.
+ * Friends and group-mates who logged a festival day so far.
  *
  * Uses ApiClientContext to get the platform-specific API client
  */
@@ -10,7 +10,7 @@ import type { GetFriendsWentResponse } from "../schemas";
 export function useFriendsWent(
   festivalId?: string,
   date?: string,
-  options?: { enabled?: boolean },
+  options?: { enabled?: boolean; staleTime?: number },
 ) {
   const apiClient = useApiClient();
 
@@ -24,7 +24,7 @@ export function useFriendsWent(
     },
     {
       enabled: !!festivalId && !!date && options?.enabled !== false,
-      staleTime: 2 * 60 * 1000,
+      staleTime: options?.staleTime ?? 2 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
     },
   );

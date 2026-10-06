@@ -44,13 +44,13 @@ describe("FriendsWentService", () => {
     ).rejects.toMatchObject({ code: ErrorCodes.FESTIVAL_NOT_FOUND });
   });
 
-  it("returns nobody for today without reading the day", async () => {
+  it("includes today so far", async () => {
     const repo = createRepo();
 
-    expect(await createService(repo).getFriendsWent(VIEWER_ID, FESTIVAL_ID, "2026-09-20")).toEqual(
-      [],
-    );
-    expect(repo.listDayRows).not.toHaveBeenCalled();
+    const friends = await createService(repo).getFriendsWent(VIEWER_ID, FESTIVAL_ID, "2026-09-20");
+
+    expect(repo.listDayRows).toHaveBeenCalledWith(VIEWER_ID, FESTIVAL_ID, "2026-09-20");
+    expect(friends).toHaveLength(1);
   });
 
   it("returns nobody for a future day", async () => {
@@ -73,22 +73,16 @@ describe("FriendsWentService", () => {
     ]);
   });
 
-  it("decides what is past on the festival's clock", async () => {
+  it("decides what is a later day on the festival's clock", async () => {
     // 00:30 on Sep 20 in Munich, still 18:30 on Sep 19 in New York
     const lateNight = new Date("2026-09-19T22:30:00Z");
 
-    const munich = await createService(createRepo("Europe/Berlin"), lateNight).getFriendsWent(
-      VIEWER_ID,
-      FESTIVAL_ID,
-      "2026-09-19",
-    );
-    const newYork = await createService(createRepo("America/New_York"), lateNight).getFriendsWent(
-      VIEWER_ID,
-      FESTIVAL_ID,
-      "2026-09-19",
-    );
+    const munich = createRepo("Europe/Berlin");
+    const newYork = createRepo("America/New_York");
+    await createService(munich, lateNight).getFriendsWent(VIEWER_ID, FESTIVAL_ID, "2026-09-20");
+    await createService(newYork, lateNight).getFriendsWent(VIEWER_ID, FESTIVAL_ID, "2026-09-20");
 
-    expect(munich).toHaveLength(1);
-    expect(newYork).toEqual([]);
+    expect(munich.listDayRows).toHaveBeenCalled();
+    expect(newYork.listDayRows).not.toHaveBeenCalled();
   });
 });

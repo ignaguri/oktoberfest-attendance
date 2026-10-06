@@ -6,7 +6,7 @@ import { NotFoundError } from "../middleware/error";
 import type { IFriendsWentRepository } from "../repositories/interfaces";
 
 /**
- * Who went on a past festival day, for the day sheet's Friends tab.
+ * Who went on a festival day so far, for the day sheet's Friends and Today tabs.
  */
 export class FriendsWentService {
   constructor(
@@ -15,8 +15,8 @@ export class FriendsWentService {
   ) {}
 
   /**
-   * Friends and group-mates who logged `date`. Today and later return nobody:
-   * the recap is for days that are over, decided on the festival's clock.
+   * Friends and group-mates who logged `date`. Later days return nobody,
+   * decided on the festival's clock.
    */
   async getFriendsWent(viewerId: string, festivalId: string, date: string): Promise<FriendWent[]> {
     const timezone = await this.repo.getFestivalTimezone(festivalId);
@@ -25,7 +25,7 @@ export class FriendsWentService {
       throw new NotFoundError(ErrorCodes.FESTIVAL_NOT_FOUND);
     }
 
-    if (date >= formatDateForDatabase(this.now(), timezone)) {
+    if (date > formatDateForDatabase(this.now(), timezone)) {
       return [];
     }
 

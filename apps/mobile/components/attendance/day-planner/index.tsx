@@ -65,8 +65,8 @@ interface DayPlannerProps {
   selectedDate: Date;
   /** The user's saved plan or reservation for the day, if any. */
   existingPlan: DayPlan | null;
-  /** Friends with a visible plan or reservation on the day. */
-  friends: FriendGoing[];
+  /** Friends with a visible plan or reservation on the day. Omitted when the sheet lists friends itself. */
+  friends?: FriendGoing[];
   onSuccess?: () => void;
   onClose: () => void;
 }
@@ -285,7 +285,7 @@ export function DayPlanner({
   return (
     <>
       <VStack space="xl" className="px-2 pb-4">
-        <WhosGoingSection friends={friends} timezone={timezone} />
+        {friends && <WhosGoingSection friends={friends} timezone={timezone} />}
 
         <VStack space="md">
           <Text className="text-base font-semibold text-typography-900">

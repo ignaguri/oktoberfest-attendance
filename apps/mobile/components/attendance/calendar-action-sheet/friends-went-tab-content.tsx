@@ -136,10 +136,14 @@ interface FriendsWentTabContentProps {
   onRetry: () => void;
   /** Opens a shared group's gallery on this day. */
   onOpenGallery: (groupId: string) => void;
+  /** Section heading instead of the "N friends went" count, for today's tab. */
+  title?: string;
+  /** Render nothing for an empty day instead of the empty message. */
+  hideWhenEmpty?: boolean;
 }
 
 /**
- * Friends and group-mates who logged a past day: drinks by type, tents, and
+ * Friends and group-mates who logged a day: drinks by type, tents, and
  * photos that open a shared group's gallery.
  */
 export function FriendsWentTabContent({
@@ -148,6 +152,8 @@ export function FriendsWentTabContent({
   error,
   onRetry,
   onOpenGallery,
+  title,
+  hideWhenEmpty = false,
 }: FriendsWentTabContentProps) {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -165,6 +171,9 @@ export function FriendsWentTabContent({
   }
 
   if (friends.length === 0) {
+    if (hideWhenEmpty) {
+      return null;
+    }
     return (
       <VStack className="px-2 py-8">
         <Text className="text-center text-sm text-typography-500">
@@ -179,9 +188,18 @@ export function FriendsWentTabContent({
 
   return (
     <VStack space="sm" className="px-2 pb-4">
-      <Text className="text-base font-semibold text-typography-900">
-        {t("attendance.friendsWent.count", { count: friends.length })}
-      </Text>
+      {title ? (
+        <HStack className="items-center justify-between">
+          <Text className="text-base font-semibold text-typography-900">{title}</Text>
+          <Text className="text-xs text-typography-500">
+            {t("attendance.list.friendsCount", { count: friends.length })}
+          </Text>
+        </HStack>
+      ) : (
+        <Text className="text-base font-semibold text-typography-900">
+          {t("attendance.friendsWent.count", { count: friends.length })}
+        </Text>
+      )}
       <VStack space="md">
         {visibleFriends.map((friend) => (
           <FriendRow key={friend.userId} friend={friend} onOpenGallery={onOpenGallery} />

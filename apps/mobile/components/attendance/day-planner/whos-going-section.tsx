@@ -112,10 +112,13 @@ function FriendRow({
 export function WhosGoingSection({
   friends,
   timezone,
+  title,
 }: {
   friends: FriendGoing[];
   /** The festival's timezone, so arrival times read as they were booked. */
   timezone: string;
+  /** Heading instead of "Who's going". */
+  title?: string;
 }) {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -132,7 +135,7 @@ export function WhosGoingSection({
     <VStack space="sm">
       <HStack className="items-center justify-between">
         <Text className="text-base font-semibold text-typography-900">
-          {t("attendance.planner.whosGoing")}
+          {title ?? t("attendance.planner.whosGoing")}
         </Text>
         <Text className="text-xs text-typography-500">
           {t("attendance.list.friendsCount", { count: friends.length })}

@@ -17,14 +17,14 @@ function errorResponse(description: string) {
   };
 }
 
-// GET /attendance/friends-went - Friends who logged a past festival day
+// GET /attendance/friends-went - Friends who logged a festival day so far
 const friendsWentRoute = createRoute({
   method: "get",
   path: "/attendance/friends-went",
   tags: ["attendance"],
-  summary: "List friends who went on a past day",
+  summary: "List friends who went on a day",
   description:
-    "Friends' and group-mates' attendance on a past festival day: drinks by type, tents and public photos. Empty for today and later.",
+    "Friends' and group-mates' attendance on a festival day so far: drinks by type, tents and public photos. Empty for later days.",
   request: {
     query: GetFriendsWentQuerySchema,
   },
