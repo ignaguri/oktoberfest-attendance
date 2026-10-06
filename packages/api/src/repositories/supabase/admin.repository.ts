@@ -1133,7 +1133,13 @@ export class SupabaseAdminRepository {
     const { data, error } = await this.supabase
       .from("tents")
       // `tents.id` has no database default, so it is generated here.
-      .insert({ id: crypto.randomUUID(), name: input.name, category: input.category ?? null })
+      .insert({
+        id: crypto.randomUUID(),
+        name: input.name,
+        category: input.category ?? null,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
+      })
       .select("id, name, category")
       .single();
 

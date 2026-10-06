@@ -76,10 +76,4 @@ export { useGroupCalendar, usePersonalCalendar } from "../../hooks/useCalendar";
 export { useAvailableAchievements, useUserAchievements } from "../../hooks/useAchievements";
 
 // Admin hooks
-export {
-  useAllGroups,
-  useAllUsers,
-  useCreateFestival,
-  useDeleteFestival,
-  useUpdateFestival,
-} from "../../hooks/useAdmin";
+export { useAllGroups, useAllUsers } from "../../hooks/useAdmin";

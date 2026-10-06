@@ -19191,6 +19191,14 @@
                           "location": {
                             "type": "string"
                           },
+                          "latitude": {
+                            "type": "number",
+                            "nullable": true
+                          },
+                          "longitude": {
+                            "type": "number",
+                            "nullable": true
+                          },
                           "start_date": {
                             "type": "string"
                           },
@@ -19236,6 +19244,8 @@
                           "short_name",
                           "festival_type",
                           "location",
+                          "latitude",
+                          "longitude",
                           "start_date",
                           "end_date",
                           "map_url",
@@ -19319,6 +19329,18 @@
                     "type": "string",
                     "minLength": 1,
                     "maxLength": 255
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "nullable": true,
+                    "minimum": -90,
+                    "maximum": 90
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "nullable": true,
+                    "minimum": -180,
+                    "maximum": 180
                   },
                   "start_date": {
                     "type": "string",
@@ -19406,6 +19428,14 @@
                         "location": {
                           "type": "string"
                         },
+                        "latitude": {
+                          "type": "number",
+                          "nullable": true
+                        },
+                        "longitude": {
+                          "type": "number",
+                          "nullable": true
+                        },
                         "start_date": {
                           "type": "string"
                         },
@@ -19451,6 +19481,8 @@
                         "short_name",
                         "festival_type",
                         "location",
+                        "latitude",
+                        "longitude",
                         "start_date",
                         "end_date",
                         "map_url",
@@ -19549,6 +19581,14 @@
                         "location": {
                           "type": "string"
                         },
+                        "latitude": {
+                          "type": "number",
+                          "nullable": true
+                        },
+                        "longitude": {
+                          "type": "number",
+                          "nullable": true
+                        },
                         "start_date": {
                           "type": "string"
                         },
@@ -19594,6 +19634,8 @@
                         "short_name",
                         "festival_type",
                         "location",
+                        "latitude",
+                        "longitude",
                         "start_date",
                         "end_date",
                         "map_url",
@@ -19697,6 +19739,18 @@
                     "minLength": 1,
                     "maxLength": 255
                   },
+                  "latitude": {
+                    "type": "number",
+                    "nullable": true,
+                    "minimum": -90,
+                    "maximum": 90
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "nullable": true,
+                    "minimum": -180,
+                    "maximum": 180
+                  },
                   "start_date": {
                     "type": "string",
                     "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
@@ -19774,6 +19828,14 @@
                         "location": {
                           "type": "string"
                         },
+                        "latitude": {
+                          "type": "number",
+                          "nullable": true
+                        },
+                        "longitude": {
+                          "type": "number",
+                          "nullable": true
+                        },
                         "start_date": {
                           "type": "string"
                         },
@@ -19819,6 +19881,8 @@
                         "short_name",
                         "festival_type",
                         "location",
+                        "latitude",
+                        "longitude",
                         "start_date",
                         "end_date",
                         "map_url",
@@ -19866,7 +19930,7 @@
           "admin"
         ],
         "summary": "Delete a festival (admin)",
-        "description": "Refuses with 409 when attendances, groups or tent visits still reference the festival; archive it instead.",
+        "description": "Refuses with 409 while user data (attendances, groups, plans, achievements...) still references the festival; archive it instead.",
         "security": [
           {
             "bearerAuth": []
@@ -20064,6 +20128,18 @@
                       "old",
                       null
                     ]
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "nullable": true,
+                    "minimum": -90,
+                    "maximum": 90
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "nullable": true,
+                    "minimum": -180,
+                    "maximum": 180
                   }
                 },
                 "required": [

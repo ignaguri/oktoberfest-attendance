@@ -83,6 +83,7 @@ export function useCreateAdminFestival() {
     {
       onSuccess: () => {
         invalidateQueries(QueryKeys.adminFestivals());
+        invalidateQueries(QueryKeys.festivals());
       },
     },
   );
@@ -108,6 +109,8 @@ export function useUpdateAdminFestival() {
         // festival cleared is_active on another one, whose cached detail would
         // otherwise keep its Active badge until it went stale.
         invalidateQueries(QueryKeys.adminFestivalAll());
+        // The user-facing switcher and active festival read this list too
+        invalidateQueries(QueryKeys.festivals());
       },
     },
   );
@@ -126,6 +129,7 @@ export function useDeleteAdminFestival() {
   return useMutation(async (festivalId: string) => apiClient.admin.festivals.delete(festivalId), {
     onSuccess: () => {
       invalidateQueries(QueryKeys.adminFestivals());
+      invalidateQueries(QueryKeys.festivals());
     },
   });
 }
