@@ -22,6 +22,8 @@ import { buildOverlapBody, formatOverlapDayLabel } from "./plan-overlap-copy";
 // Yesterday still counts as the day starting until 01:00 festival-time.
 const DAY_START_GRACE_MS = 60 * 60 * 1000;
 
+export type DayStartResult = "started" | "not-started" | "backfill";
+
 type NotificationPreferences = Database["public"]["Tables"]["user_notification_preferences"]["Row"];
 
 type SubscriberProfile = {
@@ -1453,9 +1455,11 @@ export class NotificationService {
    * notification, even when the mobile sync queue flushes a backlog and they
    * arrive at once.
    *
-   * @returns true when this call claimed the day and sent the notification.
-   *   false otherwise — including on error, so a caller falls back to the
-   *   ordinary tent check-in rather than going silent.
+   * @returns "started" when this call claimed the day (and notified anyone
+   *   eligible). "backfill" when the date is outside today plus the 01:00
+   *   grace, so nothing should be sent at all.
+   *   "not-started" otherwise — including on error, so a caller falls back to
+   *   the ordinary tent check-in rather than going silent.
    */
   async notifyDayStart(input: {
     actorId: string;
@@ -1463,7 +1467,7 @@ export class NotificationService {
     date: string;
     kind: "drink" | "checkin";
     tentName: string | null;
-  }): Promise<boolean> {
+  }): Promise<DayStartResult> {
     let adminClient;
     try {
       adminClient = createAdminClient();
@@ -1472,7 +1476,7 @@ export class NotificationService {
         { error: adminError },
         "Admin client unavailable; skipping day-start notification",
       );
-      return false;
+      return "not-started";
     }
 
     try {
@@ -1502,7 +1506,7 @@ export class NotificationService {
           },
           "Day-start date outside today (plus 01:00 grace) window; skipping claim",
         );
-        return false;
+        return "backfill";
       }
 
       const { data: claimed, error: claimError } = await adminClient
@@ -1515,12 +1519,12 @@ export class NotificationService {
 
       if (claimError) {
         logger.error({ error: claimError }, "Error claiming day-start ledger row");
-        return false;
+        return "not-started";
       }
 
       // Someone else already started this day for this actor.
       if (!claimed || claimed.length === 0) {
-        return false;
+        return "not-started";
       }
 
       const { data: recipientIds, error: recipientsError } = await adminClient.rpc(
@@ -1533,7 +1537,7 @@ export class NotificationService {
       // notification rather than staying silent on our behalf.
       if (recipientsError) {
         logger.error({ error: recipientsError }, "Error resolving day-start recipients");
-        return false;
+        return "not-started";
       }
 
       const recipients = (recipientIds ?? []) as string[];
@@ -1543,11 +1547,11 @@ export class NotificationService {
       // in"), so degrade to the tent check-in fallback rather than going
       // silent for this user-day.
       if (toNotify === null) {
-        return false;
+        return "not-started";
       }
 
       if (toNotify.length === 0) {
-        return true;
+        return "started";
       }
 
       const { data: actor, error: actorError } = await this.supabase
@@ -1558,7 +1562,7 @@ export class NotificationService {
 
       if (actorError || !actor) {
         logger.error({ error: actorError }, "Error fetching actor for day-start notification");
-        return false;
+        return "not-started";
       }
 
       const actorName = actor.username || actor.full_name || "Someone";
@@ -1584,7 +1588,7 @@ export class NotificationService {
       // ledger row stays claimed regardless (this actor's day-start is used
       // up either way), but the caller reads the return value to decide
       // whether to fall back to the ordinary check-in push, so it must be
-      // false unless at least one trigger actually went out.
+      // "not-started" unless at least one trigger actually went out.
       const failures = results.filter((result) => result.status === "rejected");
       if (failures.length > 0) {
         logger.error(
@@ -1597,10 +1601,10 @@ export class NotificationService {
         );
       }
 
-      return failures.length < results.length;
+      return failures.length < results.length ? "started" : "not-started";
     } catch (error) {
       logger.error({ error }, "Error sending day-start notifications");
-      return false;
+      return "not-started";
     }
   }
 

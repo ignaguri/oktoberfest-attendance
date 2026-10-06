@@ -115,7 +115,7 @@ describe("NotificationService.notifyDayStart", () => {
   it("notifies friends and group-mates when it claims the day", async () => {
     mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -123,7 +123,7 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: "Hofbräu",
     });
 
-    expect(claimed).toBe(true);
+    expect(result).toBe("started");
     expect(triggerMock).toHaveBeenCalledTimes(1);
     expect(triggerMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -138,10 +138,10 @@ describe("NotificationService.notifyDayStart", () => {
     );
   });
 
-  it("sends nothing and reports false when the day was already claimed", async () => {
+  it("sends nothing and reports not-started when the day was already claimed", async () => {
     mockAdminClient({ claimed: false, recipients: [FRIEND_ID], prefs: [] });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -149,7 +149,7 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: "Augustiner",
     });
 
-    expect(claimed).toBe(false);
+    expect(result).toBe("not-started");
     expect(triggerMock).not.toHaveBeenCalled();
   });
 
@@ -177,12 +177,12 @@ describe("NotificationService.notifyDayStart", () => {
     );
   });
 
-  it("reports false when the admin client is unavailable, so the caller falls back", async () => {
+  it("reports not-started when the admin client is unavailable, so the caller falls back", async () => {
     vi.mocked(createAdminClient).mockImplementation(() => {
       throw new Error("no service role key");
     });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -190,7 +190,7 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(false);
+    expect(result).toBe("not-started");
     expect(triggerMock).not.toHaveBeenCalled();
   });
 
@@ -199,7 +199,7 @@ describe("NotificationService.notifyDayStart", () => {
   it("does not claim the ledger or announce for a date older than yesterday", async () => {
     const client = mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: "2026-09-01", // "now" is faked to 2026-09-22
@@ -207,7 +207,7 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(false);
+    expect(result).toBe("backfill");
     expect(triggerMock).not.toHaveBeenCalled();
     // The recency check must run before the ledger claim, not just before the
     // fan-out: the ledger row must never be touched for a stale date.
@@ -221,7 +221,7 @@ describe("NotificationService.notifyDayStart", () => {
     vi.setSystemTime(new Date("2026-09-22T00:30:00.000Z"));
     mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: "2026-09-21",
@@ -229,7 +229,7 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(true);
+    expect(result).toBe("started");
     expect(triggerMock).toHaveBeenCalledTimes(1);
   });
 
@@ -241,7 +241,7 @@ describe("NotificationService.notifyDayStart", () => {
       vi.setSystemTime(new Date(now));
       const client = mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
 
-      const claimed = await service.notifyDayStart({
+      const result = await service.notifyDayStart({
         actorId: ACTOR_ID,
         festivalId: FESTIVAL_ID,
         date: "2026-09-21",
@@ -249,7 +249,7 @@ describe("NotificationService.notifyDayStart", () => {
         tentName: null,
       });
 
-      expect(claimed).toBe(false);
+      expect(result).toBe("backfill");
       expect(triggerMock).not.toHaveBeenCalled();
       expect(client.from).not.toHaveBeenCalledWith("day_start_notifications");
     },
@@ -267,7 +267,7 @@ describe("NotificationService.notifyDayStart", () => {
       prefs: [{ user_id: OPTED_OUT_ID, day_start_enabled: false }],
     });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -275,20 +275,20 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(true);
+    expect(result).toBe("started");
     expect(triggerMock).not.toHaveBeenCalled();
   });
 
   // Fix 2: a fully-failed fan-out must not report success. announceCheckIn
-  // reads `true` as "handled" and skips the tent check-in fallback, and the
+  // reads "started" as "handled" and skips the tent check-in fallback, and the
   // day-start Novu workflow does not exist in production yet, so every
-  // trigger call rejects there today. Reverting to a bare `return true`
+  // trigger call rejects there today. Reverting to a bare `return "started"`
   // would leave this exact gap live.
-  it("reports false when every trigger rejects", async () => {
+  it("reports not-started when every trigger rejects", async () => {
     mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
     triggerMock.mockRejectedValue(new Error("workflow not found"));
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -296,18 +296,18 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(false);
+    expect(result).toBe("not-started");
   });
 
   // The other side of the same boundary: one real push among failures still
   // counts as handled, so the caller must not also run the check-in
   // fallback and double-notify.
-  it("reports true when at least one trigger succeeds among failures", async () => {
+  it("reports started when at least one trigger succeeds among failures", async () => {
     mockAdminClient({ claimed: true, recipients: [FRIEND_ID, FRIEND_ID_2], prefs: [] });
     triggerMock.mockRejectedValueOnce(new Error("workflow not found"));
     triggerMock.mockResolvedValueOnce({ result: {} });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -315,19 +315,19 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(true);
+    expect(result).toBe("started");
     expect(triggerMock).toHaveBeenCalledTimes(2);
   });
 
   // Every bail-out after the claim has the same shape: the ledger row is
-  // spent, nothing was pushed, so the caller has to hear `false` and run its
-  // ordinary notification. Reporting `true` here would silence the day
+  // spent, nothing was pushed, so the caller has to hear "not-started" and run its
+  // ordinary notification. Reporting "started" here would silence the day
   // entirely.
-  it("reports false when the recipient lookup fails", async () => {
+  it("reports not-started when the recipient lookup fails", async () => {
     const client = mockAdminClient({ claimed: true, recipients: [], prefs: [] });
     client.rpc.mockResolvedValue({ data: null, error: new Error("rpc exploded") });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -335,18 +335,18 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(false);
+    expect(result).toBe("not-started");
     expect(triggerMock).not.toHaveBeenCalled();
   });
 
-  it("reports false when the actor profile cannot be read", async () => {
+  it("reports not-started when the actor profile cannot be read", async () => {
     service = new NotificationService(
       mockRequestScopedSupabase({ profileError: true }),
       "test-novu-key",
     );
     mockAdminClient({ claimed: true, recipients: [FRIEND_ID], prefs: [] });
 
-    const claimed = await service.notifyDayStart({
+    const result = await service.notifyDayStart({
       actorId: ACTOR_ID,
       festivalId: FESTIVAL_ID,
       date: DATE,
@@ -354,7 +354,7 @@ describe("NotificationService.notifyDayStart", () => {
       tentName: null,
     });
 
-    expect(claimed).toBe(false);
+    expect(result).toBe("not-started");
     expect(triggerMock).not.toHaveBeenCalled();
   });
 });
