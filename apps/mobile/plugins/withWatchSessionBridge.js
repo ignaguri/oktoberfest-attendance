@@ -268,21 +268,16 @@ const INIT_CALL =
   "\n    // Activate the WatchConnectivity bridge so session tokens written to the\n    // shared App Group are forwarded to the paired Apple Watch.\n    _ = WatchSessionBridge.shared\n";
 
 /**
- * Anchor used for the init-call insertion. Includes the full
- * factory.startReactNative(...) call followed by its closing #endif so the
- * match is structurally unique inside AppDelegate.swift. A bare "#endif"
- * would also match the #if DEBUG block later in the file, and whether it
- * hit the correct one would depend on source order — fragile across Expo
- * template changes.
+ * Anchor used for the init-call insertion: the didFinishLaunchingWithOptions
+ * return, which appears exactly once in AppDelegate.swift. It used to be the
+ * factory.startReactNative(...) block, but withSceneLifecycle.js removes that
+ * block (the scene delegate starts React Native under iOS 27), and plugin
+ * order must not decide whether this injection lands.
  *
- * Whitespace must match the Expo-generated template exactly (4-space indent
- * on the call, 6-space indent on the named arguments, "#endif" at column 0).
+ * Whitespace must match the Expo-generated template exactly (4-space indent).
  */
-const INIT_ANCHOR = `    factory.startReactNative(
-      withModuleName: "main",
-      in: window,
-      launchOptions: launchOptions)
-#endif`;
+const INIT_ANCHOR = `
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)`;
 
 module.exports = function withWatchSessionBridge(config) {
   return withDangerousMod(config, [
@@ -303,8 +298,8 @@ module.exports = function withWatchSessionBridge(config) {
         return cfg;
       }
 
-      // 1. Inject the activation call after the closing #endif of the
-      //    #if os(iOS) || os(tvOS) block inside didFinishLaunchingWithOptions.
+      // 1. Inject the activation call right before didFinishLaunchingWithOptions
+      //    returns.
       //    Must be unambiguous — fail loudly if the Expo template drifted,
       //    rather than silently injecting at the wrong spot (or not at all).
       const anchorMatches = src.split(INIT_ANCHOR).length - 1;
@@ -319,7 +314,7 @@ module.exports = function withWatchSessionBridge(config) {
           `withWatchSessionBridge: INIT_ANCHOR matched ${anchorMatches} times in AppDelegate.swift — expected exactly 1.`,
         );
       }
-      src = src.replace(INIT_ANCHOR, INIT_ANCHOR + INIT_CALL);
+      src = src.replace(INIT_ANCHOR, INIT_CALL + INIT_ANCHOR);
 
       // 2. Append the WatchSessionBridge class as top-level code at end of file.
       src = src + "\n" + BRIDGE_CLASS_SNIPPET;
