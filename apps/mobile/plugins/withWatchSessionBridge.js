@@ -38,12 +38,14 @@ final class WatchSessionBridge: NSObject {
   // the same UserDefaults KVO path that carries tokens.
   private let sentinelForceSync = "forceSyncNonce"
   private let sentinelPing = "pingNonce"
+  private let sentinelStateRequest = "watchStateRequestNonce"
   private var defaults: UserDefaults?
 
   private var pollTimer: Timer?
   private var lastPayload: [String: String] = [:]
   private var lastForceSyncNonce: String = ""
   private var lastPingNonce: String = ""
+  private var lastStateRequestNonce: String = ""
 
   private override init() {
     super.init()
@@ -95,6 +97,16 @@ final class WatchSessionBridge: NSObject {
       watchBridgeLog.info("forceSync nonce=\\(nonce, privacy: .public) — clearing dedupe cache")
       // Clear dedupe cache so forwardToWatch sends even if tokens didn't change.
       lastPayload = [:]
+    }
+
+    // JS listeners mount long after WCSession activation, so the activation
+    // emit usually reaches nobody. A hook bumps this nonce once it is
+    // subscribed to ask for the current state. Before activation, leave the
+    // nonce unburned: activationDidComplete emits anyway and the poll retries.
+    if let nonce = defaults.string(forKey: sentinelStateRequest), nonce != lastStateRequestNonce, !nonce.isEmpty,
+       WCSession.default.activationState == .activated {
+      lastStateRequestNonce = nonce
+      emitWatchState()
     }
 
     if let nonce = defaults.string(forKey: sentinelPing), nonce != lastPingNonce, !nonce.isEmpty {

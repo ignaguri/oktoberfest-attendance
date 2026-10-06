@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { DeviceEventEmitter, Platform } from "react-native";
 
+import { requestWatchState } from "@/lib/watch-sync";
+
 export interface WatchStatus {
   isPaired: boolean | null;
   isInstalled: boolean | null;
@@ -42,6 +44,9 @@ export function useWatchStatus(): WatchStatus {
         );
       },
     );
+
+    // The bridge's activation emit fires before this listener exists.
+    requestWatchState();
 
     return () => subscription.remove();
   }, []);
