@@ -20,7 +20,7 @@ export const FriendWentPhotoSchema = z.object({
   pictureUrl: z.string(),
 });
 
-/** A friend or group-mate who logged a past festival day. */
+/** A friend or group-mate who logged a festival day. */
 export const FriendWentSchema = z.object({
   userId: z.uuid(),
   username: z.string().nullable(),

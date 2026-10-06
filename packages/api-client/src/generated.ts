@@ -7089,8 +7089,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List friends who went on a past day
-         * @description Friends' and group-mates' attendance on a past festival day: drinks by type, tents and public photos. Empty for today and later.
+         * List friends who went on a day
+         * @description Friends' and group-mates' attendance on a festival day so far: drinks by type, tents and public photos. Empty for later days.
          */
         get: {
             parameters: {
