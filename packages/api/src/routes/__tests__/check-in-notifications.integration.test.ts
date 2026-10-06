@@ -166,7 +166,7 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.NOVU_API_KEY = "test-novu-key";
-    notifyDayStartMock.mockResolvedValue(true);
+    notifyDayStartMock.mockResolvedValue("started");
   });
 
   afterEach(() => {
@@ -214,7 +214,7 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
   // real group membership, otherwise the fallback branch never runs and this
   // test would pass even if it had been deleted outright.
   it("falls back to a tent check-in once the day is already claimed", async () => {
-    notifyDayStartMock.mockResolvedValue(false);
+    notifyDayStartMock.mockResolvedValue("not-started");
 
     const app = mountRoutes();
     const user = await createTestUser();
@@ -239,6 +239,34 @@ describe("check-in notifications reach the endpoints mobile actually calls", () 
     expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
     expect(notifyDayStartMock).toHaveBeenCalledWith(expect.objectContaining({ kind: "checkin" }));
     expect(notifyTentCheckinMock).toHaveBeenCalledTimes(1);
+  });
+
+  // A past day is a backfill, not a live check-in: no fallback push either.
+  it("sends nothing when the visit is for a past day", async () => {
+    notifyDayStartMock.mockResolvedValue("backfill");
+
+    const app = mountRoutes();
+    const user = await createTestUser();
+    const festivalId = await createTestFestival();
+    const tentId = await anyTentId();
+    await putUserInGroup(user.id, festivalId);
+
+    const response = await app.request("/attendance/tent-visits", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        festivalId,
+        tentId,
+        visitedAt: new Date("2024-09-21T18:00:00.000Z").toISOString(),
+      }),
+    });
+
+    expect(response.status).toBe(201);
+    expect(notifyDayStartMock).toHaveBeenCalledTimes(1);
+    expect(notifyTentCheckinMock).not.toHaveBeenCalled();
   });
 
   // A replayed push (same tentVisitId, at-least-once offline sync queue)

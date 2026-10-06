@@ -10,7 +10,7 @@ import { createNotificationService } from "./notification.service";
  * The ledger claim inside notifyDayStart decides which: winning it means this
  * is the day's first action, so friends and group-mates get a day-start;
  * losing it means the day is already underway, so group-mates get the ordinary
- * tent check-in. Never both.
+ * tent check-in. Never both. A backfilled past day gets neither.
  *
  * Checks for a notification service before doing anything else: every caller sits on a
  * write path the offline sync queue can hammer, so a Novu-less environment
@@ -34,10 +34,9 @@ export async function announceCheckIn(
   }
 
   try {
-    const groupIds = await groupIdsForFestival(supabase, input.userId, input.festivalId);
     const tentNames = await tentNamesFor(supabase, input.tentIds);
 
-    const startedDay = await notificationService.notifyDayStart({
+    const dayStart = await notificationService.notifyDayStart({
       actorId: input.userId,
       festivalId: input.festivalId,
       date: input.date,
@@ -45,10 +44,11 @@ export async function announceCheckIn(
       tentName: tentNames || null,
     });
 
-    if (startedDay) {
+    if (dayStart !== "not-started") {
       return;
     }
 
+    const groupIds = await groupIdsForFestival(supabase, input.userId, input.festivalId);
     if (groupIds.length > 0) {
       await notificationService.notifyTentCheckin(
         input.userId,
