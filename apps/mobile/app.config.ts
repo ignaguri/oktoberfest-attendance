@@ -152,6 +152,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     "./plugins/withModularHeaders.js",
     "./plugins/withApsEnvironment.js",
+    "./plugins/withSceneLifecycle.js",
     "./plugins/withWatchSessionBridge.js",
     "./plugins/withWatchInfoPlistEnv.js",
     "./plugins/withFirebaseNotificationColor.js",

@@ -28,6 +28,11 @@ private let watchBridgeLog = Logger(subsystem: "com.prostcounter.watch", categor
 ///   JS (ExtensionStorage) → UserDefaults(suiteName:) → KVO here
 ///     → WCSession.sendMessage (if watch reachable, for real-time delivery)
 ///     → WCSession.updateApplicationContext (persistent, simulator-compatible)
+/// Mirrors RCTHost's -callFunctionOnJSModule:method:args: (see emitToJS).
+@objc private protocol JSModuleCalling {
+  func callFunctionOnJSModule(_ moduleName: String, method: String, args: [Any])
+}
+
 final class WatchSessionBridge: NSObject {
 
   static let shared = WatchSessionBridge()
@@ -38,12 +43,14 @@ final class WatchSessionBridge: NSObject {
   // the same UserDefaults KVO path that carries tokens.
   private let sentinelForceSync = "forceSyncNonce"
   private let sentinelPing = "pingNonce"
+  private let sentinelStateRequest = "watchStateRequestNonce"
   private var defaults: UserDefaults?
 
   private var pollTimer: Timer?
   private var lastPayload: [String: String] = [:]
   private var lastForceSyncNonce: String = ""
   private var lastPingNonce: String = ""
+  private var lastStateRequestNonce: String = ""
 
   private override init() {
     super.init()
@@ -97,6 +104,16 @@ final class WatchSessionBridge: NSObject {
       lastPayload = [:]
     }
 
+    // JS listeners mount long after WCSession activation, so the activation
+    // emit usually reaches nobody. A hook bumps this nonce once it is
+    // subscribed to ask for the current state. Before activation, leave the
+    // nonce unburned: activationDidComplete emits anyway and the poll retries.
+    if let nonce = defaults.string(forKey: sentinelStateRequest), nonce != lastStateRequestNonce, !nonce.isEmpty,
+       WCSession.default.activationState == .activated {
+      lastStateRequestNonce = nonce
+      emitWatchState()
+    }
+
     if let nonce = defaults.string(forKey: sentinelPing), nonce != lastPingNonce, !nonce.isEmpty {
       // Don't burn the nonce on transient failures. If the session isn't
       // activated or the watch isn't reachable yet, leave lastPingNonce alone
@@ -133,16 +150,39 @@ final class WatchSessionBridge: NSObject {
       "isReachable": WCSession.default.isReachable,
     ]
     DispatchQueue.main.async {
-      if let bridge = RCTBridge.current() {
-        bridge.enqueueJSCall(
-          "RCTDeviceEventEmitter",
-          method: "emit",
-          args: ["watchState", payload],
-          completion: nil
-        )
+      if self.emitToJS("watchState", payload) {
         watchBridgeLog.info("dispatched watchState paired=\\(WCSession.default.isPaired, privacy: .public) installed=\\(WCSession.default.isWatchAppInstalled, privacy: .public) reachable=\\(WCSession.default.isReachable, privacy: .public) to RN")
+      } else {
+        watchBridgeLog.info("no React Native host yet, watchState not dispatched")
       }
     }
+  }
+
+  /// Emits a DeviceEventEmitter event to JavaScript. Call on the main queue.
+  ///
+  /// The app runs bridgeless (New Architecture), where RCTBridge.current() is
+  /// always nil, so events go through the RCTHost the React Native factory
+  /// owns. The bridge path stays as a fallback for a legacy-arch build.
+  /// Returns false when React Native hasn't started yet.
+  ///
+  /// RCTHost is only forward-declared in the headers Swift sees, so
+  /// RCTRootViewFactory.reactHost is invisible here. Read it through KVC and
+  /// call it through JSModuleCalling, which declares the same selector.
+  @MainActor
+  private func emitToJS(_ name: String, _ body: [String: Any]) -> Bool {
+    let selector = NSSelectorFromString("callFunctionOnJSModule:method:args:")
+    if let factory = (UIApplication.shared.delegate as? AppDelegate)?.reactNativeFactory,
+       let host = factory.rootViewFactory.value(forKey: "reactHost") as? NSObject,
+       host.responds(to: selector) {
+      unsafeBitCast(host, to: JSModuleCalling.self)
+        .callFunctionOnJSModule("RCTDeviceEventEmitter", method: "emit", args: [name, body])
+      return true
+    }
+    if let bridge = RCTBridge.current() {
+      bridge.enqueueJSCall("RCTDeviceEventEmitter", method: "emit", args: [name, body], completion: nil)
+      return true
+    }
+    return false
   }
 
   private func forwardToWatch() {
@@ -246,16 +286,10 @@ extension WatchSessionBridge: WCSessionDelegate {
       payload["nonce"] = nonce
     }
     DispatchQueue.main.async {
-      if let bridge = RCTBridge.current() {
-        bridge.enqueueJSCall(
-          "RCTDeviceEventEmitter",
-          method: "emit",
-          args: ["watchRemoteEvent", payload],
-          completion: nil
-        )
+      if self.emitToJS("watchRemoteEvent", payload) {
         watchBridgeLog.info("dispatched watchRemoteEvent type=\\(type, privacy: .public) to RN")
       } else {
-        watchBridgeLog.error("no RCTBridge.current() — event dropped")
+        watchBridgeLog.error("no React Native host yet, watchRemoteEvent dropped")
       }
     }
   }
@@ -268,21 +302,16 @@ const INIT_CALL =
   "\n    // Activate the WatchConnectivity bridge so session tokens written to the\n    // shared App Group are forwarded to the paired Apple Watch.\n    _ = WatchSessionBridge.shared\n";
 
 /**
- * Anchor used for the init-call insertion. Includes the full
- * factory.startReactNative(...) call followed by its closing #endif so the
- * match is structurally unique inside AppDelegate.swift. A bare "#endif"
- * would also match the #if DEBUG block later in the file, and whether it
- * hit the correct one would depend on source order — fragile across Expo
- * template changes.
+ * Anchor used for the init-call insertion: the didFinishLaunchingWithOptions
+ * return, which appears exactly once in AppDelegate.swift. It used to be the
+ * factory.startReactNative(...) block, but withSceneLifecycle.js removes that
+ * block (the scene delegate starts React Native under iOS 27), and plugin
+ * order must not decide whether this injection lands.
  *
- * Whitespace must match the Expo-generated template exactly (4-space indent
- * on the call, 6-space indent on the named arguments, "#endif" at column 0).
+ * Whitespace must match the Expo-generated template exactly (4-space indent).
  */
-const INIT_ANCHOR = `    factory.startReactNative(
-      withModuleName: "main",
-      in: window,
-      launchOptions: launchOptions)
-#endif`;
+const INIT_ANCHOR = `
+    return super.application(application, didFinishLaunchingWithOptions: launchOptions)`;
 
 module.exports = function withWatchSessionBridge(config) {
   return withDangerousMod(config, [
@@ -303,8 +332,8 @@ module.exports = function withWatchSessionBridge(config) {
         return cfg;
       }
 
-      // 1. Inject the activation call after the closing #endif of the
-      //    #if os(iOS) || os(tvOS) block inside didFinishLaunchingWithOptions.
+      // 1. Inject the activation call right before didFinishLaunchingWithOptions
+      //    returns.
       //    Must be unambiguous — fail loudly if the Expo template drifted,
       //    rather than silently injecting at the wrong spot (or not at all).
       const anchorMatches = src.split(INIT_ANCHOR).length - 1;
@@ -319,7 +348,7 @@ module.exports = function withWatchSessionBridge(config) {
           `withWatchSessionBridge: INIT_ANCHOR matched ${anchorMatches} times in AppDelegate.swift — expected exactly 1.`,
         );
       }
-      src = src.replace(INIT_ANCHOR, INIT_ANCHOR + INIT_CALL);
+      src = src.replace(INIT_ANCHOR, INIT_CALL + INIT_ANCHOR);
 
       // 2. Append the WatchSessionBridge class as top-level code at end of file.
       src = src + "\n" + BRIDGE_CLASS_SNIPPET;

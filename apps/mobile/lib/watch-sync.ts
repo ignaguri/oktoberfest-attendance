@@ -85,6 +85,17 @@ export function forceSyncSessionToWatch(params: WatchSession): void {
   storage.set("forceSyncNonce", String(Date.now()));
 }
 
+/**
+ * Ask the native bridge to re-emit `watchState`. WCSession activates before any
+ * JS listener exists, so its first emit is lost; hooks call this right after
+ * subscribing to get the current state. No-op off iOS.
+ */
+export function requestWatchState(): void {
+  const storage = getStorage();
+  if (!storage) return;
+  storage.set("watchStateRequestNonce", `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`);
+}
+
 export type PingWatchResult = "pong" | "timeout" | "no-storage";
 
 /**
