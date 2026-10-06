@@ -1457,7 +1457,8 @@ export class NotificationService {
    *
    * @returns "started" when this call claimed the day (and notified anyone
    *   eligible). "backfill" when the date is outside today plus the 01:00
-   *   grace, so nothing should be sent at all.
+   *   grace, or the festival timezone can't be read to tell, so nothing should
+   *   be sent at all.
    *   "not-started" otherwise — including on error, so a caller falls back to
    *   the ordinary tent check-in rather than going silent.
    */
@@ -1468,6 +1469,44 @@ export class NotificationService {
     kind: "drink" | "checkin";
     tentName: string | null;
   }): Promise<DayStartResult> {
+    // Both clients let a user backfill a past date, and claiming the ledger
+    // for one would announce a day that isn't starting. So only today
+    // counts, in the festival's own timezone rather than the server's, with
+    // yesterday allowed until 01:00: a visit near midnight can have its
+    // offline-queue push land after the day has rolled over. Checking the
+    // date an hour ago gives exactly that grace window. Runs before anything
+    // that can fail into "not-started", which would let a backfill fall back
+    // to a live check-in push.
+    let todayInTz;
+    let graceDateInTz;
+    try {
+      const attendanceRepo = new SupabaseAttendanceRepository(this.supabase);
+      const timezone = await attendanceRepo.getFestivalTimezone(input.festivalId);
+      const now = new Date();
+      todayInTz = formatDateForDatabase(now, timezone);
+      graceDateInTz = formatDateForDatabase(new Date(now.getTime() - DAY_START_GRACE_MS), timezone);
+    } catch (timezoneError) {
+      logger.error(
+        { error: timezoneError },
+        "Festival timezone unavailable; cannot tell a backfill from today, sending nothing",
+      );
+      return "backfill";
+    }
+
+    if (input.date !== todayInTz && input.date !== graceDateInTz) {
+      logger.warn(
+        {
+          actorId: input.actorId,
+          festivalId: input.festivalId,
+          date: input.date,
+          todayInTz,
+          graceDateInTz,
+        },
+        "Day-start date outside today (plus 01:00 grace) window; skipping claim",
+      );
+      return "backfill";
+    }
+
     let adminClient;
     try {
       adminClient = createAdminClient();
@@ -1480,35 +1519,6 @@ export class NotificationService {
     }
 
     try {
-      // Both clients let a user backfill a past date, and claiming the ledger
-      // for one would announce a day that isn't starting. So only today
-      // counts, in the festival's own timezone rather than the server's, with
-      // yesterday allowed until 01:00: a visit near midnight can have its
-      // offline-queue push land after the day has rolled over. Checking the
-      // date an hour ago gives exactly that grace window.
-      const attendanceRepo = new SupabaseAttendanceRepository(this.supabase);
-      const timezone = await attendanceRepo.getFestivalTimezone(input.festivalId);
-      const now = new Date();
-      const todayInTz = formatDateForDatabase(now, timezone);
-      const graceDateInTz = formatDateForDatabase(
-        new Date(now.getTime() - DAY_START_GRACE_MS),
-        timezone,
-      );
-
-      if (input.date !== todayInTz && input.date !== graceDateInTz) {
-        logger.warn(
-          {
-            actorId: input.actorId,
-            festivalId: input.festivalId,
-            date: input.date,
-            todayInTz,
-            graceDateInTz,
-          },
-          "Day-start date outside today (plus 01:00 grace) window; skipping claim",
-        );
-        return "backfill";
-      }
-
       const { data: claimed, error: claimError } = await adminClient
         .from("day_start_notifications")
         .upsert(

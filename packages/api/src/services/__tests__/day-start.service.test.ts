@@ -194,6 +194,22 @@ describe("NotificationService.notifyDayStart", () => {
     expect(triggerMock).not.toHaveBeenCalled();
   });
 
+  it("still reports a backfill when the admin client is unavailable", async () => {
+    vi.mocked(createAdminClient).mockImplementation(() => {
+      throw new Error("no service role key");
+    });
+
+    const result = await service.notifyDayStart({
+      actorId: ACTOR_ID,
+      festivalId: FESTIVAL_ID,
+      date: "2026-09-01",
+      kind: "checkin",
+      tentName: null,
+    });
+
+    expect(result).toBe("backfill");
+  });
+
   // The critical fix: a backfilled date well in the past must never claim the
   // ledger or announce, however both clients let a user pick any past date.
   it("does not claim the ledger or announce for a date older than yesterday", async () => {
