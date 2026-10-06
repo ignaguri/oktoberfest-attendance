@@ -47,11 +47,12 @@ export interface IGroupRepository {
   findByInviteToken(inviteToken: string): Promise<Group | null>;
 
   /**
-   * Add a user to a group
-   * @param groupId - Group ID
+   * Add a user to the group an invite token belongs to
+   * @param inviteToken - Invite token
    * @param userId - User ID to add
+   * @throws ConflictError if already a member, NotFoundError if the token is unknown
    */
-  addMember(groupId: string, userId: string): Promise<void>;
+  joinWithToken(inviteToken: string, userId: string): Promise<void>;
 
   /**
    * Remove a user from a group

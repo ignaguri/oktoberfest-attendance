@@ -2870,6 +2870,20 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_group_by_invite_token: {
+        Args: { p_token: string }
+        Returns: {
+          carried_over_from: string
+          created_at: string
+          created_by: string
+          description: string
+          festival_id: string
+          id: string
+          invite_token: string
+          name: string
+          winning_criteria_id: number
+        }[]
+      }
       get_group_leaderboard: {
         Args: { p_group_id: string; p_winning_criteria_id: number }
         Returns: {
@@ -3051,15 +3065,6 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: never; Returns: boolean }
-      join_group: {
-        Args: {
-          p_festival_id?: string
-          p_group_name: string
-          p_password: string
-          p_user_id: string
-        }
-        Returns: string
-      }
       join_group_with_token: {
         Args: { p_token: string; p_user_id: string }
         Returns: Json
@@ -3128,6 +3133,15 @@ export type Database = {
           start_at: string
           tent_id: string
           user_id: string
+        }[]
+      }
+      search_groups: {
+        Args: { p_festival_id?: string; p_limit?: number; p_name: string }
+        Returns: {
+          festival_id: string
+          id: string
+          member_count: number
+          name: string
         }[]
       }
       send_friend_request: {

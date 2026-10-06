@@ -6,6 +6,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
+  createTestSupabaseWithAuth,
 } from "../../__tests__/helpers/test-supabase";
 import { SupabaseGroupRepository } from "../../repositories/supabase";
 
@@ -502,6 +503,92 @@ describe("Group Routes Integration (Local DB)", () => {
       expect(
         await repo.getFestivalSchedule("00000000-0000-0000-0000-000000000000"),
       ).toBeNull();
+    });
+  });
+
+  // Group rows carry invite_token and password, so only members may read them;
+  // everyone else goes through the SECURITY DEFINER functions.
+  describe("as a non-member", () => {
+    let outsiderId: string;
+    let outsider: SupabaseClient<Database>;
+    let group: { id: string; name: string; inviteToken: string };
+
+    beforeAll(async () => {
+      const { data: auth, error } = await createTestSupabaseAnon().auth.signUp({
+        email: `outsider-${Date.now()}@integration-test.com`,
+        password: "test-password-123!",
+      });
+      if (error || !auth.user || !auth.session) {
+        throw new Error(`Failed to create outsider: ${error?.message}`);
+      }
+      outsiderId = auth.user.id;
+      outsider = createTestSupabaseWithAuth(auth.session.access_token);
+
+      const name = `Closed Crew ${Date.now()}`;
+      const { data: created } = await supabaseAdmin.rpc("create_group_with_member", {
+        p_group_name: name,
+        p_user_id: testUser.id,
+        p_festival_id: testFestival.id,
+        p_winning_criteria_id: 2,
+      });
+      const { data: row } = await supabaseAdmin
+        .from("groups")
+        .select("invite_token")
+        .eq("id", created![0].group_id)
+        .single();
+      group = { id: created![0].group_id, name, inviteToken: row!.invite_token! };
+    });
+
+    afterAll(async () => {
+      await supabaseAdmin.auth.admin.deleteUser(outsiderId).catch(() => undefined);
+    });
+
+    it("cannot read the group row, signed in or not", async () => {
+      const { data: anonRows } = await createTestSupabaseAnon()
+        .from("groups")
+        .select("id")
+        .eq("id", group.id);
+      const { data: outsiderRows } = await outsider
+        .from("groups")
+        .select("id")
+        .eq("id", group.id);
+
+      expect(anonRows).toEqual([]);
+      expect(outsiderRows).toEqual([]);
+    });
+
+    it("cannot add itself to the group directly", async () => {
+      const { error } = await outsider
+        .from("group_members")
+        .insert({ group_id: group.id, user_id: outsiderId });
+
+      expect(error).not.toBeNull();
+    });
+
+    it("gets nothing from a blank search called straight over PostgREST", async () => {
+      const { data, error } = await outsider.rpc("search_groups", { p_name: "  " });
+
+      expect(error).toBeNull();
+      expect(data).toEqual([]);
+    });
+
+    it("finds the group by name and by token, and joins with the token", async () => {
+      const outsiderRepo = new SupabaseGroupRepository(outsider);
+
+      const results = await outsiderRepo.search({
+        name: group.name,
+        festivalId: testFestival.id,
+        limit: 10,
+      });
+      expect(results).toEqual([
+        { id: group.id, name: group.name, festivalId: testFestival.id, memberCount: 1 },
+      ]);
+
+      const resolved = await outsiderRepo.findByInviteToken(group.inviteToken);
+      expect(resolved?.id).toBe(group.id);
+
+      await outsiderRepo.joinWithToken(group.inviteToken, outsiderId);
+      expect(await outsiderRepo.isMember(group.id, outsiderId)).toBe(true);
     });
   });
 });

@@ -69,23 +69,19 @@ export class GroupService {
   }
 
   /**
-   * Join a group by ID. The invite token is what authorizes the join: RLS on
-   * group_members only checks the row is the caller's own, so this check is the
-   * only thing keeping people out of groups they found by search.
+   * Join a group by ID. The invite token is what authorizes the join; an
+   * unknown group and a token for a different group both fail the same way.
    */
   async joinGroup(groupId: string, userId: string, inviteToken: string): Promise<void> {
-    const group = await this.groupRepo.findById(groupId);
+    const token = extractInviteToken(inviteToken);
+    const group = token ? await this.groupRepo.findByInviteToken(token) : null;
 
-    if (!group) {
-      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
-    }
-
-    if (extractInviteToken(inviteToken) !== group.inviteToken.toLowerCase()) {
+    if (!token || !group || group.id !== groupId) {
       throw new ForbiddenError(ErrorCodes.INVALID_INVITE_TOKEN);
     }
 
     // Add member (will throw if already a member)
-    await this.groupRepo.addMember(groupId, userId);
+    await this.groupRepo.joinWithToken(token, userId);
   }
 
   /**
@@ -239,7 +235,7 @@ export class GroupService {
     }
 
     // Add member (will throw if already a member)
-    await this.groupRepo.addMember(group.id, userId);
+    await this.groupRepo.joinWithToken(token, userId);
 
     return group;
   }
