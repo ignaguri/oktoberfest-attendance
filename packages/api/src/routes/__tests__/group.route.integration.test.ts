@@ -565,6 +565,13 @@ describe("Group Routes Integration (Local DB)", () => {
       expect(error).not.toBeNull();
     });
 
+    it("gets nothing from a blank search called straight over PostgREST", async () => {
+      const { data, error } = await outsider.rpc("search_groups", { p_name: "  " });
+
+      expect(error).toBeNull();
+      expect(data).toEqual([]);
+    });
+
     it("finds the group by name and by token, and joins with the token", async () => {
       const outsiderRepo = new SupabaseGroupRepository(outsider);
 
