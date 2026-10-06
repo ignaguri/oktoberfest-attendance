@@ -274,19 +274,11 @@ describe("Group Routes", () => {
         winning_criteria: { id: 2, name: "total_beers" },
       };
 
-      vi.mocked(mockSupabase.from)
-        // 1. joinGroup - findById: select().eq().single()
-        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupDbRow)))
-        // 2. joinGroup - findById member count: select().eq()
-        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 0 }))
-        // 3. addMember - isMember check: select().eq().eq().maybeSingle()
-        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(null)))
-        // 4. addMember - findById: select().eq().single()
-        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess(mockGroupDbRow)))
-        // 5. addMember - findById member count: select().eq()
-        .mockReturnValueOnce(createMockChain({ ...mockSupabaseSuccess(null), count: 0 }))
-        // 6. addMember - insert: insert()
-        .mockReturnValueOnce(createMockChain(mockSupabaseSuccess({})));
+      vi.mocked(mockSupabase.rpc)
+        // 1. joinGroup - findByInviteToken: get_group_by_invite_token
+        .mockResolvedValueOnce(mockSupabaseSuccess([mockGroupDbRow]) as never)
+        // 2. joinWithToken: join_group_with_token
+        .mockResolvedValueOnce(mockSupabaseSuccess({ success: true }) as never);
 
       const req = createAuthRequest("/groups/923e4567-e89b-12d3-a456-426614174000/join", {
         method: "POST",
@@ -301,18 +293,18 @@ describe("Group Routes", () => {
       expect(json).toHaveProperty("message");
     });
 
-    it("should return 404 for non-existent group", async () => {
-      vi.mocked(mockSupabase.from)
-        // 1. joinGroup - findById: returns not found (PGRST116)
-        .mockReturnValueOnce(createMockChain(mockSupabaseNotFound()));
+    it("should reject a token that does not resolve to the group", async () => {
+      vi.mocked(mockSupabase.rpc)
+        // 1. joinGroup - findByInviteToken: no group has this token
+        .mockResolvedValueOnce(mockSupabaseSuccess([]) as never);
 
       const req = createAuthRequest("/groups/a23e4567-e89b-12d3-a456-426614174000/join", {
         method: "POST",
-        body: JSON.stringify({ inviteToken: "invalid-token" }),
+        body: JSON.stringify({ inviteToken: "b0d2a1b9-7b1e-41cd-be6e-48418d0c6f11" }),
       });
 
       const res = await app.request(req as Request);
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(403);
     });
 
     it("should validate group ID format", async () => {

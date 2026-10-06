@@ -155,55 +155,39 @@ export class SupabaseGroupRepository implements IGroupRepository {
   }
 
   async findByInviteToken(inviteToken: string): Promise<Group | null> {
-    const { data, error } = await this.supabase
-      .from("groups")
-      .select(
-        `
-        *,
-        winning_criteria:winning_criteria_id (id, name)
-      `,
-      )
-      .eq("invite_token", inviteToken)
-      .single();
-
-    if (error && error.code === PgErrorCode.NO_ROWS) {
-      return null;
-    }
-
-    if (error || !data) {
-      throw new DatabaseError(`Failed to fetch group: ${error?.message || "No data returned"}`);
-    }
-
-    return this.mapToGroup(data);
-  }
-
-  async addMember(groupId: string, userId: string): Promise<void> {
-    // Check if already a member
-    const isMember = await this.isMember(groupId, userId);
-    if (isMember) {
-      throw new ConflictError("User is already a member of this group");
-    }
-
-    // Get group to verify festival
-    const group = await this.findById(groupId);
-    if (!group) {
-      throw new NotFoundError("Group not found");
-    }
-
-    const { error } = await this.supabase.from("group_members").insert({
-      group_id: groupId,
-      user_id: userId,
+    // An RPC because the caller is not a member yet and cannot read the row.
+    const { data, error } = await this.supabase.rpc("get_group_by_invite_token", {
+      p_token: inviteToken,
     });
 
-    // A join racing this one (a double tap, a retried request) passed the
-    // membership check too and inserted first: same outcome as the check above.
-    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
-      throw new ConflictError("User is already a member of this group");
+    if (error) {
+      throw new DatabaseError(`Failed to fetch group: ${error.message}`);
     }
+
+    return data && data.length > 0 ? this.mapToGroup(data[0]) : null;
+  }
+
+  async joinWithToken(inviteToken: string, userId: string): Promise<void> {
+    const { data, error } = await this.supabase.rpc("join_group_with_token", {
+      p_user_id: userId,
+      p_token: inviteToken,
+    });
 
     if (error) {
       throw new DatabaseError(`Failed to add member: ${error.message}`);
     }
+
+    const result = data as { success: boolean; error_code?: string } | null;
+    if (result?.success) {
+      return;
+    }
+    if (result?.error_code === "ALREADY_MEMBER") {
+      throw new ConflictError("User is already a member of this group");
+    }
+    if (result?.error_code === "TOKEN_NOT_FOUND") {
+      throw new NotFoundError(ErrorCodes.INVALID_INVITE_TOKEN);
+    }
+    throw new DatabaseError(`Failed to add member: ${result?.error_code ?? "No data returned"}`);
   }
 
   async removeMember(groupId: string, userId: string): Promise<void> {
@@ -289,36 +273,22 @@ export class SupabaseGroupRepository implements IGroupRepository {
   }
 
   async search(query: SearchGroupsQuery): Promise<SearchGroupResult[]> {
-    let supabaseQuery = this.supabase
-      .from("groups")
-      .select(
-        `
-        id,
-        name,
-        festival_id,
-        group_members(count)
-      `,
-      )
-      .ilike("name", `%${query.name}%`)
-      .limit(query.limit);
-
-    if (query.festivalId) {
-      supabaseQuery = supabaseQuery.eq("festival_id", query.festivalId);
-    }
-
-    supabaseQuery = supabaseQuery.order("name", { ascending: true });
-
-    const { data, error } = await supabaseQuery;
+    // An RPC because a non-member cannot read other groups' rows.
+    const { data, error } = await this.supabase.rpc("search_groups", {
+      p_name: query.name,
+      p_festival_id: query.festivalId,
+      p_limit: query.limit,
+    });
 
     if (error) {
       throw new DatabaseError(`Failed to search groups: ${error.message}`);
     }
 
-    return (data || []).map((group: any) => ({
+    return (data || []).map((group) => ({
       id: group.id,
       name: group.name,
       festivalId: group.festival_id,
-      memberCount: group.group_members?.[0]?.count || 0,
+      memberCount: Number(group.member_count),
     }));
   }
 

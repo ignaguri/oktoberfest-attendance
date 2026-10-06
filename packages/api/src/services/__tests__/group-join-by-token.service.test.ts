@@ -17,7 +17,7 @@ describe("GroupService.joinByToken", () => {
   beforeEach(() => {
     repo = {
       findByInviteToken: vi.fn().mockResolvedValue(group),
-      addMember: vi.fn().mockResolvedValue(undefined),
+      joinWithToken: vi.fn().mockResolvedValue(undefined),
     } as unknown as IGroupRepository;
     service = new GroupService(repo);
   });
@@ -58,8 +58,10 @@ describe("GroupService.joinGroup", () => {
 
   beforeEach(() => {
     repo = {
-      findById: vi.fn().mockResolvedValue(group),
-      addMember: vi.fn().mockResolvedValue(undefined),
+      findByInviteToken: vi.fn(async (token: string) =>
+        token === TOKEN ? group : ({ id: "44444444-4444-4444-8444-444444444444" } as Group),
+      ),
+      joinWithToken: vi.fn().mockResolvedValue(undefined),
     } as unknown as IGroupRepository;
     service = new GroupService(repo);
   });
@@ -68,7 +70,7 @@ describe("GroupService.joinGroup", () => {
     await service.joinGroup(group.id, USER_ID, TOKEN);
     await service.joinGroup(group.id, USER_ID, `https://prostcounter.fun/join-group?token=${TOKEN}`);
 
-    expect(repo.addMember).toHaveBeenCalledTimes(2);
+    expect(repo.joinWithToken).toHaveBeenCalledTimes(2);
   });
 
   it.each([
@@ -79,6 +81,6 @@ describe("GroupService.joinGroup", () => {
     await expect(service.joinGroup(group.id, USER_ID, inviteToken)).rejects.toMatchObject({
       code: ErrorCodes.INVALID_INVITE_TOKEN,
     });
-    expect(repo.addMember).not.toHaveBeenCalled();
+    expect(repo.joinWithToken).not.toHaveBeenCalled();
   });
 });

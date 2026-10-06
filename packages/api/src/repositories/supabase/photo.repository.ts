@@ -368,10 +368,15 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .from("groups")
       .select("name")
       .eq("id", groupId)
-      .single();
+      .maybeSingle();
 
     if (groupError) {
       throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
+    }
+
+    // Only members can read the row, so this also covers a group the user left.
+    if (!group) {
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     const { data, error } = await this.supabase.rpc("get_user_group_photo_settings", {
@@ -388,7 +393,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     return {
       userId,
       groupId,
-      groupName: group?.name || "Unknown Group",
+      groupName: group.name,
       hidePhotosFromGroup: settings?.hide_photos_from_group ?? false,
     };
   }
@@ -403,10 +408,15 @@ export class SupabasePhotoRepository implements IPhotoRepository {
       .from("groups")
       .select("name")
       .eq("id", groupId)
-      .single();
+      .maybeSingle();
 
     if (groupError) {
       throw new DatabaseError(`Failed to fetch group: ${groupError.message}`);
+    }
+
+    // Only members can read the row, so this also covers a group the user left.
+    if (!group) {
+      throw new NotFoundError(ErrorCodes.GROUP_NOT_FOUND);
     }
 
     const { error } = await this.supabase.rpc("update_user_group_photo_settings", {
@@ -422,7 +432,7 @@ export class SupabasePhotoRepository implements IPhotoRepository {
     return {
       userId,
       groupId,
-      groupName: group?.name || "Unknown Group",
+      groupName: group.name,
       hidePhotosFromGroup,
     };
   }
