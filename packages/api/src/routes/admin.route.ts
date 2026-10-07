@@ -710,7 +710,7 @@ const deleteFestivalRoute = createRoute({
   tags: ["admin"],
   summary: "Delete a festival (admin)",
   description:
-    "Refuses with 409 when attendances, groups or tent visits still reference the festival; archive it instead.",
+    "Refuses with 409 while user data (attendances, groups, plans, achievements...) still references the festival; archive it instead.",
   request: { params: z.object({ festivalId: z.string().uuid() }) },
   responses: {
     200: {
@@ -746,13 +746,10 @@ app.openapi(deleteFestivalRoute, async (c) => {
   if ("blockedBy" in result) {
     // 409 rather than 400: the request is well-formed, the festival's state is
     // what refuses it. The client shows "archive instead".
-    const reason = {
-      attendances: "existing attendance data",
-      groups: "existing groups",
-      tent_visits: "existing tent visits",
-    }[result.blockedBy];
-
-    throw new ConflictError(`Cannot delete a festival with ${reason}. Archive it instead.`);
+    const reason = result.blockedBy.replace(/_/g, " ");
+    throw new ConflictError(
+      `Cannot delete a festival that still has ${reason}. Archive it instead.`,
+    );
   }
 
   return c.json({ success: true }, 200);

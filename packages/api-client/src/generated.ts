@@ -11537,6 +11537,8 @@ export interface paths {
                                 /** @enum {string} */
                                 festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
                                 location: string;
+                                latitude: number | null;
+                                longitude: number | null;
                                 start_date: string;
                                 end_date: string;
                                 map_url: string | null;
@@ -11592,6 +11594,8 @@ export interface paths {
                         /** @enum {string} */
                         festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
                         location: string;
+                        latitude?: number | null;
+                        longitude?: number | null;
                         start_date: string;
                         end_date: string;
                         /** Format: uri */
@@ -11621,6 +11625,8 @@ export interface paths {
                                 /** @enum {string} */
                                 festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
                                 location: string;
+                                latitude: number | null;
+                                longitude: number | null;
                                 start_date: string;
                                 end_date: string;
                                 map_url: string | null;
@@ -11696,6 +11702,8 @@ export interface paths {
                                 /** @enum {string} */
                                 festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
                                 location: string;
+                                latitude: number | null;
+                                longitude: number | null;
                                 start_date: string;
                                 end_date: string;
                                 map_url: string | null;
@@ -11744,7 +11752,7 @@ export interface paths {
         post?: never;
         /**
          * Delete a festival (admin)
-         * @description Refuses with 409 when attendances, groups or tent visits still reference the festival; archive it instead.
+         * @description Refuses with 409 while user data (attendances, groups, plans, achievements...) still references the festival; archive it instead.
          */
         delete: {
             parameters: {
@@ -11822,6 +11830,8 @@ export interface paths {
                         /** @enum {string} */
                         festival_type?: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
                         location?: string;
+                        latitude?: number | null;
+                        longitude?: number | null;
                         start_date?: string;
                         end_date?: string;
                         /** Format: uri */
@@ -11851,6 +11861,8 @@ export interface paths {
                                 /** @enum {string} */
                                 festival_type: "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other";
                                 location: string;
+                                latitude: number | null;
+                                longitude: number | null;
                                 start_date: string;
                                 end_date: string;
                                 map_url: string | null;
@@ -11957,6 +11969,8 @@ export interface paths {
                         name: string;
                         /** @enum {string|null} */
                         category?: "large" | "small" | "old" | null;
+                        latitude?: number | null;
+                        longitude?: number | null;
                     };
                 };
             };

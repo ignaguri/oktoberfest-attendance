@@ -261,12 +261,8 @@ describe("achievement unlocking against a real database", () => {
     }
     expect(second).toEqual([]);
 
-    // Cleanup: consumptions, user_achievements and achievement_events all
-    // cascade off their FKs, but attendances -> festivals does not (plain
-    // FK, no ON DELETE), so the attendance must go before the festival or
-    // the festival delete fails.
-    await supabaseAdmin.from("attendances").delete().eq("id", attendance.id);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
+    // The festival is tracked, so afterAll removes it with its attendance
+    // and the unlocked achievements, which block a festival delete.
   });
 });
 
@@ -306,7 +302,6 @@ describe("inline unlock wiring on the write-path routes", () => {
       .delete()
       .eq("user_id", user.id)
       .eq("festival_id", festival.id);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 
@@ -343,7 +338,6 @@ describe("inline unlock wiring on the write-path routes", () => {
       .delete()
       .eq("user_id", user.id)
       .eq("festival_id", festival.id);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 
@@ -450,7 +444,6 @@ describe("inline unlock wiring on the write-path routes", () => {
       .eq("user_id", user.id)
       .eq("festival_id", festival.id);
     await supabaseAdmin.from("tents").delete().in("id", [tent1.id, tent2.id]);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 
@@ -508,7 +501,6 @@ describe("inline unlock wiring on the write-path routes", () => {
 
     await supabaseAdmin.from("beer_pictures").delete().eq("id", picture.id);
     await supabaseAdmin.from("attendances").delete().eq("id", attendance.id);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 });
@@ -581,7 +573,6 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     await supabaseAdmin.from("beer_pictures").delete().eq("id", picture.id);
     await supabaseAdmin.from("attendances").delete().eq("id", attendance.id);
     await supabaseAdmin.from("groups").delete().eq("id", groupId);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 
@@ -651,7 +642,6 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
       .delete()
       .eq("created_by", user.id)
       .eq("festival_id", festival.id);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 
@@ -705,7 +695,6 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     await expectUnlockPersisted(supabaseAdmin, joiner.id, "groups_joined.t1");
 
     await supabaseAdmin.from("groups").delete().eq("id", groupId);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(creator.id).catch(() => undefined);
     await supabaseAdmin.auth.admin.deleteUser(joiner.id).catch(() => undefined);
   });
@@ -759,7 +748,6 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
     await expectUnlockPersisted(supabaseAdmin, joiner.id, "groups_joined.t1");
 
     await supabaseAdmin.from("groups").delete().eq("id", groupId);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(creator.id).catch(() => undefined);
     await supabaseAdmin.auth.admin.deleteUser(joiner.id).catch(() => undefined);
   });
@@ -794,7 +782,6 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
 
     await supabaseAdmin.from("tent_crowd_reports").delete().eq("tent_id", tent.id);
     await supabaseAdmin.from("tents").delete().eq("id", tent.id);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 
@@ -927,7 +914,6 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
       .delete()
       .eq("user_id", user.id)
       .eq("festival_id", festival.id);
-    await supabaseAdmin.from("festivals").delete().eq("id", festival.id);
     await supabaseAdmin.auth.admin.deleteUser(user.id).catch(() => undefined);
   });
 });

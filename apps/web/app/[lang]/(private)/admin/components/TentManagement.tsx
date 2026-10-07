@@ -4,16 +4,30 @@
 // caused by @hookform/resolvers v5.x importing "zod/v4/core" which Turbopack cannot resolve.
 // See: https://github.com/colinhacks/zod/issues/4879
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import {
+  useAddAdminFestivalTent,
+  useAddAllAdminFestivalTents,
+  useAdminAvailableTents,
+  useAdminFestivals,
+  useAdminFestivalTents,
+  useCopyAdminFestivalTents,
+  useCreateAdminTent,
+  useRemoveAdminFestivalTent,
+  useSetAdminFestivalTentPrice,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
   type AdminAddTentToFestivalForm,
   AdminAddTentToFestivalFormSchema,
   type AdminCopyTentsForm,
   AdminCopyTentsFormSchema,
+  type AdminFestival,
+  type AdminFestivalTent,
+  type CreateAdminTentInput,
   TENT_CATEGORIES,
 } from "@prostcounter/shared/schemas";
 import { Copy, Edit, Euro, Plus, Tent, Trash2 } from "lucide-react";
-import { startTransition, useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -39,30 +53,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Festival } from "@/lib/types";
-
-import { fetchAllFestivals } from "../festivalActions";
-import {
-  addAllAvailableTentsToFestival,
-  addTentToFestival,
-  copyTentsToFestival,
-  createTent,
-  getAvailableTents,
-  getFestivalTents,
-  getFestivalTentStats,
-  removeTentFromFestival,
-  type TentWithPrice,
-  updateTentPrice,
-} from "../tentActions";
 
 export default function TentManagement() {
   const { t } = useTranslation();
-  const [festivals, setFestivals] = useState<Festival[]>([]);
   const [selectedFestival, setSelectedFestival] = useState<string>("");
-  const [festivalTents, setFestivalTents] = useState<TentWithPrice[]>([]);
-  const [availableTents, setAvailableTents] = useState<any[]>([]);
-  const [tentStats, setTentStats] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { festivals, error: festivalsError } = useAdminFestivals();
+  const {
+    tents: festivalTents,
+    stats: tentStats,
+    isLoading,
+    error: tentsError,
+  } = useAdminFestivalTents(selectedFestival || undefined);
+  const { tents: availableTents } = useAdminAvailableTents(selectedFestival || undefined);
+  const createTent = useCreateAdminTent();
+  const addTent = useAddAdminFestivalTent();
+  const addAllTents = useAddAllAdminFestivalTents();
+  const copyTents = useCopyAdminFestivalTents();
+  const setTentPrice = useSetAdminFestivalTentPrice();
+  const removeTent = useRemoveAdminFestivalTent();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showCopyDialog, setShowCopyDialog] = useState(false);
 
@@ -89,84 +97,57 @@ export default function TentManagement() {
     },
   });
 
-  // Load festivals on component mount
+  // Select the active festival, or the newest, once the list arrives
   useEffect(() => {
-    const loadFestivals = async () => {
-      try {
-        const festivalsData = await fetchAllFestivals();
-        setFestivals(festivalsData);
-        if (festivalsData.length > 0 && !selectedFestival) {
-          // Select the most recent active festival
-          const activeFestival = festivalsData.find((f) => f.is_active);
-          setSelectedFestival(activeFestival?.id || festivalsData[0].id);
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Error loading festivals:", error);
-        toast.error(t("notifications.error.festivalLoadFailed"));
-      }
-    };
-    loadFestivals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Load tent data when festival selection changes
-  useEffect(() => {
-    if (selectedFestival) {
-      loadFestivalData();
+    if (festivals.length > 0 && !selectedFestival) {
+      const activeFestival = festivals.find((f) => f.is_active);
+      setSelectedFestival(activeFestival?.id || festivals[0].id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFestival]);
+  }, [festivals, selectedFestival]);
 
-  const loadFestivalData = async () => {
-    if (!selectedFestival) return;
+  useEffect(() => {
+    copyTentsForm.setValue("targetFestivalId", selectedFestival);
+  }, [copyTentsForm, selectedFestival]);
 
-    setIsLoading(true);
-    try {
-      const [tentsData, availableData, statsData] = await Promise.all([
-        getFestivalTents(selectedFestival),
-        getAvailableTents(selectedFestival),
-        getFestivalTentStats(selectedFestival),
-      ]);
+  useEffect(() => {
+    if (festivalsError) {
+      toast.error(t("notifications.error.festivalLoadFailed"));
+    }
+  }, [festivalsError, t]);
 
-      setFestivalTents(tentsData);
-      setAvailableTents(availableData);
-      setTentStats(statsData);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error loading festival data:", error);
+  useEffect(() => {
+    if (tentsError) {
       toast.error(t("notifications.error.tentLoadFailed"));
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [tentsError, t]);
 
   const handleCreateTent = async (data: AdminAddTentToFestivalForm) => {
     try {
-      await createTent(
-        {
-          name: data.name,
-          category: data.category || null,
-          latitude: data.latitude ?? null,
-          longitude: data.longitude ?? null,
-        },
-        selectedFestival,
-        data.beer_price,
-      );
+      const { tent } = await createTent.mutate({
+        name: data.name,
+        category: (data.category || null) as CreateAdminTentInput["category"],
+        latitude: data.latitude ?? null,
+        longitude: data.longitude ?? null,
+      });
+      await addTent.mutate({
+        festivalId: selectedFestival,
+        data: { tent_id: tent.id, beer_price: data.beer_price ?? null },
+      });
       toast.success(t("notifications.success.tentCreated"));
       createTentForm.reset();
       setShowAddDialog(false);
-      await loadFestivalData();
     } catch (error: any) {
       toast.error(error.message || t("notifications.error.generic"));
     }
   };
 
-  const handleAddExistingTent = async (tentId: string, beerPrice?: number | null) => {
+  const handleAddExistingTent = async (tentId: string) => {
     try {
-      await addTentToFestival(selectedFestival, tentId, beerPrice);
+      await addTent.mutate({
+        festivalId: selectedFestival,
+        data: { tent_id: tentId },
+      });
       toast.success(t("notifications.success.tentAddedToFestival"));
-      await loadFestivalData();
     } catch (error: any) {
       toast.error(error.message || t("notifications.error.generic"));
     }
@@ -174,13 +155,15 @@ export default function TentManagement() {
 
   const handleAddAllAvailableTents = async () => {
     try {
-      const result = await addAllAvailableTentsToFestival(selectedFestival);
+      const result = await addAllTents.mutate({
+        festivalId: selectedFestival,
+        data: {},
+      });
       toast.success(
         t("notifications.success.tentsAddedToFestival", {
           count: result.added,
         }),
       );
-      await loadFestivalData();
     } catch (error: any) {
       toast.error(error.message || t("notifications.error.generic"));
     }
@@ -188,9 +171,8 @@ export default function TentManagement() {
 
   const handleRemoveTent = async (tentId: string) => {
     try {
-      await removeTentFromFestival(selectedFestival, tentId);
+      await removeTent.mutate({ festivalId: selectedFestival, tentId });
       toast.success(t("notifications.success.tentRemovedFromFestival"));
-      await loadFestivalData();
     } catch (error: any) {
       toast.error(error.message || t("notifications.error.generic"));
     }
@@ -198,9 +180,12 @@ export default function TentManagement() {
 
   const handleUpdatePrice = async (tentId: string, price: number | null) => {
     try {
-      await updateTentPrice(selectedFestival, tentId, price);
+      await setTentPrice.mutate({
+        festivalId: selectedFestival,
+        tentId,
+        beerPrice: price,
+      });
       toast.success(t("notifications.success.priceUpdated"));
-      await loadFestivalData();
     } catch (error: any) {
       toast.error(error.message || t("notifications.error.generic"));
     }
@@ -208,14 +193,23 @@ export default function TentManagement() {
 
   const handleCopyTents = async (data: AdminCopyTentsForm) => {
     try {
-      await copyTentsToFestival(data.sourceFestivalId, selectedFestival, data.tentIds, {
-        copyPrices: data.copyPrices,
-        overridePrice: data.overridePrice,
+      const { copied } = await copyTents.mutate({
+        festivalId: selectedFestival,
+        data: {
+          source_festival_id: data.sourceFestivalId,
+          tent_ids: data.tentIds,
+          copy_prices: data.copyPrices,
+          ...(data.overridePrice != null && {
+            override_price: data.overridePrice,
+          }),
+        },
       });
-      toast.success(t("notifications.success.tentsCopied", { count: data.tentIds.length }));
-      copyTentsForm.reset();
+      toast.success(t("notifications.success.tentsCopied", { count: copied }));
+      copyTentsForm.reset({
+        ...copyTentsForm.formState.defaultValues,
+        targetFestivalId: selectedFestival,
+      });
       setShowCopyDialog(false);
-      await loadFestivalData();
     } catch (error: any) {
       toast.error(error.message || t("notifications.error.generic"));
     }
@@ -297,7 +291,7 @@ export default function TentManagement() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">
-                  {tentStats.avg_price > 0 ? `€${tentStats.avg_price.toFixed(2)}` : "N/A"}
+                  {tentStats.avg_price !== null ? `€${tentStats.avg_price.toFixed(2)}` : "N/A"}
                 </div>
                 <div className="text-muted-foreground text-sm">
                   {t("admin.tents.stats.avgPrice")}
@@ -374,8 +368,7 @@ export default function TentManagement() {
                           step="0.0001"
                           placeholder={t("admin.tents.form.latitudePlaceholder")}
                           {...createTentForm.register("latitude", {
-                            valueAsNumber: true,
-                            setValueAs: (value) => (value === "" ? null : value),
+                            setValueAs: (value) => (value === "" || value == null ? null : Number(value)),
                           })}
                         />
                       </div>
@@ -387,8 +380,7 @@ export default function TentManagement() {
                           step="0.0001"
                           placeholder={t("admin.tents.form.longitudePlaceholder")}
                           {...createTentForm.register("longitude", {
-                            valueAsNumber: true,
-                            setValueAs: (value) => (value === "" ? null : value),
+                            setValueAs: (value) => (value === "" || value == null ? null : Number(value)),
                           })}
                         />
                       </div>
@@ -406,8 +398,7 @@ export default function TentManagement() {
                           className="pl-10"
                           placeholder={t("admin.tents.form.beerPricePlaceholder")}
                           {...createTentForm.register("beer_price", {
-                            valueAsNumber: true,
-                            setValueAs: (value) => (value === "" ? null : value),
+                            setValueAs: (value) => (value === "" || value == null ? null : Number(value)),
                           })}
                         />
                       </div>
@@ -474,11 +465,11 @@ export default function TentManagement() {
                 <div className="space-y-4">
                   {festivalTents.map((tent) => (
                     <TentCard
-                      key={tent.id}
+                      key={tent.festival_tent_id}
                       tent={tent}
                       festivalDefaultPrice={selectedFestivalData?.beer_cost || 16.2}
-                      onUpdatePrice={(price) => handleUpdatePrice(tent.id, price)}
-                      onRemove={() => handleRemoveTent(tent.id)}
+                      onUpdatePrice={(price) => handleUpdatePrice(tent.tent_id, price)}
+                      onRemove={() => handleRemoveTent(tent.tent_id)}
                     />
                   ))}
                 </div>
@@ -545,7 +536,7 @@ function TentCard({
   onUpdatePrice,
   onRemove,
 }: {
-  tent: TentWithPrice;
+  tent: AdminFestivalTent;
   festivalDefaultPrice: number;
   onUpdatePrice: (price: number | null) => void;
   onRemove: () => void;
@@ -631,45 +622,30 @@ function CopyTentsDialog({
   onSubmit,
 }: {
   form: ReturnType<typeof useForm<AdminCopyTentsForm>>;
-  festivals: Festival[];
+  festivals: AdminFestival[];
   onSubmit: (data: AdminCopyTentsForm) => void;
 }) {
   const { t } = useTranslation();
-  const [sourceTents, setSourceTents] = useState<TentWithPrice[]>([]);
-  const [selectedTents, setSelectedTents] = useState<string[]>([]);
 
   const sourceFestivalId = form.watch("sourceFestivalId");
-
-  const loadSourceTents = useCallback(async () => {
-    if (!sourceFestivalId) return;
-
-    try {
-      const tents = await getFestivalTents(sourceFestivalId);
-      startTransition(() => {
-        setSourceTents(tents);
-        setSelectedTents([]);
-      });
-    } catch {
-      toast.error(t("notifications.error.tentSourceLoadFailed"));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceFestivalId]);
+  const selectedTents = form.watch("tentIds");
+  const setSelectedTents = (tentIds: string[]) => form.setValue("tentIds", tentIds);
+  const { tents: sourceTents, error: sourceTentsError } = useAdminFestivalTents(
+    sourceFestivalId || undefined,
+  );
 
   useEffect(() => {
-    if (sourceFestivalId) {
-      loadSourceTents();
-    }
-  }, [sourceFestivalId, loadSourceTents]);
+    form.setValue("tentIds", []);
+  }, [form, sourceFestivalId]);
 
-  const handleSubmit = (data: AdminCopyTentsForm) => {
-    onSubmit({
-      ...data,
-      tentIds: selectedTents,
-    });
-  };
+  useEffect(() => {
+    if (sourceTentsError) {
+      toast.error(t("notifications.error.tentSourceLoadFailed"));
+    }
+  }, [sourceTentsError, t]);
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div>
         <Label>{t("admin.tents.dialog.sourceFestival")}</Label>
         <Select
@@ -694,19 +670,19 @@ function CopyTentsDialog({
           <Label>{t("admin.tents.dialog.selectTentsToCopy")}</Label>
           <div className="max-h-60 space-y-2 overflow-y-auto rounded-md border p-3">
             {sourceTents.map((tent) => (
-              <div key={tent.id} className="flex items-center space-x-2">
+              <div key={tent.tent_id} className="flex items-center space-x-2">
                 <Checkbox
-                  id={tent.id}
-                  checked={selectedTents.includes(tent.id)}
+                  id={tent.tent_id}
+                  checked={selectedTents.includes(tent.tent_id)}
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      setSelectedTents([...selectedTents, tent.id]);
+                      setSelectedTents([...selectedTents, tent.tent_id]);
                     } else {
-                      setSelectedTents(selectedTents.filter((id) => id !== tent.id));
+                      setSelectedTents(selectedTents.filter((id) => id !== tent.tent_id));
                     }
                   }}
                 />
-                <label htmlFor={tent.id} className="flex-1 cursor-pointer">
+                <label htmlFor={tent.tent_id} className="flex-1 cursor-pointer">
                   <div className="flex items-center justify-between">
                     <span>{tent.name}</span>
                     <div className="flex items-center gap-2">

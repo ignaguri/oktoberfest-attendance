@@ -929,47 +929,21 @@ export class SupabaseAdminRepository {
   }
 
   /**
-   * Deletes a festival, refusing when dependent data exists.
+   * Deletes a festival, refusing when people's data still references it.
    *
-   * The three tables checked here are exactly the ones whose foreign key to
-   * `festivals` has no ON DELETE CASCADE, so the delete would fail on the
-   * constraint and surface a raw Postgres message as a 500. Everything else
-   * (achievements, festival_tents, reservations, location_sessions, the
-   * wrapped cache) cascades and is destroyed silently, which is why the
-   * confirmation copy says so.
-   *
-   * Returns a reason string instead of throwing so the route can answer 409.
+   * The foreign keys from user data (attendances, groups, visits, plans,
+   * reservations, achievements...) have no ON DELETE CASCADE, so Postgres
+   * refuses the delete; only festival config and derived caches cascade.
+   * Returns the blocking table instead of throwing so the route can answer 409.
    */
-  async deleteFestival(
-    festivalId: string,
-  ): Promise<{ deleted: true } | { blockedBy: "attendances" | "groups" | "tent_visits" }> {
-    const [attendances, groups, tentVisits] = await Promise.all([
-      this.supabase.from("attendances").select("id").eq("festival_id", festivalId).limit(1),
-      this.supabase.from("groups").select("id").eq("festival_id", festivalId).limit(1),
-      this.supabase.from("tent_visits").select("id").eq("festival_id", festivalId).limit(1),
-    ]);
-
-    if (attendances.error) {
-      throw new Error(`Error checking festival attendances: ${attendances.error.message}`);
-    }
-    if (groups.error) {
-      throw new Error(`Error checking festival groups: ${groups.error.message}`);
-    }
-    if (tentVisits.error) {
-      throw new Error(`Error checking festival tent visits: ${tentVisits.error.message}`);
-    }
-
-    if (attendances.data && attendances.data.length > 0) {
-      return { blockedBy: "attendances" };
-    }
-    if (groups.data && groups.data.length > 0) {
-      return { blockedBy: "groups" };
-    }
-    if (tentVisits.data && tentVisits.data.length > 0) {
-      return { blockedBy: "tent_visits" };
-    }
-
+  async deleteFestival(festivalId: string): Promise<{ deleted: true } | { blockedBy: string }> {
     const { error } = await this.supabase.from("festivals").delete().eq("id", festivalId);
+
+    if (error?.code === PgErrorCode.FOREIGN_KEY_VIOLATION) {
+      // details: Key (id)=(...) is still referenced from table "attendances".
+      const table = /from table "(\w+)"/.exec(error.details ?? "")?.[1];
+      return { blockedBy: table ?? "festival data" };
+    }
 
     if (error) {
       throw new Error(`Error deleting festival: ${error.message}`);
@@ -1159,7 +1133,13 @@ export class SupabaseAdminRepository {
     const { data, error } = await this.supabase
       .from("tents")
       // `tents.id` has no database default, so it is generated here.
-      .insert({ id: crypto.randomUUID(), name: input.name, category: input.category ?? null })
+      .insert({
+        id: crypto.randomUUID(),
+        name: input.name,
+        category: input.category ?? null,
+        latitude: input.latitude ?? null,
+        longitude: input.longitude ?? null,
+      })
       .select("id, name, category")
       .single();
 

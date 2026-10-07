@@ -1,12 +1,24 @@
 import type { Database } from "@prostcounter/db";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+/** Tables of people's data whose festival FK blocks a festival delete. */
+export const FESTIVAL_USER_DATA_TABLES = [
+  "user_achievements",
+  "achievement_events",
+  "reservations",
+  "day_plans",
+  "location_sessions",
+  "tent_crowd_reports",
+  "wrapped_shares",
+  "group_messages",
+] as const;
+
 /**
  * Deletes integration-test users and festivals, and throws if any of it fails.
  *
  * Most tables cascade off users and festivals, but a few plain FKs (no ON
  * DELETE) block the parent delete: group_members and location_sessions block
- * a user, and groups, attendances and tent_visits block a festival (with
+ * a user, and every table holding people's data blocks a festival (with
  * beer_pictures blocking its attendances). Supabase returns those failures
  * instead of throwing, so an unchecked delete quietly leaves the row behind,
  * and every later run adds more.
@@ -71,6 +83,9 @@ export async function deleteTestUsersAndFestivals(
       );
     }
 
+    for (const table of FESTIVAL_USER_DATA_TABLES) {
+      check(table, (await admin.from(table).delete().in("festival_id", festivalIds)).error);
+    }
     check(
       "tent_visits",
       (await admin.from("tent_visits").delete().in("festival_id", festivalIds)).error,

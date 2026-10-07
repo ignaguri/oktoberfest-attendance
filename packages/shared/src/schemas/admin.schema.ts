@@ -243,6 +243,8 @@ export const AdminFestivalSchema = z.object({
   short_name: z.string(),
   festival_type: FestivalTypeSchema,
   location: z.string(),
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
   start_date: z.string(),
   end_date: z.string(),
   map_url: z.string().nullable(),
@@ -256,6 +258,9 @@ export const AdminFestivalSchema = z.object({
 });
 
 export type AdminFestival = z.infer<typeof AdminFestivalSchema>;
+
+const latitude = z.number().min(-90).max(90).nullable().optional();
+const longitude = z.number().min(-180).max(180).nullable().optional();
 
 /**
  * A real calendar day, not just YYYY-MM-DD shaped.
@@ -288,6 +293,8 @@ export const CreateAdminFestivalSchema = z
     short_name: z.string().trim().min(1).max(100),
     festival_type: FestivalTypeSchema,
     location: z.string().trim().min(1).max(255),
+    latitude,
+    longitude,
     ...festivalDateRange,
     map_url: z.string().url().nullable().optional(),
     timezone: z.string().min(1).max(100).optional(),
@@ -311,6 +318,8 @@ export const UpdateAdminFestivalSchema = z
     short_name: z.string().min(1).max(100).optional(),
     festival_type: FestivalTypeSchema.optional(),
     location: z.string().min(1).max(255).optional(),
+    latitude,
+    longitude,
     start_date: festivalDateRange.start_date.optional(),
     end_date: festivalDateRange.end_date.optional(),
     map_url: z.string().url().nullable().optional(),
@@ -366,6 +375,8 @@ export type AdminTent = z.infer<typeof AdminTentSchema>;
 export const CreateAdminTentSchema = z.object({
   name: z.string().min(1).max(255),
   category: tentCategory.nullable().optional(),
+  latitude,
+  longitude,
 });
 
 export type CreateAdminTentInput = z.infer<typeof CreateAdminTentSchema>;

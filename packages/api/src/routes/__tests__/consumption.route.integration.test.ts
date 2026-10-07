@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { SupabaseConsumptionRepository } from "../../repositories/supabase";
+import { FESTIVAL_USER_DATA_TABLES } from "../../__tests__/helpers/test-cleanup";
 import {
   createTestSupabaseAdmin,
   createTestSupabaseAnon,
@@ -150,6 +151,11 @@ describe("Consumption Routes Integration (Local DB)", () => {
       }
 
       await supabaseAdmin.from("attendances").delete().eq("festival_id", testFestival.id);
+
+      // Logging attendance unlocks achievements, which block the festival delete
+      for (const table of FESTIVAL_USER_DATA_TABLES) {
+        await supabaseAdmin.from(table).delete().eq("festival_id", testFestival.id);
+      }
     }
 
     // 4. Delete festival-tent association

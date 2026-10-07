@@ -1,6 +1,14 @@
 "use client";
 
+import {
+  useAdminFestivals,
+  useCreateAdminFestival,
+  useDeleteAdminFestival,
+  useUpdateAdminFestival,
+} from "@prostcounter/shared/hooks";
+import { ErrorCodes } from "@prostcounter/shared/errors";
 import { useTranslation } from "@prostcounter/shared/i18n";
+import type { AdminFestival } from "@prostcounter/shared/schemas";
 import { format, parseISO } from "date-fns";
 import { Calendar, Edit, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -19,14 +27,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import type { Festival, FestivalStatus, FestivalType } from "@/lib/types";
+import { ApiError } from "@/lib/api-client";
+import type { FestivalStatus, FestivalType } from "@/lib/types";
 
-import {
-  createFestival,
-  deleteFestival,
-  fetchAllFestivals,
-  updateFestival,
-} from "../festivalActions";
+import { revalidateFestivalPages } from "../actions";
 
 interface FestivalFormData {
   name: string;
@@ -62,29 +66,20 @@ const initialFormData: FestivalFormData = {
 
 export default function FestivalManagement() {
   const { t } = useTranslation();
-  const [festivals, setFestivals] = useState<Festival[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { festivals, isLoading, error: festivalsError } = useAdminFestivals();
+  const createFestival = useCreateAdminFestival();
+  const updateFestival = useUpdateAdminFestival();
+  const deleteFestival = useDeleteAdminFestival();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingFestival, setEditingFestival] = useState<Festival | null>(null);
+  const [editingFestival, setEditingFestival] = useState<AdminFestival | null>(null);
   const [formData, setFormData] = useState<FestivalFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    loadFestivals();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadFestivals = async () => {
-    try {
-      setIsLoading(true);
-      const data = await fetchAllFestivals();
-      setFestivals(data);
-    } catch {
+    if (festivalsError) {
       toast.error(t("notifications.error.festivalLoadFailed"));
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [festivalsError, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,26 +87,38 @@ export default function FestivalManagement() {
 
     setIsSubmitting(true);
     try {
+      // The API wants null, not "", for the optional fields
+      const data = {
+        ...formData,
+        map_url: formData.map_url || null,
+        description: formData.description || null,
+      };
       if (editingFestival) {
-        await updateFestival(editingFestival.id, formData);
+        await updateFestival.mutate({ festivalId: editingFestival.id, data });
         toast.success(t("notifications.success.festivalUpdated"));
       } else {
-        await createFestival(formData);
+        await createFestival.mutate(data);
         toast.success(t("notifications.success.festivalCreated"));
       }
+      void revalidateFestivalPages();
 
       setIsFormOpen(false);
       setEditingFestival(null);
       setFormData(initialFormData);
-      loadFestivals();
-    } catch {
-      toast.error(t("notifications.error.generic"));
+    } catch (error) {
+      if (error instanceof ApiError && error.code === ErrorCodes.FESTIVAL_SHORT_NAME_TAKEN) {
+        toast.error(t("apiErrors.FESTIVAL_SHORT_NAME_TAKEN"));
+      } else {
+        toast.error(
+          error instanceof Error && error.message ? error.message : t("notifications.error.generic"),
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleEdit = (festival: Festival) => {
+  const handleEdit = (festival: AdminFestival) => {
     setEditingFestival(festival);
     setFormData({
       name: festival.name,
@@ -141,11 +148,16 @@ export default function FestivalManagement() {
     }
 
     try {
-      await deleteFestival(festivalId);
+      await deleteFestival.mutate(festivalId);
       toast.success(t("notifications.success.festivalDeleted"));
-      loadFestivals();
-    } catch {
-      toast.error(t("notifications.error.festivalDeleteFailed"));
+      void revalidateFestivalPages();
+    } catch (error) {
+      // A 409 names the user data that blocks the delete
+      toast.error(
+        error instanceof Error && error.message
+          ? error.message
+          : t("notifications.error.festivalDeleteFailed"),
+      );
     }
   };
 

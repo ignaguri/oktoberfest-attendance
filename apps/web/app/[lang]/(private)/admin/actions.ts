@@ -501,3 +501,29 @@ async function deleteImage(path: string) {
   if (error) throw new Error("Error deleting image: " + error.message);
   revalidatePath("/admin");
 }
+
+/**
+ * The landing page's countdown reads festivals behind a day-long revalidate.
+ * Admin-only: a server action is a public endpoint, and anyone could otherwise
+ * keep flushing that cache.
+ */
+export async function revalidateFestivalPages() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("is_super_admin")
+    .eq("id", user.id)
+    .single();
+  if (!profile?.is_super_admin) {
+    return;
+  }
+
+  revalidatePath("/[lang]", "page");
+}
