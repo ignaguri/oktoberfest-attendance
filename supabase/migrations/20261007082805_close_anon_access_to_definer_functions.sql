@@ -238,12 +238,17 @@ $function$
 ;
 
 REVOKE EXECUTE ON FUNCTION public.send_friend_request(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.send_friend_request(uuid, uuid) TO authenticated, service_role;
 REVOKE EXECUTE ON FUNCTION public.accept_friend_request(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.accept_friend_request(uuid, uuid) TO authenticated, service_role;
 REVOKE EXECUTE ON FUNCTION public.decline_friend_request(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.decline_friend_request(uuid, uuid) TO authenticated, service_role;
 
--- Already guarded on auth.uid(), but neither is used without a session
+-- Already guarded on auth.uid(), but neither should be callable without a session
 REVOKE EXECUTE ON FUNCTION public.get_nearby_group_members(uuid, uuid, integer) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_nearby_group_members(uuid, uuid, integer) TO authenticated, service_role;
 REVOKE EXECUTE ON FUNCTION public.get_user_groups() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_user_groups() TO authenticated, service_role;
 
 -- Trigger functions are never meant to be called over RPC
 REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
@@ -256,6 +261,8 @@ REVOKE EXECUTE ON FUNCTION public.trigger_tent_visit_cache_invalidation() FROM P
 -- stats and spending. The API reads them with a user's token only.
 REVOKE ALL ON public.user_festival_stats FROM anon;
 REVOKE ALL ON public.user_festival_spending_stats FROM anon;
+GRANT SELECT ON public.user_festival_stats TO authenticated, service_role;
+GRANT SELECT ON public.user_festival_spending_stats TO authenticated, service_role;
 
 -- Both now follow RLS. A viewer sees another user's attendances and
 -- consumptions under the same rule (own, friend or shared group), so other

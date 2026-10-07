@@ -21,6 +21,15 @@ const FRIEND_RPCS = [
   ["decline_friend_request", { p_friendship_id: randomUUID(), p_user_id: randomUUID() }],
 ] as const;
 
+const ANON_DENIED_RPCS = [
+  ...FRIEND_RPCS,
+  [
+    "get_nearby_group_members",
+    { input_user_id: randomUUID(), input_festival_id: randomUUID(), radius_meters: 500 },
+  ],
+  ["get_user_groups", {}],
+] as const;
+
 afterAll(async () => {
   await deleteTestUsersAndFestivals(createTestSupabaseAdmin(), {
     userIds: createdUserIds,
@@ -28,11 +37,12 @@ afterAll(async () => {
   });
 });
 
-// Dropping and recreating a function or view resets its grants to defaults,
-// which include anon, so these pin the friend-request and stats-view fixes.
+// Default privileges grant new functions and views to anon, so a later
+// recreate or re-grant would silently reopen these. Trigger functions aren't
+// covered: an RPC call to one fails regardless of grants.
 describe("anon access to definer functions and stats views", () => {
-  it.each(FRIEND_RPCS)("anon cannot call %s", async (fn, args) => {
-    const { error } = await createTestSupabaseAnon().rpc(fn, args);
+  it.each(ANON_DENIED_RPCS)("anon cannot call %s", async (fn, args) => {
+    const { error } = await createTestSupabaseAnon().rpc(fn, args as never);
 
     expect(error?.code).toBe(PERMISSION_DENIED);
   });
