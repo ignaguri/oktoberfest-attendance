@@ -189,6 +189,12 @@ final class AppViewModel: ObservableObject {
             // Fetched first: today's date depends on the festival's timezone.
             let festival = try await api.fetchFestival(id: festId)
             self.festival = festival
+            // A drink tapped during the fetch clears festivalId (it looks like
+            // a festival switch) and then waits on this bootstrap: restore it,
+            // unless the iPhone really did switch festival meanwhile.
+            if festivalId == nil, tokenStore.read()?.currentFestivalId == festId {
+                festivalId = festId
+            }
             dateFormatter.timeZone = festival.timezone.flatMap(TimeZone.init(identifier:)) ?? Self.defaultTimeZone
             if let outOfRange = Self.dateRangeStatus(today: todayString, festival: festival) {
                 status = outOfRange
