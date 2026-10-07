@@ -43,6 +43,8 @@ final class AppViewModel: ObservableObject {
         case needsRetry
         case noSession
         case noFestival
+        case festivalNotStarted
+        case festivalEnded
     }
 
     /// Watch-side crowd levels. Server enum is empty|moderate|crowded|full;
@@ -75,6 +77,7 @@ final class AppViewModel: ObservableObject {
         source: .none
     )
     @Published private(set) var festivalId: String? = nil
+    @Published private(set) var festival: Festival? = nil
     // Derived from festivals.beerCost; used as pricePaidCents on log POST to satisfy
     // the server's price_paid_cents >= base_price_cents constraint. Defaults to
     // festival beer price so all drink types pass the check even without a
@@ -113,16 +116,39 @@ final class AppViewModel: ObservableObject {
         f.calendar = .init(identifier: .iso8601)
         f.locale = .init(identifier: "en_US_POSIX")
         f.dateFormat = "yyyy-MM-dd"
-        // Must match packages/shared/src/utils/date-utils.ts formatDateForDatabase —
-        // the server validates `date` as a regex only (YYYY-MM-DD) and trusts the
-        // client to format in festival-local time. Using .current would send the
-        // device's local calendar date, which drifts from the festival day across
-        // time zones (e.g. a watch in UTC-5 at 11 PM Munich would post yesterday).
-        f.timeZone = TimeZone(identifier: "Europe/Berlin")!
+        // Must match packages/shared/src/utils/date-utils.ts formatDateForDatabase:
+        // dates are festival-local, not device-local, so a watch in UTC-5 at
+        // 11 PM Munich time doesn't post yesterday. Bootstrap swaps in the
+        // festival's own timezone.
+        f.timeZone = Self.defaultTimeZone
         self.dateFormatter = f
     }
 
+    private static let defaultTimeZone = TimeZone(identifier: "Europe/Berlin")!
+
     var todayString: String { dateFormatter.string(from: Date()) }
+
+    var festivalTimeZone: TimeZone { dateFormatter.timeZone }
+
+    var festivalStartDate: Date? {
+        festival.flatMap { dateFormatter.date(from: $0.startDate) }
+    }
+
+    /// No festival to log against, so MainView shows the empty state instead of Prost!.
+    var isOutsideFestival: Bool {
+        status == .noFestival || status == .festivalNotStarted || status == .festivalEnded
+    }
+
+    /// On wrist raise: an empty state rechecks with the server, while the
+    /// Prost! screen only needs the cached dates to notice the festival ended.
+    func recheckOnForeground() async {
+        if isOutsideFestival {
+            await bootstrap()
+        } else if status != .loading && status != .logging, let festival,
+                  let outOfRange = Self.dateRangeStatus(today: todayString, festival: festival) {
+            status = outOfRange
+        }
+    }
 
     func bootstrap() async {
         // Skip if already loaded and healthy.
@@ -142,23 +168,38 @@ final class AppViewModel: ObservableObject {
     }
 
     private func performBootstrap() async {
-        status = .loading
+        // Keep the empty state up while rechecking, so it doesn't flash Prost!.
+        if !isOutsideFestival {
+            status = .loading
+        }
         guard let session = tokenStore.read() else {
             status = .noSession
             return
         }
         guard let festId = session.currentFestivalId, !festId.isEmpty else {
+            festivalId = nil
+            festival = nil
+            dateFormatter.timeZone = Self.defaultTimeZone
             status = .noFestival
             return
         }
         festivalId = festId
 
         do {
+            // Fetched first: today's date depends on the festival's timezone.
+            let festival = try await api.fetchFestival(id: festId)
+            self.festival = festival
+            dateFormatter.timeZone = festival.timezone.flatMap(TimeZone.init(identifier:)) ?? Self.defaultTimeZone
+            if let outOfRange = Self.dateRangeStatus(today: todayString, festival: festival) {
+                status = outOfRange
+                return
+            }
+            status = .loading
+
             async let attendanceTask = api.fetchTodayAttendance(
                 festivalId: festId,
                 isoDate: todayString
             )
-            async let festivalTask = api.fetchFestival(id: festId)
             async let nearbyTask: [NearbyTent] = {
                 guard let location = try? await locationService.currentLocation() else { return [] }
                 return (try? await api.fetchNearbyTents(
@@ -172,7 +213,6 @@ final class AppViewModel: ObservableObject {
             }()
 
             let attendance = try await attendanceTask
-            let festival = try await festivalTask
             let fetchedNearby = await nearbyTask
             let fetchedFestivalTents = await festivalTentsTask
 
@@ -202,7 +242,11 @@ final class AppViewModel: ObservableObject {
             // to the "sign in on iPhone first" UX.
             status = .noSession
         } catch {
-            status = .needsRetry
+            // An offline recheck keeps the empty state rather than offering
+            // Prost!, unless the iPhone switched festival and it's now stale.
+            if !isOutsideFestival || festival?.id != festivalId {
+                status = .needsRetry
+            }
         }
     }
 
@@ -212,13 +256,19 @@ final class AppViewModel: ObservableObject {
         // stayed alive), re-bootstrap so we don't keep logging against the
         // old festival. Otherwise bootstrap only when cached id is missing.
         let latestFestivalId = tokenStore.read()?.currentFestivalId
-        if festivalId == nil || (latestFestivalId != nil && latestFestivalId != festivalId) {
+        if festivalId == nil || festival?.id != festivalId
+            || (latestFestivalId != nil && latestFestivalId != festivalId) {
             // Force bootstrap to re-fetch even if status == .idle.
             festivalId = nil
             await bootstrap()
         }
-        guard let festId = festivalId else {
+        guard let festId = festivalId, let festival, festival.id == festId else {
             // bootstrap failed or no festival available — leave status as-is (noSession / noFestival / needsRetry).
+            return
+        }
+        // An app left open past midnight on the last day.
+        if let outOfRange = Self.dateRangeStatus(today: todayString, festival: festival) {
+            status = outOfRange
             return
         }
         // Capture the tent before the POST so the prompt asks about the tent
@@ -267,6 +317,20 @@ final class AppViewModel: ObservableObject {
                 // won't help. Surface the sign-in prompt immediately.
                 status = .noSession
                 return
+            } catch APIError.httpStatus(let code, let data)
+                where (400..<500).contains(code) && code != 408 && code != 429 {
+                // A rejected request fails the same way on retry.
+                let errorCode = (try? JSONDecoder().decode(APIErrorResponse.self, from: data))?.error.code
+                if errorCode == "DATE_OUTSIDE_FESTIVAL" {
+                    // The app outlived the festival's last day, or its dates
+                    // changed: refetch so bootstrap lands on the empty state.
+                    festivalId = nil
+                    await bootstrap()
+                }
+                if status == .logging || status == .idle {
+                    status = .needsRetry
+                }
+                return
             } catch {
                 lastError = error
                 if attempt < 3 {
@@ -290,6 +354,13 @@ final class AppViewModel: ObservableObject {
 
     func acknowledgeSuccess() {
         if status == .success { status = .idle }
+    }
+
+    /// nil while the festival is on. Dates are YYYY-MM-DD, so string order is date order.
+    static func dateRangeStatus(today: String, festival: Festival) -> Status? {
+        if today < festival.startDate { return .festivalNotStarted }
+        if today > festival.endDate { return .festivalEnded }
+        return nil
     }
 
     /// Pure helper so the detection rule can be exercised without touching the API.

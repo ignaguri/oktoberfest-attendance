@@ -6,6 +6,15 @@ struct Festival: Decodable, Identifiable {
     let startDate: String
     let endDate: String
     let beerCost: Double?   // EUR, e.g. 13.5 — used to derive pricePaidCents for drink logs
+    let timezone: String?
+}
+
+// The API's error envelope: { error: { code, message } }.
+struct APIErrorResponse: Decodable {
+    struct Body: Decodable {
+        let code: String?
+    }
+    let error: Body
 }
 
 // Maps to AttendanceByDateSchema (extends AttendanceWithTotalsSchema).

@@ -5,71 +5,20 @@ struct MainView: View {
     @StateObject private var viewModel = AppViewModel()
     @State private var showingDrinkPicker = false
     @State private var showingTentPicker = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 8) {
-                Button {
-                    showingTentPicker = true
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(viewModel.currentTent.tentName)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                        Image(systemName: "chevron.right")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    Task {
-                        await viewModel.logDrink(.beer)
-                        if viewModel.status == .success {
-                            WKInterfaceDevice.current().play(.success)
-                        }
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(verbatim: "🍺")
-                        Text(verbatim: "Prost!")
-                    }
-                    .font(.title3.bold())
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(
-                    viewModel.status == .logging ||
-                    viewModel.status == .noSession ||
-                    viewModel.status == .noFestival
-                )
-
-                Button(String(localized: "watch.drink.other")) {
-                    showingDrinkPicker = true
-                }
-                .font(.footnote)
-                .buttonStyle(.plain)
-                .foregroundStyle(.blue)
-
-                Text(todaySummary)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-
-                statusBanner
+        Group {
+            if viewModel.isOutsideFestival {
+                FestivalEmptyStateView(viewModel: viewModel)
+            } else {
+                prostScreen
             }
-            .padding(.horizontal, 6)
         }
         .sheet(isPresented: $showingDrinkPicker) {
             DrinkTypePickerView { type in
                 showingDrinkPicker = false
-                Task {
-                    await viewModel.logDrink(type)
-                    if viewModel.status == .success {
-                        WKInterfaceDevice.current().play(.success)
-                    }
-                }
+                Task { await logDrink(type) }
             }
         }
         .sheet(isPresented: $showingTentPicker) {
@@ -101,6 +50,79 @@ struct MainView: View {
             )
         }
         .task { await viewModel.bootstrap() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                Task { await viewModel.recheckOnForeground() }
+            }
+        }
+        .onChange(of: viewModel.isOutsideFestival) { _, isOutside in
+            if isOutside {
+                showingDrinkPicker = false
+                showingTentPicker = false
+                viewModel.dismissCrowdPrompt()
+            }
+        }
+    }
+
+    private func logDrink(_ type: AppViewModel.DrinkType) async {
+        await viewModel.logDrink(type)
+        if viewModel.status == .success {
+            WKInterfaceDevice.current().play(.success)
+        } else if viewModel.isOutsideFestival {
+            // The festival ended under an open app: the drink wasn't logged.
+            WKInterfaceDevice.current().play(.failure)
+        }
+    }
+
+    private var prostScreen: some View {
+        ScrollView {
+            VStack(spacing: 8) {
+                Button {
+                    showingTentPicker = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(viewModel.currentTent.tentName)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    Task { await logDrink(.beer) }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(verbatim: "🍺")
+                        Text(verbatim: "Prost!")
+                    }
+                    .font(.title3.bold())
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(
+                    viewModel.status == .logging ||
+                    viewModel.status == .noSession
+                )
+
+                Button(String(localized: "watch.drink.other")) {
+                    showingDrinkPicker = true
+                }
+                .font(.footnote)
+                .buttonStyle(.plain)
+                .foregroundStyle(.blue)
+
+                Text(todaySummary)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                statusBanner
+            }
+            .padding(.horizontal, 6)
+        }
     }
 
     private var todaySummary: String {
@@ -127,7 +149,7 @@ struct MainView: View {
     @ViewBuilder
     private var statusBanner: some View {
         switch viewModel.status {
-        case .idle, .loading, .logging:
+        case .idle, .loading, .logging, .noFestival, .festivalNotStarted, .festivalEnded:
             EmptyView()
         case .success:
             Text(verbatim: "✓ Prost!")
@@ -143,10 +165,6 @@ struct MainView: View {
                 .foregroundStyle(.red)
         case .noSession:
             Text("watch.status.noSession")
-                .font(.caption2)
-                .foregroundStyle(.orange)
-        case .noFestival:
-            Text("watch.status.noFestival")
                 .font(.caption2)
                 .foregroundStyle(.orange)
         }

@@ -106,6 +106,22 @@
         "es" : { "stringUnit" : { "state" : "translated", "value" : "No enviado — tocá Prost para reintentar" } }
       }
     },
+    "watch.festival.ended" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Festival has ended" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Festival ist beendet" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "El festival terminó" } }
+      }
+    },
+    "watch.festival.startsOn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Starts %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Beginnt am %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Empieza el %@" } }
+      }
+    },
     "watch.status.noFestival" : {
       "extractionState" : "manual",
       "localizations" : {
