@@ -17104,6 +17104,16 @@
               }
             }
           },
+          "400": {
+            "description": "Validation error, or the festival isn't on today",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Unauthorized",
             "content": {

@@ -16,7 +16,6 @@ import {
   UpdatePersonalAttendanceSchema,
 } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
-import { formatDateForDatabase } from "@prostcounter/shared/utils";
 
 import { logger } from "../lib/logger";
 import { PgErrorCode } from "../lib/postgres-errors";
@@ -29,6 +28,7 @@ import {
 } from "../repositories/supabase";
 import { announceCheckIn } from "../services/check-in-notifications";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { assertDateWithinFestival, festivalDateOf } from "../utils/festival-dates";
 import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
@@ -283,6 +283,7 @@ app.openapi(createAttendanceRoute, async (c) => {
   if (!festival) {
     throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
+  assertDateWithinFestival(festival, data.date);
 
   // Create/update attendance with tents
   const result = await attendanceRepo.createWithTents(user.id, data);
@@ -371,6 +372,7 @@ app.openapi(updatePersonalAttendanceRoute, async (c) => {
   if (!festival) {
     throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
+  assertDateWithinFestival(festival, data.date);
 
   // Update personal attendance
   const result = await attendanceRepo.updatePersonal(user.id, data);
@@ -466,6 +468,7 @@ app.openapi(logTentVisitRoute, async (c) => {
   if (!festival) {
     throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
+  assertDateWithinFestival(festival, festivalDateOf(festival, new Date(data.visitedAt)));
 
   const result = await attendanceRepo.logTentVisit(user.id, data);
 
@@ -564,14 +567,11 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     throw new NotFoundError(ErrorCodes.RESERVATION_NOT_FOUND);
   }
 
-  // Get festival timezone
-  const { data: festival, error: festivalError } = await supabase
-    .from("festivals")
-    .select("timezone")
-    .eq("id", reservation.festival_id)
-    .single();
+  const festival = await new SupabaseAttendanceRepository(supabase).festivalExists(
+    reservation.festival_id,
+  );
 
-  if (festivalError || !festival) {
+  if (!festival) {
     throw new NotFoundError(ErrorCodes.FESTIVAL_NOT_FOUND);
   }
 
@@ -580,7 +580,8 @@ app.openapi(checkInFromReservationRoute, async (c) => {
   // which is UTC: a reservation starting just after local midnight was filed
   // under the previous day.
   const startDate = new Date(reservation.start_at);
-  const festivalDate = formatDateForDatabase(startDate, festival.timezone);
+  const festivalDate = festivalDateOf(festival, startDate);
+  assertDateWithinFestival(festival, festivalDate);
 
   // Check if user already has attendance for this date
   const { data: existingAttendance, error: attendanceError } = await supabase

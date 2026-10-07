@@ -463,6 +463,22 @@ describe("Crowd Report Routes - Unit Tests", () => {
       waitTimeMinutes: 10,
     };
 
+    /** The route reads the festival's dates before anything else. */
+    function festivalChain(endDate = "2999-12-31") {
+      return createMockChain(
+        mockSupabaseSuccess({
+          id: festivalId,
+          start_date: "2000-01-01",
+          end_date: endDate,
+          timezone: "Europe/Berlin",
+        }),
+      );
+    }
+
+    function mockFestival(endDate?: string) {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(festivalChain(endDate));
+    }
+
     it("should submit a crowd report successfully", async () => {
       const mockCreatedReport = {
         id: "823e4567-e89b-12d3-a456-426614174007",
@@ -472,6 +488,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
       };
 
       // First call: hasRecentReport (count query)
+      mockFestival();
+
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({ data: null, error: null, count: 0 }),
       );
@@ -501,10 +519,11 @@ describe("Crowd Report Routes - Unit Tests", () => {
       // this route now triggers after a successful submission (evaluate-only:
       // getHeldSlugs reads user_achievements; the unlock itself is never
       // surfaced in this response).
-      expect(mockSupabase.from).toHaveBeenCalledTimes(3);
-      expect(mockSupabase.from).toHaveBeenNthCalledWith(1, "tent_crowd_reports");
+      expect(mockSupabase.from).toHaveBeenCalledTimes(4);
+      expect(mockSupabase.from).toHaveBeenNthCalledWith(1, "festivals");
       expect(mockSupabase.from).toHaveBeenNthCalledWith(2, "tent_crowd_reports");
-      expect(mockSupabase.from).toHaveBeenNthCalledWith(3, "user_achievements");
+      expect(mockSupabase.from).toHaveBeenNthCalledWith(3, "tent_crowd_reports");
+      expect(mockSupabase.from).toHaveBeenNthCalledWith(4, "user_achievements");
     });
 
     it("should submit a report without waitTimeMinutes", async () => {
@@ -521,6 +540,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
       };
 
       // hasRecentReport
+      mockFestival();
+
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({ data: null, error: null, count: 0 }),
       );
@@ -546,6 +567,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
 
     it("should return 409 when rate limited (recent report exists)", async () => {
       // hasRecentReport returns count > 0
+      mockFestival();
+
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({ data: null, error: null, count: 1 }),
       );
@@ -563,12 +586,31 @@ describe("Crowd Report Routes - Unit Tests", () => {
       expect(body.error).toBeDefined();
       expect(body.error.statusCode).toBe(409);
       expect(body.error.message).toContain("already submitted a report");
-      // Should only call from() once (hasRecentReport), not submitReport
+      // festivals + hasRecentReport, not submitReport
+      expect(mockSupabase.from).toHaveBeenCalledTimes(2);
+    });
+
+    it("should reject a report once the festival has ended", async () => {
+      mockFestival("2001-01-01");
+
+      const req = createAuthRequest(`/tents/${tentId}/crowd-report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(validBody),
+      });
+
+      const res = await app.request(req as Request);
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as any;
+      expect(body.error.code).toBe("DATE_OUTSIDE_FESTIVAL");
       expect(mockSupabase.from).toHaveBeenCalledTimes(1);
     });
 
     it("should return 500 when hasRecentReport database query fails", async () => {
       // hasRecentReport database error
+      mockFestival();
+
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseError("Failed to check recent reports", "PGRST000")),
       );
@@ -589,6 +631,8 @@ describe("Crowd Report Routes - Unit Tests", () => {
 
     it("should return 500 when submitReport database insert fails", async () => {
       // hasRecentReport succeeds (no recent report)
+      mockFestival();
+
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain({ data: null, error: null, count: 0 }),
       );
@@ -733,6 +777,7 @@ describe("Crowd Report Routes - Unit Tests", () => {
           .mockImplementation(() => createMockChain({ data: null, error: null }));
         (mockSupabase as any).from = mockFrom;
 
+        mockFrom.mockReturnValueOnce(festivalChain());
         // hasRecentReport
         mockFrom.mockReturnValueOnce(createMockChain({ data: null, error: null, count: 0 }));
 

@@ -69,6 +69,20 @@ describe("Consumption Routes - Unit Tests", () => {
     );
   }
 
+  /** ConsumptionService reads the festival's dates before anything else. */
+  function mockFestival(festivalId: string, startDate = "2024-09-21", endDate = "2024-10-06") {
+    vi.mocked(mockSupabase.from).mockReturnValueOnce(
+      createMockChain(
+        mockSupabaseSuccess({
+          id: festivalId,
+          timezone: "Europe/Berlin",
+          start_date: startDate,
+          end_date: endDate,
+        }),
+      ),
+    );
+  }
+
   describe("POST /consumption", () => {
     it("should log a new consumption and return updated attendance", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
@@ -91,6 +105,8 @@ describe("Consumption Routes - Unit Tests", () => {
       };
 
       // findOrCreate query
+      mockFestival(festivalId);
+
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(mockAttendance)),
       );
@@ -170,6 +186,8 @@ describe("Consumption Routes - Unit Tests", () => {
       const attendanceId = "223e4567-e89b-12d3-a456-426614174002";
 
       // Mock attendance findOrCreate - no existing, then create new
+      mockFestival(festivalId);
+
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseError("Not found", "PGRST116")),
       );
@@ -280,6 +298,8 @@ describe("Consumption Routes - Unit Tests", () => {
         total_tip_cents: 40,
         avg_price_cents: 1620,
       };
+
+      mockFestival(festivalId);
 
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(mockAttendance)),
@@ -402,6 +422,24 @@ describe("Consumption Routes - Unit Tests", () => {
       expect(res.status).toBe(400); // Bad request
     });
 
+    it("should reject a date outside the festival", async () => {
+      const festivalId = "123e4567-e89b-12d3-a456-426614174000";
+      mockFestival(festivalId);
+
+      const req = createAuthRequest("/consumption", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ festivalId, date: "2024-10-07", pricePaidCents: 1620 }),
+      });
+
+      const res = await app.request(req as Request);
+
+      expect(res.status).toBe(400);
+      const body = (await res.json()) as any;
+      expect(body.error.code).toBe("DATE_OUTSIDE_FESTIVAL");
+      expect(mockSupabase.from).toHaveBeenCalledTimes(1);
+    });
+
     it("should handle database errors during consumption creation", async () => {
       const festivalId = "123e4567-e89b-12d3-a456-426614174000";
       const attendanceId = "223e4567-e89b-12d3-a456-426614174001";
@@ -420,6 +458,8 @@ describe("Consumption Routes - Unit Tests", () => {
         total_tip_cents: 0,
         avg_price_cents: 0,
       };
+
+      mockFestival(festivalId);
 
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(mockAttendance)),
@@ -466,6 +506,8 @@ describe("Consumption Routes - Unit Tests", () => {
         total_tip_cents: 0,
         avg_price_cents: 0,
       };
+
+      mockFestival(festivalId);
 
       vi.mocked(mockSupabase.from).mockReturnValueOnce(
         createMockChain(mockSupabaseSuccess(mockAttendance)),

@@ -10119,6 +10119,15 @@ export interface paths {
                         };
                     };
                 };
+                /** @description Validation error, or the festival isn't on today */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
