@@ -208,9 +208,9 @@ export class SupabaseProfileRepository {
       return null;
     }
 
-    // An RPC, not the user_festival_stats view: the view counts every day but
-    // reads drinks under the viewer's RLS, so a stranger got the real days
-    // next to zero drinks. These totals are public on the global leaderboard.
+    // An RPC, not the user_festival_stats view: the view follows the viewer's
+    // RLS and shows a stranger nothing, but these totals are public on the
+    // global leaderboard.
     const { data: rows } = await this.supabase.rpc("get_profile_festival_stats", {
       p_user_id: userId,
       p_festival_id: festivalId,
@@ -306,11 +306,7 @@ export class SupabaseProfileRepository {
     );
   }
 
-  /**
-   * The festival list comes from `attendances`, never from `user_festival_stats`.
-   * That view is not security_invoker, so reading the list from it would hand a
-   * stranger every festival the user ever attended.
-   */
+  /** The festival list comes from `attendances`, read under the viewer's RLS. */
   private async fetchAttendanceHistory(userId: string): Promise<ProfileHistoryRow[]> {
     // Read in pages: PostgREST truncates at `max_rows` (1000, see
     // supabase/config.toml), which would silently drop festivals from a history
