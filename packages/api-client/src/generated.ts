@@ -717,7 +717,7 @@ export interface paths {
                         };
                     };
                 };
-                /** @description Validation error, or the tent is already the day's latest visit */
+                /** @description Validation error, the visit is outside the festival's dates, or the tent is already the day's latest visit */
                 400: {
                     headers: {
                         [name: string]: unknown;
@@ -792,6 +792,15 @@ export interface paths {
                                 eventId: string;
                             }[];
                         };
+                    };
+                };
+                /** @description Validation error, or the reservation's day is outside the festival's dates */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
                     };
                 };
                 /** @description Unauthorized */

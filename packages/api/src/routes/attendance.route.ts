@@ -438,7 +438,8 @@ const logTentVisitRoute = createRoute({
       },
     },
     400: {
-      description: "Validation error, or the tent is already the day's latest visit",
+      description:
+        "Validation error, the visit is outside the festival's dates, or the tent is already the day's latest visit",
       content: {
         "application/json": {
           schema: ApiErrorSchema,
@@ -517,6 +518,14 @@ const checkInFromReservationRoute = createRoute({
       content: {
         "application/json": {
           schema: CheckInFromReservationResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Validation error, or the reservation's day is outside the festival's dates",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
         },
       },
     },
