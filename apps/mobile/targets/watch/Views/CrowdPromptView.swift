@@ -49,7 +49,7 @@ struct CrowdPromptView: View {
 #if DEBUG
 struct CrowdPromptView_Previews: PreviewProvider {
     static var previews: some View {
-        // Exercise the first-drink detection assertions at preview-render time
+        // Exercise the crowd prompt assertions at preview-render time
         // so they run during DEBUG development without an XCTest target.
         let _ = AppViewModel.runCrowdDetectionAssertions()
         return CrowdPromptView(

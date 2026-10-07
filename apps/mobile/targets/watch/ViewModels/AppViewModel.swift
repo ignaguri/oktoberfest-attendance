@@ -92,12 +92,13 @@ final class AppViewModel: ObservableObject {
     /// picker so the user can pick any tent regardless of GPS.
     @Published private(set) var festivalTents: [FestivalTent] = []
     /// When non-nil, MainView surfaces the CrowdPromptView for this tent.
-    /// Set when the tapped Prost was the first drink of the day against a known tent.
+    /// Set after a Prost in a tent the prompt hasn't asked about yet today.
     @Published var promptingCrowdForTentId: String? = nil
 
     private let api: APIClient
     private let tokenStore: TokenStore
     private let locationService: LocationService
+    private let crowdPromptMemory = CrowdPromptMemory()
     private let dateFormatter: DateFormatter
     /// Single-flight guard so concurrent callers funnel through the same
     /// in-flight bootstrap instead of kicking off parallel fetches that
@@ -220,13 +221,9 @@ final class AppViewModel: ObservableObject {
             // bootstrap failed or no festival available — leave status as-is (noSession / noFestival / needsRetry).
             return
         }
-        // Capture the pre-log state so we can decide whether to surface the
-        // crowd prompt once the POST succeeds.
+        // Capture the tent before the POST so the prompt asks about the tent
+        // the drink was logged against.
         let tentAtLogTime = currentTent.tentId
-        let shouldPromptAfter = Self.shouldPromptForCrowd(
-            priorDrinkCount: drinkCount,
-            tentId: tentAtLogTime
-        )
 
         status = .logging
 
@@ -263,9 +260,7 @@ final class AppViewModel: ObservableObject {
                 }
                 notifyIPhoneOfDrinkLog()
                 status = .success
-                if shouldPromptAfter, let tentId = tentAtLogTime {
-                    promptingCrowdForTentId = tentId
-                }
+                promptForCrowdIfNeeded(tentId: tentAtLogTime, date: body.date)
                 return
             } catch APIError.noSession, APIError.unauthorized {
                 // Refresh in APIClient.authorize already failed — retrying
@@ -298,10 +293,21 @@ final class AppViewModel: ObservableObject {
     }
 
     /// Pure helper so the detection rule can be exercised without touching the API.
-    /// Prompt only when this drink is the first of the day AND we actually know
-    /// which tent to attribute the crowd level to.
-    static func shouldPromptForCrowd(priorDrinkCount: Int, tentId: String?) -> Bool {
-        priorDrinkCount == 0 && tentId != nil
+    /// Prompt once per tent per day, and only when we know which tent to
+    /// attribute the crowd level to.
+    static func shouldPromptForCrowd(tentId: String?, promptedTentIds: [String]) -> Bool {
+        guard let tentId else { return false }
+        return !promptedTentIds.contains(tentId)
+    }
+
+    /// `date` is the drink's day, so a Prost right before midnight is
+    /// remembered against the day it was logged on.
+    private func promptForCrowdIfNeeded(tentId: String?, date: String) {
+        guard let tentId, let userId = tokenStore.read()?.userId else { return }
+        let prompted = crowdPromptMemory.promptedTentIds(userId: userId, date: date)
+        guard Self.shouldPromptForCrowd(tentId: tentId, promptedTentIds: prompted) else { return }
+        crowdPromptMemory.record(tentId: tentId, userId: userId, date: date)
+        promptingCrowdForTentId = tentId
     }
 
     /// Submit the selected crowd level for the prompt's tent. Failures are
@@ -329,21 +335,25 @@ final class AppViewModel: ObservableObject {
     }
 
     #if DEBUG
-    /// Debug-only sanity checks for the first-drink detection rule.
+    /// Debug-only sanity checks for the crowd prompt rule.
     /// Invoked from CrowdPromptView_Previews so the assertions run whenever
     /// previews render, without requiring an XCTest target.
     static func runCrowdDetectionAssertions() {
         assert(
-            Self.shouldPromptForCrowd(priorDrinkCount: 0, tentId: "t1"),
-            "First drink with a tent should prompt"
+            Self.shouldPromptForCrowd(tentId: "t1", promptedTentIds: []),
+            "First drink in a tent should prompt"
         )
         assert(
-            !Self.shouldPromptForCrowd(priorDrinkCount: 0, tentId: nil),
-            "First drink without a tent should not prompt"
+            !Self.shouldPromptForCrowd(tentId: nil, promptedTentIds: []),
+            "A drink without a tent should not prompt"
         )
         assert(
-            !Self.shouldPromptForCrowd(priorDrinkCount: 3, tentId: "t1"),
-            "Subsequent drink should not prompt"
+            !Self.shouldPromptForCrowd(tentId: "t1", promptedTentIds: ["t1"]),
+            "Another drink in the same tent should not prompt"
+        )
+        assert(
+            Self.shouldPromptForCrowd(tentId: "t2", promptedTentIds: ["t1"]),
+            "Moving to a new tent should prompt"
         )
         print("[AppViewModel] crowd detection assertions passed ✓")
     }
