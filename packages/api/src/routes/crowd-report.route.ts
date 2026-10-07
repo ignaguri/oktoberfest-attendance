@@ -8,10 +8,16 @@ import {
   SubmitCrowdReportResponseSchema,
 } from "@prostcounter/shared";
 
+import { ErrorCodes } from "@prostcounter/shared/errors";
+
 import type { AuthContext } from "../middleware/auth";
-import { ConflictError } from "../middleware/error";
-import { SupabaseCrowdReportRepository } from "../repositories/supabase";
+import { ConflictError, ValidationError } from "../middleware/error";
+import {
+  SupabaseAttendanceRepository,
+  SupabaseCrowdReportRepository,
+} from "../repositories/supabase";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { assertDateWithinFestival, festivalDateOf } from "../utils/festival-dates";
 import { ApiErrorSchema } from "../lib/error-response";
 
 // Create router
@@ -134,6 +140,14 @@ const submitCrowdReportRoute = createRoute({
         },
       },
     },
+    400: {
+      description: "Validation error, or the festival isn't on today",
+      content: {
+        "application/json": {
+          schema: ApiErrorSchema,
+        },
+      },
+    },
     401: {
       description: "Unauthorized",
       content: {
@@ -159,6 +173,14 @@ app.openapi(submitCrowdReportRoute, async (c) => {
   const user = c.var.user;
   const { tentId } = c.req.valid("param");
   const body = c.req.valid("json");
+
+  // A crowd report describes the tent right now, so it only makes sense
+  // while the festival is on
+  const festival = await new SupabaseAttendanceRepository(supabase).festivalExists(body.festivalId);
+  if (!festival) {
+    throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
+  }
+  assertDateWithinFestival(festival, festivalDateOf(festival, new Date()));
 
   const repo = new SupabaseCrowdReportRepository(supabase);
 

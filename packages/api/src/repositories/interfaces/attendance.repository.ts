@@ -11,6 +11,14 @@ import type {
   UpdatePersonalAttendanceResult,
 } from "@prostcounter/shared";
 
+/** A festival's id, timezone and the dates it covers (YYYY-MM-DD). */
+export interface FestivalRef {
+  id: string;
+  timezone: string | null;
+  startDate: string;
+  endDate: string;
+}
+
 /**
  * Attendance repository interface
  * Provides data access for attendance records
@@ -97,7 +105,7 @@ export interface IAttendanceRepository {
    * @param festivalId - Festival ID
    * @returns Festival data or null
    */
-  festivalExists(festivalId: string): Promise<{ id: string; timezone: string | null } | null>;
+  festivalExists(festivalId: string): Promise<FestivalRef | null>;
 
   /**
    * Get attendance for a specific date with pictures

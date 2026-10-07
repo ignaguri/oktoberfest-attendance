@@ -3,6 +3,7 @@ import { ErrorCodes } from "@prostcounter/shared/errors";
 
 import { ValidationError } from "../middleware/error";
 import type { IAttendanceRepository, IConsumptionRepository } from "../repositories/interfaces";
+import { assertDateWithinFestival } from "../utils/festival-dates";
 
 /**
  * Consumption Service
@@ -30,6 +31,12 @@ export class ConsumptionService {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
       throw new ValidationError(ErrorCodes.INVALID_DATE_FORMAT);
     }
+
+    const festival = await this.attendanceRepo.festivalExists(festivalId);
+    if (!festival) {
+      throw new ValidationError(ErrorCodes.FESTIVAL_NOT_FOUND);
+    }
+    assertDateWithinFestival(festival, date);
 
     // Pricing is not validated here any more. Both prices in the payload are
     // ignored, so comparing them said nothing about what would be stored; the

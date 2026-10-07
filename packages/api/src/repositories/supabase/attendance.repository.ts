@@ -18,7 +18,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { PgErrorCode } from "../../lib/postgres-errors";
 import { DatabaseError, ValidationError } from "../../middleware/error";
-import type { IAttendanceRepository } from "../interfaces";
+import type { FestivalRef, IAttendanceRepository } from "../interfaces";
 
 export class SupabaseAttendanceRepository implements IAttendanceRepository {
   constructor(private supabase: SupabaseClient<Database>) {}
@@ -502,12 +502,10 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
     };
   }
 
-  async festivalExists(
-    festivalId: string,
-  ): Promise<{ id: string; timezone: string | null } | null> {
+  async festivalExists(festivalId: string): Promise<FestivalRef | null> {
     const { data, error } = await this.supabase
       .from("festivals")
-      .select("id, timezone")
+      .select("id, timezone, start_date, end_date")
       .eq("id", festivalId)
       .single();
 
@@ -522,7 +520,12 @@ export class SupabaseAttendanceRepository implements IAttendanceRepository {
       return null;
     }
 
-    return data;
+    return {
+      id: data.id,
+      timezone: data.timezone,
+      startDate: data.start_date,
+      endDate: data.end_date,
+    };
   }
 
   async getByDate(

@@ -6,6 +6,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import { ACHIEVEMENT_METRIC_KEYS } from "@prostcounter/shared/achievements";
 
+import { createLiveFestival } from "../../__tests__/helpers/day-plan-fixtures";
 import { deleteTestUsersAndFestivals } from "../../__tests__/helpers/test-cleanup";
 import {
   createTestSupabaseAdmin,
@@ -755,7 +756,9 @@ describe("evaluate-only unlock wiring on nine more write paths", () => {
   it("POST /tents/{tentId}/crowd-report persists the unlock without changing the response", async () => {
     const supabaseAdmin = createTestSupabaseAdmin();
     const user = await createTestUser();
-    const festival = await createTestFestival(supabaseAdmin);
+    // Crowd reports are only accepted while the festival is on
+    const festival = await createLiveFestival(supabaseAdmin);
+    createdFestivalIds.push(festival.id);
     const app = mountRoute(crowdReportRoutes);
 
     const { data: tent, error: tentError } = await supabaseAdmin
