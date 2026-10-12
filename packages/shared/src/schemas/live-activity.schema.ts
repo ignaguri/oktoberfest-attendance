@@ -25,7 +25,8 @@ export const LiveActivityStateSchema = z.object({
   lastDrinkType: DrinkTypeSchema,
   lastTentId: z.uuid().nullable(),
   pendingCount: z.number().int().min(0),
-  lastLogAt: z.iso.datetime({ offset: true }),
+  /** Null when the only log is an untimed (offline) check-in. */
+  lastLogAt: z.iso.datetime({ offset: true }).nullable(),
   message: LiveActivityMessageSchema.nullable(),
 });
 export type LiveActivityState = z.infer<typeof LiveActivityStateSchema>;

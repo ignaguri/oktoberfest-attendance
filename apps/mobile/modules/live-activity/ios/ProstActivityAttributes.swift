@@ -12,7 +12,7 @@ struct ProstActivityAttributes: ActivityAttributes {
         var lastDrinkType: String
         var lastTentId: String?
         var pendingCount: Int
-        var lastLogAt: String
+        var lastLogAt: String?
         var message: String?
     }
 

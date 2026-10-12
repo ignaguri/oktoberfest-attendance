@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
 import { useFestival } from "@prostcounter/shared/contexts";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import {
@@ -26,36 +27,13 @@ import { decideLiveActivity } from "./decide";
 import { buildAndroidLabels } from "./labels";
 import { logPendingTap } from "./log-tap";
 import { mergeWithRunningState } from "./merge";
+import { forgetRegisteredToken, REGISTERED_TOKEN_KEY, registerAndroidToken } from "./registered-token";
 import { replayPendingTaps } from "./replay";
 import { useLiveActivitySetting } from "./setting";
-
-const REGISTERED_TOKEN_KEY = "liveActivity.registeredToken";
 
 // Android's native surface and pending store share the headless "+1" task's chain.
 function serialized<T>(work: () => Promise<T>): Promise<T> {
   return Platform.OS === "android" ? runSerialized(work) : work();
-}
-
-/** Android registers the device's Expo push token, not a per-surface one. */
-async function registerAndroidToken(token: string, festivalId: string, date: string): Promise<void> {
-  await apiClient.liveActivity.registerToken({
-    platform: "android",
-    token,
-    apnsEnvironment: null,
-    festivalId,
-    date,
-  });
-  await AsyncStorage.setItem(REGISTERED_TOKEN_KEY, token);
-}
-
-async function forgetRegisteredToken(): Promise<void> {
-  const token = await AsyncStorage.getItem(REGISTERED_TOKEN_KEY);
-  if (!token) {
-    return;
-  }
-  await AsyncStorage.removeItem(REGISTERED_TOKEN_KEY);
-  // Best effort: after sign-out there is no session; the server prunes stale rows itself.
-  await apiClient.liveActivity.deleteToken(token).catch(() => {});
 }
 
 export function LiveActivityController() {
@@ -72,7 +50,7 @@ export function LiveActivityController() {
   const syncing = useRef(false);
   const rerun = useRef(false);
 
-  const timezone = currentFestival?.timezone ?? "Europe/Berlin";
+  const timezone = currentFestival?.timezone ?? DEFAULT_TIMEZONE;
   const today = formatDateForDatabase(now, timezone);
   const festivalId = currentFestival?.id;
   const { data: attendance, loading: attendanceLoading } = useAdaptedAttendanceByDate(festivalId, today);
@@ -171,7 +149,6 @@ export function LiveActivityController() {
       const localState = buildLiveActivityState({
         attendance: attendance ?? null,
         consumptions: consumptions ?? [],
-        now,
       });
       const running = await LiveActivity.getRunningAttributes();
       const sameDay = running?.festivalId === festivalId && running?.date === today;

@@ -13,8 +13,6 @@ export interface BuildLiveActivityStateInput {
   consumptions: Pick<Consumption, "drinkType" | "tentId" | "recordedAt">[];
   pendingCount?: number;
   message?: LiveActivityMessage | null;
-  /** Stands in for the log time when the only log is an untimed check-in. */
-  now?: Date;
 }
 
 // Offline check-ins carry only a date, which parses as UTC midnight.
@@ -38,8 +36,7 @@ export function buildLiveActivityState(
   if (logTimes.length === 0 && !untimedCheckIn) {
     return null;
   }
-  const lastLogAt =
-    logTimes.length > 0 ? new Date(Math.max(...logTimes)) : (input.now ?? new Date());
+  const lastLogAt = logTimes.length > 0 ? new Date(Math.max(...logTimes)).toISOString() : null;
 
   const currentTentId = getCurrentTentId(visits) ?? null;
   const currentTent = visits.find((v) => v.tentId === currentTentId);
@@ -51,7 +48,7 @@ export function buildLiveActivityState(
     lastDrinkType: newestDrink?.drinkType ?? "beer",
     lastTentId: newestDrink?.tentId ?? currentTentId,
     pendingCount: input.pendingCount ?? 0,
-    lastLogAt: lastLogAt.toISOString(),
+    lastLogAt,
     message: input.message ?? null,
   };
 }
@@ -64,9 +61,12 @@ export interface LiveActivityDay {
 
 /** Two hours after the last log, but never past the festival day's midnight. */
 export function liveActivityStaleDate(state: LiveActivityState, day: LiveActivityDay): string {
-  const inactiveAt = Date.parse(state.lastLogAt) + LIVE_ACTIVITY_INACTIVITY_HOURS * 60 * 60 * 1000;
   const [year, month, date] = day.date.split("-").map(Number);
   const midnight = new TZDate(year, month - 1, date + 1, day.timezone).getTime();
+  if (state.lastLogAt === null) {
+    return new Date(midnight).toISOString();
+  }
+  const inactiveAt = Date.parse(state.lastLogAt) + LIVE_ACTIVITY_INACTIVITY_HOURS * 60 * 60 * 1000;
   return new Date(Math.min(inactiveAt, midnight)).toISOString();
 }
 

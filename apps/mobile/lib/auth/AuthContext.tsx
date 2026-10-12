@@ -15,6 +15,7 @@ import { identifyDevice } from "vexo-analytics";
 import { refetchFailedQueries } from "@/lib/data/query-client";
 import { clearAllData } from "@/lib/database/debug";
 import { getDatabase } from "@/lib/database/init";
+import { forgetRegisteredToken } from "@/lib/live-activity/registered-token";
 import { logger } from "@/lib/logger";
 import { clearBadgeCount } from "@/lib/notifications/handlers";
 import { supabase } from "@/lib/supabase";
@@ -192,6 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    await forgetRegisteredToken();
     await runUserSignOut(userInitiatedSignOutRef, () => supabase.auth.signOut());
     await clearAllAuthData();
     // Clear local SQLite data to avoid stale data from previous user session

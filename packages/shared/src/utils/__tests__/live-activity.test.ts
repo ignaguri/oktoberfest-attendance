@@ -86,10 +86,9 @@ describe("buildLiveActivityState", () => {
         tentVisits: [visit(tentA, "Augustiner", "2026-10-03")],
       },
       consumptions: [],
-      now: new Date("2026-10-03T18:00:00.000Z"),
     });
     expect(checkInOnly?.tentName).toBe("Augustiner");
-    expect(checkInOnly?.lastLogAt).toBe("2026-10-03T18:00:00.000Z");
+    expect(checkInOnly?.lastLogAt).toBeNull();
   });
 
   it("carries pending count and message through", () => {
@@ -129,6 +128,15 @@ describe("staleness", () => {
     const lateState = { ...state, lastLogAt: "2026-10-03T21:30:00.000Z" };
     // 23:30 in Munich: midnight comes before the two hours are up.
     expect(liveActivityStaleDate(lateState, day)).toBe("2026-10-03T22:00:00.000Z");
+  });
+
+  it("lasts until midnight with only an untimed check-in", () => {
+    if (!state) {
+      throw new Error("expected a state");
+    }
+    expect(liveActivityStaleDate({ ...state, lastLogAt: null }, day)).toBe(
+      "2026-10-03T22:00:00.000Z",
+    );
   });
 });
 

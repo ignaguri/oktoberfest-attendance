@@ -46,8 +46,7 @@ enum LiveActivityTap {
         _ state: ProstActivityAttributes.ContentState,
         _ attributes: ProstActivityAttributes
     ) -> Date? {
-        guard let lastLog = parseDate(state.lastLogAt) else { return nil }
-        let inactiveAt = lastLog.addingTimeInterval(inactivity)
+        let inactiveAt = state.lastLogAt.flatMap(parseDate)?.addingTimeInterval(inactivity)
         var calendar = Calendar(identifier: .iso8601)
         calendar.timeZone = TimeZone(identifier: attributes.timezone) ?? TimeZone(identifier: "Europe/Berlin")!
         let formatter = DateFormatter()
@@ -59,6 +58,8 @@ enum LiveActivityTap {
             let dayStart = formatter.date(from: attributes.date),
             let midnight = calendar.date(byAdding: .day, value: 1, to: dayStart)
         else { return inactiveAt }
+        // Only an untimed check-in: no inactivity clock, just the day's end.
+        guard let inactiveAt else { return midnight }
         return min(inactiveAt, midnight)
     }
 

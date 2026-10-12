@@ -91,7 +91,8 @@ export class LiveActivityPushService {
         for (const token of group) {
           try {
             const dead = await this.send(token, state, now, builtAt, day);
-            if (dead) {
+            // An emptied day ends the surface, so its token has nothing left to receive.
+            if (dead || !state) {
               toDelete.push(token.id);
             }
           } catch (error) {
@@ -211,10 +212,11 @@ export function createLiveActivityPushService(supabase: SupabaseClient): LiveAct
   return new LiveActivityPushService({
     tokens: new SupabaseLiveActivityTokenRepository(client),
     loadFestival: (festivalId) => attendanceRepo.festivalExists(festivalId),
-    loadDay: async (userId, festivalId, date) => ({
-      attendance: await attendanceRepo.getByDate(userId, festivalId, date),
-      consumptions: await consumptionRepo.findByFestivalAndDate(userId, festivalId, date),
-    }),
+    loadDay: async (userId, festivalId, date) => {
+      const attendance = await attendanceRepo.getByDate(userId, festivalId, date);
+      const consumptions = attendance ? await consumptionRepo.findByAttendance(attendance.id) : [];
+      return { attendance, consumptions };
+    },
     apns: getApnsClient(),
     sendExpo: (token, data) => sendExpoDataPush(token, data),
     now: () => new Date(),

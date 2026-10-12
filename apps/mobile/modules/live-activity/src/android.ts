@@ -50,11 +50,10 @@ async function post(surface: AndroidSurface): Promise<void> {
     status = labels.messages[state.message];
   }
   const where = `📍 ${state.tentName ?? labels.noTent}`;
-  const lastActivity = labels.lastActivity.replace(
-    "{{time}}",
-    formatLocalized(new Date(state.lastLogAt), "p"),
-  );
-  const details = `${where} · ${lastActivity}`;
+  const lastActivity = state.lastLogAt
+    ? labels.lastActivity.replace("{{time}}", formatLocalized(new Date(state.lastLogAt), "p"))
+    : null;
+  const details = lastActivity ? `${where} · ${lastActivity}` : where;
 
   await Notifications.scheduleNotificationAsync({
     identifier: NOTIFICATION_ID,

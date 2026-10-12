@@ -93,7 +93,7 @@ public class LiveActivityModule: Module {
                 "lastDrinkType": state.lastDrinkType,
                 "lastTentId": state.lastTentId ?? NSNull(),
                 "pendingCount": state.pendingCount,
-                "lastLogAt": state.lastLogAt,
+                "lastLogAt": state.lastLogAt ?? NSNull(),
                 "message": state.message ?? NSNull(),
             ]
             let data = try JSONSerialization.data(withJSONObject: json)

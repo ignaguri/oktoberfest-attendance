@@ -1,5 +1,8 @@
 import type { LiveActivityState } from "@prostcounter/shared/schemas";
 
+const logTime = (state: LiveActivityState) =>
+  state.lastLogAt ? Date.parse(state.lastLogAt) : Number.NEGATIVE_INFINITY;
+
 /**
  * Combines today's local data with what the running surface shows. Lock-screen
  * taps reach the server directly and only land in local SQLite on the next sync,
@@ -15,7 +18,7 @@ export function mergeWithRunningState(
   if (!local) {
     return running;
   }
-  const localIsNewer = Date.parse(local.lastLogAt) > Date.parse(running.lastLogAt);
+  const localIsNewer = logTime(local) > logTime(running);
   const newer = localIsNewer ? local : running;
   return {
     ...newer,

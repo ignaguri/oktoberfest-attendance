@@ -101,8 +101,8 @@ describe("LiveActivityPushService.notifyUserChanged", () => {
     });
   });
 
-  it("ends the surface when the day has nothing left", async () => {
-    const { deps } = makeDeps(
+  it("ends the surface and drops its token when the day has nothing left", async () => {
+    const { deps, deleteByIds } = makeDeps(
       [
         token({}),
         token({ id: "id-2", platform: "android", token: "expo-token", apnsEnvironment: null }),
@@ -120,6 +120,7 @@ describe("LiveActivityPushService.notifyUserChanged", () => {
       timestamp: now.getTime(),
       userId: "user-1",
     });
+    expect(deleteByIds).toHaveBeenCalledWith(["id-1", "id-2"]);
   });
 
   it("ends an earlier day's surface before pruning its token", async () => {
@@ -186,7 +187,7 @@ describe("LiveActivityPushService.notifyUserChanged", () => {
       .mockRejectedValueOnce(new Error("db down"))
       .mockResolvedValueOnce({
         attendance: { drinkCount: 1, beerCount: 1, tentVisits: [] },
-        consumptions: [],
+        consumptions: [{ drinkType: "beer", tentId: null, recordedAt: "2026-10-03T11:00:00.000Z" }],
       });
     const { deps, deleteByIds } = makeDeps(
       [

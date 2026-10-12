@@ -62,7 +62,7 @@ struct DetailLines: View {
                 } else {
                     Text(verbatim: "📍 ") + Text("liveActivity.noTent")
                 }
-                if let lastLog = LiveActivityTap.parseDate(state.lastLogAt) {
+                if let lastLog = state.lastLogAt.flatMap(LiveActivityTap.parseDate) {
                     Text(verbatim: "·")
                     Text("liveActivity.lastActivity \(lastLog, style: .time)")
                 }
