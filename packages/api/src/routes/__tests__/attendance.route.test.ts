@@ -13,6 +13,8 @@ import {
 } from "../../__tests__/helpers/test-server";
 import attendanceRoutes from "../attendance.route";
 
+vi.mock("../../services/live-activity", () => ({ scheduleLiveActivityRefresh: vi.fn() }));
+
 describe("Attendance Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;
   let mockSupabase: ReturnType<typeof createMockSupabase>;

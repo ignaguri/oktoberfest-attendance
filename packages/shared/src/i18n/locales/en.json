@@ -1456,6 +1456,8 @@
       "friendPlansDescription": "When a friend is going on a day you've marked",
       "dayStart": "Friends starting their day",
       "dayStartDescription": "When a friend or group member has their first drink or check-in of the day",
+      "liveActivity": "Drink counter on lock screen",
+      "liveActivityDescription": "Shows today's drinks with a +1 button while you're at the festival",
       "groupActivity": "Group Activity",
       "reminders": "Reminders",
       "remindersDescription": "Reservation reminders and check-in prompts",
@@ -4283,6 +4285,19 @@
     },
     "upload": {
       "tagsFailed": "Photo uploaded, but the tags didn't save."
+    }
+  },
+  "liveActivity": {
+    "title": "Drinks today: {{count}}",
+    "paused": "Paused",
+    "noTent": "No tent yet",
+    "lastActivity": "Last activity at {{time}}",
+    "channelName": "Drink counter",
+    "message": {
+      "openAppToSync": "Open ProstCounter to sync",
+      "newDay": "New day: open ProstCounter",
+      "festivalEnded": "Festival has ended",
+      "notLogged": "Not logged"
     }
   }
 }

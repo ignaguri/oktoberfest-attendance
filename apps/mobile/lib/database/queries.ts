@@ -21,6 +21,12 @@ import { festivalTents, tents } from "./schema/tents";
 // Attendance Queries with Consumption Aggregations
 // =============================================================================
 
+// Same rule as the server's attendance_with_totals view: the stored column only
+// counts for legacy days without consumption rows, and goes stale otherwise.
+const beerCountSql = sql<number>`CASE WHEN COUNT(${consumptions.id}) > 0
+  THEN SUM(CASE WHEN ${consumptions.drink_type} IN ('beer', 'radler') THEN 1 ELSE 0 END)
+  ELSE COALESCE(${attendances.beer_count}, 0) END`;
+
 /**
  * Query attendances with consumption totals (drink count, total spent, etc.).
  * Returns attendances ordered by date DESC with aggregated consumption data.
@@ -35,7 +41,7 @@ export async function queryAttendancesWithTotals(db: DrizzleDb, festivalId: stri
       user_id: attendances.user_id,
       festival_id: attendances.festival_id,
       date: attendances.date,
-      beer_count: attendances.beer_count,
+      beer_count: beerCountSql,
       created_at: attendances.created_at,
       updated_at: attendances.updated_at,
       // Aggregated consumption fields
@@ -72,7 +78,7 @@ export async function queryAttendanceByDateWithTotals(
       user_id: attendances.user_id,
       festival_id: attendances.festival_id,
       date: attendances.date,
-      beer_count: attendances.beer_count,
+      beer_count: beerCountSql,
       created_at: attendances.created_at,
       updated_at: attendances.updated_at,
       drinkCount: sql<number>`COALESCE(COUNT(${consumptions.id}), 0)`,

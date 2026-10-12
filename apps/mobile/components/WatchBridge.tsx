@@ -19,12 +19,17 @@ import { clearSessionOnWatch, syncSessionToWatch } from "@/lib/watch-sync";
  *      AppState to change.
  */
 export function WatchBridge() {
-  const { session, user } = useAuth();
+  const { session, user, isLoading } = useAuth();
   const { currentFestival } = useFestival();
   const { sync, isOnline } = useOfflineSafe();
 
   useEffect(() => {
     if (Platform.OS !== "ios") return;
+    // A Live Activity tap boots the app in the background; clearing before the
+    // session loads would sign the lock screen and watch out.
+    if (isLoading) {
+      return;
+    }
 
     if (!session) {
       clearSessionOnWatch();
@@ -42,6 +47,7 @@ export function WatchBridge() {
       expiresAt: expires_at ?? 0,
     });
   }, [
+    isLoading,
     session?.access_token,
     session?.refresh_token,
     session?.expires_at,

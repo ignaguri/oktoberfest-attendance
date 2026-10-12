@@ -14,6 +14,7 @@ import {
 import { tentNamesFor } from "../services/check-in-notifications";
 import { ConsumptionService } from "../services/consumption.service";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { scheduleLiveActivityRefresh } from "../services/live-activity";
 import { createNotificationService } from "../services/notification.service";
 import { ApiErrorSchema } from "../lib/error-response";
 
@@ -129,6 +130,7 @@ app.openapi(logConsumptionRoute, async (c) => {
     "POST /consumption",
   );
 
+  scheduleLiveActivityRefresh(supabase, user.id);
   return c.json({ ...attendance, unlocked }, 200);
 });
 
@@ -237,6 +239,7 @@ app.openapi(deleteConsumptionRoute, async (c) => {
   const consumptionRepo = new SupabaseConsumptionRepository(supabase);
   await consumptionRepo.delete(id, user.id);
 
+  scheduleLiveActivityRefresh(supabase, user.id);
   return c.json({ success: true, message: "Consumption deleted successfully" }, 200);
 });
 

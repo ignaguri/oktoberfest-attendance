@@ -22,6 +22,7 @@ import * as TaskManager from "expo-task-manager";
 import { Platform } from "react-native";
 
 import { logger } from "@/lib/logger";
+import { LiveActivity } from "@/modules/live-activity";
 
 import { initializeDatabase } from "./init";
 import { createSyncManager, type SyncResult } from "./sync/sync-manager";
@@ -42,6 +43,11 @@ function ensureTaskDefined() {
     logger.info("[BackgroundSync] Task started");
 
     try {
+      // Android can't time out the ongoing counter by itself.
+      await LiveActivity.endIfStale(new Date()).catch((error) =>
+        logger.warn("[BackgroundSync] endIfStale failed", error),
+      );
+
       // Initialize database (may already be initialized)
       const db = await initializeDatabase();
       const syncManager = createSyncManager(db);

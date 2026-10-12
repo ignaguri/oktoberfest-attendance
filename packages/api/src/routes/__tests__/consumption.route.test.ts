@@ -13,6 +13,9 @@ import {
 } from "../../__tests__/helpers/test-server";
 import consumptionRoutes from "../consumption.route";
 
+const scheduleLiveActivityRefresh = vi.hoisted(() => vi.fn());
+vi.mock("../../services/live-activity", () => ({ scheduleLiveActivityRefresh }));
+
 describe("Consumption Routes - Unit Tests", () => {
   let app: ReturnType<typeof createTestApp>;
   let mockSupabase: ReturnType<typeof createMockSupabase>;
@@ -179,6 +182,7 @@ describe("Consumption Routes - Unit Tests", () => {
           avgPriceCents: 1640,
         }),
       );
+      expect(scheduleLiveActivityRefresh).toHaveBeenCalledWith(mockSupabase, mockUser.id);
     });
 
     it("should create new attendance when logging first consumption of the day", async () => {
@@ -485,6 +489,7 @@ describe("Consumption Routes - Unit Tests", () => {
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(500);
+      expect(scheduleLiveActivityRefresh).not.toHaveBeenCalled();
     });
 
     it("should support optional fields (tentId, drinkName, recordedAt)", async () => {

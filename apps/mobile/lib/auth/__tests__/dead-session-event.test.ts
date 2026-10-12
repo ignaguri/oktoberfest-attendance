@@ -17,6 +17,9 @@ vi.mock("@/lib/database/debug", () => ({
 vi.mock("@/lib/database/init", () => ({
   getDatabase: vi.fn(),
 }));
+vi.mock("@/lib/live-activity/registered-token", () => ({
+  forgetRegisteredToken: vi.fn(),
+}));
 vi.mock("@/lib/notifications/handlers", () => ({
   clearBadgeCount: vi.fn(),
 }));

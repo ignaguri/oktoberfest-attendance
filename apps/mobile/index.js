@@ -9,4 +9,6 @@ if (__DEV__) {
   ]);
 }
 
+// Defines the Android lock-screen counter task in every JS context, including headless starts.
+import "./lib/live-activity/android-task";
 import "expo-router/entry";

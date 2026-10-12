@@ -1289,6 +1289,50 @@ export type Database = {
           },
         ]
       }
+      live_activity_tokens: {
+        Row: {
+          apns_environment: string | null
+          created_at: string
+          date: string
+          festival_id: string
+          id: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          apns_environment?: string | null
+          created_at?: string
+          date: string
+          festival_id: string
+          id?: string
+          platform: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          apns_environment?: string | null
+          created_at?: string
+          date?: string
+          festival_id?: string
+          id?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_activity_tokens_festival_id_fkey"
+            columns: ["festival_id"]
+            isOneToOne: false
+            referencedRelation: "festivals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       location_points: {
         Row: {
           accuracy: number | null

@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // Opaque full-bleed square: iOS applies its own mask. logo.png is the rounded in-app variant.
   icon: "./assets/images/icon.png",
   userInterfaceStyle: "automatic",
-  runtimeVersion: "1.10.0-a",
+  runtimeVersion: "1.11.0-a",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
@@ -21,6 +21,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     googleServicesFile: "./GoogleService-Info.plist",
     associatedDomains: ["applinks:prostcounter.fun", "applinks:www.prostcounter.fun"],
     infoPlist: {
+      NSSupportsLiveActivities: true,
       NSFaceIDUsageDescription: "Use Face ID to quickly sign in to your ProstCounter account",
       NSPhotoLibraryUsageDescription:
         "ProstCounter needs access to your photo library to let you upload beer pictures to your daily attendance log and share them with your group members in the gallery. For example, you can select a photo of your beer to document your Oktoberfest experience.",
@@ -155,7 +156,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withSceneLifecycle.js",
     "./plugins/withWatchSessionBridge.js",
     "./plugins/withWatchInfoPlistEnv.js",
-    "./plugins/withFirebaseNotificationColor.js",
     "./plugins/withGoogleMapsApiKey.js",
     "./plugins/withAsyncStorageMavenRepo.js",
     "./plugins/withAndroidGradleJvmArgs.js",

@@ -1,0 +1,62 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "liveActivity.lastActivity %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Last activity at %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zuletzt aktiv um %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Última actividad a las %@" } }
+      }
+    },
+    "liveActivity.message.festivalEnded" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Festival has ended" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Festival ist beendet" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "El festival terminó" } }
+      }
+    },
+    "liveActivity.message.newDay" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "New day: open ProstCounter" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Neuer Tag: öffne ProstCounter" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Nuevo día: abrí ProstCounter" } }
+      }
+    },
+    "liveActivity.message.notLogged" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Not logged" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Nicht gespeichert" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "No se registró" } }
+      }
+    },
+    "liveActivity.message.openAppToSync" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Open ProstCounter to sync" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Öffne ProstCounter zum Synchronisieren" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Abrí ProstCounter para sincronizar" } }
+      }
+    },
+    "liveActivity.noTent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No tent yet" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Noch kein Zelt" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Todavía sin carpa" } }
+      }
+    },
+    "liveActivity.paused" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Paused" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Pausiert" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "En pausa" } }
+      }
+    }
+  }
+}
