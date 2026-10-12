@@ -156,7 +156,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     "./plugins/withSceneLifecycle.js",
     "./plugins/withWatchSessionBridge.js",
     "./plugins/withWatchInfoPlistEnv.js",
-    "./plugins/withFirebaseNotificationColor.js",
     "./plugins/withGoogleMapsApiKey.js",
     "./plugins/withAsyncStorageMavenRepo.js",
     "./plugins/withAndroidGradleJvmArgs.js",
