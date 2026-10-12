@@ -188,4 +188,4 @@ export {
   isLiveActivityStale,
   liveActivityStaleDate,
 } from "./live-activity";
-export type { BuildLiveActivityStateInput } from "./live-activity";
+export type { BuildLiveActivityStateInput, LiveActivityDay } from "./live-activity";

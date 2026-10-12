@@ -122,12 +122,13 @@ describe("LiveActivityPushService.notifyUserChanged", () => {
     });
   });
 
-  it("prunes tokens from an earlier day without sending", async () => {
+  it("ends an earlier day's surface before pruning its token", async () => {
     const { deps, deleteByIds } = makeDeps([token({ id: "old", date: "2026-10-02" })]);
 
     await new LiveActivityPushService(deps).notifyUserChanged("user-1");
 
-    expect(deps.apns?.sendLiveActivity).not.toHaveBeenCalled();
+    const apnsCall = vi.mocked(deps.apns!.sendLiveActivity).mock.calls[0][0];
+    expect((apnsCall.payload as { aps: { event: string } }).aps.event).toBe("end");
     expect(deleteByIds).toHaveBeenCalledWith(["old"]);
   });
 
@@ -198,7 +199,8 @@ describe("LiveActivityPushService.notifyUserChanged", () => {
 
     await new LiveActivityPushService(deps).notifyUserChanged("user-1");
 
-    expect(deps.apns?.sendLiveActivity).toHaveBeenCalledTimes(1);
+    // f-2's update plus the end sent to f-3's day-old surface; f-1 failed to load.
+    expect(deps.apns?.sendLiveActivity).toHaveBeenCalledTimes(2);
     expect(deleteByIds).toHaveBeenCalledWith(["old"]);
     errorSpy.mockRestore();
   });

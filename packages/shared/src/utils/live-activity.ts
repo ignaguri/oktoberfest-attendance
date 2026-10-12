@@ -1,3 +1,5 @@
+import { TZDate } from "@date-fns/tz";
+
 import type { AttendanceWithTotals, Consumption, DrinkType } from "../schemas/consumption.schema";
 import {
   LIVE_ACTIVITY_INACTIVITY_HOURS,
@@ -54,13 +56,26 @@ export function buildLiveActivityState(
   };
 }
 
-export function liveActivityStaleDate(state: LiveActivityState): string {
-  const staleAt = Date.parse(state.lastLogAt) + LIVE_ACTIVITY_INACTIVITY_HOURS * 60 * 60 * 1000;
-  return new Date(staleAt).toISOString();
+/** The festival day a surface shows, in the festival's timezone. */
+export interface LiveActivityDay {
+  date: string;
+  timezone: string;
 }
 
-export function isLiveActivityStale(state: LiveActivityState, now: Date): boolean {
-  return now.getTime() >= Date.parse(liveActivityStaleDate(state));
+/** Two hours after the last log, but never past the festival day's midnight. */
+export function liveActivityStaleDate(state: LiveActivityState, day: LiveActivityDay): string {
+  const inactiveAt = Date.parse(state.lastLogAt) + LIVE_ACTIVITY_INACTIVITY_HOURS * 60 * 60 * 1000;
+  const [year, month, date] = day.date.split("-").map(Number);
+  const midnight = new TZDate(year, month - 1, date + 1, day.timezone).getTime();
+  return new Date(Math.min(inactiveAt, midnight)).toISOString();
+}
+
+export function isLiveActivityStale(
+  state: LiveActivityState,
+  day: LiveActivityDay,
+  now: Date,
+): boolean {
+  return now.getTime() >= Date.parse(liveActivityStaleDate(state, day));
 }
 
 const DRINK_EMOJI: Record<DrinkType, string> = {

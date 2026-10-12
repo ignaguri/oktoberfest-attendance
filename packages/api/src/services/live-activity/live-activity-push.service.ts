@@ -1,8 +1,10 @@
 import type { Database } from "@prostcounter/db";
 import type { LiveActivityState } from "@prostcounter/shared";
+import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
 import {
   type BuildLiveActivityStateInput,
   buildLiveActivityState,
+  type LiveActivityDay,
   liveActivityStaleDate,
 } from "@prostcounter/shared/utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -73,17 +75,22 @@ export class LiveActivityPushService {
       const { festivalId, date } = group[0];
       try {
         const festival = await this.deps.loadFestival(festivalId);
+        const day = { date, timezone: festival?.timezone ?? DEFAULT_TIMEZONE };
+        // Taken before the read: a later read never sees less, so Android can drop older pushes.
+        const builtAt = this.deps.now().getTime();
         if (!festival || festivalDateOf(festival, now) !== date) {
+          // End yesterday's surfaces first: once the token is gone nothing can dismiss them.
+          for (const token of group) {
+            await this.send(token, null, now, builtAt, day).catch(() => false);
+          }
           toDelete.push(...group.map((t) => t.id));
           continue;
         }
 
-        // Taken before the read: a later read never sees less, so Android can drop older pushes.
-        const builtAt = this.deps.now().getTime();
         const state = buildLiveActivityState(await this.deps.loadDay(userId, festivalId, date));
         for (const token of group) {
           try {
-            const dead = await this.send(token, state, now, builtAt);
+            const dead = await this.send(token, state, now, builtAt, day);
             if (dead) {
               toDelete.push(token.id);
             }
@@ -129,6 +136,7 @@ export class LiveActivityPushService {
     state: LiveActivityState | null,
     now: Date,
     builtAt: number,
+    day: LiveActivityDay,
   ): Promise<boolean> {
     if (token.platform === "android") {
       const result = await this.deps.sendExpo(token.token, {
@@ -154,7 +162,7 @@ export class LiveActivityPushService {
           timestamp: Math.floor(builtAt / 1000),
           event: "update",
           "content-state": state,
-          "stale-date": toSeconds(liveActivityStaleDate(state)),
+          "stale-date": toSeconds(liveActivityStaleDate(state, day)),
         }
       : {
           timestamp: Math.floor(builtAt / 1000),

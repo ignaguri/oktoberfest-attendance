@@ -8,7 +8,7 @@ export function buildAndroidLabels(t: TFunction): AndroidLabels {
     title: t("liveActivity.title", { count: "{{count}}" }),
     paused: t("liveActivity.paused"),
     noTent: t("liveActivity.noTent"),
-    lastDrink: t("liveActivity.lastDrink", { time: "{{time}}" }),
+    lastActivity: t("liveActivity.lastActivity", { time: "{{time}}" }),
     channelName: t("liveActivity.channelName"),
     messages: {
       openAppToSync: t("liveActivity.message.openAppToSync"),

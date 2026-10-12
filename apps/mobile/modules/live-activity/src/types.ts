@@ -26,7 +26,7 @@ export interface AndroidLabels {
   title: string;
   paused: string;
   noTent: string;
-  lastDrink: string;
+  lastActivity: string;
   channelName: string;
   messages: Record<LiveActivityMessage, string>;
 }

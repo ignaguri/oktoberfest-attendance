@@ -4291,7 +4291,7 @@
     "title": "Drinks today: {{count}}",
     "paused": "Paused",
     "noTent": "No tent yet",
-    "lastDrink": "Last one at {{time}}",
+    "lastActivity": "Last activity at {{time}}",
     "channelName": "Drink counter",
     "message": {
       "openAppToSync": "Open ProstCounter to sync",

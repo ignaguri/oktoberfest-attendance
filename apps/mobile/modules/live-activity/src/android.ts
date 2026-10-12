@@ -42,7 +42,7 @@ async function post(surface: AndroidSurface): Promise<void> {
     },
   ]);
 
-  const stale = isLiveActivityStale(state, new Date());
+  const stale = isLiveActivityStale(state, surface.attributes, new Date());
   let status: string | null = null;
   if (stale) {
     status = labels.paused;
@@ -50,11 +50,11 @@ async function post(surface: AndroidSurface): Promise<void> {
     status = labels.messages[state.message];
   }
   const where = `📍 ${state.tentName ?? labels.noTent}`;
-  const lastDrink = labels.lastDrink.replace(
+  const lastActivity = labels.lastActivity.replace(
     "{{time}}",
     formatLocalized(new Date(state.lastLogAt), "p"),
   );
-  const details = `${where} · ${lastDrink}`;
+  const details = `${where} · ${lastActivity}`;
 
   await Notifications.scheduleNotificationAsync({
     identifier: NOTIFICATION_ID,
@@ -137,7 +137,7 @@ export const androidLiveActivity: LiveActivityApi = {
   },
   async endIfStale(now) {
     const surface = await readAndroidSurface();
-    if (surface && isLiveActivityStale(surface.state, now)) {
+    if (surface && isLiveActivityStale(surface.state, surface.attributes, now)) {
       await androidLiveActivity.end();
     }
   },

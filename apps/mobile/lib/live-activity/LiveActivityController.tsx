@@ -191,7 +191,7 @@ export function LiveActivityController() {
           : null,
         today,
         hasState: state !== null,
-        stale: state ? isLiveActivityStale(state, now) : true,
+        stale: state ? isLiveActivityStale(state, { date: today, timezone }, now) : true,
         running: running ? { festivalId: running.festivalId, date: running.date } : null,
       });
 

@@ -40,8 +40,26 @@ enum LiveActivityTap {
         return withFraction.date(from: value) ?? ISO8601DateFormatter().date(from: value)
     }
 
-    static func staleDate(_ state: ProstActivityAttributes.ContentState) -> Date? {
-        parseDate(state.lastLogAt)?.addingTimeInterval(inactivity)
+    /// Same rule as liveActivityStaleDate in packages/shared: two hours after the last log,
+    /// but never past the festival day's midnight.
+    static func staleDate(
+        _ state: ProstActivityAttributes.ContentState,
+        _ attributes: ProstActivityAttributes
+    ) -> Date? {
+        guard let lastLog = parseDate(state.lastLogAt) else { return nil }
+        let inactiveAt = lastLog.addingTimeInterval(inactivity)
+        var calendar = Calendar(identifier: .iso8601)
+        calendar.timeZone = TimeZone(identifier: attributes.timezone) ?? TimeZone(identifier: "Europe/Berlin")!
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = calendar.timeZone
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard
+            let dayStart = formatter.date(from: attributes.date),
+            let midnight = calendar.date(byAdding: .day, value: 1, to: dayStart)
+        else { return inactiveAt }
+        return min(inactiveAt, midnight)
     }
 
     private static let gate = TapGate()
@@ -67,7 +85,7 @@ enum LiveActivityTap {
 
         guard let userId = PendingTapStore.currentUserId() else {
             state.message = "openAppToSync"
-            await activity.update(.init(state: state, staleDate: staleDate(state)))
+            await activity.update(.init(state: state, staleDate: staleDate(state, attributes)))
             return
         }
 
@@ -89,7 +107,7 @@ enum LiveActivityTap {
         state.pendingCount = PendingTapStore.read().filter { matches($0, attributes) }.count
         state.lastLogAt = tap.tappedAt
         state.message = nil
-        await activity.update(.init(state: state, staleDate: staleDate(state)))
+        await activity.update(.init(state: state, staleDate: staleDate(state, attributes)))
 
         var latest: LogDrinkResponse?
         var droppedCount = 0
@@ -145,7 +163,7 @@ enum LiveActivityTap {
             await activity.end(.init(state: state, staleDate: nil), dismissalPolicy: .default)
             return
         }
-        await activity.update(.init(state: state, staleDate: staleDate(state)))
+        await activity.update(.init(state: state, staleDate: staleDate(state, attributes)))
     }
 }
 

@@ -23,10 +23,19 @@ export const iosLiveActivity: LiveActivityApi = {
     return native ? native.isSupported() : false;
   },
   async start(attributes, state) {
-    await native?.start(JSON.stringify(attributes), JSON.stringify(state), liveActivityStaleDate(state));
+    await native?.start(
+      JSON.stringify(attributes),
+      JSON.stringify(state),
+      liveActivityStaleDate(state, attributes),
+    );
   },
   async update(state) {
-    await native?.update(JSON.stringify(state), liveActivityStaleDate(state));
+    // The stale date needs the activity's own day; nothing to update without one.
+    const attributes = await iosLiveActivity.getRunningAttributes();
+    if (!attributes) {
+      return;
+    }
+    await native?.update(JSON.stringify(state), liveActivityStaleDate(state, attributes));
   },
   async end() {
     await native?.end();

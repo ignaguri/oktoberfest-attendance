@@ -64,7 +64,7 @@ struct DetailLines: View {
                 }
                 if let lastLog = LiveActivityTap.parseDate(state.lastLogAt) {
                     Text(verbatim: "·")
-                    Text("liveActivity.lastDrink \(lastLog, style: .time)")
+                    Text("liveActivity.lastActivity \(lastLog, style: .time)")
                 }
             }
             .font(.caption)

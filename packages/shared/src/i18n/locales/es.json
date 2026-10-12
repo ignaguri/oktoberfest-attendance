@@ -4351,7 +4351,7 @@
     "title": "Bebidas hoy: {{count}}",
     "paused": "En pausa",
     "noTent": "Todavía sin carpa",
-    "lastDrink": "La última a las {{time}}",
+    "lastActivity": "Última actividad a las {{time}}",
     "channelName": "Contador de bebidas",
     "message": {
       "openAppToSync": "Abrí ProstCounter para sincronizar",

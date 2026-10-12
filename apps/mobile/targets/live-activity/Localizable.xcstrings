@@ -2,12 +2,12 @@
   "sourceLanguage" : "en",
   "version" : "1.0",
   "strings" : {
-    "liveActivity.lastDrink %@" : {
+    "liveActivity.lastActivity %@" : {
       "extractionState" : "manual",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Last one at %@" } },
-        "de" : { "stringUnit" : { "state" : "translated", "value" : "Letzte um %@" } },
-        "es" : { "stringUnit" : { "state" : "translated", "value" : "La última a las %@" } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Last activity at %@" } },
+        "de" : { "stringUnit" : { "state" : "translated", "value" : "Zuletzt aktiv um %@" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Última actividad a las %@" } }
       }
     },
     "liveActivity.message.festivalEnded" : {

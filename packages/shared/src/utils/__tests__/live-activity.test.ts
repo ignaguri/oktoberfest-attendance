@@ -111,13 +111,24 @@ describe("staleness", () => {
     consumptions: [{ drinkType: "beer", tentId: null, recordedAt: "2026-10-03T11:00:00.000Z" }],
   });
 
+  const day = { date: "2026-10-03", timezone: "Europe/Berlin" };
+
   it("goes stale two hours after the last log", () => {
     if (!state) {
       throw new Error("expected a state");
     }
-    expect(liveActivityStaleDate(state)).toBe("2026-10-03T13:00:00.000Z");
-    expect(isLiveActivityStale(state, new Date("2026-10-03T12:59:59.000Z"))).toBe(false);
-    expect(isLiveActivityStale(state, new Date("2026-10-03T13:00:00.000Z"))).toBe(true);
+    expect(liveActivityStaleDate(state, day)).toBe("2026-10-03T13:00:00.000Z");
+    expect(isLiveActivityStale(state, day, new Date("2026-10-03T12:59:59.000Z"))).toBe(false);
+    expect(isLiveActivityStale(state, day, new Date("2026-10-03T13:00:00.000Z"))).toBe(true);
+  });
+
+  it("never outlives the festival day's midnight", () => {
+    if (!state) {
+      throw new Error("expected a state");
+    }
+    const lateState = { ...state, lastLogAt: "2026-10-03T21:30:00.000Z" };
+    // 23:30 in Munich: midnight comes before the two hours are up.
+    expect(liveActivityStaleDate(lateState, day)).toBe("2026-10-03T22:00:00.000Z");
   });
 });
 

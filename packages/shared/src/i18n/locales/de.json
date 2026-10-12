@@ -4528,7 +4528,7 @@
     "title": "Getränke heute: {{count}}",
     "paused": "Pausiert",
     "noTent": "Noch kein Zelt",
-    "lastDrink": "Letzte um {{time}}",
+    "lastActivity": "Zuletzt aktiv um {{time}}",
     "channelName": "Getränkezähler",
     "message": {
       "openAppToSync": "Öffne ProstCounter zum Synchronisieren",
