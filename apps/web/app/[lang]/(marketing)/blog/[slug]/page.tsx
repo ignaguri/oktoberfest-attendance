@@ -13,8 +13,6 @@ import { getAllPosts, getAvailableLocales, getPostBySlug } from "@/lib/blog";
 import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
-export const revalidate = 3600;
-
 type Params = { lang: string; slug: string };
 
 export async function generateStaticParams({

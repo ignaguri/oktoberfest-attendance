@@ -6,8 +6,6 @@ import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { blogIndexCopy } from "@/lib/marketing/seoCopy";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
-export const revalidate = 3600;
-
 type Params = { lang: string };
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
