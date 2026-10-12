@@ -1,3 +1,2 @@
 - Nuevo: tu contador de bebidas en la pantalla de bloqueo. Sumá otra ronda con +1 sin abrir la app.
-- En iPhone también aparece en la Dynamic Island.
 ¡Prost!

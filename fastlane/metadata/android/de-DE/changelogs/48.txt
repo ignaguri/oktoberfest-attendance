@@ -1,3 +1,2 @@
 - Neu: dein Getränkezähler auf dem Sperrbildschirm. Mit +1 trägst du die nächste Runde ein, ohne die App zu öffnen.
-- Auf dem iPhone auch in der Dynamic Island.
 Prost!

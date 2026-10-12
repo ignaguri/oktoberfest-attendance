@@ -1,3 +1,2 @@
 - New: your drink counter on the lock screen. Add another round with +1 without opening the app.
-- On iPhone it also shows in the Dynamic Island.
 Prost!
