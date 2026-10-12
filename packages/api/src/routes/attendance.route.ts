@@ -28,6 +28,7 @@ import {
 } from "../repositories/supabase";
 import { announceCheckIn } from "../services/check-in-notifications";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
+import { scheduleLiveActivityRefresh } from "../services/live-activity";
 import { assertDateWithinFestival, festivalDateOf } from "../utils/festival-dates";
 import { ApiErrorSchema } from "../lib/error-response";
 
@@ -216,6 +217,7 @@ app.openapi(deleteAttendanceRoute, async (c) => {
     );
   }
 
+  scheduleLiveActivityRefresh(supabase, user.id);
   return c.json(
     {
       success: true,
@@ -311,6 +313,7 @@ app.openapi(createAttendanceRoute, async (c) => {
 
   const unlocked = await evaluateAfterWrite(supabase, user.id, data.festivalId, "POST /attendance");
 
+  scheduleLiveActivityRefresh(supabase, user.id);
   return c.json({ ...result, unlocked }, 200);
 });
 
@@ -408,6 +411,7 @@ app.openapi(updatePersonalAttendanceRoute, async (c) => {
     "POST /attendance/personal",
   );
 
+  scheduleLiveActivityRefresh(supabase, user.id);
   return c.json({ ...result, unlocked }, 200);
 });
 
@@ -498,6 +502,7 @@ app.openapi(logTentVisitRoute, async (c) => {
     logger.error({ error: cacheError }, "Failed to invalidate wrapped cache after tent visit");
   }
 
+  scheduleLiveActivityRefresh(supabase, user.id);
   return c.json(result, 201);
 });
 
@@ -707,6 +712,7 @@ app.openapi(checkInFromReservationRoute, async (c) => {
     "POST /attendance/check-in",
   );
 
+  scheduleLiveActivityRefresh(supabase, user.id);
   return c.json(
     {
       success: true,

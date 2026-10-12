@@ -105,6 +105,7 @@ import type {
   ProfileDetail,
   ProfileShort,
   PublicProfile,
+  RegisterLiveActivityTokenInput,
   SearchUsersResponse,
   ShareLang,
   SubmitCrowdReportResponse,
@@ -551,6 +552,37 @@ export function createTypedApiClient(config: ApiClientConfig) {
           await extractApiError(response, "Failed to delete consumption");
         }
         return parseJsonResponse<{ success: boolean; message: string }>(response);
+      },
+    },
+
+    /**
+     * Lock-screen counter (Live Activity / ongoing notification) push tokens
+     */
+    liveActivity: {
+      async registerToken(data: RegisterLiveActivityTokenInput): Promise<{ success: boolean }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("POST", `${baseUrl}/v1/live-activity/token`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to register live activity token");
+        }
+        return parseJsonResponse<{ success: boolean }>(response);
+      },
+
+      async deleteToken(token: string): Promise<{ success: boolean }> {
+        const headers = await getAuthHeaders();
+        const response = await fetchWithLogging("DELETE", `${baseUrl}/v1/live-activity/token`, {
+          method: "DELETE",
+          headers,
+          body: JSON.stringify({ token }),
+        });
+        if (!response.ok) {
+          await extractApiError(response, "Failed to delete live activity token");
+        }
+        return parseJsonResponse<{ success: boolean }>(response);
       },
     },
 
