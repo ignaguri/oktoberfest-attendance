@@ -1693,6 +1693,8 @@
       "friendPlansDescription": "Wenn Freunde an einem Tag hingehen, den du markiert hast",
       "dayStart": "Freunde starten in den Tag",
       "dayStartDescription": "Wenn ein Freund oder Gruppenmitglied das erste Getränk oder den ersten Check-in des Tages hat",
+      "liveActivity": "Getränkezähler auf dem Sperrbildschirm",
+      "liveActivityDescription": "Zeigt die heutigen Getränke mit einem +1-Button, während du auf dem Fest bist",
       "groupActivity": "Gruppen-Aktivität",
       "reminders": "Erinnerungen",
       "remindersDescription": "Reservierungserinnerungen und Check-in-Aufforderungen",
@@ -4520,6 +4522,19 @@
     },
     "upload": {
       "tagsFailed": "Foto hochgeladen, aber die Markierungen wurden nicht gespeichert."
+    }
+  },
+  "liveActivity": {
+    "title": "Getränke heute: {{count}}",
+    "paused": "Pausiert",
+    "noTent": "Noch kein Zelt",
+    "lastDrink": "Letzte um {{time}}",
+    "channelName": "Getränkezähler",
+    "message": {
+      "openAppToSync": "Öffne ProstCounter zum Synchronisieren",
+      "newDay": "Neuer Tag: öffne ProstCounter",
+      "festivalEnded": "Festival ist beendet",
+      "notLogged": "Nicht gespeichert"
     }
   }
 }

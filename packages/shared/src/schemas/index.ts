@@ -4,6 +4,7 @@
 export * from "./auth.schema";
 export * from "./consumption.schema";
 export * from "./attendance.schema";
+export * from "./live-activity.schema";
 export * from "./festival.schema";
 export * from "./tent.schema";
 export * from "./group.schema";

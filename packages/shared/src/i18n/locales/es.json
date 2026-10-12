@@ -1516,6 +1516,8 @@
       "friendPlansDescription": "Cuando un amigo va un día que marcaste",
       "dayStart": "Amigos que empiezan el día",
       "dayStartDescription": "Cuando un amigo o alguien de tu grupo toma su primera bebida o hace su primer check-in del día",
+      "liveActivity": "Contador en la pantalla de bloqueo",
+      "liveActivityDescription": "Muestra las bebidas de hoy con un botón +1 mientras estás en el festival",
       "groupActivity": "Actividad del grupo",
       "reminders": "Recordatorios",
       "remindersDescription": "Recordatorios de reservas y avisos de check-in",
@@ -4343,6 +4345,19 @@
     },
     "upload": {
       "tagsFailed": "La foto se subió, pero las etiquetas no se guardaron."
+    }
+  },
+  "liveActivity": {
+    "title": "Bebidas hoy: {{count}}",
+    "paused": "En pausa",
+    "noTent": "Todavía sin carpa",
+    "lastDrink": "La última a las {{time}}",
+    "channelName": "Contador de bebidas",
+    "message": {
+      "openAppToSync": "Abrí ProstCounter para sincronizar",
+      "newDay": "Nuevo día: abrí ProstCounter",
+      "festivalEnded": "El festival terminó",
+      "notLogged": "No se registró"
     }
   }
 }
