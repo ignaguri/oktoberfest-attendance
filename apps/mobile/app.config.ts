@@ -4,7 +4,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: "ProstCounter",
   slug: "prostcounter",
-  version: "1.10.2",
+  version: "1.11.0",
   orientation: "portrait",
   scheme: "prostcounter",
   // Opaque full-bleed square: iOS applies its own mask. logo.png is the rounded in-app variant.
