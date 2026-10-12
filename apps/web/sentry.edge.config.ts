@@ -6,6 +6,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 import { APP_VERSION } from "./lib/version";
+import { sentryDataCollection, sentryEnvironment } from "./lib/sentry-options";
 
 Sentry.init({
   dsn: "https://976065906ffaab22c65cb37405653cea@o4507997605527552.ingest.de.sentry.io/4507997611098192",
@@ -17,4 +18,6 @@ Sentry.init({
   debug: false,
 
   release: APP_VERSION,
+  dataCollection: sentryDataCollection,
+  environment: sentryEnvironment,
 });

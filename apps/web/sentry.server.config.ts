@@ -5,6 +5,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 import { APP_VERSION } from "./lib/version";
+import { sentryDataCollection, sentryEnvironment } from "./lib/sentry-options";
 import { INVALID_CREDENTIALS_MESSAGE } from "./utils/sentry";
 
 Sentry.init({
@@ -23,4 +24,6 @@ Sentry.init({
   debug: false,
 
   release: APP_VERSION,
+  dataCollection: sentryDataCollection,
+  environment: sentryEnvironment,
 });
