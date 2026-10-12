@@ -1,4 +1,4 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import { config } from "dotenv";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";

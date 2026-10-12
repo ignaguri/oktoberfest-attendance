@@ -139,8 +139,9 @@ export const config = {
      * - sitemap.xml (sitemap file)
      * - manifest.json (web app manifest file)
      * - manifest.webmanifest (web app manifest file)
+     * - monitoring (Sentry tunnel route, must stay reachable when signed out)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.json|manifest.webmanifest|monitoring|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
