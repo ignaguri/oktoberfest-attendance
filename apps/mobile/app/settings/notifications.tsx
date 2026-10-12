@@ -8,6 +8,7 @@ import {
   Clock,
   ExternalLink,
   Footprints,
+  Lock,
   Sunrise,
   Trophy,
   Users,
@@ -20,6 +21,7 @@ import { MugLoader } from "@/components/ui/mug-loader";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { Colors, IconColors, SwitchColors } from "@/lib/constants/colors";
+import { useLiveActivitySetting } from "@/lib/live-activity/setting";
 import { useNotificationContextSafe } from "@/lib/notifications/NotificationContext";
 import { usePushRegistration } from "@/lib/notifications/usePushRegistration";
 
@@ -43,6 +45,7 @@ export default function NotificationSettingsScreen() {
   } = useNotificationPreferences();
 
   const updatePreferences = useUpdateNotificationPreferences();
+  const liveActivitySetting = useLiveActivitySetting();
 
   // Token registration + Novu subscribe, shared with the launch prompt
   const { register, isRegistering: isEnabling } = usePushRegistration();
@@ -291,6 +294,31 @@ export default function NotificationSettingsScreen() {
                 disabled={isSaving}
                 accessibilityLabel={t("profile.notifications.dayStart")}
                 accessibilityHint={t("profile.notifications.dayStartDescription")}
+                trackColor={{
+                  false: SwitchColors.trackOff,
+                  true: SwitchColors.trackOn,
+                }}
+                thumbColor={SwitchColors.thumb}
+              />
+            </View>
+
+            <View className="flex-row items-center justify-between py-3">
+              <View className="flex-1 flex-row items-center gap-3">
+                <Lock size={24} color={IconColors.default} />
+                <View className="flex-1">
+                  <Text className="text-typography-900">
+                    {t("profile.notifications.liveActivity")}
+                  </Text>
+                  <Text className="text-sm text-typography-500">
+                    {t("profile.notifications.liveActivityDescription")}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={liveActivitySetting.enabled}
+                onValueChange={liveActivitySetting.setEnabled}
+                accessibilityLabel={t("profile.notifications.liveActivity")}
+                accessibilityHint={t("profile.notifications.liveActivityDescription")}
                 trackColor={{
                   false: SwitchColors.trackOff,
                   true: SwitchColors.trackOn,

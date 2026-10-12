@@ -57,6 +57,7 @@ import {
 import { OfflineDataProvider } from "@/lib/database/offline-provider";
 import { mobileFestivalStorage } from "@/lib/festival-storage";
 import { initMobileI18n } from "@/lib/i18n";
+import { LiveActivityController } from "@/lib/live-activity/LiveActivityController";
 import { LocationProvider } from "@/lib/location";
 import { logger } from "@/lib/logger";
 import { defaultScreenOptions } from "@/lib/navigation/header-config";
@@ -461,6 +462,7 @@ export default function RootLayout() {
                                           <SentryUserContextHandler />
                                           <NotificationResponseHandler />
                                           <WatchBridge />
+                                          <LiveActivityController />
                                           <NovuAutoSubscriber />
                                           <NotificationPromptHandler />
                                           <PushRegistrationSync />
