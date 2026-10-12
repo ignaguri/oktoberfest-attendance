@@ -35,19 +35,19 @@
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
     "date-fns": "^4.4.0",
-    "i18next": "^26.4.2",
-    "react-i18next": "^17.0.13",
-    "zod": "^4.5.4"
+    "i18next": "^26.4.4",
+    "react-i18next": "^17.0.16",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.102.8",
+    "@tanstack/react-query": "^5.104.2",
     "@types/react": "^19.2.18",
     "react": "19.2.8",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.0"
+    "vitest": "^5.0.4"
   },
   "peerDependencies": {
-    "@tanstack/react-query": "^5.0.0",
+    "@tanstack/react-query": "^5.104.2",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
