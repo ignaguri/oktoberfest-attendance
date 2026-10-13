@@ -89,6 +89,7 @@ describe("logger.error Sentry policy in production", () => {
     const { logger } = await import("../logger");
     logger.error("no session", new AuthRequiredError());
     logger.error("expired", new ApiError("UNAUTHORIZED", "Invalid or expired token", 401));
+    logger.error("denied", new ApiError("FORBIDDEN", "Not allowed", 403));
     expect(captureException).not.toHaveBeenCalled();
 
     logger.error("validation", new ApiError("VALIDATION_ERROR", "bad body", 400));
