@@ -8,8 +8,6 @@ import { marketingOpenGraph } from "@/lib/marketing/openGraph";
 import { categoryCopy } from "@/lib/marketing/seoCopy";
 import { localeAlternates, marketingUrlAbsolute, toSupportedLanguage } from "@/lib/utils/marketingUrl";
 
-export const revalidate = 3600;
-
 type Params = { lang: string; category: string };
 
 export async function generateStaticParams(): Promise<{ category: string }[]> {

@@ -3,9 +3,6 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { OfflineBanner } from "@/components/OfflineBanner";
 
-// Public pages (sign-in, sign-up, etc.) are dynamic due to auth checks
-export const revalidate = 0;
-
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center pb-2">

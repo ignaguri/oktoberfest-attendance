@@ -8,9 +8,11 @@ import { processReservationNotifications } from "../scheduler/reservations";
 
 export const runtime = "nodejs";
 
-// Called every 5 minutes by the pg_cron job `reservation-notifications`
-// (see migration 20260930103634_reservation_reminders_cron.sql). Vercel Hobby
-// crons can only run daily, which sent reminders up to a day late.
+// Called by the pg_cron job `reservation-notifications`, which checks every 5
+// minutes but only calls here when a reminder or prompt is due (see migrations
+// 20260930103634_reservation_reminders_cron.sql and
+// 20261012223825_reservation_cron_skip_when_idle.sql). Vercel Hobby crons can
+// only run daily, which sent reminders up to a day late.
 export async function POST(req: Request) {
   const secret = process.env.CRON_SECRET;
   const header = req.headers.get("x-cron-secret");

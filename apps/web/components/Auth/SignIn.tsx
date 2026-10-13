@@ -6,7 +6,6 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { type SignInFormData, signInSchema } from "@prostcounter/shared/schemas";
 import { Eye, EyeOff } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { Link } from "next-view-transitions";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -21,11 +20,14 @@ import { login, signInWithOAuth } from "./actions";
 import { CaptchaWidget, useCaptcha } from "./Captcha";
 import { AppleIcon, GoogleIcon } from "./SocialIcons";
 
+// Read from window.location, not useSearchParams, so the sign-in page can be
+// prerendered: these are only needed in effects and handlers.
+function getRedirectParam() {
+  return new URLSearchParams(window.location.search).get("redirect");
+}
+
 export default function SignIn() {
   const { t } = useTranslation();
-  const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect");
-  const error = searchParams.get("error");
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -47,7 +49,8 @@ export default function SignIn() {
 
   // Show OAuth error if present
   useEffect(() => {
-    if (error === "oauth_failed") {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get("error") === "oauth_failed") {
       const details = searchParams.get("details");
       const errorMessage = details
         ? `OAuth sign-in failed: ${decodeURIComponent(details)}`
@@ -57,7 +60,7 @@ export default function SignIn() {
         message: errorMessage,
       });
     }
-  }, [error, setError, searchParams, t]);
+  }, [setError, t]);
 
   const onSubmit = async (data: SignInFormData) => {
     // The widget renders as a visible checkbox, so the form can be submitted
@@ -70,7 +73,7 @@ export default function SignIn() {
     }
 
     try {
-      await login(data, redirect, captchaToken);
+      await login(data, getRedirectParam(), captchaToken);
     } catch (error: any) {
       // Check if this is a Next.js redirect response
       if (error?.digest?.startsWith("NEXT_REDIRECT")) {
@@ -94,7 +97,7 @@ export default function SignIn() {
 
   const handleOAuthSignIn = async (provider: "google" | "apple") => {
     try {
-      await signInWithOAuth(provider, redirect);
+      await signInWithOAuth(provider, getRedirectParam());
     } catch (error: any) {
       // Check if this is a Next.js redirect response
       if (error?.digest?.startsWith("NEXT_REDIRECT")) {
