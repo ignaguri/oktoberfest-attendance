@@ -3,6 +3,8 @@
  * Logs to console in development and can be extended to send to monitoring services
  */
 
+import { isExpectedAuthStatus } from "@prostcounter/shared/errors";
+
 type LogLevel = "debug" | "info" | "warn" | "error";
 
 interface LogContext {
@@ -107,6 +109,21 @@ const NETWORK_UNREACHABLE_PATTERN =
 export function isNetworkUnreachableError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : typeof error === "string" ? error : "";
   return NETWORK_UNREACHABLE_PATTERN.test(message);
+}
+
+/**
+ * No session, or a 401/403 from the API: the user is signed out or not
+ * allowed, not a bug. Matched by name so the api-client stays out of this
+ * module.
+ */
+function isExpectedAuthError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  if (error.name === "AuthRequiredError") {
+    return true;
+  }
+  return error.name === "ApiError" && isExpectedAuthStatus((error as { statusCode?: unknown }).statusCode);
 }
 
 /**
@@ -238,7 +255,7 @@ class Logger {
     console.error(this.formatMessage("error", message, errorContext));
 
     // Send to Sentry in production
-    if (!this.isDev && !isNetworkUnreachableError(error)) {
+    if (!this.isDev && !isNetworkUnreachableError(error) && !isExpectedAuthError(error)) {
       const event: PendingSentryEvent = {
         message,
         error,

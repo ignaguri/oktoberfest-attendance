@@ -41,11 +41,17 @@ export async function updateSession(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/admin")) {
     const userAgent = request.headers.get("user-agent") || "unknown";
 
-    // Log admin access attempt
-    logAdminAction(user?.id || "anonymous", "admin_access_attempt", {
-      userAgent,
-      path: request.nextUrl.pathname,
-    });
+    // Page views and signed-out probes (mostly scanners) only log; a signed-in
+    // non-admin is still reported below.
+    logAdminAction(
+      user?.id || "anonymous",
+      "admin_access_attempt",
+      {
+        userAgent,
+        path: request.nextUrl.pathname,
+      },
+      "info",
+    );
 
     if (!user) {
       // If there's no user, redirect to the login page
@@ -76,9 +82,7 @@ export async function updateSession(request: NextRequest) {
     }
 
     // Log successful admin access
-    logAdminAction(userId, "admin_access_granted", {
-      path: request.nextUrl.pathname,
-    });
+    logAdminAction(userId, "admin_access_granted", { path: request.nextUrl.pathname }, "info");
   } else if (
     !user &&
     !["/auth", "/sign-in", "/sign-up", "/reset-password", "/error", "/download"].includes(
