@@ -5,7 +5,11 @@
 import * as Sentry from "@sentry/nextjs";
 
 import { APP_VERSION } from "./lib/version";
-import { sentryDataCollection, sentryEnvironment } from "./lib/sentry-options";
+import {
+  sentryDataCollection,
+  sentryEnvironment,
+  shouldReportHonoError,
+} from "./lib/sentry-options";
 import { INVALID_CREDENTIALS_MESSAGE } from "./utils/sentry";
 
 Sentry.init({
@@ -16,6 +20,13 @@ Sentry.init({
   // each wrong password produce a second Sentry event (PROST-COUNTER-8D) on top
   // of the one reportSupabaseAuthException already suppresses.
   ignoreErrors: [INVALID_CREDENTIALS_MESSAGE],
+
+  // Swapped in for the default instance rather than added next to it, so only
+  // one Hono middleware decides what gets captured.
+  integrations: (defaults) => [
+    ...defaults.filter((integration) => integration.name !== "Hono"),
+    Sentry.honoIntegration({ shouldHandleError: shouldReportHonoError }),
+  ],
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 0.1,

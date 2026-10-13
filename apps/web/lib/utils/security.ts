@@ -158,13 +158,18 @@ export function logAdminAction(
   userId: string,
   action: string,
   details: Record<string, unknown> = {},
+  level: "info" | "warning" = "warning",
 ): void {
   try {
-    logSecurityEvent("admin_action", {
-      userId,
-      action,
-      ...details,
-    });
+    logSecurityEvent(
+      "admin_action",
+      {
+        userId,
+        action,
+        ...details,
+      },
+      level,
+    );
 
     // Also log to console in development
     if (process.env.NODE_ENV === "development") {
