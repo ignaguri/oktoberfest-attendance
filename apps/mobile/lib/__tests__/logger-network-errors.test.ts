@@ -84,6 +84,18 @@ describe("logger.error Sentry policy in production", () => {
     expect(captureMessage).not.toHaveBeenCalled();
   });
 
+  it("skips signed-out and 401/403 API errors but captures other statuses", async () => {
+    const { ApiError, AuthRequiredError } = await import("@prostcounter/api-client");
+    const { logger } = await import("../logger");
+    logger.error("no session", new AuthRequiredError());
+    logger.error("expired", new ApiError("UNAUTHORIZED", "Invalid or expired token", 401));
+    expect(captureException).not.toHaveBeenCalled();
+
+    logger.error("validation", new ApiError("VALIDATION_ERROR", "bad body", 400));
+    logger.error("server", new ApiError("INTERNAL_ERROR", "boom", 500));
+    expect(captureException).toHaveBeenCalledTimes(2);
+  });
+
   it("still captures any other error", async () => {
     const { logger } = await import("../logger");
     logger.error("[SyncManager] Pull festivals failed:", new Error("boom"));

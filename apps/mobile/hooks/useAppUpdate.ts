@@ -62,8 +62,15 @@ export function useAppUpdate() {
     lastCheckRef.current = now;
 
     try {
-      const update = await Updates.checkForUpdateAsync();
-      if (!update.isAvailable) {
+      const update = await Updates.checkForUpdateAsync().catch((error: unknown) => {
+        // Mostly offline devices and local builds with no channel; the next
+        // foreground retries, so this is not worth a Sentry event.
+        logger.warn("Error checking for update:", {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return null;
+      });
+      if (!update?.isAvailable) {
         return;
       }
 
@@ -74,7 +81,7 @@ export function useAppUpdate() {
         await reload();
       }
     } catch (error) {
-      logger.error("Error checking for update:", error);
+      logger.error("Error fetching update:", error);
     } finally {
       isCheckingRef.current = false;
     }
