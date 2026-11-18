@@ -194,7 +194,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await forgetRegisteredToken();
-    await runUserSignOut(userInitiatedSignOutRef, () => supabase.auth.signOut());
+    await runUserSignOut(userInitiatedSignOutRef, async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        await supabase.auth.signOut({ scope: "local" });
+      }
+    });
     await clearAllAuthData();
     // Clear local SQLite data to avoid stale data from previous user session
     try {
