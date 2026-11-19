@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  isBackgroundRequestHeader,
   parseClientPlatformHeader,
   parseClientVersionHeader,
   parsePushPermissionHeader,
@@ -40,5 +41,14 @@ describe("parseClientVersionHeader", () => {
     expect(parseClientVersionHeader("1.7.0")).toBe("1.7.0");
     expect(parseClientVersionHeader("")).toBeUndefined();
     expect(parseClientVersionHeader("9".repeat(100))).toHaveLength(32);
+  });
+});
+
+describe("isBackgroundRequestHeader", () => {
+  it("is true only for the exact value the mobile background task sends", () => {
+    expect(isBackgroundRequestHeader("1")).toBe(true);
+    expect(isBackgroundRequestHeader(undefined)).toBe(false);
+    expect(isBackgroundRequestHeader("")).toBe(false);
+    expect(isBackgroundRequestHeader("true")).toBe(false);
   });
 });

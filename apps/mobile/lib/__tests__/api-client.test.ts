@@ -252,3 +252,47 @@ describe("events.record keepalive", () => {
     }
   });
 });
+
+describe("background request header", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    getSession.mockReset();
+    getSession.mockResolvedValue({
+      data: {
+        session: { access_token: "tok-123", expires_at: Math.floor(Date.now() / 1000) + 3600 },
+      },
+    });
+    platformOS.current = "ios";
+  });
+
+  async function headersAfter(configure: (module: typeof ApiClientModule) => void) {
+    const fetchMock = vi.fn(
+      async (_url: string, _init?: RequestInit) =>
+        ({
+          ok: true,
+          status: 200,
+          headers: new Headers({ "content-type": "application/json" }),
+          clone() {
+            return this;
+          },
+          async json() {
+            return { festivals: [] };
+          },
+        }) as unknown as Response,
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const apiClientModule = await import("../api-client");
+    configure(apiClientModule);
+    await apiClientModule.apiClient.festivals.list().catch(() => {});
+    return fetchMock.mock.calls[0]![1]!.headers as Record<string, string>;
+  }
+
+  it("is sent only while a background task is making requests", async () => {
+    const foreground = await headersAfter(() => {});
+    expect(foreground).not.toHaveProperty("X-Client-Background");
+
+    const background = await headersAfter((module) => module.setBackgroundRequests(true));
+    expect(background["X-Client-Background"]).toBe("1");
+    expect(background.Authorization).toBe("Bearer tok-123");
+  });
+});
