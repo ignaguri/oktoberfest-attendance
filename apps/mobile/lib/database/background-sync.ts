@@ -31,10 +31,8 @@ import { createSyncManager, type SyncResult } from "./sync/sync-manager";
 export const BACKGROUND_SYNC_TASK = "PROSTCOUNTER_BACKGROUND_SYNC";
 
 /**
- * Ensures the background sync task is defined with TaskManager.
- * Uses TaskManager.isTaskDefined() to prevent duplicate registrations
- * across HMR reloads and re-evaluations.
- * Must be called before registering the task.
+ * Called at module scope below: a background launch mounts no components.
+ * isTaskDefined() guards against HMR re-evaluation.
  */
 function ensureTaskDefined() {
   if (TaskManager.isTaskDefined(BACKGROUND_SYNC_TASK)) return;
@@ -61,9 +59,10 @@ function ensureTaskDefined() {
         return BackgroundTaskResult.Success;
       }
 
-      // Perform sync
+      // Push only: a pull is an authenticated request, which records an active day
+      // for a user who never opened the app. The foreground sync pulls on open.
       const result: SyncResult = await syncManager.sync({
-        direction: "both",
+        direction: "push",
         festivalId,
         userId,
       });
@@ -86,6 +85,8 @@ function ensureTaskDefined() {
   });
 }
 
+ensureTaskDefined();
+
 /**
  * Register the background sync task with the system.
  * Call this once when the app initializes (after user is authenticated).
@@ -103,9 +104,6 @@ export async function registerBackgroundSync(
   }
 
   try {
-    // Ensure the task is defined before registering
-    ensureTaskDefined();
-
     // Check if task is already registered
     const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
     if (isRegistered) {
@@ -192,9 +190,6 @@ export async function setBackgroundSyncContext(
   userId: string | null,
   festivalId: string | null,
 ): Promise<void> {
-  // Ensure the task is defined before setting context
-  ensureTaskDefined();
-
   try {
     if (userId) {
       await AsyncStorage.setItem("current_user_id", userId);

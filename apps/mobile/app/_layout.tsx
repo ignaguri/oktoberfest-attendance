@@ -73,14 +73,8 @@ import {
 import { NovuProviderWrapper } from "@/lib/notifications/NovuProvider";
 import { shouldSyncPushRegistration } from "@/lib/notifications/push-registration-rules";
 import { usePushRegistration } from "@/lib/notifications/usePushRegistration";
-import { initSentry } from "@/lib/sentry";
 import { TutorialProvider } from "@/lib/tutorial";
 import { useWatchStatus } from "@/lib/watch/useWatchStatus";
-
-// Initialize Sentry for error monitoring (native only)
-if (Platform.OS !== "web") {
-  initSentry();
-}
 
 // Initialize Vexo analytics (native only, production only)
 if (Platform.OS !== "web" && !__DEV__) {
