@@ -1,12 +1,7 @@
 "use client";
 
-import type { ColumnDef, Row, SortingState } from "@tanstack/react-table";
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import type { ColumnDef, Row, RowData, SortingState } from "@tanstack/react-table";
+import { FlexRender, useTable } from "@tanstack/react-table";
 import { useState } from "react";
 
 import {
@@ -18,25 +13,26 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+import { type DataTableFeatures, dataTableFeatures } from "./table-features";
+
+interface DataTableProps<TData extends RowData> {
+  columns: ColumnDef<DataTableFeatures, TData>[];
   data: TData[];
-  onRowClick?: (row: Row<TData>) => void;
+  onRowClick?: (row: Row<DataTableFeatures, TData>) => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   onRowClick,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const table = useReactTable({
+  const table = useTable({
+    features: dataTableFeatures,
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
     },
@@ -51,9 +47,7 @@ export function DataTable<TData, TValue>({
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : <FlexRender header={header} />}
                   </TableHead>
                 );
               })}
@@ -65,13 +59,12 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map((row, index) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && "selected"}
                 onClick={() => onRowClick && onRowClick(row)}
                 className={`cursor-pointer ${index % 2 === 0 ? "bg-white" : "bg-gray-100"}`}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <FlexRender cell={cell} />
                   </TableCell>
                 ))}
               </TableRow>

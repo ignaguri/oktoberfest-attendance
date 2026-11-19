@@ -31,7 +31,7 @@
     "@gluestack-ui/utils": "^3.0.21",
     "@gorhom/bottom-sheet": "^5.2.14",
     "@hcaptcha/react-native-hcaptcha": "^4.1.0",
-    "@hookform/resolvers": "^5.9.1",
+    "@hookform/resolvers": "^7.0.7",
     "@legendapp/motion": "^2.5.3",
     "@novu/js": "3.20.0",
     "@novu/react-native": "^3.20.0",

@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { DataTable } from "@/components/Table/DataTable";
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
+import type { DataTableFeatures } from "@/components/Table/table-features";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -73,7 +74,7 @@ const PersonalAttendanceTable = ({
     [deleteAttendanceMutation, onAttendanceDelete, t],
   );
 
-  const columns: ColumnDef<AttendanceWithTentVisits>[] = [
+  const columns: ColumnDef<DataTableFeatures, AttendanceWithTentVisits>[] = [
     {
       accessorKey: "date",
       header: ({ column }) => (

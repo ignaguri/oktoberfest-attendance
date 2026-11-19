@@ -1,16 +1,12 @@
 "use client";
 
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { FlexRender, useTable } from "@tanstack/react-table";
 import { Crown, Flame, Tent } from "lucide-react";
 import { useState } from "react";
 
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
+import { type DataTableFeatures, dataTableFeatures } from "@/components/Table/table-features";
 import {
   Table,
   TableBody,
@@ -67,7 +63,7 @@ export const Leaderboard = ({
   const { t } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const columns: ColumnDef<LeaderboardEntry>[] = [
+  const columns: ColumnDef<DataTableFeatures, LeaderboardEntry>[] = [
     {
       accessorKey: "name",
       header: t("common.labels.name"),
@@ -173,15 +169,14 @@ export const Leaderboard = ({
     });
   }
 
-  const table = useReactTable({
+  const table = useTable({
+    features: dataTableFeatures,
     data: entries,
     columns,
     state: {
       sorting,
     },
     onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
@@ -193,9 +188,7 @@ export const Leaderboard = ({
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : <FlexRender header={header} />}
                   </TableHead>
                 );
               })}
@@ -207,12 +200,11 @@ export const Leaderboard = ({
             table.getRowModel().rows.map((row, index) => (
               <TableRow
                 key={row.id}
-                data-state={row.getIsSelected() && "selected"}
                 className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <FlexRender cell={cell} />
                   </TableCell>
                 ))}
               </TableRow>
