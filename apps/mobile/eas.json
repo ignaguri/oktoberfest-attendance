@@ -35,7 +35,8 @@
       "channel": "production",
       "autoIncrement": true,
       "android": {
-        "prebuildCommand": "npx expo prebuild --clean --platform android"
+        "prebuildCommand": "npx expo prebuild --clean --platform android",
+        "gradleCommand": ":app:bundleRelease --max-workers=2"
       },
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://jdmhjakxhtghsbnstyou.supabase.co",
