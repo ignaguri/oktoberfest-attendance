@@ -208,7 +208,7 @@ export default function SignUpScreen() {
               action="primary"
               variant="solid"
               size="lg"
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={isAnyLoading}
               className="mt-2 rounded-full"
             >

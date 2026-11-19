@@ -19,7 +19,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Platform, StatusBar, type View } from "react-native";
+import { Platform, StatusBar, type ViewInstance } from "react-native";
 
 import { useAuth } from "@/lib/auth/AuthContext";
 import { logger } from "@/lib/logger";
@@ -57,7 +57,7 @@ interface TutorialContextValue {
   /** Whether tutorial status is still loading */
   isLoading: boolean;
   /** Register a target ref for a step */
-  registerTarget: (stepId: string, ref: View | null) => void;
+  registerTarget: (stepId: string, ref: ViewInstance | null) => void;
   /** Unregister a target ref */
   unregisterTarget: (stepId: string) => void;
   /** Get measurement for a target */
@@ -93,7 +93,7 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
   const [hasAutoStarted, setHasAutoStarted] = useState(false);
 
   // Target refs stored in a Map
-  const targetRefs = useRef<Map<string, View>>(new Map());
+  const targetRefs = useRef<Map<string, ViewInstance>>(new Map());
 
   const isCompleted = tutorialStatus?.tutorial_completed ?? false;
   const isFestivalActive = currentFestival
@@ -152,7 +152,7 @@ function TutorialProviderInner({ children }: TutorialProviderProps) {
     return () => clearTimeout(timer);
   }, [isActive, currentStep?.tabRoute, router]);
 
-  const registerTarget = useCallback((stepId: string, ref: View | null) => {
+  const registerTarget = useCallback((stepId: string, ref: ViewInstance | null) => {
     if (ref) {
       targetRefs.current.set(stepId, ref);
     } else {

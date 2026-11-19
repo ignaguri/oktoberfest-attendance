@@ -243,7 +243,7 @@ export function CreateGroupSheet({
             variant="solid"
             action="primary"
             className="flex-1"
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => handleSubmit(onSubmit)()}
             isDisabled={isSubmitting}
           >
             {isSubmitting && <ButtonSpinner color={Colors.white} />}

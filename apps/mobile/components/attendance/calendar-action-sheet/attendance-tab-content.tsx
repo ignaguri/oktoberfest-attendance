@@ -588,7 +588,7 @@ export function AttendanceTabContent({
             variant="solid"
             action="primary"
             className="flex-1"
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => handleSubmit(onSubmit)()}
             isDisabled={isProcessing}
           >
             <ButtonText>

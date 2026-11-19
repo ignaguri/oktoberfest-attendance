@@ -145,7 +145,7 @@ export default function ForgotPasswordScreen() {
                   action="primary"
                   variant="solid"
                   size="lg"
-                  onPress={handleSubmit(onSubmit)}
+                  onPress={() => handleSubmit(onSubmit)()}
                   disabled={isLoading}
                   className="mt-2 rounded-full"
                 >

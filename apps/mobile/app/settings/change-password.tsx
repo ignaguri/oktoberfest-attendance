@@ -164,7 +164,7 @@ export default function ChangePasswordScreen() {
             <Button
               action="primary"
               size="lg"
-              onPress={handleSubmit(onSubmit)}
+              onPress={() => handleSubmit(onSubmit)()}
               disabled={isLoading}
               className="rounded-full"
             >

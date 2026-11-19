@@ -3,7 +3,7 @@ import { TrackerContextProvider } from "@prostcounter/shared/analytics/react";
 import { randomUUID } from "expo-crypto";
 import { useSegments } from "expo-router";
 import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from "react";
-import { AppState, type AppStateStatus } from "react-native";
+import { AppState } from "react-native";
 
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -55,7 +55,7 @@ export function TrackerProvider({ children }: { children: ReactNode }) {
     setTracker(created);
     created.track("app_opened", { source: "cold" });
 
-    let previousState: AppStateStatus = AppState.currentState;
+    let previousState = AppState.currentState;
     const subscription = AppState.addEventListener("change", (nextState) => {
       if (nextState === "background") {
         created.pause();

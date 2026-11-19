@@ -7,7 +7,15 @@ import { getInitials } from "@prostcounter/ui";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Camera } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Dimensions, Image, type LayoutChangeEvent, Pressable, RefreshControl, ScrollView } from "react-native";
+import {
+  Dimensions,
+  Image,
+  type LayoutChangeEvent,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  type ScrollViewInstance,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { PhotoDetailModal } from "@/components/gallery/photo-detail-modal";
@@ -97,7 +105,7 @@ export default function GroupGalleryScreen() {
     url: string;
   } | null>(null);
 
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
   const dateTargetYRef = useRef<number | null>(null);
   const isFollowingDateRef = useRef(true);
 

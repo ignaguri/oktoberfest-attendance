@@ -3,7 +3,7 @@ import { useFestival } from "@prostcounter/shared/contexts";
 import { useFriendRequestCount } from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import { isAfter, isBefore, parseISO, startOfDay } from "date-fns";
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { NativeTabs } from "expo-router/native-tabs";
 import { useMemo } from "react";
 import { Platform, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";

@@ -25,7 +25,7 @@ import {
   Pressable,
   useWindowDimensions,
   View,
-  type ViewToken,
+  type ListViewToken,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -140,7 +140,7 @@ export function ShareCarousel({
 
   // FlatList rejects a new onViewableItemsChanged between renders, so it must stay stable
   const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken<ShareCard>[] }) => {
+    ({ viewableItems }: { viewableItems: ListViewToken[] }) => {
       const first = viewableItems[0];
       if (first?.index !== null && first?.index !== undefined) {
         setIndex(first.index);

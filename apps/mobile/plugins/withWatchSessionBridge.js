@@ -296,17 +296,14 @@ extension WatchSessionBridge: WCSessionDelegate {
 }
 `;
 
-// Inserted right after the #endif that closes the #if os(iOS) || os(tvOS) block
-// in application(_:didFinishLaunchingWithOptions:).
+// Inserted right before application(_:didFinishLaunchingWithOptions:) returns.
 const INIT_CALL =
   "\n    // Activate the WatchConnectivity bridge so session tokens written to the\n    // shared App Group are forwarded to the paired Apple Watch.\n    _ = WatchSessionBridge.shared\n";
 
 /**
  * Anchor used for the init-call insertion: the didFinishLaunchingWithOptions
- * return, which appears exactly once in AppDelegate.swift. It used to be the
- * factory.startReactNative(...) block, but withSceneLifecycle.js removes that
- * block (the scene delegate starts React Native under iOS 27), and plugin
- * order must not decide whether this injection lands.
+ * return, which appears exactly once in AppDelegate.swift. The SDK 58 template
+ * starts React Native from SceneDelegate, so there is no startReactNative block.
  *
  * Whitespace must match the Expo-generated template exactly (4-space indent).
  */
