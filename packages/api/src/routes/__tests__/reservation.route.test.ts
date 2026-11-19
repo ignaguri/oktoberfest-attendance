@@ -209,6 +209,12 @@ describe("Reservation Routes - Unit Tests", () => {
       const res = await app.request(req as Request);
 
       expect(res.status).toBe(400);
+      expect(await res.json()).toMatchObject({
+        error: {
+          code: "VALIDATION_ERROR",
+          message: "Reservation start time must be in the future",
+        },
+      });
     });
 
     it("should validate festivalId is required", async () => {

@@ -5,36 +5,31 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "../lib/logger";
 
 export class ApiError extends Error {
+  public statusCode: number;
   public code: ErrorCode;
 
-  constructor(
-    public statusCode: number,
-    codeOrMessage: ErrorCode | string,
-    message?: string,
-  ) {
+  constructor(statusCode: number, codeOrMessage: ErrorCode | string, message?: string) {
     // If codeOrMessage is a valid ErrorCode, use it as code
     // Otherwise, use the default code and codeOrMessage as message
-    if (isErrorCode(codeOrMessage)) {
-      super(message || codeOrMessage);
-      this.code = codeOrMessage;
-    } else {
-      super(codeOrMessage);
-      this.code = ErrorCodes.INTERNAL_ERROR;
-    }
+    const hasErrorCode = isErrorCode(codeOrMessage);
+    super(hasErrorCode ? message || codeOrMessage : codeOrMessage);
+    this.statusCode = statusCode;
+    this.code = hasErrorCode ? codeOrMessage : ErrorCodes.INTERNAL_ERROR;
     this.name = "ApiError";
   }
 }
 
 export class ValidationError extends ApiError {
-  constructor(
-    codeOrMessage: ErrorCode | string = ErrorCodes.VALIDATION_ERROR,
-    public errors?: unknown,
-  ) {
-    if (isErrorCode(codeOrMessage)) {
-      super(400, codeOrMessage);
-    } else {
-      super(400, ErrorCodes.VALIDATION_ERROR, codeOrMessage);
-    }
+  public errors?: unknown;
+
+  constructor(codeOrMessage: ErrorCode | string = ErrorCodes.VALIDATION_ERROR, errors?: unknown) {
+    const hasErrorCode = isErrorCode(codeOrMessage);
+    super(
+      400,
+      hasErrorCode ? codeOrMessage : ErrorCodes.VALIDATION_ERROR,
+      hasErrorCode ? undefined : codeOrMessage,
+    );
+    this.errors = errors;
     this.name = "ValidationError";
   }
 }

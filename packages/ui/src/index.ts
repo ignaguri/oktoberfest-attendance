@@ -12,7 +12,7 @@
  *
  * ### Mobile (React Native/Expo)
  * - Location: `apps/mobile/components/ui/`
- * - Library: Gluestack UI v3 + NativeWind v5
+ * - Library: Gluestack UI v5 + NativeWind v4
  *
  * ## Usage Example:
  *

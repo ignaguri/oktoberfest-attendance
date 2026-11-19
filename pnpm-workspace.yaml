@@ -45,7 +45,7 @@ overrides:
   liquidjs: ">=10.26.0 <11"
   socket.io-parser: ">=4.2.6 <5"
   node-forge: ">=1.4.3 <2"
-  vite: "7.3.8"
+  vite: "8.3.8"
   postcss: ">=8.5.23 <9"
   yaml: ">=2.8.3 <3"
   qs: ">=6.16.1 <7"
