@@ -24,6 +24,7 @@ import {
   startBackgroundLocationUpdates,
   stopBackgroundLocationUpdates,
 } from "./background-location";
+import { endOrphanedLocationSession } from "./end-orphaned-session";
 import { useLocation } from "./useLocation";
 
 /**
@@ -137,11 +138,9 @@ export function LocationProvider({ children }: { children: ReactNode }) {
 
         // Check if we have an active session stored
         if (storedSessionId) {
-          // Try to verify the session is still active
           const isRunning = await isBackgroundLocationRunning();
           if (!isRunning) {
-            // Session expired or was stopped, clear it
-            await clearLocationSessionId();
+            await endOrphanedLocationSession(storedSessionId);
           }
         }
       } catch (error) {
