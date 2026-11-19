@@ -235,14 +235,43 @@ export async function updateOperationStatus(
   }
 }
 
+/** How long a 'processing' op can sit before its processor is presumed dead. */
+export const STALE_CLAIM_MS = 10 * 60 * 1000;
+
 /**
- * Marks an operation as processing.
+ * Claims a pending operation for this processor.
+ *
+ * The foreground sync and the background task each own a processor, and their
+ * in-memory locks do not see each other, so the claim has to be one atomic
+ * statement. False means the other processor got there first.
  */
-export async function markOperationProcessing(
+export async function claimOperation(
   db: SQLite.SQLiteDatabase,
   operationId: string,
+): Promise<boolean> {
+  const result = await db.runAsync(
+    `UPDATE _sync_queue SET status = 'processing', claimed_at = ?, last_error = NULL
+     WHERE id = ? AND status = 'pending'`,
+    [new Date().toISOString(), operationId],
+  );
+  return result.changes > 0;
+}
+
+/**
+ * Hands ops back to the queue when the processor that claimed them never
+ * finished, because the OS killed a background push mid-request. A claim with
+ * no timestamp predates the column, and no processor can still be holding it.
+ */
+export async function releaseStaleClaims(
+  db: SQLite.SQLiteDatabase,
+  now: Date = new Date(),
 ): Promise<void> {
-  await updateOperationStatus(db, operationId, "processing");
+  const cutoff = new Date(now.getTime() - STALE_CLAIM_MS).toISOString();
+  await db.runAsync(
+    `UPDATE _sync_queue SET status = 'pending', claimed_at = NULL
+     WHERE status = 'processing' AND (claimed_at IS NULL OR claimed_at < ?)`,
+    [cutoff],
+  );
 }
 
 /**
