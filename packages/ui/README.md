@@ -18,7 +18,7 @@ apps/web/components/ui/         # shadcn/ui implementations (Radix UI + Tailwind
 ├── avatar.tsx
 └── ...
 
-apps/mobile/components/ui/      # gluestack-ui v3 implementations (React Native)
+apps/mobile/components/ui/      # gluestack-ui v5 implementations (React Native)
 ├── button.tsx
 ├── input.tsx
 ├── avatar.tsx
@@ -58,7 +58,7 @@ export const Button: React.FC<ButtonProps> = ({ variant, size, children, ...prop
 ### Mobile (React Native/Expo)
 
 - **Location**: `apps/mobile/components/ui/`
-- **Library**: [gluestack-ui v3](https://gluestack.io/) (React Native components)
+- **Library**: [gluestack-ui v5](https://gluestack.io/) (React Native components)
 - **Import Pattern**: `import { Button } from "@/components/ui/button"`
 
 **Example**:
@@ -278,17 +278,17 @@ packages/ui/src/components/calendar/
 
 ## Notes for Mobile Implementation
 
-When implementing mobile UI components with gluestack-ui v3:
+When implementing mobile UI components with gluestack-ui v5:
 
 1. **Styling**: Use `sx` prop instead of `className`
 2. **Design Tokens**: Leverage gluestack's token system for consistency
 3. **Compound Components**: Use gluestack's compound pattern (e.g., `Button + ButtonText`)
 4. **Accessibility**: gluestack-ui handles React Native accessibility automatically
-5. **Future Compatibility**: gluestack-ui v3 may improve Next.js compatibility in future releases
+5. **Future Compatibility**: gluestack-ui v5 may improve Next.js compatibility in future releases
 
 ## References
 
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
-- [gluestack-ui v3 Documentation](https://gluestack.io/)
+- [gluestack-ui v5 Documentation](https://gluestack.io/)
 - [Radix UI Documentation](https://www.radix-ui.com/)
 - [React Native Documentation](https://reactnative.dev/)
