@@ -18,7 +18,7 @@
     "sup:db:pull": "supabase db pull",
     "sup:db:push": "supabase db push",
     "sup:db:reset": "supabase db reset",
-    "sup:db:types": "supabase gen types typescript --local > packages/db/src/types.ts",
+    "sup:db:types": "supabase gen types typescript > packages/db/src/types.ts",
     "sup:mig:new": "supabase migration new",
     "sup:start": "supabase start",
     "sup:stop": "supabase stop",
@@ -47,7 +47,7 @@
   "devDependencies": {
     "@novu/api": "^3.20.0",
     "@playwright/test": "^1.65.1",
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.10",
     "expo": "~58.0.26",
     "husky": "^9.1.7",
     "next": "16.4.6",
@@ -55,7 +55,7 @@
     "oxlint": "^1.94.0",
     "react": "19.3.1",
     "react-native": "0.88.1",
-    "supabase": "2.120.0",
+    "supabase": "3.2.0",
     "tsx": "^4.23.15",
     "turbo": "^2.11.13",
     "typescript": "5.9.3"
