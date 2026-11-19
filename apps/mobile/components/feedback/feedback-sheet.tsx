@@ -264,7 +264,7 @@ export function FeedbackSheet({ isOpen, mode, onClose }: FeedbackSheetProps) {
                 variant="solid"
                 action="primary"
                 className="flex-1"
-                onPress={handleSubmit(onSubmit)}
+                onPress={() => handleSubmit(onSubmit)()}
                 isDisabled={isSubmitting}
                 accessibilityLabel={t("feedback.send")}
                 accessibilityHint={t("feedback.sendHint")}

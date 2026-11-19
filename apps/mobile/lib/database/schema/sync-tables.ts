@@ -26,6 +26,7 @@ export const syncQueue = sqliteTable(
     retry_count: integer().notNull().default(0),
     last_error: text(),
     created_at: text().notNull(),
+    claimed_at: text(),
   },
   (t) => [
     index("idx_sync_queue_status").on(t.status, t.created_at),

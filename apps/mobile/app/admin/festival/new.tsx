@@ -209,7 +209,7 @@ export default function AdminNewFestivalScreen() {
 
           <Button
             isDisabled={createFestival.loading}
-            onPress={handleSubmit(onSubmit)}
+            onPress={() => handleSubmit(onSubmit)()}
             accessibilityLabel={t("admin.festivals.buttons.createFestival")}
           >
             {createFestival.loading && <ButtonSpinner />}

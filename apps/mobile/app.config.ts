@@ -10,7 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   // Opaque full-bleed square: iOS applies its own mask. logo.png is the rounded in-app variant.
   icon: "./assets/images/icon.png",
   userInterfaceStyle: "automatic",
-  runtimeVersion: "1.11.1-a",
+  runtimeVersion: "1.11.1-b",
   updates: {
     url: "https://u.expo.dev/fca65703-ce2a-48b3-aec4-11a90fbb8996",
   },
@@ -151,9 +151,18 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         isAndroidBackgroundLocationEnabled: true,
       },
     ],
+    [
+      "expo-build-properties",
+      {
+        android: {
+          // SDK 58 turns R8 on; keep SDK 57 behaviour until a release build is smoke-tested
+          // on a device and Sentry gets the ProGuard mapping
+          enableMinifyInReleaseBuilds: false,
+        },
+      },
+    ],
     "./plugins/withModularHeaders.js",
     "./plugins/withApsEnvironment.js",
-    "./plugins/withSceneLifecycle.js",
     "./plugins/withWatchSessionBridge.js",
     "./plugins/withWatchInfoPlistEnv.js",
     "./plugins/withGoogleMapsApiKey.js",

@@ -57,11 +57,22 @@ export function setClientPushPermission(status: NotificationPermissionStatus | u
   clientPushPermission = status;
 }
 
+/**
+ * Set while a background task is the one making requests, so the API can keep
+ * them out of the active-day metrics: the user did not open the app.
+ */
+let backgroundRequests = false;
+
+export function setBackgroundRequests(active: boolean): void {
+  backgroundRequests = active;
+}
+
 function withClientState(headers: ApiHeaders): ApiHeaders {
-  if (!clientPushPermission) {
-    return headers;
-  }
-  return { ...headers, "X-Client-Push-Permission": clientPushPermission };
+  return {
+    ...headers,
+    ...(clientPushPermission ? { "X-Client-Push-Permission": clientPushPermission } : {}),
+    ...(backgroundRequests ? { "X-Client-Background": "1" } : {}),
+  };
 }
 
 /**

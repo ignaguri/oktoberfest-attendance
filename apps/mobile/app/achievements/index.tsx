@@ -15,9 +15,14 @@ import type {
 import { cn } from "@prostcounter/ui";
 import { useLocalSearchParams } from "expo-router";
 import { Award } from "lucide-react-native";
-import type { RefObject } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { RefreshControl, ScrollView, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  type ScrollViewInstance,
+  View,
+  type ViewInstance,
+} from "react-native";
 
 import { AchievementStatsSummary } from "@/components/achievements/achievement-stats-summary";
 import { CategoryChips, type CategoryFilter } from "@/components/achievements/category-chips";
@@ -73,7 +78,7 @@ function CategorySection({
   category: SeriesCategory;
   cards: SeriesCardData[];
   highlightedCardId: string | null;
-  registerCardRef: (cardId: string, node: View | null) => void;
+  registerCardRef: (cardId: string, node: ViewInstance | null) => void;
 }) {
   const { t } = useTranslation();
   const { completed, inProgress } = splitCardsByCompletion(cards);
@@ -141,18 +146,18 @@ export default function AchievementsScreen() {
   const [activeScope, setActiveScope] = useState<SeriesScope>("festival");
   const { highlight } = useLocalSearchParams<{ highlight?: string }>();
   const [highlightedCardId, setHighlightedCardId] = useState<string | null>(null);
-  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollViewRef = useRef<ScrollViewInstance>(null);
   // The ScrollView's inner content view, held via the innerViewRef prop rather
   // than getInnerViewRef() — the prop is the typed, documented way to reach it.
-  const contentViewRef = useRef<View>(null);
-  const cardRefs = useRef<Map<string, View>>(new Map());
+  const contentViewRef = useRef<ViewInstance>(null);
+  const cardRefs = useRef<Map<string, ViewInstance>>(new Map());
   // Guards against re-triggering the scroll/highlight on every re-render while
   // the same `?highlight=` value is still in the route params.
   const processedHighlightRef = useRef<string | null>(null);
   // Card still to scroll to once it is mounted under the right scope tab
   const pendingScrollCardIdRef = useRef<string | null>(null);
 
-  const registerCardRef = useCallback((cardId: string, node: View | null) => {
+  const registerCardRef = useCallback((cardId: string, node: ViewInstance | null) => {
     if (node) {
       cardRefs.current.set(cardId, node);
     } else {
@@ -307,11 +312,7 @@ export default function AchievementsScreen() {
   return (
     <ScrollView
       ref={scrollViewRef}
-      // Cast only to bridge React 19's ref typing: useRef<View>(null) is a
-      // RefObject<View | null>, while react-native still types this prop as
-      // RefObject<View>. A null current is exactly what the prop expects
-      // before mount, so nothing is being papered over here.
-      innerViewRef={contentViewRef as RefObject<View>}
+      innerViewRef={contentViewRef}
       className="flex-1 bg-background-50"
       refreshControl={
         <RefreshControl

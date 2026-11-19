@@ -138,7 +138,7 @@ export function OfflineDataProvider({
   const lastSyncTimeRef = useRef<number>(0);
   // The festival of the most recent sync that actually started, success or not
   const attemptedFestivalIdRef = useRef<string | undefined>(undefined);
-  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  const appStateRef = useRef(AppState.currentState);
 
   // The provider outlives sign-out, which clears the local rows, so the next
   // user's first sync must not be throttled or skipped by the previous user's.
@@ -424,7 +424,7 @@ export function OfflineDataProvider({
 
     const subscription = AppState.addEventListener("change", (nextAppState: AppStateStatus) => {
       // App came to foreground
-      if (appStateRef.current.match(/inactive|background/) && nextAppState === "active") {
+      if (appStateRef.current?.match(/inactive|background/) && nextAppState === "active") {
         // Check if we should sync
         const now = Date.now();
         if (

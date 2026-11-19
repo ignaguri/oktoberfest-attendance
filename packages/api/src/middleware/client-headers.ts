@@ -18,6 +18,14 @@ export function parsePushPermissionHeader(value: string | undefined): PushPermis
   return value as PushPermission;
 }
 
+/**
+ * X-Client-Background: the request comes from a background task, not from the
+ * user using the app, so it must not count as an active day.
+ */
+export function isBackgroundRequestHeader(value: string | undefined): boolean {
+  return value === "1";
+}
+
 export type ClientPlatform = "ios" | "android" | "web";
 
 const CLIENT_PLATFORMS: ReadonlySet<string> = new Set<ClientPlatform>(["ios", "android", "web"]);

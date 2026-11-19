@@ -115,7 +115,7 @@ export type MutableTable =
 // Constants
 // =============================================================================
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 export const DATABASE_NAME = "prostcounter.db";
 
 // =============================================================================
@@ -217,7 +217,8 @@ export const CREATE_TABLES_SQL: Record<string, string> = {
       status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'failed', 'completed')),
       retry_count INTEGER DEFAULT 0,
       last_error TEXT,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      claimed_at TEXT
     )
   `,
 

@@ -6,7 +6,7 @@
  */
 
 import { type ReactNode, useEffect, useRef } from "react";
-import { View } from "react-native";
+import { View, type ViewInstance } from "react-native";
 
 import { useTutorialSafe } from "@/lib/tutorial";
 
@@ -19,7 +19,7 @@ interface TutorialTargetProps {
 
 export function TutorialTarget({ stepId, children }: TutorialTargetProps) {
   const tutorial = useTutorialSafe();
-  const viewRef = useRef<View>(null);
+  const viewRef = useRef<ViewInstance>(null);
 
   useEffect(() => {
     if (!tutorial) return;

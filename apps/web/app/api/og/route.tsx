@@ -1,8 +1,6 @@
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 const categoryColors: Record<string, string> = {
   festivals: "#F59E0B",
   tips: "#3B82F6",

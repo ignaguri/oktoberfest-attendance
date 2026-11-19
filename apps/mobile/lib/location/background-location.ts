@@ -37,15 +37,8 @@ let onBackgroundLocationUpdate:
 let backgroundLocationData: BackgroundLocationData | null = null;
 
 /**
- * Counter for consecutive callback-missing invocations
- */
-let missingCallbackCount = 0;
-const MAX_MISSING_CALLBACK = 5;
-
-/**
- * Ensures the background location task is defined with TaskManager.
- * Uses TaskManager.isTaskDefined() to prevent duplicate registrations
- * across HMR reloads and re-evaluations.
+ * Called at module scope below: a background launch mounts no components.
+ * isTaskDefined() guards against HMR re-evaluation.
  */
 function ensureTaskDefined() {
   if (TaskManager.isTaskDefined(BACKGROUND_LOCATION_TASK)) return;
@@ -83,31 +76,25 @@ function ensureTaskDefined() {
 
     // Call the callback if set
     if (onBackgroundLocationUpdate && backgroundLocationData) {
-      missingCallbackCount = 0;
       try {
         await onBackgroundLocationUpdate(latestLocation, backgroundLocationData);
       } catch (err) {
         logger.error("Error in callback", err);
       }
     } else {
-      missingCallbackCount++;
-      logger.warn("Callback or data missing", {
-        attempt: missingCallbackCount,
-        max: MAX_MISSING_CALLBACK,
-      });
-
-      // Stop updates if callback is consistently missing to save battery
-      if (missingCallbackCount >= MAX_MISSING_CALLBACK) {
-        logger.warn("Max missing callback attempts reached, stopping updates");
-        try {
-          await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
-        } catch (err) {
-          logger.error("Error auto-stopping", err);
-        }
+      // The callback only exists in the JS context that started sharing; a fresh
+      // one (cold start, Android headless wake) never gets it, so stop right away.
+      logger.warn("Callback or data missing, stopping updates");
+      try {
+        await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
+      } catch (err) {
+        logger.error("Error auto-stopping", err);
       }
     }
   });
 }
+
+ensureTaskDefined();
 
 /**
  * Set the callback for background location updates
@@ -117,11 +104,7 @@ export function setBackgroundLocationCallback(
     | ((location: Location.LocationObject, data: BackgroundLocationData) => Promise<void>)
     | null,
 ) {
-  ensureTaskDefined();
   onBackgroundLocationUpdate = callback;
-  if (callback) {
-    missingCallbackCount = 0;
-  }
 }
 
 /**
@@ -165,8 +148,6 @@ export async function startBackgroundLocationUpdates(
   data: BackgroundLocationData,
 ): Promise<boolean> {
   try {
-    ensureTaskDefined();
-
     // Check if background location task is already running
     const isRunning = await Location.hasStartedLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
 
@@ -177,7 +158,6 @@ export async function startBackgroundLocationUpdates(
 
     // Store the data for the task (persists to AsyncStorage)
     await setBackgroundLocationData(data);
-    missingCallbackCount = 0;
 
     // Start background location updates
     await Location.startLocationUpdatesAsync(BACKGROUND_LOCATION_TASK, {

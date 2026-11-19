@@ -13,7 +13,8 @@ import type { SyncQueueItem } from "../schema";
 // Mock the sync-queue module
 vi.mock("../sync-queue", () => ({
   getPendingOperations: vi.fn().mockResolvedValue([]),
-  markOperationProcessing: vi.fn().mockResolvedValue(undefined),
+  claimOperation: vi.fn().mockResolvedValue(true),
+  releaseStaleClaims: vi.fn().mockResolvedValue(undefined),
   markOperationCompleted: vi.fn().mockResolvedValue(undefined),
   markOperationFailed: vi.fn().mockResolvedValue(undefined),
   markRecordClean: vi.fn().mockResolvedValue(undefined),
@@ -48,6 +49,7 @@ function createMockOperation(overrides: Partial<SyncQueueItem> = {}): SyncQueueI
     retry_count: 0,
     last_error: null,
     created_at: new Date().toISOString(),
+    claimed_at: null,
     ...overrides,
   };
 }

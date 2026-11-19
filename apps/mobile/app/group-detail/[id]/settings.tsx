@@ -377,7 +377,7 @@ export default function GroupSettingsScreen() {
                   variant="solid"
                   action="primary"
                   size="md"
-                  onPress={handleSubmit(onSubmit)}
+                  onPress={() => handleSubmit(onSubmit)()}
                   isDisabled={!isDirty || isSaving}
                 >
                   {isSaving ? (

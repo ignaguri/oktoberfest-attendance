@@ -86,7 +86,8 @@ export {
   idempotencyKeyExists,
   markOperationCompleted,
   markOperationFailed,
-  markOperationProcessing,
+  claimOperation,
+  releaseStaleClaims,
   markRecordClean,
   // Dirty tracking
   markRecordDirty,

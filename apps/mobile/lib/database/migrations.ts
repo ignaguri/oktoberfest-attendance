@@ -107,6 +107,12 @@ const MIGRATIONS: MigrationFn[] = [
          AND last_error = 'Attendance not found or access denied'`,
     );
   },
+
+  // v5 -> v6: Timestamp a queue claim, so an op left in 'processing' by a push
+  // the OS killed can be told apart from one a live processor is working on.
+  async (db) => {
+    await addColumnIfNotExists(db, "_sync_queue", "claimed_at", "TEXT");
+  },
 ];
 
 /**

@@ -4,7 +4,11 @@ import { createMiddleware } from "hono/factory";
 
 import { logger } from "../lib/logger";
 import { evaluateAfterWrite } from "../services/evaluate-after-write";
-import { parsePushPermissionHeader, type PushPermission } from "./client-headers";
+import {
+  isBackgroundRequestHeader,
+  parsePushPermissionHeader,
+  type PushPermission,
+} from "./client-headers";
 import { UnauthorizedError } from "./error";
 
 // Extend Hono context to include user
@@ -115,13 +119,15 @@ export const authMiddleware = createMiddleware<AuthContext>(async (c, next) => {
   c.set("user", user);
   c.set("supabase", supabase);
 
-  recordActiveDay(
-    supabase,
-    user.id,
-    c.req.header("X-Client-Platform"),
-    c.req.header("X-Client-Version"),
-    parsePushPermissionHeader(c.req.header("X-Client-Push-Permission")),
-  );
+  if (!isBackgroundRequestHeader(c.req.header("X-Client-Background"))) {
+    recordActiveDay(
+      supabase,
+      user.id,
+      c.req.header("X-Client-Platform"),
+      c.req.header("X-Client-Version"),
+      parsePushPermissionHeader(c.req.header("X-Client-Push-Permission")),
+    );
+  }
 
   await next();
 });

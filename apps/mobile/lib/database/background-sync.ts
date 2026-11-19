@@ -21,6 +21,7 @@ import { BackgroundTaskResult } from "expo-background-task";
 import * as TaskManager from "expo-task-manager";
 import { Platform } from "react-native";
 
+import { setBackgroundRequests } from "@/lib/api-client";
 import { logger } from "@/lib/logger";
 import { LiveActivity } from "@/modules/live-activity";
 
@@ -31,10 +32,8 @@ import { createSyncManager, type SyncResult } from "./sync/sync-manager";
 export const BACKGROUND_SYNC_TASK = "PROSTCOUNTER_BACKGROUND_SYNC";
 
 /**
- * Ensures the background sync task is defined with TaskManager.
- * Uses TaskManager.isTaskDefined() to prevent duplicate registrations
- * across HMR reloads and re-evaluations.
- * Must be called before registering the task.
+ * Called at module scope below: a background launch mounts no components.
+ * isTaskDefined() guards against HMR re-evaluation.
  */
 function ensureTaskDefined() {
   if (TaskManager.isTaskDefined(BACKGROUND_SYNC_TASK)) return;
@@ -61,12 +60,20 @@ function ensureTaskDefined() {
         return BackgroundTaskResult.Success;
       }
 
-      // Perform sync
-      const result: SyncResult = await syncManager.sync({
-        direction: "both",
-        festivalId,
-        userId,
-      });
+      // Push only: a pull is an authenticated request, which records an active day
+      // for a user who never opened the app. The foreground sync pulls on open.
+      // The pushes are flagged for the same reason.
+      setBackgroundRequests(true);
+      let result: SyncResult;
+      try {
+        result = await syncManager.sync({
+          direction: "push",
+          festivalId,
+          userId,
+        });
+      } finally {
+        setBackgroundRequests(false);
+      }
 
       logger.info("[BackgroundSync] Sync completed", {
         pulled: result.pulled,
@@ -86,6 +93,8 @@ function ensureTaskDefined() {
   });
 }
 
+ensureTaskDefined();
+
 /**
  * Register the background sync task with the system.
  * Call this once when the app initializes (after user is authenticated).
@@ -103,9 +112,6 @@ export async function registerBackgroundSync(
   }
 
   try {
-    // Ensure the task is defined before registering
-    ensureTaskDefined();
-
     // Check if task is already registered
     const isRegistered = await TaskManager.isTaskRegisteredAsync(BACKGROUND_SYNC_TASK);
     if (isRegistered) {
@@ -192,9 +198,6 @@ export async function setBackgroundSyncContext(
   userId: string | null,
   festivalId: string | null,
 ): Promise<void> {
-  // Ensure the task is defined before setting context
-  ensureTaskDefined();
-
   try {
     if (userId) {
       await AsyncStorage.setItem("current_user_id", userId);

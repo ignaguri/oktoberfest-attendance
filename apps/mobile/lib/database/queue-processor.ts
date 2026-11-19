@@ -15,11 +15,12 @@ import { isNetworkUnreachableError, logger } from "@/lib/logger";
 import type { SyncableTable, SyncQueueItem } from "./schema";
 import {
   getPendingOperations,
+  claimOperation,
   getQueueStats,
   markOperationCompleted,
   markOperationFailed,
-  markOperationProcessing,
   markRecordClean,
+  releaseStaleClaims,
 } from "./sync-queue";
 
 // =============================================================================
@@ -131,6 +132,8 @@ export class QueueProcessor {
     };
 
     try {
+      await releaseStaleClaims(this.db);
+
       // An op whose dependency completes during this run (a photo upload
       // waiting on its attendance) becomes ready only after its round was
       // picked, so keep taking rounds until one completes nothing new. Each op
@@ -230,8 +233,10 @@ export class QueueProcessor {
       return { success: false, error: `No handler for ${op.operation}` };
     }
 
-    // Mark as processing
-    await markOperationProcessing(this.db, op.id);
+    if (!(await claimOperation(this.db, op.id))) {
+      logger.debug(`[QueueProcessor] Operation ${op.id} claimed by another processor`);
+      return { success: false, skipped: true, error: "Claimed by another processor" };
+    }
 
     try {
       await handler(op);
