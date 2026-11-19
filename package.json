@@ -15,8 +15,8 @@
     "format:check": "oxfmt --check",
     "type-check": "turbo type-check",
     "test": "turbo test",
-    "sup:db:pull": "supabase db pull",
-    "sup:db:push": "supabase db push",
+    "sup:db:pull": "supabase db pull --remote",
+    "sup:db:push": "supabase db push --remote",
     "sup:db:reset": "supabase db reset",
     "sup:db:types": "supabase gen types typescript > packages/db/src/types.ts",
     "sup:mig:new": "supabase migration new",
@@ -58,7 +58,7 @@
     "supabase": "3.2.0",
     "tsx": "^4.23.15",
     "turbo": "^2.11.13",
-    "typescript": "5.9.3"
+    "typescript": "7.0.2"
   },
   "engines": {
     "node": ">=22 <25"
