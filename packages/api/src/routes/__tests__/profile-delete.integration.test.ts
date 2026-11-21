@@ -9,7 +9,10 @@ import {
   type TestUser,
 } from "../../__tests__/helpers/day-plan-fixtures";
 import { deleteTestUsersAndFestivals } from "../../__tests__/helpers/test-cleanup";
-import { createTestSupabaseAdmin } from "../../__tests__/helpers/test-supabase";
+import {
+  createTestSupabaseAdmin,
+  createTestSupabaseWithAuth,
+} from "../../__tests__/helpers/test-supabase";
 import { createTestApp } from "../../__tests__/helpers/test-server";
 import { authMiddleware } from "../../middleware/auth";
 import profileRoutes from "../profile.route";
@@ -19,6 +22,7 @@ describe("DELETE /profile (Local DB)", () => {
   let admin: SupabaseClient<Database>;
   let user: TestUser;
   let festival: TestFestival;
+  let avatarPath: string;
 
   beforeAll(async () => {
     admin = createTestSupabaseAdmin();
@@ -67,14 +71,32 @@ describe("DELETE /profile (Local DB)", () => {
         achievement_id: achievement.id,
         festival_id: festival.id,
       }),
+      admin.from("festival_group_standings").insert({
+        festival_id: festival.id,
+        group_id: group.id,
+        user_id: user.id,
+        rank: 1,
+        member_count: 1,
+        criteria_id: 4,
+      }),
     ]);
     const insertError = inserts.find((result) => result.error)?.error;
     if (insertError) {
       throw new Error(`Failed to seed user data: ${insertError.message}`);
     }
+
+    // Uploaded as the user, so Storage records them as the owner.
+    avatarPath = `${user.id}_${Date.now()}.webp`;
+    const { error: uploadError } = await createTestSupabaseWithAuth(user.token)
+      .storage.from("avatars")
+      .upload(avatarPath, new Blob(["x"], { type: "image/webp" }));
+    if (uploadError) {
+      throw new Error(`Failed to upload avatar: ${uploadError.message}`);
+    }
   });
 
   afterAll(async () => {
+    await admin.storage.from("avatars").remove([avatarPath]);
     await deleteTestUsersAndFestivals(admin, {
       userIds: [user.id],
       festivalIds: [festival.id],
@@ -96,7 +118,9 @@ describe("DELETE /profile (Local DB)", () => {
     expect(authUser.user).toBeNull();
 
     const counts = await Promise.all(
-      (["group_members", "beer_pictures", "user_achievements"] as const).map(async (table) => {
+      (
+        ["group_members", "beer_pictures", "user_achievements", "festival_group_standings"] as const
+      ).map(async (table) => {
         const { count } = await admin
           .from(table)
           .select("*", { count: "exact", head: true })
@@ -113,7 +137,11 @@ describe("DELETE /profile (Local DB)", () => {
       group_members: 0,
       beer_pictures: 0,
       user_achievements: 0,
+      festival_group_standings: 0,
     });
     expect(profileCount).toBe(0);
+
+    const { data: avatars } = await admin.storage.from("avatars").list("", { search: avatarPath });
+    expect(avatars).toEqual([]);
   });
 });
