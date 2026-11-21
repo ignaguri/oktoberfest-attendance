@@ -31,7 +31,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
 import { ConflictError } from "../../middleware/error";
-import { createAdminClient } from "../../utils/admin-client";
+import { createAdminClient, deleteAuthUser } from "../../utils/admin-client";
 
 /**
  * How many auth users to request per page when building the email map.
@@ -328,14 +328,9 @@ export class SupabaseAdminRepository {
     }
   }
 
-  /** Deletes a user from auth; the profile row cascades. Service role only. */
+  /** Same full account deletion as the user's own DELETE /profile. */
   async deleteUser(userId: string): Promise<void> {
-    const adminClient = createAdminClient();
-    const { error } = await adminClient.auth.admin.deleteUser(userId);
-
-    if (error) {
-      throw new Error(`Error deleting user: ${error.message}`);
-    }
+    await deleteAuthUser(userId);
   }
 
   private async festivalTimezones(festivalIds: (string | null)[]): Promise<Map<string, string>> {
