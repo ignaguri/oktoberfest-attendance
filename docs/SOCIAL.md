@@ -39,13 +39,17 @@ Copy key is `followInstagram` under `footer`, `marketing.footer` and `profile.ab
 | 2026-10-02 | Reel     | 18s crew rivalry: Settle it hook, original Lyria bed                   | `brags/2026-09-25-164442-crew-rivalry/brag.mp4`    |
 | 2026-10-02 | Reel     | 18s tent hopper: every tent Full hook, original Lyria bed              | `brags/2026-09-25-164442-tent-hopper/brag.mp4`     |
 | 2026-10-02 | Reel     | 18s wrapped: 31 Maß, 9 days, 8 tents hook, original Lyria bed          | `brags/2026-09-25-164442-wrapped/brag.mp4`         |
+| 2026-10-06 | Post     | City's Wiesn 2026 numbers, Wrapped look, invite to open your Wrapped   | HTML card rendered in a session scratchpad (not kept) |
+| 2026-10-06 | Post     | Lost-and-found 2026: 4,000 items, curious finds as Wrapped tags        | HTML card rendered in a session scratchpad (not kept) |
 
 Links: [carousel](https://www.instagram.com/prostcounter/p/Ddt5T5tCGEQ/),
 [reel](https://www.instagram.com/prostcounter/reel/Ddt9ydwPRPC/),
 [badge hunter reel](https://www.instagram.com/prostcounter/reel/Dd340vqI-yn/),
 [crew rivalry reel](https://www.instagram.com/prostcounter/reel/Dd_pzAhB4iY/),
 [tent hopper reel](https://www.instagram.com/prostcounter/reel/Dd_qKJaxiS1/),
-[wrapped reel](https://www.instagram.com/prostcounter/reel/Dd_qcV0uC4C/).
+[wrapped reel](https://www.instagram.com/prostcounter/reel/Dd_qcV0uC4C/),
+[Wiesn 2026 numbers](https://www.instagram.com/prostcounter/p/DeKXSWtiMnY/),
+[lost and found 2026](https://www.instagram.com/prostcounter/p/DeKXbn5CNke/).
 Single posts, oldest first: [map](https://www.instagram.com/prostcounter/p/DdvyjVwCJCN/),
 [wrapped](https://www.instagram.com/prostcounter/p/DdvzpV8iOr6/),
 [badges](https://www.instagram.com/prostcounter/p/Ddv0ekwiKnd/),
@@ -74,6 +78,8 @@ Posted in reverse so the grid reads Home first.
 
 ### Posting from the web
 
+- Upload JPEGs. A PNG goes through every step and then fails on share with "Media type invalid"
+  (`sips -s format jpeg in.png --out out.jpg`).
 - Feed images max out at 4:5. Pick the 4:5 crop ("Seleccionar recorte"), or Instagram
   squares them.
 - Every video post becomes a Reel. Pick "Original" in the crop step to keep 9:16.
