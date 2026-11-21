@@ -43,8 +43,6 @@ export const searchKeys = {
   // User search queries
   users: (filters: UserSearchFilters = {}) => [...searchKeys.all, "users", filters] as const,
   user: (id: string) => [...searchKeys.all, "users", "detail", id] as const,
-  userAttendances: (userId: string, filters: BaseSearchFilters = {}) =>
-    [...searchKeys.all, "users", "attendances", userId, filters] as const,
 
   // Group search queries
   groups: (filters: GroupSearchFilters = {}) => [...searchKeys.all, "groups", filters] as const,

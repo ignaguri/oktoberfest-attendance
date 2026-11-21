@@ -1,4 +1,4 @@
-import type { Database } from "@prostcounter/db";
+import type { Database, Tables } from "@prostcounter/db";
 import type { Consumption, LogConsumptionInput, TipMode } from "@prostcounter/shared";
 import { calculatePricePaidCents, DEFAULT_DRINK_PRICES } from "@prostcounter/shared";
 import { ErrorCodes } from "@prostcounter/shared/errors";
@@ -139,7 +139,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       );
     }
 
-    return this.mapToConsumption(data);
+    return toConsumption(data);
   }
 
   /**
@@ -162,7 +162,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       return null;
     }
 
-    return this.mapToConsumption(data);
+    return toConsumption(data);
   }
 
   async findByAttendance(attendanceId: string): Promise<Consumption[]> {
@@ -176,7 +176,7 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       throw new DatabaseError(`Failed to fetch consumptions: ${error.message}`);
     }
 
-    return data.map((item) => this.mapToConsumption(item));
+    return data.map((item) => toConsumption(item));
   }
 
   async findByFestivalAndDate(
@@ -243,21 +243,21 @@ export class SupabaseConsumptionRepository implements IConsumptionRepository {
       );
     }
   }
+}
 
-  private mapToConsumption(data: any): Consumption {
-    return {
-      id: data.id,
-      attendanceId: data.attendance_id,
-      tentId: data.tent_id,
-      drinkType: data.drink_type,
-      drinkName: data.drink_name,
-      basePriceCents: data.base_price_cents,
-      pricePaidCents: data.price_paid_cents,
-      tipCents: data.tip_cents,
-      volumeMl: data.volume_ml,
-      recordedAt: data.recorded_at,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
-    };
-  }
+export function toConsumption(data: Tables<"consumptions">): Consumption {
+  return {
+    id: data.id,
+    attendanceId: data.attendance_id,
+    tentId: data.tent_id,
+    drinkType: data.drink_type,
+    drinkName: data.drink_name,
+    basePriceCents: data.base_price_cents,
+    pricePaidCents: data.price_paid_cents,
+    tipCents: data.tip_cents,
+    volumeMl: data.volume_ml,
+    recordedAt: data.recorded_at,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+  };
 }

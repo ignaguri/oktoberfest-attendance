@@ -11264,6 +11264,315 @@ export interface paths {
         };
         trace?: never;
     };
+    "/v1/admin/attendances/{attendanceId}/consumptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a day's logged drinks (admin) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    attendanceId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Consumptions retrieved successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            consumptions: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                attendanceId: string;
+                                /** Format: uuid */
+                                tentId: string | null;
+                                /** @enum {string} */
+                                drinkType: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
+                                drinkName: string | null;
+                                basePriceCents: number;
+                                pricePaidCents: number;
+                                tipCents: number | null;
+                                volumeMl: number | null;
+                                /** Format: date-time */
+                                recordedAt: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Add a drink to a day (admin)
+         * @description Logged at midday on the festival's clock and priced as the owner would have been charged.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    attendanceId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        drink_type: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
+                        /** Format: uuid */
+                        tent_id?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Consumption added successfully */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            consumption: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                attendanceId: string;
+                                /** Format: uuid */
+                                tentId: string | null;
+                                /** @enum {string} */
+                                drinkType: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
+                                drinkName: string | null;
+                                basePriceCents: number;
+                                pricePaidCents: number;
+                                tipCents: number | null;
+                                volumeMl: number | null;
+                                /** Format: date-time */
+                                recordedAt: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Attendance not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/consumptions/{consumptionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a logged drink (admin) */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    consumptionId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Consumption deleted successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Consumption not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Change a logged drink's type (admin)
+         * @description Re-prices the drink for its new type, keeping the tip paid on top.
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    consumptionId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        drink_type: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
+                    };
+                };
+            };
+            responses: {
+                /** @description Consumption updated successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            consumption: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                attendanceId: string;
+                                /** Format: uuid */
+                                tentId: string | null;
+                                /** @enum {string} */
+                                drinkType: "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other";
+                                drinkName: string | null;
+                                basePriceCents: number;
+                                pricePaidCents: number;
+                                tipCents: number | null;
+                                volumeMl: number | null;
+                                /** Format: date-time */
+                                recordedAt: string;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Forbidden - User is not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+                /** @description Consumption not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ApiError"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
     "/v1/admin/groups": {
         parameters: {
             query?: never;

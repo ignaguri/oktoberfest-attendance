@@ -141,11 +141,9 @@
       "updateNow": "Update Now"
     },
     "members": "members",
-    "beers": "Beers",
     "close": "Close",
     "dismiss": "Dismiss",
     "loading": "Loading",
-    "tents": "Tents",
     "unknownUser": "Unknown User",
     "unknown": "Unknown"
   },
@@ -609,8 +607,6 @@
   "attendance": {
     "pageTitle": "My Attendances",
     "addNew": "Add Attendance",
-    "beerCount": "{{count}} beer",
-    "beerCount_other": "{{count}} beers",
     "drinkCount": "{{count}} drink",
     "drinkCount_other": "{{count}} drinks",
     "drinkTypes": {
@@ -815,8 +811,7 @@
     "price": "Price",
     "tent": {
       "selectTents": "Select tents"
-    },
-    "updateAttendance": "Update Attendance"
+    }
   },
   "achievements": {
     "pageTitle": "Achievements",
@@ -1705,6 +1700,15 @@
           "beersDerived_one": "Counted from {{count}} logged drink. Change the drinks to change this.",
           "beersDerived_other": "Counted from {{count}} logged drinks. Change the drinks to change this.",
           "beersInvalid": "Enter a whole number, 0 or more",
+          "drinks": "Drinks",
+          "drinksHint": "Drink changes save right away. Tap a drink to change its type.",
+          "drinksLoading": "Loading drinks...",
+          "changeDrinkHint": "Shows the drink types to switch this drink to",
+          "removeDrink": "Remove drink",
+          "removeDrinkHint": "Deletes this drink from the day",
+          "addDrink": "Add",
+          "addDrinkHint": "Adds a drink of the selected type to this day",
+          "drinkError": "Could not update the drinks",
           "tents": "Tents",
           "tentsLoading": "Loading tents...",
           "tentsEmpty": "This festival has no tents yet",
@@ -1980,8 +1984,6 @@
       "title": "User List",
       "editUser": "Edit User",
       "editUserDescription": "Update user details",
-      "editAttendances": "Edit Attendances",
-      "editAttendancesDescription": "Manage user attendances",
       "form": {
         "emailNote": "Email cannot be changed",
         "newPassword": "New Password (leave blank to keep unchanged)",
@@ -1990,20 +1992,28 @@
         "updateUser": "Update User"
       },
       "attendances": {
-        "title": "User Attendances ({{count}})",
-        "titleFor": "Attendances for {{name}}",
+        "heading": "Attendances",
+        "drinks": {
+          "title": "Drinks",
+          "hint": "Changes save right away. A drink whose type changes is re-priced for the new type.",
+          "loading": "Loading drinks...",
+          "empty": "No drinks logged on this day.",
+          "type": "Drink type",
+          "remove": "Remove drink",
+          "add": "Add drink",
+          "error": "Could not update the drinks",
+          "loadError": "Could not load the drinks"
+        },
         "headers": {
           "date": "Date",
           "beers": "Beers",
           "tents": "Tents"
         },
         "loading": "Loading attendances...",
-        "clickToLoad": "Click to load attendances",
         "empty": "No attendances found for this user.",
         "deleteTitle": "Delete Attendance",
         "deleteConfirm": "Are you sure you want to delete this attendance?",
         "buttons": {
-          "edit": "Edit",
           "delete": "Delete",
           "cancel": "Cancel"
         }
@@ -3482,7 +3492,6 @@
       "max": "That's a lot of beers! Are you sure?",
       "negative": "Beer count cannot be negative",
       "wholeNumber": "Must be a whole number",
-      "integer": "Must be a whole number",
       "tentRequired": "Must select at least one tent if beer count is 0"
     },
     "photo": {
@@ -3613,7 +3622,6 @@
       "userLoadFailed": "Failed to load attendances",
       "userUpdateFailed": "Failed to update user",
       "userDeleteFailed": "Failed to delete user",
-      "attendanceUpdateAdminFailed": "Failed to update attendance",
       "attendanceDeleteAdminFailed": "Failed to delete attendance",
       "swNotSupported": "Service worker or caches not supported",
       "swClearFailed": "Failed to clear service worker caches"

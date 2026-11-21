@@ -8,14 +8,17 @@
 
 import { QueryKeys, useApiClient, useInvalidateQueries, useMutation, useQuery } from "../data";
 import type {
+  AddAdminConsumptionInput,
   AdminAttendance,
   AdminUser,
   AdminUserGroup,
   ListAdminUsersResponse,
   UpdateAdminAttendanceInput,
+  UpdateAdminConsumptionInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
 } from "../schemas/admin.schema";
+import type { Consumption } from "../schemas/consumption.schema";
 
 const EMPTY_USERS: ListAdminUsersResponse = {
   users: [],
@@ -215,5 +218,78 @@ export function useDeleteAdminAttendance() {
         invalidateQueries(QueryKeys.adminUserAttendancesAll());
       },
     },
+  );
+}
+
+/** Hook to list the drinks logged on one attendance, newest first. */
+export function useAdminAttendanceConsumptions(attendanceId?: string) {
+  const apiClient = useApiClient();
+
+  const query = useQuery<Consumption[]>(
+    QueryKeys.adminAttendanceConsumptions(attendanceId ?? ""),
+    async () => {
+      if (!attendanceId) return [];
+      const response = await apiClient.admin.attendances.listConsumptions(attendanceId);
+      return response.consumptions || [];
+    },
+    {
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      enabled: !!attendanceId,
+    },
+  );
+
+  return {
+    consumptions: query.data || [],
+    isLoading: query.loading,
+    error: query.error?.message || null,
+  };
+}
+
+/**
+ * A day's drink list and the attendance list's counts both change with every
+ * drink edit.
+ */
+function useInvalidateDrinks() {
+  const invalidateQueries = useInvalidateQueries();
+
+  return () => {
+    invalidateQueries(QueryKeys.adminAttendanceConsumptionsAll());
+    invalidateQueries(QueryKeys.adminUserAttendancesAll());
+  };
+}
+
+/** Hook to add a drink to a day. */
+export function useAddAdminConsumption() {
+  const apiClient = useApiClient();
+  const invalidateDrinks = useInvalidateDrinks();
+
+  return useMutation(
+    async ({ attendanceId, data }: { attendanceId: string; data: AddAdminConsumptionInput }) =>
+      apiClient.admin.attendances.addConsumption(attendanceId, data),
+    { onSuccess: invalidateDrinks },
+  );
+}
+
+/** Hook to change a logged drink's type; the server re-prices it. */
+export function useUpdateAdminConsumption() {
+  const apiClient = useApiClient();
+  const invalidateDrinks = useInvalidateDrinks();
+
+  return useMutation(
+    async ({ consumptionId, data }: { consumptionId: string; data: UpdateAdminConsumptionInput }) =>
+      apiClient.admin.consumptions.update(consumptionId, data),
+    { onSuccess: invalidateDrinks },
+  );
+}
+
+/** Hook to remove a logged drink. */
+export function useDeleteAdminConsumption() {
+  const apiClient = useApiClient();
+  const invalidateDrinks = useInvalidateDrinks();
+
+  return useMutation(
+    async (consumptionId: string) => apiClient.admin.consumptions.delete(consumptionId),
+    { onSuccess: invalidateDrinks },
   );
 }

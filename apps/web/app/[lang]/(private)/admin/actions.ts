@@ -6,9 +6,7 @@ import type { Tables } from "@prostcounter/db";
 import type { ErrorCode } from "@prostcounter/shared/errors";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import { revalidatePath, unstable_cache } from "next/cache";
-import { v4 as uuidv4 } from "uuid";
 
-import { formatTimestampForDatabase } from "@/lib/date-utils";
 import { logAdminAction, sanitizeSearchTerm } from "@/lib/utils/security";
 import { createClient } from "@/utils/supabase/server";
 
@@ -324,101 +322,6 @@ export async function getWinningCriteria() {
 
   if (error) throw new Error("Error fetching winning criteria: " + error.message);
   return criteria;
-}
-
-export async function getUserAttendances(userId: string) {
-  const supabase = await createClient(true);
-  const { data: attendances, error } = await supabase
-    .from("attendances")
-    .select("*")
-    .eq("user_id", userId);
-
-  if (error) throw new Error("Error fetching attendances: " + error.message);
-
-  // Fetch tent visits for each attendance
-  const attendancesWithTents = await Promise.all(
-    attendances.map(async (attendance) => {
-      const tentVisits = await getTentVisitsForAttendance(userId, new Date(attendance.date));
-      return {
-        ...attendance,
-        tent_ids: tentVisits.map((visit) => visit.tent_id), // Extract tent IDs
-      };
-    }),
-  );
-
-  return attendancesWithTents;
-}
-
-export async function updateAttendance(
-  attendanceId: string,
-  attendanceData: Partial<Tables<"attendances">> & { tent_ids?: string[] },
-) {
-  const supabase = await createClient(true);
-
-  const { tent_ids, ...attendanceDataWithoutTentIds } = attendanceData;
-  // Update the attendance record
-  const { data, error } = await supabase
-    .from("attendances")
-    .update(attendanceDataWithoutTentIds)
-    .eq("id", attendanceId)
-    .single();
-
-  if (error) throw new Error("Error updating attendance: " + error.message);
-
-  // Update the tent visits
-  if (tent_ids && attendanceData.user_id && attendanceData.date) {
-    // First, delete existing tent visits for the user and date
-    await supabase
-      .from("tent_visits")
-      .delete()
-      .eq("user_id", attendanceData.user_id)
-      .eq("visit_date", attendanceData.date);
-
-    // Insert new tent visits
-    const tentVisits = tent_ids.map((tentId) => ({
-      id: uuidv4(),
-      user_id: attendanceData.user_id!,
-      festival_id: attendanceData.festival_id!,
-      tent_id: tentId,
-      visit_date: attendanceData.date!,
-    }));
-
-    const { error: tentVisitError } = await supabase.from("tent_visits").insert(tentVisits);
-
-    if (tentVisitError) {
-      throw new Error("Error adding tent visits: " + tentVisitError.message);
-    }
-  }
-
-  revalidatePath("/admin");
-  return data;
-}
-
-export async function deleteAttendance(attendanceId: string) {
-  const supabase = await createClient(true);
-  const { error } = await supabase.from("attendances").delete().eq("id", attendanceId);
-  if (error) throw new Error("Error deleting attendance: " + error.message);
-  revalidatePath("/admin");
-}
-
-export async function getTentVisitsForAttendance(userId: string, date: Date) {
-  const supabase = await createClient(true);
-
-  // Create start and end of day timestamps for the given date
-  const startOfDay = new Date(date);
-  startOfDay.setHours(0, 0, 0, 0);
-  const endOfDay = new Date(date);
-  endOfDay.setHours(23, 59, 59, 999);
-
-  const { data: tentVisits, error } = await supabase
-    .from("tent_visits")
-    .select("tent_id")
-    .eq("user_id", userId)
-    .gte("visit_date", formatTimestampForDatabase(startOfDay))
-    .lte("visit_date", formatTimestampForDatabase(endOfDay));
-
-  if (error) throw new Error("Error fetching tent visits: " + error.message);
-  return tentVisits;
 }
 
 // Cache management functions removed - NodeCache system deprecated

@@ -1,5 +1,6 @@
 import type { Database } from "@prostcounter/db";
 import type {
+  AddAdminConsumptionInput,
   AdminAttendance,
   AdminFestival,
   AdminFestivalTent,
@@ -10,6 +11,7 @@ import type {
   AdminUser,
   AdminUserGroup,
   AdminWrappedCacheEntry,
+  Consumption,
   CopyAdminFestivalTentsInput,
   ListAdminUsersResponse,
   CreateAdminFestivalInput,
@@ -20,9 +22,11 @@ import type {
   UpdateAdminTentInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
+  DrinkType,
   TentCategory,
   WinningCriterion,
 } from "@prostcounter/shared";
+import { DEFAULT_DRINK_PRICES } from "@prostcounter/shared";
 import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import { atZonedTime, formatDateForDatabase } from "@prostcounter/shared/utils";
@@ -30,8 +34,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError } from "../../middleware/error";
+import { ConflictError, NotFoundError } from "../../middleware/error";
 import { createAdminClient, deleteAuthUser } from "../../utils/admin-client";
+import { SupabaseConsumptionRepository, toConsumption } from "./consumption.repository";
 
 /**
  * How many auth users to request per page when building the email map.
@@ -359,11 +364,20 @@ export class SupabaseAdminRepository {
     date: string,
     timezone: string,
   ): Promise<string[]> {
+    return (await this.visitsOnDay(userId, festivalId, date, timezone)).map((v) => v.id);
+  }
+
+  private async visitsOnDay(
+    userId: string,
+    festivalId: string,
+    date: string,
+    timezone: string,
+  ): Promise<{ id: string; tent_id: string | null }[]> {
     const window = dayWindowUtc(date);
 
     const { data, error } = await this.supabase
       .from("tent_visits")
-      .select("id, visit_date")
+      .select("id, tent_id, visit_date")
       .eq("user_id", userId)
       .eq("festival_id", festivalId)
       .gte("visit_date", window.start)
@@ -377,7 +391,7 @@ export class SupabaseAdminRepository {
       .filter(
         (v) => !!v.visit_date && formatDateForDatabase(new Date(v.visit_date), timezone) === date,
       )
-      .map((v) => v.id);
+      .map((v) => ({ id: v.id, tent_id: v.tent_id }));
   }
 
   /**
@@ -1001,6 +1015,165 @@ export class SupabaseAdminRepository {
 
     if (error) {
       throw new Error(`Error deleting attendance: ${error.message}`);
+    }
+  }
+
+  // ===========================================================================
+  // Consumptions
+  // ===========================================================================
+
+  async listAttendanceConsumptions(attendanceId: string): Promise<Consumption[]> {
+    return new SupabaseConsumptionRepository(this.supabase).findByAttendance(attendanceId);
+  }
+
+  /**
+   * Adds a drink to a day as its owner would have logged it: priced through
+   * the cascade with the owner's tip preference. The admin asserts a day, not
+   * a time, so it is recorded at midday on the festival's clock. Without a
+   * tent, it is priced at the day's tent when exactly one was visited.
+   */
+  async addAttendanceConsumption(
+    attendanceId: string,
+    input: AddAdminConsumptionInput,
+  ): Promise<Consumption> {
+    const { data: attendance, error } = await this.supabase
+      .from("attendances")
+      .select("user_id, festival_id, date")
+      .eq("id", attendanceId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error reading attendance: ${error.message}`);
+    }
+    if (!attendance?.user_id) {
+      throw new NotFoundError("Attendance not found");
+    }
+
+    const timezone =
+      (await this.festivalTimezones([attendance.festival_id])).get(attendance.festival_id) ??
+      DEFAULT_TIMEZONE;
+
+    let tentId = input.tent_id ?? undefined;
+    if (!tentId) {
+      const dayTentIds = new Set(
+        (
+          await this.visitsOnDay(
+            attendance.user_id,
+            attendance.festival_id,
+            attendance.date,
+            timezone,
+          )
+        ).flatMap((v) => (v.tent_id ? [v.tent_id] : [])),
+      );
+      if (dayTentIds.size === 1) {
+        [tentId] = dayTentIds;
+      }
+    }
+
+    return new SupabaseConsumptionRepository(this.supabase).create(
+      attendance.user_id,
+      attendanceId,
+      {
+        drinkType: input.drink_type,
+        tentId,
+        // LogConsumptionSchema's default
+        volumeMl: 1000,
+        recordedAt: middayOn(attendance.date, timezone),
+      },
+    );
+  }
+
+  /**
+   * Changes a drink's type and re-prices it for the new type, keeping the tip
+   * the owner paid on top of the base price.
+   */
+  async updateConsumptionType(consumptionId: string, drinkType: DrinkType): Promise<Consumption> {
+    const { data: existing, error: readError } = await this.supabase
+      .from("consumptions")
+      .select(
+        "tent_id, base_price_cents, price_paid_cents, attendance:attendances!inner(festival_id)",
+      )
+      .eq("id", consumptionId)
+      .maybeSingle();
+
+    if (readError) {
+      throw new Error(`Error reading consumption: ${readError.message}`);
+    }
+    if (!existing) {
+      throw new NotFoundError("Consumption not found");
+    }
+
+    const { data: price, error: priceError } = await this.supabase.rpc("get_drink_price_cents", {
+      p_festival_id: existing.attendance.festival_id,
+      p_tent_id: existing.tent_id ?? undefined,
+      p_drink_type: drinkType,
+    });
+
+    if (priceError) {
+      throw new Error(`Error resolving drink price: ${priceError.message}`);
+    }
+
+    const basePriceCents = price ?? DEFAULT_DRINK_PRICES[drinkType];
+    const tipCents = Math.max(existing.price_paid_cents - existing.base_price_cents, 0);
+
+    const { data, error } = await this.supabase
+      .from("consumptions")
+      .update({
+        drink_type: drinkType,
+        // A custom name described the old type
+        drink_name: null,
+        base_price_cents: basePriceCents,
+        price_paid_cents: basePriceCents + tipCents,
+      })
+      .eq("id", consumptionId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error updating consumption: ${error?.message}`);
+    }
+
+    return toConsumption(data);
+  }
+
+  /**
+   * Removes a drink. Removing the day's last one also zeroes the stored
+   * beer_count, which the view falls back to on a day without drinks.
+   */
+  async deleteConsumption(consumptionId: string): Promise<void> {
+    const { data, error } = await this.supabase
+      .from("consumptions")
+      .delete()
+      .eq("id", consumptionId)
+      .select("id, attendance_id");
+
+    if (error) {
+      throw new Error(`Error deleting consumption: ${error.message}`);
+    }
+    const attendanceId = data?.[0]?.attendance_id;
+    if (!attendanceId) {
+      throw new NotFoundError("Consumption not found");
+    }
+
+    const { count, error: countError } = await this.supabase
+      .from("consumptions")
+      .select("id", { count: "exact", head: true })
+      .eq("attendance_id", attendanceId);
+
+    if (countError) {
+      throw new Error(`Error counting consumptions: ${countError.message}`);
+    }
+    if (count !== 0) {
+      return;
+    }
+
+    const { error: clearError } = await this.supabase
+      .from("attendances")
+      .update({ beer_count: 0 })
+      .eq("id", attendanceId);
+
+    if (clearError) {
+      throw new Error(`Error clearing beer count: ${clearError.message}`);
     }
   }
 

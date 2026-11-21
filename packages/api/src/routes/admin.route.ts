@@ -1,5 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import {
+  AddAdminConsumptionSchema,
   AddAdminFestivalTentSchema,
   AddAllAdminFestivalTentsSchema,
   AdminAttendanceSchema,
@@ -12,11 +13,13 @@ import {
   AdminUserGroupSchema,
   AdminUserSchema,
   AdminWrappedCacheEntrySchema,
+  ConsumptionSchema,
   CopyAdminFestivalTentsSchema,
   CreateAdminFestivalSchema,
   CreateAdminTentSchema,
   ListAdminUsersResponseSchema,
   UpdateAdminAttendanceSchema,
+  UpdateAdminConsumptionSchema,
   UpdateAdminFestivalTentPriceSchema,
   UpdateAdminUserAuthSchema,
   UpdateAdminFestivalSchema,
@@ -367,6 +370,147 @@ app.openapi(deleteAttendanceRoute, async (c) => {
 
   const adminRepo = new SupabaseAdminRepository(supabase);
   await adminRepo.deleteAttendance(attendanceId);
+
+  return c.json({ success: true }, 200);
+});
+
+// GET /admin/attendances/:attendanceId/consumptions - List a day's drinks
+const listAttendanceConsumptionsRoute = createRoute({
+  method: "get",
+  path: "/admin/attendances/{attendanceId}/consumptions",
+  tags: ["admin"],
+  summary: "List a day's logged drinks (admin)",
+  request: {
+    params: z.object({ attendanceId: z.string().uuid() }),
+  },
+  responses: {
+    200: {
+      description: "Consumptions retrieved successfully",
+      content: {
+        "application/json": { schema: z.object({ consumptions: z.array(ConsumptionSchema) }) },
+      },
+    },
+    ...errorResponses,
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(listAttendanceConsumptionsRoute, async (c) => {
+  const { supabase } = c.var;
+  const { attendanceId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const consumptions = await adminRepo.listAttendanceConsumptions(attendanceId);
+
+  return c.json({ consumptions }, 200);
+});
+
+// POST /admin/attendances/:attendanceId/consumptions - Add a drink to a day
+const addAttendanceConsumptionRoute = createRoute({
+  method: "post",
+  path: "/admin/attendances/{attendanceId}/consumptions",
+  tags: ["admin"],
+  summary: "Add a drink to a day (admin)",
+  description:
+    "Logged at midday on the festival's clock and priced as the owner would have been charged.",
+  request: {
+    params: z.object({ attendanceId: z.string().uuid() }),
+    body: {
+      content: { "application/json": { schema: AddAdminConsumptionSchema } },
+    },
+  },
+  responses: {
+    201: {
+      description: "Consumption added successfully",
+      content: { "application/json": { schema: z.object({ consumption: ConsumptionSchema }) } },
+    },
+    ...errorResponses,
+    404: {
+      description: "Attendance not found",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(addAttendanceConsumptionRoute, async (c) => {
+  const { supabase } = c.var;
+  const { attendanceId } = c.req.valid("param");
+  const body = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const consumption = await adminRepo.addAttendanceConsumption(attendanceId, body);
+
+  return c.json({ consumption }, 201);
+});
+
+// PATCH /admin/consumptions/:consumptionId - Change a drink's type
+const updateConsumptionRoute = createRoute({
+  method: "patch",
+  path: "/admin/consumptions/{consumptionId}",
+  tags: ["admin"],
+  summary: "Change a logged drink's type (admin)",
+  description: "Re-prices the drink for its new type, keeping the tip paid on top.",
+  request: {
+    params: z.object({ consumptionId: z.string().uuid() }),
+    body: {
+      content: { "application/json": { schema: UpdateAdminConsumptionSchema } },
+    },
+  },
+  responses: {
+    200: {
+      description: "Consumption updated successfully",
+      content: { "application/json": { schema: z.object({ consumption: ConsumptionSchema }) } },
+    },
+    ...errorResponses,
+    404: {
+      description: "Consumption not found",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(updateConsumptionRoute, async (c) => {
+  const { supabase } = c.var;
+  const { consumptionId } = c.req.valid("param");
+  const { drink_type } = c.req.valid("json");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  const consumption = await adminRepo.updateConsumptionType(consumptionId, drink_type);
+
+  return c.json({ consumption }, 200);
+});
+
+// DELETE /admin/consumptions/:consumptionId - Remove a logged drink
+const deleteConsumptionRoute = createRoute({
+  method: "delete",
+  path: "/admin/consumptions/{consumptionId}",
+  tags: ["admin"],
+  summary: "Remove a logged drink (admin)",
+  request: {
+    params: z.object({ consumptionId: z.string().uuid() }),
+  },
+  responses: {
+    200: {
+      description: "Consumption deleted successfully",
+      content: { "application/json": { schema: z.object({ success: z.boolean() }) } },
+    },
+    ...errorResponses,
+    404: {
+      description: "Consumption not found",
+      content: { "application/json": { schema: ApiErrorSchema } },
+    },
+  },
+  security: [{ bearerAuth: [] }],
+});
+
+app.openapi(deleteConsumptionRoute, async (c) => {
+  const { supabase } = c.var;
+  const { consumptionId } = c.req.valid("param");
+
+  const adminRepo = new SupabaseAdminRepository(supabase);
+  await adminRepo.deleteConsumption(consumptionId);
 
   return c.json({ success: true }, 200);
 });

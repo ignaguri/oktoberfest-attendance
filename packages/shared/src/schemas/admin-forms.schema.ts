@@ -49,20 +49,6 @@ export const AdminUserUpdateFormSchema = z.object({
 });
 
 // =============================================================================
-// Admin Attendance Forms
-// =============================================================================
-
-export type AdminAttendanceForm = z.infer<typeof AdminAttendanceFormSchema>;
-export const AdminAttendanceFormSchema = z.object({
-  date: z.date({ error: "validation.required" }),
-  beer_count: z
-    .number()
-    .min(0, { error: "validation.beerCount.min" })
-    .int({ error: "validation.beerCount.integer" }),
-  tent_ids: z.array(z.string()).min(1, { error: "validation.tent.minOne" }),
-});
-
-// =============================================================================
 // Admin Tent Forms
 // =============================================================================
 

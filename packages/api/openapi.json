@@ -18782,6 +18782,558 @@
         }
       }
     },
+    "/v1/admin/attendances/{attendanceId}/consumptions": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List a day's logged drinks (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "attendanceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consumptions retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "consumptions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "attendanceId": {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          "tentId": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "uuid"
+                          },
+                          "drinkType": {
+                            "type": "string",
+                            "enum": [
+                              "beer",
+                              "radler",
+                              "alcohol_free",
+                              "wine",
+                              "soft_drink",
+                              "other"
+                            ]
+                          },
+                          "drinkName": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "basePriceCents": {
+                            "type": "integer"
+                          },
+                          "pricePaidCents": {
+                            "type": "integer"
+                          },
+                          "tipCents": {
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "volumeMl": {
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "recordedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "attendanceId",
+                          "tentId",
+                          "drinkType",
+                          "drinkName",
+                          "basePriceCents",
+                          "pricePaidCents",
+                          "tipCents",
+                          "volumeMl",
+                          "recordedAt",
+                          "createdAt",
+                          "updatedAt"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "consumptions"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Add a drink to a day (admin)",
+        "description": "Logged at midday on the festival's clock and priced as the owner would have been charged.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "attendanceId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drink_type": {
+                    "type": "string",
+                    "enum": [
+                      "beer",
+                      "radler",
+                      "alcohol_free",
+                      "wine",
+                      "soft_drink",
+                      "other"
+                    ]
+                  },
+                  "tent_id": {
+                    "type": "string",
+                    "nullable": true,
+                    "format": "uuid"
+                  }
+                },
+                "required": [
+                  "drink_type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Consumption added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "consumption": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "attendanceId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "tentId": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uuid"
+                        },
+                        "drinkType": {
+                          "type": "string",
+                          "enum": [
+                            "beer",
+                            "radler",
+                            "alcohol_free",
+                            "wine",
+                            "soft_drink",
+                            "other"
+                          ]
+                        },
+                        "drinkName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "basePriceCents": {
+                          "type": "integer"
+                        },
+                        "pricePaidCents": {
+                          "type": "integer"
+                        },
+                        "tipCents": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "volumeMl": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "recordedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "attendanceId",
+                        "tentId",
+                        "drinkType",
+                        "drinkName",
+                        "basePriceCents",
+                        "pricePaidCents",
+                        "tipCents",
+                        "volumeMl",
+                        "recordedAt",
+                        "createdAt",
+                        "updatedAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "consumption"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Attendance not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/consumptions/{consumptionId}": {
+      "patch": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Change a logged drink's type (admin)",
+        "description": "Re-prices the drink for its new type, keeping the tip paid on top.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "consumptionId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drink_type": {
+                    "type": "string",
+                    "enum": [
+                      "beer",
+                      "radler",
+                      "alcohol_free",
+                      "wine",
+                      "soft_drink",
+                      "other"
+                    ]
+                  }
+                },
+                "required": [
+                  "drink_type"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Consumption updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "consumption": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "attendanceId": {
+                          "type": "string",
+                          "format": "uuid"
+                        },
+                        "tentId": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uuid"
+                        },
+                        "drinkType": {
+                          "type": "string",
+                          "enum": [
+                            "beer",
+                            "radler",
+                            "alcohol_free",
+                            "wine",
+                            "soft_drink",
+                            "other"
+                          ]
+                        },
+                        "drinkName": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "basePriceCents": {
+                          "type": "integer"
+                        },
+                        "pricePaidCents": {
+                          "type": "integer"
+                        },
+                        "tipCents": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "volumeMl": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "recordedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "attendanceId",
+                        "tentId",
+                        "drinkType",
+                        "drinkName",
+                        "basePriceCents",
+                        "pricePaidCents",
+                        "tipCents",
+                        "volumeMl",
+                        "recordedAt",
+                        "createdAt",
+                        "updatedAt"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "consumption"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Consumption not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Remove a logged drink (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "consumptionId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Consumption deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - User is not an admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Consumption not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/admin/groups": {
       "get": {
         "tags": [

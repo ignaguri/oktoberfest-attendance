@@ -1237,6 +1237,45 @@ describe("Admin Routes - Unit Tests", () => {
     });
   });
 
+  describe("admin drinks editor", () => {
+    it("answers 404 when adding to a day that does not exist", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: null, error: null }),
+      );
+
+      const res = await app.request(
+        createAuthRequest(`/admin/attendances/${ATTENDANCE_ID}/consumptions`, {
+          method: "POST",
+          body: JSON.stringify({ drink_type: "beer" }),
+        }),
+      );
+
+      expect(res.status).toBe(404);
+    });
+
+    it("rejects a drink type the schema does not know", async () => {
+      const res = await app.request(
+        createAuthRequest(`/admin/consumptions/${ATTENDANCE_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ drink_type: "cocktail" }),
+        }),
+      );
+
+      expect(res.status).toBe(400);
+      expect(mockSupabase.from).not.toHaveBeenCalled();
+    });
+
+    it("answers 404 when nothing was removed", async () => {
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(createMockChain({ data: [], error: null }));
+
+      const res = await app.request(
+        createAuthRequest(`/admin/consumptions/${ATTENDANCE_ID}`, { method: "DELETE" }),
+      );
+
+      expect(res.status).toBe(404);
+    });
+  });
+
   describe("POST /admin/festivals/:festivalId/tents/copy", () => {
     it("skips tents the target festival already serves", async () => {
       vi.mocked(mockSupabase.from)

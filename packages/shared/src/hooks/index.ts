@@ -262,13 +262,17 @@ export {
   useUpdateAdminTent,
 } from "./useAdminTents";
 export {
+  useAddAdminConsumption,
+  useAdminAttendanceConsumptions,
   useAdminUser,
   useAdminUserAttendances,
   useAdminUserGroups,
   useAdminUsers,
   useDeleteAdminAttendance,
+  useDeleteAdminConsumption,
   useDeleteAdminUser,
   useUpdateAdminAttendance,
+  useUpdateAdminConsumption,
   useUpdateAdminUserAuth,
   useUpdateAdminUserProfile,
 } from "./useAdminUsers";
