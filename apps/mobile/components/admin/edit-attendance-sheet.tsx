@@ -1,8 +1,13 @@
 import { ApiError } from "@prostcounter/api-client";
 import { ErrorCodes } from "@prostcounter/shared/errors";
-import { useAdminFestivalTents, useUpdateAdminAttendance } from "@prostcounter/shared/hooks";
+import {
+  useAdminAttendanceConsumptions,
+  useAdminFestivalTents,
+  useUpdateAdminAttendance,
+} from "@prostcounter/shared/hooks";
 import { useTranslation } from "@prostcounter/shared/i18n";
 import type { AdminAttendance } from "@prostcounter/shared/schemas";
+import { countsAsBeer } from "@prostcounter/shared/utils";
 import { cn } from "@prostcounter/ui";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { format } from "date-fns";
@@ -28,6 +33,8 @@ import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { Colors, IconColors } from "@/lib/constants/colors";
 
+import { AttendanceDrinksEditor } from "./attendance-drinks-editor";
+
 interface EditAttendanceSheetProps {
   attendance: AdminAttendance;
   onClose: () => void;
@@ -35,7 +42,8 @@ interface EditAttendanceSheetProps {
 }
 
 /**
- * Edits one day: its date, its beer count and the tents visited on it.
+ * Edits one day: its date, its beer count, its logged drinks and the tents
+ * visited on it.
  *
  * Mounted only while a row is being edited, and keyed on the attendance id, so
  * the draft below is seeded once from props and a background refetch of the
@@ -45,7 +53,8 @@ interface EditAttendanceSheetProps {
  * The beer count is editable only on a day with no consumptions. See
  * `drink_count` on AdminAttendanceSchema: the view reads
  * `attendances.beer_count` only when the day has none, so on any other day
- * this write would save cleanly and change nothing the admin can see.
+ * this write would save cleanly and change nothing the admin can see. Those
+ * days are corrected through the drinks list instead.
  */
 export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttendanceSheetProps) {
   const { t } = useTranslation();
@@ -57,6 +66,7 @@ export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttend
     refetch: refetchTents,
   } = useAdminFestivalTents(attendance.festival_id);
   const updateAttendance = useUpdateAdminAttendance();
+  const { consumptions, isLoading: drinksLoading } = useAdminAttendanceConsumptions(attendance.id);
 
   // Midday rather than midnight: the picker hands back a local Date, and a
   // day that starts at 00:00 is one DST hour away from becoming the day before.
@@ -65,7 +75,15 @@ export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttend
   const [beerCount, setBeerCount] = useState(() => String(attendance.beer_count));
   const [tentIds, setTentIds] = useState<string[]>(() => attendance.tent_ids);
 
-  const beerCountIsLive = attendance.drink_count === 0;
+  // From the live list once loaded, since drinks added here change which
+  // count is real
+  const drinkCount = drinksLoading ? attendance.drink_count : consumptions.length;
+  // beerCount is seeded from the view, which only holds the stored number on a
+  // day that opened with no drinks
+  const beerCountIsLive = attendance.drink_count === 0 && drinkCount === 0;
+  const derivedBeerCount = drinksLoading
+    ? attendance.beer_count
+    : consumptions.filter((c) => countsAsBeer(c.drinkType)).length;
   const parsedBeerCount = Number.parseInt(beerCount, 10);
   const beerCountInvalid =
     beerCountIsLive && (!/^\d+$/.test(beerCount.trim()) || Number.isNaN(parsedBeerCount));
@@ -202,7 +220,7 @@ export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttend
               </Text>
               <Input isDisabled={!beerCountIsLive} isInvalid={beerCountInvalid}>
                 <InputField
-                  value={beerCount}
+                  value={beerCountIsLive ? beerCount : String(derivedBeerCount)}
                   onChangeText={setBeerCount}
                   keyboardType="number-pad"
                   accessibilityLabel={t("admin.mobile.userDetail.edit.beers")}
@@ -219,10 +237,17 @@ export function EditAttendanceSheet({ attendance, onClose, onError }: EditAttend
                   : beerCountIsLive
                     ? t("admin.mobile.userDetail.edit.beersStored")
                     : t("admin.mobile.userDetail.edit.beersDerived", {
-                        count: attendance.drink_count,
+                        count: drinkCount,
                       })}
               </Text>
             </VStack>
+
+            <AttendanceDrinksEditor
+              attendanceId={attendance.id}
+              consumptions={consumptions}
+              isLoading={drinksLoading}
+              onError={onError}
+            />
 
             {/* Tents */}
             <VStack space="sm">

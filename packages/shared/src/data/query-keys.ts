@@ -85,6 +85,8 @@ export class QueryKeys {
   // Tent queries
   static tents = (festivalId: string) => ["tents", festivalId] as const;
   static allTents = () => ["tents", "all"] as const;
+  /** Prefix covering every user-facing tent list, for admin tent writes. */
+  static tentsAll = () => ["tents"] as const;
   static festivalTents = (festivalId: string) => ["festival-tents", festivalId] as const;
   static tentStats = (festivalId: string) => ["tent-stats", festivalId] as const;
 
@@ -172,6 +174,10 @@ export class QueryKeys {
   /** Prefix covering every cached attendance list. */
   static adminUserAttendancesAll = () => ["admin", "user-attendances"] as const;
   static adminUserGroups = (userId: string) => ["admin", "user-groups", userId] as const;
+  static adminAttendanceConsumptions = (attendanceId: string) =>
+    ["admin", "attendance-consumptions", attendanceId] as const;
+  /** Prefix covering every cached day's drinks. */
+  static adminAttendanceConsumptionsAll = () => ["admin", "attendance-consumptions"] as const;
   static adminFestivals = () => ["admin", "festivals"] as const;
   static adminFestival = (festivalId: string) => ["admin", "festival", festivalId] as const;
   /**

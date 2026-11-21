@@ -5,7 +5,7 @@ import type { User } from "@supabase/supabase-js";
 import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
-import { getUserAttendances, getUsers } from "@/app/[lang]/(private)/admin/actions";
+import { getUsers } from "@/app/[lang]/(private)/admin/actions";
 import { searchKeys, type UserSearchFilters } from "@/lib/data/search-query-keys";
 
 // Import the server actions
@@ -17,11 +17,6 @@ export interface UserSearchResult {
   totalCount: number;
   totalPages: number;
   currentPage: number;
-}
-
-export interface UserAttendancesResult {
-  attendances: Tables<"attendances">[];
-  totalCount: number;
 }
 
 /**
@@ -77,28 +72,6 @@ export function useInfiniteUserSearch(filters: Omit<UserSearchFilters, "page"> =
     initialPageParam: 1,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
-  });
-}
-
-/**
- * Hook for getting user attendances
- */
-export function useUserAttendances(
-  userId: string,
-  filters: { search?: string; page?: number; limit?: number } = {},
-) {
-  return useQuery({
-    queryKey: searchKeys.userAttendances(userId, filters),
-    queryFn: async (): Promise<UserAttendancesResult> => {
-      const attendances = await getUserAttendances(userId);
-      return {
-        attendances,
-        totalCount: attendances.length,
-      };
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
-    enabled: !!userId,
   });
 }
 

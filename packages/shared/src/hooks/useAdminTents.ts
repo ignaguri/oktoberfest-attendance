@@ -135,6 +135,7 @@ export function useUpdateAdminTent() {
       apiClient.admin.tents.update(tentId, data),
     {
       onSuccess: () => {
+        invalidateQueries(QueryKeys.tentsAll());
         invalidateQueries(QueryKeys.adminTents());
         // Every festival's list and picker, via the shared prefix rather than
         // a literal copy of it.
@@ -154,6 +155,7 @@ export function useAddAdminFestivalTent() {
       apiClient.admin.tents.addToFestival(festivalId, data),
     {
       onSuccess: (_result, variables) => {
+        invalidateQueries(QueryKeys.tentsAll());
         invalidateQueries(QueryKeys.adminFestivalTents(variables.festivalId));
         invalidateQueries(QueryKeys.adminFestivalTentsAvailable(variables.festivalId));
       },
@@ -171,6 +173,7 @@ export function useAddAllAdminFestivalTents() {
       apiClient.admin.tents.addAllToFestival(festivalId, data),
     {
       onSuccess: (_result, variables) => {
+        invalidateQueries(QueryKeys.tentsAll());
         invalidateQueries(QueryKeys.adminFestivalTents(variables.festivalId));
         invalidateQueries(QueryKeys.adminFestivalTentsAvailable(variables.festivalId));
       },
@@ -188,6 +191,7 @@ export function useCopyAdminFestivalTents() {
       apiClient.admin.tents.copyToFestival(festivalId, data),
     {
       onSuccess: (_result, variables) => {
+        invalidateQueries(QueryKeys.tentsAll());
         invalidateQueries(QueryKeys.adminFestivalTents(variables.festivalId));
         invalidateQueries(QueryKeys.adminFestivalTentsAvailable(variables.festivalId));
       },
@@ -217,6 +221,7 @@ export function useSetAdminFestivalTentPrice() {
     }) => apiClient.admin.tents.setPrice(festivalId, tentId, beerPrice),
     {
       onSuccess: (_result, variables) => {
+        invalidateQueries(QueryKeys.tentsAll());
         invalidateQueries(QueryKeys.adminFestivalTents(variables.festivalId));
       },
     },
@@ -238,6 +243,7 @@ export function useRemoveAdminFestivalTent() {
       apiClient.admin.tents.removeFromFestival(festivalId, tentId),
     {
       onSuccess: (_result, variables) => {
+        invalidateQueries(QueryKeys.tentsAll());
         invalidateQueries(QueryKeys.adminFestivalTents(variables.festivalId));
         invalidateQueries(QueryKeys.adminFestivalTentsAvailable(variables.festivalId));
       },

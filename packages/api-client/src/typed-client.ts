@@ -7,6 +7,7 @@
 
 // Import shared schema types
 import type {
+  AddAdminConsumptionInput,
   AddAdminFestivalTentInput,
   AddAllAdminFestivalTentsInput,
   AdminAttendance,
@@ -113,6 +114,7 @@ import type {
   SubmitFeedbackResponse,
   TutorialStatus,
   UpdateAdminAttendanceInput,
+  UpdateAdminConsumptionInput,
   UpdateAdminFestivalInput,
   UpdateAdminFestivalOfficialStatsInput,
   UpdateAdminGroupInput,
@@ -3308,6 +3310,66 @@ export function createTypedApiClient(config: ApiClientConfig) {
           );
           if (!response.ok) {
             await extractApiError(response, "Failed to delete attendance");
+          }
+          return parseJsonResponse<{ success: boolean }>(response);
+        },
+
+        async listConsumptions(attendanceId: string): Promise<{ consumptions: Consumption[] }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "GET",
+            `${baseUrl}/v1/admin/attendances/${attendanceId}/consumptions`,
+            { headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to fetch drinks");
+          }
+          return parseJsonResponse<{ consumptions: Consumption[] }>(response);
+        },
+
+        async addConsumption(
+          attendanceId: string,
+          data: AddAdminConsumptionInput,
+        ): Promise<{ consumption: Consumption }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "POST",
+            `${baseUrl}/v1/admin/attendances/${attendanceId}/consumptions`,
+            { method: "POST", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to add drink");
+          }
+          return parseJsonResponse<{ consumption: Consumption }>(response);
+        },
+      },
+
+      consumptions: {
+        async update(
+          consumptionId: string,
+          data: UpdateAdminConsumptionInput,
+        ): Promise<{ consumption: Consumption }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "PATCH",
+            `${baseUrl}/v1/admin/consumptions/${consumptionId}`,
+            { method: "PATCH", headers, body: JSON.stringify(data) },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to update drink");
+          }
+          return parseJsonResponse<{ consumption: Consumption }>(response);
+        },
+
+        async delete(consumptionId: string): Promise<{ success: boolean }> {
+          const headers = await getAuthHeaders();
+          const response = await fetchWithLogging(
+            "DELETE",
+            `${baseUrl}/v1/admin/consumptions/${consumptionId}`,
+            { method: "DELETE", headers },
+          );
+          if (!response.ok) {
+            await extractApiError(response, "Failed to delete drink");
           }
           return parseJsonResponse<{ success: boolean }>(response);
         },

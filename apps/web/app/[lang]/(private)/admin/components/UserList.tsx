@@ -6,12 +6,14 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import type { Tables } from "@prostcounter/db";
 import { useTranslation } from "@prostcounter/shared/i18n";
-import type { AdminAttendanceForm, AdminUserUpdateForm } from "@prostcounter/shared/schemas";
-import { AdminAttendanceFormSchema, AdminUserUpdateFormSchema } from "@prostcounter/shared/schemas";
+import { useAdminUserAttendances, useDeleteAdminAttendance } from "@prostcounter/shared/hooks";
+import type { AdminAttendance, AdminUserUpdateForm } from "@prostcounter/shared/schemas";
+import { AdminUserUpdateFormSchema } from "@prostcounter/shared/schemas";
 import type { User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDate } from "date-fns/format";
-import { Beer, Tent, Trash } from "lucide-react";
+import { parseISO } from "date-fns/parseISO";
+import { Beer, GlassWater, Tent, Trash } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "next-view-transitions";
@@ -21,7 +23,6 @@ import { UserSearch } from "@/components/admin/search/UserSearch";
 import ResponsiveDialog from "@/components/ResponsiveDialog";
 import { DataTable } from "@/components/Table/DataTable";
 import { DataTableColumnHeader } from "@/components/Table/DataTableColumnHeader";
-import TentSelector from "@/components/TentSelector";
 import {
   Accordion,
   AccordionContent,
@@ -42,33 +43,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { searchKeys } from "@/lib/data/search-query-keys";
-import { formatDateForDatabase } from "@/lib/date-utils";
 import { translateError } from "@/lib/i18n/client";
 import { logger } from "@/lib/logger";
 
-import {
-  deleteAttendance,
-  deleteUser,
-  getUserAttendances,
-  updateAttendance,
-  updateUserAuth,
-  updateUserProfile,
-} from "../actions";
+import { deleteUser, updateUserAuth, updateUserProfile } from "../actions";
+import { AttendanceDrinks } from "./AttendanceDrinks";
 
 const UserEditForm = ({
   user,
   onSubmit,
-  attendances,
-  onDeleteAttendance,
-  onFetchAttendances,
-  isFetchingAttendances,
 }: {
   user: CombinedUser;
   onSubmit: (data: AdminUserUpdateForm) => Promise<void>;
-  attendances?: AttendanceWithTents[];
-  onDeleteAttendance?: (attendanceId: string) => void;
-  onFetchAttendances?: () => void;
-  isFetchingAttendances?: boolean;
 }) => {
   const { t } = useTranslation();
   const {
@@ -150,26 +136,11 @@ const UserEditForm = ({
       <div className="mt-6">
         <Accordion type="single" collapsible>
           <AccordionItem value="attendances">
-            <AccordionTrigger onClick={onFetchAttendances} className="text-left">
-              {t("admin.users.attendances.title", {
-                count: attendances?.length || 0,
-              })}
+            <AccordionTrigger className="text-left">
+              {t("admin.users.attendances.heading")}
             </AccordionTrigger>
             <AccordionContent>
-              {isFetchingAttendances ? (
-                <div className="text-muted-foreground py-4 text-center">
-                  {t("admin.users.attendances.loading")}
-                </div>
-              ) : attendances && onDeleteAttendance ? (
-                <AttendanceTable
-                  attendances={attendances}
-                  onDeleteAttendance={onDeleteAttendance}
-                />
-              ) : (
-                <div className="text-muted-foreground py-4 text-center">
-                  {t("admin.users.attendances.clickToLoad")}
-                </div>
-              )}
+              <AttendanceTable userId={user.id} />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -178,89 +149,13 @@ const UserEditForm = ({
   );
 };
 
-const AttendanceEditForm = ({
-  attendance,
-  onSubmit,
-}: {
-  attendance: AttendanceWithTents;
-  onSubmit: (data: AdminAttendanceForm) => Promise<void>;
-}) => {
+const AttendanceTable = ({ userId }: { userId: string }) => {
   const { t } = useTranslation();
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<AdminAttendanceForm>({
-    resolver: standardSchemaResolver(AdminAttendanceFormSchema),
-    defaultValues: {
-      date: new Date(attendance.date),
-      beer_count: attendance.beer_count,
-      tent_ids: attendance.tent_ids || [],
-    },
-  });
-
-  const watchedTentIds = watch("tent_ids");
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label htmlFor="date" className="block">
-          {t("common.form.date")}
-        </Label>
-        <Input
-          type="date"
-          id="date"
-          className="border p-1"
-          errorMsg={errors.date?.message}
-          {...register("date", {
-            valueAsDate: true,
-            setValueAs: (value: string) => new Date(value),
-          })}
-        />
-        {errors.date && <div className="text-red-500">{errors.date.message}</div>}
-      </div>
-      <div>
-        <Label htmlFor="beer_count" className="block">
-          {t("attendance.beerCount")}
-        </Label>
-        <Input
-          type="number"
-          id="beer_count"
-          className="border p-1"
-          errorMsg={errors.beer_count?.message}
-          {...register("beer_count", { valueAsNumber: true })}
-        />
-        {errors.beer_count && <div className="text-red-500">{errors.beer_count.message}</div>}
-      </div>
-      <div>
-        <Label htmlFor="tents" className="block">
-          {t("common.tents")}
-        </Label>
-        <TentSelector
-          selectedTents={watchedTentIds}
-          onTentsChange={(tents) => setValue("tent_ids", tents)}
-        />
-        {errors.tent_ids && <div className="text-red-500">{errors.tent_ids.message}</div>}
-      </div>
-      <Button type="submit" disabled={isSubmitting}>
-        {t("attendance.updateAttendance")}
-      </Button>
-    </form>
-  );
-};
-
-const AttendanceTable = ({
-  attendances,
-  onDeleteAttendance,
-}: {
-  attendances: AttendanceWithTents[];
-  onDeleteAttendance: (attendanceId: string) => void;
-}) => {
-  const { t } = useTranslation();
+  const { attendances, isLoading, error } = useAdminUserAttendances(userId);
+  const deleteAttendance = useDeleteAdminAttendance();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedAttendanceId, setSelectedAttendanceId] = useState<string | null>(null);
+  const [drinksAttendance, setDrinksAttendance] = useState<AdminAttendance | null>(null);
 
   const handleDelete = useCallback((attendanceId: string) => {
     setSelectedAttendanceId(attendanceId);
@@ -268,12 +163,26 @@ const AttendanceTable = ({
   }, []);
 
   const confirmDelete = useCallback(async () => {
-    if (selectedAttendanceId) {
-      await onDeleteAttendance(selectedAttendanceId);
-      setIsDeleteDialogOpen(false);
-      setSelectedAttendanceId(null);
+    if (!selectedAttendanceId) {
+      return;
     }
-  }, [selectedAttendanceId, onDeleteAttendance]);
+    try {
+      await deleteAttendance.mutate(selectedAttendanceId);
+      toast.success(t("notifications.success.attendanceDeleted"));
+    } catch (error) {
+      logger.error(
+        "Error deleting attendance",
+        logger.clientComponent("UserList", {
+          action: "deleteAttendance",
+          attendanceId: selectedAttendanceId,
+        }),
+        error as Error,
+      );
+      toast.error(t("notifications.error.attendanceDeleteAdminFailed"));
+    }
+    setIsDeleteDialogOpen(false);
+    setSelectedAttendanceId(null);
+  }, [deleteAttendance, selectedAttendanceId, t]);
 
   const columns = useMemo(
     () => [
@@ -285,7 +194,7 @@ const AttendanceTable = ({
             title={t("admin.users.attendances.headers.date")}
           />
         ),
-        cell: ({ row }: any) => formatDate(new Date(row.original.date), "dd/MM/yyyy"),
+        cell: ({ row }: any) => formatDate(parseISO(row.original.date), "dd/MM/yyyy"),
       },
       {
         accessorKey: "beer_count",
@@ -322,19 +231,47 @@ const AttendanceTable = ({
         header: "",
         enableSorting: false,
         cell: ({ row }: any) => (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleDelete(row.original.id)}
-            className="h-8 w-8 p-0"
-          >
-            <Trash size={14} />
-          </Button>
+          <div className="flex justify-end gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDrinksAttendance(row.original)}
+              className="h-8 w-8 p-0"
+              aria-label={t("admin.users.attendances.drinks.title")}
+            >
+              <GlassWater size={14} />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleDelete(row.original.id)}
+              className="h-8 w-8 p-0"
+              aria-label={t("admin.users.attendances.buttons.delete")}
+            >
+              <Trash size={14} />
+            </Button>
+          </div>
         ),
       },
     ],
     [handleDelete, t],
   );
+
+  if (isLoading) {
+    return (
+      <div className="text-muted-foreground py-4 text-center">
+        {t("admin.users.attendances.loading")}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-muted-foreground py-4 text-center">
+        {t("notifications.error.userLoadFailed")}
+      </div>
+    );
+  }
 
   if (attendances.length === 0) {
     return (
@@ -347,6 +284,21 @@ const AttendanceTable = ({
   return (
     <>
       <DataTable columns={columns} data={attendances} />
+
+      <ResponsiveDialog
+        open={drinksAttendance !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDrinksAttendance(null);
+          }
+        }}
+        title={t("admin.users.attendances.drinks.title")}
+        description={
+          drinksAttendance ? formatDate(parseISO(drinksAttendance.date), "dd/MM/yyyy") : ""
+        }
+      >
+        {drinksAttendance && <AttendanceDrinks attendanceId={drinksAttendance.id} />}
+      </ResponsiveDialog>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogOverlay />
@@ -374,19 +326,12 @@ const AttendanceTable = ({
 };
 
 type CombinedUser = User & { profile: Tables<"profiles"> };
-interface AttendanceWithTents extends Tables<"attendances"> {
-  tent_ids?: string[];
-}
 
 const UserList = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const [attendances, setAttendances] = useState<AttendanceWithTents[]>([]);
   const [selectedUser, setSelectedUser] = useState<CombinedUser | null>(null);
-  const [selectedAttendance, setSelectedAttendance] = useState<AttendanceWithTents | null>(null);
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false);
-  const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
-  const [isFetchingAttendances, setIsFetchingAttendances] = useState(false);
 
   const handleRefresh = () => {
     // Invalidate all user search queries to trigger a refresh
@@ -395,30 +340,8 @@ const UserList = () => {
     });
   };
 
-  async function fetchAttendances(userId: string) {
-    setIsFetchingAttendances(true);
-    try {
-      const fetchedAttendances = await getUserAttendances(userId);
-      setAttendances(fetchedAttendances);
-    } catch (error) {
-      logger.error(
-        "Error fetching attendances",
-        logger.clientComponent("UserList", {
-          action: "fetchAttendances",
-          userId,
-        }),
-        error as Error,
-      );
-      toast.error(t("notifications.error.userLoadFailed"));
-    } finally {
-      setIsFetchingAttendances(false);
-    }
-  }
-
   async function handleUserSelect(user: CombinedUser) {
-    setSelectedAttendance(null);
     setSelectedUser(user);
-    setAttendances([]);
     setIsUserDialogOpen(true); // Open the dialog for user editing
   }
 
@@ -479,54 +402,6 @@ const UserList = () => {
     }
   }
 
-  async function handleDeleteAttendance(attendanceId: string) {
-    try {
-      await deleteAttendance(attendanceId);
-      toast.success(t("notifications.success.attendanceDeleted"));
-      // Refresh attendances list
-      if (selectedUser) {
-        const updatedAttendances = await getUserAttendances(selectedUser.id);
-        setAttendances(updatedAttendances);
-      }
-    } catch (error) {
-      logger.error(
-        "Error deleting attendance",
-        logger.clientComponent("UserList", {
-          action: "deleteAttendance",
-          attendanceId,
-        }),
-        error as Error,
-      );
-      toast.error(t("notifications.error.attendanceDeleteAdminFailed"));
-    }
-  }
-
-  async function handleUpdateAttendance(data: AdminAttendanceForm) {
-    try {
-      if (!selectedAttendance || !selectedUser) return;
-      await updateAttendance(selectedAttendance.id, {
-        date: formatDateForDatabase(data.date), // Convert Date to string with timezone handling
-        beer_count: data.beer_count,
-        user_id: selectedUser.id,
-        tent_ids: data.tent_ids,
-      });
-      fetchAttendances(selectedUser.id);
-      setSelectedAttendance(null);
-      toast.success(t("notifications.success.attendanceUpdated"));
-      setIsAttendanceDialogOpen(false);
-    } catch (error) {
-      logger.error(
-        "Error updating attendance",
-        logger.clientComponent("UserList", {
-          action: "updateAttendance",
-          attendanceId: selectedAttendance?.id,
-        }),
-        error as Error,
-      );
-      toast.error(t("notifications.error.attendanceUpdateAdminFailed"));
-    }
-  }
-
   return (
     <div>
       <h2 className="mb-4 text-xl font-semibold">{t("admin.users.title")}</h2>
@@ -553,61 +428,7 @@ const UserList = () => {
             <Link href={`/admin/users/${selectedUser.id}`} className="text-sm underline">
               {t("admin.analytics.timeline.open")}
             </Link>
-            <UserEditForm
-              user={selectedUser}
-              onSubmit={handleUpdateUser}
-              attendances={attendances}
-              onDeleteAttendance={handleDeleteAttendance}
-              onFetchAttendances={() => selectedUser && fetchAttendances(selectedUser.id)}
-              isFetchingAttendances={isFetchingAttendances}
-            />
-          </div>
-        )}
-      </ResponsiveDialog>
-
-      {/* Attendance Edit Dialog */}
-      <ResponsiveDialog
-        open={isAttendanceDialogOpen}
-        onOpenChange={setIsAttendanceDialogOpen}
-        title={t("admin.users.editAttendances")}
-        description={t("admin.users.editAttendancesDescription")}
-      >
-        {selectedUser && (
-          <div>
-            <h2 className="mb-2 text-xl font-semibold">
-              {t("admin.users.attendances.titleFor", {
-                name: selectedUser.profile?.full_name,
-              })}
-            </h2>
-            {attendances.map((attendance) => (
-              <div key={attendance.id} className="mb-2">
-                <span>
-                  {attendance.date.toString()} - {attendance.beer_count} {t("common.beers")}
-                </span>
-                <Button
-                  onClick={() => {
-                    setSelectedAttendance(attendance);
-                    setIsAttendanceDialogOpen(true);
-                  }}
-                  className="ml-2"
-                >
-                  {t("admin.users.attendances.buttons.edit")}
-                </Button>
-                <Button
-                  onClick={() => handleDeleteAttendance(attendance.id)}
-                  className="ml-2"
-                  variant="destructive"
-                >
-                  {t("admin.users.attendances.buttons.delete")}
-                </Button>
-              </div>
-            ))}
-            {selectedAttendance && (
-              <AttendanceEditForm
-                attendance={selectedAttendance}
-                onSubmit={handleUpdateAttendance}
-              />
-            )}
+            <UserEditForm user={selectedUser} onSubmit={handleUpdateUser} />
           </div>
         )}
       </ResponsiveDialog>

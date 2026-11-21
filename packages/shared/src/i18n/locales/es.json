@@ -141,11 +141,9 @@
       "updateNow": "Actualizar ahora"
     },
     "members": "miembros",
-    "beers": "Cervezas",
     "close": "Cerrar",
     "dismiss": "Descartar",
     "loading": "Cargando",
-    "tents": "Carpas",
     "unknownUser": "Usuario desconocido",
     "unknown": "Desconocido"
   },
@@ -609,8 +607,6 @@
   "attendance": {
     "pageTitle": "Mis asistencias",
     "addNew": "Agregar asistencia",
-    "beerCount": "{{count}} cerveza",
-    "beerCount_other": "{{count}} cervezas",
     "drinkCount": "{{count}} bebida",
     "drinkCount_other": "{{count}} bebidas",
     "drinkTypes": {
@@ -815,8 +811,7 @@
     "price": "Precio",
     "tent": {
       "selectTents": "Seleccionar carpas"
-    },
-    "updateAttendance": "Actualizar asistencia"
+    }
   },
   "achievements": {
     "pageTitle": "Logros",
@@ -1765,6 +1760,15 @@
           "beersDerived_one": "Calculado a partir de {{count}} consumición registrada. Cambiá las consumiciones para modificarlo.",
           "beersDerived_other": "Calculado a partir de {{count}} consumiciones registradas. Cambiá las consumiciones para modificarlo.",
           "beersInvalid": "Introducí un número entero, 0 o más",
+          "drinks": "Bebidas",
+          "drinksHint": "Los cambios en las bebidas se guardan al instante. Tocá una bebida para cambiar su tipo.",
+          "drinksLoading": "Cargando bebidas...",
+          "changeDrinkHint": "Muestra los tipos de bebida a los que podés cambiarla",
+          "removeDrink": "Quitar bebida",
+          "removeDrinkHint": "Borra esta bebida del día",
+          "addDrink": "Agregar",
+          "addDrinkHint": "Agrega una bebida del tipo elegido a este día",
+          "drinkError": "No se pudieron actualizar las bebidas",
           "tents": "Carpas",
           "tentsLoading": "Cargando carpas...",
           "tentsEmpty": "Este festival todavía no tiene carpas",
@@ -2040,8 +2044,6 @@
       "title": "Lista de usuarios",
       "editUser": "Editar usuario",
       "editUserDescription": "Actualizar detalles del usuario",
-      "editAttendances": "Editar asistencias",
-      "editAttendancesDescription": "Gestionar asistencias del usuario",
       "form": {
         "emailNote": "El email no se puede cambiar",
         "newPassword": "Nueva contraseña (dejalo en blanco para mantener la actual)",
@@ -2050,20 +2052,28 @@
         "updateUser": "Actualizar usuario"
       },
       "attendances": {
-        "title": "Asistencias del usuario ({{count}})",
-        "titleFor": "Asistencias de {{name}}",
+        "heading": "Asistencias",
+        "drinks": {
+          "title": "Bebidas",
+          "hint": "Los cambios se guardan al instante. Si cambiás el tipo de una bebida, se recalcula su precio.",
+          "loading": "Cargando bebidas...",
+          "empty": "No hay bebidas registradas este día.",
+          "type": "Tipo de bebida",
+          "remove": "Quitar bebida",
+          "add": "Agregar bebida",
+          "error": "No se pudieron actualizar las bebidas",
+          "loadError": "No se pudieron cargar las bebidas"
+        },
         "headers": {
           "date": "Fecha",
           "beers": "Cervezas",
           "tents": "Carpas"
         },
         "loading": "Cargando asistencias...",
-        "clickToLoad": "Hacé click para cargar asistencias",
         "empty": "No se encontraron asistencias para este usuario.",
         "deleteTitle": "Eliminar asistencia",
         "deleteConfirm": "¿Estás seguro de que querés eliminar esta asistencia?",
         "buttons": {
-          "edit": "Editar",
           "delete": "Eliminar",
           "cancel": "Cancelar"
         }
@@ -3542,7 +3552,6 @@
       "max": "¡Eso es un montón de cervezas! ¿Estás seguro?",
       "negative": "La cantidad de cervezas no puede ser negativa",
       "wholeNumber": "Debe ser un número entero",
-      "integer": "Debe ser un número entero",
       "tentRequired": "Debés seleccionar al menos una carpa si la cantidad de cervezas es 0"
     },
     "photo": {
@@ -3673,7 +3682,6 @@
       "userLoadFailed": "Error al cargar las asistencias",
       "userUpdateFailed": "Error al actualizar el usuario",
       "userDeleteFailed": "Error al eliminar el usuario",
-      "attendanceUpdateAdminFailed": "Error al actualizar la asistencia",
       "attendanceDeleteAdminFailed": "Error al eliminar la asistencia",
       "swNotSupported": "Service worker o cachés no compatibles",
       "swClearFailed": "Error al limpiar los cachés del service worker"

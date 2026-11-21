@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { DrinkTypeSchema } from "./consumption.schema";
 import { CuriousFindSchema } from "./wrapped.schema";
 
 /**
@@ -146,6 +147,20 @@ export const UpdateAdminAttendanceSchema = z.object({
 });
 
 export type UpdateAdminAttendanceInput = z.infer<typeof UpdateAdminAttendanceSchema>;
+
+/** A drink added to a day by an admin, logged at midday on the festival's clock. */
+export const AddAdminConsumptionSchema = z.object({
+  drink_type: DrinkTypeSchema,
+  tent_id: z.string().uuid().nullable().optional(),
+});
+
+export type AddAdminConsumptionInput = z.infer<typeof AddAdminConsumptionSchema>;
+
+export const UpdateAdminConsumptionSchema = z.object({
+  drink_type: DrinkTypeSchema,
+});
+
+export type UpdateAdminConsumptionInput = z.infer<typeof UpdateAdminConsumptionSchema>;
 
 // =============================================================================
 // Groups

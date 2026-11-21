@@ -130,11 +130,9 @@
       "actions": "Aktionen"
     },
     "members": "Mitglieder",
-    "beers": "Biere",
     "close": "Schließen",
     "dismiss": "Verwerfen",
     "loading": "Wird geladen",
-    "tents": "Zelte",
     "unknownUser": "Unbekannter Benutzer",
     "unknown": "Unbekannt",
     "updates": {
@@ -609,8 +607,6 @@
   "attendance": {
     "pageTitle": "Meine Besuche",
     "addNew": "Besuch hinzufügen",
-    "beerCount": "{{count}} Mass",
-    "beerCount_other": "{{count}} Mass",
     "drinkCount": "{{count}} Getränk",
     "drinkCount_other": "{{count}} Getränke",
     "drinkTypes": {
@@ -815,7 +811,6 @@
     "tent": {
       "selectTents": "Zelte auswählen"
     },
-    "updateAttendance": "Anwesenheit aktualisieren",
     "beerPicture": "Bierfoto"
   },
   "achievements": {
@@ -1942,6 +1937,15 @@
           "beersDerived_one": "Berechnet aus {{count}} erfassten Getränk. Ändere die Getränke, um das zu ändern.",
           "beersDerived_other": "Berechnet aus {{count}} erfassten Getränken. Ändere die Getränke, um das zu ändern.",
           "beersInvalid": "Gib eine ganze Zahl ab 0 ein",
+          "drinks": "Getränke",
+          "drinksHint": "Änderungen an Getränken werden sofort gespeichert. Tippe auf ein Getränk, um seine Art zu ändern.",
+          "drinksLoading": "Getränke werden geladen...",
+          "changeDrinkHint": "Zeigt die Getränkearten, in die du dieses Getränk ändern kannst",
+          "removeDrink": "Getränk entfernen",
+          "removeDrinkHint": "Löscht dieses Getränk von diesem Tag",
+          "addDrink": "Hinzufügen",
+          "addDrinkHint": "Fügt diesem Tag ein Getränk der gewählten Art hinzu",
+          "drinkError": "Die Getränke konnten nicht aktualisiert werden",
           "tents": "Zelte",
           "tentsLoading": "Zelte werden geladen...",
           "tentsEmpty": "Dieses Fest hat noch keine Zelte",
@@ -2224,23 +2228,29 @@
       },
       "editUser": "Benutzer bearbeiten",
       "editUserDescription": "Benutzerdaten aktualisieren",
-      "editAttendances": "Besuche bearbeiten",
-      "editAttendancesDescription": "Besuche des Benutzers verwalten",
       "attendances": {
-        "title": "Besuche des Benutzers ({{count}})",
-        "titleFor": "Besuche von {{name}}",
+        "heading": "Besuche",
+        "drinks": {
+          "title": "Getränke",
+          "hint": "Änderungen werden sofort gespeichert. Ändert sich die Art eines Getränks, wird sein Preis neu berechnet.",
+          "loading": "Getränke werden geladen...",
+          "empty": "An diesem Tag wurden keine Getränke erfasst.",
+          "type": "Getränkeart",
+          "remove": "Getränk entfernen",
+          "add": "Getränk hinzufügen",
+          "error": "Die Getränke konnten nicht aktualisiert werden",
+          "loadError": "Die Getränke konnten nicht geladen werden"
+        },
         "headers": {
           "date": "Datum",
           "beers": "Biere",
           "tents": "Zelte"
         },
         "loading": "Besuche werden geladen...",
-        "clickToLoad": "Klicken, um Besuche zu laden",
         "empty": "Keine Besuche für diesen Benutzer gefunden.",
         "deleteTitle": "Besuch löschen",
         "deleteConfirm": "Möchtest du diesen Besuch wirklich löschen?",
         "buttons": {
-          "edit": "Bearbeiten",
           "delete": "Löschen",
           "cancel": "Abbrechen"
         }
@@ -3719,7 +3729,6 @@
       "max": "Das sind viele Mass! Bist du sicher?",
       "negative": "Anzahl der Mass kann nicht negativ sein",
       "wholeNumber": "Muss eine ganze Zahl sein",
-      "integer": "Muss eine ganze Zahl sein",
       "tentRequired": "Mindestens ein Zelt muss ausgewählt werden, wenn die Anzahl der Mass 0 ist"
     },
     "photo": {
@@ -3850,7 +3859,6 @@
       "userLoadFailed": "Laden der Besuche fehlgeschlagen",
       "userUpdateFailed": "Aktualisierung des Benutzers fehlgeschlagen",
       "userDeleteFailed": "Löschen des Benutzers fehlgeschlagen",
-      "attendanceUpdateAdminFailed": "Aktualisierung des Besuchs fehlgeschlagen",
       "attendanceDeleteAdminFailed": "Löschen des Besuchs fehlgeschlagen",
       "swNotSupported": "Service Worker oder Caches nicht unterstützt",
       "swClearFailed": "Leeren der Service Worker-Caches fehlgeschlagen"

@@ -1,5 +1,6 @@
 import type { Database } from "@prostcounter/db";
 import type {
+  AddAdminConsumptionInput,
   AdminAttendance,
   AdminFestival,
   AdminFestivalTent,
@@ -10,6 +11,7 @@ import type {
   AdminUser,
   AdminUserGroup,
   AdminWrappedCacheEntry,
+  Consumption,
   CopyAdminFestivalTentsInput,
   ListAdminUsersResponse,
   CreateAdminFestivalInput,
@@ -20,9 +22,11 @@ import type {
   UpdateAdminTentInput,
   UpdateAdminUserAuthInput,
   UpdateAdminUserProfileInput,
+  DrinkType,
   TentCategory,
   WinningCriterion,
 } from "@prostcounter/shared";
+import { DEFAULT_DRINK_PRICES } from "@prostcounter/shared";
 import { DEFAULT_TIMEZONE } from "@prostcounter/shared/constants";
 import { ErrorCodes } from "@prostcounter/shared/errors";
 import { atZonedTime, formatDateForDatabase } from "@prostcounter/shared/utils";
@@ -30,8 +34,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { logger } from "../../lib/logger";
 import { PgErrorCode } from "../../lib/postgres-errors";
-import { ConflictError } from "../../middleware/error";
+import { ConflictError, NotFoundError } from "../../middleware/error";
 import { createAdminClient, deleteAuthUser } from "../../utils/admin-client";
+import { SupabaseConsumptionRepository, toConsumption } from "./consumption.repository";
 
 /**
  * How many auth users to request per page when building the email map.
@@ -126,11 +131,6 @@ interface WrappedCacheRow {
   updated_at: string;
   user: { username: string | null; full_name: string | null };
   festival: { name: string };
-}
-
-/** Euros to cents, the unit `beer_price_cents` and `drink_type_prices` store. */
-function toCents(beerPrice: number | null): number | null {
-  return beerPrice === null ? null : Math.round(beerPrice * 100);
 }
 
 export class SupabaseAdminRepository {
@@ -364,11 +364,20 @@ export class SupabaseAdminRepository {
     date: string,
     timezone: string,
   ): Promise<string[]> {
+    return (await this.visitsOnDay(userId, festivalId, date, timezone)).map((v) => v.id);
+  }
+
+  private async visitsOnDay(
+    userId: string,
+    festivalId: string,
+    date: string,
+    timezone: string,
+  ): Promise<{ id: string; tent_id: string | null }[]> {
     const window = dayWindowUtc(date);
 
     const { data, error } = await this.supabase
       .from("tent_visits")
-      .select("id, visit_date")
+      .select("id, tent_id, visit_date")
       .eq("user_id", userId)
       .eq("festival_id", festivalId)
       .gte("visit_date", window.start)
@@ -382,7 +391,7 @@ export class SupabaseAdminRepository {
       .filter(
         (v) => !!v.visit_date && formatDateForDatabase(new Date(v.visit_date), timezone) === date,
       )
-      .map((v) => v.id);
+      .map((v) => ({ id: v.id, tent_id: v.tent_id }));
   }
 
   /**
@@ -1010,105 +1019,187 @@ export class SupabaseAdminRepository {
   }
 
   // ===========================================================================
+  // Consumptions
+  // ===========================================================================
+
+  async listAttendanceConsumptions(attendanceId: string): Promise<Consumption[]> {
+    return new SupabaseConsumptionRepository(this.supabase).findByAttendance(attendanceId);
+  }
+
+  /**
+   * Adds a drink to a day as its owner would have logged it: priced through
+   * the cascade with the owner's tip preference. The admin asserts a day, not
+   * a time, so it is recorded at midday on the festival's clock. Without a
+   * tent, it is priced at the day's tent when exactly one was visited.
+   */
+  async addAttendanceConsumption(
+    attendanceId: string,
+    input: AddAdminConsumptionInput,
+  ): Promise<Consumption> {
+    const { data: attendance, error } = await this.supabase
+      .from("attendances")
+      .select("user_id, festival_id, date")
+      .eq("id", attendanceId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error reading attendance: ${error.message}`);
+    }
+    if (!attendance?.user_id) {
+      throw new NotFoundError("Attendance not found");
+    }
+
+    const timezone =
+      (await this.festivalTimezones([attendance.festival_id])).get(attendance.festival_id) ??
+      DEFAULT_TIMEZONE;
+
+    let tentId = input.tent_id ?? undefined;
+    if (!tentId) {
+      const dayTentIds = new Set(
+        (
+          await this.visitsOnDay(
+            attendance.user_id,
+            attendance.festival_id,
+            attendance.date,
+            timezone,
+          )
+        ).flatMap((v) => (v.tent_id ? [v.tent_id] : [])),
+      );
+      if (dayTentIds.size === 1) {
+        [tentId] = dayTentIds;
+      }
+    }
+
+    return new SupabaseConsumptionRepository(this.supabase).create(
+      attendance.user_id,
+      attendanceId,
+      {
+        drinkType: input.drink_type,
+        tentId,
+        // LogConsumptionSchema's default
+        volumeMl: 1000,
+        recordedAt: middayOn(attendance.date, timezone),
+      },
+    );
+  }
+
+  /**
+   * Changes a drink's type and re-prices it for the new type, keeping the tip
+   * the owner paid on top of the base price.
+   */
+  async updateConsumptionType(consumptionId: string, drinkType: DrinkType): Promise<Consumption> {
+    const { data: existing, error: readError } = await this.supabase
+      .from("consumptions")
+      .select(
+        "tent_id, base_price_cents, price_paid_cents, attendance:attendances!inner(festival_id)",
+      )
+      .eq("id", consumptionId)
+      .maybeSingle();
+
+    if (readError) {
+      throw new Error(`Error reading consumption: ${readError.message}`);
+    }
+    if (!existing) {
+      throw new NotFoundError("Consumption not found");
+    }
+
+    const { data: price, error: priceError } = await this.supabase.rpc("get_drink_price_cents", {
+      p_festival_id: existing.attendance.festival_id,
+      p_tent_id: existing.tent_id ?? undefined,
+      p_drink_type: drinkType,
+    });
+
+    if (priceError) {
+      throw new Error(`Error resolving drink price: ${priceError.message}`);
+    }
+
+    const basePriceCents = price ?? DEFAULT_DRINK_PRICES[drinkType];
+    const tipCents = Math.max(existing.price_paid_cents - existing.base_price_cents, 0);
+
+    const { data, error } = await this.supabase
+      .from("consumptions")
+      .update({
+        drink_type: drinkType,
+        // A custom name described the old type
+        drink_name: null,
+        base_price_cents: basePriceCents,
+        price_paid_cents: basePriceCents + tipCents,
+      })
+      .eq("id", consumptionId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Error updating consumption: ${error?.message}`);
+    }
+
+    return toConsumption(data);
+  }
+
+  /**
+   * Removes a drink. Removing the day's last one also zeroes the stored
+   * beer_count, which the view falls back to on a day without drinks.
+   */
+  async deleteConsumption(consumptionId: string): Promise<void> {
+    const { data, error } = await this.supabase
+      .from("consumptions")
+      .delete()
+      .eq("id", consumptionId)
+      .select("id, attendance_id");
+
+    if (error) {
+      throw new Error(`Error deleting consumption: ${error.message}`);
+    }
+    const attendanceId = data?.[0]?.attendance_id;
+    if (!attendanceId) {
+      throw new NotFoundError("Consumption not found");
+    }
+
+    const { count, error: countError } = await this.supabase
+      .from("consumptions")
+      .select("id", { count: "exact", head: true })
+      .eq("attendance_id", attendanceId);
+
+    if (countError) {
+      throw new Error(`Error counting consumptions: ${countError.message}`);
+    }
+    if (count !== 0) {
+      return;
+    }
+
+    const { error: clearError } = await this.supabase
+      .from("attendances")
+      .update({ beer_count: 0 })
+      .eq("id", attendanceId);
+
+    if (clearError) {
+      throw new Error(`Error clearing beer count: ${clearError.message}`);
+    }
+  }
+
+  // ===========================================================================
   // Tents
   // ===========================================================================
 
   /**
-   * Keeps `drink_type_prices` in step with a tent's beer price.
-   *
-   * Three places hold this one number: `festival_tents.beer_price` in euros,
-   * which `tent.repository` reads; `beer_price_cents`, added by the pricing
-   * overhaul; and a `drink_type_prices` row, which is the canonical source that
-   * overhaul moved to and which `pricing.repository` reads. Callers write the
-   * two columns, this writes the canonical row, and they always move together --
-   * updating one alone leaves a reader showing a stale price.
-   *
-   * Only `drink_type` "beer" is touched. The web panel's per-tent price has
-   * always been a beer price; the other drink types fall back to the festival
-   * default.
+   * Inserts festival_tents rows and their canonical beer prices in one
+   * transaction (`add_festival_tents`). Tents the festival already serves are
+   * skipped; the returned rows are the ones actually inserted.
    */
-  private async syncTentBeerPrices(
-    entries: { festivalTentId: string; priceCents: number | null }[],
-  ): Promise<void> {
-    if (entries.length === 0) {
-      return;
+  private async insertFestivalTents(
+    festivalId: string,
+    tents: { tent_id: string; beer_price: number | null }[],
+  ): Promise<{ festival_tent_id: string; tent_id: string }[]> {
+    const { data, error } = await this.supabase.rpc("add_festival_tents", {
+      p_festival_id: festivalId,
+      p_tents: tents,
+    });
+
+    if (error || !data) {
+      throw new Error(`Error adding tents to festival: ${error?.message}`);
     }
 
-    const toClear = entries.filter((e) => e.priceCents === null).map((e) => e.festivalTentId);
-    const toSet = entries.filter(
-      (e): e is { festivalTentId: string; priceCents: number } => e.priceCents !== null,
-    );
-
-    if (toClear.length > 0) {
-      // No zero row: `drink_type_prices_positive_price` rejects <= 0, so an
-      // absent price is an absent row.
-      const { error } = await this.supabase
-        .from("drink_type_prices")
-        .delete()
-        .in("festival_tent_id", toClear)
-        .eq("drink_type", "beer");
-
-      if (error) {
-        throw new Error(`Error clearing tent beer price: ${error.message}`);
-      }
-    }
-
-    if (toSet.length === 0) {
-      return;
-    }
-
-    // Read first rather than upsert. The uniqueness that would drive ON CONFLICT
-    // is a *partial* index (`drink_type_prices_tent_unique ... WHERE
-    // festival_tent_id IS NOT NULL`), and PostgREST's on_conflict cannot supply
-    // the predicate Postgres needs to infer one.
-    const { data: existing, error: existingError } = await this.supabase
-      .from("drink_type_prices")
-      .select("id, festival_tent_id")
-      .in(
-        "festival_tent_id",
-        toSet.map((e) => e.festivalTentId),
-      )
-      .eq("drink_type", "beer");
-
-    if (existingError) {
-      throw new Error(`Error reading tent beer prices: ${existingError.message}`);
-    }
-
-    const existingIdByTent = new Map(
-      (existing ?? []).map((row) => [row.festival_tent_id as string, row.id]),
-    );
-
-    const inserts = toSet
-      .filter((e) => !existingIdByTent.has(e.festivalTentId))
-      .map((e) => ({
-        festival_tent_id: e.festivalTentId,
-        drink_type: "beer" as const,
-        price_cents: e.priceCents,
-      }));
-
-    if (inserts.length > 0) {
-      const { error } = await this.supabase.from("drink_type_prices").insert(inserts);
-
-      if (error) {
-        throw new Error(`Error creating tent beer price: ${error.message}`);
-      }
-    }
-
-    for (const entry of toSet) {
-      const rowId = existingIdByTent.get(entry.festivalTentId);
-      if (!rowId) {
-        continue;
-      }
-
-      const { error } = await this.supabase
-        .from("drink_type_prices")
-        .update({ price_cents: entry.priceCents, updated_at: new Date().toISOString() })
-        .eq("id", rowId);
-
-      if (error) {
-        throw new Error(`Error updating tent beer price: ${error.message}`);
-      }
-    }
+    return data;
   }
 
   async listTents(): Promise<AdminTent[]> {
@@ -1221,7 +1312,7 @@ export class SupabaseAdminRepository {
    * Adds one catalogue tent to a festival, idempotently.
    *
    * `unique_festival_tent` covers (festival_id, tent_id), so a second add of
-   * the same tent raises 23505. That is not a bug worth a 500: the tent is
+   * the same tent inserts nothing. That is not a bug worth a 500: the tent is
    * already served, which is the state the caller asked for. The picker rows
    * are tappable while a write is in flight, so the realistic source of a
    * duplicate is one admin's double tap, and reporting a failure for an add
@@ -1236,29 +1327,13 @@ export class SupabaseAdminRepository {
     tentId: string,
     beerPrice: number | null,
   ): Promise<void> {
-    const { data, error } = await this.supabase
-      .from("festival_tents")
-      .insert({
-        festival_id: festivalId,
-        tent_id: tentId,
-        beer_price: beerPrice,
-        beer_price_cents: toCents(beerPrice),
-      })
-      .select("id")
-      .single();
+    const inserted = await this.insertFestivalTents(festivalId, [
+      { tent_id: tentId, beer_price: beerPrice },
+    ]);
 
-    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
-      if (beerPrice !== null) {
-        await this.updateFestivalTentPrice(festivalId, tentId, beerPrice);
-      }
-      return;
+    if (inserted.length === 0 && beerPrice !== null) {
+      await this.updateFestivalTentPrice(festivalId, tentId, beerPrice);
     }
-
-    if (error || !data) {
-      throw new Error(`Error adding tent to festival: ${error?.message}`);
-    }
-
-    await this.syncTentBeerPrices([{ festivalTentId: data.id, priceCents: toCents(beerPrice) }]);
   }
 
   /**
@@ -1268,8 +1343,7 @@ export class SupabaseAdminRepository {
    * admin adding a single tent in between would make one row of the batch a
    * duplicate. A plain insert fails the whole batch on that one row and adds
    * none of the other thirty, so the conflict is ignored instead: the returned
-   * rows are the ones actually inserted, which is both the count to report and
-   * the set to price.
+   * rows are the ones actually inserted, which is the count to report.
    */
   async addAllAvailableTents(festivalId: string, beerPrice: number | null): Promise<number> {
     const available = await this.listAvailableTents(festivalId);
@@ -1278,27 +1352,12 @@ export class SupabaseAdminRepository {
       return 0;
     }
 
-    const priceCents = toCents(beerPrice);
-    const { data, error } = await this.supabase
-      .from("festival_tents")
-      .upsert(
-        available.map((tent) => ({
-          festival_id: festivalId,
-          tent_id: tent.id,
-          beer_price: beerPrice,
-          beer_price_cents: priceCents,
-        })),
-        { onConflict: "festival_id,tent_id", ignoreDuplicates: true },
-      )
-      .select("id");
+    const inserted = await this.insertFestivalTents(
+      festivalId,
+      available.map((tent) => ({ tent_id: tent.id, beer_price: beerPrice })),
+    );
 
-    if (error || !data) {
-      throw new Error(`Error adding tents to festival: ${error?.message}`);
-    }
-
-    await this.syncTentBeerPrices(data.map((row) => ({ festivalTentId: row.id, priceCents })));
-
-    return data.length;
+    return inserted.length;
   }
 
   /**
@@ -1444,32 +1503,12 @@ export class SupabaseAdminRepository {
     // Ignoring the conflict rather than failing the batch, for the same reason
     // as addAllAvailableTents: the "already there" read above is a separate
     // statement, and one tent arriving in between should not cost the copy.
-    const { data, error } = await this.supabase
-      .from("festival_tents")
-      .upsert(
-        toCopy.map((row) => ({
-          festival_id: targetFestivalId,
-          tent_id: row.tent_id,
-          beer_price: priceFor(row.beer_price),
-          beer_price_cents: toCents(priceFor(row.beer_price)),
-        })),
-        { onConflict: "festival_id,tent_id", ignoreDuplicates: true },
-      )
-      .select("id, tent_id");
-
-    if (error || !data) {
-      throw new Error(`Error copying tents: ${error?.message}`);
-    }
-
-    const sourcePriceByTent = new Map(toCopy.map((row) => [row.tent_id, row.beer_price]));
-    await this.syncTentBeerPrices(
-      data.map((row) => ({
-        festivalTentId: row.id,
-        priceCents: toCents(priceFor(sourcePriceByTent.get(row.tent_id) ?? null)),
-      })),
+    const inserted = await this.insertFestivalTents(
+      targetFestivalId,
+      toCopy.map((row) => ({ tent_id: row.tent_id, beer_price: priceFor(row.beer_price) })),
     );
 
-    return data.length;
+    return inserted.length;
   }
 
   /**
