@@ -531,45 +531,6 @@ export class SupabaseProfileRepository {
     return data as Profile;
   }
 
-  async deleteProfile(userId: string): Promise<void> {
-    // Delete user's data in order (respecting foreign keys).
-    // consumptions cascade-delete via attendances (FK ON DELETE CASCADE).
-
-    await this.supabase.from("beer_pictures").delete().eq("user_id", userId);
-
-    await this.supabase.from("tent_visits").delete().eq("user_id", userId);
-
-    await this.supabase.from("attendances").delete().eq("user_id", userId);
-
-    await this.supabase.from("group_members").delete().eq("user_id", userId);
-
-    await this.supabase.from("day_plans").delete().eq("user_id", userId);
-
-    await this.supabase.from("user_achievements").delete().eq("user_id", userId);
-
-    await this.supabase.from("user_notification_preferences").delete().eq("user_id", userId);
-
-    await (this.supabase as any).from("user_locations").delete().eq("user_id", userId);
-    await (this.supabase as any)
-      .from("location_sharing_preferences")
-      .delete()
-      .eq("user_id", userId);
-
-    const { data: deleted, error } = await this.supabase
-      .from("profiles")
-      .delete()
-      .eq("id", userId)
-      .select("id");
-
-    if (error) {
-      throw new Error(`Failed to delete profile: ${error.message}`);
-    }
-
-    if (!deleted || deleted.length === 0) {
-      throw new Error(`Profile delete affected 0 rows for id=${userId}; likely RLS policy blocked`);
-    }
-  }
-
   async getTutorialStatus(userId: string): Promise<TutorialStatus> {
     const { data, error } = await this.supabase
       .from("profiles")
