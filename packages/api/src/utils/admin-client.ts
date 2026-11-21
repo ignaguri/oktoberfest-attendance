@@ -23,8 +23,8 @@ export function createAdminClient() {
 }
 
 /**
- * Deletes a user from Supabase Auth
- * Requires service role key
+ * Deletes a user's account. Removing the auth user cascades to their profile
+ * and all data that references it. Requires service role key.
  */
 export async function deleteAuthUser(userId: string): Promise<void> {
   const adminClient = createAdminClient();
