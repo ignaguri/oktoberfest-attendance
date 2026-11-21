@@ -13,7 +13,7 @@ import adminRoutes from "../admin.route";
 const mockListUsers = vi.fn();
 const mockGetUserById = vi.fn();
 const mockUpdateUserById = vi.fn();
-const mockDeleteUser = vi.fn();
+const mockDeleteAuthUser = vi.fn();
 
 vi.mock("../../utils/admin-client", () => ({
   createAdminClient: () => ({
@@ -22,11 +22,10 @@ vi.mock("../../utils/admin-client", () => ({
         listUsers: mockListUsers,
         getUserById: mockGetUserById,
         updateUserById: mockUpdateUserById,
-        deleteUser: mockDeleteUser,
       },
     },
   }),
-  deleteAuthUser: vi.fn(),
+  deleteAuthUser: (userId: string) => mockDeleteAuthUser(userId),
 }));
 
 const ADMIN_ID = "11111111-1111-4111-8111-111111111111";
@@ -59,7 +58,7 @@ describe("Admin Routes - Unit Tests", () => {
     mockListUsers.mockReset();
     mockGetUserById.mockReset();
     mockUpdateUserById.mockReset();
-    mockDeleteUser.mockReset();
+    mockDeleteAuthUser.mockReset();
 
     // Stands in for authMiddleware + requireAdmin. The guard itself is covered
     // in middleware/__tests__/require-admin.test.ts; these tests exercise the
@@ -217,14 +216,14 @@ describe("Admin Routes - Unit Tests", () => {
 
   describe("DELETE /admin/users/:userId", () => {
     it("deletes another user", async () => {
-      mockDeleteUser.mockResolvedValue({ error: null });
+      mockDeleteAuthUser.mockResolvedValue(undefined);
 
       const res = await app.request(
         createAuthRequest(`/admin/users/${OTHER_ID}`, { method: "DELETE" }),
       );
 
       expect(res.status).toBe(200);
-      expect(mockDeleteUser).toHaveBeenCalledWith(OTHER_ID);
+      expect(mockDeleteAuthUser).toHaveBeenCalledWith(OTHER_ID);
     });
 
     it("refuses to let an admin delete their own account", async () => {
@@ -233,7 +232,7 @@ describe("Admin Routes - Unit Tests", () => {
       );
 
       expect(res.status).toBe(403);
-      expect(mockDeleteUser).not.toHaveBeenCalled();
+      expect(mockDeleteAuthUser).not.toHaveBeenCalled();
     });
   });
 

@@ -295,13 +295,8 @@ const deleteProfileRoute = createRoute({
 });
 
 app.openapi(deleteProfileRoute, async (c) => {
-  const { user, supabase } = c.var;
+  const { user } = c.var;
 
-  // First delete all user data from the database
-  const profileRepo = new SupabaseProfileRepository(supabase);
-  await profileRepo.deleteProfile(user.id);
-
-  // Then delete the auth user using service role
   await deleteAuthUser(user.id);
 
   return c.json({ success: true, message: "Account deleted successfully" }, 200);

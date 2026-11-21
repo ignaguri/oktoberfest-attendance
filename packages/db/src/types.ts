@@ -3278,6 +3278,13 @@ export type Database = {
         Args: { session_uuid: string }
         Returns: boolean
       }
+      user_storage_objects: {
+        Args: { p_user_id: string }
+        Returns: {
+          bucket_id: string
+          name: string
+        }[]
+      }
       wrapped_data_version: { Args: never; Returns: number }
       wrapped_unlocks_at: { Args: { p_festival_id: string }; Returns: string }
     }
