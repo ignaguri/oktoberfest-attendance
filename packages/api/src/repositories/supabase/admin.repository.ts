@@ -128,11 +128,6 @@ interface WrappedCacheRow {
   festival: { name: string };
 }
 
-/** Euros to cents, the unit `beer_price_cents` and `drink_type_prices` store. */
-function toCents(beerPrice: number | null): number | null {
-  return beerPrice === null ? null : Math.round(beerPrice * 100);
-}
-
 export class SupabaseAdminRepository {
   /**
    * @param supabase - the caller's own client. Used for everything RLS can
@@ -1014,101 +1009,24 @@ export class SupabaseAdminRepository {
   // ===========================================================================
 
   /**
-   * Keeps `drink_type_prices` in step with a tent's beer price.
-   *
-   * Three places hold this one number: `festival_tents.beer_price` in euros,
-   * which `tent.repository` reads; `beer_price_cents`, added by the pricing
-   * overhaul; and a `drink_type_prices` row, which is the canonical source that
-   * overhaul moved to and which `pricing.repository` reads. Callers write the
-   * two columns, this writes the canonical row, and they always move together --
-   * updating one alone leaves a reader showing a stale price.
-   *
-   * Only `drink_type` "beer" is touched. The web panel's per-tent price has
-   * always been a beer price; the other drink types fall back to the festival
-   * default.
+   * Inserts festival_tents rows and their canonical beer prices in one
+   * transaction (`add_festival_tents`). Tents the festival already serves are
+   * skipped; the returned rows are the ones actually inserted.
    */
-  private async syncTentBeerPrices(
-    entries: { festivalTentId: string; priceCents: number | null }[],
-  ): Promise<void> {
-    if (entries.length === 0) {
-      return;
+  private async insertFestivalTents(
+    festivalId: string,
+    tents: { tent_id: string; beer_price: number | null }[],
+  ): Promise<{ festival_tent_id: string; tent_id: string }[]> {
+    const { data, error } = await this.supabase.rpc("add_festival_tents", {
+      p_festival_id: festivalId,
+      p_tents: tents,
+    });
+
+    if (error || !data) {
+      throw new Error(`Error adding tents to festival: ${error?.message}`);
     }
 
-    const toClear = entries.filter((e) => e.priceCents === null).map((e) => e.festivalTentId);
-    const toSet = entries.filter(
-      (e): e is { festivalTentId: string; priceCents: number } => e.priceCents !== null,
-    );
-
-    if (toClear.length > 0) {
-      // No zero row: `drink_type_prices_positive_price` rejects <= 0, so an
-      // absent price is an absent row.
-      const { error } = await this.supabase
-        .from("drink_type_prices")
-        .delete()
-        .in("festival_tent_id", toClear)
-        .eq("drink_type", "beer");
-
-      if (error) {
-        throw new Error(`Error clearing tent beer price: ${error.message}`);
-      }
-    }
-
-    if (toSet.length === 0) {
-      return;
-    }
-
-    // Read first rather than upsert. The uniqueness that would drive ON CONFLICT
-    // is a *partial* index (`drink_type_prices_tent_unique ... WHERE
-    // festival_tent_id IS NOT NULL`), and PostgREST's on_conflict cannot supply
-    // the predicate Postgres needs to infer one.
-    const { data: existing, error: existingError } = await this.supabase
-      .from("drink_type_prices")
-      .select("id, festival_tent_id")
-      .in(
-        "festival_tent_id",
-        toSet.map((e) => e.festivalTentId),
-      )
-      .eq("drink_type", "beer");
-
-    if (existingError) {
-      throw new Error(`Error reading tent beer prices: ${existingError.message}`);
-    }
-
-    const existingIdByTent = new Map(
-      (existing ?? []).map((row) => [row.festival_tent_id as string, row.id]),
-    );
-
-    const inserts = toSet
-      .filter((e) => !existingIdByTent.has(e.festivalTentId))
-      .map((e) => ({
-        festival_tent_id: e.festivalTentId,
-        drink_type: "beer" as const,
-        price_cents: e.priceCents,
-      }));
-
-    if (inserts.length > 0) {
-      const { error } = await this.supabase.from("drink_type_prices").insert(inserts);
-
-      if (error) {
-        throw new Error(`Error creating tent beer price: ${error.message}`);
-      }
-    }
-
-    for (const entry of toSet) {
-      const rowId = existingIdByTent.get(entry.festivalTentId);
-      if (!rowId) {
-        continue;
-      }
-
-      const { error } = await this.supabase
-        .from("drink_type_prices")
-        .update({ price_cents: entry.priceCents, updated_at: new Date().toISOString() })
-        .eq("id", rowId);
-
-      if (error) {
-        throw new Error(`Error updating tent beer price: ${error.message}`);
-      }
-    }
+    return data;
   }
 
   async listTents(): Promise<AdminTent[]> {
@@ -1221,7 +1139,7 @@ export class SupabaseAdminRepository {
    * Adds one catalogue tent to a festival, idempotently.
    *
    * `unique_festival_tent` covers (festival_id, tent_id), so a second add of
-   * the same tent raises 23505. That is not a bug worth a 500: the tent is
+   * the same tent inserts nothing. That is not a bug worth a 500: the tent is
    * already served, which is the state the caller asked for. The picker rows
    * are tappable while a write is in flight, so the realistic source of a
    * duplicate is one admin's double tap, and reporting a failure for an add
@@ -1236,29 +1154,13 @@ export class SupabaseAdminRepository {
     tentId: string,
     beerPrice: number | null,
   ): Promise<void> {
-    const { data, error } = await this.supabase
-      .from("festival_tents")
-      .insert({
-        festival_id: festivalId,
-        tent_id: tentId,
-        beer_price: beerPrice,
-        beer_price_cents: toCents(beerPrice),
-      })
-      .select("id")
-      .single();
+    const inserted = await this.insertFestivalTents(festivalId, [
+      { tent_id: tentId, beer_price: beerPrice },
+    ]);
 
-    if (error?.code === PgErrorCode.UNIQUE_VIOLATION) {
-      if (beerPrice !== null) {
-        await this.updateFestivalTentPrice(festivalId, tentId, beerPrice);
-      }
-      return;
+    if (inserted.length === 0 && beerPrice !== null) {
+      await this.updateFestivalTentPrice(festivalId, tentId, beerPrice);
     }
-
-    if (error || !data) {
-      throw new Error(`Error adding tent to festival: ${error?.message}`);
-    }
-
-    await this.syncTentBeerPrices([{ festivalTentId: data.id, priceCents: toCents(beerPrice) }]);
   }
 
   /**
@@ -1268,8 +1170,7 @@ export class SupabaseAdminRepository {
    * admin adding a single tent in between would make one row of the batch a
    * duplicate. A plain insert fails the whole batch on that one row and adds
    * none of the other thirty, so the conflict is ignored instead: the returned
-   * rows are the ones actually inserted, which is both the count to report and
-   * the set to price.
+   * rows are the ones actually inserted, which is the count to report.
    */
   async addAllAvailableTents(festivalId: string, beerPrice: number | null): Promise<number> {
     const available = await this.listAvailableTents(festivalId);
@@ -1278,27 +1179,12 @@ export class SupabaseAdminRepository {
       return 0;
     }
 
-    const priceCents = toCents(beerPrice);
-    const { data, error } = await this.supabase
-      .from("festival_tents")
-      .upsert(
-        available.map((tent) => ({
-          festival_id: festivalId,
-          tent_id: tent.id,
-          beer_price: beerPrice,
-          beer_price_cents: priceCents,
-        })),
-        { onConflict: "festival_id,tent_id", ignoreDuplicates: true },
-      )
-      .select("id");
+    const inserted = await this.insertFestivalTents(
+      festivalId,
+      available.map((tent) => ({ tent_id: tent.id, beer_price: beerPrice })),
+    );
 
-    if (error || !data) {
-      throw new Error(`Error adding tents to festival: ${error?.message}`);
-    }
-
-    await this.syncTentBeerPrices(data.map((row) => ({ festivalTentId: row.id, priceCents })));
-
-    return data.length;
+    return inserted.length;
   }
 
   /**
@@ -1444,32 +1330,12 @@ export class SupabaseAdminRepository {
     // Ignoring the conflict rather than failing the batch, for the same reason
     // as addAllAvailableTents: the "already there" read above is a separate
     // statement, and one tent arriving in between should not cost the copy.
-    const { data, error } = await this.supabase
-      .from("festival_tents")
-      .upsert(
-        toCopy.map((row) => ({
-          festival_id: targetFestivalId,
-          tent_id: row.tent_id,
-          beer_price: priceFor(row.beer_price),
-          beer_price_cents: toCents(priceFor(row.beer_price)),
-        })),
-        { onConflict: "festival_id,tent_id", ignoreDuplicates: true },
-      )
-      .select("id, tent_id");
-
-    if (error || !data) {
-      throw new Error(`Error copying tents: ${error?.message}`);
-    }
-
-    const sourcePriceByTent = new Map(toCopy.map((row) => [row.tent_id, row.beer_price]));
-    await this.syncTentBeerPrices(
-      data.map((row) => ({
-        festivalTentId: row.id,
-        priceCents: toCents(priceFor(sourcePriceByTent.get(row.tent_id) ?? null)),
-      })),
+    const inserted = await this.insertFestivalTents(
+      targetFestivalId,
+      toCopy.map((row) => ({ tent_id: row.tent_id, beer_price: priceFor(row.beer_price) })),
     );
 
-    return data.length;
+    return inserted.length;
   }
 
   /**

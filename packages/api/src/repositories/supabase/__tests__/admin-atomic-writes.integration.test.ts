@@ -20,8 +20,8 @@ import {
 import { SupabaseAdminRepository } from "../admin.repository";
 
 /**
- * The two admin writes that used to be several requests: activating a festival
- * and setting a tent's beer price, now one RPC each.
+ * The admin writes that used to be several requests: activating a festival,
+ * setting a tent's beer price and adding priced tents, now one RPC each.
  */
 describe("admin writes are atomic (Local DB)", () => {
   let admin: SupabaseClient<Database>;
@@ -39,11 +39,11 @@ describe("admin writes are atomic (Local DB)", () => {
     return (data ?? []).map((row) => row.id);
   }
 
-  async function tentPrices() {
+  async function tentPrices(festivalId = festival.id) {
     const { data: row } = await admin
       .from("festival_tents")
       .select("id, beer_price, beer_price_cents")
-      .eq("festival_id", festival.id)
+      .eq("festival_id", festivalId)
       .eq("tent_id", tent.id)
       .single();
     const { data: canonical } = await admin
@@ -105,6 +105,14 @@ describe("admin writes are atomic (Local DB)", () => {
     expect(await activeFestivalIds()).toEqual(before);
   });
 
+  it("adding a tent writes its price to all three places", async () => {
+    expect(await tentPrices()).toEqual({
+      beerPrice: 15.5,
+      beerPriceCents: 1550,
+      canonicalCents: 1550,
+    });
+  });
+
   it("writes the price to all three places", async () => {
     await repo.updateFestivalTentPrice(festival.id, tent.id, 16.8);
 
@@ -125,16 +133,32 @@ describe("admin writes are atomic (Local DB)", () => {
     });
   });
 
-  // Both functions are reachable straight from a client. anon has no EXECUTE,
+  it("adds an unpriced tent, twice, without a canonical row", async () => {
+    await repo.addFestivalTent(otherFestival.id, tent.id, null);
+    await repo.addFestivalTent(otherFestival.id, tent.id, null);
+
+    expect(await tentPrices(otherFestival.id)).toEqual({
+      beerPrice: null,
+      beerPriceCents: null,
+      canonicalCents: null,
+    });
+  });
+
+  // These functions are reachable straight from a client. anon has no EXECUTE,
   // and for a signed-in non-admin RLS is the gate (they are SECURITY INVOKER).
   describe("callers who are not super admins", () => {
-    it.each(["set_active_festival", "set_festival_tent_beer_price"] as const)(
+    it.each(["set_active_festival", "set_festival_tent_beer_price", "add_festival_tents"] as const)(
       "anonymous callers cannot run %s",
       async (fn) => {
-        const args =
-          fn === "set_active_festival"
-            ? { p_festival_id: festival.id }
-            : { p_festival_id: festival.id, p_tent_id: tent.id, p_beer_price: 99 };
+        const args = {
+          set_active_festival: { p_festival_id: festival.id },
+          set_festival_tent_beer_price: {
+            p_festival_id: festival.id,
+            p_tent_id: tent.id,
+            p_beer_price: 99,
+          },
+          add_festival_tents: { p_festival_id: festival.id, p_tents: [] },
+        }[fn];
 
         const { error } = await createTestSupabaseAnon().rpc(fn, args as never);
 

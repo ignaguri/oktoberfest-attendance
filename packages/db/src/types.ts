@@ -45,6 +45,7 @@ export type Database = {
           user_id: string
           user_notified_at: string | null
         }
+        ComputedFields: never
         Insert: {
           achievement_id: string
           created_at?: string
@@ -99,7 +100,7 @@ export type Database = {
       achievements: {
         Row: {
           category: Database["public"]["Enums"]["achievement_category_enum"]
-          conditions: Json
+          conditions: NonNullable<Json>
           created_at: string
           description: string
           icon: string
@@ -113,9 +114,10 @@ export type Database = {
           tier: number | null
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           category: Database["public"]["Enums"]["achievement_category_enum"]
-          conditions?: Json
+          conditions?: NonNullable<Json>
           created_at?: string
           description: string
           icon: string
@@ -131,7 +133,7 @@ export type Database = {
         }
         Update: {
           category?: Database["public"]["Enums"]["achievement_category_enum"]
-          conditions?: Json
+          conditions?: NonNullable<Json>
           created_at?: string
           description?: string
           icon?: string
@@ -157,6 +159,7 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
         }
+        ComputedFields: never
         Insert: {
           beer_count?: number
           created_at?: string | null
@@ -194,6 +197,7 @@ export type Database = {
           user_id: string
           visibility: Database["public"]["Enums"]["photo_visibility_enum"]
         }
+        ComputedFields: never
         Insert: {
           attendance_id: string
           created_at?: string
@@ -257,6 +261,7 @@ export type Database = {
           updated_at: string
           volume_ml: number | null
         }
+        ComputedFields: never
         Insert: {
           attendance_id: string
           base_price_cents: number
@@ -268,7 +273,7 @@ export type Database = {
           price_paid_cents: number
           recorded_at?: string
           tent_id?: string | null
-          tip_cents?: number | null
+          tip_cents?: never
           updated_at?: string
           volume_ml?: number | null
         }
@@ -283,7 +288,7 @@ export type Database = {
           price_paid_cents?: number
           recorded_at?: string
           tent_id?: string | null
-          tip_cents?: number | null
+          tip_cents?: never
           updated_at?: string
           volume_ml?: number | null
         }
@@ -319,6 +324,7 @@ export type Database = {
           plan_id: string
           user_id: string | null
         }
+        ComputedFields: never
         Insert: {
           created_at?: string | null
           group_id?: string | null
@@ -379,6 +385,7 @@ export type Database = {
           festival_id: string
           recipient_id: string
         }
+        ComputedFields: never
         Insert: {
           actor_id: string
           created_at?: string
@@ -453,6 +460,7 @@ export type Database = {
           user_id: string
           visible_to_groups: boolean
         }
+        ComputedFields: never
         Insert: {
           auto_checkin?: boolean | null
           created_at?: string | null
@@ -533,6 +541,7 @@ export type Database = {
           date: string
           festival_id: string
         }
+        ComputedFields: never
         Insert: {
           actor_id: string
           created_at?: string
@@ -579,6 +588,7 @@ export type Database = {
           price_cents: number
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           drink_type: Database["public"]["Enums"]["drink_type"]
@@ -628,6 +638,7 @@ export type Database = {
           rating: number | null
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           app_version?: string | null
           created_at?: string
@@ -686,6 +697,7 @@ export type Database = {
           outcome: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           day: string
@@ -734,6 +746,7 @@ export type Database = {
           rank: number
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           computed_at?: string
           criteria_id: number
@@ -778,7 +791,7 @@ export type Database = {
       }
       festival_official_stats: {
         Row: {
-          curious_finds: Json
+          curious_finds: NonNullable<Json>
           festival_id: string
           lost_items: number | null
           mass_served: number | null
@@ -787,8 +800,9 @@ export type Database = {
           updated_at: string
           visitors: number | null
         }
+        ComputedFields: never
         Insert: {
-          curious_finds?: Json
+          curious_finds?: NonNullable<Json>
           festival_id: string
           lost_items?: number | null
           mass_served?: number | null
@@ -798,7 +812,7 @@ export type Database = {
           visitors?: number | null
         }
         Update: {
-          curious_finds?: Json
+          curious_finds?: NonNullable<Json>
           festival_id?: string
           lost_items?: number | null
           mass_served?: number | null
@@ -827,6 +841,7 @@ export type Database = {
           tent_id: string
           updated_at: string | null
         }
+        ComputedFields: never
         Insert: {
           beer_price?: number | null
           beer_price_cents?: number | null
@@ -883,6 +898,7 @@ export type Database = {
           timezone: string
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           beer_cost?: number | null
           created_at?: string
@@ -934,6 +950,7 @@ export type Database = {
           status: Database["public"]["Enums"]["friendship_status"]
           updated_at: string
         }
+        ComputedFields: never
         Insert: {
           addressee_id: string
           created_at?: string
@@ -991,6 +1008,7 @@ export type Database = {
           responded_at: string | null
           status: Database["public"]["Enums"]["group_invitation_status"]
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           group_id: string
@@ -1063,6 +1081,7 @@ export type Database = {
           responded_at: string | null
           status: Database["public"]["Enums"]["group_join_request_status"]
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           group_id: string
@@ -1117,6 +1136,7 @@ export type Database = {
           joined_at: string | null
           user_id: string | null
         }
+        ComputedFields: never
         Insert: {
           group_id?: string | null
           id?: string
@@ -1172,6 +1192,7 @@ export type Database = {
           user_id: string
           visibility: Database["public"]["Enums"]["message_visibility"]
         }
+        ComputedFields: never
         Insert: {
           content: string
           created_at?: string
@@ -1232,6 +1253,7 @@ export type Database = {
           token_expiration: string | null
           winning_criteria_id: number
         }
+        ComputedFields: never
         Insert: {
           carried_over_from?: string | null
           created_at?: string | null
@@ -1301,6 +1323,7 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           apns_environment?: string | null
           created_at?: string
@@ -1343,6 +1366,7 @@ export type Database = {
           recorded_at: string
           session_id: string
         }
+        ComputedFields: never
         Insert: {
           accuracy?: number | null
           created_at?: string
@@ -1378,6 +1402,7 @@ export type Database = {
           id: string
           session_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           group_id: string
@@ -1426,6 +1451,7 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           expires_at?: string
@@ -1480,6 +1506,7 @@ export type Database = {
           notification_type: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           group_id?: string | null
@@ -1531,6 +1558,7 @@ export type Database = {
           persona_id: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           opened_at?: string
           persona_id: string
@@ -1553,6 +1581,7 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           content: string
           created_at?: string
@@ -1615,6 +1644,7 @@ export type Database = {
           photo_id: string
           reactor_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           photo_id: string
@@ -1644,6 +1674,7 @@ export type Database = {
           photo_id: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           emoji: string
@@ -1704,6 +1735,7 @@ export type Database = {
           photo_id: string
           tagged_user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           photo_id: string
@@ -1732,6 +1764,7 @@ export type Database = {
           picture_path: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           attendance_id: string
           created_at?: string
@@ -1778,6 +1811,7 @@ export type Database = {
           username: string | null
           website: string | null
         }
+        ComputedFields: never
         Insert: {
           avatar_url?: string | null
           full_name?: string | null
@@ -1827,6 +1861,7 @@ export type Database = {
           user_id: string
           visible_to_groups: boolean
         }
+        ComputedFields: never
         Insert: {
           auto_checkin?: boolean
           created_at?: string | null
@@ -1903,6 +1938,7 @@ export type Database = {
           updated_at: string
           value: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           description?: string | null
@@ -1931,6 +1967,7 @@ export type Database = {
           user_id: string
           wait_time_minutes: number | null
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           crowd_level: Database["public"]["Enums"]["crowd_level"]
@@ -1988,6 +2025,7 @@ export type Database = {
           user_id: string
           visit_date: string | null
         }
+        ComputedFields: never
         Insert: {
           festival_id: string
           id: string
@@ -2042,6 +2080,7 @@ export type Database = {
           longitude: number | null
           name: string
         }
+        ComputedFields: never
         Insert: {
           category?: string | null
           id?: string
@@ -2069,6 +2108,7 @@ export type Database = {
           unlocked_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           achievement_id: string
           festival_id?: string | null
@@ -2113,6 +2153,7 @@ export type Database = {
           request_count: number
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           app_version?: string | null
           day: string
@@ -2144,6 +2185,7 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           group_id: string
@@ -2193,6 +2235,7 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
         }
+        ComputedFields: never
         Insert: {
           achievement_notifications_enabled?: boolean | null
           checkin_enabled?: boolean | null
@@ -2248,6 +2291,7 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           hide_photos_from_all_groups?: boolean
@@ -2269,6 +2313,7 @@ export type Database = {
           id: number
           name: string
         }
+        ComputedFields: never
         Insert: {
           id?: number
           name: string
@@ -2289,8 +2334,9 @@ export type Database = {
           id: string
           updated_at: string
           user_id: string
-          wrapped_data: Json
+          wrapped_data: NonNullable<Json>
         }
+        ComputedFields: never
         Insert: {
           created_at?: string
           data_version?: number
@@ -2300,7 +2346,7 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id: string
-          wrapped_data: Json
+          wrapped_data: NonNullable<Json>
         }
         Update: {
           created_at?: string
@@ -2311,7 +2357,7 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
-          wrapped_data?: Json
+          wrapped_data?: NonNullable<Json>
         }
         Relationships: [
           {
@@ -2339,7 +2385,7 @@ export type Database = {
       }
       wrapped_shares: {
         Row: {
-          card_data: Json
+          card_data: NonNullable<Json>
           card_kind: string
           created_at: string
           festival_id: string
@@ -2349,8 +2395,9 @@ export type Database = {
           updated_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
-          card_data: Json
+          card_data: NonNullable<Json>
           card_kind: string
           created_at?: string
           festival_id: string
@@ -2361,7 +2408,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          card_data?: Json
+          card_data?: NonNullable<Json>
           card_kind?: string
           created_at?: string
           festival_id?: string
@@ -2387,6 +2434,7 @@ export type Database = {
           first_viewed_at: string
           user_id: string
         }
+        ComputedFields: never
         Insert: {
           festival_id: string
           first_viewed_at?: string
@@ -2414,14 +2462,14 @@ export type Database = {
           activity_data: Json | null
           activity_time: string | null
           activity_type:
-            | Database["public"]["Enums"]["activity_type_enum"]
-            | null
+            Database["public"]["Enums"]["activity_type_enum"] | null
           avatar_url: string | null
           festival_id: string | null
           full_name: string | null
           user_id: string | null
           username: string | null
         }
+        ComputedFields: never
         Relationships: []
       }
       attendance_with_totals: {
@@ -2429,16 +2477,17 @@ export type Database = {
           avg_price_cents: number | null
           beer_count: number | null
           created_at: string | null
-          date: string | null
+          date: string
           drink_count: number | null
-          festival_id: string | null
-          id: string | null
+          festival_id: string
+          id: string
           total_base_cents: number | null
           total_spent_cents: number | null
           total_tip_cents: number | null
           updated_at: string | null
           user_id: string | null
         }
+        ComputedFields: never
         Relationships: [
           {
             foreignKeyName: "attendances_festival_id_fkey"
@@ -2455,24 +2504,26 @@ export type Database = {
           avg_beers: number | null
           days_attended: number | null
           full_name: string | null
-          group_id: string | null
-          group_name: string | null
+          group_id: string
+          group_name: string
           total_beers: number | null
-          user_id: string | null
+          user_id: string
           username: string | null
         }
+        ComputedFields: never
         Relationships: []
       }
       tent_crowd_status: {
         Row: {
           avg_wait_minutes: number | null
           crowd_level: Database["public"]["Enums"]["crowd_level"] | null
-          festival_id: string | null
+          festival_id: string
           last_reported_at: string | null
           report_count: number | null
-          tent_id: string | null
-          tent_name: string | null
+          tent_id: string
+          tent_name: string
         }
+        ComputedFields: never
         Relationships: [
           {
             foreignKeyName: "festival_tents_festival_id_fkey"
@@ -2495,7 +2546,7 @@ export type Database = {
           avg_spent_per_day_cents: number | null
           avg_tip_per_drink_cents: number | null
           days_attended: number | null
-          festival_id: string | null
+          festival_id: string
           total_base_cents: number | null
           total_beers: number | null
           total_drinks: number | null
@@ -2503,6 +2554,7 @@ export type Database = {
           total_tips_cents: number | null
           user_id: string | null
         }
+        ComputedFields: never
         Relationships: [
           {
             foreignKeyName: "attendances_festival_id_fkey"
@@ -2517,13 +2569,14 @@ export type Database = {
         Row: {
           avg_beers: number | null
           days_attended: number | null
-          festival_id: string | null
+          festival_id: string
           total_base_cents: number | null
           total_beers: number | null
           total_spent_cents: number | null
           total_tips_cents: number | null
           user_id: string | null
         }
+        ComputedFields: never
         Relationships: [
           {
             foreignKeyName: "attendances_festival_id_fkey"
@@ -2536,18 +2589,12 @@ export type Database = {
       }
       v_user_shared_group_members: {
         Row: {
-          festival_id: string | null
+          festival_id: string
           owner_id: string | null
           viewer_id: string | null
         }
+        ComputedFields: never
         Relationships: [
-          {
-            foreignKeyName: "fk_user_id"
-            columns: ["viewer_id"]
-            isOneToOne: false
-            referencedRelation: "leaderboard"
-            referencedColumns: ["user_id"]
-          },
           {
             foreignKeyName: "fk_user_id"
             columns: ["owner_id"]
@@ -2558,13 +2605,20 @@ export type Database = {
           {
             foreignKeyName: "fk_user_id"
             columns: ["viewer_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboard"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_user_id"
+            columns: ["owner_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "fk_user_id"
-            columns: ["owner_id"]
+            columns: ["viewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -2610,6 +2664,13 @@ export type Database = {
         }
         Returns: string
       }
+      add_festival_tents: {
+        Args: { p_festival_id: string; p_tents: Json }
+        Returns: {
+          festival_tent_id: string
+          tent_id: string
+        }[]
+      }
       add_or_update_attendance_with_tents: {
         Args: {
           p_beer_count: number
@@ -2631,7 +2692,7 @@ export type Database = {
         }[]
       }
       analytics_cohort_members: {
-        Args: never
+        Args: Record<PropertyKey, never>
         Returns: {
           activated: boolean
           activated_7d: boolean
@@ -2668,7 +2729,7 @@ export type Database = {
         }[]
       }
       analytics_festival_retention: {
-        Args: never
+        Args: Record<PropertyKey, never>
         Returns: {
           attendees: number
           festival_id: string
@@ -2729,7 +2790,7 @@ export type Database = {
         }[]
       }
       analytics_signup_cohorts: {
-        Args: never
+        Args: Record<PropertyKey, never>
         Returns: {
           activated: number
           activated_7d: number
@@ -2778,8 +2839,14 @@ export type Database = {
         }
         Returns: number
       }
-      cleanup_old_location_points: { Args: never; Returns: undefined }
-      cleanup_old_rate_limit_records: { Args: never; Returns: undefined }
+      cleanup_old_location_points: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      cleanup_old_rate_limit_records: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       create_group_with_member: {
         Args: {
           p_carried_over_from?: string
@@ -2814,8 +2881,14 @@ export type Database = {
         Args: { p_attendance_id: string }
         Returns: undefined
       }
-      expire_old_location_sessions: { Args: never; Returns: undefined }
-      expire_old_locations: { Args: never; Returns: undefined }
+      expire_old_location_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      expire_old_locations: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       feed_photo_gallery_group: {
         Args: { p_festival_id: string; p_uploader_id: string }
         Returns: string
@@ -3040,7 +3113,7 @@ export type Database = {
           user_id: string
         }[]
       }
-      get_user_groups: { Args: never; Returns: string[] }
+      get_user_groups: { Args: Record<PropertyKey, never>; Returns: string[] }
       get_user_photo_global_settings: {
         Args: { p_user_id: string }
         Returns: {
@@ -3065,7 +3138,7 @@ export type Database = {
         Returns: Json
       }
       get_wrapped_festivals: {
-        Args: never
+        Args: Record<PropertyKey, never>
         Returns: {
           end_date: string
           festival_id: string
@@ -3108,13 +3181,13 @@ export type Database = {
         Args: { group_id: string; user_id: string }
         Returns: boolean
       }
-      is_super_admin: { Args: never; Returns: boolean }
+      is_super_admin: { Args: Record<PropertyKey, never>; Returns: boolean }
       join_group_with_token: {
         Args: { p_token: string; p_user_id: string }
         Returns: Json
       }
       list_my_group_invitations: {
-        Args: never
+        Args: Record<PropertyKey, never>
         Returns: {
           created_at: string
           festival_id: string
@@ -3237,7 +3310,10 @@ export type Database = {
         Args: { p_tier: number }
         Returns: Database["public"]["Enums"]["achievement_rarity_enum"]
       }
-      trigger_reservation_notifications: { Args: never; Returns: undefined }
+      trigger_reservation_notifications: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       update_personal_attendance_with_tents: {
         Args: {
           p_attendance_id?: string
@@ -3285,7 +3361,10 @@ export type Database = {
           name: string
         }[]
       }
-      wrapped_data_version: { Args: never; Returns: number }
+      wrapped_data_version: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       wrapped_unlocks_at: { Args: { p_festival_id: string }; Returns: string }
     }
     Enums: {
@@ -3309,25 +3388,14 @@ export type Database = {
         | "tent_reservation"
       crowd_level: "empty" | "moderate" | "crowded" | "full"
       drink_type:
-        | "beer"
-        | "radler"
-        | "alcohol_free"
-        | "wine"
-        | "soft_drink"
-        | "other"
+        "beer" | "radler" | "alcohol_free" | "wine" | "soft_drink" | "other"
       festival_status_enum: "upcoming" | "active" | "ended"
       festival_type_enum:
-        | "oktoberfest"
-        | "starkbierfest"
-        | "fruehlingsfest"
-        | "other"
+        "oktoberfest" | "starkbierfest" | "fruehlingsfest" | "other"
       friendship_status: "pending" | "accepted" | "declined"
       group_invitation_status: "pending" | "accepted" | "declined" | "cancelled"
       group_join_request_status:
-        | "pending"
-        | "accepted"
-        | "declined"
-        | "cancelled"
+        "pending" | "accepted" | "declined" | "cancelled"
       group_message_type: "message" | "alert"
       location_sharing_status_enum: "active" | "paused" | "expired"
       message_visibility: "groups" | "public"
@@ -3347,12 +3415,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3374,13 +3442,12 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3399,13 +3466,12 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+    keyof DefaultSchema["Tables"] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3424,13 +3490,12 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    keyof DefaultSchema["Enums"] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3443,11 +3508,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -3513,4 +3578,3 @@ export const Constants = {
     },
   },
 } as const
-

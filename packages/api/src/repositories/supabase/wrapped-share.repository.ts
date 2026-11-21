@@ -61,7 +61,7 @@ export class SupabaseWrappedShareRepository implements WrappedShareStore {
     card: ShareCard,
   ): Promise<string> {
     const writer = this.requireWriter();
-    const cardData = card as unknown as Json;
+    const cardData = card as unknown as NonNullable<Json>;
     const existing = await this.findLiveToken(userId, festivalId, kind);
     if (existing) {
       const { error } = await writer

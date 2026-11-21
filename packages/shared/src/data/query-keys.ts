@@ -85,6 +85,8 @@ export class QueryKeys {
   // Tent queries
   static tents = (festivalId: string) => ["tents", festivalId] as const;
   static allTents = () => ["tents", "all"] as const;
+  /** Prefix covering every user-facing tent list, for admin tent writes. */
+  static tentsAll = () => ["tents"] as const;
   static festivalTents = (festivalId: string) => ["festival-tents", festivalId] as const;
   static tentStats = (festivalId: string) => ["tent-stats", festivalId] as const;
 

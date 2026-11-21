@@ -1262,21 +1262,14 @@ describe("Admin Routes - Unit Tests", () => {
       const body = (await res.json()) as any;
       expect(body.copied).toBe(0);
       // No insert: overwriting would clobber the target's own price.
-      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(2);
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
     });
   });
 
   describe("POST /admin/festivals/:festivalId/tents", () => {
-    it("treats a re-add as success rather than surfacing the unique violation", async () => {
-      vi.mocked(mockSupabase.from).mockReturnValueOnce(
-        createMockChain({
-          data: null,
-          error: {
-            code: "23505",
-            message: 'duplicate key value violates unique constraint "unique_festival_tent"',
-          },
-        }),
-      );
+    it("treats a re-add as success", async () => {
+      // add_festival_tents skips a tent the festival already serves
+      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({ data: [], error: null } as never);
 
       const res = await app.request(
         createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents`, {
@@ -1289,21 +1282,18 @@ describe("Admin Routes - Unit Tests", () => {
       // A double tap on the picker should not report a failed add.
       expect(res.status).toBe(201);
       // Nothing else to do: no price came with the request.
-      expect(vi.mocked(mockSupabase.from).mock.calls.length).toBe(1);
+      expect(mockSupabase.rpc).toHaveBeenCalledTimes(1);
     });
 
     it("still applies a price sent with a duplicate add", async () => {
-      vi.mocked(mockSupabase.from)
-        // the insert, rejected by unique_festival_tent
-        .mockReturnValueOnce(
-          createMockChain({ data: null, error: { code: "23505", message: "duplicate key" } }),
-        )
-        // the read-back after the price update on the existing assignment
-        .mockReturnValueOnce(createMockChain({ data: festivalTentRow(9.5), error: null }));
-      vi.mocked(mockSupabase.rpc).mockResolvedValueOnce({
-        data: FESTIVAL_TENT_ID,
-        error: null,
-      } as never);
+      vi.mocked(mockSupabase.rpc)
+        // the insert, which skipped the existing assignment
+        .mockResolvedValueOnce({ data: [], error: null } as never)
+        .mockResolvedValueOnce({ data: FESTIVAL_TENT_ID, error: null } as never);
+      // the read-back after the price update on the existing assignment
+      vi.mocked(mockSupabase.from).mockReturnValueOnce(
+        createMockChain({ data: festivalTentRow(9.5), error: null }),
+      );
 
       const res = await app.request(
         createAuthRequest(`/admin/festivals/${FESTIVAL_ID}/tents`, {
@@ -1331,7 +1321,7 @@ describe("Admin Routes - Unit Tests", () => {
 
       // Without the cap this reaches Postgres as `numeric field overflow`.
       expect(res.status).toBe(400);
-      expect(mockSupabase.from).not.toHaveBeenCalled();
+      expect(mockSupabase.rpc).not.toHaveBeenCalled();
     });
   });
 
